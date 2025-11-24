@@ -16,9 +16,17 @@ concurrency:
 env:
   PYTHON_VERSION: '3.11'
   LINT_SCRIPT_PATH: ./lint_tuva_project.sh
+#######  DuckDB/MotherDuck
+  DBT_MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
 #######  BigQuery
   TUVA_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
   TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+#######  Databricks
+  DBT_DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+  DBT_DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+  DBT_DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+  DBT_DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+  DBT_DATABRICKS_SCHEMA: ${{ secrets.DBT_DATABRICKS_SCHEMA }}
 #######  Fabric
   DBT_FABRIC_CI_HOST: ${{ secrets.DBT_FABRIC_CI_HOST }}
   DBT_FABRIC_SERVICE_PRINCIPAL_ID: ${{ secrets.DBT_FABRIC_SERVICE_PRINCIPAL_ID }}
@@ -27,9 +35,10 @@ env:
   DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
   DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
 #######  Redshift
-  DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
-  DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
-  DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+  DBT_REDSHIFT_SERVERLESS_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+  DBT_REDSHIFT_SERVERLESS_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+  DBT_REDSHIFT_SERVERLESS_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+  DBT_REDSHIFT_SERVERLESS_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
 #######  Snowflake
   DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
   DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
@@ -134,6 +143,367 @@ jobs:
             ```text
             ${{ steps.read-lint-output.outputs.content }}
             ```
+
+#######  DuckDB/MotherDuck
+  duckdb_clinical_and_claims_enabled:
+    needs: sqlfluff-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          # Create unique database name for CI run
+          db_name = "my_db"
+          
+          # Build the MotherDuck connection string
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 4,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          
+          print(f"Created DuckDB/MotherDuck profile with database: {db_name}")
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/duckdb --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  duckdb_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: duckdb_clinical_and_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          db_name = "my_db"
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 8,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/duckdb --vars '{"use_synthetic_data": true,"claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  duckdb_claims_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: duckdb_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          db_name = "my_db"
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 4,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/duckdb --vars '{"use_synthetic_data": true,"claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  duckdb_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: duckdb_claims_prov_attribution_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          db_name = "my_db"
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 4,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/duckdb --vars '{"use_synthetic_data": true,"clinical_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  duckdb_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: duckdb_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          db_name = "my_db"
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 4,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/duckdb --vars '{"use_synthetic_data": true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
 #######  BigQuery
   bigquery_clinical_and_claims_enabled:
     needs: sqlfluff-lint
@@ -251,7 +621,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   bigquery_claims_prov_attribution_enabled:
@@ -311,7 +681,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   bigquery_clinical_enabled:
@@ -371,7 +741,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   bigquery_prov_attribution_enabled:
@@ -431,7 +801,437 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+#######  Databricks
+  databricks_clinical_and_claims_enabled:
+    needs: sqlfluff-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Certifi addresses a known certificate issue with databricks and dbt
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          # Install SSL certificates fix
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          # Use schema suffix for CI isolation
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          
+          print(f"Created Databricks profile with catalog={profile['default']['outputs']['dev']['catalog']}, schema={schema_name}")
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/databricks --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  databricks_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: databricks_clinical_and_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/databricks --vars '{"use_synthetic_data": true,"claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  databricks_claims_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: databricks_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/databricks --vars '{"use_synthetic_data": true,"claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  databricks_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: databricks_claims_prov_attribution_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/databricks --vars '{"use_synthetic_data": true,"clinical_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  databricks_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: databricks_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/databricks --vars '{"use_synthetic_data": true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
 #######  Fabric
@@ -521,7 +1321,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   fabric_claims_prov_attribution_enabled:
@@ -566,7 +1366,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   fabric_clinical_enabled:
@@ -611,7 +1411,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   fabric_prov_attribution_enabled:
@@ -656,7 +1456,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
 #######  Redshift
@@ -670,26 +1470,65 @@ jobs:
           ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift        
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-build
+      - name: dbt build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -707,32 +1546,71 @@ jobs:
           ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift        
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true}'
+          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   redshift_claims_prov_attribution_enabled:
@@ -745,20 +1623,59 @@ jobs:
           ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift        
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
@@ -770,7 +1687,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   redshift_clinical_enabled:
@@ -783,20 +1700,59 @@ jobs:
           ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift        
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
@@ -808,7 +1764,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   redshift_prov_attribution_enabled:
@@ -821,20 +1777,59 @@ jobs:
           ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift        
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
@@ -846,7 +1841,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
 #######  Snowflake
@@ -922,7 +1917,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   snowflake_claims_prov_attribution_enabled:
@@ -960,7 +1955,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   snowflake_clinical_enabled:
@@ -998,7 +1993,7 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
   snowflake_prov_attribution_enabled:
@@ -1036,18 +2031,66 @@ jobs:
 
       - name: Get the result
         if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
+        shell: bash
+
+  snowflake_semantic_layer_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      # Changed to compile to save processing time
+      - name: dbt-compile
+        run: |
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"claims_enabled":true,"semantic_layer_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-compile.outputs.result }}"
         shell: bash
 
 #######  Post message to the PR with the status of each job (i.e. success or failure)
   post_status_to_PR:
     needs: [
       sqlfluff-lint,
+      duckdb_clinical_and_claims_enabled,
+      duckdb_claims_enabled,
+      duckdb_claims_prov_attribution_enabled,
+      duckdb_clinical_enabled,
+      duckdb_prov_attribution_enabled,
       bigquery_clinical_and_claims_enabled,
       bigquery_claims_enabled,
       bigquery_claims_prov_attribution_enabled,
       bigquery_clinical_enabled,
-      fabric_prov_attribution_enabled,
+      bigquery_prov_attribution_enabled,
+      databricks_clinical_and_claims_enabled,
+      databricks_claims_enabled,
+      databricks_claims_prov_attribution_enabled,
+      databricks_clinical_enabled,
+      databricks_prov_attribution_enabled,
       fabric_clinical_and_claims_enabled,
       fabric_claims_enabled,
       fabric_claims_prov_attribution_enabled,
@@ -1062,7 +2105,8 @@ jobs:
       snowflake_claims_enabled,
       snowflake_claims_prov_attribution_enabled,
       snowflake_clinical_enabled,
-      snowflake_prov_attribution_enabled
+      snowflake_prov_attribution_enabled,
+      snowflake_semantic_layer_enabled
     ]
     if: always()
     runs-on: ubuntu-latest
@@ -1074,9 +2118,15 @@ jobs:
         run: |
           PR_COMMENT="Workflow has finished with the following statuses:
           <ul><li>Linter: ${{ needs.sqlfluff-lint.result }}</li></ul>
+          <ul><li>DuckDB Clinical and Claims: ${{ needs.duckdb_clinical_and_claims_enabled.result }}</li></ul>
+          <ul><li>DuckDB Claims: ${{ needs.duckdb_claims_enabled.result }}</li></ul>
+          <ul><li>DuckDB Clinical: ${{ needs.duckdb_clinical_enabled.result }}</li></ul>
           <ul><li>BigQuery Clinical and Claims: ${{ needs.bigquery_clinical_and_claims_enabled.result }}</li></ul>
           <ul><li>BigQuery Claims: ${{ needs.bigquery_claims_enabled.result }}</li></ul>
           <ul><li>BigQuery Clinical: ${{ needs.bigquery_clinical_enabled.result }}</li></ul>
+          <ul><li>Databricks Clinical and Claims: ${{ needs.databricks_clinical_and_claims_enabled.result }}</li></ul>
+          <ul><li>Databricks Claims: ${{ needs.databricks_claims_enabled.result }}</li></ul>
+          <ul><li>Databricks Clinical: ${{ needs.databricks_clinical_enabled.result }}</li></ul>
           <ul><li>Fabric Clinical and Claims: ${{ needs.fabric_clinical_and_claims_enabled.result }}</li></ul>
           <ul><li>Fabric Claims: ${{ needs.fabric_claims_enabled.result }}</li></ul>
           <ul><li>Fabric Clinical: ${{ needs.fabric_clinical_enabled.result }}</li></ul>
@@ -1085,7 +2135,8 @@ jobs:
           <ul><li>Redshift Clinical: ${{ needs.redshift_clinical_enabled.result }}</li></ul>
           <ul><li>Snowflake Clinical and Claims: ${{ needs.snowflake_clinical_and_claims_enabled.result }}</li></ul>
           <ul><li>Snowflake Claims: ${{ needs.snowflake_claims_enabled.result }}</li></ul>
-          <ul><li>Snowflake Clinical: ${{ needs.snowflake_clinical_enabled.result }}</li></ul>"
+          <ul><li>Snowflake Clinical: ${{ needs.snowflake_clinical_enabled.result }}</li></ul>
+          <ul><li>Snowflake Semantic Layer: ${{ needs.snowflake_semantic_layer_enabled.result }}</li></ul>"
           PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
           gh pr comment $PR_ID --body "$PR_COMMENT"
         env:
