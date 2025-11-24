@@ -205,7 +205,9 @@ with stg_eligibility as (
             when enrollment_status = 'New' and payment_year_age between 35 and 44 then '35-44'
             when enrollment_status = 'New' and payment_year_age between 45 and 54 then '45-54'
             when enrollment_status = 'New' and payment_year_age between 55 and 59 then '55-59'
-            when enrollment_status = 'New' and payment_year_age between 60 and 64 then '60-64'
+            when enrollment_status = 'New' and payment_year_age between 60 and 63 then '60-64'
+            when enrollment_status = 'New' and enrollment_status != 'Aged' and payment_year_age = 64 then '60-64'
+            when enrollment_status = 'New' and enrollment_status = 'Aged' and payment_year_age = 64 then '65'            
             when enrollment_status = 'New' and payment_year_age = 65 then '65'
             when enrollment_status = 'New' and payment_year_age = 66 then '66'
             when enrollment_status = 'New' and payment_year_age = 67 then '67'
@@ -223,14 +225,13 @@ with stg_eligibility as (
 )
 
 , add_status_logic as (
-
     select
           person_id
         , payer
         , payment_year
         , collection_start_date
         , collection_end_date
-        , case when original_reason_entitlement_code in ('2','3') then 'ESRD' else enrollment_status end as enrollment_status
+        , case when original_reason_entitlement_code in ('2', '3') then 'ESRD' else enrollment_status end as enrollment_status
         , case
             when gender = 'female' then 'Female'
             when gender = 'male' then 'Male'
