@@ -25,7 +25,6 @@ with stg_eligibility as (
         , elig.original_reason_entitlement_code
         , elig.dual_status_code
         , elig.medicare_status_code
-        , elig.enrollment_status
         , dates.collection_year
         , dates.payment_year
         , dates.collection_start_date
@@ -143,18 +142,17 @@ with stg_eligibility as (
         , stg_eligibility.medicare_status_code
         /* Defaulting to "New" enrollment status when missing */
         , case
-            when stg_eligibility.enrollment_status is not null then stg_eligibility.enrollment_status
             when add_enrollment.enrollment_status is null then 'New'
             else add_enrollment.enrollment_status
           end as enrollment_status
         {% if target.type == 'fabric' %}
             , case
-                when add_enrollment.enrollment_status is null and stg_eligibility.enrollment_status is null then 1
+                when add_enrollment.enrollment_status is null then 1
                 else 0
               end as enrollment_status_default
         {% else %}
             , case
-                when add_enrollment.enrollment_status is null and stg_eligibility.enrollment_status is null then true
+                when add_enrollment.enrollment_status is null then true
                 else false
               end as enrollment_status_default
         {% endif %}
