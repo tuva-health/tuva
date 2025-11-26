@@ -21,7 +21,6 @@ with conditions as (
 
     select
           person_id
-        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , observation_date
         , result
         , code_type
@@ -35,7 +34,6 @@ with conditions as (
 
     select
           person_id
-        , payer
         , observation_date
         {% if target.type in ['fabric', 'duckdb', 'databricks'] %}
          , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
@@ -90,7 +88,6 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , numeric_observations.payer
         , numeric_observations.observation_date
         , numeric_observations.result
         , numeric_observations.code_type
@@ -167,7 +164,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , numeric_observations.payer
+        , obstructive_sleep_apnea.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -182,6 +179,7 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join obstructive_sleep_apnea
             on numeric_observations.person_id = obstructive_sleep_apnea.person_id
+            and 
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
         inner join seed_hcc_descriptions
@@ -195,7 +193,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , numeric_observations.payer
+        , diabetes.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -224,7 +222,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , numeric_observations.payer
+        , hypertension.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -253,7 +251,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , numeric_observations.payer
+        , CAST('clinical source' {{ dbt.type_string() }}) as payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -327,7 +325,6 @@ with conditions as (
 
     select
           depression_assessment.person_id
-        , depression_assessment.payer
         , depression_assessment.observation_date
         , depression_assessment.result
         , depression_assessment.code_type
@@ -338,7 +335,6 @@ with conditions as (
             partition by
                   depression_assessment.person_id
                 , depression_assessment.data_source
-                , depression_assessment.payer
             order by
                 case when depression_assessment.observation_date is null then 1 else 0 end
                 , depression_assessment.observation_date desc
@@ -351,7 +347,6 @@ with conditions as (
 
     select
           person_id
-        , payer
         , observation_date
         , code_type
         , code
@@ -361,7 +356,6 @@ with conditions as (
         , ROW_NUMBER() over (
             partition by
                   person_id
-                , payer
                 , data_source
             --order by result desc nulls last
             order by
@@ -377,7 +371,7 @@ with conditions as (
 
     select
           depression_assessments_ordered.person_id
-        , depression_assessments_ordered.payer
+        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , depression_assessments_ordered.data_source
         , depression_assessments_ordered.observation_date
         , depression_assessments_ordered.result as observation_result
