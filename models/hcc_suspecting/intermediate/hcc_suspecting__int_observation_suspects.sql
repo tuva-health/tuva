@@ -456,7 +456,7 @@ with conditions as (
 
     select
           CAST(person_id as {{ dbt.type_string() }}) as person_id
-        , CAST(payer as {{ dbt.type_string() }}) as payer
+        , payer
         , CAST(data_source as {{ dbt.type_string() }}) as data_source
         , CAST(observation_date as date) as observation_date
         , CAST(observation_result as {{ dbt.type_string() }}) as observation_result
