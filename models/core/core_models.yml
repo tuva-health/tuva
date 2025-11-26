@@ -2,7 +2,7 @@ version: 2
 models:
   - name: core__appointment
     description: |
-      The core appointment table contains information related to appointments at  a healthcare facility. This table may include canceled, completed,  or scheduled events.
+      The core appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed,  or scheduled events.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1422,7 +1422,7 @@ models:
         meta:
           data_type: timestamp
   - name: core__member_months
-    description: Creates member months from eligibility data
+    description: The core member months tables has one record per member per month in the eligibility source data.  Members without claims are included in this data table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1492,7 +1492,7 @@ models:
         description: Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).
   - name: core__observation
     description: |
-      The observation table contains information on measurements other than  lab tests e.g. blood pressure, height, and weight.
+      The observation table contains information on measurements other than lab tests e.g. blood pressure, height, and weight.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1507,50 +1507,92 @@ models:
           - unique:
               config:
                 severity: warn
+        meta:
+          data_type: varchar
+          is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
         tests:
           - not_null
+        meta:
+          data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        meta:
+          data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        meta:
+          data_type: varchar
       - name: panel_id
         description: Unique identifier for the panel.
+        meta:
+          data_type: varchar
       - name: observation_date
         description: Date the observation was recorded.
+        meta:
+          data_type: date
       - name: observation_type
         description: Type of observation.
+        meta:
+          data_type: varchar
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         meta:
           terminology: https://thetuvaproject.com/terminology/code-type
+          data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        meta:
+          data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        meta:
+          data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
+        meta:
+          data_type: varchar
       - name: normalized_code
         description: The normalized code.
+        meta:
+          data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
+        meta:
+          data_type: varchar
       - name: mapping_method
         description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        meta:
+          data_type: varchar
       - name: result
         description: The result of the record (e.g., lab test, observation, etc).
+        meta:
+          data_type: varchar
       - name: source_units
         description: Source units of the lab test.
+        meta:
+          data_type: varchar
       - name: normalized_units
         description: Normalized units of the lab test.
+        meta:
+          data_type: varchar
       - name: source_reference_range_low
         description: The low end of the reference range from the source system.
+        meta:
+          data_type: varchar
       - name: source_reference_range_high
         description: The high end of the reference range from the source system.
+        meta:
+          data_type: varchar
       - name: normalized_reference_range_low
         description: The normalized low end of the reference range.
+        meta:
+          data_type: varchar
       - name: normalized_reference_range_high
         description: The normalized high end of the reference range.
+        meta:
+          data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
         meta:
@@ -1931,7 +1973,7 @@ models:
           data_type: timestamp
   - name: core__procedure
     description: |
-      The procedure table contains information on procedures that were performed  on patients in the dataset.
+      The procedure table contains information on procedures that were performed on patients in the dataset.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1946,71 +1988,103 @@ models:
           - unique:
               config:
                 severity: warn
+        meta:
+          data_type: varchar
+          is_primary_key: true
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        meta:
+          data_type: varchar
       - name: claim_id
         description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        meta:
+          data_type: varchar
       - name: person_id
         description: Unique identifier for each person in the dataset.
         tests:
           - not_null
+        meta:
+          data_type: varchar
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        meta:
+          data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        meta:
+          data_type: varchar
       - name: procedure_date
         description: Date when the procedure was performed.
+        meta:
+          data_type: varchar
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         meta:
           terminology: https://thetuvaproject.com/terminology/code-type
+          data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
         meta:
           terminology: https://thetuvaproject.com/terminology/icd-10-pcs
           terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+          data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        meta:
+          data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
         meta:
           terminology: https://thetuvaproject.com/terminology/code-type
+          data_type: varchar
       - name: normalized_code
         description: The normalized code.
         meta:
           terminology: https://thetuvaproject.com/terminology/icd-10-pcs
           terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+          data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: mapping_method
         description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        meta:
+          data_type: varchar
       - name: modifier_1
         description: First modifier for the procedure code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: modifier_2
         description: Second modifier for the procedure code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: modifier_3
         description: Third modifier for the procedure code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: modifier_4
         description: Fourth modifier for the procedure code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: modifier_5
         description: Fifth modifier for the procedure code.
         meta:
           terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
+          data_type: varchar
       - name: practitioner_id
         description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
         meta:
+          data_type: varchar
+        meta:
           terminology: https://thetuvaproject.com/terminology/provider
           terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+          data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
         meta:
