@@ -18,12 +18,12 @@ with conditions as (
 
 )
 
-, seed_hcc_mapping as (
+, seed_hcc_mapping_base as (
 
     select
           payment_year
         , diagnosis_code
-        , cms_hcc_v28 as hcc_code
+        , cms_hcc_v28 as diagnosis_code
         , 'CMS-HCC-V28' as model_version
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
     where cms_hcc_v28_flag = 'Yes'
@@ -37,6 +37,23 @@ with conditions as (
         , 'CMS-HCC-V24' as model_version
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
     where cms_hcc_v24_flag = 'Yes'
+)
+
+, seed_hcc_mapping as (
+select
+      payment_year
+    , diagnosis_code
+    , hcc_code
+    , model_version
+from seed_hcc_mapping_base
+union all
+select
+      payment_year + 1 as payment_year
+    , diagnosis_code
+    , hcc_code
+    , model_version
+from seed_hcc_mapping_base
+where payment_year = (select max(payment_year) as payment_year from seed_hcc_mapping_base)    
 )
 
 -- Add in support for v24
