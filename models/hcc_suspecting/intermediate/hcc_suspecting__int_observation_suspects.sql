@@ -21,7 +21,7 @@ with conditions as (
 
     select
           person_id
-        , cast('clinical source' as {{ dbt.type_string() }}) as payer
+        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , observation_date
         , result
         , code_type
@@ -467,7 +467,7 @@ with conditions as (
         , CAST(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , CAST(hcc_description as {{ dbt.type_string() }}) as hcc_description
         {% if target.type == 'fabric' %}
-            , cast(current_year_billed as bit) as current_year_billed
+            , CAST(current_year_billed as bit) as current_year_billed
         {% else %}
             , CAST(current_year_billed as boolean) as current_year_billed
         {% endif %}
