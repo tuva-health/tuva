@@ -179,7 +179,6 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join obstructive_sleep_apnea
             on numeric_observations.person_id = obstructive_sleep_apnea.person_id
-            and 
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
         inner join seed_hcc_descriptions
