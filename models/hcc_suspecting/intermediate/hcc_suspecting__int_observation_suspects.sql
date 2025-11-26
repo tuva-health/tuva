@@ -21,7 +21,7 @@ with conditions as (
 
     select
           person_id
-        , 'clinical source' as payer
+        , cast('clinical source' as {{ dbt.type_string() }}) as payer
         , observation_date
         , result
         , code_type
@@ -338,6 +338,7 @@ with conditions as (
             partition by
                   depression_assessment.person_id
                 , depression_assessment.data_source
+                , depression_assessment.payer
             order by
                 case when depression_assessment.observation_date is null then 1 else 0 end
                 , depression_assessment.observation_date desc
@@ -456,7 +457,7 @@ with conditions as (
 
     select
           CAST(person_id as {{ dbt.type_string() }}) as person_id
-        , payer
+        , CAST(payer as {{ dbt.type_string() }}) as payer
         , CAST(data_source as {{ dbt.type_string() }}) as data_source
         , CAST(observation_date as date) as observation_date
         , CAST(observation_result as {{ dbt.type_string() }}) as observation_result
