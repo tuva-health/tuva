@@ -2,7 +2,6 @@ version: 2
 models:
   - name: input_layer__immunization
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
       The immunization table contains information about immunizations administered to patients.
     config:
       schema: |
@@ -11,213 +10,325 @@ models:
       materialized: view
     columns:
       - name: immunization_id
-        description: '{{ doc("immunization_id") }}'
+        description: Unique identifier for each immunization.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
           - unique:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: error
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - not_null:
               config:
                 severity: error
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+        meta:
+          data_type: varchar
+          is_primary_key: true
       - name: person_id
-        description: '{{ doc("person_id") }}'
+        description: Unique identifier for each person in the dataset.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
           - not_null:
               config:
                 severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: patient_id
-        description: '{{ doc("patient_id") }}'
+        description: Identifier that links a patient to a particular clinical source system.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: encounter_id
-        description: '{{ doc("encounter_id") }}'
+        description: Unique identifier for each encounter in the dataset.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: source_code_type
-        description: '{{ doc("source_code_type") }}'
+        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: source_code
-        description: '{{ doc("source_code") }}'
+        description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: source_description
-        description: '{{ doc("source_description") }}'
+        description: Description of the source code in the source system.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: normalized_code_type
-        description: '{{ doc("normalized_code_type") }}'
+        description: The normalized type of code.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: normalized_code
-        description: '{{ doc("normalized_code") }}'
+        description: The normalized code.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: normalized_description
-        description: '{{ doc("normalized_description") }}'
+        description: Normalized description of the code.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: status
-        description: '{{ doc("status") }}'
+        description: Status of the record (e.g., condition, test, etc).
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: status_reason
-        description: '{{ doc("status_reason") }}'
+        description: Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: occurrence_date
-        description: '{{ doc("occurrence_date") }}'
+        description: Date the event occured or was to be occured.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
           - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: date
       - name: source_dose
-        description: '{{ doc("source_dose") }}'
+        description: The quantity of vaccine product that was administered.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: normalized_dose
-        description: '{{ doc("normalized_dose") }}'
+        description: Normalized quantity of vaccine product that was administered.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: lot_number
-        description: '{{ doc("lot_number") }}'
+        description: Lot number of the vaccine product.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: body_site
-        description: '{{ doc("body_site") }}'
+        description: The body site where the vaccine was administered.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: route
-        description: '{{ doc("route") }}'
+        description: The route used to administer the medication and/or vaccine.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: location_id
-        description: '{{ doc("location_id") }}'
+        description: Unique identifier for each location.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: practitioner_id
-        description: '{{ doc("practitioner_id") }}'
+        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: data_source
-        description: '{{ doc("data_source") }}'
+        description: User-configured field that indicates the data source.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
+          is_primary_key: true
       - name: file_name
-        description: '{{ doc("file_name") }}'
+        description: The file name of the source file.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: ingest_datetime
-        description: '{{ doc("ingest_datetime") }}'
+        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
+              tags:
+                - tuva_dqi_sev_1
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, time, timestamp, timestamp_ntz, 
-                timestampntz, timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp 
-                  with time zone, timestamp without time zone, datetime2, datetimeoffset]
-              tags: ['tuva_dqi_sev_2', 'dqi']
+              column_type_list:
+                - date
+                - datetime
+                - time
+                - timestamp
+                - timestamp_ntz
+                - timestampntz
+                - timestamp_ltz
+                - timestampltz
+                - timestamp_tz
+                - timestamptz
+                - timestamp with time zone
+                - timestamp without time zone
+                - datetime2
+                - datetimeoffset
+              tags:
+                - tuva_dqi_sev_2
+                - dqi
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: timestamp
