@@ -4,7 +4,7 @@
 }}
 
 select
-    cast(medication_id as {{ dbt.type_string() }}) as medication_id
+      cast(medication_id as {{ dbt.type_string() }}) as medication_id
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(patient_id as {{ dbt.type_string() }}) as patient_id
     , cast(encounter_id as {{ dbt.type_string() }}) as encounter_id

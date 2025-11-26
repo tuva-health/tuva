@@ -12,12 +12,12 @@ with all_conditions as (
     select *
     from {{ ref('core__stg_claims_condition') }}
     union all
-    select *
-    from {{ ref('core__stg_clinical_condition') }}
+    select cond.*, 'clinical source' as payer
+    from {{ ref('core__stg_clinical_condition') }} as cond
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-    select *
+    select *, 'clinical source' as payer
     from {{ ref('core__stg_clinical_condition') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -33,6 +33,7 @@ with all_conditions as (
 {% if var('enable_normalize_engine',false) != true %}
 select
     all_conditions.condition_id
+  , all_conditions.payer
   , all_conditions.person_id
   , all_conditions.member_id
   , all_conditions.patient_id
@@ -84,11 +85,12 @@ left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
 
 
 
-{#  This code is only exectued if an enable_normalize_engine var is defined and set to true
+{#  This code is only executed if an enable_normalize_engine var is defined and set to true
     it expects a seed file called  #}
 {% else %}
 select
     all_conditions.condition_id
+  , all_conditions.payer
   , all_conditions.person_id
   , all_conditions.member_id
   , all_conditions.patient_id

@@ -7,6 +7,7 @@ with demographics as (
 
     select
           person_id
+        , payer
         , enrollment_status
         , medicaid_status
         , dual_status
@@ -41,6 +42,7 @@ with demographics as (
 
     select
           person_id
+        , payer
         , hcc_code
         , model_version
         , payment_year
@@ -54,6 +56,7 @@ with demographics as (
 
     select
           demographics.person_id
+        , demographics.payer
         , demographics.enrollment_status
         , demographics.medicaid_status
         , demographics.dual_status
@@ -67,11 +70,13 @@ with demographics as (
     from demographics
         inner join hcc_hierarchy
             on demographics.person_id = hcc_hierarchy.person_id
+            and demographics.payer = hcc_hierarchy.payer
             and demographics.model_version = hcc_hierarchy.model_version
             and demographics.payment_year = hcc_hierarchy.payment_year
             and demographics.collection_end_date = hcc_hierarchy.collection_end_date
     group by
           demographics.person_id
+        , demographics.payer
         , demographics.enrollment_status
         , demographics.medicaid_status
         , demographics.dual_status
@@ -88,6 +93,7 @@ with demographics as (
 
     select
           person_id
+        , payer
         , enrollment_status
         , medicaid_status
         , dual_status
@@ -109,6 +115,7 @@ with demographics as (
 
     select
           hcc_counts_normalized.person_id
+        , hcc_counts_normalized.payer
         , hcc_counts_normalized.model_version
         , hcc_counts_normalized.payment_year
         , hcc_counts_normalized.collection_start_date
@@ -132,6 +139,7 @@ with demographics as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -145,6 +153,7 @@ with demographics as (
 
 select
       person_id
+    , payer
     , description
     , coefficient
     , factor_type

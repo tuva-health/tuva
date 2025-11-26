@@ -5,6 +5,7 @@
 
 select
       person_id
+    , payer
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default
