@@ -2,7 +2,8 @@ version: 2
 models:
   - name: input_layer__patient
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer. The patient table contains demographic and geographic information on  patients.
+      The patient table contains demographic and geographic information on  patients.  Patients in this table may have more than 1 record,
+      since their source system ID (i.e. patient_id) may change over time.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -569,6 +570,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: The file name of the source file.
         tests:

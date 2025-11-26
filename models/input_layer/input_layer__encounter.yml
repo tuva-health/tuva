@@ -2,10 +2,11 @@ version: 2
 models:
   - name: input_layer__encounter
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
       The encounter table contains information about patients visits (i.e. 
       encounters).  This includes acute inpatient, emergency department, office 
-      visits, SNF stays, etc.
+      visits, SNF stays, and other types of visits.  It's important to map the 
+      encounter_type field correctly for clinical data--in claims data this field is determined
+      automatically.  
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -513,6 +514,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: The file name of the source file.
         tests:

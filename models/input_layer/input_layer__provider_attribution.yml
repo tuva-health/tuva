@@ -2,7 +2,11 @@ version: 2
 models:
   - name: input_layer__provider_attribution
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer. The provider_attribution table assigns a provider to each patient-member_month of eligibility. The user may assign both a payer attributed provider (as typically assigned by the payer in VBC contracts) as well as custom attributed provider (typically determined by the user). Fields related to each attributed provider (practice, organization, line of business)are also present.
+      The provider_attribution table assigns a provider to each patient-member_month of eligibility. The user may 
+      assign both a payer attributed provider (as typically assigned by the payer in VBC contracts) as well as custom 
+      attributed provider (typically determined by the user). Fields related to each attributed provider (practice, 
+      organization, line of business) are also present.  This table allows you to input a custom attribution assigment from 
+      another system.  You can also use the Provider Attribution data mart to do this assignment by using your claims data.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -81,6 +85,8 @@ models:
               config:
                 severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+        meta:
+          data_type: varchar
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.
         tests:

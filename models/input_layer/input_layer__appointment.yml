@@ -2,10 +2,9 @@ version: 2
 models:
   - name: input_layer__appointment
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
       The appointment table contains information related to appointments at a 
       healthcare facility. This table may include canceled, completed, 
-      or scheduled events.
+      or scheduled appointments.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -559,6 +558,7 @@ models:
                 enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: The file name of the source file.
         tests:

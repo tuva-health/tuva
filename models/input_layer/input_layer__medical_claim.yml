@@ -5,7 +5,9 @@ models:
       The medical_claim table contains information on healthcare services and supplies provided to patients, 
       billed by providers, and paid for by health insurers. It includes information on the provider who rendered 
       the service, the amount paid for the service by the health insurer, and the underlying reason for the 
-      service (i.e. diagnosis).
+      service (i.e. diagnosis).  Medical claims data may include original, adjusted, reversed, or final claims.  It is up
+      to the person mapping the dataset to make the correct determination about these nuances and filter out all but
+      final claims -- otherwise key metrics such as cost, utilization, and outcomes will be incorrect.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -130,7 +132,7 @@ models:
                 severity: error
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: integer
           is_primary_key: true
       - name: claim_type
         description: 'Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision. This field is a string that describes the type of claim and must have one of the following 3 values: institutional, professional, or undetermined. This is a header-level field, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table. The logic to populate this field is as follows: - A claim is said to be institutional if it has any of these 6 fields populated: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code. Note that we are only requiring that at least one of those fields is populated, not that it is populated with a valid value. - A claim is said to be professional if none of the 6 fields above (bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code) are populated AND it has at least one populated place_of_service_code. Note that we only require that at least one place_of_service_code is populated, not that it is populated with a valid value. - If neither of the above two bullets is the case, the claim is said to be undetermined. Making the claim_type determination at the header level might happen in a CTE that looks like this: with claim_types as ( select claim_id , max( bill_type_code is not null or drg_code is not null or admit_type_code is not null or admit_source_code is not null or discharge_disposition_code is not null or revenue_center_code is not null ) as is_institutional , max( bill_type_code is null and drg_code is null and admit_type_code is null and admit_source_code is null and discharge_disposition_code is null and revenue_center_code is null and place_of_service_code is not null ) as is_professional from mapped_claims_data group by claim_id ) Then, later, the claim type determination can be made in a case statement, like this: ... , case when is_institutional then institutional when is_professional and not is_institutional then professional when not is_professional and not is_institutional then undetermined end as claim_type'
@@ -3716,7 +3718,7 @@ models:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: boolean
       - name: data_source
         description: User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, "BCBS Tennessee". This field should be populated for every line in the medical_claim table and is a header-level field, so its value must be the same for all lines in a given claim. DQI checks every row in the medical_claim table has a populated data_source and that the value of this field is consistent across all lines for a given claim_id.
         tests:

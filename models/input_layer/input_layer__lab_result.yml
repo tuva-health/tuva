@@ -2,7 +2,6 @@ version: 2
 models:
   - name: input_layer__lab_result
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
       The lab result table contains information about lab test results, 
       including the LOINC code and description, units, reference range, and 
       result.
@@ -769,6 +768,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: The file name of the source file.
         tests:

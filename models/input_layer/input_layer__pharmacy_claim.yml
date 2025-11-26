@@ -2,7 +2,9 @@ version: 2
 models:
   - name: input_layer__pharmacy_claim
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer. The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled by a patient, billed by a pharmacy, and paid by an insurer.
+      The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled for a patient, 
+      billed by a pharmacy, and paid by an insurer.  Prescriptions that are ordered but not filled should not make it into the table.  Claims
+      adjustments, denials, and reversals should be handled similar to the medical_claim table.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -104,7 +106,7 @@ models:
                 severity: error
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: integer
           is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical).
@@ -296,7 +298,7 @@ models:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: integer
       - name: days_supply
         description: The number of days supply included. This field is a positive integer that represents the number of days supply for the medication. Before the application of Adjustments, Denials, and Reversals (ADR), days_supply may be represented as a negative value on some claim lines, but appropriately handing ADR should result in only positive integer values.
         tests:
@@ -317,7 +319,7 @@ models:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: integer
       - name: refills
         description: Number of refills for the prescription. This field is a positive integer that represents the number of refills for the prescription. Before the application iof Adjustments, Denials, and Reversals (ADR), refills may be represented as negative values on some claim lines, but appropriately handing ADR should result in only positive integer values.
         tests:
@@ -329,7 +331,7 @@ models:
                 severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
-          data_type: number
+          data_type: integer
       - name: paid_date
         description: The date the claim was paid. This field is a date that corresponds to when the health insurer processed the claim for payment, and in the context of pharmacy claims should coincide with the date the pharmacy received reimbursement from the health insurer.
         tests:
@@ -597,7 +599,7 @@ models:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
-          data_type: number
+          data_type: boolean
       - name: data_source
         description: User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, "BCBS Tennessee". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.
         tests:

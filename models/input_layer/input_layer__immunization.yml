@@ -2,7 +2,6 @@ version: 2
 models:
   - name: input_layer__immunization
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
       The immunization table contains information about immunizations administered to patients.
     config:
       schema: |
@@ -286,6 +285,7 @@ models:
                 enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: The file name of the source file.
         tests:

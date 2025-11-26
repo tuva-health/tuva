@@ -5,7 +5,8 @@ models:
       The eligibility table includes information about a patient's health 
       insurance coverage and demographics (note: we use the word patient as a 
       synonym for member). Every claims dataset should in theory include some sort of 
-      eligibility data, otherwise it's impossible to calculate member months, 
+      eligibility data because they have to know whether a patient has coverage in order to 
+      determine whether to play a claim.  Eligibility data is used to calculate member months, 
       which are needed to calculate measures like PMPM.
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -317,7 +318,7 @@ models:
               quote: false
               column_name: CAST(death_flag AS STRING)
         meta:
-          data_type: number
+          data_type: boolean
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
         tests:

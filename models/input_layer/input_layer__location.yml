@@ -2,8 +2,7 @@ version: 2
 models:
   - name: input_layer__location
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer.
-      The location table contains information on practice and facility locations 
+      The location table contains information on actual practice and facility locations 
       where patients receive medical care.
     config:
       schema: |
@@ -285,3 +284,4 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true

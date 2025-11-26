@@ -2,7 +2,7 @@ version: 2
 models:
   - name: input_layer__practitioner
     description: |
-      Mapping check to make sure all columns are mapped appropriately into the input layer. The practitioner table contains information on the providers in the  dataset e.g. physicians, physicians assistants, etc.
+      The practitioner table contains information on the providers in the dataset e.g. physicians, physicians assistants, etc.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -203,3 +203,4 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
