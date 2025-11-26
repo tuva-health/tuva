@@ -67,6 +67,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: claim_line_number
         description: Indicates the line number for the particular line of the claim. This is a positive integer that identifies the claim line that a given row on the table represents. The values of claim_line_number for a given claim_id must be sequential positive integers starting at 1. For example, if claim_id = ABC has 4 claim lines (i.e., 4 rows on the pharmacy_claim table), those 4 rows must have claim_line_number equal to 1, 2, 3, and 4, respectively. The claim_line_number field should be populated for every row in the pharmacy_claim table. Pharmacy claims datasets do not often have a claim_line_number field. In these cases, you can set claim_line_number = 1 for each claim_id. We include claim_line_number in the input layer for pharmacy_claim to handle the case where there may be multiple claim lines per claim_id, and for consistency with medical_claim. DQI checks that the values of claim_line_number are different for all lines within the same claim.
         tests:
@@ -104,6 +105,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: number
+          is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical).
         tests:
@@ -616,6 +618,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: 'The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.'
         tests:

@@ -33,6 +33,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
         tests:

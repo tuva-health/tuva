@@ -93,6 +93,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: claim_line_number
         description: 'Indicates the line number for the particular line of the claim. This is a positive integer that identifies the claim line that a given row on the table represents. The values of claim_line_number for a given claim_id must be sequential positive integers starting at 1. For example, if claim_id = ABC has 4 claim lines (i.e., 4 rows on the medical_claim table), those 4 rows must have claim_line_number equal to 1, 2, 3, and 4, respectively. The claim_line_number field should be populated for every row in the medical_claim table. Claims data sources may contain claim line numbers that do not behave as expected. For example, they might not start at 1, they may not be sequential (incremented by 1), or claim line numbers may repeat when the lines seem to correspond to different line items. In this case, or when a claim_line_number is not present in the source data, claim_line_number can be created manually: row_number() over (partition by claim_id order by claim_start_date) as claim_line_number'
         tests:
@@ -130,6 +131,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: number
+          is_primary_key: true
       - name: claim_type
         description: 'Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision. This field is a string that describes the type of claim and must have one of the following 3 values: institutional, professional, or undetermined. This is a header-level field, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table. The logic to populate this field is as follows: - A claim is said to be institutional if it has any of these 6 fields populated: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code. Note that we are only requiring that at least one of those fields is populated, not that it is populated with a valid value. - A claim is said to be professional if none of the 6 fields above (bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code) are populated AND it has at least one populated place_of_service_code. Note that we only require that at least one place_of_service_code is populated, not that it is populated with a valid value. - If neither of the above two bullets is the case, the claim is said to be undetermined. Making the claim_type determination at the header level might happen in a CTE that looks like this: with claim_types as ( select claim_id , max( bill_type_code is not null or drg_code is not null or admit_type_code is not null or admit_source_code is not null or discharge_disposition_code is not null or revenue_center_code is not null ) as is_institutional , max( bill_type_code is null and drg_code is null and admit_type_code is null and admit_source_code is null and discharge_disposition_code is null and revenue_center_code is null and place_of_service_code is not null ) as is_professional from mapped_claims_data group by claim_id ) Then, later, the claim type determination can be made in a case statement, like this: ... , case when is_institutional then institutional when is_professional and not is_institutional then professional when not is_professional and not is_institutional then undetermined end as claim_type'
         tests:
@@ -3735,6 +3737,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: 'The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We always suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.'
         tests:

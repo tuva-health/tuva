@@ -69,6 +69,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
         tests:
@@ -117,6 +118,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage.
         tests:
@@ -130,6 +132,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage.
         tests:
@@ -143,6 +146,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: data_source
         description: User-configured field that indicates the data source.
         tests:
@@ -180,6 +184,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: payer_attributed_provider
         description: Unique identifier for the provider assigned to this patient-year_month by the payer.
         tests:

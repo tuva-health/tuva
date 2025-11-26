@@ -62,6 +62,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: npi
         description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
         tests:

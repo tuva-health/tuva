@@ -100,6 +100,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string; member_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system.
         tests:
@@ -113,6 +114,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: subscriber_id
         description: Identifier that links a patient to a particular insurance product or health plan. This field is a string; subscriber_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system. This ID corresponds to the policyholder for the insurance plan, and can be 1:many with person_id or member_id.
         tests:
@@ -355,6 +357,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: date
+          is_primary_key: true
       - name: enrollment_end_date
         description: Date the patient's insurance eligibility ended.
         tests:
@@ -402,6 +405,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: date
+          is_primary_key: true
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.
         tests:
@@ -423,6 +427,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: payer_type
         description: 'Type of payer (e.g. commercial, medicare, medicaid, etc.). This field is a string that contains the type of insurance provided by the payer. It must take one of the values contained in the payer_type terminology file: commercial, medicare, medicaid, and self-insured.'
         tests:
@@ -473,6 +478,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code. This field is a single-character string that contains a members original reason for Medicare entitlement. When available, mapping this field is particularly helpful for providing a more accurate risk score. If its not available, the CMS HCC mart will use medicare_status_code instead. The CMS HCC mart will default to a value of "Aged" when neither code is available. This field can take the values 0, 1, 2, or 3.
         tests:
@@ -844,6 +850,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: file_name
         description: 'The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.'
         tests:

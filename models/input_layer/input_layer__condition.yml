@@ -65,6 +65,7 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
+          is_primary_key: true
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
         tests:
