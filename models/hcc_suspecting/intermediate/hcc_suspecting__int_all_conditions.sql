@@ -25,7 +25,7 @@ with conditions as (
         , diagnosis_code
         , cms_hcc_v28 as hcc_code
         , 'CMS-HCC-V28' as model_version
-    from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
     where cms_hcc_v28_flag = 'Yes'
 
     union all
@@ -35,7 +35,7 @@ with conditions as (
         , diagnosis_code
         , cms_hcc_v24 as hcc_code
         , 'CMS-HCC-V24' as model_version
-    from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
     where cms_hcc_v24_flag = 'Yes'
 )
 
