@@ -250,7 +250,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
-        , CAST('clinical source' {{ dbt.type_string() }}) as payer
+        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
