@@ -7,7 +7,6 @@ with patients as (
 
     select
           person_id
-        , payer
         , sex
         , birth_date
         {% if target.type == 'fabric' %}
@@ -37,7 +36,7 @@ with patients as (
 
     select
           patients.person_id
-        , patients.payer
+        , suspecting_list.payer
         , patients.sex
         , patients.birth_date
         , patients.age
@@ -45,7 +44,6 @@ with patients as (
     from patients
          inner join suspecting_list
          on patients.person_id = suspecting_list.person_id
-         and patients.payer = suspecting_list.payer
 
 )
 

@@ -109,6 +109,10 @@ select
     , cast(reason as {{ dbt.type_string() }}) as reason
     , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
     , cast(suspect_date as date) as suspect_date
-    , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from unioned
