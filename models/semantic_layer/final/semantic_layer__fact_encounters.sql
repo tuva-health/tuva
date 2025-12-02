@@ -7,8 +7,8 @@ select
     encounter_id
   , person_id
   , {{ dbt.concat(["person_id", "'|'", "data_source"]) }} as patient_source_key
-  , {{ dbt.concat(["person_id", "'|'", "TO_CHAR(encounter_start_date, 'YYYYMM')"]) }} as member_month_sk
-  , TO_CHAR(encounter_start_date, 'YYYYMM') as year_month
+  , {{ dbt.concat(["person_id", "'|'", the_tuva_project.to_char('encounter_start_date', 'YYYYMM')]) }} as member_month_sk
+  , {{ the_tuva_project.to_char('encounter_start_date', 'YYYYMM') }} as year_month
   , eg.encounter_group_sk
   , et.encounter_type_sk
   , encounter_start_date
