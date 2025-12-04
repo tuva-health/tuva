@@ -74,6 +74,7 @@ with members as (
             when dual_status = 'Partial' and orec = 'Aged' then 'CPA'
             -- Community Partial Benefit Dual Disabled (CPD)
             when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
+            when enrollment_status = 'New' then 'E'
         end as risk_model_code
     from {{ ref('cms_hcc__demographic_factors') }}
     where plan_segment is null /* data not available */

@@ -92,7 +92,8 @@ with conditions as (
 
 )
 
-select
+-- Need the distinct to remove cases where 2 snomed codes map to 1 ICD code for the same claim
+select distinct
       person_id
     , payer
     , claim_id
