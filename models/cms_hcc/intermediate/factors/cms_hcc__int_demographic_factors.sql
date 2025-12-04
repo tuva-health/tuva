@@ -56,8 +56,9 @@ with members as (
         , orec
         , institutional_status
         , coefficient
-        , case  
+        , case
             when enrollment_status = 'ESRD' then 'ESRD'
+            when enrollment_status = 'New' then 'E'
             -- Long Term Institutional (INS)
             when institutional_status = 'Yes' then 'INS'
             -- Community NonDual Aged (CNA)
@@ -74,7 +75,6 @@ with members as (
             when dual_status = 'Partial' and orec = 'Aged' then 'CPA'
             -- Community Partial Benefit Dual Disabled (CPD)
             when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
-            when enrollment_status = 'New' then 'E'
         end as risk_model_code
     from {{ ref('cms_hcc__demographic_factors') }}
     where plan_segment is null /* data not available */
