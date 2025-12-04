@@ -54,7 +54,9 @@ with medical_claims as (
 , cpt_hcpcs_list as (
 
     select
-          payment_year
+        -- This is mislabelled as payment year, it should be collection year
+        -- TODO: Update the label in the seed file
+          payment_year as collection_year
         , hcpcs_cpt_code
     from {{ ref('cms_hcc__cpt_hcpcs') }}
 
@@ -93,7 +95,7 @@ group by prov.npi
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
         -- CMS uses the claim line level provider specialty code, but this is good enough for now
         -- TODO: Use claim line provider specialty codes instead
         left join accepted_providers prov
@@ -152,7 +154,7 @@ group by prov.npi
         -- this early on
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
 
