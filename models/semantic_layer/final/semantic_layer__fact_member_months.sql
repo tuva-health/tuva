@@ -83,7 +83,7 @@ WITH monthly_patient_costs AS (
 
 monthly_patient_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+        {{ the_tuva_project.to_char('collection_end_date', 'YYYYMM') }} AS year_month
       , person_id
       , normalized_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
@@ -91,11 +91,11 @@ monthly_patient_risk_cte AS (
 
 monthly_population_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+        {{ the_tuva_project.to_char('collection_end_date', 'YYYYMM') }} AS year_month
       , AVG(normalized_risk_score) AS monthly_avg_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
     GROUP BY
-        TO_CHAR(collection_end_date, 'YYYYMM')
+        {{ the_tuva_project.to_char('collection_end_date', 'YYYYMM') }}
 ),
 combined_data_cte AS (
     SELECT

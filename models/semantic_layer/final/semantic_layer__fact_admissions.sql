@@ -6,7 +6,7 @@
 SELECT
     e.encounter_id
   , e.person_id
-  , {{ dbt.concat(["e.person_id", "'|'", "TO_CHAR(e.encounter_start_date, 'YYYYMM')"]) }} as member_month_sk
+  , {{ dbt.concat(["e.person_id", "'|'", the_tuva_project.to_char('e.encounter_start_date', 'YYYYMM')]) }} as member_month_sk
   , r.index_admission_flag
   , r.had_readmission_flag
   , r.planned_flag
