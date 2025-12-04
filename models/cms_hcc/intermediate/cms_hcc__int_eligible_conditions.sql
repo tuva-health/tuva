@@ -94,7 +94,7 @@ group by prov.npi
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
         -- CMS uses the claim line level provider specialty code, but this is good enough for now
         -- TODO: Use claim line provider specialty codes instead
@@ -126,7 +126,7 @@ group by prov.npi
         , dates.collection_end_date
     from medical_claims
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('11', '41')
 
@@ -153,7 +153,7 @@ group by prov.npi
         -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
         -- this early on
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
