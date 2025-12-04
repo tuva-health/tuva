@@ -19,6 +19,7 @@ with stg_eligibility as (
 
     select
           elig.person_id
+        , elig.payer
         , elig.enrollment_start_date
         , elig.enrollment_end_date
         , elig.original_reason_entitlement_code
@@ -69,6 +70,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , enrollment_start_date
         , enrollment_end_date
         , payment_year
@@ -90,13 +92,17 @@ with stg_eligibility as (
 
 , calculate_prior_coverage as (
 
-    select person_id
+    select
+          person_id
+        , payer
         , payment_year
         , collection_end_date
         , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
         , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
     from cap_collection_start_end_dates
-    group by person_id
+    group by
+          person_id
+        , payer
         , payment_year
         , collection_end_date
 
@@ -110,6 +116,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , payment_year
         , collection_end_date
         , case
@@ -124,6 +131,7 @@ with stg_eligibility as (
 
     select
           stg_eligibility.person_id
+        , stg_eligibility.payer
         , stg_eligibility.payment_year
         , stg_eligibility.collection_start_date
         , stg_eligibility.collection_end_date
@@ -151,6 +159,7 @@ with stg_eligibility as (
     from stg_eligibility
         left outer join add_enrollment
             on stg_eligibility.person_id = add_enrollment.person_id
+            and stg_eligibility.payer = add_enrollment.payer
             and stg_eligibility.payment_year = add_enrollment.payment_year
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
@@ -164,6 +173,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -191,7 +201,9 @@ with stg_eligibility as (
             when enrollment_status = 'New' and payment_year_age between 35 and 44 then '35-44'
             when enrollment_status = 'New' and payment_year_age between 45 and 54 then '45-54'
             when enrollment_status = 'New' and payment_year_age between 55 and 59 then '55-59'
-            when enrollment_status = 'New' and payment_year_age between 60 and 64 then '60-64'
+            when enrollment_status = 'New' and payment_year_age between 60 and 63 then '60-64'
+            when enrollment_status = 'New' and enrollment_status != 'Aged' and payment_year_age = 64 then '60-64'
+            when enrollment_status = 'New' and enrollment_status = 'Aged' and payment_year_age = 64 then '65'
             when enrollment_status = 'New' and payment_year_age = 65 then '65'
             when enrollment_status = 'New' and payment_year_age = 66 then '66'
             when enrollment_status = 'New' and payment_year_age = 67 then '67'
@@ -209,13 +221,13 @@ with stg_eligibility as (
 )
 
 , add_status_logic as (
-
     select
           person_id
+        , payer
         , payment_year
         , collection_start_date
         , collection_end_date
-        , enrollment_status
+        , case when original_reason_entitlement_code in ('2', '3') then 'ESRD' else enrollment_status end as enrollment_status
         , case
             when gender = 'female' then 'Female'
             when gender = 'male' then 'Male'
@@ -244,7 +256,7 @@ with stg_eligibility as (
             when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
-        , cast('No' as {{ dbt.type_string() }}) as institutional_status
+        , case when enrollment_status = 'Institutional' then 'Yes' else 'No' end as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
@@ -283,6 +295,7 @@ with stg_eligibility as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -310,6 +323,7 @@ with stg_eligibility as (
 
 select
       person_id
+    , payer
     , enrollment_status
     , gender
     , age_group
