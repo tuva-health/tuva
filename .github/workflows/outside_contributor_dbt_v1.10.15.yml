@@ -1,4 +1,4 @@
-name: outside_contributor_dbt_v1.9.4
+name: outside_contributor_dbt_v1.10.15
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.12'
   LINT_SCRIPT_PATH: ./lint_tuva_project.sh
 #######  DuckDB/MotherDuck
   DBT_MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           python -m pip install --upgrade pip
           # Install dbt adapter needed for compile/lint (using Snowflake here)
           # Also install sqlfluff
-          pip install dbt-core==1.9.4 dbt-snowflake sqlfluff==3.3.1 sqlfluff-templater-dbt
+          pip install dbt-core==1.10.15 dbt-snowflake sqlfluff==3.5.0 sqlfluff-templater-dbt
 
       # --- Setup dbt Profile for Linting ---
       - name: Create dbt profiles directory
@@ -162,7 +162,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-duckdb
+          pip install dbt-core==1.10.15 dbt-duckdb
 
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
@@ -237,7 +237,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-duckdb
+          pip install dbt-core==1.10.15 dbt-duckdb
 
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
@@ -308,7 +308,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-duckdb
+          pip install dbt-core==1.10.15 dbt-duckdb
 
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
@@ -379,7 +379,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-duckdb
+          pip install dbt-core==1.10.15 dbt-duckdb
 
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
@@ -450,7 +450,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-duckdb
+          pip install dbt-core==1.10.15 dbt-duckdb
 
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
@@ -522,7 +522,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-bigquery        
+          pip install dbt-core==1.10.15 dbt-bigquery        
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -581,7 +581,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-bigquery        
+          pip install dbt-core==1.10.15 dbt-bigquery        
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -641,7 +641,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-bigquery        
+          pip install dbt-core==1.10.15 dbt-bigquery        
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -701,7 +701,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-bigquery        
+          pip install dbt-core==1.10.15 dbt-bigquery        
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -761,7 +761,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-bigquery        
+          pip install dbt-core==1.10.15 dbt-bigquery        
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -823,7 +823,7 @@ jobs:
       - name: Install dbt-core and Databricks adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-databricks
+          pip install dbt-core==1.10.15 dbt-databricks
           # Install SSL certificates fix
           pip install certifi
 
@@ -911,7 +911,7 @@ jobs:
       - name: Install dbt-core and Databricks adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-databricks
+          pip install dbt-core==1.10.15 dbt-databricks
           pip install certifi
 
       - name: Set SSL certificate environment variables
@@ -996,7 +996,7 @@ jobs:
       - name: Install dbt-core and Databricks adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-databricks
+          pip install dbt-core==1.10.15 dbt-databricks
           pip install certifi
 
       - name: Set SSL certificate environment variables
@@ -1081,7 +1081,7 @@ jobs:
       - name: Install dbt-core and Databricks adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-databricks
+          pip install dbt-core==1.10.15 dbt-databricks
           pip install certifi
 
       - name: Set SSL certificate environment variables
@@ -1166,7 +1166,7 @@ jobs:
       - name: Install dbt-core and Databricks adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-databricks
+          pip install dbt-core==1.10.15 dbt-databricks
           pip install certifi
 
       - name: Set SSL certificate environment variables
@@ -1259,7 +1259,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-fabric          
+          pip install dbt-core==1.10.15 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -1303,7 +1303,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-fabric          
+          pip install dbt-core==1.10.15 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -1348,7 +1348,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-fabric          
+          pip install dbt-core==1.10.15 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -1393,7 +1393,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-fabric          
+          pip install dbt-core==1.10.15 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -1438,7 +1438,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-fabric          
+          pip install dbt-core==1.10.15 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -1477,7 +1477,7 @@ jobs:
       - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+          pip install dbt-core==1.10.15 dbt-redshift
 
       - name: Create dbt profile
         env:
@@ -1553,7 +1553,7 @@ jobs:
       - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+          pip install dbt-core==1.10.15 dbt-redshift
 
       - name: Create dbt profile
         env:
@@ -1630,7 +1630,7 @@ jobs:
       - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+          pip install dbt-core==1.10.15 dbt-redshift
 
       - name: Create dbt profile
         env:
@@ -1707,7 +1707,7 @@ jobs:
       - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+          pip install dbt-core==1.10.15 dbt-redshift
 
       - name: Create dbt profile
         env:
@@ -1784,7 +1784,7 @@ jobs:
       - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+          pip install dbt-core==1.10.15 dbt-redshift
 
       - name: Create dbt profile
         env:
@@ -1862,7 +1862,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake        
+          pip install dbt-core==1.10.15 dbt-snowflake        
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -1899,7 +1899,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake          
+          pip install dbt-core==1.10.15 dbt-snowflake          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -1937,7 +1937,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake          
+          pip install dbt-core==1.10.15 dbt-snowflake          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -1975,7 +1975,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake          
+          pip install dbt-core==1.10.15 dbt-snowflake          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -2013,7 +2013,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake          
+          pip install dbt-core==1.10.15 dbt-snowflake          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -2051,7 +2051,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-snowflake
+          pip install dbt-core==1.10.15 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
