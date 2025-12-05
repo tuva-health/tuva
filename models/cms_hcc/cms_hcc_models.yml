@@ -566,6 +566,8 @@ models:
         description: >
           Indicates what age group the patient is in. (e.g. "60-64").
           CMS guidance: Age is calculated as of Feb 1 of the payment year.
+        tests:
+          - not_null          
       - name: medicaid_status
         description: Indicates whether the patient is enrolled in Medicaid.
       - name: dual_status

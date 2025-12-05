@@ -187,25 +187,14 @@ with stg_eligibility as (
         , enrollment_status
         , enrollment_status_default
         , case
-            when enrollment_status = 'Continuing' and payment_year_age between 0 and 34 then '0-34'
-            when enrollment_status = 'Continuing' and payment_year_age between 35 and 44 then '35-44'
-            when enrollment_status = 'Continuing' and payment_year_age between 45 and 54 then '45-54'
-            when enrollment_status = 'Continuing' and payment_year_age between 55 and 59 then '55-59'
-            when enrollment_status = 'Continuing' and payment_year_age between 60 and 64 then '60-64'
-            when enrollment_status = 'Continuing' and payment_year_age between 65 and 69 then '65-69'
-            when enrollment_status = 'Continuing' and payment_year_age between 70 and 74 then '70-74'
-            when enrollment_status = 'Continuing' and payment_year_age between 75 and 79 then '75-79'
-            when enrollment_status = 'Continuing' and payment_year_age between 80 and 84 then '80-84'
-            when enrollment_status = 'Continuing' and payment_year_age between 85 and 89 then '85-89'
-            when enrollment_status = 'Continuing' and payment_year_age between 90 and 94 then '90-94'
-            when enrollment_status = 'Continuing' and payment_year_age >= 95 then '>=95'
             when enrollment_status = 'New' and payment_year_age between 0 and 34 then '0-34'
             when enrollment_status = 'New' and payment_year_age between 35 and 44 then '35-44'
             when enrollment_status = 'New' and payment_year_age between 45 and 54 then '45-54'
             when enrollment_status = 'New' and payment_year_age between 55 and 59 then '55-59'
             when enrollment_status = 'New' and payment_year_age between 60 and 63 then '60-64'
             when enrollment_status = 'New' and original_reason_entitlement_code != '0' and payment_year_age = 64 then '60-64'
-            when enrollment_status = 'New' and original_reason_entitlement_code = '0' and payment_year_age = 64 then '65'
+            -- If original_reason_entitlement_code = '0' then if 64, mark the age as 65
+            when enrollment_status = 'New' and payment_year_age = 64 then '65'
             when enrollment_status = 'New' and payment_year_age = 65 then '65'
             when enrollment_status = 'New' and payment_year_age = 66 then '66'
             when enrollment_status = 'New' and payment_year_age = 67 then '67'
@@ -217,6 +206,18 @@ with stg_eligibility as (
             when enrollment_status = 'New' and payment_year_age between 85 and 89 then '85-89'
             when enrollment_status = 'New' and payment_year_age between 90 and 94 then '90-94'
             when enrollment_status = 'New' and payment_year_age >= 95 then '>=95'
+            when payment_year_age between 0 and 34 then '0-34'
+            when payment_year_age between 35 and 44 then '35-44'
+            when payment_year_age between 45 and 54 then '45-54'
+            when payment_year_age between 55 and 59 then '55-59'
+            when payment_year_age between 60 and 64 then '60-64'
+            when payment_year_age between 65 and 69 then '65-69'
+            when payment_year_age between 70 and 74 then '70-74'
+            when payment_year_age between 75 and 79 then '75-79'
+            when payment_year_age between 80 and 84 then '80-84'
+            when payment_year_age between 85 and 89 then '85-89'
+            when payment_year_age between 90 and 94 then '90-94'
+            when payment_year_age >= 95 then '>=95'
           end as age_group
     from latest_eligibility
 
