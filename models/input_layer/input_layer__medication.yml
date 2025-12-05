@@ -1,8 +1,11 @@
 version: 2
 models:
   - name: input_layer__medication
-    description: |
-      The medication table contains information on medications ordered and/or administered during a patient encounter.
+    description: >
+      Mapping check to make sure all columns are mapped appropriately into the input
+      layer.
+      The medication table contains information on medications ordered and/or  administered
+      during a patient encounter.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -10,613 +13,396 @@ models:
       materialized: view
     columns:
       - name: medication_id
-        description: Unique identifier for each medication in the table.
+        description: '{{ doc("medication_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - unique:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: person_id
-        description: Unique identifier for each person in the dataset.
+        description: '{{ doc("person_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_2
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
+        description: '{{ doc("patient_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
+        description: '{{ doc("encounter_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: dispensing_date
-        description: Date the medication was dispensed.
+        description: '{{ doc("dispensing_date") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
-              tags:
-                - tuva_dqi_sev_2
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_between:
-              tags:
-                - tuva_dqi_sev_3
-                - dqi
+              tags: [ 'tuva_dqi_sev_3', 'dqi']
               min_value: '''1900-01-01'''
               max_value: '''2100-01-01'''
               strictly: false
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: date
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: prescribing_date
-        description: Date the medication was prescribed.
+        description: '{{ doc("prescribing_date") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
-              tags:
-                - tuva_dqi_sev_2
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_between:
-              tags:
-                - tuva_dqi_sev_3
-                - dqi
+              tags: [ 'tuva_dqi_sev_3', 'dqi']
               min_value: '''1900-01-01'''
               max_value: '''2100-01-01'''
               strictly: false
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: date
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: '{{ doc("source_code_type") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-              values:
-                - ndc
-                - rxnorm
-              tags:
-                - tuva_dqi_sev_2
-                - dqi
-                - dqi_cms_hccs
-                - dqi_quality_measures
+              values: ['ndc', 'rxnorm']
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs', 'dqi_quality_measures']
               config:
                 severity: warn
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
-                - dqi_cms_hccs
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures', 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: source_code
-        description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        description: '{{ doc("source_code") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: source_description
-        description: Description of the source code in the source system.
+        description: '{{ doc("source_description") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: ndc_code
-        description: National drug code associated with the medication.
+        description: '{{ doc("ndc_code") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_3
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: ndc_description
-        description: Description for the NDC.
+        description: '{{ doc("ndc_description") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: rxnorm_code
-        description: RxNorm code associated with the medication.
+        description: '{{ doc("rxnorm_code") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__rxnorm_to_atc')
               field: rxcui
-              tags:
-                - tuva_dqi_sev_4
-                - dqi
-                - dqi_quality_measures
+              tags: ['tuva_dqi_sev_4', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
-                - dqi_quality_measures
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: rxnorm_description
-        description: Description for the RxNorm code.
+        description: '{{ doc("rxnorm_description") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: atc_code
-        description: ATC code for the medication.
+        description: '{{ doc("atc_code") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: atc_description
-        description: Description for the ATC code.
+        description: '{{ doc("atc_description") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: route
-        description: The route used to administer the medication and/or vaccine.
+        description: '{{ doc("route") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: strength
-        description: The strength of the medication.
+        description: '{{ doc("strength") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: quantity
-        description: The quantity of the medication.
+        description: '{{ doc("quantity") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: number
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: quantity_unit
-        description: The units for the quantity.
+        description: '{{ doc("quantity_unit") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: days_supply
-        description: The number of days supply included.
+        description: '{{ doc("days_supply") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_4
-                - dqi
+              tags: ['tuva_dqi_sev_4', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: number
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: '{{ doc("practitioner_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: data_source
-        description: User-configured field that indicates the data source.
+        description: '{{ doc("data_source") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
-              description: Percentage of values that are null.
-              tags:
-                - tuva_dqi_sev_5
-                - dqi
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: file_name
-        description: The file name of the source file.
+        description: '{{ doc("file_name") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        description: '{{ doc("ingest_datetime") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
+              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list:
-                - date
-                - datetime
-                - time
-                - timestamp
-                - timestamp_ntz
-                - timestampntz
-                - timestamp_ltz
-                - timestampltz
-                - timestamp_tz
-                - timestamptz
-                - timestamp with time zone
-                - timestamp without time zone
-                - datetime2
-                - datetimeoffset
-              tags:
-                - tuva_dqi_sev_2
-                - dqi
+              column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                    with time zone, timestamp without time zone, datetime2, datetimeoffset]
+              tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: timestamp
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"

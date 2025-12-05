@@ -1,35 +1,29 @@
 version: 2
 models:
   - name: input_layer__provider_attribution
-    description: |
-      The provider_attribution table assigns a provider to each patient-member_month of eligibility. The user may 
-      assign both a payer attributed provider (as typically assigned by the payer in VBC contracts) as well as custom 
-      attributed provider (typically determined by the user). Fields related to each attributed provider (practice, 
-      organization, line of business) are also present.  This table allows you to input a custom attribution assigment from 
-      another system.  You can also use the Provider Attribution data mart to do this assignment by using your claims data.
+    description: >
+      Mapping check to make sure all columns are mapped appropriately into the input
+      layer.
+      The provider_attribution table assigns a provider to each patient-member_month
+      of eligibility. The user may assign both a payer attributed provider (as
+      typically assigned by the payer in VBC contracts) as well as custom
+      attributed provider (typically determined by the user).
+      Fields related to each attributed provider (practice, organization,
+      line of business)are also present.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - person_id
             - payer
-            - '{{ ''"plan"'' if (target.type == ''fabric'') else ''plan'' }}'
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - year_month
             - data_source
-          tags:
-            - tuva_dqi_sev_1
-            - dqi
-            - dqi_service_categories
-            - dqi_ccsr
-            - dqi_cms_chronic_conditions
-            - dqi_tuva_chronic_conditions
-            - dqi_cms_hccs
-            - dqi_ed_classification
-            - dqi_financial_pmpm
-            - dqi_quality_measures
-            - dqi_readmission
+          tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
+            'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification',
+            'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission']
           config:
             severity: error
-            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -37,261 +31,147 @@ models:
       materialized: view
     columns:
       - name: person_id
-        description: Unique identifier for each person in the dataset.
+        description: '{{ doc("person_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
+        description: '{{ doc("patient_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: year_month
-        description: Unique year-month of in the dataset computed from eligibility.
+        description: '{{ doc("year_month") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: '{{ doc("payer") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: '{{ doc("plan") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: data_source
-        description: User-configured field that indicates the data source.
+        description: '{{ doc("data_source") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_service_categories
-                - dqi_ccsr
-                - dqi_cms_chronic_conditions
-                - dqi_tuva_chronic_conditions
-                - dqi_cms_hccs
-                - dqi_ed_classification
-                - dqi_financial_pmpm
-                - dqi_quality_measures
-                - dqi_readmission
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
               config:
                 severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-        meta:
-          data_type: varchar
-          is_primary_key: true
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: payer_attributed_provider
-        description: Unique identifier for the provider assigned to this patient-year_month by the payer.
+        description: '{{ doc("payer_attributed_provider") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_practice
-        description: Name of the practice for the payer attributed provider.
+        description: '{{ doc("payer_attributed_provider_practice") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_organization
-        description: Name of the organization for the payer attributed provider.
+        description: '{{ doc("payer_attributed_provider_organization") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_lob
-        description: Name of the line of business for the payer attributed provider (e.g. medicare, medicaid, commercial).
+        description: '{{ doc("payer_attributed_provider_lob") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider
-        description: Unique identifier for the provider assigned to this patient-year_month by the user.
+        description: '{{ doc("custom_attributed_provider") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_practice
-        description: Name of the practice for the attributed provider assigned by the user.
+        description: '{{ doc("custom_attributed_provider_practice") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_organization
-        description: Name of the organization for the attributed provider assigned by the user.
+        description: '{{ doc("custom_attributed_provider_organization") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_lob
-        description: Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).
+        description: '{{ doc("custom_attributed_provider_lob") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags:
-                - tuva_dqi_sev_1
-                - dqi
-                - dqi_financial_pmpm
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-        meta:
-          data_type: varchar
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
