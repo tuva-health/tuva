@@ -34,7 +34,6 @@ set -euo pipefail
 
 # --- Configuration ---
 SQLFLUFF_OUTPUT_FILE="SQLFLUFF_LINTER_OUTPUT.TXT"
-DBT_PROJECT_DIR="ci_testing"  # Directory where dbt commands should be run
 
 # --- Script Flags (Defaults for Local Use) ---
 MODE="local" # 'local' or 'ci'
@@ -92,7 +91,7 @@ check_git_directory() {
 run_dbt_debug() {
   local dbt_output
   # Capture stderr to stdout for unified output capture
-  if ! dbt_output=$(cd "$DBT_PROJECT_DIR" && dbt debug 2>&1); then
+  if ! dbt_output=$(dbt debug 2>&1); then
     echo "Error: dbt debug failed. A valid dbt connection is required." >&2
     echo "$dbt_output" >&2 # Show debug failure output
     exit 1
@@ -104,7 +103,7 @@ run_dbt_debug() {
 # Function to run dbt clean
 run_dbt_clean() {
   echo "Running dbt clean..."
-  if ! (cd "$DBT_PROJECT_DIR" && dbt clean); then
+  if ! dbt clean; then
     echo "Error: dbt clean failed." >&2
     exit 1
   fi
@@ -114,7 +113,7 @@ run_dbt_clean() {
 # Function to run dbt deps
 run_dbt_deps() {
   echo "Running dbt deps..."
-  if ! (cd "$DBT_PROJECT_DIR" && dbt deps); then
+  if ! dbt deps; then
     echo "Error: dbt deps failed. Unable to install dependencies." >&2
     exit 1
   fi
@@ -254,7 +253,7 @@ restore_dbt_project() {
 
 # Function to run dbt compile
 run_dbt_compile() {
-  if ! (cd "$DBT_PROJECT_DIR" && dbt compile); then
+  if ! dbt compile; then
     echo "Error: dbt compile failed." >&2
     # Cleanup is handled by trap
     exit 1 # Exit immediately as compile failure is critical
@@ -392,8 +391,8 @@ cleanup_integration_files() {
 cleanup() {
   local exit_status=${1:-$?} # Use provided status or last command's status
   echo -e "\n--- Running Cleanup (Script exit status: $exit_status) ---"
-  # Note: When using ci_testing directory, we don't need to restore dbt_project.yml
-  # or cleanup integration files as we're not modifying the root project
+  restore_dbt_project
+  cleanup_integration_files
   echo "--- Cleanup Finished ---"
   # Exit with the original script exit status
   exit "$exit_status"
@@ -422,8 +421,8 @@ main() {
   prompt_user_confirmation "$debug_output"
 
   # --- Core Logic ---
-  # Note: When using ci_testing directory, we don't need to copy integration files
-  # or modify dbt_project.yml as ci_testing has its own configuration
+  copy_integration_files
+  add_variables_to_dbt_project # Creates .bak file
   run_dbt_compile
 
   # Run sqlfluff based on mode/flags
