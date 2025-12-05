@@ -863,7 +863,7 @@ Date the medication was prescribed.
 {% enddocs %}
 
 {% docs prescribing_provider_id %}
-ID for the provider that wrote the prescription (e.g. priamry care physician).
+ID for the provider that wrote the prescription (e.g., primary care physician).
 {% enddocs %}
 
 {% docs prescribing_provider_name %}
