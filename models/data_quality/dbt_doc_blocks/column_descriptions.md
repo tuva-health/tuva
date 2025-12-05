@@ -1223,7 +1223,7 @@ State for the patient (most recent known address).
 {% enddocs %}
 
 {% docs fips_state_abbreviation %}
-Abbreviated form of the state for the patient (most recient known address).
+Abbreviated form of the state for the patient (most recent known address).
 {% enddocs %}
 
 {% docs hedis_measure_id %}
