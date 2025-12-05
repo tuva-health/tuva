@@ -321,7 +321,7 @@ models:
         meta:
           data_type: integer
       - name: refills
-        description: Number of refills for the prescription. This field is a positive integer that represents the number of refills for the prescription. Before the application iof Adjustments, Denials, and Reversals (ADR), refills may be represented as negative values on some claim lines, but appropriately handing ADR should result in only positive integer values.
+        description: Number of refills for the prescription. This field is a positive integer that represents the number of refills for the prescription. Before the application of Adjustments, Denials, and Reversals (ADR), refills may be represented as negative values on some claim lines, but appropriately handing ADR should result in only positive integer values.
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags:

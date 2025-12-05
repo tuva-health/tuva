@@ -27,7 +27,7 @@ models:
                 - dqi_readmission
               config:
                 severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - unique:
               tags:
                 - tuva_dqi_sev_1
@@ -73,7 +73,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - not_null:
               tags:
                 - tuva_dqi_sev_2
@@ -93,7 +93,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -114,7 +114,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -136,7 +136,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags:
@@ -145,7 +145,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -164,7 +164,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: date
       - name: prescribing_date
@@ -177,7 +177,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags:
@@ -186,7 +186,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -205,7 +205,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: date
       - name: source_code_type
@@ -218,7 +218,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - accepted_values:
               values:
                 - ndc
@@ -252,7 +252,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -273,7 +273,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -294,7 +294,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - not_null:
               tags:
                 - tuva_dqi_sev_3
@@ -323,7 +323,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -344,7 +344,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - relationships:
               to: ref('terminology__rxnorm_to_atc')
               field: rxcui
@@ -354,7 +354,7 @@ models:
                 - dqi_quality_measures
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -375,7 +375,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -395,7 +395,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -415,7 +415,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -435,7 +435,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -455,7 +455,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -475,7 +475,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -495,7 +495,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -515,7 +515,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - not_null:
               tags:
                 - tuva_dqi_sev_4
@@ -542,7 +542,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -562,7 +562,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: Percentage of values that are null.
               tags:
@@ -583,7 +583,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar
       - name: ingest_datetime
@@ -595,7 +595,7 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
           - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list:
                 - date
@@ -617,6 +617,6 @@ models:
                 - dqi
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: timestamp
