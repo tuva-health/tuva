@@ -240,3 +240,6 @@ select
     , collection_end_date
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types
+-- 100% v28 starting in 2026
+-- TODO: Update the seed table so this filter isn't necessary
+where 1 = (case when payment_year >= 2026 and model_version = 'CMS-HCC-V24' then 0 else 1 end)
