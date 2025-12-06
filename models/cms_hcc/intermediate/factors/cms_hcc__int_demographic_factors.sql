@@ -143,7 +143,7 @@ with members as (
             /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
         and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
         and members.institutional_status = seed_demographic_factors.institutional_status
-    where members.enrollment_status = 'Institutional'
+    where members.enrollment_status = 'Continuing'
 )
 
 
