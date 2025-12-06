@@ -4,7 +4,6 @@
 }}
 
 with members as (
-
     select
           person_id
         , payer
@@ -44,7 +43,6 @@ with members as (
 )
 
 , seed_demographic_factors as (
-
     select
           model_version
         , factor_type
@@ -81,8 +79,7 @@ with members as (
 
 )
 
-, v24_new_enrollees as (
-
+, new_enrollees as (
     select
           members.person_id
         , members.payer
@@ -105,19 +102,16 @@ with members as (
         , seed_demographic_factors.coefficient
         , seed_demographic_factors.risk_model_code
     from members
-        inner join seed_demographic_factors
-            on members.enrollment_status = seed_demographic_factors.enrollment_status
-            and members.gender = seed_demographic_factors.gender
-            and members.age_group = seed_demographic_factors.age_group
-            and members.medicaid_status = seed_demographic_factors.medicaid_status
-            and members.orec = seed_demographic_factors.orec
+    inner join seed_demographic_factors
+        on members.enrollment_status = seed_demographic_factors.enrollment_status
+        and members.gender = seed_demographic_factors.gender
+        and members.age_group = seed_demographic_factors.age_group
+        and members.medicaid_status = seed_demographic_factors.medicaid_status
+        and members.orec = seed_demographic_factors.orec
     where members.enrollment_status = 'New'
-        and seed_demographic_factors.model_version = 'CMS-HCC-V24'
-
 )
 
-, v24_continuing_enrollees as (
-
+, continuing_enrollees as (
     select
           members.person_id
         , members.payer
@@ -140,22 +134,20 @@ with members as (
         , seed_demographic_factors.coefficient
         , seed_demographic_factors.risk_model_code
     from members
-        inner join seed_demographic_factors
-            on members.enrollment_status = seed_demographic_factors.enrollment_status
-            and members.gender = seed_demographic_factors.gender
-            and members.age_group = seed_demographic_factors.age_group
-            and members.medicaid_status = seed_demographic_factors.medicaid_status
-            and members.dual_status = seed_demographic_factors.dual_status
-                /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
-            and members.institutional_status = seed_demographic_factors.institutional_status
-    where members.enrollment_status != 'New'
-        and seed_demographic_factors.model_version = 'CMS-HCC-V24'
-
+    inner join seed_demographic_factors
+        on members.enrollment_status = seed_demographic_factors.enrollment_status
+        and members.gender = seed_demographic_factors.gender
+        and members.age_group = seed_demographic_factors.age_group
+        and members.medicaid_status = seed_demographic_factors.medicaid_status
+        and members.dual_status = seed_demographic_factors.dual_status
+            /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
+        and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
+        and members.institutional_status = seed_demographic_factors.institutional_status
+    where members.enrollment_status = 'Institutional'
 )
 
-, v28_new_enrollees as (
 
+, institutional_enrollees as (
     select
           members.person_id
         , members.payer
@@ -178,71 +170,22 @@ with members as (
         , seed_demographic_factors.coefficient
         , seed_demographic_factors.risk_model_code
     from members
-        inner join seed_demographic_factors
-            on members.enrollment_status = seed_demographic_factors.enrollment_status
-            and members.gender = seed_demographic_factors.gender
-            and members.age_group = seed_demographic_factors.age_group
-            and members.medicaid_status = seed_demographic_factors.medicaid_status
-            and members.orec = seed_demographic_factors.orec
-    where members.enrollment_status = 'New'
-        and seed_demographic_factors.model_version = 'CMS-HCC-V28'
-
-)
-
--- TODO: Add enrollment type for MSSP ACOs
--- Logic for determining enrollment type can be found here: https://www.cms.gov/files/document/uses-and-limitations-cclfs.pdf on p. 46
-, v28_continuing_enrollees as (
-
-    select
-          members.person_id
-        , members.payer
-        , members.enrollment_status
-        , members.gender
-        , members.age_group
-        , members.medicaid_status
-        , members.dual_status
-        , members.orec
-        , members.institutional_status
-        , members.enrollment_status_default
-        , members.medicaid_dual_status_default
-        , members.orec_default
-        , members.institutional_status_default
-        , members.payment_year
-        , members.collection_start_date
-        , members.collection_end_date
-        , seed_demographic_factors.model_version
-        , seed_demographic_factors.factor_type
-        , seed_demographic_factors.coefficient
-        , seed_demographic_factors.risk_model_code
-    from members
-        inner join seed_demographic_factors
-            on members.enrollment_status = seed_demographic_factors.enrollment_status
-            and members.gender = seed_demographic_factors.gender
-            and members.age_group = seed_demographic_factors.age_group
-            and members.medicaid_status = seed_demographic_factors.medicaid_status
-            and members.dual_status = seed_demographic_factors.dual_status
-                /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
-            and members.institutional_status = seed_demographic_factors.institutional_status
-    where members.enrollment_status != 'New'
-        and seed_demographic_factors.model_version = 'CMS-HCC-V28'
-
+    inner join seed_demographic_factors
+        on members.enrollment_status = seed_demographic_factors.enrollment_status
+        and members.gender = seed_demographic_factors.gender
+        and members.age_group = seed_demographic_factors.age_group
+    where members.enrollment_status = 'Institutional'
 )
 
 , unioned as (
-
-    select * from v24_new_enrollees
+    select * from new_enrollees
     union all
-    select * from v24_continuing_enrollees
+    select * from continuing_enrollees
     union all
-    select * from v28_new_enrollees
-    union all
-    select * from v28_continuing_enrollees
-
+    select * from institutional_enrollees
 )
 
 , add_data_types as (
-
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
@@ -272,7 +215,6 @@ with members as (
         , cast(collection_start_date as date) as collection_start_date
         , cast(collection_end_date as date) as collection_end_date
     from unioned
-
 )
 
 select
