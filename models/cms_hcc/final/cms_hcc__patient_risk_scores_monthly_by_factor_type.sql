@@ -122,7 +122,7 @@ with seed_adjustment_rates as (
             when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V24' then 1.146
             else adj.normalization_factor
           end as normalization_factor
-        , case when raw.payment_year in (2024,2025) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment 
+        , case when raw.payment_year in (2024,2025,2026) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment 
         , raw.model_version
         , raw.payment_year
         , raw.collection_start_date

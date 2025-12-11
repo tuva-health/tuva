@@ -55,15 +55,15 @@ with members as (
         , institutional_status
         , coefficient
         , case
+            -- ESRD
             when enrollment_status = 'ESRD' then 'ESRD'
+            -- New Enrollee
             when enrollment_status = 'New' then 'E'
             -- Long Term Institutional (INS)
             when institutional_status = 'Yes' then 'INS'
             -- Community NonDual Aged (CNA)
             when medicaid_status = 'No' and orec = 'Aged' then 'CNA'
             -- Community NonDual Disabled (CND)
-            -- Adding 2 to differentation between originally disabled and disabled < 65
-            when medicaid_status = 'No' and orec = 'Disabled' and age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'CNDA'
             when medicaid_status = 'No' and orec = 'Disabled' then 'CND'
             -- Community Full Benefit Dual Aged (CFA)
             when dual_status = 'Full' and orec = 'Aged' then 'CFA'
