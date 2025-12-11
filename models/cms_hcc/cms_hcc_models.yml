@@ -453,10 +453,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _int_eligible_conditions
       tags: cms_hcc
-      materialized: table
-    columns:
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.      
+      materialized: table    
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -474,6 +471,8 @@ models:
     columns:
       - name: person_id
         description: Unique ID for the patient.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.          
       - name: condition_code
         description: The condition code.
         tests:
@@ -688,10 +687,7 @@ models:
       alias: _stg_condition
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging conditions from core.
-    columns:
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.    
+    description: Staging conditions from core. 
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -707,6 +703,8 @@ models:
         description: Unique claim_id for each claim.
       - name: person_id
         description: Unique person_id for each person.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.           
       - name: recorded_date
         description: Date in which the condition was recorded.
       - name: condition_type
@@ -723,10 +721,7 @@ models:
       alias: _stg_eligibility
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging eligibility from core.
-    columns:
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.    
+    description: Staging eligibility from core.  
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -738,6 +733,8 @@ models:
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.          
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
       - name: enrollment_end_date
@@ -756,10 +753,7 @@ models:
       alias: _stg_medical_claim
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging medical claims from core.
-    columns:
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.    
+    description: Staging medical claims from core.   
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -768,6 +762,8 @@ models:
             - claim_id
             - claim_line_number      
     columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage. 
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
