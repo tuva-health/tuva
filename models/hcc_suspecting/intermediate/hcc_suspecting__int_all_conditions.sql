@@ -18,25 +18,42 @@ with conditions as (
 
 )
 
-
--- TODO: Include prior years HCC mappings
-, seed_hcc_mapping as (
+, seed_hcc_mapping_base as (
 
     select
-          diagnosis_code
+          payment_year
+        , diagnosis_code
         , cms_hcc_v28 as hcc_code
         , 'CMS-HCC-V28' as model_version
-    from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
-    where cms_hcc_v28 is not null
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where cms_hcc_v28_flag = 'Yes'
 
     union all
 
     select
-          diagnosis_code
+          payment_year
+        , diagnosis_code
         , cms_hcc_v24 as hcc_code
         , 'CMS-HCC-V24' as model_version
-    from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
-    where cms_hcc_v24 is not null
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where cms_hcc_v24_flag = 'Yes'
+)
+
+, seed_hcc_mapping as (
+select
+      payment_year
+    , diagnosis_code
+    , hcc_code
+    , model_version
+from seed_hcc_mapping_base
+union all
+select
+      payment_year + 1 as payment_year
+    , diagnosis_code
+    , hcc_code
+    , model_version
+from seed_hcc_mapping_base
+where payment_year = (select max(payment_year) as payment_year from seed_hcc_mapping_base)    
 )
 
 -- Add in support for v24
@@ -65,9 +82,11 @@ with conditions as (
         , seed_hcc_descriptions.hcc_description
     from conditions
          left outer join seed_hcc_mapping
-         on conditions.code = seed_hcc_mapping.diagnosis_code
+            on conditions.code = seed_hcc_mapping.diagnosis_code
+            and {{ date_part('year', 'conditions.recorded_date') }} + 1 = seed_hcc_mapping.payment_year
          left outer join seed_hcc_descriptions
          on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
+         and seed_hcc_mapping.model_version = seed_hcc_descriptions.model_version
     where conditions.code_type = 'icd-10-cm'
 )
 
