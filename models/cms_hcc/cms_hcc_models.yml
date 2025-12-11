@@ -454,6 +454,9 @@ models:
       alias: _int_eligible_conditions
       tags: cms_hcc
       materialized: table
+    columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.      
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -686,6 +689,9 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging conditions from core.
+    columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.    
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -718,6 +724,9 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging eligibility from core.
+    columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.    
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -748,6 +757,9 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging medical claims from core.
+    columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.    
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

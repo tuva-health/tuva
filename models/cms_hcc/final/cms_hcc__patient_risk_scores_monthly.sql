@@ -12,7 +12,7 @@ select
     , sum(normalized_risk_score) as normalized_risk_score
     , sum(payment_risk_score) as payment_risk_score
     , sum(payment_risk_score_weighted_by_months) as payment_risk_score_weighted_by_months
-    , sum(member_months) as member_months
+    , max(member_months) as member_months
     , payment_year
     , collection_start_date
     , collection_end_date
