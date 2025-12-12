@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: person_demographics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ncqa_hedis_measures
+        {% else %}ncqa_hedis_measures{%- endif -%}
+      tags: ncqa_hedis_measures
+      materialized: table
+
+  - name: visit_codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ncqa_hedis_measures
+        {% else %}ncqa_hedis_measures{%- endif -%}
+      tags: ncqa_hedis_measures
+      materialized: table
+
+  - name: enrollment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ncqa_hedis_measures
+        {% else %}ncqa_hedis_measures{%- endif -%}
+      tags: ncqa_hedis_measures
+      materialized: table
+
+  - name: living_long_term_in_institution
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ncqa_hedis_measures
+        {% else %}ncqa_hedis_measures{%- endif -%}
+      tags: ncqa_hedis_measures
+      materialized: table
+
+  - name: members_using_hospice_benefit
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ncqa_hedis_measures
+        {% else %}ncqa_hedis_measures{%- endif -%}
+      tags: ncqa_hedis_measures
+      materialized: table
