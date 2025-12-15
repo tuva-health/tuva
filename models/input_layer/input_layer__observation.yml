@@ -84,6 +84,11 @@ models:
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: payer
         description: '{{ doc("payer") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
         meta:
           data_type: varchar
       - name: patient_id
