@@ -7,6 +7,7 @@ with all_medications as (
 
     select
           person_id
+        , payer
         , dispensing_date
         , drug_code
         , code_system
@@ -38,6 +39,7 @@ with all_medications as (
 
     select distinct
           person_id
+        , payer
         , data_source
         , hcc_code
         , current_year_billed
@@ -53,6 +55,7 @@ with all_medications as (
 
     select
           all_medications.person_id
+        , all_medications.payer
         , all_medications.dispensing_date
         , all_medications.drug_code
         , all_medications.code_system
@@ -86,6 +89,7 @@ with all_medications as (
 
     select
           unioned.person_id
+        , unioned.payer
         , unioned.data_source
         , unioned.hcc_code
         , unioned.hcc_description
@@ -96,6 +100,7 @@ with all_medications as (
     from unioned
         left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
+            and unioned.payer = billed_hccs.payer
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
 )
@@ -104,6 +109,7 @@ with all_medications as (
 
     select
           person_id
+        , payer
         , data_source
         , hcc_code
         , hcc_description
@@ -125,6 +131,7 @@ with all_medications as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
@@ -144,6 +151,7 @@ with all_medications as (
 
 select
       person_id
+    , payer
     , data_source
     , hcc_code
     , hcc_description

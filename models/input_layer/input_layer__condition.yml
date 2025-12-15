@@ -62,6 +62,23 @@ models:
                 - dqi_readmission
               config:
                 severity: error
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: payer
+        description: '{{ doc("payer") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"        
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"        
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         meta:
           data_type: varchar

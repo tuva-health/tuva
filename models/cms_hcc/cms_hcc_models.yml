@@ -156,7 +156,67 @@ models:
           The payment year the HCC and risk scores are being calculated for.
       - name: tuva_last_run
         description: The date the model was run.
-
+  - name: cms_hcc__patient_risk_scores_monthly_by_factor_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: patient_risk_scores_monthly_by_factor_type
+      tags: cms_hcc
+      materialized: table
+    description: >
+      This model calculates the CMS HCC raw risk score, blended risk score,
+      normalized risk score, and payment risk score for each enrollee, factor type,
+      in the payment year and collection period.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - factor_type
+            - payment_year
+            - collection_start_date
+            - collection_end_date
+    columns:
+      - name: person_id
+        description: Unique ID for the patient.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: factor_type
+        description: >
+          Type of risk factor, e.g. Demographic, Disease, etc.
+      - name: v24_risk_score
+        description: >
+          The patient risk score from model version CMS-HCC-V24 for this factor type.
+      - name: v28_risk_score
+        description: >
+          The patient risk score from model version CMS-HCC-V28 for this factor type.
+      - name: blended_risk_score
+        description: >
+          The sum of v24_risk_score and v28_risk_score for this factor type.
+      - name: normalized_risk_score
+        description: >
+          The blended risk score divided by the normalization adjustment factor.
+      - name: payment_risk_score
+        description: >
+          The normalized risk score multiplied by 1 - the MA coding pattern adjustment factor.
+      - name: payment_risk_score_weighted_by_months
+        description: >
+          Payment risk score multiplied by member_months.
+      - name: member_months
+        description: >
+          Member months derived from the finanicial_pmpm mart utilizing payment year eligibility.
+      - name: payment_year
+        description: >
+          The payment year the HCC and risk scores are being calculated for. 
+          This is 1 year after the collection year or year in which the diagnoses were actually coded.
+      - name: collection_start_date
+        description: >
+          The start date for the collection period the HCC and risk scores are being calculated for.
+      - name: collection_end_date
+        description: >
+          The end date for the collection period the HCC and risk scores are being calculated for.
+      - name: tuva_last_run
+        description: The date the model was run.      
   - name: cms_hcc__patient_risk_scores_monthly
     config:
       schema: |
@@ -173,6 +233,7 @@ models:
           combination_of_columns:
             - person_id
             - payment_year
+            - payer
             - collection_end_date
     columns:
       - name: person_id
@@ -392,13 +453,26 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _int_eligible_conditions
       tags: cms_hcc
-      materialized: table
+      materialized: table    
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - claim_id
+            - claim_line_number
+            - condition_code
+            - payment_year
+            - collection_start_date
+            - collection_end_date
     description: >
       Conditions from eligible risk-adjustable claims per claim type for the 
       collection year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.          
       - name: condition_code
         description: The condition code.
         tests:
@@ -613,12 +687,24 @@ models:
       alias: _stg_condition
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging conditions from core.
+    description: Staging conditions from core. 
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - claim_id
+            - person_id
+            - recorded_date
+            - condition_type
+            - code_type 
+            - code            
     columns:
       - name: claim_id
         description: Unique claim_id for each claim.
       - name: person_id
         description: Unique person_id for each person.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.           
       - name: recorded_date
         description: Date in which the condition was recorded.
       - name: condition_type
@@ -635,10 +721,20 @@ models:
       alias: _stg_eligibility
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging eligibility from core.
+    description: Staging eligibility from core.  
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - enrollment_start_date
+            - enrollment_end_date
+            - data_source
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.          
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
       - name: enrollment_end_date
@@ -657,8 +753,17 @@ models:
       alias: _stg_medical_claim
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging medical claims from core.
+    description: Staging medical claims from core.   
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - claim_id
+            - claim_line_number      
     columns:
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage. 
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
@@ -704,6 +809,12 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging member months from financial_pmpm
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - year_month    
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.

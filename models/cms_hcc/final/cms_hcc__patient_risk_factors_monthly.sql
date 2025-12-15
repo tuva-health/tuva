@@ -6,6 +6,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         /* concatenate demographic risk factors */
 
     , {{ dbt.concat(
@@ -49,6 +50,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , model_version
         , enrollment_status_default
         , medicaid_dual_status_default
@@ -65,6 +67,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , {{ concat_custom(["hcc_description", "' (HCC '", "hcc_code", "')'"]) }} as description
         , coefficient
         , factor_type
@@ -80,6 +83,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , description
         , coefficient
         , factor_type
@@ -95,6 +99,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , description
         , coefficient
         , factor_type
@@ -110,6 +115,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , description
         , coefficient
         , factor_type
@@ -125,6 +131,7 @@ with demographic_factors as (
 
     select
           person_id
+        , payer
         , description
         , coefficient
         , factor_type
@@ -156,6 +163,7 @@ with demographic_factors as (
 
     select
           unioned.person_id
+        , unioned.payer
         , demographic_defaults.enrollment_status_default
         , demographic_defaults.medicaid_dual_status_default
         , demographic_defaults.orec_default
@@ -170,6 +178,7 @@ with demographic_factors as (
     from unioned
         left outer join demographic_defaults
             on unioned.person_id = demographic_defaults.person_id
+            and unioned.payer = demographic_defaults.payer
             and unioned.model_version = demographic_defaults.model_version
             and unioned.payment_year = demographic_defaults.payment_year
             and unioned.collection_end_date = demographic_defaults.collection_end_date
@@ -180,6 +189,7 @@ with demographic_factors as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         {% if target.type == 'fabric' %}
             , cast(enrollment_status_default as bit) as enrollment_status_default
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
@@ -204,6 +214,7 @@ with demographic_factors as (
 
 select
       person_id
+    , payer
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default

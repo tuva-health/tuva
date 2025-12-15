@@ -5,7 +5,7 @@
 
 with patient_stage as (
     select
-        person_id
+          person_id
         , name_suffix
         , first_name
         , middle_name
@@ -36,7 +36,7 @@ with patient_stage as (
 )
 
 select
-    cast(person_id as {{ dbt.type_string() }}) as person_id
+      cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
     , cast(middle_name as {{ dbt.type_string() }}) as middle_name

@@ -7,6 +7,7 @@ with conditions as (
 
     select
           person_id
+        , payer
         , recorded_date
         , condition_type
         , code_type
@@ -75,6 +76,7 @@ with conditions as (
 
     select distinct
           person_id
+        , payer
         , data_source
         , hcc_code
         , current_year_billed
@@ -104,6 +106,7 @@ with conditions as (
 
      select
           conditions.person_id
+        , conditions.payer
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -122,6 +125,7 @@ with conditions as (
 
      select
           conditions.person_id
+        , conditions.payer
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -140,6 +144,7 @@ with conditions as (
 
      select
           conditions.person_id
+        , conditions.payer
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -159,6 +164,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
+        , obstructive_sleep_apnea.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -186,6 +192,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
+        , diabetes.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -213,6 +220,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
+        , hypertension.payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -240,6 +248,7 @@ with conditions as (
 
     select
           numeric_observations.person_id
+        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -275,6 +284,7 @@ with conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , observation_date
         , observation_result
@@ -358,6 +368,7 @@ with conditions as (
 
     select
           depression_assessments_ordered.person_id
+        , CAST('clinical source' as {{ dbt.type_string() }}) as payer
         , depression_assessments_ordered.data_source
         , depression_assessments_ordered.observation_date
         , depression_assessments_ordered.result as observation_result
@@ -393,6 +404,7 @@ with conditions as (
 
     select
           unioned.person_id
+        , unioned.payer
         , unioned.data_source
         , unioned.observation_date
         , unioned.observation_result
@@ -415,6 +427,7 @@ with conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , observation_date
         , observation_result
@@ -435,6 +448,7 @@ with conditions as (
 
     select
           CAST(person_id as {{ dbt.type_string() }}) as person_id
+        , CAST(payer as {{ dbt.type_string() }}) as payer
         , CAST(data_source as {{ dbt.type_string() }}) as data_source
         , CAST(observation_date as date) as observation_date
         , CAST(observation_result as {{ dbt.type_string() }}) as observation_result
@@ -444,7 +458,7 @@ with conditions as (
         , CAST(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , CAST(hcc_description as {{ dbt.type_string() }}) as hcc_description
         {% if target.type == 'fabric' %}
-            , cast(current_year_billed as bit) as current_year_billed
+            , CAST(current_year_billed as bit) as current_year_billed
         {% else %}
             , CAST(current_year_billed as boolean) as current_year_billed
         {% endif %}
@@ -457,6 +471,7 @@ with conditions as (
 
 select
       person_id
+    , payer
     , data_source
     , observation_date
     , observation_result

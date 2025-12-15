@@ -7,6 +7,7 @@
 
 select
       person_id
+    , 'clinical source' as payer
     , observation_date
     , result
     , lower(coalesce(normalized_code_type, source_code_type)) as code_type
@@ -18,6 +19,7 @@ from {{ ref('core__observation') }}
 
 select
       person_id
+    , 'clinical source' as payer
     , observation_date
     , result
     , lower(coalesce(normalized_code_type,source_code_type)) as code_type
@@ -30,6 +32,7 @@ from {{ ref('core__observation') }}
 {% if target.type == 'fabric' %}
     select top 0
       cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as payer
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
     , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as code_type
@@ -38,6 +41,7 @@ from {{ ref('core__observation') }}
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as person_id
+        , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
         , cast(null as {{ dbt.type_string() }} ) as result
         , cast(null as {{ dbt.type_string() }} ) as code_type

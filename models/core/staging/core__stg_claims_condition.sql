@@ -13,6 +13,7 @@ with unpivot_cte as (
   select
         claim_id
         , claim_line_number
+        , payer
         , person_id
         , member_id
         , coalesce(admission_date
@@ -38,6 +39,8 @@ with unpivot_cte as (
 select distinct
 {{ dbt.safe_cast(
     concat_custom([
+        "CAST(unpivot_cte.payer AS " ~ dbt.type_string() ~ ")",
+        "'_'",
         "CAST(unpivot_cte.data_source AS " ~ dbt.type_string() ~ ")",
         "'_'",
         "CAST(unpivot_cte.claim_id AS " ~ dbt.type_string() ~ ")",
@@ -72,6 +75,7 @@ select distinct
     , cast(poa.present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and

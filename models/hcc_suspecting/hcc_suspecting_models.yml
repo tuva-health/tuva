@@ -403,6 +403,10 @@ models:
     columns:
       - name: person_id
         description: Unique ID for the patient.
+      - name: payer
+        description: Name of the payer.
+      - name: claim_id
+        description: Unique identifier for the medical claim.
       - name: recorded_date
         description: Date in which the condition was recorded.
       - name: condition_type
@@ -420,6 +424,17 @@ models:
           named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - recorded_date
+            - condition_type
+            - code_type
+            - code
+            - data_source
+            - payer
+            - claim_id
 
   - name: hcc_suspecting__int_prep_egfr_labs
     config:
