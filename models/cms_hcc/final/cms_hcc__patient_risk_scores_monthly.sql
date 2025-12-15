@@ -8,7 +8,7 @@ select
     , payer
     , payment_year
     , collection_start_date
-    , collection_end_date    
+    , collection_end_date
     , sum(v24_risk_score) as v24_risk_score
     , sum(v28_risk_score) as v28_risk_score
     , sum(blended_risk_score) as blended_risk_score

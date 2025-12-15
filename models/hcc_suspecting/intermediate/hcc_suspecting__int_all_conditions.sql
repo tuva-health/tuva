@@ -41,19 +41,19 @@ with conditions as (
 
 , seed_hcc_mapping as (
 select
-      payment_year
-    , diagnosis_code
-    , hcc_code
-    , model_version
-from seed_hcc_mapping_base
+      seed_1.payment_year
+    , seed_1.diagnosis_code
+    , seed_1.hcc_code
+    , seed_1.model_version
+from seed_hcc_mapping_base as seed_1
 union all
 select
-      payment_year + 1 as payment_year
-    , diagnosis_code
-    , hcc_code
-    , model_version
-from seed_hcc_mapping_base
-where payment_year = (select max(payment_year) as payment_year from seed_hcc_mapping_base)    
+      seed_2.payment_year + 1 as payment_year
+    , seed_2.diagnosis_code
+    , seed_2.hcc_code
+    , seed_2.model_version
+from seed_hcc_mapping_base as seed_2
+where seed_2.payment_year = (select max(payment_year) as payment_year from seed_hcc_mapping_base)
 )
 
 -- Add in support for v24
