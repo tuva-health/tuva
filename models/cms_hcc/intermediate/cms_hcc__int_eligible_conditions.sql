@@ -62,19 +62,6 @@ with medical_claims as (
 
 )
 
-, accepted_providers as (
--- Distinct is to remove duplicates when a taxonomy maps to more than 1 medicare specialty code
-select 
-        prov.npi
-      , max(case when accpt.specialty_code is not null then 1 else 0 end) as accepted_provider
-from {{ ref('terminology__provider') }} as prov
-inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as xwalk
-    on prov.primary_taxonomy_code = xwalk.provider_taxonomy_code
-left join {{ ref('terminology__cms_acceptable_provider_specialty_codes') }} accpt
-    on lpad(xwalk.medicare_specialty_code,2,'0') = accpt.specialty_code
-group by prov.npi
-)
-
 , professional_claims as (
 
     select
@@ -96,17 +83,7 @@ group by prov.npi
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
-        -- CMS uses the claim line level provider specialty code, but this is good enough for now
-        -- TODO: Use claim line provider specialty codes instead
-        left join accepted_providers prov
-            on medical_claims.rendering_npi = prov.npi
     where claim_type = 'professional'
-        -- and 1 = (case 
-        --             when prov.npi is null then 1
-        --             else prov.accepted_provider
-        --         end
-        --             )
-
 )
 
 , inpatient_claims as (
