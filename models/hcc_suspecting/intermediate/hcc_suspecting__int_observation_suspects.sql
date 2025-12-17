@@ -184,10 +184,10 @@ with conditions as (
             on numeric_observations.person_id = obstructive_sleep_apnea.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
-        cross join seed_hcc_descriptions
+        inner join seed_hcc_descriptions
+            on seed_hcc_descriptions.hcc_code = '48'
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 30
-        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -213,10 +213,10 @@ with conditions as (
             on numeric_observations.person_id = diabetes.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'diabetes.recorded_date') }}
-        cross join seed_hcc_descriptions
+        inner join seed_hcc_descriptions
+            on seed_hcc_descriptions.hcc_code = '48'
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 35
-        and seed_hcc_descriptions.hcc_code = '48'
 )
 
 , bmi_over_35_with_hypertension as (
@@ -241,10 +241,10 @@ with conditions as (
             on numeric_observations.person_id = hypertension.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'hypertension.recorded_date') }}
-        cross join seed_hcc_descriptions
+        inner join seed_hcc_descriptions
+            on seed_hcc_descriptions.hcc_code = '48'
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 35
-        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -266,10 +266,10 @@ with conditions as (
         inner join seed_clinical_concepts
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
-        cross join seed_hcc_descriptions
+        inner join seed_hcc_descriptions
+            on seed_hcc_descriptions.hcc_code = '48'
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 40
-        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -390,10 +390,10 @@ with conditions as (
             "' on '",
             "depression_assessments_ordered.observation_date"]) }} as contributing_factor
     from depression_assessments_ordered
-        cross join seed_hcc_descriptions
+        inner join seed_hcc_descriptions
+            on seed_hcc_descriptions.hcc_code = '155'
     where result_order = 1
         and result >= 15
-        and seed_hcc_descriptions.hcc_code = '155'
 
 )
 
