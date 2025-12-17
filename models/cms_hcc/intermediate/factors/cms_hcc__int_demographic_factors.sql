@@ -4,6 +4,7 @@
 }}
 
 with members as (
+
     select
           person_id
         , payer
