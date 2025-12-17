@@ -46,7 +46,10 @@ select
     , hcc_code
     , model_version
 from seed_hcc_mapping_base
+
 union all
+
+-- Adding a year in order to get next year's payment year flowing through as well before the mappings are available
 select
       payment_year + 1 as payment_year
     , diagnosis_code
@@ -85,7 +88,8 @@ where payment_year = (select max(payment_year) as payment_year from seed_hcc_map
             on conditions.code = seed_hcc_mapping.diagnosis_code
             and {{ date_part('year', 'conditions.recorded_date') }} + 1 = seed_hcc_mapping.payment_year
          left outer join seed_hcc_descriptions
-         on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
+            on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
+            and seed_hcc_mapping.model_version = seed_hcc_descriptions.model_version
     where conditions.code_type = 'icd-10-cm'
 )
 

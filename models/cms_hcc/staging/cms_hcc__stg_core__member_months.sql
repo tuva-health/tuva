@@ -2,7 +2,7 @@
      enabled = var('cms_hcc_enabled',var('financial_pmpm_enabled', var('claims_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
--- Need distinct because of plan
+-- Need distinct to deduplicate and remove the plan column
 select distinct
       person_id
     , payer

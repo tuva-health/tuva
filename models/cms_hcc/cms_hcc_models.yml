@@ -162,7 +162,60 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: patient_risk_scores_monthly_by_factor_type
       tags: cms_hcc
-      materialized: table  
+      materialized: table
+    description: >
+      The same columns as `cms_hcc__patient_risk_scores_monthly`, but it includes factor_type as well.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payment_year
+            - payer
+            - collection_end_date
+            - factor_type
+    columns:
+      - name: person_id
+        description: Unique ID for the patient.
+      - name: v24_risk_score
+        description: >
+          The sum of all patient risk factors from model version CMS-HCC-V24. 
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
+      - name: v28_risk_score
+        description: >
+          The sum of all patient risk factors from model version CMS-HCC-V28.
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
+      - name: blended_risk_score
+        description: The of sum v24_risk_score and v28_risk_score.
+      - name: normalized_risk_score
+        description: >
+          The blended risk score divided by the normalization adjustment factor 
+          for the corresponding HCC model version and payment year's rate 
+          announcement from CMS.
+      - name: payment_risk_score
+        description: >
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
+      - name: payment_risk_score_weighted_by_months
+        description: >
+          Payment risk score multiplied by member_months.
+      - name: member_months
+        description: >
+          Member months derived from the finanicial_pmpm mart utilizing 
+          payment year eligibility.
+      - name: payment_year
+        description: >
+          The payment year the HCC and risk scores are being calculated for.
+      - name: collection_start_date
+        description: >
+          The start date for the collection period the HCC and risk scores are being calculated for.
+      - name: collection_end_date
+        description: >
+          The end date for the collection period the HCC and risk scores are being calculated for.
+      - name: tuva_last_run
+        description: The date the model was run.      
   - name: cms_hcc__patient_risk_scores_monthly
     config:
       schema: |

@@ -170,6 +170,10 @@ models:
         description: Indicates how the patient became eligible for Medicare.
         meta:
           terminology: https://thetuvaproject.com/terminology/medicare-status
+      - name: enrollment_status
+        description: >
+          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status, 
+          leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
       - name: group_id
         description: '{{ doc("group_id") }}'
       - name: group_name
