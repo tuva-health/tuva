@@ -249,7 +249,6 @@ group by
             , cast(enrollment_status_default as boolean) as enrollment_status_default
             , cast(orec_default as boolean) as orec_default
         {% endif %}        
-        , cast(orec_default as {{ dbt.type_string() }}) as orec_default
         , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
         , round(cast(v28_risk_score as {{ dbt.type_numeric() }}), 3) as v28_risk_score
         , round(cast(blended_risk_score as {{ dbt.type_numeric() }}), 3) as blended_risk_score
