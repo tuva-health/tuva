@@ -14,14 +14,16 @@ with members as (
         , medicaid_status
         , dual_status
         /* HACK: Adhoc fix for new enrollees and <65 years old. They are being given coefficient = 0, but really should be given what is currently listed as 'Aged'.
-        Aged is an incorrect label here and should just be null given the labels in the SAS code look like this: NE_NMCAID_NORIGDIS_NEF0_34.
-        This simply says 'New Enrollee, Not Medicaid, Not Originally Disabled, Female, 0-34'. Not Originally Disabled != Aged.
+        However, 'Aged' is an incorrect label here and should be updated to null given the labels in the SAS code look like this: NE_NMCAID_NORIGDIS_NEF0_34.
+        The SAS code NE_NMCAID_NORIGDIS_NEF0_34 simply says 'New Enrollee, Not Medicaid, Not Originally Disabled, Female, 0-34'. Not Originally Disabled != Aged.
         Here is the definition for originally disabled per the SAS code:
             %* disabled;
             DISABL = (&AGEF < 65 & &OREC ne "0");
             %* originally disabled;
             ORIGDS  = (&OREC = '1')*(DISABL = 0);
         This means that < 65 is just disabled and not originally disabled.
+        All in all, this is a hack to use the correct coefficient for New enrolles < 65. The correct coefficient is 'Aged'. However, the seed file needs to be
+        updated for these members so there is a coefficient value instead of 0.
        */
         , case       
             when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
