@@ -43,6 +43,7 @@ select
     , ee.overlaps_with_another_encounter_flag
     , ee.missing_drg_flag
     , ee.invalid_drg_flag
+    , aa.data_source
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from
     {{ ref('readmissions__encounter') }} as aa

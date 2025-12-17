@@ -14,6 +14,7 @@ select
     , ccsr_parent_category
     , parent_category_description
     , body_system
+    , data_source
     , {{ var('dxccsr_version') }} as dxccsr_version
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('ccsr__long_condition_category') }}
