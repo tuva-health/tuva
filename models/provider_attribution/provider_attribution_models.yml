@@ -4,10 +4,10 @@ models:
   - name: provider_attribution__assigned_beneficiaries_yearly
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_yearly
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
     columns:
       - name: attribution_key
         tests:
@@ -17,10 +17,10 @@ models:
   - name: provider_attribution__assigned_beneficiaries_current
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_current
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
     columns:
       - name: attribution_key
         tests:
@@ -30,10 +30,10 @@ models:
   - name: provider_attribution__provider_ranking
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: provider_ranking
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
     columns:
       - name: provider_id
         tests: [not_null]
@@ -46,84 +46,84 @@ models:
   - name: provider_attribution__int_person_years
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_person_years
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__provider_classification
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_provider_classification
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__int_primary_care_claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_primary_care_claims
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__int_yearly_steps
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_yearly_steps
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__int_current_steps
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_current_steps
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__stg_core__medical_claim
     description: Staging view of core medical claims used for provider attribution.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__medical_claim
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__stg_core__claims_medical_claim
     description: Staging view of normalized medical claim encounter references used for provider attribution.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__claims_medical_claim
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__stg_core__member_months
     description: Staging view of member months used for provider attribution eligibility logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__member_months
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__stg_reference_data__calendar
     description: Staging view of reference calendar data supporting provider attribution date logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_reference_data__calendar
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
 
   - name: provider_attribution__stg_terminology__provider
     description: Staging view of provider taxonomy detail used in provider attribution classification.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_terminology__provider
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: ["provider_attribution"]
