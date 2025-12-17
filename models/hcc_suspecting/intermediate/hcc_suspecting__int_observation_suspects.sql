@@ -241,7 +241,7 @@ with conditions as (
             on numeric_observations.person_id = hypertension.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'hypertension.recorded_date') }}
-        cross join seed_hcc_descriptions            
+        cross join seed_hcc_descriptions
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 35
         and seed_hcc_descriptions.hcc_code = '48'

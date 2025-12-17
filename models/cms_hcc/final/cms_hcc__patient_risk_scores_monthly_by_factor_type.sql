@@ -111,25 +111,25 @@ with seed_adjustment_rates as (
             when raw.payment_year <= 2023 and raw.model_version = 'CMS-HCC-V28' then 0
             when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V28' then risk_score * 0.33
             when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V28' then risk_score * 0.67
-            when raw.payment_year >= 2026 and raw.model_version = 'CMS-HCC-V28' then risk_score            
+            when raw.payment_year >= 2026 and raw.model_version = 'CMS-HCC-V28' then risk_score
             end as weighted_raw_risk_score
         -- , adj.normalization_factor
         -- , adj.ma_coding_pattern_adjustment
         -- TODO: Once the seed is updated remove the case when for norm factor + ma coding pattern adj
-        , case 
+        , case
             when raw.payment_year = 2026 and raw.model_version = 'CMS-HCC-V28' then 1.067
             when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V24' then 1.153
             when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V24' then 1.146
             else adj.normalization_factor
           end as normalization_factor
-        , case when raw.payment_year in (2024,2025,2026) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment 
+        , case when raw.payment_year in (2024, 2025, 2026) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment
         , raw.model_version
         , raw.payment_year
         , raw.collection_start_date
         , raw.collection_end_date
-    from raw_score raw
+    from raw_score as raw
     left outer join seed_adjustment_rates as adj
-        on  raw.payment_year = adj.payment_year
+        on raw.payment_year = adj.payment_year
         and raw.model_version = adj.model_version
 
 )
@@ -147,7 +147,7 @@ with seed_adjustment_rates as (
         , model_version
         , raw_risk_score
         , weighted_raw_risk_score
-        , round((weighted_raw_risk_score / normalization_factor),3) as normalized_risk_score
+        , round((weighted_raw_risk_score / normalization_factor), 3) as normalized_risk_score
         , ma_coding_pattern_adjustment
         , payment_year
         , collection_start_date
@@ -169,7 +169,7 @@ with seed_adjustment_rates as (
         , raw_risk_score
         , weighted_raw_risk_score
         , normalized_risk_score
-        , round((normalized_risk_score * (1 - ma_coding_pattern_adjustment)),3) as payment_risk_score
+        , round((normalized_risk_score * (1 - ma_coding_pattern_adjustment)), 3) as payment_risk_score
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -187,7 +187,7 @@ select
         , orec_default
         , payment_year
         , collection_start_date
-        , collection_end_date        
+        , collection_end_date
         , max(case when model_version = 'CMS-HCC-V24' then weighted_raw_risk_score end) as v24_risk_score
         , max(case when model_version = 'CMS-HCC-V28' then weighted_raw_risk_score end) as v28_risk_score
         , sum(weighted_raw_risk_score) as blended_risk_score
@@ -204,7 +204,7 @@ group by
         , orec_default
         , payment_year
         , collection_start_date
-        , collection_end_date  
+        , collection_end_date
 )
 
 , weighted_score as (
