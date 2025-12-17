@@ -25,7 +25,7 @@ with members as (
         All in all, this is a hack to use the correct coefficient for New enrolles < 65. The correct coefficient is 'Aged'. However, the seed file needs to be
         updated for these members so there is a coefficient value instead of 0.
        */
-        , case       
+        , case
             when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
             when enrollment_status = 'New' and age_group = '35-44' then 'Aged'
             when enrollment_status = 'New' and age_group = '45-54' then 'Aged'
