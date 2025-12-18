@@ -17,7 +17,7 @@ select
     , invalid_reason
     , summary_sk
     , frequency
-	, '{{ var('tuva_last_run') }}' as tuva_last_run
+	, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_claims_for_pbi') }}
 
 union all
@@ -34,7 +34,7 @@ select
     , invalid_reason
     , summary_sk
     , frequency
-	, '{{ var('tuva_last_run') }}' as tuva_last_run
+	, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_clinical_for_pbi') }}
 
 {% elif var('claims_enabled', False) == true -%}
@@ -51,7 +51,7 @@ SELECT
     invalid_reason,
     summary_sk,
     frequency,
-	'{{ var('tuva_last_run') }}' as tuva_last_run
+	cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_for_pbi') }}
 
 {% elif var('clinical_enabled', False) == true -%}
@@ -68,7 +68,7 @@ SELECT
     invalid_reason,
     summary_sk,
     frequency,
-	'{{ var('tuva_last_run') }}' as tuva_last_run
+	cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_for_pbi') }}
 
 {%- endif %}

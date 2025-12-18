@@ -278,5 +278,5 @@ select
     , claim_end_date
     , procedure_date
     , patient_type
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from exclusions_unioned

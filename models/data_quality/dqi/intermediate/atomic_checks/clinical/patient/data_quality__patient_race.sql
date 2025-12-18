@@ -22,6 +22,6 @@ select
            then 'Race description does not join to Terminology race table'
            else null end as invalid_reason
     , cast(race as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('patient') }} as m
 left outer join {{ ref('terminology__race') }} as term on m.race = term.description

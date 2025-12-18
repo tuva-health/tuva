@@ -65,7 +65,7 @@ with cohort_ranks as (
 
 
 --getting all encounters, with labeled cohorts, if no cohort cohort is "medicine"
-select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort, '{{ var('tuva_last_run') }}' as tuva_last_run
+select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('readmissions__encounter') }} as enc
 left outer join main_encounter_cohort as mec
     on enc.encounter_id = mec.encounter_id

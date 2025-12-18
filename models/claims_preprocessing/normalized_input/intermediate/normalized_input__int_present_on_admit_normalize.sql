@@ -280,7 +280,7 @@ select
     , diagnosis_column
     , poa.present_on_admit_code as normalized_present_on_admit_code
     , count(*) as present_on_admit_occurrence_count
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pivot_poa as piv
 left outer join {{ ref('terminology__present_on_admission') }} as poa
     on replace(piv.present_on_admit_code, '.', '') = poa.present_on_admit_code

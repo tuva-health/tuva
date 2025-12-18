@@ -7,7 +7,7 @@ select distinct
   , e.person_id
   , e.data_source
   , {{ datediff('p.birth_date', 'e.first_day_of_month', 'year') }} as age
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_member_months') }} as e
 inner join {{ ref('ahrq_measures__stg_pqi_patient') }} as p
   on e.person_id = p.person_id

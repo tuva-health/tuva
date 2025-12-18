@@ -17,5 +17,5 @@ SELECT
   , cal.first_day_of_month
   , cal.last_day_of_month
   , cal.year_month_int
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('reference_data__calendar') }} cal

@@ -38,7 +38,7 @@ select
         , else_value= 0
         , quote_identifiers = False
       ) }}
-      , '{{ var('tuva_last_run') }}' as tuva_last_run
+      , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('cms_chronic_conditions__stg_core__patient') }} as p
      left outer join conditions
         on p.person_id = conditions.person_id

@@ -60,5 +60,5 @@ select
     , occurrence_count
     , next_occurrence_count
     , occurrence_row_count
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from occurence_comparison

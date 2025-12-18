@@ -49,7 +49,7 @@ select
        , cast(pharm.data_source as {{ dbt.type_string() }}) as data_source
        , {{ try_to_cast_date('pharm.file_date', 'YYYY-MM-DD') }} as file_date
        , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__pharmacy_claim') }} as pharm
 left outer join {{ ref('claims_enrollment__flag_rx_claims_with_enrollment') }} as enroll
   on pharm.claim_id = enroll.claim_id

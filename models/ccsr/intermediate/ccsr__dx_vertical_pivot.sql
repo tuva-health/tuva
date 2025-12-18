@@ -39,7 +39,7 @@ with codes as (
 
 select distinct
     *
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from long_union
 -- as not all diagnosis codes have multiple categories, we can discard nulls
 where ccsr_category is not null

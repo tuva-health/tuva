@@ -23,6 +23,6 @@ select
         else null
     end as invalid_reason
     , {{ concat_custom(["m.revenue_center_code", "'|'", "coalesce(term.revenue_center_description, '')"]) }} as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     from {{ ref('medical_claim') }} as m
 left outer join {{ ref('terminology__revenue_center') }} as term on m.revenue_center_code = term.revenue_center_code

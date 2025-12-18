@@ -67,7 +67,7 @@ select
   , quote_identifiers = False
   , suffix='_allowed'
 ) }}
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from service_cat_2
 group by
   person_id

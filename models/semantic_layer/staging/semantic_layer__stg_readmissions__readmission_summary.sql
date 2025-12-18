@@ -24,5 +24,5 @@ SELECT
   , r.readmission_specialty_cohort
   , r.readmission_died_flag
   , r.readmission_diagnosis_ccs
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('readmissions__readmission_summary') }} as r

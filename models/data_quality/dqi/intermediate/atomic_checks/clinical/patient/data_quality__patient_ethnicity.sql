@@ -19,6 +19,6 @@ select
         when m.ethnicity is not null and term.code is null then 'Ethnicity does not join to Terminology Ethnicity table'
         else null end as invalid_reason
     , cast(m.ethnicity as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('patient') }} as m
 left outer join {{ ref('terminology__ethnicity') }} as term on m.ethnicity = term.code
