@@ -1,0 +1,176 @@
+language: en-US
+
+reviews:
+    profile: assertive
+    request_changes_workflow: true
+
+    suggested_labels: true
+    auto_apply_labels: true
+
+    path_filters:
+        - "dbt_project.yml"
+        - "README.md"
+        - "packages.yml"
+        - "models/**"
+        - "macros/**"
+        - "seeds/**"
+        - "!dbt_packages/**"
+        - "!target/**"
+        - "!logs/**"
+        - "!.venv/**"
+        - "!**/.DS_Store"
+
+    path_instructions:
+        - path: "models/**/*.sql"
+          instructions: |
+              This is a dbt project that must stay as close to ANSI SQL as practical and remain portable across warehouses (priority: Snowflake, Redshift, Databricks, BigQuery, Microsoft Fabric, DuckDB).
+              
+              Review goals for models:
+              * Prefer ANSI constructs and dbt_utils macros over vendor-specific functions.
+              * Call out non-portable functions/syntax (examples to flag in review): to_date(...), right(...), count(arg1, arg2), :: casts, IFF/DECODE, QUALIFY, SAFE_OFFSET/SAFE_CAST, TOP, LIMIT vs QUALIFY patterns, etc. If needed, wrap in a macro that uses adapter.dispatch or dbt_utils.
+              * Enforce explicitness for readability and correctness: explicit JOIN types, explicit UNION ALL/DISTINCT, avoid DISTINCT + GROUP BY together, and avoid ambiguous GROUP BY / ORDER BY ordinals if the project policy is explicit column names.
+              * Maintain style consistency with the repo SQLFluff configuration: lowercase keywords/identifiers/functions/literals/types, leading commas, newline after CTE blocks, newline at end of file, consistent spacing.
+              * Integration safety: do not hardcode database/schema; use ref()/source() (and package-qualified refs if integrating models from another dbt package).
+              * Try and call out use of the keyword DISTINCT, and suggest other ways to address this if it makes sense.
+              * Look for a single model doing too much, and if so, suggest possibly breaking up logically into multiple models.
+              * Check model names to make sure they make sense. Intermediate models should contain `int` in the model name, and staging models should contain `stg` in the name. File names should be all lowercase, and seperated by underscores.
+
+        - path: "macros/**/*.sql"
+          instructions: |
+              Macros are the portability layer. Prefer encapsulating non-ANSI behavior here (instead of in models) using:
+              * adapter.dispatch to implement warehouse-specific overrides with a single stable macro API.
+              * dbt_utils macros where appropriate for cross-database behavior.
+              
+              Review goals for macros:
+              * If a macro introduces warehouse-specific SQL (date parsing/casting, string slicing, regex, boolean casting, etc.), require either adapter.dispatch or a dbt_utils equivalent.
+              * Flag direct use of vendor-specific functions in macros unless guarded by dispatch (examples to call out): to_date(...), right(...), count(arg1, arg2), and other non-ANSI functions.
+              * Keep macro inputs/outputs consistent because this project integrates with another dbt project (treat macros as a contract).
+              * Make sure macros will work or be implemented for Snowflake, Redshift, Databricks, BigQuery, Microsoft Fabric, and DuckDB.
+              * Ensure Jinja spacing/padding is consistent and readable.
+
+        - path: "seeds/**"
+          instructions: |
+              Review seed changes for correctness and backward compatibility: header stability, column order, delimiter/quoting changes, and whether downstream models/tests rely on exact values.
+
+        - path: "dbt_project.yml"
+          instructions: |
+              Treat this as integration-critical configuration. Review changes for package/model namespace impacts, config changes that affect compilation (e.g., quoting, model-paths, dispatch), and anything that could break the dependent dbt project.
+
+        - path: "packages.yml"
+          instructions: |
+              Review for safe dependency upgrades: pin versions, note breaking changes, and confirm cross-project refs (package.model) remain valid.
+
+        - path: "README.md"
+          instructions: |
+              Review for spelling errors, and also to make sure changes that are made relevant to README.md are reflected.
+
+tools:
+    sqlfluff:
+        enabled: true
+
+pre_merge_checks:
+    title:
+        mode: warning
+        requirements: "Title should be concise, describe dbt domain impact (models/macros), and mention portability/integration when relevant."
+
+    custom_checks:
+        - name: "AL01 explicit table alias AS"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AL01 violations in changed SQL files. Table aliasing must follow the repo preference (explicit AS)."
+
+        - name: "AL02 explicit column alias AS"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AL02 violations in changed SQL files. Column aliasing must use explicit AS."
+
+        - name: "AL03 alias select expressions"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AL03 violations in changed SQL files. Any expression in SELECT (aggregations/calculations) must have an explicit alias."
+
+        - name: "AL04 unique table aliases"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AL04 violations in changed SQL files. Table aliases must be unique within a clause."
+
+        - name: "AM01 no DISTINCT with GROUP BY"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AM01 violations in changed SQL files. Do not combine DISTINCT and GROUP BY in a conflicting way."
+
+        - name: "AM02 explicit UNION ALL/DISTINCT"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AM02 violations in changed SQL files. UNION must be explicitly qualified (UNION ALL or UNION DISTINCT)."
+
+        - name: "AM05 fully qualify JOIN types"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AM05 violations in changed SQL files. Use explicit join types (e.g., INNER JOIN, LEFT OUTER JOIN) rather than bare JOIN."
+
+        - name: "AM06 explicit GROUP/ORDER refs"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AM06 violations in changed SQL files. GROUP BY/ORDER BY must follow the configured style (explicit column names vs ordinals)."
+
+        - name: "AM07 set queries column parity"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any AM07 violations in changed SQL files. Set queries (UNION/INTERSECT/EXCEPT) must return the same number of columns."
+
+        - name: "CP01 lowercase keywords"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CP01 violations in changed SQL files. SQL keywords must be lowercase per config."
+
+        - name: "CP02 lowercase identifiers"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CP02 violations in changed SQL files. Identifiers (tables/columns) must be lowercase per config."
+
+        - name: "CP03 lowercase function names"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CP03 violations in changed SQL files. Function names must be lowercase per config."
+
+        - name: "CP04 lowercase literals"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CP04 violations in changed SQL files. Literal casing (e.g., true/false/null) must be lowercase per config."
+
+        - name: "CP05 lowercase type names"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CP05 violations in changed SQL files. Type names must be lowercase per config."
+
+        - name: "CV01 consistent not-equal operator"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any CV01 violations in changed SQL files. Do not mix != and <>; prefer ANSI <> when possible."
+
+        - name: "L019 comma placement (legacy)"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any L019 (legacy) or comma-placement violations in changed SQL files. This repo uses leading commas; keep it consistent."
+
+        - name: "L022 CTE newline (legacy)"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any L022 (legacy) CTE-newline violations in changed SQL files. Ensure proper newline separation after CTE blocks."
+
+        - name: "LT01 spacing"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any LT01 violations in changed SQL files. Enforce consistent whitespace/spacing."
+
+        - name: "LT04 leading commas"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any LT04 violations in changed SQL files. Commas must follow configured style (leading)."
+
+        - name: "LT12 final newline"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any LT12 violations in changed SQL files. Files must end with a trailing newline."
+
+        - name: "LT14 keyword newlines"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any LT14 violations in changed SQL files. Major keywords/clauses must be placed on new lines per config."
+
+        - name: "JJ01 Jinja padding"
+          mode: warning
+          instructions: "Fail if SQLFluff reports any JJ01 violations in changed SQL/Jinja files. Jinja tags should have consistent spacing/padding."
+
+        - name: "Portability: ban unsafe functions"
+          mode: error
+          instructions: |
+              Fail if any changed file under models/** or macros/** introduces direct use of non-portable functions/syntax without an adapter-dispatch/dbt_utils wrapper.
+              Specifically flag (at minimum): to_date(...), right(...), and count(arg1, arg2).
+              Require a macro wrapper (prefer adapter.dispatch) or a dbt_utils equivalent, targeting portability across Snowflake, Redshift, Databricks, BigQuery, Microsoft Fabric, DuckDB.
+
+        - name: "Integration: no hardcoded db/schema"
+          mode: error
+          instructions: |
+              Fail if changed dbt models/macros hardcode database/schema/object references that should be managed by dbt.
+              Require ref()/source() usage (package-qualified refs when appropriate) to keep cross-project integration stable.
