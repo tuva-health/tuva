@@ -257,7 +257,7 @@ with stg_eligibility as (
             when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
-        , 'No' as institutional_status
+        , cast('No' as {{ dbt.type_string() }}) as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
