@@ -24,7 +24,7 @@ where discharge_disposition_code in (
 
 -- All discharges that meet the discharge_disposition_code
 -- requirements to be an index admission
-select a.encounter_id, '{{ var('tuva_last_run') }}' as tuva_last_run
+select a.encounter_id, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('readmissions__encounter') }} as a
 left outer join all_invalid_discharges as b
     on a.encounter_id = b.encounter_id

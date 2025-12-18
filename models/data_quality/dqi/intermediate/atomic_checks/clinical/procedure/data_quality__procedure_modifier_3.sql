@@ -18,6 +18,6 @@ select
            then 'Modifier 3 does not join to Terminology hcpcs_level_2 table'
            else null end as invalid_reason
     , cast(modifier_3 as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('procedure') }} as m
 left outer join {{ ref('terminology__hcpcs_level_2') }} as term on m.modifier_3 = term.hcpcs

@@ -32,6 +32,6 @@ SELECT
     encounter_id
   , rendering_id as primary_provider_id
   , specialty
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from rank_ordered
 where rn = 1

@@ -10,13 +10,13 @@ from {{ ref('cms_hcc__patient_risk_factors') }}
 
 select 'missing cms-hcc demographic factor' as data_quality_check
 ,case when demographic_factor = 0 then 1 else 0 end as result_count
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from cte 
 
 union all
 
 select 'missing cms-hcc disease factor' as data_quality_check
 ,case when disease_factor = 0 then 1 else 0 end as result_count
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from cte 
 

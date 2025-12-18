@@ -33,5 +33,5 @@ select distinct
   claim_id
 , claim_line_number
 , data_source
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from prof_and_low_priority_inst_claims

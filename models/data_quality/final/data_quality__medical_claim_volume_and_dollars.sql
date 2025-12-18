@@ -37,7 +37,7 @@ select
     d.year_month_int as year_month
   , coalesce(claim_volume, 0) as claim_volume
   , coalesce(paid_amount, 0) as paid_amount
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from date_cte d
 left join medical_claim m
   on d.year_month_int = m.year_month_int

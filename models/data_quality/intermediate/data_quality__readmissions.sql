@@ -36,7 +36,7 @@ with disqualified_unpivot as (
 select 
     {{ concat_custom(["'inpatient encounter '", "d.disqualified_reason"]) }} as data_quality_check
     ,  count(distinct encounter_id) as result_count
-      , '{{ var('tuva_last_run') }}' as tuva_last_run
+      , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from disqualified_unpivot d
 where cast(flagvalue as {{ dbt.type_int() }} ) = 1  
 group by disqualified_reason

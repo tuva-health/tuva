@@ -19,7 +19,7 @@ select distinct
   , cal_death.full_date as normalized_death_date
   , cal_enroll_start.full_date as normalized_enrollment_start_date
   , cal_enroll_end.full_date as normalized_enrollment_end_date
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} as elig
 left outer join {{ ref('reference_data__calendar') }} as cal_dob
     on elig.birth_date = cal_dob.full_date

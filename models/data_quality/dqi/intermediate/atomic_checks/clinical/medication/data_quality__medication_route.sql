@@ -13,5 +13,5 @@ select
     , case when m.route is not null then 'valid' else 'null' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
     , cast(route as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('medication') }} as m

@@ -108,5 +108,5 @@ select
         {% else %}
             , cast(current_year_billed as boolean) as current_year_billed
         {% endif %}
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from unioned

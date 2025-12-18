@@ -17,6 +17,6 @@ select
           then 'Encounter type does not join to Terminology encounter_type table'
           else null end as invalid_reason
     , cast(m.encounter_type as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
 left outer join {{ ref('terminology__encounter_type') }} as term on m.encounter_type = term.encounter_type

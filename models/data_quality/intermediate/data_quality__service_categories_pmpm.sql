@@ -26,7 +26,7 @@ with member_months as (
 select
     pmpm.*
     , ref_data.analytics_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pmpm
 left join {{ ref('data_quality__reference_mart_analytics') }} ref_data
     on pmpm.analytics_concept = ref_data.analytics_concept
