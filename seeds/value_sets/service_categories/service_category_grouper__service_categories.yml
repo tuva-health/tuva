@@ -5,6 +5,7 @@ seeds:
     description: >
       Heirarchy and ranking of Tuva service category logic
     config:
+      alias: service_category__service_categories
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
       column_types:
