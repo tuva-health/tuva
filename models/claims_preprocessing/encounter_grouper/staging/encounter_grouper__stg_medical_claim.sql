@@ -135,7 +135,7 @@ select
   , f.charge_amount
   , f.allowed_amount
   , f.data_source
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from final as f
 cross join ccs_release_year as cry
 left outer join {{ ref('terminology__ccs_services_procedures') }} as c

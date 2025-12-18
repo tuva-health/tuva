@@ -22,7 +22,7 @@ with service_category_1_mapping as (
         , b.service_category_2 as original_service_cat_2
         , b.service_category_3 as original_service_cat_3
         , s.priority
-        , '{{ var('tuva_last_run') }}' as tuva_last_run
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
         , b.source_model_name
     from {{ ref('service_category_grouper__stg_medical_claim') }} as a
     left outer join {{ ref('service_category_grouper__combined_professional') }} as b
@@ -55,7 +55,7 @@ with service_category_1_mapping as (
         , b.service_category_2 as original_service_cat_2
         , b.service_category_3 as original_service_cat_3
         , s.priority
-        , '{{ var('tuva_last_run') }}' as tuva_last_run
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
         , b.source_model_name
     from {{ ref('service_category_grouper__stg_medical_claim') }} as a
     left outer join {{ ref('service_category_grouper__combined_institutional_header_level') }} as b
@@ -87,7 +87,7 @@ with service_category_1_mapping as (
         , b.service_category_2 as original_service_cat_2
         , b.service_category_3 as original_service_cat_3
         , s.priority
-        , '{{ var('tuva_last_run') }}' as tuva_last_run
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
         , b.source_model_name
     from {{ ref('service_category_grouper__stg_medical_claim') }} as a
     left outer join {{ ref('service_category_grouper__combined_institutional_line_level') }} as b

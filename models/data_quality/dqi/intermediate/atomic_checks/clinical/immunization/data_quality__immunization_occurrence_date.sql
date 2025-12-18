@@ -21,5 +21,5 @@ select
         else null 
     end as invalid_reason
     , cast(occurrence_date as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('immunization') }} as m

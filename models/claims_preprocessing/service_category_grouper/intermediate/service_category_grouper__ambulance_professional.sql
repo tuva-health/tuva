@@ -12,8 +12,8 @@ select distinct
   , 'ambulance' as service_category_2
   , 'ambulance' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('service_category_grouper__stg_medical_claim') }}
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }}
 where
   claim_type = 'professional'
   and (

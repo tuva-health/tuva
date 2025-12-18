@@ -10,8 +10,8 @@ select distinct
   , 'skilled nursing' as service_category_2
   , 'inpatient part A' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('service_category_grouper__stg_medical_claim') }}
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('21')
 
@@ -28,7 +28,7 @@ select distinct
   , 'skilled nursing' as service_category_2
   , 'inpatient part B' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('service_category_grouper__stg_medical_claim') }}
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('22')

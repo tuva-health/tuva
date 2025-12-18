@@ -280,7 +280,7 @@ select
     , procedure_column
     , cal.full_date as procedure_date
     , count(*) as procedure_date_occurrence_count
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pivot_procedure as piv
 left outer join {{ ref('reference_data__calendar') }} as cal
     on piv.procedure_date = cal.full_date

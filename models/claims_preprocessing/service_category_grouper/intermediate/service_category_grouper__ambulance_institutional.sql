@@ -12,9 +12,9 @@ select distinct
   , 'ambulance' as service_category_2
   , 'ambulance' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('service_category_grouper__stg_medical_claim') }} as med
-inner join {{ ref('service_category_grouper__stg_outpatient_institutional') }} as outpatient
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }} as med
+inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
   on med.claim_id = outpatient.claim_id
   and med.data_source = outpatient.data_source
 where

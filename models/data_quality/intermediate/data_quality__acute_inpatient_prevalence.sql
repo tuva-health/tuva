@@ -39,7 +39,7 @@ select
     ,encounter_percent as data_source_value
     ,m.analytics_value
     ,rank_nbr as value_rank
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join cte on
 m.analytics_concept = cte.analytics_concept

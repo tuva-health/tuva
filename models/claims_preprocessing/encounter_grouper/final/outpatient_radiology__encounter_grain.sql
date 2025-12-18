@@ -137,7 +137,7 @@ select d.encounter_id
 , tot.inst_claim_count
 , tot.prof_claim_count
 , d.data_source
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from detail_values as d
 inner join total_amounts as tot on d.encounter_id = tot.encounter_id
 inner join service_category_flags as sc on d.encounter_id = sc.encounter_id

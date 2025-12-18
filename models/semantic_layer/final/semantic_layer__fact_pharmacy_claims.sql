@@ -47,7 +47,7 @@ select
   , pe.brand_cost_per_unit * p.quantity as brand_paid_amount
   , pe.generic_available
   , pe.generic_available_sk
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('semantic_layer__stg_core__pharmacy_claim') }} as p
 left outer join {{ ref('terminology__ndc') }} as n 
   on p.ndc_code = n.ndc

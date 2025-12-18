@@ -10,8 +10,8 @@ with distinct_count as (
         , data_source
         , diagnosis_column
         , count(*) as distinct_count
-        , '{{ var('tuva_last_run') }}' as tuva_last_run
-    from {{ ref('claims_normalization__int_present_on_admit_normalize') }}
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    from {{ ref('normalized_input__int_present_on_admit_normalize') }}
     group by
         claim_id
         , data_source
@@ -29,8 +29,8 @@ select
 order by present_on_admit_occurrence_count desc), 0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column
 order by present_on_admit_occurrence_count desc) as occurrence_row_count
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('claims_normalization__int_present_on_admit_normalize') }} as norm
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('normalized_input__int_present_on_admit_normalize') }} as norm
 inner join distinct_count as dist
     on norm.claim_id = dist.claim_id
     and norm.data_source = dist.data_source

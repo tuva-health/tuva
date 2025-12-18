@@ -152,7 +152,7 @@ select
     else 0
   end as mortality_flag
 , c.data_source
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('inpatient_rehab__start_end_dates') }} as a
 inner join encounter_cross_walk as x on a.encounter_id = x.old_encounter_id
 inner join total_amounts as tot on x.encounter_id = tot.encounter_id

@@ -435,7 +435,7 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from yearly
 
 union all
@@ -456,5 +456,5 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from current_scope

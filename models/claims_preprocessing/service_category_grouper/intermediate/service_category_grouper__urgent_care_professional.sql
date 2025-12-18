@@ -12,8 +12,8 @@ with multiple_source as (
   , 'urgent care' as service_category_2
   , 'urgent care' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-  from {{ ref('service_category_grouper__stg_medical_claim') }}
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  from {{ ref('service_category__stg_medical_claim') }}
   where claim_type = 'professional'
     and place_of_service_code in ('20')
 
@@ -27,8 +27,8 @@ with multiple_source as (
   , 'urgent care' as service_category_2
   , 'urgent care' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-  from {{ ref('service_category_grouper__stg_medical_claim') }}
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  from {{ ref('service_category__stg_medical_claim') }}
   where claim_type = 'professional'
   and hcpcs_code in ('S9088', '99051', 'S9083')
 )

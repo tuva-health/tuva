@@ -22,6 +22,6 @@ select distinct -- to bring to claim_ID grain
         else null
     end as invalid_reason
     , {{ concat_custom(["m.ndc_code", "'|'", "coalesce(term.rxnorm_description, term.fda_description, '')"]) }} as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('pharmacy_claim') }} as m
 left outer join {{ ref('terminology__ndc') }} as term on m.ndc_code = term.ndc

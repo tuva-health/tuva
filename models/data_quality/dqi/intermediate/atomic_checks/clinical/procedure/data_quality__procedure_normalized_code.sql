@@ -82,16 +82,16 @@ where
     m.normalized_code_type not in ('icd-9-pcs', 'icd-10-pcs','hcpcs_level_2')
 )
 
-select *, '{{ var('tuva_last_run') }}' as tuva_last_run from icd9
+select *, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run from icd9
 
 union all
 
-select * , '{{ var('tuva_last_run') }}' as tuva_last_run from icd10
+select * , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run from icd10
 
 union all
 
-select * , '{{ var('tuva_last_run') }}' as tuva_last_run from hcpcs_level_2
+select * , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run from hcpcs_level_2
 
 union all
 
-select * , '{{ var('tuva_last_run') }}' as tuva_last_run from others
+select * , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run from others

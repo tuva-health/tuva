@@ -30,6 +30,6 @@ select distinct
     , procedure_code_type
     , column_name
     , replace(piv.procedure_code, '.', '') as procedure_code
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pivot_procedure as piv
 where claim_type = 'institutional'
