@@ -158,7 +158,7 @@ select
     , procedure_date_24
     , procedure_date_25
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} as med
 left outer join {{ ref('terminology__admit_source') }} as ad_src
     on med.admit_source_code = ad_src.admit_source_code

@@ -26,7 +26,7 @@
 
 
 
-select distinct a.encounter_id, '{{ var('tuva_last_run') }}' as tuva_last_run
+select distinct a.encounter_id, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('readmissions__encounter') }} as a
 inner join {{ ref('readmissions__index_time_requirement') }} as b
     on a.encounter_id = b.encounter_id

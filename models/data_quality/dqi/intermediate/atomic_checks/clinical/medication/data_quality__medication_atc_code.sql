@@ -18,7 +18,7 @@ select
            then 'ATC Code does not join to Terminology rxnorm_to_atc table on any atc level'
            else null end as invalid_reason
     , cast(atc_code as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('medication') }} as m
 left outer join {{ ref('terminology__rxnorm_to_atc') }} as term_1 on m.atc_code = term_1.atc_1_name
 left outer join {{ ref('terminology__rxnorm_to_atc') }} as term_2 on m.atc_code = term_2.atc_2_name

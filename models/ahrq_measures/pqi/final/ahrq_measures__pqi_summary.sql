@@ -15,7 +15,7 @@ select p.pqi_number
  , e.encounter_end_date
  , e.length_of_stay
  , e.paid_amount
- , '{{ var('tuva_last_run') }}' as tuva_last_run
+ , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('ahrq_measures__pqi_num_long') }} as p
 inner join {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as e
     on p.encounter_id = e.encounter_id

@@ -18,6 +18,6 @@ select
            then 'NDC code type does not join to Terminology ndc table'
            else null end as invalid_reason
     , cast(substring(ndc_description, 1, 255) as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('medication') }} as m
 left outer join {{ ref('terminology__ndc') }} as term on m.ndc_code = term.ndc

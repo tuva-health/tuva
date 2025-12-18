@@ -18,6 +18,6 @@ select distinct -- to bring to claim_ID grain
         else null
     end as invalid_reason
     ,cast(m.drg_code_type as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('medical_claim') }} as m
 left outer join {{ ref('reference_data__code_type') }} as term on m.drg_code_type = term.code_type

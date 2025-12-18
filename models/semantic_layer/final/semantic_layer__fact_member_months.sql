@@ -275,5 +275,5 @@ SELECT
   , cd.medical_paid
   , cd.total_allowed
   , cd.medical_allowed
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM combined_data_cte as cd

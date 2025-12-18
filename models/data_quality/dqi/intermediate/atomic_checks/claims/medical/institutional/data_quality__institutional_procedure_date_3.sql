@@ -62,7 +62,7 @@ select distinct -- to bring to claim_id grain
         else null
         end as invalid_reason
     , cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value -- noqa
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from base as m
 left outer join claim_grain as cg on m.claim_id = cg.claim_id and m.data_source = cg.data_source
 left outer join claim_agg as agg on m.claim_id = agg.claim_id and m.data_source = agg.data_source

@@ -29,7 +29,7 @@ select
   , bb.concept_name as condition
   , min(first_diagnosis_date) as first_diagnosis_date
   , max(last_diagnosis_date) as last_diagnosis_date
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from conditions_with_first_and_last_diagnosis_date as aa
 inner join {{ ref('clinical_concept_library__value_set_member_relevant_fields') }} as bb
 on aa.icd_10_cm = bb.code

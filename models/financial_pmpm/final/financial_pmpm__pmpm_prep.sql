@@ -130,5 +130,5 @@ select
   , inpatient_paid + outpatient_paid + office_based_paid + ancillary_paid + other_paid as medical_paid
   , inpatient_allowed + outpatient_allowed + office_based_allowed + ancillary_allowed + other_allowed + pharmacy_allowed as total_allowed
   , inpatient_allowed + outpatient_allowed + office_based_allowed + ancillary_allowed + other_allowed as medical_allowed
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from combine
