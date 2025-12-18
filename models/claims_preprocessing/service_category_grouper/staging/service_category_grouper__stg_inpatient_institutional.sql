@@ -7,7 +7,7 @@ with drg_requirement as (
   select distinct
       mc.claim_id
     , mc.data_source
-  from {{ ref('service_category__stg_medical_claim') }} as mc
+  from {{ ref('service_category_grouper__stg_medical_claim') }} as mc
   left outer join {{ ref('terminology__ms_drg') }} as msdrg
     on mc.drg_code_type = 'ms-drg'
     and mc.drg_code = msdrg.ms_drg_code
@@ -24,7 +24,7 @@ with drg_requirement as (
   select distinct
       claim_id
     , data_source
-  from {{ ref('service_category__stg_medical_claim') }}
+  from {{ ref('service_category_grouper__stg_medical_claim') }}
   where claim_type = 'institutional'
     and substring(bill_type_code, 1, 2) in (
       '11'  -- Hospital Inpatient (Part A)
@@ -61,7 +61,7 @@ select distinct
   , a.data_source
   , 'inpatient' as service_type
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as a
+from {{ ref('service_category_grouper__stg_medical_claim') }} as a
 inner join bill_type_requirement as d
   on a.claim_id = d.claim_id
   and a.data_source = d.data_source
@@ -77,7 +77,7 @@ select distinct
   , a.data_source
   , 'inpatient' as service_type
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as a
+from {{ ref('service_category_grouper__stg_medical_claim') }} as a
 inner join drg_requirement as c
   on a.claim_id = c.claim_id
   and a.data_source = c.data_source

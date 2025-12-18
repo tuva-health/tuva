@@ -33,7 +33,7 @@ select
     , max(case when column_name = 'DIAGNOSIS_POA_24' then normalized_code else null end) as diagnosis_poa_24
     , max(case when column_name = 'DIAGNOSIS_POA_25' then normalized_code else null end) as diagnosis_poa_25
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__int_present_on_admit_voting') }}
+from {{ ref('claims_normalization__int_present_on_admit_voting') }}
 where (occurrence_row_count = 1
         and occurrence_count > next_occurrence_count)
 group by

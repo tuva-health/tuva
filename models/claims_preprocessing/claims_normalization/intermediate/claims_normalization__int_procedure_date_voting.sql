@@ -11,7 +11,7 @@ with distinct_count as (
         , procedure_column
         , count(*) as distinct_count
         , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-    from {{ ref('normalized_input__int_procedure_date_normalize') }}
+    from {{ ref('claims_normalization__int_procedure_date_normalize') }}
     group by
         claim_id
         , data_source
@@ -30,7 +30,7 @@ order by procedure_date_occurrence_count desc), 0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.procedure_column
 order by procedure_date_occurrence_count desc) as occurrence_row_count
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__int_procedure_date_normalize') }} as norm
+from {{ ref('claims_normalization__int_procedure_date_normalize') }} as norm
 inner join distinct_count as dist
     on norm.claim_id = dist.claim_id
     and norm.data_source = dist.data_source

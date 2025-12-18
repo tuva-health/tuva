@@ -17,7 +17,7 @@ select distinct
   , cal_admission.full_date as normalized_admission_date
   , cal_discharge.full_date as normalized_discharge_date
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__stg_medical_claim') }} as med
+from {{ ref('claims_normalization__stg_medical_claim') }} as med
 left outer join {{ ref('reference_data__calendar') }} as cal_claim_start
     on med.claim_start_date = cal_claim_start.full_date
 left outer join {{ ref('reference_data__calendar') }} as cal_claim_end

@@ -11,8 +11,8 @@ with multiple_sources as (
       , 'outpatient hospital or clinic' as service_category_3
       , '{{ this.name }}' as source_model_name
       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-    from {{ ref('service_category__stg_medical_claim') }} as m
-    inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
+    from {{ ref('service_category_grouper__stg_medical_claim') }} as m
+    inner join {{ ref('service_category_grouper__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
       and m.data_source = o.data_source
     where
@@ -39,8 +39,8 @@ with multiple_sources as (
       , 'outpatient hospital or clinic' as service_category_3
       , '{{ this.name }}' as source_model_name
       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-    from {{ ref('service_category__stg_medical_claim') }} as m
-    inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
+    from {{ ref('service_category_grouper__stg_medical_claim') }} as m
+    inner join {{ ref('service_category_grouper__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
       and m.data_source = o.data_source
     where

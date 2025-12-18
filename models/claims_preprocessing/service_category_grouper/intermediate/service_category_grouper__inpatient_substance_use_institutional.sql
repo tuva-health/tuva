@@ -11,8 +11,8 @@ select distinct
   , 'inpatient substance use' as service_category_3
   , '{{ this.name }}' as source_model_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as s
-inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
+from {{ ref('service_category_grouper__stg_medical_claim') }} as s
+inner join {{ ref('service_category_grouper__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
   and s.data_source = a.data_source
 where

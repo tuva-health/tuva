@@ -13,8 +13,8 @@ select distinct
 , 'durable medical equipment' as service_category_3
 , '{{ this.name }}' as source_model_name
 , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as med
-inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
+from {{ ref('service_category_grouper__stg_medical_claim') }} as med
+inner join {{ ref('service_category_grouper__stg_outpatient_institutional') }} as outpatient
   on med.claim_id = outpatient.claim_id
   and med.data_source = outpatient.data_source
 where med.ccs_category = '243'

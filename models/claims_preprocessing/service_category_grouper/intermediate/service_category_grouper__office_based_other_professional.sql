@@ -14,20 +14,20 @@ select distinct
   , 'office-based other' as service_category_3
   , '{{ this.name }}' as source_model_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_office_based') }} as med
-  left outer join {{ ref('service_category__pharmacy_professional') }} as pharm
+from {{ ref('service_category_grouper__stg_office_based') }} as med
+  left outer join {{ ref('service_category_grouper__pharmacy_professional') }} as pharm
   on med.claim_line_id = pharm.claim_line_id
   and med.data_source = pharm.data_source
-  left outer join {{ ref('service_category__office_based_radiology') }} as rad
+  left outer join {{ ref('service_category_grouper__office_based_radiology') }} as rad
   on med.claim_line_id = rad.claim_line_id
   and med.data_source = rad.data_source
-  left outer join {{ ref('service_category__office_based_visit_professional') }} as visit
+  left outer join {{ ref('service_category_grouper__office_based_visit_professional') }} as visit
   on med.claim_line_id = visit.claim_line_id
   and med.data_source = visit.data_source
-  left outer join {{ ref('service_category__office_based_surgery_professional') }} as surg
+  left outer join {{ ref('service_category_grouper__office_based_surgery_professional') }} as surg
   on med.claim_line_id = surg.claim_line_id
   and med.data_source = surg.data_source
-  left outer join {{ ref('service_category__office_based_physical_therapy_professional') }} as pt
+  left outer join {{ ref('service_category_grouper__office_based_physical_therapy_professional') }} as pt
   on med.claim_line_id = pt.claim_line_id
   and med.data_source = pt.data_source
 where pharm.claim_line_id is null

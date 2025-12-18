@@ -7,4 +7,4 @@ select
   claim_id
 , service_type
 , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_inpatient_institutional') }} as a
+from {{ ref('service_category_grouper__stg_inpatient_institutional') }} as a

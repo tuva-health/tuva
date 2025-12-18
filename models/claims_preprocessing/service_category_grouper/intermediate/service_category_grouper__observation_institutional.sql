@@ -12,7 +12,7 @@ select distinct
    , 'observation' as service_category_3
    , '{{ this.name }}' as source_model_name
    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as med
+from {{ ref('service_category_grouper__stg_medical_claim') }} as med
 where claim_type = 'institutional'
    and (revenue_center_code in ('0762')
    or hcpcs_code in ('G0378', 'G0379')

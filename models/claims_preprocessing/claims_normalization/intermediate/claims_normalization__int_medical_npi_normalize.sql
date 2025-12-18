@@ -31,7 +31,7 @@ select distinct
         cast(fac_prov.provider_organization_name as {{ dbt.type_string() }})
     end as normalized_facility_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__stg_medical_claim') }} as med
+from {{ ref('claims_normalization__stg_medical_claim') }} as med
 left outer join {{ ref('terminology__provider') }} as rend_prov
   on med.rendering_npi = rend_prov.npi
 left outer join {{ ref('terminology__provider') }} as bill_prov

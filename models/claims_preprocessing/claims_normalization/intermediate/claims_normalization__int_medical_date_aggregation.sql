@@ -13,7 +13,7 @@ select
     , min(normalized_admission_date) as minimum_admission_date
     , max(normalized_discharge_date) as maximum_discharge_date
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__int_medical_claim_date_normalize') }}
+from {{ ref('claims_normalization__int_medical_claim_date_normalize') }}
 where claim_type = 'institutional'
 group by
     claim_id
@@ -29,7 +29,7 @@ select
     , null as minimum_admission_date
     , null as maximum_discharge_date
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__int_medical_claim_date_normalize') }}
+from {{ ref('claims_normalization__int_medical_claim_date_normalize') }}
 where claim_type = 'professional'
 group by
     claim_id

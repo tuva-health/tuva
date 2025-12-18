@@ -15,6 +15,6 @@ select
     , next_occurrence_count
     , occurrence_row_count
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__int_discharge_disposition_voting') }}
+from {{ ref('claims_normalization__int_discharge_disposition_voting') }}
 where (occurrence_row_count = 1
         and occurrence_count > next_occurrence_count)

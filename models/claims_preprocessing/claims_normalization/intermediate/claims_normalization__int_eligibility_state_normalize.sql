@@ -19,7 +19,7 @@ select distinct
     , ansi.ansi_fips_state_code as fips_state_code
     , ansi.ansi_fips_state_abbreviation as fips_state_abbreviation
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__stg_eligibility') }} as elig
+from {{ ref('claims_normalization__stg_eligibility') }} as elig
 left outer join {{ ref('reference_data__ansi_fips_state') }} as ansi
   on (
        trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_abbreviation))

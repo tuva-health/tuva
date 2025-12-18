@@ -11,7 +11,7 @@ select distinct
   , 'inpatient part A' as service_category_3
   , '{{ this.name }}' as source_model_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }}
+from {{ ref('service_category_grouper__stg_medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('21')
 
@@ -29,6 +29,6 @@ select distinct
   , 'inpatient part B' as service_category_3
   , '{{ this.name }}' as source_model_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }}
+from {{ ref('service_category_grouper__stg_medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('22')

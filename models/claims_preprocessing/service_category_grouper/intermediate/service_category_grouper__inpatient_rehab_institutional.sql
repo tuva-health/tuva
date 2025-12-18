@@ -11,8 +11,8 @@ select distinct
   , 'inpatient rehabilitation' as service_category_3
   , '{{ this.name }}' as source_model_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} as s
-  inner join {{ ref('service_category__stg_inpatient_institutional') }} as i
+from {{ ref('service_category_grouper__stg_medical_claim') }} as s
+  inner join {{ ref('service_category_grouper__stg_inpatient_institutional') }} as i
   on s.claim_id = i.claim_id
   and s.data_source = i.data_source
 where s.primary_taxonomy_code in ('283X00000X'
