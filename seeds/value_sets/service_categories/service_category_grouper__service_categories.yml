@@ -1,0 +1,27 @@
+version: 2
+
+seeds:
+  - name: service_category_grouper__service_categories
+    description: >
+      Heirarchy and ranking of Tuva service category logic
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
+      column_types:
+        service_category_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+        service_category_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+        service_category_3: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+        priority: |
+          integer
+    columns:
+      - name: service_category_1
+        description: service category 1 in the Tuva model 
+      - name: service_category_2
+        description: service category 2 in the Tuva model
+      - name: service_category_3
+        description: service category 3 in the Tuva model, only populated for a group of the service category 2 values.
+      - name: priority
+        description: priority ranking of the service categories that will be used if a claim qualifies under multiple logic.

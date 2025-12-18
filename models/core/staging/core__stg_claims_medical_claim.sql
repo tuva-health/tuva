@@ -108,8 +108,8 @@ select
     , {{ try_to_cast_date('med.file_date', 'YYYY-MM-DD') }} as file_date
     , cast(med.file_name as {{ dbt.type_string() }}) as file_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__medical_claim') }} as med
-inner join {{ ref('service_category__service_category_grouper') }} as srv_group
+from {{ ref('claims_normalization__medical_claim') }} as med
+inner join {{ ref('service_category_grouper__service_category_grouper') }} as srv_group
   on med.claim_id = srv_group.claim_id
   and med.claim_line_number = srv_group.claim_line_number
   and srv_group.duplicate_row_number = 1

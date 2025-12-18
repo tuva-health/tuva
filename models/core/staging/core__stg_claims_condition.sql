@@ -27,7 +27,7 @@ with unpivot_cte as (
         , {{ i }} as diagnosis_rank
         , diagnosis_poa_{{ i }} as present_on_admit_code
         , data_source
-  from {{ ref('normalized_input__medical_claim') }}
+  from {{ ref('claims_normalization__medical_claim') }}
   where diagnosis_code_{{ i }} is not null
   {% if not loop.last %}
   union all

@@ -18,9 +18,9 @@ with tuva_chronic_condition_long as (
 
 , service_category_grouper as (
   select
-      'service_category__service_category_grouper' as table_name
+      'service_category_grouper__service_category_grouper' as table_name
     , count(*) as record_count
-  from {{ ref('service_category__service_category_grouper') }}
+  from {{ ref('service_category_grouper__service_category_grouper') }}
 )
 
 , financial_pmpm_payer as (

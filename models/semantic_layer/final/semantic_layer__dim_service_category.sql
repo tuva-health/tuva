@@ -8,7 +8,7 @@ with cte as (
       service_category_1
     , service_category_2
     , service_category_3
-  from {{ ref('service_category__service_categories') }}
+from {{ ref('service_category_grouper__service_categories') }}
 )
 
 select

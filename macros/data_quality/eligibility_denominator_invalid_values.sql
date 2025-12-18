@@ -14,7 +14,7 @@
 {%- set sql_statement -%}
     select test_field
     from {{ ref('data_quality__test_catalog') }}
-    where source_table = 'normalized_input__eligibility'
+    where source_table = 'claims_normalization__eligibility'
     and test_category = 'invalid_values'
 {%- endset -%}
 
@@ -34,7 +34,7 @@
     from {{ relation }} as rel
          left join {{ ref('data_quality__test_catalog') }} as cat
            on cat.test_category = 'invalid_values'
-           and cat.source_table = 'normalized_input__eligibility'
+           and cat.source_table = 'claims_normalization__eligibility'
            and cat.test_field = '{{ test_field }}'
     where rel.{{ test_field }} is not null
     group by cat.test_name

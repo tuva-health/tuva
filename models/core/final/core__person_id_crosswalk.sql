@@ -14,7 +14,7 @@ select distinct
     , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__eligibility') }}
+from {{ ref('claims_normalization__eligibility') }}
 union all
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -48,6 +48,6 @@ select distinct
     , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('normalized_input__eligibility') }}
+from {{ ref('claims_normalization__eligibility') }}
 
 {%- endif %}

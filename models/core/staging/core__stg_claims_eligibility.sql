@@ -50,4 +50,4 @@ select
        , {{ try_to_cast_date('file_date', 'YYYY-MM-DD') }} as file_date
        , cast(file_name as {{ dbt.type_string() }}) as file_name
        , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('normalized_input__eligibility') }}
+from {{ ref('claims_normalization__eligibility') }}
