@@ -32,7 +32,7 @@ with patient_stage as (
             as row_sequence
         , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
         , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
-    from {{ ref('normalized_input__eligibility') }}
+    from {{ ref('claims_normalization__eligibility') }}
 )
 
 select

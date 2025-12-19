@@ -30,7 +30,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('normalized_input__medical_claim') }}
+from {{ ref('claims_normalization__medical_claim') }}
 where hcpcs_code is not null
 
 {% for i in procedure_cols %}
@@ -56,7 +56,7 @@ select
   , null as modifier_4
   , null as modifier_5
   , data_source as data_source
-from {{ ref('normalized_input__medical_claim') }}
+from {{ ref('claims_normalization__medical_claim') }}
 where procedure_code_{{ i }} is not null
 {% endfor %}
 
