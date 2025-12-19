@@ -281,7 +281,7 @@ select claim_id
 , encounter_group
 , priority_number
 , anchor_claim_id
-from {{ ref('encounters__institutional_claim_lines') }}
+from {{ ref('encounters__int_institutional_claim_lines') }}
 
 union all
 

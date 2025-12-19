@@ -97,10 +97,10 @@ from {{ ref('inpatient_substance_use__generate_encounter_id') }} as enc
         enc.claim_id
         , med.claim_line_number
         , enc.encounter_id
-        , 'inpatient substance use' as encounter_type
-        , 'inpatient' as encounter_group
-        , 6 as priority_number
-        , null as anchor_claim_id
+        , encounter_type
+        , encounter_group
+        , priority_number
+        , anchor_claim_id
     from unioned as enc
     inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 )

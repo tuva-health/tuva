@@ -1004,7 +1004,7 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
-  - name: encounters__institutional_claim_lines
+  - name: encounters__int_institutional_claim_lines
     description: all institutional claim lines that belong to an encounter
     config:
       schema: |
@@ -1019,8 +1019,6 @@ models:
         description: '{{ doc("claim_id") }}'
       - name: claim_line_number
         description: '{{ doc("claim_line_number") }}'
-      - name: old_encounter_id
-        description: '{{ doc("encounter_id") }}'
       - name: encounter_id
         description: '{{ doc("encounter_id") }}'
       - name: encounter_type
@@ -1031,8 +1029,6 @@ models:
         description: '{{ doc("priority_number") }}'
       - name: anchor_claim_id
         description: '{{ doc("claim_id") }}'
-      - name: claim_attribution_number
-        description: '{{ doc("claim_attribution_number") }}'
 
   - name: encounters__combined_claim_line_crosswalk
     description: all claim lines that belong to an encounter
@@ -1061,8 +1057,8 @@ models:
         description: '{{ doc("priority_number") }}'
       - name: anchor_claim_id
         description: '{{ doc("claim_id") }}'
-      - name: claim_attribution_number
-        description: '{{ doc("claim_attribution_number") }}'
+      - name: claim_line_attribution_number
+        description: '{{ doc("claim_line_attribution_number") }}'
 
   - name: urgent_care__encounter_grain
     description: one row per urgent care encounter id summarizing encounter level metrics
