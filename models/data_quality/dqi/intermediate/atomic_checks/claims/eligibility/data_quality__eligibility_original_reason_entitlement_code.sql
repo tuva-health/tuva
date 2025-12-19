@@ -18,6 +18,6 @@ select distinct
         else null
     end as invalid_reason
     , {{ concat_custom(["m.original_reason_entitlement_code", "'|'", "coalesce(term.original_reason_entitlement_description,'')"]) }} as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('eligibility') }} as m
 left outer join {{ ref('terminology__medicare_orec') }} as term on m.original_reason_entitlement_code = term.original_reason_entitlement_code

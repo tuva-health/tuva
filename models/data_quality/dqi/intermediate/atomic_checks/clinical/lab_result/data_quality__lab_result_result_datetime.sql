@@ -24,5 +24,5 @@ select
         else null
     end as invalid_reason
     , cast(result_datetime as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('lab_result') }} as m

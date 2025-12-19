@@ -49,5 +49,5 @@ SELECT
   , e.source_model
   , e.data_source
   , e.encounter_source_type
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('core__encounter') }} as e

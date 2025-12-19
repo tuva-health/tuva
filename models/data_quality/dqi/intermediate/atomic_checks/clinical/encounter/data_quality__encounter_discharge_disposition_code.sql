@@ -17,6 +17,6 @@ select
            then 'Discharge Disposition Code does not join to Terminology discharge_disposition table'
            else null end as invalid_reason
     , cast(m.discharge_disposition_code as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
 left outer join {{ ref('terminology__discharge_disposition') }} as term on m.discharge_disposition_code = term.discharge_disposition_code

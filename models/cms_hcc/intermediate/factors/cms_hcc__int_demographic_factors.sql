@@ -241,7 +241,7 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types
 -- 100% v28 starting in 2026
 -- TODO: Update the seed table so this filter isn't necessary

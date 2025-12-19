@@ -31,7 +31,7 @@ select distinct
     , ccsr__procedure_category_map.device
     , ccsr__procedure_category_map.qualifier
     , {{ var('prccsr_version') }} as prccsr_version
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from procedures
 inner join ccsr__procedure_category_map
     on procedures.normalized_code = ccsr__procedure_category_map.code

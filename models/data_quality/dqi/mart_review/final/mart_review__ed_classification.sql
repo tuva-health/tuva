@@ -51,7 +51,7 @@ select
     ]) }} as patient_source_key
     , e.facility_name
     , e.encounter_start_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__encounter') }} as e
 left outer join {{ ref('ed_classification__summary') }} as s on e.encounter_id = s.encounter_id
 left outer join cte on e.facility_id = cte.location_id

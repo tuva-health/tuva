@@ -7,7 +7,7 @@ select distinct
     a.claim_id
   , a.data_source
   , 'outpatient' as service_type
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as a
 left outer join {{ ref('service_category__stg_inpatient_institutional') }} as i
   on a.claim_id = i.claim_id

@@ -16,5 +16,5 @@ select
                                     else 'valid' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
     , cast(copayment_amount as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('medical_claim') }} as m

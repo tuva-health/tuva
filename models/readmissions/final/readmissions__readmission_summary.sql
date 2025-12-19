@@ -66,7 +66,7 @@ select
     , bb.specialty_cohort as readmission_specialty_cohort
     , bb.died_flag as readmission_died_flag
     , bb.diagnosis_ccs as readmission_diagnosis_ccs
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from
     encounter_sequence as aa
     left outer join encounter_sequence as bb
