@@ -3,14 +3,14 @@
    )
 }}
 with seed_adjustment_rates as (
-    
+
     select
           model_version
         , payment_year
         , normalization_factor
         , ma_coding_pattern_adjustment
     from {{ ref('cms_hcc__adjustment_rates') }}
-    
+
 )
 
 , risk_factors as (
