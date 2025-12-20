@@ -17,6 +17,6 @@ select
            then 'Normalized code does not join to Terminology cvx table'
            else null end as invalid_reason
     , cast(m.normalized_code as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__stg_immunization') }} as m
 left outer join {{ ref('terminology__cvx') }} as term on m.normalized_code = term.cvx

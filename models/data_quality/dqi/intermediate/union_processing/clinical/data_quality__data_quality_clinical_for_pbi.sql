@@ -17,7 +17,7 @@ with ranked_examples as (
               , count(drill_down_value) as frequency
               , row_number() over (partition by summary_sk, bucket_name, field_value
 order by field_value) as rn
-              , '{{ var('tuva_last_run') }}' as tuva_last_run
+              , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
        from {{ ref('data_quality__data_quality_clinical_detail') }}
        where bucket_name not in ('valid', 'null')
        group by
@@ -47,7 +47,7 @@ order by field_value) as rn
               , count(detail.drill_down_value) as frequency
               , row_number() over (partition by detail.summary_sk
 order by detail.summary_sk) as rn
-              , '{{ var('tuva_last_run') }}' as tuva_last_run
+              , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
        from {{ ref('data_quality__data_quality_clinical_detail') }} as detail
               left outer join {{ ref('data_quality__crosswalk_field_info') }} as field_info on detail.table_name = field_info.input_layer_table_name
                      and detail.field_name = field_info.field_name
@@ -78,7 +78,7 @@ select
        , max(drill_down_value) as drill_down_value
        , null as field_value
        , count(drill_down_value) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_clinical_detail') }}
 where bucket_name = 'null'
 group by
@@ -105,7 +105,7 @@ select
        , max(detail.drill_down_value) as drill_down_value
        , detail.field_value as field_value
        , count(detail.drill_down_value) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_clinical_detail') }} as detail
 left outer join {{ ref('data_quality__crosswalk_field_info') }} as field_info on detail.table_name = field_info.input_layer_table_name
        and detail.field_name = field_info.field_name
@@ -137,7 +137,7 @@ select
        , drill_down_value as drill_down_value
        , field_value as field_value
        , frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from ranked_examples
 where rn <= 5
 
@@ -156,7 +156,7 @@ select
        , 'all others' as drill_down_value
        , field_value as field_value
        , sum(frequency) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from ranked_examples
 where rn > 5 --- aggregating all other rows
 group by
@@ -184,7 +184,7 @@ select
        , drill_down_value as drill_down_value
        , field_value as field_value
        , frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pk_examples
 where rn <= 5
 
@@ -203,7 +203,7 @@ select
        , 'all others' as drill_down_value
        , 'all others' as field_value
        , sum(frequency) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pk_examples
 where rn > 5 --- aggregating all other rows
 group by

@@ -17,6 +17,6 @@ select
           then 'Facility NPI does not join to Terminology provider table'
           else null end as invalid_reason
     , cast(facility_id as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
 left outer join {{ ref('terminology__provider') }} as term on m.facility_id = term.npi

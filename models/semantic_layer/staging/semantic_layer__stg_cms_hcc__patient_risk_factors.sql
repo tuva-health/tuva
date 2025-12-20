@@ -10,5 +10,5 @@ SELECT
   , rf.coefficient
   , rf.model_version
   , rf.payment_year
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('cms_hcc__patient_risk_factors') }} as rf

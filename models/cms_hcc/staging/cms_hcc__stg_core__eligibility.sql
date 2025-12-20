@@ -13,5 +13,5 @@ select distinct
     , medicare_status_code
     , enrollment_status
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__eligibility') }}

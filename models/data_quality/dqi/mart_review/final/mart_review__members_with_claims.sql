@@ -36,7 +36,7 @@ select
     , SUM(case when pc.person_id is not null then 1
              when mc.person_id is not null then 1 else 0 end) as members_with_claims
     , COUNT(*) as total_member_months
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__member_months') }} as mm
 left outer join medical_claim as mc
     on mm.person_id = mc.person_id

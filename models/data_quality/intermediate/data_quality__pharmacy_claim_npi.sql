@@ -63,5 +63,5 @@ from pharmacy_claim
 )
 
 select *
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from final

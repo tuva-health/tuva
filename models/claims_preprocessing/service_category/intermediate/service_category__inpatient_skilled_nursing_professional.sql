@@ -12,7 +12,7 @@ select distinct
   , 'skilled nursing' as service_category_2
   , 'skilled nursing' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as a
 left outer join {{ ref('service_category__dme_professional') }} as b
   on a.claim_id = b.claim_id

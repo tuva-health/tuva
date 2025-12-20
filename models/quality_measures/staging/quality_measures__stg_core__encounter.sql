@@ -13,7 +13,7 @@ select
     , length_of_stay
     , encounter_start_date
     , encounter_end_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__encounter') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -26,7 +26,7 @@ select
     , length_of_stay
     , encounter_start_date
     , encounter_end_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__encounter') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}

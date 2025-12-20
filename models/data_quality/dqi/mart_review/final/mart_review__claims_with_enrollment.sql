@@ -29,5 +29,5 @@ select
     , claims_with_enrollment
     , claims
     , CAST(claims_with_enrollment / claims as {{ dbt.type_numeric() }} ) as percentage_claims_with_enrollment
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from enrollment_stage

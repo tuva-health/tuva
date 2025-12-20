@@ -75,7 +75,7 @@ select
   , sum(skilled_nursing_allowed) / count(1) as skilled_nursing_allowed
   , sum(telehealth_visit_allowed) / count(1) as telehealth_visit_allowed
   , sum(urgent_care_allowed) / count(1) as urgent_care_allowed
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('financial_pmpm__pmpm_prep') }} as a
 group by
   year_month

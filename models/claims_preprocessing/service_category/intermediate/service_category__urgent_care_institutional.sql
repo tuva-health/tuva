@@ -10,7 +10,7 @@ with multiple_sources as (
     , 'urgent care' as service_category_2
     , 'urgent care' as service_category_3
     , '{{ this.name }}' as source_model_name
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
   from {{ ref('service_category__stg_medical_claim') }} as a
   where claim_type = 'institutional'
     and revenue_center_code = '0456'
@@ -24,7 +24,7 @@ with multiple_sources as (
     , 'urgent care' as service_category_2
     , 'urgent care' as service_category_3
     , '{{ this.name }}' as source_model_name
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
   from {{ ref('service_category__stg_medical_claim') }} as a
   where claim_type = 'institutional'
     and hcpcs_code in ('S9088', '99051', 'S9083')

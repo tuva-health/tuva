@@ -23,7 +23,7 @@ select
     , sum(case when bucket_name = 'valid' then 1 else 0 end) as valid_num
     , sum(case when bucket_name <> 'null' then 1 else 0 end) as fill_num
     , count(drill_down_value) as denom
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from
     {{ ref('data_quality__data_quality_detail') }} as x
 left outer join cte as fm
