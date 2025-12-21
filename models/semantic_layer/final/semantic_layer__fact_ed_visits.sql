@@ -10,7 +10,7 @@ SELECT
   , coalesce(s.ed_classification_order, cast(99 as varchar)) as ed_classification_order
   , coalesce(s.ed_classification_description, 'Unclassified') as ed_classification_description
   , case when try_cast(s.ed_classification_order as integer) <= 3 then 1 else 0 end as avoidable
-  , case when try_cast(s.ed_classification_order as integer) <= 3 then s.ed_classification_description
+  , case when try_cast(s.ed_classification_order as integer) <= 3 then s.ed_classification_description else null end as avoidable_description
   , e.paid_amount
   , e.allowed_amount
   , e.charge_amount
