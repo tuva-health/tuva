@@ -7,7 +7,7 @@ SELECT
     e.encounter_id
   , e.person_id
   , {{ dbt.concat(["e.person_id", "'|'", yyyymm("e.encounter_start_date")]) }} as member_month_sk
-  , coalesce(s.ed_classification_order, 99) as ed_classification_order
+  , coalesce(s.ed_classification_order, cast(99 as varchar)) as ed_classification_order
   , coalesce(s.ed_classification_description, 'Unclassified') as ed_classification_description
   , case when s.ed_classification_order <= 3 then 1 else 0 end as avoidable
   , case when s.encounter_id is null then 'Unclassified'
