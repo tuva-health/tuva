@@ -582,9 +582,23 @@ models:
                 severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 meta:
-                  dqi_test_description: https://resdac.org/cms-data/variables/medicare-status-code-january
-        meta:
-          data_type: varchar
+                  dqi_test_description: "https://resdac.org/cms-data/variables/medicare-status-code-january"
+      - name: enrollment_status
+        description: >
+          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status, 
+          leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"        
+          - accepted_values:
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
+              values: ['Continuing', 'New', 'Institutional', 'ESRD', null]
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
         tests:

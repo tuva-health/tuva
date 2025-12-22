@@ -6,6 +6,10 @@
 select
       person_id
     , payer
+    , risk_model_code
+    , enrollment_status
+    , enrollment_status_default
+    , orec_default
     , payment_year
     , collection_start_date
     , collection_end_date
@@ -21,6 +25,10 @@ from {{ ref('cms_hcc__patient_risk_scores_monthly_by_factor_type') }}
 group by
       person_id
     , payer
+    , risk_model_code
+    , enrollment_status
+    , enrollment_status_default
+    , orec_default
     , payment_year
     , collection_start_date
     , collection_end_date

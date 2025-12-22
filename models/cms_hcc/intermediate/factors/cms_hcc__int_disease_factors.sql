@@ -13,10 +13,11 @@ with demographics as (
         , age_group
         , medicaid_status
         , dual_status
-        , orec
+        , case when age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else orec end as orec
         , institutional_status
         , model_version
         , payment_year
+        , risk_model_code
         , collection_start_date
         , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -37,12 +38,14 @@ with demographics as (
 
 )
 
+-- TODO: Add a year component since coefficients can change over time
 , seed_disease_factors as (
 
     select
           model_version
         , factor_type
-        , enrollment_status
+        -- Temporary until the seed file can be updated
+        , case when institutional_status = 'Yes' then 'Institutional' else enrollment_status end as enrollment_status
         , medicaid_status
         , dual_status
         , orec
@@ -68,6 +71,7 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.risk_model_code
         , demographics.collection_start_date
         , demographics.collection_end_date
         , hcc_hierarchy.hcc_code
@@ -91,6 +95,7 @@ with demographics as (
         , demographics_with_hccs.payment_year
         , demographics_with_hccs.collection_start_date
         , demographics_with_hccs.collection_end_date
+        , demographics_with_hccs.risk_model_code
         , seed_disease_factors.factor_type
         , seed_disease_factors.description
         , seed_disease_factors.coefficient
@@ -113,6 +118,7 @@ with demographics as (
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(description as {{ dbt.type_string() }}) as hcc_description
+        , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
@@ -128,6 +134,7 @@ select
     , payer
     , hcc_code
     , hcc_description
+    , risk_model_code
     , coefficient
     , factor_type
     , model_version

@@ -12,6 +12,7 @@ select
     , claim_end_date
     , bill_type_code
     , hcpcs_code
+    , rendering_id
     , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__medical_claim') }}

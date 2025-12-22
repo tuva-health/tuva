@@ -30,6 +30,7 @@ with medical_claims as (
         , claim_type
         , payer
         , person_id
+        , rendering_id as rendering_npi
         , claim_start_date
         , claim_end_date
         , bill_type_code
@@ -53,7 +54,9 @@ with medical_claims as (
 , cpt_hcpcs_list as (
 
     select
-          payment_year
+        -- This is mislabelled as payment year, it should be collection year
+        -- TODO: Update the label in the seed file
+          payment_year as collection_year
         , hcpcs_cpt_code
     from {{ ref('cms_hcc__cpt_hcpcs') }}
 
@@ -78,10 +81,9 @@ with medical_claims as (
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
+            and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
     where claim_type = 'professional'
-
 )
 
 , inpatient_claims as (
@@ -101,7 +103,7 @@ with medical_claims as (
         , dates.collection_end_date
     from medical_claims
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('11', '41')
 
@@ -128,8 +130,8 @@ with medical_claims as (
         -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
         -- this early on
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            on coalesce(claim_end_date, claim_start_date) between dates.collection_start_date and dates.collection_end_date
+            and cpt_hcpcs_list.collection_year + 1 = dates.payment_year
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
 

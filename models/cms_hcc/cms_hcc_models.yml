@@ -133,7 +133,7 @@ models:
           If payment year >= 2024 then the score may be weighted following 
           CMS's transition plan.
       - name: blended_risk_score
-        description: The of sum v24_risk_score and v28_risk_score.
+        description: The sum of the v24_risk_score and v28_risk_score columns.
       - name: normalized_risk_score
         description: >
           The blended risk score divided by the normalization adjustment factor 
@@ -171,34 +171,35 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - person_id
-            - payer
-            - factor_type
             - payment_year
-            - collection_start_date
+            - payer
             - collection_end_date
+            - factor_type
     columns:
       - name: person_id
         description: Unique ID for the patient.
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
-      - name: factor_type
-        description: >
-          Type of risk factor, e.g. Demographic, Disease, etc.
       - name: v24_risk_score
         description: >
-          The patient risk score from model version CMS-HCC-V24 for this factor type.
+          The sum of all patient risk factors from model version CMS-HCC-V24. 
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: v28_risk_score
         description: >
-          The patient risk score from model version CMS-HCC-V28 for this factor type.
+          The sum of all patient risk factors from model version CMS-HCC-V28.
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: blended_risk_score
-        description: >
-          The sum of v24_risk_score and v28_risk_score for this factor type.
+        description: The sum of the v24_risk_score and v28_risk_score columns.
       - name: normalized_risk_score
         description: >
-          The blended risk score divided by the normalization adjustment factor.
+          The blended risk score divided by the normalization adjustment factor 
+          for the corresponding HCC model version and payment year's rate 
+          announcement from CMS.
       - name: payment_risk_score
         description: >
-          The normalized risk score multiplied by 1 - the MA coding pattern adjustment factor.
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
       - name: payment_risk_score_weighted_by_months
         description: >
           Payment risk score multiplied by member_months.
@@ -249,7 +250,7 @@ models:
           If payment year >= 2024 then the score may be weighted following 
           CMS's transition plan.
       - name: blended_risk_score
-        description: The of sum v24_risk_score and v28_risk_score.
+        description: The sum of the v24_risk_score and v28_risk_score columns.
       - name: normalized_risk_score
         description: >
           The blended risk score divided by the normalization adjustment factor 
@@ -453,7 +454,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _int_eligible_conditions
       tags: cms_hcc
-      materialized: table    
+      materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -622,6 +623,8 @@ models:
         description: >
           Indicates what age group the patient is in. (e.g. "60-64").
           CMS guidance: Age is calculated as of Feb 1 of the payment year.
+        tests:
+          - not_null          
       - name: medicaid_status
         description: Indicates whether the patient is enrolled in Medicaid.
       - name: dual_status
@@ -687,7 +690,7 @@ models:
       alias: _stg_condition
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging conditions from core. 
+    description: Staging conditions from core.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -721,7 +724,7 @@ models:
       alias: _stg_eligibility
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging eligibility from core.  
+    description: Staging eligibility from core.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -753,7 +756,7 @@ models:
       alias: _stg_medical_claim
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging medical claims from core.   
+    description: Staging medical claims from core.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:

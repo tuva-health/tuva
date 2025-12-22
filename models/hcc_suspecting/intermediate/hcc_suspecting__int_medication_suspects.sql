@@ -31,6 +31,7 @@ with all_medications as (
     select distinct
           hcc_code
         , hcc_description
+        , 'CMS-HCC-V28' as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
@@ -41,6 +42,7 @@ with all_medications as (
           person_id
         , payer
         , data_source
+        , model_version
         , hcc_code
         , current_year_billed
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
@@ -61,20 +63,21 @@ with all_medications as (
         , all_medications.code_system
         , all_medications.data_source
         , seed_clinical_concepts.concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from all_medications
         inner join seed_clinical_concepts
             on all_medications.code_system = seed_clinical_concepts.code_system
             and all_medications.drug_code = seed_clinical_concepts.code
-        inner join seed_hcc_descriptions
-            on hcc_code = '155'
+        cross join seed_hcc_descriptions
     where lower(seed_clinical_concepts.concept_name) = 'antidepressant medication'
-    and all_medications.dispensing_date >= {{ dbt.dateadd (
-              datepart = "year"
-            , interval = -5
-            , from_date_or_timestamp = dbt.current_timestamp()
-        ) }}
+        and all_medications.dispensing_date >= {{ dbt.dateadd (
+                datepart = "year"
+                , interval = -5
+                , from_date_or_timestamp = dbt.current_timestamp()
+            ) }}
+        and seed_hcc_descriptions.hcc_code = '155'
 
 )
 /* END HCC 155 logic */
@@ -91,6 +94,7 @@ with all_medications as (
           unioned.person_id
         , unioned.payer
         , unioned.data_source
+        , unioned.model_version
         , unioned.hcc_code
         , unioned.hcc_description
         , unioned.concept_name
@@ -103,6 +107,7 @@ with all_medications as (
             and unioned.payer = billed_hccs.payer
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+            and unioned.model_version = billed_hccs.model_version
 )
 
 , add_standard_fields as (
@@ -111,6 +116,7 @@ with all_medications as (
           person_id
         , payer
         , data_source
+        , model_version
         , hcc_code
         , hcc_description
         , dispensing_date
@@ -133,6 +139,7 @@ with all_medications as (
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
+        , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(dispensing_date as date) as dispensing_date
@@ -153,6 +160,7 @@ select
       person_id
     , payer
     , data_source
+    , model_version
     , hcc_code
     , hcc_description
     , dispensing_date

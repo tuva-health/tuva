@@ -46,7 +46,9 @@ select
     , seed_1.hcc_code
     , seed_1.model_version
 from seed_hcc_mapping_base as seed_1
+
 union all
+
 select
       seed_2.payment_year + 1 as payment_year
     , seed_2.diagnosis_code
@@ -85,8 +87,8 @@ where seed_2.payment_year = (select max(payment_year) as payment_year from seed_
             on conditions.code = seed_hcc_mapping.diagnosis_code
             and {{ date_part('year', 'conditions.recorded_date') }} + 1 = seed_hcc_mapping.payment_year
          left outer join seed_hcc_descriptions
-         on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
-         and seed_hcc_mapping.model_version = seed_hcc_descriptions.model_version
+            on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
+            and seed_hcc_mapping.model_version = seed_hcc_descriptions.model_version
     where conditions.code_type = 'icd-10-cm'
 )
 

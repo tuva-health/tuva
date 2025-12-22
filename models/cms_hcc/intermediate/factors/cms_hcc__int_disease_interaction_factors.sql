@@ -13,7 +13,7 @@ with demographics as (
         , age_group
         , medicaid_status
         , dual_status
-        , orec
+        , case when age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else orec end as orec
         , institutional_status
         , model_version
         , payment_year
@@ -42,7 +42,7 @@ with demographics as (
     select
           model_version
         , factor_type
-        , enrollment_status
+        , case when institutional_status = 'Yes' then 'Institutional' else enrollment_status end as enrollment_status
         , medicaid_status
         , dual_status
         , orec

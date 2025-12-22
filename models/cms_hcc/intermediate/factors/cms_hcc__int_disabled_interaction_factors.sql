@@ -37,7 +37,7 @@ with demographics as (
     select
           model_version
         , factor_type
-        , enrollment_status
+        , case when institutional_status = 'Yes' then 'Institutional' else enrollment_status end as enrollment_status
         , institutional_status
         , short_name
         , description

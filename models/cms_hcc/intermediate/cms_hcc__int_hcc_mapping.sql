@@ -35,6 +35,20 @@ with conditions as (
         , cms_hcc_v28_flag
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
 
+    union all
+
+    -- Adding a mapping for the next year copying the current year mappings
+    select
+          payment_year + 1 as payment_year
+        , diagnosis_code
+        , cms_hcc_v24
+        , cms_hcc_v24_flag
+        , cms_hcc_v28
+        , cms_hcc_v28_flag
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where payment_year = (select max(payment_year) as payment_year from {{ ref('cms_hcc__icd_10_cm_mappings') }})
+
+
 )
 
 /* casting hcc_code to avoid formatting changes during union */
