@@ -1004,6 +1004,32 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
+  - name: encounters__int_institutional_claim_lines
+    description: all institutional claim lines that belong to an encounter
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: claim_id
+        description: '{{ doc("claim_id") }}'
+      - name: claim_line_number
+        description: '{{ doc("claim_line_number") }}'
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: priority_number
+        description: '{{ doc("priority_number") }}'
+      - name: anchor_claim_id
+        description: '{{ doc("claim_id") }}'
+
   - name: encounters__combined_claim_line_crosswalk
     description: all claim lines that belong to an encounter
     config:
@@ -1015,116 +1041,24 @@ models:
         - claims_preprocessing
         - encounters
     columns:
+      - name: claim_id
+        description: '{{ doc("claim_id") }}'
+      - name: claim_line_number
+        description: '{{ doc("claim_line_number") }}'
+      - name: old_encounter_id
+        description: '{{ doc("encounter_id") }}'
       - name: encounter_id
         description: '{{ doc("encounter_id") }}'
-      - name: encounter_start_date
-        description: '{{ doc("encounter_start_date") }}'
-      - name: encounter_end_date
-        description: '{{ doc("encounter_end_date") }}'
-      - name: patient_data_source_id
-        description: '{{ doc("patient_data_source_id") }}'
       - name: encounter_type
         description: '{{ doc("encounter_type") }}'
       - name: encounter_group
         description: '{{ doc("encounter_group") }}'
-      - name: person_id
-        description: '{{ doc("person_id") }}'
-      - name: admit_age
-        description: '{{ doc("admit_age") }}'
-      - name: gender
-        description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
-      - name: race
-        description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
-      - name: primary_diagnosis_code_type
-        description: '{{ doc("primary_diagnosis_code_type") }}'
-      - name: primary_diagnosis_code
-        description: '{{ doc("primary_diagnosis_code") }}'
-      - name: primary_diagnosis_description
-        description: '{{ doc("primary_diagnosis_description") }}'
-      - name: facility_id
-        description: '{{ doc("facility_id") }}'
-      - name: observation_flag
-        description: '{{ doc("observation_flag") }}'
-      - name: ed_flag
-        description: '{{ doc("ed_flag") }}'
-      - name: lab_flag
-        description: '{{ doc("lab_flag") }}'
-      - name: dme_flag
-        description: '{{ doc("dme_flag") }}'
-      - name: ambulance_flag
-        description: '{{ doc("ambulance_flag") }}'
-      - name: pharmacy_flag
-        description: '{{ doc("pharmacy_flag") }}'
-      - name: facility_name
-        description: '{{ doc("facility_name") }}'
-      - name: facility_type
-        description: '{{ doc("facility_type") }}'
-      - name: delivery_flag
-        description: '{{ doc("delivery_flag") }}'
-      - name: delivery_type
-        description: '{{ doc("delivery_type") }}'
-      - name: newborn_flag
-        description: '{{ doc("newborn_flag") }}'
-      - name: nicu_flag
-        description: '{{ doc("nicu_flag") }}'
-      - name: facility_npi
-        description: '{{ doc("facility_npi") }}'
-      - name: provider_first_name
-        description: '{{ doc("provider_first_name") }}'
-      - name: provider_last_name
-        description: '{{ doc("provider_last_name") }}'
-      - name: drg_code_type
-        description: '{{ doc("drg_code_type") }}'
-      - name: drg_code
-        description: '{{ doc("drg_code") }}'
-      - name: drg_description
-        description: '{{ doc("drg_description") }}'
-      - name: medical_surgical
-        description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
-      - name: admit_source_code
-        description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
-      - name: admit_source_description
-        description: '{{ doc("admit_source_description") }}'
-      - name: admit_type_code
-        description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
-      - name: admit_type_description
-        description: '{{ doc("admit_type_description") }}'
-      - name: discharge_disposition_code
-        description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
-      - name: discharge_disposition_description
-        description: '{{ doc("discharge_disposition_description") }}'
-      - name: total_paid_amount
-        description: '{{ doc("total_paid_amount") }}'
-      - name: total_allowed_amount
-        description: '{{ doc("total_allowed_amount") }}'
-      - name: total_charge_amount
-        description: '{{ doc("total_charge_amount") }}'
-      - name: claim_count
-        description: '{{ doc("claim_count") }}'
-      - name: inst_claim_count
-        description: '{{ doc("inst_claim_count") }}'
-      - name: prof_claim_count
-        description: '{{ doc("prof_claim_count") }}'
-      - name: length_of_stay
-        description: '{{ doc("length_of_stay") }}'
-      - name: mortality_flag
-        description: '{{ doc("mortality_flag") }}'
-      - name: data_source
-        description: '{{ doc("data_source") }}'
-      - name: tuva_last_run
-        description: '{{ doc("tuva_last_run") }}'    
+      - name: priority_number
+        description: '{{ doc("priority_number") }}'
+      - name: anchor_claim_id
+        description: '{{ doc("claim_id") }}'
+      - name: claim_line_attribution_number
+        description: '{{ doc("claim_line_attribution_number") }}'
 
   - name: urgent_care__encounter_grain
     description: one row per urgent care encounter id summarizing encounter level metrics
