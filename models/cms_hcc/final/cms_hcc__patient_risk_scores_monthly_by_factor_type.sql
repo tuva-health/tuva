@@ -93,44 +93,44 @@ with seed_adjustment_rates as (
 , transition_scores as (
 
     select
-          raw.person_id
-        , raw.payer
-        , raw.factor_type
-        , raw.risk_model_code
-        , raw.enrollment_status
-        , raw.enrollment_status_default
-        , raw.orec_default
-        , raw.risk_score as raw_risk_score
+          raw_score.person_id
+        , raw_score.payer
+        , raw_score.factor_type
+        , raw_score.risk_model_code
+        , raw_score.enrollment_status
+        , raw_score.enrollment_status_default
+        , raw_score.orec_default
+        , raw_score.risk_score as raw_risk_score
         -- TODO: Uncomment when seed is updated
-        -- , raw.risk_score * adj.blend_weight as weighted_raw_risk_score
+        -- , raw_score.risk_score * adj.blend_weight as weighted_raw_risk_score
         , case
-            when raw.payment_year <= 2023 and raw.model_version = 'CMS-HCC-V24' then risk_score
-            when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V24' then risk_score * 0.67
-            when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V24' then risk_score * 0.33
-            when raw.payment_year >= 2026 and raw.model_version = 'CMS-HCC-V24' then 0
-            when raw.payment_year <= 2023 and raw.model_version = 'CMS-HCC-V28' then 0
-            when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V28' then risk_score * 0.33
-            when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V28' then risk_score * 0.67
-            when raw.payment_year >= 2026 and raw.model_version = 'CMS-HCC-V28' then risk_score
+            when raw_score.payment_year <= 2023 and raw_score.model_version = 'CMS-HCC-V24' then risk_score
+            when raw_score.payment_year = 2024 and raw_score.model_version = 'CMS-HCC-V24' then risk_score * 0.67
+            when raw_score.payment_year = 2025 and raw_score.model_version = 'CMS-HCC-V24' then risk_score * 0.33
+            when raw_score.payment_year >= 2026 and raw_score.model_version = 'CMS-HCC-V24' then 0
+            when raw_score.payment_year <= 2023 and raw_score.model_version = 'CMS-HCC-V28' then 0
+            when raw_score.payment_year = 2024 and raw_score.model_version = 'CMS-HCC-V28' then risk_score * 0.33
+            when raw_score.payment_year = 2025 and raw_score.model_version = 'CMS-HCC-V28' then risk_score * 0.67
+            when raw_score.payment_year >= 2026 and raw_score.model_version = 'CMS-HCC-V28' then risk_score
             end as weighted_raw_risk_score
         -- , adj.normalization_factor
         -- , adj.ma_coding_pattern_adjustment
         -- TODO: Once the seed is updated remove the case when for norm factor + ma coding pattern adj
         , case
-            when raw.payment_year = 2026 and raw.model_version = 'CMS-HCC-V28' then 1.067
-            when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V24' then 1.153
-            when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V24' then 1.146
+            when raw_score.payment_year = 2026 and raw_score.model_version = 'CMS-HCC-V28' then 1.067
+            when raw_score.payment_year = 2025 and raw_score.model_version = 'CMS-HCC-V24' then 1.153
+            when raw_score.payment_year = 2024 and raw_score.model_version = 'CMS-HCC-V24' then 1.146
             else adj.normalization_factor
           end as normalization_factor
-        , case when raw.payment_year in (2024, 2025, 2026) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment
-        , raw.model_version
-        , raw.payment_year
-        , raw.collection_start_date
-        , raw.collection_end_date
-    from raw_score as raw
+        , case when raw_score.payment_year in (2024, 2025, 2026) then .059 else adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment
+        , raw_score.model_version
+        , raw_score.payment_year
+        , raw_score.collection_start_date
+        , raw_score.collection_end_date
+    from raw_score
     left outer join seed_adjustment_rates as adj
-        on raw.payment_year = adj.payment_year
-        and raw.model_version = adj.model_version
+        on raw_score.payment_year = adj.payment_year
+        and raw_score.model_version = adj.model_version
 
 )
 
