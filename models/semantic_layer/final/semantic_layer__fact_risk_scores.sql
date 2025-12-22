@@ -13,5 +13,5 @@ SELECT
   , rs.payment_risk_score_weighted_by_months
   , rs.member_months
   , rs.payment_year
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores') }} as rs

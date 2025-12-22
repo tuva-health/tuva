@@ -85,7 +85,7 @@ select
   , sum(paid_amount) as total_paid
   , sum(allowed_amount) as total_allowed
   , data_source
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
   from combine_medical_and_rx
 group by
     person_id

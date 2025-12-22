@@ -257,7 +257,7 @@ with stg_eligibility as (
             when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
-        , 'No' as institutional_status
+        , cast('No' as {{ dbt.type_string() }}) as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
@@ -339,5 +339,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

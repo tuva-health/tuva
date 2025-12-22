@@ -46,7 +46,7 @@ select
         and discharge_locations.discharge_location = 'other' then p.discharge_pred_proba_other
       else 0
     end as discharge_location_long
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('benchmarks__predict_inpatient_prospective') }} as p
 cross join discharge_locations
 cross join expected_vs_actual

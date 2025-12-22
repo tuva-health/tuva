@@ -28,5 +28,5 @@ select distinct -- to bring to claim_ID grain
      end as invalid_reason
     {% endif %}
     ,cast(zip_code as {{ dbt.type_string() }}) as field_value
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('eligibility') }} as m

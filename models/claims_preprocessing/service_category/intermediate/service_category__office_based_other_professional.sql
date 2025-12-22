@@ -13,7 +13,7 @@ select distinct
   , 'office-based other' as service_category_2
   , 'office-based other' as service_category_3
   , '{{ this.name }}' as source_model_name
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_office_based') }} as med
   left outer join {{ ref('service_category__pharmacy_professional') }} as pharm
   on med.claim_line_id = pharm.claim_line_id

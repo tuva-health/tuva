@@ -419,6 +419,6 @@ select
   , case when person_id in (select * from lupus) then 1
        else 0
   end as lupus
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 
 from patients

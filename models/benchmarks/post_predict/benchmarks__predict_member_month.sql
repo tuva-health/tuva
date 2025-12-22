@@ -269,7 +269,7 @@ select
  , mm.{{ quote_column('plan') }}
  , mm.data_source
  , emm.benchmark_key
- , '{{ var('tuva_last_run') }}' as tuva_last_run
+ , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
    -- ==== ACTUAL PMPM paid amounts (Encounter Groups) ====
  , coalesce(c.paid_amount,                  0) as actual_paid_amount
  , coalesce(c.inpatient_paid_amount_actual, 0) as actual_inpatient_paid_amount

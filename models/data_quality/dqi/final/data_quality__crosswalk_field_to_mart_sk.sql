@@ -37,7 +37,7 @@ with results as (
       , mart_name
       , dense_rank() over (
 order by input_layer_table_name, claim_type, field_name) as table_claim_type_field_sk
-	, '{{ var('tuva_last_run') }}' as tuva_last_run
+	, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     from results
     group by
         input_layer_table_name

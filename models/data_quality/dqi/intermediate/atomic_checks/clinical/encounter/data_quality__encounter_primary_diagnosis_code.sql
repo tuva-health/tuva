@@ -17,6 +17,6 @@ select
           then 'Primary diagnosis code does not join to Terminology icd_10_cm table'
     else null end as invalid_reason
     , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
 left outer join {{ ref('terminology__icd_10_cm') }} as term on m.primary_diagnosis_code = term.icd_10_cm

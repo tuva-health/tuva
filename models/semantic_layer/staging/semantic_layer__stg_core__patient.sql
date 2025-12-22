@@ -27,5 +27,5 @@ SELECT
   , p.data_source
   , p.age
   , p.age_group
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('core__patient')}} as p

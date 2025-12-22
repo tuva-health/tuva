@@ -24,7 +24,7 @@ select
       then sum(paid_amount) / sum(quantity)
       else null
     end as cost_per_unit
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
 left outer join {{ ref('terminology__rxnorm_brand_generic') }} as r
   on p.rxcui = r.product_rxcui

@@ -18,7 +18,7 @@ with ranked_examples as (
        , count(drill_down_value) as frequency
        , row_number() over (partition by summary_sk, bucket_name, field_value
 order by field_value) as rn
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_claims_detail') }}
 where bucket_name not in ('valid', 'null')
 group by
@@ -45,7 +45,7 @@ select
        , max(drill_down_value) as drill_down_value --1 sample claim
        , null as field_value
        , count(drill_down_value) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_claims_detail') }}
 where bucket_name = 'null'
 group by
@@ -71,7 +71,7 @@ select
        , max(drill_down_value) as drill_down_value --1 sample claim
        , field_value as field_value
        , count(drill_down_value) as frequency
-       , '{{ var('tuva_last_run') }}' as tuva_last_run
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_claims_detail') }}
 where bucket_name = 'valid'
 group by
