@@ -30,6 +30,7 @@ select distinct
     , ccsr__procedure_category_map.approach
     , ccsr__procedure_category_map.device
     , ccsr__procedure_category_map.qualifier
+    , procedures.data_source
     , {{ var('prccsr_version') }} as prccsr_version
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from procedures
