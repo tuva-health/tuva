@@ -22,7 +22,7 @@ with egfr_labs as (
     select distinct
           hcc_code
         , hcc_description
-        , 'CMS-HCC-V28' as model_version
+        , cast('CMS-HCC-V28' as {{ dbt.type_string() }}) as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
@@ -130,7 +130,7 @@ with egfr_labs as (
         , code as lab_code
         , result_date
         , result
-        , 'CMS-HCC-V28' as model_version
+        , cast('CMS-HCC-V28' as {{ dbt.type_string() }}) as model_version
         , case
             when result between 0 and 14 then '326'
             when result between 15 and 29 then '327'
