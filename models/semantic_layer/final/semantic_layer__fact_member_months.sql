@@ -83,7 +83,7 @@ WITH monthly_patient_costs AS (
 
 monthly_patient_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+       {{yyyymm("collection_end_date")}} AS year_month
       , person_id
       , normalized_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
@@ -91,11 +91,11 @@ monthly_patient_risk_cte AS (
 
 monthly_population_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+       {{yyyymm("collection_end_date")}} AS year_month
       , AVG(normalized_risk_score) AS monthly_avg_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
     GROUP BY
-        TO_CHAR(collection_end_date, 'YYYYMM')
+        {{yyyymm("collection_end_date")}}
 ),
 combined_data_cte AS (
     SELECT
@@ -200,7 +200,7 @@ SELECT
   , CASE
       WHEN SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr) > 0
       THEN CAST(cd.member_months_value AS DECIMAL(10,4)) / SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr)
-      ELSE 0
+      ELSE CAST(0 AS DECIMAL(10,4))
     END AS MonthAllocationFactor
   , cd.data_source
   , cd.patient_source_key
