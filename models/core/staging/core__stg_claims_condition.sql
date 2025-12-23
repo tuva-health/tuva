@@ -15,7 +15,7 @@ with combine_diag_poa as (
     , diag.diagnosis_code_type as source_code_type
     , diag.diagnosis_code as source_code
     , cast('discharge_diagnosis' as  {{ dbt.type_string() }}) as condition_type
-    , {{ dbt.split_part(string_text='diag.column_name', delimiter_text='_', part_number=-1) }} as diagnosis_rank
+    , {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} as diagnosis_rank
     , poa.normalized_code as present_on_admit_code
  from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} diag
  left join {{ ref('normalized_input__int_present_on_admit_voting') }} poa
