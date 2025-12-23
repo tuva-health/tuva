@@ -46,6 +46,7 @@ from combine_diag_poa code
 inner join {{ ref('normalized_input__medical_claim') }} med
     on  code.claim_id = med.claim_id
     and code.data_source = med.data_source
+where code.source_code is not null
 )
 
 select distinct
