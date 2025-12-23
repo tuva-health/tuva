@@ -21,7 +21,7 @@ with combine_diag_poa as (
  left join {{ ref('normalized_input__int_present_on_admit_voting') }} poa
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
-    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text='_', part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text='_', part_number=-1) }}
+    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
 )
 
 , unpivot_cte as (
