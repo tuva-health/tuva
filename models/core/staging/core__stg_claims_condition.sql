@@ -8,6 +8,7 @@
 -- *************************************************
 
 -- The code needs to be brought in like this since a single diagnosis column can have multiple claims
+-- TODO: Add test to ensure all diagnosis in the medical claim are being brought through and none are being lost
 with combine_diag_poa as (
  select 
       diag.claim_id
@@ -42,6 +43,9 @@ select
     , code.condition_type
     , code.diagnosis_rank
     , code.present_on_admit_code
+-- Using this CTE since normalized_input__medical_claim is missing diagnosis due to the max
+-- in normalized_input__int_diagnosis_code_final. Some diagnosis columns have more than 1 diagnosis
+-- and we want all possible diagnosis.
 from combine_diag_poa code
 inner join {{ ref('normalized_input__medical_claim') }} med
     on  code.claim_id = med.claim_id
