@@ -35,8 +35,8 @@ select
   , esk.ccsr_category_description
   , mc.person_id
   , {{ dbt.concat(["mc.person_id", "'|'", "mc.data_source"]) }} as patient_source_key
-  , {{ dbt.concat(["mc.person_id", "'|'", yyyymm("mc.claim_start_date")]) }} as member_month_sk
-  , TO_CHAR(mc.claim_start_date, 'YYYYMM') as year_month
+  , {{ dbt.concat(["mc.person_id", "'|'", the_tuva_project.yyyymm("mc.claim_start_date")]) }} as member_month_sk
+  , {{ yyyymm("mc.claim_start_date") }} as year_month
   , sc.service_category_sk
   , mc.claim_id
   , mc.claim_line_number
