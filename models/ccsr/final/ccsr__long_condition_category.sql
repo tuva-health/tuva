@@ -36,6 +36,7 @@ select
     , ccsr__dx_vertical_pivot.ccsr_category_rank
     , ccsr__dx_vertical_pivot.is_ip_default_category
     , ccsr__dx_vertical_pivot.is_op_default_category
+    , condition.data_source
     , {{ var('dxccsr_version') }} as dxccsr_version
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from condition

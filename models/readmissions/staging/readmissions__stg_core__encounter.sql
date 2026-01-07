@@ -15,6 +15,7 @@ select
     , paid_amount
     , primary_diagnosis_code
     , encounter_source_type
+    , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__encounter') }}
 where encounter_type = 'acute inpatient'

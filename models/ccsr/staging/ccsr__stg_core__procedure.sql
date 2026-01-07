@@ -8,5 +8,6 @@ select
     , claim_id
     , person_id
     , normalized_code
+    , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__procedure') }}

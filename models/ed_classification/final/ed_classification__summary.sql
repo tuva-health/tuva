@@ -30,6 +30,7 @@ select
     , latitude as patient_latitude
     , longitude as patient_longitude
     , race as patient_race
+    , pat.data_source
 from {{ ref('ed_classification__int_filter_encounter_with_classification') }} as class
 inner join {{ ref('ed_classification__categories') }} as cat
     on class.classification = cat.classification
