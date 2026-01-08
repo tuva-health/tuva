@@ -1,4 +1,4 @@
-{% test warn_if_null_percentage_above_zero(model, column_name) %}
+{% test warn_if_null_percentage_is_100(model, column_name) %}
 
 {#-
     Calculates the percentage of NULL values in a column using ANSI SQL.
