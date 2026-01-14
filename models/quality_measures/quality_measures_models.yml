@@ -32,16 +32,16 @@ models:
         description: Ending date of the performance or measurement period.
       - name: denominator_sum
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_sum
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved with exclusion logic applied.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved with exclusion logic applied.
       - name: exclusion_sum
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: performance_rate
         description: >
-          Calculated performance rate. The numerator sum divided by the  denominator sum after exclusion logic applied and multiplied by 100.
+          Calculated performance rate. The numerator sum divided by the denominator sum after exclusion logic applied and multiplied by 100.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -54,7 +54,7 @@ models:
       materialized: table
     description: >
       Long view of the results for the reporting version of all measures.
-      Each row represents the results a measure per patient. A null for the  denominator
+      Each row represents the results a measure per patient. A null for the denominator
       indicates that the patient was not eligible for that measure.
     tests:
       - the_tuva_project.expect_table_row_count_to_be_between:
@@ -73,16 +73,16 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: performance_flag
         description: >
-          Performance flag calculated by using exclusion, numerator, and  denominator flags. When excluded from a measure the flag is null.
+          Performance flag calculated by using exclusion, numerator, and denominator flags. When excluded from a measure the flag is null.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -94,7 +94,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -134,26 +134,26 @@ models:
         description: Unique person_id for each person.
       - name: cqm_438
         description: >
-          Performance flag for CQM438, Statin Therapy for the Prevention and  Treatment of Cardiovascular Disease. A null indicates that the  measure was not applicable for the patient.
+          Performance flag for CQM438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease. A null indicates that the measure was not applicable for the patient.
       - name: cqm_130
         description: >
-          Performance flag for CQM130, Documentation of Current Medications in the Medical Record.  A null indicates that the measure was not applicable for the patient.
+          Performance flag for CQM130, Documentation of Current Medications in the Medical Record. A null indicates that the measure was not applicable for the patient.
       - name: nqf_0420
         description: >
-          Performance flag for NQF0420, Pain Assessment and Follow-Up.  A null indicates that the measure was not applicable for the patient.
+          Performance flag for NQF0420, Pain Assessment and Follow-Up. A null indicates that the measure was not applicable for the patient.
       - name: adh_diabetes
         description: >
-          Performance flag for ADH-Diabetes, Medication Adherence for Diabetes Medications.  A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-Diabetes, Medication Adherence for Diabetes Medications. A null indicates that the measure was not applicable for the patient.
       - name: adh_ras
         description: >
-          Performance flag for ADH-RAS, Medication Adherence for Hypertension.  A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-RAS, Medication Adherence for Hypertension. A null indicates that the measure was not applicable for the patient.
       - name: supd
         description: >
           Performance flag for SUPD, Statin Use in Persons with Diabetes.
           A null indicates that the measure was not applicable for the patient.
       - name: adh_statins
         description: >
-          Performance flag for ADH-Statins, Medication Adherence for Cholesterol.  A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-Statins, Medication Adherence for Cholesterol. A null indicates that the measure was not applicable for the patient.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -322,7 +322,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -343,10 +343,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -364,13 +364,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -382,7 +382,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -426,11 +426,11 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Documentation of Current Medications in the Medical Record        
+### Documentation of Current Medications in the Medical Record
   - name: quality_measures__int_cqm130__performance_period
     config:
       schema: |
@@ -471,7 +471,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -492,10 +492,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -513,13 +513,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -531,7 +531,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -575,7 +575,7 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -616,7 +616,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -637,10 +637,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -658,13 +658,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -676,7 +676,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -720,7 +720,7 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -769,7 +769,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -790,10 +790,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -811,13 +811,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -829,7 +829,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -866,7 +866,7 @@ models:
           The degree to which the person behaviour corresponds with taking a medicine optimally in percentage.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -913,7 +913,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -934,10 +934,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -955,13 +955,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -973,7 +973,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -1010,7 +1010,7 @@ models:
           The extent to which a person's behaviour corresponds with taking a medicine optimally.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1051,7 +1051,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1072,10 +1072,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1093,13 +1093,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1111,7 +1111,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -1145,7 +1145,7 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1192,7 +1192,7 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1213,10 +1213,10 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1234,13 +1234,13 @@ models:
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that  may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of  individuals to be removed from the numerator and/or denominator of  a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1252,7 +1252,7 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient  from the measure.
+          Reason (usually the value set concept name) that excludes patient from the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -1289,7 +1289,7 @@ models:
           The extent to which a person's behaviour corresponds with taking a medicine optimally.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator  for whom a particular service has been provided or for whom a  particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1445,7 +1445,7 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging medical claims from the input layer. Creates an empty table if  using clinical only.
+      Staging medical claims from the input layer. Creates an empty table if using clinical only.
     columns:
       - name: person_id
       - name: claim_start_date
@@ -1467,7 +1467,7 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging pharmacy claims from the input layer. Creates an empty table if  using clinical only.
+      Staging pharmacy claims from the input layer. Creates an empty table if using clinical only.
     columns:
       - name: person_id
       - name: dispensing_date
@@ -1485,7 +1485,7 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging lab results from the input layer. Creates an empty table if  using claims only.
+      Staging lab results from the input layer. Creates an empty table if using claims only.
     columns:
       - name: person_id
       - name: result
