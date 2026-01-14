@@ -155,7 +155,10 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         enrollment_status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-
+        hospice_flag: integer
+        institutional_snp_flag: integer
+        long_term_institutional_flag: integer
+        
   - name: immunization_seed
     config:
       schema: |

@@ -32,6 +32,9 @@ select
     , dual_status_code
     , medicare_status_code
     , enrollment_status
+    , hospice_flag
+    , institutional_snp_flag
+    , long_term_institutional_flag
     , group_id
     , group_name
     , name_suffix
