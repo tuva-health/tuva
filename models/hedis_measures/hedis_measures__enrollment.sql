@@ -1,6 +1,6 @@
 {{ config(
      enabled = (  var('hedis_measures_enabled', False) == True  and
-                  var('claims_enabled', var('clinical_enabled', False))
+                  (var('claims_enabled', False) == True or var('clinical_enabled', False) == True)
                ) | as_bool
    )
 }}
@@ -11,5 +11,6 @@ select
 , enrollment_end_date
 , payer
 , payer_type
-, institutional_special_needs_plan --need to add to this table
+, institutional_snp_flag
+, data_source
 from {{ ref('core__eligibility') }}

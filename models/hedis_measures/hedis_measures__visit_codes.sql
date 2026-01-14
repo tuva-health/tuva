@@ -1,6 +1,6 @@
 {{ config(
      enabled = (  var('hedis_measures_enabled', False) == True  and
-                  var('claims_enabled', var('clinical_enabled', False))
+                  (var('claims_enabled', False) == True or var('clinical_enabled', False) == True)
                ) | as_bool
    )
 }}
