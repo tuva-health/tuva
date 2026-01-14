@@ -17,19 +17,20 @@ models:
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
 
+  require_generic_test_arguments_property: true
 vars:
     ## CCSR data mart vars
     # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
-    record_type: "ip"
+  record_type: "ip"
 
     # CCSR Version numbers from HCUP
-    dxccsr_version: "'2023.1'"
-    prccsr_version: "'2023.1'"
+  dxccsr_version: "'2023.1'"
+  prccsr_version: "'2023.1'"
 
     ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year, this can be
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
-    cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
+  cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
 
     ## Quality Measures period var
     # to run quality measueres for a period other than current year, add the below variable uncommented to your project
@@ -44,18 +45,18 @@ vars:
     ## Tuva Last Run
     # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
     # Default timezone is UTC
-    tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
     ## Tuva seed S3 bucket override (for PG only) - also optional prefix in case the bucket has other content
     #tuva_seeds_s3_bucket: "tuva-public-resources"
     #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
-    custom_bucket_name: tuva-public-resources
+  custom_bucket_name: tuva-public-resources
 
     ## DQI data testing on input layer
-    enable_input_layer_testing: true
+  enable_input_layer_testing: true
 
     ## Set this variable to true if you want legacy data quality models to build
-    enable_legacy_data_quality: false
+  enable_legacy_data_quality: false
 
     # Enable groups of marts
     # clinical_enabled: true
@@ -76,7 +77,6 @@ vars:
     # tuva_chronic_conditions_enabled: false
     # tuva_provider_attribution: false
 
-    
 on-run-start:
   - "{{ log_invocation_start() }}"
 on-run-end:
@@ -89,10 +89,9 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 docs-paths: ["dbt_doc_blocks"]
-target-path: "target"
 clean-targets:
-    - "target"
-    - "dbt_packages"
+  - "target"
+  - "dbt_packages"
 
 seeds:
   the_tuva_project:
@@ -210,7 +209,7 @@ seeds:
       terminology__rxnorm_to_atc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.5','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_brand_generic:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.5','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.5','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.5','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:

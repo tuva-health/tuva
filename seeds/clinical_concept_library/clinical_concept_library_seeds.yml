@@ -41,9 +41,9 @@ seeds:
       - name: concept_id
         description: Primary key for the table
       - name: concept_name
-        description: Human-readable term for the concept. Should include spaces as needed, and casing per titlecase conventions, e.g. “Myocardial Infarction”.
+        description: Human-readable term for the concept. Should include spaces as needed, and casing per titlecase conventions, e.g. "Myocardial Infarction".
       - name: status
-        description: Status of this concept and the completeness of the links to value_set_members. Values include “in progress”, “ready for review”, “reviewed”, “inactive”, others to be added as needed.
+        description: Status of this concept and the completeness of the links to value_set_members. Values include "in progress", "ready for review", "reviewed", "inactive", others to be added as needed.
       - name: concept_oid
         description: OID for the concept; Added since some clinical concepts used in standardized quality measures have OIDs.
       - name: last_update_date
@@ -52,9 +52,9 @@ seeds:
         description: Relevant details regarding the nature and reasons for the most recent update.
       - name: concept_type
         description: |
-          Clinical type of the concept. Potential values: “condition”, “therapy”, “diagnostic test”, others TBD.
+          Clinical type of the concept. Potential values: "condition", "therapy", "diagnostic test", others TBD.
       - name: content_source
-        description: Indicates whether the clinical concept definition and associated value set content was developed by Tuva or from some other public source. Values will be “Tuva-developed” or “external”.
+        description: Indicates whether the clinical concept definition and associated value set content was developed by Tuva or from some other public source. Values will be "Tuva-developed" or "external".
       - name: external_source_detail
         description: For concepts for which the definition and associated value set content was not developed by Tuva, this provides details on the source of the concept.
       - name: concept_scope
@@ -104,7 +104,7 @@ seeds:
       - name: concept_id
         description: Foreign key to concept table
       - name: status
-        description: Status of this individual value_set_members record. Options = “active” and “inactive”, others to be added as needed.
+        description: Status of this individual value_set_members record. Options = "active" and "inactive", others to be added as needed.
       - name: last_update_date
         description: Date of last update of this row, formatted as YYYY-MM-DD.
       - name: last_update_note
@@ -118,7 +118,7 @@ seeds:
       - name: coding_system_version
         description: Version of the coding system used. For now, editorial conventions and/or business logic will be required to establish a consistent format for coding version for each coding system.
       - name: include_descendants
-        description: Indicates whether the value set should include descendants of the specified code. If “true”, include the specified code and all of its descendants. If “false”, include only the specified code. Applies only to coding systems for which Tuva has implemented this feature.
+        description: Indicates whether the value set should include descendants of the specified code. If "true", include the specified code and all of its descendants. If "false", include only the specified code. Applies only to coding systems for which Tuva has implemented this feature.
       - name: comment
         description: In some cases it may be helpful to provide some explanatory context for inclusion of a particular code, e.g., insights into the intended meaning of the code that aren’t implicit in the code description but are implied by other aspects of the coding system e.g., ICD-10-CM coding guidance.
 
@@ -141,7 +141,7 @@ seeds:
       - name: coding_system_id
         description: Primary key for the table
       - name: coding_system_name
-        description: Name of the coding system, e.g. “SNOMED CT US Edition”
+        description: Name of the coding system, e.g. "SNOMED CT US Edition"
       - name: coding_system_uri
         description: URI as used in FHIR to represent coding system. This provides an unambiguous identifier for the coding system.
       - name: coding_system_oid

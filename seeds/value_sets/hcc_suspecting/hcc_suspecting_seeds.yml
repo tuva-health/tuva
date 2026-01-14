@@ -30,8 +30,7 @@ seeds:
 
   - name: hcc_suspecting__hcc_descriptions
     description: >
-      Disease factors by model version and risk segment. Extracted from rate 
-      announcement documents on cms.gov.
+      Disease factors by model version and risk segment. Extracted from rate  announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
@@ -51,8 +50,7 @@ seeds:
 
   - name: hcc_suspecting__icd_10_cm_mappings
     description: >
-      ICD-10 to HCC mapping by payment year and model version. Combined and 
-      cleaned version of code files on cms.gov.
+      ICD-10 to HCC mapping by payment year and model version. Combined and  cleaned version of code files on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
@@ -79,8 +77,9 @@ seeds:
     columns:
       - name: diagnosis_code
         description: ICD-10 diagnosis code
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-10-cm
       - name: cms_hcc_esrd_v21
         description: CMS-HCC ESRD version 21 code
       - name: cms_hcc_esrd_v24

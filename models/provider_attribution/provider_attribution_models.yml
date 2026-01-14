@@ -41,7 +41,8 @@ models:
         tests: [not_null]
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: [attribution_key, provider_id]
+          arguments:
+            combination_of_columns: [attribution_key, provider_id]
 
   - name: provider_attribution__int_person_years
     config:
