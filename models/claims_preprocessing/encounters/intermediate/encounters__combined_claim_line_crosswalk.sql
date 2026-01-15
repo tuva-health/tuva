@@ -19,18 +19,6 @@ where claim_attribution_number = 1
 
 union all
 
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'acute inpatient' as encounter_type
-, 'inpatient' as encounter_group
-, 0 as priority_number
-, null as anchor_claim_id
-from {{ ref('acute_inpatient__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
-
-union all
-
 /* Intentionally bringing in professional claims assigned to inpatient stays in case admit is assigned to ED  */
 select claim_id
  , claim_line_number
@@ -41,18 +29,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('acute_inpatient__prof_claims') }}
 where claim_attribution_number = 1
-
-union all
-
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'emergency department' as encounter_type
-, 'outpatient' as encounter_group
-, 1 as priority_number
-, original_anchor_claim as anchor_claim_id
-from {{ ref('emergency_department__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 
 union all
 
@@ -68,18 +44,6 @@ where claim_attribution_number = 1
 
 union all
 
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient hospice' as encounter_type
-, 'inpatient' as encounter_group
-, 1 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_hospice__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
-
-union all
-
 select claim_id
 , claim_line_number
 , encounter_id
@@ -89,18 +53,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('inpatient_psych__prof_claims') }}
 where claim_attribution_number = 1
-
-union all
-
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient psych' as encounter_type
-, 'inpatient' as encounter_group
-, 2 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_psych__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 
 union all
 
@@ -116,18 +68,6 @@ where claim_attribution_number = 1
 
 union all
 
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient rehabilitation' as encounter_type
-, 'inpatient' as encounter_group
-, 3 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_rehab__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
-
-union all
-
 select claim_id
 , claim_line_number
 , encounter_id
@@ -137,19 +77,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('inpatient_long_term__prof_claims') }}
 where claim_attribution_number = 1
-
-union all
-
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient long term acute care' as encounter_type
-, 'inpatient' as encounter_group
-, 4 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_long_term__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
-
 
 union all
 
@@ -165,18 +92,6 @@ where claim_attribution_number = 1
 
 union all
 
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient skilled nursing' as encounter_type
-, 'inpatient' as encounter_group
-, 5 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_snf__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
-
-union all
-
 select claim_id
 , claim_line_number
 , encounter_id
@@ -186,18 +101,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('inpatient_substance_use__prof_claims') }}
 where claim_attribution_number = 1
-
-union all
-
-select enc.claim_id
-, med.claim_line_number
-, enc.encounter_id
-, 'inpatient substance use' as encounter_type
-, 'inpatient' as encounter_group
-, 6 as priority_number
-, null as anchor_claim_id
-from {{ ref('inpatient_substance_use__generate_encounter_id') }} as enc
-inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 
 union all
 
@@ -211,7 +114,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type = 'office visit radiology'
-
 
 union all
 
@@ -314,7 +216,6 @@ select claim_id
 , null as anchor_claim_id
 from {{ ref('outpatient_surgery__match_claims_to_anchor') }}
 
-
 union all
 
 select claim_id
@@ -370,6 +271,17 @@ select claim_id
 , 999 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }}
+
+union all
+
+select claim_id
+, claim_line_number
+, encounter_id
+, encounter_type
+, encounter_group
+, priority_number
+, anchor_claim_id
+from {{ ref('encounters__int_institutional_claim_lines') }}
 
 union all
 
