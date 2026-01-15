@@ -3,109 +3,111 @@ version: 2
 models:
   - name: benchmarks__person_year
     description: |
-        flat table for training ml models on 
+      flat table for training ml models on
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: person_year
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
         - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - payer
-            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
-            - year_nbr      
+          arguments:
+            combination_of_columns:
+              - person_id
+              - payer
+              - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
+              - year_nbr
 
   - name: benchmarks__person_year_prospective
     description: |
-        flat table for training ml models on for prospective_models
+      flat table for training ml models on for prospective_models
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: person_year_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
         - prospective
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - benchmark_key  
+          arguments:
+            combination_of_columns:
+              - benchmark_key
 
   - name: benchmarks__pivot_condition
     description: |
-        flat table for training ml models on 
+      flat table for training ml models on
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: int_pivot_condition
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
 
 
   - name: benchmarks__predict_member_month
     description: |
-        member_month grain table for data viz with expected values
+      member_month grain table for data viz with expected values
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: predict_member_month
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - concurrent
 
   - name: benchmarks__predict_member_month_prospective
     description: |
-        member_month grain table for data viz with expected values
+      member_month grain table for data viz with expected values
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: predict_member_month_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - prospective
 
   - name: benchmarks__predict_inpatient
     description: |
-        joining inpatient predicts to encounter table actuals
+      joining inpatient predicts to encounter table actuals
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: predict_inpatient
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - concurrent
 
   - name: benchmarks__predict_inpatient_prospective
     description: |
-        joining inpatient predicts to encounter table actuals
+      joining inpatient predicts to encounter table actuals
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: predict_inpatient_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - prospective
@@ -113,90 +115,92 @@ models:
 
   - name: benchmarks__inpatient_input
     description: |
-        unpivot for viz
+      unpivot for viz
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_inpatient_input
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
         - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - encounter_id             
+          arguments:
+            combination_of_columns:
+              - encounter_id
 
   - name: benchmarks__inpatient_input_prospective
     description: |
-        unpivot for viz
+      unpivot for viz
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_inpatient_input_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
         - prospective
     data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - encounter_id    
+          arguments:
+            combination_of_columns:
+              - encounter_id
 
   - name: benchmarks__unpivot_inpatient
     description: |
-        unpivot for viz
+      unpivot for viz
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_unpivot_inpatient
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
 
   - name: benchmarks__unpivot_member_month
     description: |
-        unpivot for viz
+      unpivot for viz
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_unpivot_member_month
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
 
   - name: benchmarks__unpivot_inpatient_prospective
     description: |
-        unpivot for viz (prospective predictions)
+      unpivot for viz (prospective predictions)
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_unpivot_inpatient_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - prospective
 
   - name: benchmarks__unpivot_member_month_prospective
     description: |
-        unpivot for viz (prospective predictions)
+      unpivot for viz (prospective predictions)
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: benchmarks_unpivot_member_month_prospective
       materialized: table
-      tags: 
+      tags:
         - benchmarks_analysis
         - benchmarks
         - prospective
@@ -204,27 +208,27 @@ models:
 
   - name: benchmarks__pivot_hcc
     description: |
-        hcc_person_year
+      hcc_person_year
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: int_pivot_hcc
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
 
   - name: benchmarks__pivot_cms_condition
     description: |
-        hcc_person_year
+      hcc_person_year
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
       alias: int_pivot_cms_condition
       materialized: table
-      tags: 
+      tags:
         - benchmarks_train
         - benchmarks
 
@@ -233,21 +237,21 @@ models:
     description: Staging model for core condition data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
-  
+
 
   - name: benchmarks__stg_core__member_months
     description: Staging model for core member months data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
@@ -256,9 +260,9 @@ models:
     description: Staging model for core medical claim data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
@@ -267,9 +271,9 @@ models:
     description: Staging model for core encounter data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
@@ -278,9 +282,9 @@ models:
     description: Staging model for core patient data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
@@ -289,9 +293,9 @@ models:
     description: Staging model for reference calendar data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
@@ -300,9 +304,9 @@ models:
     description: Staging model for CMS HCC disease factors data used in benchmarks
     config:
       materialized: view
-      tags: 
+      tags:
         - benchmarks_train
-        - benchmarks      
+        - benchmarks
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}

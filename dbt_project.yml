@@ -1,7 +1,7 @@
 name: 'the_tuva_project'
 version: '0.15.5'
 config-version: 2
-require-dbt-version: ">=1.9.0"
+require-dbt-version: ">=1.10.0"
 
 profile: default
 
@@ -17,6 +17,7 @@ models:
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
 
+  require_generic_test_arguments_property: true
 vars:
     ## CCSR data mart vars
     # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
@@ -31,9 +32,9 @@ vars:
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
     cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
 
-    ## Quality Measures period var
-    # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-    #quality_measures_period_end: "2020-12-31"
+      ## Quality Measures period var
+      # to run quality measueres for a period other than current year, add the below variable uncommented to your project
+      #quality_measures_period_end: "2020-12-31"
 
     ## Enable Normalize engine var
     # set to false or leave undefined to affect no change
@@ -76,7 +77,6 @@ vars:
     # tuva_chronic_conditions_enabled: false
     # tuva_provider_attribution: false
 
-    
 on-run-start:
   - "{{ log_invocation_start() }}"
 on-run-end:
@@ -89,10 +89,9 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 docs-paths: ["dbt_doc_blocks"]
-target-path: "target"
 clean-targets:
-    - "target"
-    - "dbt_packages"
+  - "target"
+  - "dbt_packages"
 
 seeds:
   the_tuva_project:
