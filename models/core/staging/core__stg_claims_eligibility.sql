@@ -41,6 +41,9 @@ select
        , cast(dual_status_code as {{ dbt.type_string() }}) as dual_status_code
        , cast(medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code
        , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
+       , cast(hospice_flag as {{ dbt.type_int() }}) as hospice_flag
+       , cast(institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
+       , cast(long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag
        , cast(subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
        , cast(group_id as {{ dbt.type_string() }}) as group_id
        , cast(group_name as {{ dbt.type_string() }}) as group_name
