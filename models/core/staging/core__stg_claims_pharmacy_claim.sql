@@ -47,7 +47,8 @@ select
        end as int) as enrollment_flag
        , enroll.member_month_key
        , cast(pharm.data_source as {{ dbt.type_string() }}) as data_source
-       , {{ try_to_cast_date('pharm.file_date', 'YYYY-MM-DD') }} as file_date
+       , cast(pharm.file_date as {{ dbt.type_timestamp() }}) as file_date
+       , cast(pharm.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
        , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name
        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__pharmacy_claim') }} as pharm
