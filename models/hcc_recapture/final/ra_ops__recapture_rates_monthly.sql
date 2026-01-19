@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('hcc_recapture_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
+   )
+}}
+
 with flatten_hccs as (
 -- Remove claim ID and rendering NPI
 select distinct
