@@ -1,0 +1,211 @@
+version: 2
+
+models:
+  - name: ra_ops__int_all_hccs
+    description: Add eligible claim and eligible benes columns. This is not filtered to eligible claims only so all claims can be seen at this step.
+    config:
+      schema: ra_ops
+      alias: int_all_hccs
+      tags: ["ra_ops", "intermediate"]
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - hcc_code
+            - data_source
+            - payer
+            - model_version
+            - collection_year
+            - hcc_hierarchy_group
+            - recorded_date
+            - rendering_npi
+            - claim_id
+            - condition_type
+    columns:
+      - name: person_id
+        description: A unique identifier for a person.
+      - name: payer
+        description: The name of the person (i.e. beneficiary) insurance provider.
+      - name: collection_year
+        description: The year that the claims originated and were originally coded.
+      - name: recorded_date
+        description: The date the claim was originally recorded. Based on admission date, but if null then filled in by claim start date followed by claim end date.
+      - name: model_version
+        description: >
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment        
+      - name: hcc_code
+        description: The hierarchical condition category code.
+      - name: hcc_description
+        description: A description of the HCC code.
+      - name: data_source
+        description: The name of the data source origin. Filled in by the user in the input layer files.
+      - name: hcc_chronic_flag
+        description: Whether the HCC is considered chronic or not. A 1 indicates the HCC is chronic.
+      - name: claim_id
+        description: A unique identifier for the claim.
+      - name: hcc_hierarchy_group
+        description: >
+          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
+          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
+      - name: hcc_hierarchy_group_rank
+        description: >
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
+      - name: risk_model_code
+        description: >
+          There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
+          This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
+          the 2025 CMS risk adjustment software.      
+      - name: eligible_bene
+        description: A 1 is indicated for a beneficiary who is in the eligibility files. A 0 is indicated if they are not in the eligibility files.
+      - name: rendering_npi
+        description: The National Provider Identifier (NPI) of the physician who rendered services to the beneficiary.
+      - name: reason
+        description: Free text reason for the appointment or service.
+      - name: condition_type
+        description: The type of condition. Claims are filled in with values such as `discharge_diagnosis`.
+      - name: eligible_claim_indicator
+        description: >
+          Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
+          on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+  - name: ra_ops__int_hccs
+    description: Filter to just eligible claims and apply HCC hierarchies.
+    config:
+      schema: ra_ops
+      alias: int_hccs
+      tags: ["ra_ops", "intermediate"]
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - hcc_code
+            - data_source
+            - payer
+            - model_version
+            - collection_year
+            - hcc_hierarchy_group
+            - recorded_date
+            - rendering_npi
+            - claim_id
+            - condition_type
+            - suspect_hcc_flag
+    columns:
+      - name: person_id
+        description: A unique identifier for a person.
+      - name: payer
+        description: The name of the person (i.e. beneficiary) insurance provider.
+      - name: collection_year
+        description: The year that the claims originated and were originally coded.
+      - name: recorded_date
+        description: The date the claim was originally recorded. Based on admission date, but if null then filled in by claim start date followed by claim end date.
+      - name: model_version
+        description: >
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment        
+      - name: hcc_code
+        description: The hierarchical condition category code.
+      - name: hcc_description
+        description: A description of the HCC code.
+      - name: data_source
+        description: The name of the data source origin. Filled in by the user in the input layer files.
+      - name: hcc_chronic_flag
+        description: Whether the HCC is considered chronic or not. A 1 indicates the HCC is chronic.
+      - name: claim_id
+        description: A unique identifier for the claim.
+      - name: hcc_hierarchy_group
+        description: >
+          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
+          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
+      - name: hcc_hierarchy_group_rank
+        description: >
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
+      - name: risk_model_code
+        description: >
+          There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
+          This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
+          the 2025 CMS risk adjustment software.      
+      - name: eligible_bene
+        description: A 1 is indicated for a beneficiary who is in the eligibility files. A 0 is indicated if they are not in the eligibility files.
+      - name: rendering_npi
+        description: The National Provider Identifier (NPI) of the physician who rendered services to the beneficiary.
+      - name: reason
+        description: Free text reason for the appointment or service.
+      - name: condition_type
+        description: The type of condition. Claims are filled in with values such as `discharge_diagnosis`.
+      - name: eligible_claim_indicator
+        description: >
+          Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
+          on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+  - name: ra_ops__int_gap_status
+    description: >
+      Determines the gap for a given HCC code. A gap is based on prior year claims which qualified as an HCC. If there was a chronic HCC in a prior year,
+      it would be expected this same HCC was coded in a future year.
+    config:
+      schema: ra_ops
+      alias: int_gap_status
+      tags: ["ra_ops", "intermediate"]
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - hcc_code
+            - payer
+            - model_version
+            - payment_year
+            - hcc_hierarchy_group
+            - suspect_hcc_flag
+    columns:
+      - name: person_id
+        description: A unique identifier for a person.
+      - name: payer
+        description: The name of the person (i.e. beneficiary) insurance provider.
+      - name: hcc_code
+        description: The hierarchical condition category code.
+      - name: risk_model_code
+        description: >
+          There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
+          This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
+          the 2025 CMS risk adjustment software.      
+      - name: model_version
+        description: >
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment      
+      - name: payment_year
+        description: >
+          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
+          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
+          an open HCC from 2023 will have a payment year = 2025.
+      - name: recapture_flag
+        description: > 
+          Whether or not the HCC is recapturable. Includes the following values:
+            - 'Y': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
+            - 'N': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
+      - name: gap_status
+        desription: >
+          definitions for gap_status:
+            - 'closed using higher coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is greater than the prior year HCC
+            - 'closed': the specific HCC in question has been observed in a risk adjustable claim during the collection year.
+            - 'closed using lower coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is less than the prior year HCC
+            - 'new': defined as an hcc that has not been coded in the past 2 years
+            - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
+            - 'inappropriate for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
+      - name: hcc_hierarchy_group
+        description: >
+          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
+          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
+      - name: hcc_hierarchy_group_rank
+        description: >
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
+      - name: filtered_out_by_hierarchy
+        desription: >
+          This is a 1 if this HCC gets filtered out due to a hierarchy being applied or not. The hierarchy is re-applied in this model due to interactions between
+          open HCCs and closed HCCs originating in different collection years.
