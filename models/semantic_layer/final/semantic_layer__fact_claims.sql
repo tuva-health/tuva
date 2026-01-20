@@ -35,8 +35,8 @@ select
   , esk.ccsr_category_description
   , mc.person_id
   , {{ dbt.concat(["mc.person_id", "'|'", "mc.data_source"]) }} as patient_source_key
-  , {{ dbt.concat(["mc.person_id", "'|'", the_tuva_project.yyyymm("mc.claim_start_date")]) }} as member_month_sk
-  , {{ yyyymm("mc.claim_start_date") }} as year_month
+  , {{ dbt.concat(["mc.person_id", "'|'", year_month('mc.claim_start_date')]) }} as member_month_sk
+  , {{ year_month('mc.claim_start_date') }} as year_month
   , sc.service_category_sk
   , mc.claim_id
   , mc.claim_line_number
@@ -89,7 +89,7 @@ select
   , mc.total_cost_amount
   , mc.in_network_flag
   , mc.data_source
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('semantic_layer__stg_core__medical_claim') }} as mc
 INNER JOIN {{ ref('semantic_layer__dim_service_category') }} as sc on mc.service_category_1 = sc.service_category_1
     AND mc.service_category_2 = sc.service_category_2
