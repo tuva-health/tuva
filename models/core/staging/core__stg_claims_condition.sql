@@ -7,36 +7,7 @@
 -- This dbt model creates the condition table in core.
 -- *************************************************
 
-with unpivot_cte as (
-
-  {% for i in range(1, 26) %}
-  select
-        claim_id
-        , claim_line_number
-        , payer
-        , person_id
-        , member_id
-        , coalesce(admission_date
-                 , claim_start_date
-                 , discharge_date
-                 , claim_end_date
-          ) as recorded_date
-        , 'discharge_diagnosis' as condition_type
-        , diagnosis_code_type as source_code_type
-        , diagnosis_code_{{ i }} as source_code
-        , {{ i }} as diagnosis_rank
-        , diagnosis_poa_{{ i }} as present_on_admit_code
-        , data_source
-  from {{ ref('normalized_input__medical_claim') }}
-  where diagnosis_code_{{ i }} is not null
-  {% if not loop.last %}
-  union all
-  {% endif %}
-  {% endfor %}
-
-)
-
-select distinct
+{%- set tuva_core_columns -%}
 {{ dbt.safe_cast(
     concat_custom([
         "CAST(unpivot_cte.payer AS " ~ dbt.type_string() ~ ")",
@@ -73,15 +44,47 @@ select distinct
     , cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }}) as condition_rank
     , cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }}) as present_on_admit_code
     , cast(poa.present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
-    , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
-    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+      , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+with unpivot_cte as (
+
+  {% for i in range(1, 26) %}
+  select
+        claim_id
+        , claim_line_number
+        , payer
+        , person_id
+        , member_id
+        , coalesce(admission_date
+                 , claim_start_date
+                 , discharge_date
+                 , claim_end_date
+          ) as recorded_date
+        , 'discharge_diagnosis' as condition_type
+        , diagnosis_code_type as source_code_type
+        , diagnosis_code_{{ i }} as source_code
+        , {{ i }} as diagnosis_rank
+        , diagnosis_poa_{{ i }} as present_on_admit_code
+        , data_source
+  from {{ ref('normalized_input__medical_claim') }}
+  where diagnosis_code_{{ i }} is not null
+  {% if not loop.last %}
+  union all
+  {% endif %}
+  {% endfor %}
+
+)
+
+select distinct
+    {{ tuva_core_columns }}
+    {{ tuva_metadata_columns }}
 from unpivot_cte
---inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
---and
---unpivot_cte.claim_line_number = x.claim_line_number
---and
---x.claim_line_attribution_number = 1
 left outer join {{ ref('terminology__icd_10_cm') }} as icd
     on unpivot_cte.source_code = icd.icd_10_cm
 left outer join {{ ref('terminology__present_on_admission') }} as poa

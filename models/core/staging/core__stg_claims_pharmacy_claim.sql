@@ -8,8 +8,8 @@
 -- table in core.
 -- *************************************************
 
-select
-    {{ concat_custom([
+{%- set tuva_core_columns -%}
+       {{ concat_custom([
         "cast(pharm.claim_id as " ~ dbt.type_string() ~ ")",
         "'-'",
         "cast(pharm.claim_line_number as " ~ dbt.type_string() ~ ")",
@@ -46,11 +46,23 @@ select
               else 0
        end as int) as enrollment_flag
        , enroll.member_month_key
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
        , cast(pharm.data_source as {{ dbt.type_string() }}) as data_source
-       , cast(pharm.file_date as {{ dbt.type_timestamp() }}) as file_date
-       , cast(pharm.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
+       , {{ try_to_cast_date('pharm.file_date', 'YYYY-MM-DD') }} as file_date
        , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name
-       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+       , '{{ var('tuva_last_run') }}' as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__pharmacy_claim'), alias='pharm', strip_prefix=false) }}
+{%- endset %}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('normalized_input__pharmacy_claim') }} as pharm
 left outer join {{ ref('claims_enrollment__flag_rx_claims_with_enrollment') }} as enroll
   on pharm.claim_id = enroll.claim_id

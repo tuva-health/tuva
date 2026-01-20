@@ -12,28 +12,8 @@
 --      service_category_2
 -- *************************************************
 
-with all_encounters as (
-    select claim_id
-, claim_line_number
-, encounter_id
-, encounter_type
-, encounter_group
-    from {{ ref('encounters__combined_claim_line_crosswalk') }}
-    where claim_line_attribution_number = 1
-
-    union all
-
-    select
-  claim_id
-, claim_line_number
-, encounter_id
-, encounter_type
-, encounter_group
-    from {{ ref('encounters__orphaned_claims') }}
-)
-
-select
-    {{ concat_custom([
+{%- set tuva_core_columns -%}
+       {{ concat_custom([
         "med.claim_id",
         "'-'",
         "med.claim_line_number",
@@ -104,11 +84,43 @@ select
             else 0
     end as int) as enrollment_flag
     , enroll.member_month_key
-    , cast(med.data_source as {{ dbt.type_string() }}) as data_source
-    , cast(med.file_date as {{ dbt.type_timestamp() }}) as file_date
-    , cast(med.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+       , cast(med.data_source as {{ dbt.type_string() }}) as data_source
+    , {{ try_to_cast_date('med.file_date', 'YYYY-MM-DD') }} as file_date
     , cast(med.file_name as {{ dbt.type_string() }}) as file_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__medical_claim'), alias='med', strip_prefix=false) }}
+{%- endset %}
+
+with all_encounters as (
+    select claim_id
+, claim_line_number
+, encounter_id
+, encounter_type
+, encounter_group
+    from {{ ref('encounters__combined_claim_line_crosswalk') }}
+    where claim_line_attribution_number = 1
+
+    union all
+
+    select
+  claim_id
+, claim_line_number
+, encounter_id
+, encounter_type
+, encounter_group
+    from {{ ref('encounters__orphaned_claims') }}
+)
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('normalized_input__medical_claim') }} as med
 inner join {{ ref('service_category__service_category_grouper') }} as srv_group
   on med.claim_id = srv_group.claim_id

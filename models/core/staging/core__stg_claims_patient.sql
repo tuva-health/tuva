@@ -3,39 +3,7 @@
    )
 }}
 
-with patient_stage as (
-    select
-          person_id
-        , name_suffix
-        , first_name
-        , middle_name
-        , last_name
-        , gender
-        , race
-        , birth_date
-        , death_date
-        , death_flag
-        , social_security_number
-        , address
-        , city
-        , state
-        , zip_code
-        , phone
-        , email
-        , ethnicity
-        , data_source
-        , row_number() over (
-	        partition by person_id
-	        order by case when enrollment_end_date is null
-                then cast('2050-01-01' as date)
-                else enrollment_end_date end desc)
-            as row_sequence
-        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
-        , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
-    from {{ ref('normalized_input__eligibility') }}
-)
-
-select
+{%- set tuva_core_columns -%}
       cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
@@ -73,6 +41,33 @@ select
             else '90+'
         end as {{ dbt.type_string() }}
     ) as age_group
-    , tuva_last_run_datetime as tuva_last_run
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    tuva_last_run_datetime as tuva_last_run
+{%- endset -%}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__eligibility'), strip_prefix=false) }}
+{%- endset %}
+
+with patient_stage as (
+    select
+       *
+        , row_number() over (
+	        partition by person_id
+	        order by case when enrollment_end_date is null
+                then cast('2050-01-01' as date)
+                else enrollment_end_date end desc)
+            as row_sequence
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
+        , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
+    from {{ ref('normalized_input__eligibility') }}
+)
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    , {{ tuva_metadata_columns }}
 from patient_stage
 where row_sequence = 1

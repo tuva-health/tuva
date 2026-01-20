@@ -3,7 +3,7 @@
    )
 }}
 
-select
+{%- set tuva_core_columns -%}
       cast(medication_id as {{ dbt.type_string() }}) as medication_id
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(patient_id as {{ dbt.type_string() }}) as patient_id
@@ -25,6 +25,19 @@ select
     , cast(quantity_unit as {{ dbt.type_string() }}) as quantity_unit
     , cast(days_supply as {{ dbt.type_int() }}) as days_supply
     , cast(practitioner_id as {{ dbt.type_string() }}) as practitioner_id
-    , cast(data_source as {{ dbt.type_string() }}) as data_source
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__medication'), strip_prefix=false) }}
+{%- endset %}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('input_layer__medication') }}
