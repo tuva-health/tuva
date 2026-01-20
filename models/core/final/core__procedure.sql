@@ -4,13 +4,19 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__procedure')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , all_procedures.data_source
+    , all_procedures.tuva_last_run
+{%- endset -%}
 
 with all_procedures as (
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_claims_procedure') }}
-union all
-select * from {{ ref('core__stg_clinical_procedure') }}
+{{ smart_union([ref('core__stg_claims_procedure'), ref('core__stg_clinical_procedure')]) }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
@@ -61,8 +67,8 @@ select
   , all_procedures.modifier_4
   , all_procedures.modifier_5
   , all_procedures.practitioner_id
-  , all_procedures.data_source
-  , all_procedures.tuva_last_run
+  {{ tuva_extension_columns }}
+  {{ tuva_metadata_columns }}
 from all_procedures
 left outer join {{ ref('terminology__icd_10_pcs') }} as icd10
     on all_procedures.source_code_type = 'icd-10-pcs'
@@ -121,8 +127,8 @@ select
   , all_procedures.modifier_4
   , all_procedures.modifier_5
   , all_procedures.practitioner_id
-  , all_procedures.data_source
-  , all_procedures.tuva_last_run
+  {{ tuva_extension_columns }}
+  {{ tuva_metadata_columns }}
 from all_procedures
 left join {{ ref('terminology__icd_10_pcs') }} icd10
     on all_procedures.source_code_type = 'icd-10-pcs'

@@ -4,6 +4,15 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__lab_result')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , labs.data_source
+    , labs.tuva_last_run
+{%- endset -%}
+
 {% if var('enable_normalize_engine',false) != true %}
 
 select
@@ -76,8 +85,8 @@ select
     , labs.normalized_abnormal_flag
     , labs.specimen
     , labs.ordering_practitioner_id
-    , labs.data_source
-    , labs.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_lab_result') }} as labs
     left outer join {{ ref('terminology__loinc') }} as loinc
         on labs.source_order_type = 'loinc'
@@ -170,8 +179,8 @@ select
     , labs.normalized_abnormal_flag
     , labs.specimen
     , labs.ordering_practitioner_id
-    , labs.data_source
-    , labs.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 From  {{ ref('core__stg_clinical_lab_result') }} as labs
     left outer join {{ ref('terminology__loinc') }} as loinc
         on labs.source_order_type = 'loinc'

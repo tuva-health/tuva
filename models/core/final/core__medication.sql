@@ -4,6 +4,14 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__medication'), strip_prefix=false) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+   , data_source
+   , tuva_last_run
+{%- endset -%}
 
 with source_mapping as (
 {% if var('enable_normalize_engine',false) != true %}
@@ -62,6 +70,7 @@ with source_mapping as (
    , meds.practitioner_id
    , meds.data_source
    , meds.tuva_last_run
+   {{ tuva_extension_columns }}
 from {{ ref('core__stg_clinical_medication') }} as meds
     left outer join {{ ref('terminology__ndc') }} as ndc
         on meds.source_code_type = 'ndc'
@@ -140,6 +149,7 @@ from {{ ref('core__stg_clinical_medication') }} as meds
    , meds.practitioner_id
    , meds.data_source
    , meds.tuva_last_run
+   {{ tuva_extension_columns }}
 from {{ ref('core__stg_clinical_medication') }} meds
     left join {{ ref('terminology__ndc') }} ndc
         on meds.source_code_type = 'ndc'
@@ -231,8 +241,8 @@ select
    , sm.quantity_unit
    , sm.days_supply
    , sm.practitioner_id
-   , sm.data_source
-   , sm.tuva_last_run
+   {{ select_extension_columns(ref('input_layer__medication'), alias='sm') }}
+   {{ tuva_metadata_columns }}
 from source_mapping as sm
     left outer join {{ ref('terminology__ndc') }} as ndc
         on sm.ndc_code = ndc.ndc

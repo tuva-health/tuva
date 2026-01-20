@@ -4,6 +4,15 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__observation')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , obs.data_source
+    , obs.tuva_last_run
+{%- endset -%}
+
 {% if var('enable_normalize_engine',false) != true %}
 select
       obs.observation_id
@@ -67,8 +76,8 @@ select
     , obs.source_reference_range_high
     , obs.normalized_reference_range_low
     , obs.normalized_reference_range_high
-    , obs.data_source
-    , obs.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_observation') }} as obs
 left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
     on obs.source_code_type = 'icd-10-cm'
@@ -162,8 +171,8 @@ select
     , obs.source_reference_range_high
     , obs.normalized_reference_range_low
     , obs.normalized_reference_range_high
-    , obs.data_source
-    , obs.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_observation') }} obs
 left join {{ ref('terminology__icd_10_cm') }} icd10cm
     on obs.source_code_type = 'icd-10-cm'
