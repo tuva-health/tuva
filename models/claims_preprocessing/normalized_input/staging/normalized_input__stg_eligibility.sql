@@ -53,4 +53,5 @@ select
     , file_name
     , file_date
     , ingest_datetime
+    {{ select_extension_columns(ref('input_layer__eligibility'), strip_prefix=false) }}
 from {{ ref('input_layer__eligibility') }}
