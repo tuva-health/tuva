@@ -4,6 +4,44 @@
    )
 }}
 
+{%- set tuva_columns -%}
+      person_id
+    , patient_id
+    , name_suffix
+    , first_name
+    , middle_name
+    , last_name
+    , sex
+    , race
+    , birth_date
+    , death_date
+    , death_flag
+    , social_security_number
+    , address
+    , city
+    , state
+    , zip_code
+    , county
+    , latitude
+    , longitude
+    , phone
+    , email
+    , ethnicity
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , person_id as x_temp_person_id #}
+    {# , first_name as x_temp_first_name #}
+    {# , last_name as zzz_temp_last_name #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
+    , data_source
+    , file_name
+    , ingest_datetime
+{%- endset -%}
+
 {% if var('use_synthetic_data') == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
@@ -29,14 +67,20 @@ cast(null as {{ dbt.type_string() }}) as person_id
 , cast(null as {{ dbt.type_string() }}) as phone
 , cast(null as {{ dbt.type_string() }}) as email
 , cast(null as {{ dbt.type_string() }}) as ethnicity
+, cast(null as {{ dbt.type_string() }}) as x_temp_person_id
+, cast(null as {{ dbt.type_string() }}) as x_temp_first_name
+, cast(null as {{ dbt.type_string() }}) as zzz_temp_last_name
 , cast(null as {{ dbt.type_string() }}) as data_source
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
-, cast(null as {{ dbt.type_timestamp() }}) as tuva_last_run
 {{ limit_zero() }}
 
 {%- else -%}
 
-select * from {{ source('source_input', 'patient') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ source('source_input', 'patient') }}
 
 {%- endif %}

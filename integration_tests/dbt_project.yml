@@ -5,6 +5,12 @@ config-version: 2
 profile: default
 
 vars:
+  ## Passthrough Columns Configuration
+  # Allows custom columns with a prefix to flow through Tuva models to core outputs.
+  # passthrough:
+  #   prefix: 'x_'    # Prefix to identify passthrough columns (default: 'x_')
+  #   strip: false    # Whether to strip prefix in final output (default: false)
+
   error_empty_seeds: true
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
