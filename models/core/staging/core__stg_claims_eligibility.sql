@@ -8,10 +8,7 @@
 -- This dbt model creates the eligibility table in core.
 -- *************************************************
 
-
-
-
-select
+{%- set tuva_core_columns -%}
        {{ concat_custom([
             "person_id",
             "'-'",
@@ -50,8 +47,22 @@ select
        , cast(normalized_state_name as {{ dbt.type_string() }}) as normalized_state_name
        , cast(fips_state_code as {{ dbt.type_string() }}) as fips_state_code
        , cast(fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
        , cast(data_source as {{ dbt.type_string() }}) as data_source
        , cast(file_date as {{ dbt.type_timestamp() }}) as file_date
+       , cast(file_name as {{ dbt.type_string() }}) as file_name
        , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__eligibility'), strip_prefix=false) }}
+{%- endset %}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('normalized_input__eligibility') }}

@@ -19,6 +19,10 @@
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
+    , enrollment_status
+    , hospice_flag
+    , institutional_snp_flag
+    , long_term_institutional_flag
     , subscriber_relation
     , group_id
     , group_name
@@ -34,6 +38,7 @@
 {%- set tuva_metadata_columns -%}
     , data_source
     , file_date
+    , ingest_datetime
     , file_name
     , tuva_last_run
 {%- endset %}
