@@ -77,12 +77,12 @@
     , cast(med.copayment_amount as {{ dbt.type_numeric() }}) as copayment_amount
     , cast(med.deductible_amount as {{ dbt.type_numeric() }}) as deductible_amount
     , cast(med.total_cost_amount as {{ dbt.type_numeric() }}) as total_cost_amount
-    , cast(med.in_network_flag as int) as in_network_flag
+    , cast(med.in_network_flag as {{ dbt.type_int() }}) as in_network_flag
     , cast(
     case
         when enroll.claim_id is not null then 1
             else 0
-    end as int) as enrollment_flag
+    end as {{ dbt.type_int() }}) as enrollment_flag
     , enroll.member_month_key
 {%- endset -%}
 

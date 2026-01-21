@@ -11,9 +11,9 @@
     , cast(last_name as {{ dbt.type_string() }}) as last_name
     , cast(gender as {{ dbt.type_string() }}) as sex
     , cast(race as {{ dbt.type_string() }}) as race
-    , cast(birth_date as date) as birth_date
-    , cast(death_date as date) as death_date
-    , cast(death_flag as int) as death_flag
+    , {{ try_to_cast_date('birth_date') }} as birth_date
+    , {{ try_to_cast_date('death_date') }} as death_date
+    , cast(death_flag as {{ dbt.type_int() }}) as death_flag
     , cast(social_security_number as {{ dbt.type_string() }}) as social_security_number
     , cast(address as {{ dbt.type_string() }}) as address
     , cast(city as {{ dbt.type_string() }}) as city

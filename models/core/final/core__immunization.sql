@@ -91,7 +91,7 @@ select
         immune.normalized_description
         , cvx.long_description
         , custom_mapped.normalized_description
-        ) normalized_description
+        ) as normalized_description
   , case  when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
         when cvx.cvx is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
@@ -109,7 +109,7 @@ select
     , immune.practitioner_id
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-From  {{ ref('core__stg_clinical_immunization') }} as immune
+from {{ ref('core__stg_clinical_immunization') }} as immune
 left outer join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx

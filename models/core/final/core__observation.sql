@@ -79,28 +79,28 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_observation') }} as obs
-left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
+left join {{ ref('terminology__icd_10_cm') }} as icd10cm
     on obs.source_code_type = 'icd-10-cm'
         and replace(obs.source_code, '.', '') = icd10cm.icd_10_cm
-left outer join {{ ref('terminology__icd_9_cm') }} as icd9cm
+left join {{ ref('terminology__icd_9_cm') }} as icd9cm
     on obs.source_code_type = 'icd-9-cm'
         and replace(obs.source_code, '.', '') = icd9cm.icd_9_cm
-left outer join {{ ref('terminology__icd_10_pcs') }} as icd10pcs
+left join {{ ref('terminology__icd_10_pcs') }} as icd10pcs
     on obs.source_code_type = 'icd-10-pcs'
         and obs.source_code = icd10pcs.icd_10_pcs
-left outer join {{ ref('terminology__icd_9_pcs') }} as icd9pcs
+left join {{ ref('terminology__icd_9_pcs') }} as icd9pcs
     on obs.source_code_type = 'icd-9-pcs'
         and replace(obs.source_code, '.', '') = icd9pcs.icd_9_pcs
-left outer join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
+left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on obs.source_code_type = 'hcpcs'
         and obs.source_code = hcpcs.hcpcs
-left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on obs.source_code_type = 'snomed-ct'
         and obs.source_code = snomed_ct.snomed_ct
-left outer join {{ ref('terminology__loinc') }} as loinc
+left join {{ ref('terminology__loinc') }} as loinc
     on obs.source_code_type = 'loinc'
         and obs.source_code = loinc.loinc
-left outer join {{ ref('terminology__observation_type') }} as ot
+left join {{ ref('terminology__observation_type') }} as ot
     on lower(obs.observation_type) = ot.observation_type
 
 {% else %}
@@ -173,31 +173,31 @@ select
     , obs.normalized_reference_range_high
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_clinical_observation') }} obs
-left join {{ ref('terminology__icd_10_cm') }} icd10cm
+from {{ ref('core__stg_clinical_observation') }} as obs
+left join {{ ref('terminology__icd_10_cm') }} as icd10cm
     on obs.source_code_type = 'icd-10-cm'
         and replace(obs.source_code,'.','') = icd10cm.icd_10_cm
-left join {{ ref('terminology__icd_9_cm') }} icd9cm
+left join {{ ref('terminology__icd_9_cm') }} as icd9cm
     on obs.source_code_type = 'icd-9-cm'
         and replace(obs.source_code,'.','') = icd9cm.icd_9_cm
-left join {{ ref('terminology__icd_10_pcs') }} icd10pcs
+left join {{ ref('terminology__icd_10_pcs') }} as icd10pcs
     on obs.source_code_type = 'icd-10-pcs'
         and obs.source_code = icd10pcs.icd_10_pcs
-left join {{ ref('terminology__icd_9_pcs') }} icd9pcs
+left join {{ ref('terminology__icd_9_pcs') }} as icd9pcs
     on obs.source_code_type = 'icd-9-pcs'
         and replace(obs.source_code,'.','') = icd9pcs.icd_9_pcs
-left join {{ ref('terminology__hcpcs_level_2') }} hcpcs
+left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on obs.source_code_type = 'hcpcs'
         and obs.source_code = hcpcs.hcpcs
-left join {{ ref('terminology__snomed_ct') }} snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on obs.source_code_type = 'snomed-ct'
         and obs.source_code = snomed_ct.snomed_ct
-left join {{ ref('terminology__loinc') }} loinc
+left join {{ ref('terminology__loinc') }} as loinc
     on obs.source_code_type = 'loinc'
         and obs.source_code = loinc.loinc
-left outer join {{ ref('terminology__observation_type') }} as ot
+left join {{ ref('terminology__observation_type') }} as ot
     on lower(obs.observation_type) = ot.observation_type
-left join {{ ref('custom_mapped') }} custom_mapped
+left join {{ ref('custom_mapped') }} as custom_mapped
     on  ( lower(obs.source_code_type) = lower(custom_mapped.source_code_type)
         or ( obs.source_code_type is null and custom_mapped.source_code_type is null)
         )

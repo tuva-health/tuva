@@ -77,13 +77,13 @@ select
    {{ tuva_metadata_columns }}
 from
 all_conditions
-left outer join {{ ref('terminology__icd_10_cm') }} as icd10
+left join {{ ref('terminology__icd_10_cm') }} as icd10
     on all_conditions.source_code_type = 'icd-10-cm'
         and replace(all_conditions.source_code, '.', '') = icd10.icd_10_cm
-left outer join {{ ref('terminology__icd_9_cm') }} as icd9
+left join {{ ref('terminology__icd_9_cm') }} as icd9
     on all_conditions.source_code_type = 'icd-9-cm'
         and replace(all_conditions.source_code, '.', '') = icd9.icd_9_cm
-left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on all_conditions.source_code_type = 'snomed-ct'
         and all_conditions.source_code = snomed_ct.snomed_ct
 
@@ -140,16 +140,16 @@ select
     {{ tuva_metadata_columns }}
 from
 all_conditions
-left join {{ ref('terminology__icd_10_cm') }} icd10
+left join {{ ref('terminology__icd_10_cm') }} as icd10
     on all_conditions.source_code_type = 'icd-10-cm'
         and replace(all_conditions.source_code,'.','') = icd10.icd_10_cm
-left join {{ ref('terminology__icd_9_cm') }} icd9
+left join {{ ref('terminology__icd_9_cm') }} as icd9
     on all_conditions.source_code_type = 'icd-9-cm'
         and replace(all_conditions.source_code,'.','') = icd9.icd_9_cm
-left join {{ ref('terminology__snomed_ct') }} snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on all_conditions.source_code_type = 'snomed-ct'
         and all_conditions.source_code = snomed_ct.snomed_ct
-left join {{ ref('custom_mapped') }} custom_mapped
+left join {{ ref('custom_mapped') }} as custom_mapped
     on  ( lower(all_conditions.source_code_type) = lower(custom_mapped.source_code_type)
         or ( all_conditions.source_code_type is null and custom_mapped.source_code_type is null)
         )
