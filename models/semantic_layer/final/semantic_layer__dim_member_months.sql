@@ -21,6 +21,7 @@ WITH data_with_sks AS (
     , mm.custom_attributed_provider_organization
     , mm.custom_attributed_provider_lob
     , LEFT(mm.year_month, 4) AS year_nbr
+    , mm.tuva_last_run
   FROM {{ ref('semantic_layer__stg_core__member_months') }} as mm
 )
 SELECT
@@ -40,5 +41,5 @@ SELECT
   , dws.custom_attributed_provider_practice
   , dws.custom_attributed_provider_organization
   , dws.custom_attributed_provider_lob
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , dws.tuva_last_run
 FROM data_with_sks as dws

@@ -49,7 +49,7 @@ SELECT
   , e.claim_count
   , e.inst_claim_count
   , e.prof_claim_count
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , e.tuva_last_run
 FROM {{ ref('semantic_layer__stg_readmissions__encounter_augmented') }} as ea 
 LEFT JOIN {{ ref('semantic_layer__stg_core__encounter') }} as e ON ea.encounter_id = e.encounter_id
 LEFT JOIN {{ ref('semantic_layer__stg_readmissions__readmission_summary') }} as r ON r.encounter_id = ea.encounter_id

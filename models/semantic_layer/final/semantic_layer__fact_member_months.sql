@@ -182,6 +182,7 @@ combined_data_cte AS (
       , pc.medical_paid
       , pc.total_allowed
       , pc.medical_allowed
+      , mm.tuva_last_run
     FROM {{ ref('semantic_layer__stg_core__member_months') }} mm
     LEFT JOIN monthly_patient_risk_cte mpr
         ON mm.person_id = mpr.person_id AND mm.year_month = mpr.year_month
@@ -275,5 +276,5 @@ SELECT
   , cd.medical_paid
   , cd.total_allowed
   , cd.medical_allowed
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cd.tuva_last_run
 FROM combined_data_cte as cd

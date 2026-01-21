@@ -10,5 +10,5 @@ SELECT
   , lr.reason
   , lr.contributing_factor
   , lr.latest_suspect_date
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , lr.tuva_last_run
 FROM {{ ref('semantic_layer__stg_hcc_suspecting__list_rollup') }} as lr

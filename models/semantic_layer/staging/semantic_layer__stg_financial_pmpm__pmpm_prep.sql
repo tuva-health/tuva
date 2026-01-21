@@ -77,4 +77,5 @@ SELECT
       , medical_paid
       , total_allowed
       , medical_allowed
+      , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     FROM {{ ref('financial_pmpm__pmpm_prep') }}
