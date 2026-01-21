@@ -22,11 +22,8 @@
     , custom_attributed_provider_lob
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
+{# Extension columns not supported for provider_attribution #}
 {%- set tuva_extensions -%}
-    {# , year_month as x_temp_year_month #}
-    {# , payer_attributed_provider as x_temp_payer_attributed_provider #}
-    {# , payer as zzz_temp_payer #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}
