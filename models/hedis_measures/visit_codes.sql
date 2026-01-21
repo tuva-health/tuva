@@ -165,6 +165,7 @@ select distinct
   person_id,
   code_system,
   code,
+  0 as principal_diagnosis,
   start_date,
   end_date,
   modifier_1,
@@ -175,7 +176,9 @@ select distinct
   from_lab_claim,
   claim_id,
   admission_date,
-  discharge_date
+  discharge_date,
+  0 as from_prescribing_provider_or_clinical_pharmacist,
+  0 as from_eye_care_provider
 from (
 select * from bill_type
 union all

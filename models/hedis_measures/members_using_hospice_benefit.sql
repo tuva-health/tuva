@@ -7,7 +7,7 @@
 
 select
   person_id
-, enrollment_start_date
-, enrollment_end_date
+, enrollment_start_date as start_date
+, enrollment_end_date as end_date
 from {{ ref('core__eligibility') }}
 where hospice_flag = 1

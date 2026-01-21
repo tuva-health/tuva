@@ -9,5 +9,7 @@ select
   person_id
 , enrollment_start_date
 , enrollment_end_date
+, payer
+, payer_type
+, institutional_snp_flag as institutional_special_needs_plan
 from {{ ref('core__eligibility') }}
-where long_term_institutional_flag = 1

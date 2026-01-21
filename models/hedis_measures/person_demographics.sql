@@ -5,6 +5,7 @@
    )
 }}
 
+
 select
   person_id
 , sex
