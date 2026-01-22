@@ -24,9 +24,9 @@ with combine_diag_poa as (
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
     {% if target.type == 'fabric' %}
-    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
-    {% else %}
     and reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) = reverse(left(reverse(poa.column_name), charindex('_', reverse(poa.column_name)) - 1))
+    {% else %}
+    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
     {% endif %}
   -- noqa: enable=ambiguous.join
 )
