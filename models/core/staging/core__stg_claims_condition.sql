@@ -26,7 +26,9 @@ with combine_diag_poa as (
     {% if target.type == 'fabric' %}
     and reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) = reverse(left(reverse(poa.column_name), charindex('_', reverse(poa.column_name)) - 1))
     {% else %}
-    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
+    {% set diag_part = dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) %}
+    {% set poa_part = dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) %}
+    and {{ diag_part }} = {{ poa_part }}
     {% endif %}
   -- noqa: enable=ambiguous.join
 )
