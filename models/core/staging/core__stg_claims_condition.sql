@@ -7,7 +7,7 @@
 -- This dbt model creates the condition table in core.
 -- *************************************************
 
--- The code needs to be brought in like this since a single diagnosis column can have multiple claims
+-- The code needs to be brought in like this since a single diagnosis column can have multiple different diagnosis
 -- TODO: Add test to ensure all diagnosis in the medical claim are being brought through and none are being lost
 with combine_diag_poa as (
  select
@@ -19,10 +19,12 @@ with combine_diag_poa as (
     , {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} as diagnosis_rank
     , poa.normalized_code as present_on_admit_code
  from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} as diag
+  -- noqa: disable=ambiguous.join 
  left join {{ ref('normalized_input__int_present_on_admit_voting') }} as poa
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
     and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
+  -- noqa: enable=ambiguous.join
 )
 
 , unpivot_cte as (
