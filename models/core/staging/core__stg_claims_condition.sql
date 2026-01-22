@@ -10,23 +10,23 @@
 -- The code needs to be brought in like this since a single diagnosis column can have multiple claims
 -- TODO: Add test to ensure all diagnosis in the medical claim are being brought through and none are being lost
 with combine_diag_poa as (
- select 
+ select
       diag.claim_id
     , diag.data_source
     , diag.diagnosis_code_type as source_code_type
     , diag.diagnosis_code as source_code
-    , cast('discharge_diagnosis' as  {{ dbt.type_string() }}) as condition_type
+    , cast('discharge_diagnosis' as {{ dbt.type_string() }}) as condition_type
     , {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} as diagnosis_rank
     , poa.normalized_code as present_on_admit_code
- from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} diag
- left join {{ ref('normalized_input__int_present_on_admit_voting') }} poa
+ from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} as diag
+ left join {{ ref('normalized_input__int_present_on_admit_voting') }} as poa
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
     and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
 )
 
 , unpivot_cte as (
-select 
+select
       code.claim_id
     , med.claim_line_number
     , med.payer
@@ -36,7 +36,7 @@ select
              , med.claim_start_date
              , med.discharge_date
              , med.claim_end_date
-      ) as recorded_date    
+      ) as recorded_date
     , code.data_source
     , code.source_code_type
     , code.source_code
@@ -46,9 +46,9 @@ select
 -- Using this CTE since normalized_input__medical_claim is missing diagnosis due to the max
 -- in normalized_input__int_diagnosis_code_final. Some diagnosis columns have more than 1 diagnosis
 -- and we want all possible diagnosis.
-from combine_diag_poa code
-inner join {{ ref('normalized_input__medical_claim') }} med
-    on  code.claim_id = med.claim_id
+from combine_diag_poa as code
+inner join {{ ref('normalized_input__medical_claim') }} as med
+    on code.claim_id = med.claim_id
     and code.data_source = med.data_source
 where code.source_code is not null
 )
