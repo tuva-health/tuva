@@ -4,13 +4,13 @@
 }}
 
 with recursive hierarchy (
-    hcc_code,
-    hccs_to_exclude,
-    root_hcc,
-    hcc_hierarchy_group,
-    model_version,
-    hcc_hierarchy_group_rank,
-    path    
+      hcc_code
+    , hccs_to_exclude
+    , root_hcc
+    , hcc_hierarchy_group
+    , model_version
+    , hcc_hierarchy_group_rank
+    , path
 ) as (
     -- Base case: Start with root nodes (hcc_code with no parents)
     select
