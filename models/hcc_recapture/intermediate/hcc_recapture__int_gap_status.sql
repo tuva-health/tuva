@@ -4,8 +4,8 @@
 }}
 
 with eligible_hccs as (
-    select 
-        * 
+    select
+        *
     from {{ ref('hcc_recapture__int_hccs') }}
 )
 
@@ -53,18 +53,18 @@ from eligible_hccs
 )
 
 , equiv_coef as (
-select distinct 
+select distinct
     base.model_version
   , base.hcc_hierarchy_group
   , base.hcc_code
   , base.risk_model_code
 from {{ ref('hcc_recapture__stg_coef_hier') }} as base
 inner join {{ ref('hcc_recapture__stg_coef_hier') }} as self
-    on base.hcc_hierarchy_group = self.hcc_hierarchy_group
-    and base.risk_model_code = self.risk_model_code
-    and base.coefficient = self.coefficient
-    and base.model_version = self.model_version
-    and base.hcc_code != self.hcc_code
+  on base.hcc_hierarchy_group = self.hcc_hierarchy_group
+  and base.risk_model_code = self.risk_model_code
+  and base.coefficient = self.coefficient
+  and base.model_version = self.model_version
+  and base.hcc_code != self.hcc_code
 )
 
 , add_gap_status as (
@@ -72,7 +72,7 @@ select
       coalesce(recap.person_id, base.person_id) as person_id
     , coalesce(recap.payer, base.payer) as payer
     , coalesce(recap.hcc_code, base.hcc_code) as hcc_code
-    , coalesce(recap.suspect_hcc_flag,0) as suspect_hcc_flag
+    , coalesce(recap.suspect_hcc_flag, 0) as suspect_hcc_flag
     , recap.hcc_code as recaptured_hcc_code
     , current_year_hier.hcc_code as current_year_hcc_code
     , grp.hcc_code as past_year_hcc_code
@@ -83,7 +83,7 @@ select
     , base.risk_model_code
     , case when recap.hcc_code is not null or grp.hcc_hierarchy_group is not null or base.hcc_chronic_flag = 1 then 1 else 0 end as recapture_flag
     , eligible_bene
-    , case 
+    , case
         when base.hcc_chronic_flag = 0 then 'inappropriate for recapture'
         when recap.hcc_code is not null and base.hcc_code is not null and recap.hcc_code != base.hcc_code and equiv.risk_model_code is not null then 'closed - equivalent coefficient hcc in hierarchy group'
         when grp.hcc_hierarchy_group is not null and base.hcc_hierarchy_group_rank < grp.best_past_rank then 'closed - higher coefficient hcc in hierarchy group'
@@ -128,7 +128,7 @@ where lower(base.condition_type) = 'discharge_diagnosis' or base.condition_type 
 
 -- Need to do this for HCCs in more than 1 group such as HCC 409 in v28
 , rank_gap_status as (
-select 
+select
       person_id
     , payer
     , hcc_code
@@ -175,8 +175,8 @@ from rank_gap_status
 
 -- Pick the best gap status
 , best_gap_status as (
-select 
-  * 
+select
+  *
 from min_gap_status
 where min_gap_status_rank = gap_status_rank
 )
@@ -218,15 +218,15 @@ select distinct
     , case when bgap.hcc_hierarchy_group is not null and mhier.hcc_hierarchy_group is null then 1 else 0 end as filtered_out_by_hierarchy
 from best_gap_status as bgap
 left join min_open_hierarchy as mhier
-    on bgap.person_id = mhier.person_id
-    and bgap.payer = mhier.payer
-    and bgap.payment_year = mhier.payment_year
-    and bgap.model_version = mhier.model_version
-    and bgap.hcc_hierarchy_group = mhier.hcc_hierarchy_group
-    and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
-    and bgap.suspect_hcc_flag = mhier.suspect_hcc_flag
+  on bgap.person_id = mhier.person_id
+  and bgap.payer = mhier.payer
+  and bgap.payment_year = mhier.payment_year
+  and bgap.model_version = mhier.model_version
+  and bgap.hcc_hierarchy_group = mhier.hcc_hierarchy_group
+  and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
+  and bgap.suspect_hcc_flag = mhier.suspect_hcc_flag
 -- Join eligible benes again here to capture new rows with open gaps
-inner join {{ ref('hcc_recapture__stg_eligible_benes')}} as elig
+inner join {{ ref('hcc_recapture__stg_eligible_benes') }} as elig
   on bgap.person_id = elig.person_id
   and bgap.payment_year = elig.collection_year + 1
   and bgap.payer = elig.payer

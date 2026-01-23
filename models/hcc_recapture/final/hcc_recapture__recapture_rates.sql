@@ -4,13 +4,13 @@
 }}
 
 with monthly_hcc_counts as (
-select 
+select
       payer
     , payment_year
     , sum(closed_hccs) as closed_hccs
     , sum(open_hccs) as open_hccs
     , sum(total_hccs) as total_hccs
-from {{ref('hcc_recapture__recapture_rates_monthly')}}
+from {{ref('hcc_recapture__recapture_rates_monthly') }}
 group by
       payer
     , payment_year

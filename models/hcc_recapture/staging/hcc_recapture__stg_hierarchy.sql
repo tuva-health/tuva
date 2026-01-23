@@ -3,27 +3,27 @@
    )
 }}
 
-WITH RECURSIVE hierarchy AS (
+with recursive hierarchy AS (
     -- Base case: Start with root nodes (hcc_code with no parents)
-    SELECT 
+    select
         hcc_code,
         hccs_to_exclude,
         hcc_code AS root_hcc,
         description as hcc_hierarchy_group,
         model_version,
-        1 AS hcc_hierarchy_group_rank,
-        CAST(hcc_code AS VARCHAR) AS path
-    FROM {{ ref('cms_hcc__disease_hierarchy') }}
-    WHERE hcc_code NOT IN (
-        SELECT DISTINCT hccs_to_exclude 
-        FROM {{ ref('cms_hcc__disease_hierarchy') }}
-        WHERE hccs_to_exclude IS NOT NULL
+        1 as hcc_hierarchy_group_rank,
+        cast(hcc_code as varchar) as path
+    from {{ ref('cms_hcc__disease_hierarchy') }}
+    where hcc_code not in (
+        select distinct hccs_to_exclude 
+        from {{ ref('cms_hcc__disease_hierarchy') }}
+        where hccs_to_exclude is not null
     )
     
-    UNION ALL
+    union all
     
     -- Recursive case: Find children of current nodes
-    SELECT 
+    select
         t.hcc_code as hcc_code,
         t.hccs_to_exclude,
         h.root_hcc,
@@ -31,11 +31,11 @@ WITH RECURSIVE hierarchy AS (
         h.model_version,
         h.hcc_hierarchy_group_rank + 1 AS hcc_hierarchy_group_rank,
         h.path || ' -> ' || t.hcc_code AS path
-    FROM {{ ref('cms_hcc__disease_hierarchy') }} as t
-    INNER JOIN hierarchy as h
-        ON  t.hcc_code = h.hccs_to_exclude
+    from {{ ref('cms_hcc__disease_hierarchy') }} as t
+    inner join hierarchy as h
+        on  t.hcc_code = h.hccs_to_exclude
         and t.model_version = h.model_version
-    WHERE h.hcc_hierarchy_group_rank < 100  -- Prevent infinite loops
+    where h.hcc_hierarchy_group_rank < 100  -- Prevent infinite loops
 )
 
 , max_group_rank as (
@@ -81,3 +81,4 @@ select
     , hcc_hierarchy_group
     , hcc_hierarchy_group_rank
 from combine_leaf_nodes
+

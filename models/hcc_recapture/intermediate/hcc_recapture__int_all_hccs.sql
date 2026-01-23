@@ -40,7 +40,7 @@ select distinct
     , 1 as chronic_flag
 from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as hier
 inner join hcc_diagnosis as diag
-    on hier.code = diag.diagnosis_code
+  on hier.code = diag.diagnosis_code
 )
 
 , get_risk_code as (
@@ -51,7 +51,7 @@ select distinct
     , model_version
     , risk_model_code
     , row_number() over (partition by person_id, payment_year, model_version order by collection_end_date desc) as month_order
-from {{ ref('cms_hcc__int_demographic_factors')}}
+from {{ ref('cms_hcc__int_demographic_factors') }}
 where lower(factor_type) = 'demographic'
 )
 
@@ -61,17 +61,17 @@ select distinct
     person_id
   , claim_id
   , payer
-from {{ref('cms_hcc__int_eligible_conditions')}}
+from {{ref('cms_hcc__int_eligible_conditions') }}
 )
 
 , medical_claims as (
 -- Use distinct to remove claim line
-select distinct 
+select distinct
     person_id
   , payer
   , claim_id
   , rendering_id as rendering_npi
-from {{ref('core__medical_claim')}}
+from {{ref('core__medical_claim') }}
 )
 
 , include_suspect_hccs as (
@@ -81,7 +81,7 @@ select
     , data_source
     , recorded_date
     , model_version
-    , claim_id 
+    , claim_id
     , hcc_code
     , hcc_description
     , condition_type
@@ -117,7 +117,7 @@ select distinct
     , {{ date_part('year', 'sus.recorded_date') }} as collection_year
     , sus.recorded_date
     , sus.model_version
-    , sus.claim_id 
+    , sus.claim_id
     , sus.hcc_code
     , sus.hcc_description
     , chronic.chronic_flag as hcc_chronic_flag
@@ -136,31 +136,31 @@ select distinct
     , suspect_hcc_flag
 from include_suspect_hccs as sus
 left join seed_hcc_hierarchy as hier
-    on sus.hcc_code = hier.hcc_code
-    and sus.model_version = hier.model_version
+  on sus.hcc_code = hier.hcc_code
+  and sus.model_version = hier.model_version
 left join chronic_hccs as chronic
-    on sus.model_version = chronic.model_version
-    and sus.hcc_code = chronic.hcc_code
-    and {{ date_part('year', 'sus.recorded_date') }} = chronic.payment_year - 1
+  on sus.model_version = chronic.model_version
+  and sus.hcc_code = chronic.hcc_code
+  and {{ date_part('year', 'sus.recorded_date') }} = chronic.payment_year - 1
 left join get_risk_code rcode
-    on sus.person_id = rcode.person_id
-    and sus.payer = rcode.payer
-    and {{ date_part('year', 'sus.recorded_date') }} = rcode.payment_year - 1
-    and sus.model_version = rcode.model_version
-    and rcode.month_order = 1
+  on sus.person_id = rcode.person_id
+  and sus.payer = rcode.payer
+  and {{ date_part('year', 'sus.recorded_date') }} = rcode.payment_year - 1
+  and sus.model_version = rcode.model_version
+  and rcode.month_order = 1
 left join eligible_claims as elig
-    on sus.person_id = elig.person_id
-    and sus.payer = elig.payer
-    and sus.claim_id = elig.claim_id
+  on sus.person_id = elig.person_id
+  and sus.payer = elig.payer
+  and sus.claim_id = elig.claim_id
 left join medical_claims as med
-    on  sus.person_id = med.person_id
-    and sus.payer = med.payer
-    and sus.claim_id = med.claim_id
+  on  sus.person_id = med.person_id
+  and sus.payer = med.payer
+  and sus.claim_id = med.claim_id
 -- Only include benes eligible for gap closure
-left join {{ ref('hcc_recapture__stg_eligible_benes')}} as elig_bene
-    on sus.person_id = elig_bene.person_id
-    and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
-    and sus.payer = elig_bene.payer
+left join {{ ref('hcc_recapture__stg_eligible_benes') }} as elig_bene
+  on sus.person_id = elig_bene.person_id
+  and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
+  and sus.payer = elig_bene.payer
 where sus.hcc_code is not null
-    -- Replace with cms_hcc__adjustment_rates once that table includes PY 2026 
-    and 1 = (case when {{ date_part('year', 'sus.recorded_date') }} >= 2025 and sus.model_version = 'CMS-HCC-V24' then 0 else 1 end)
+  -- Replace with cms_hcc__adjustment_rates once that table includes PY 2026 
+  and 1 = (case when {{ date_part('year', 'sus.recorded_date') }} >= 2025 and sus.model_version = 'CMS-HCC-V24' then 0 else 1 end)

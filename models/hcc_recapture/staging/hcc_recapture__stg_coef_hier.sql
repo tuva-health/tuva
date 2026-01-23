@@ -32,5 +32,5 @@ select distinct
     end as risk_model_code        
 from {{ ref('cms_hcc__disease_factors') }} as fact
 left join {{ ref('hcc_recapture__stg_hierarchy') }} as hier
-    on  fact.model_version = hier.model_version
-    and fact.hcc_code = hier.hcc_code
+  on  fact.model_version = hier.model_version
+  and fact.hcc_code = hier.hcc_code

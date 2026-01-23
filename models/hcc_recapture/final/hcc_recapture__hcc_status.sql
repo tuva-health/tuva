@@ -23,15 +23,15 @@ select distinct
     , stg.reason
     , gap.gap_status
     , gap.recapture_flag
-from {{ ref('hcc_recapture__int_hccs')}} as stg
-left join {{ ref('hcc_recapture__gap_status')}} as gap
-    on stg.person_id = gap.person_id
-    and stg.payer = gap.payer
-    and stg.model_version = gap.model_version
-    and stg.hcc_code = gap.hcc_code
-    and stg.suspect_hcc_flag = gap.suspect_hcc_flag
-    and (case 
-            when gap.gap_status = 'open' then stg.collection_year + 2
-            else stg.collection_year + 1
-        end) = gap.payment_year
+from {{ ref('hcc_recapture__int_hccs') }} as stg
+left join {{ ref('hcc_recapture__gap_status') }} as gap
+  on stg.person_id = gap.person_id
+  and stg.payer = gap.payer
+  and stg.model_version = gap.model_version
+  and stg.hcc_code = gap.hcc_code
+  and stg.suspect_hcc_flag = gap.suspect_hcc_flag
+  and (case
+          when gap.gap_status = 'open' then stg.collection_year + 2
+          else stg.collection_year + 1
+      end) = gap.payment_year
 where eligible_bene = 1

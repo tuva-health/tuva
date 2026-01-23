@@ -15,7 +15,7 @@ select
     , sum(closed_hccs) over (partition by payer, payment_year order by payment_year_month rows between unbounded preceding and current row) as ytd_closed_hccs
     , sum(open_hccs) over (partition by payer, payment_year order by payment_year_month rows between unbounded preceding and current row) as ytd_open_hccs
     , sum(total_hccs) over (partition by payer, payment_year) as yearly_total_hccs
-from {{ref('hcc_recapture__recapture_rates_monthly')}}
+from {{ref('hcc_recapture__recapture_rates_monthly') }}
 )
 
 select
