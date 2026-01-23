@@ -33,7 +33,7 @@ with recursive hierarchy as (
         , h.path || ' -> ' || t.hcc_code as path
     from {{ ref('cms_hcc__disease_hierarchy') }} as t
     inner join hierarchy as h
-        on  t.hcc_code = h.hccs_to_exclude
+        on t.hcc_code = h.hccs_to_exclude
         and t.model_version = h.model_version
     where h.hcc_hierarchy_group_rank < 100  -- Prevent infinite loops
 )
@@ -50,7 +50,7 @@ group by
 )
 
 , combine_leaf_nodes as (
-select distinct
+select
       hcc_code
     , hcc_hierarchy_group
     , model_version

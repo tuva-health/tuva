@@ -153,13 +153,13 @@ left outer join eligible_claims as elig
   and sus.payer = elig.payer
   and sus.claim_id = elig.claim_id
 left outer join medical_claims as med
-  on  sus.person_id = med.person_id
+  on sus.person_id = med.person_id
   and sus.payer = med.payer
   and sus.claim_id = med.claim_id
 -- Only include benes eligible for gap closure
 left outer join {{ ref('hcc_recapture__stg_eligible_benes') }} as elig_bene
   on sus.person_id = elig_bene.person_id
-  and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
+  and {{ date_part('year', 'sus.recorded_date') }} = elig_bene.collection_year
   and sus.payer = elig_bene.payer
 where sus.hcc_code is not null
   -- Replace with cms_hcc__adjustment_rates once that table includes PY 2026 
