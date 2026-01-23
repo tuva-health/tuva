@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('hcc_recapture_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
-   )
+     enabled = var('hcc_recapture_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))) | as_bool
 }}
 
 with seed_hcc_hierarchy as (

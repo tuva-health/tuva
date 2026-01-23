@@ -1,9 +1,8 @@
 {{ config(
-     enabled = var('hcc_recapture_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
-   )
+     enabled = var('hcc_recapture_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))) | as_bool
 }}
 
-with recursive hierarchy (
+with recursive hierarchy {% if target.type == 'redshift' %} (
       hcc_code
     , hccs_to_exclude
     , root_hcc
@@ -11,7 +10,7 @@ with recursive hierarchy (
     , model_version
     , hcc_hierarchy_group_rank
     , path
-) as (
+) {% endif %} as (
     -- Base case: Start with root nodes (hcc_code with no parents)
     select
           hcc_code
