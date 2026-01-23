@@ -9,7 +9,7 @@ select distinct
       person_id
     , payer
     , payment_year
-    , date_from_parts(payment_year, month(recorded_date), 1) as payment_year_month
+    , cast((cast(payment_year as {{ dbt.type_string() }}) || '-' || cast({{ date_part('month', 'recorded_date') }} as {{ dbt.type_string() }}) || '-' || '1') as date) as payment_year_month
     , recorded_date
     , model_version
     , hcc_code

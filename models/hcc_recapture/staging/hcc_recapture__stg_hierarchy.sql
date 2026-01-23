@@ -3,7 +3,15 @@
    )
 }}
 
-with recursive hierarchy as (
+with recursive hierarchy (
+    hcc_code,
+    hccs_to_exclude,
+    root_hcc,
+    hcc_hierarchy_group,
+    model_version,
+    hcc_hierarchy_group_rank,
+    path    
+) as (
     -- Base case: Start with root nodes (hcc_code with no parents)
     select
           hcc_code
@@ -12,7 +20,7 @@ with recursive hierarchy as (
         , description as hcc_hierarchy_group
         , model_version
         , 1 as hcc_hierarchy_group_rank
-        , cast(hcc_code as varchar) as path
+        , cast(hcc_code as {{ dbt.type_string() }}) as path
     from {{ ref('cms_hcc__disease_hierarchy') }}
     where hcc_code not in (
         select distinct hccs_to_exclude
