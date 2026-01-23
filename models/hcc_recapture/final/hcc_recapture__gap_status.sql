@@ -14,6 +14,6 @@ select distinct
     , recapture_flag
     , gap_status
     , suspect_hcc_flag
-from {{ ref('ra_ops__int_gap_status')}}
+from {{ ref('hcc_recapture__int_gap_status')}}
 -- Apply hierarchies
 where filtered_out_by_hierarchy = 0

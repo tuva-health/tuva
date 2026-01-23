@@ -1,12 +1,12 @@
 version: 2
 
 models:
-  - name: ra_ops__recapture_rates
+  - name: hcc_recapture__recapture_rates
     description: HCC recapture rates by payment year.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: recapture_rates
-      tags: ["ra_ops", "final"]
+      tags: ["hcc_recapture", "final"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -29,12 +29,12 @@ models:
         description: The total number of HCCs that were open or closed in the payment year. Excludes new and inappropriate for recapture HCCs.
       - name: recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment year.
-  - name: ra_ops__recapture_rates_monthly
+  - name: hcc_recapture__recapture_rates_monthly
     description: HCC recapture rates by payment year month.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: recapture_rates_monthly
-      tags: ["ra_ops", "final"]
+      tags: ["hcc_recapture", "final"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -62,12 +62,12 @@ models:
         description: The total number of HCCs that were open or closed in the payment month. Excludes new and inappropriate for recapture HCCs.
       - name: recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment month.
-  - name: ra_ops__recapture_rates_monthly_ytd
+  - name: hcc_recapture__recapture_rates_monthly_ytd
     description: HCC recapture rates by payment month year-to-date.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: recapture_rates_monthly_ytd
-      tags: ["ra_ops", "final"]
+      tags: ["hcc_recapture", "final"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -103,12 +103,12 @@ models:
         description: The number of HCCs open and closed in a payment year.
       - name: ytd_recapture_rate
         description: The running total of closed HCCs divided by total HCCs in a payment year.
-  - name: ra_ops__hcc_status
+  - name: hcc_recapture__hcc_status
     description: Combines claims data with HCC gap status.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: hcc_status
-      tags: ["ra_ops", "final"]
+      tags: ["hcc_recapture", "final"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -186,12 +186,12 @@ models:
           Whether or not the HCC is recapturable. Includes the following values:
             - 'Y': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
             - 'N': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years      
-  - name: ra_ops__gap_status
+  - name: hcc_recapture__gap_status
     description: The gap status for each HCC.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: gap_status
-      tags: ["ra_ops", "final"]
+      tags: ["hcc_recapture", "final"]
       materialized: table  
     tests:
       - dbt_utils.unique_combination_of_columns:

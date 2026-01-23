@@ -23,8 +23,8 @@ select distinct
     , stg.reason
     , gap.gap_status
     , gap.recapture_flag
-from {{ ref('ra_ops__int_hccs')}} stg
-left join {{ ref('ra_ops__gap_status')}} gap
+from {{ ref('hcc_recapture__int_hccs')}} stg
+left join {{ ref('hcc_recapture__gap_status')}} gap
     on stg.person_id = gap.person_id
     and stg.payer = gap.payer
     and stg.model_version = gap.model_version

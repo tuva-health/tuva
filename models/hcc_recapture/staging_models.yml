@@ -1,12 +1,12 @@
 version: 2
 
 models:
-  - name: ra_ops__stg_hierarchy
+  - name: hcc_recapture__stg_hierarchy
     description: Adds `hcc_hierarchy_group` and `hcc_hierarchy_group_rank` by using a recursive CTE to group all HCCs and rank them. Lower rank indicates higher priority.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: stg_hierarchy
-      tags: ["ra_ops", "staging"]
+      tags: ["hcc_recapture", "staging"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -31,14 +31,14 @@ models:
         description: >
           The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
           coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
-  - name: ra_ops__stg_coef_hier
+  - name: hcc_recapture__stg_coef_hier
     description: >
       Combine HCC hierarchy rankings with coefficients and add risk model code. Long-term risk model code should be added directly to the
       Tuva seed files instead.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: stg_coef_hier
-      tags: ["ra_ops", "staging"]
+      tags: ["hcc_recapture", "staging"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -69,14 +69,14 @@ models:
           There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
           This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
           the 2025 CMS risk adjustment software.
-  - name: ra_ops__stg_eligible_benes
+  - name: hcc_recapture__stg_eligible_benes
     description: >
       Beneficiaries eligible for HCC recapture. When ESRD risk scores are available in the Tuva project, 
       the filter removing ESRD beneficiaries will need to be removed.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: stg_eligible_benes
-      tags: ["ra_ops", "staging"]
+      tags: ["hcc_recapture", "staging"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:

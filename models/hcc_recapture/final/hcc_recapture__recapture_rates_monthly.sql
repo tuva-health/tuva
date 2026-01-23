@@ -16,7 +16,7 @@ select distinct
     , gap_status
     , recapture_flag
     , row_number() over (partition by person_id, payer, payment_year, model_version, hcc_code order by recorded_date asc) as earliest_hcc_code
-from {{ ref('ra_ops__hcc_status')}}
+from {{ ref('hcc_recapture__hcc_status')}}
 where 1=1
   and gap_status not in ('inappropriate for recapture', 'new')
   and gap_status is not null

@@ -6,7 +6,7 @@
 with eligible_hccs as (
     select 
         * 
-    from {{ ref('ra_ops__int_hccs') }} 
+    from {{ ref('hcc_recapture__int_hccs') }} 
 )
 
 -- Get recapturable HCCs within the past 2 years
@@ -58,8 +58,8 @@ select distinct
   , base.hcc_hierarchy_group
   , base.hcc_code
   , base.risk_model_code
-from {{ ref('ra_ops__stg_coef_hier') }} as base
-inner join {{ ref('ra_ops__stg_coef_hier') }} as self
+from {{ ref('hcc_recapture__stg_coef_hier') }} as base
+inner join {{ ref('hcc_recapture__stg_coef_hier') }} as self
     on base.hcc_hierarchy_group = self.hcc_hierarchy_group
     and base.risk_model_code = self.risk_model_code
     and base.coefficient = self.coefficient
@@ -226,7 +226,7 @@ left join min_open_hierarchy mhier
     and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
     and bgap.suspect_hcc_flag = mhier.suspect_hcc_flag
 -- Join eligible benes again here to capture new rows with open gaps
-inner join {{ ref('ra_ops__stg_eligible_benes')}} elig
+inner join {{ ref('hcc_recapture__stg_eligible_benes')}} elig
   on bgap.person_id = elig.person_id
   and bgap.payment_year = elig.collection_year + 1
   and bgap.payer = elig.payer

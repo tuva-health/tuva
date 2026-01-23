@@ -9,16 +9,17 @@ with seed_hcc_hierarchy as (
         , hcc_code
         , hcc_hierarchy_group
         , hcc_hierarchy_group_rank
-    from {{ ref('ra_ops__stg_hierarchy') }}
+    from {{ ref('hcc_recapture__stg_hierarchy') }}
 )
 
 , chronic_hccs as (
-    select 
-        mpgs.hcc_code
-        , model_version
-        , case when acute_condition_flag = 'N' then 1 else 0 end as chronic_flag
-        , case when acute_condition_flag = 'Y' then 1 else 0 end as acute_flag
-    from {{ ref('homeward_chronic_conditions') }} mpgs
+    select 1 as hcc_code, 1 as model_version, 1 as chronic_flag, 1 as acute_flag
+    -- select 
+    --     mpgs.hcc_code
+    --     , model_version
+    --     , case when acute_condition_flag = 'N' then 1 else 0 end as chronic_flag
+    --     , case when acute_condition_flag = 'Y' then 1 else 0 end as acute_flag
+    -- from mpgs
 )
 
 , get_risk_code as (
@@ -134,7 +135,7 @@ left join medical_claims as med
     and sus.payer = med.payer
     and sus.claim_id = med.claim_id
 -- Only include benes eligible for gap closure
-left join {{ ref('ra_ops__stg_eligible_benes')}} elig_bene
+left join {{ ref('hcc_recapture__stg_eligible_benes')}} elig_bene
     on sus.person_id = elig_bene.person_id
     and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
     and sus.payer = elig_bene.payer

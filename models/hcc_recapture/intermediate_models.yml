@@ -1,12 +1,12 @@
 version: 2
 
 models:
-  - name: ra_ops__int_all_hccs
+  - name: hcc_recapture__int_all_hccs
     description: Add eligible claim and eligible benes columns. This is not filtered to eligible claims only so all claims can be seen at this step.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: int_all_hccs
-      tags: ["ra_ops", "intermediate"]
+      tags: ["hcc_recapture", "intermediate"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -71,12 +71,12 @@ models:
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-  - name: ra_ops__int_hccs
+  - name: hcc_recapture__int_hccs
     description: Filter to just eligible claims and apply HCC hierarchies.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: int_hccs
-      tags: ["ra_ops", "intermediate"]
+      tags: ["hcc_recapture", "intermediate"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -142,14 +142,14 @@ models:
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-  - name: ra_ops__int_gap_status
+  - name: hcc_recapture__int_gap_status
     description: >
       Determines the gap for a given HCC code. A gap is based on prior year claims which qualified as an HCC. If there was a chronic HCC in a prior year,
       it would be expected this same HCC was coded in a future year.
     config:
-      schema: ra_ops
+      schema: hcc_recapture
       alias: int_gap_status
-      tags: ["ra_ops", "intermediate"]
+      tags: ["hcc_recapture", "intermediate"]
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:

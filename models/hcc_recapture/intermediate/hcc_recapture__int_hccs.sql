@@ -6,7 +6,7 @@
 with base as (
 select
     *
-from {{ ref('ra_ops__int_all_hccs')}}
+from {{ ref('hcc_recapture__int_all_hccs')}}
 -- hierarchies should only be applied to eligible claims
 where eligible_claim_indicator = 1
     and hcc_chronic_flag = 1
