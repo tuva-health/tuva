@@ -4,7 +4,7 @@
 }}
 
 -- Flattening months to 1 person per year
-select distinct 
+select distinct
   person_id
   , {{ date_part('year', 'collection_end_date') }} as collection_year
   , payer

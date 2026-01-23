@@ -61,7 +61,7 @@ select distinct
     person_id
   , claim_id
   , payer
-from {{ref('cms_hcc__int_eligible_conditions') }}
+from {{ ref('cms_hcc__int_eligible_conditions') }}
 )
 
 , medical_claims as (
@@ -71,7 +71,7 @@ select distinct
   , payer
   , claim_id
   , rendering_id as rendering_npi
-from {{ref('core__medical_claim') }}
+from {{ ref('core__medical_claim') }}
 )
 
 , include_suspect_hccs as (
@@ -135,29 +135,29 @@ select distinct
     , reason
     , suspect_hcc_flag
 from include_suspect_hccs as sus
-left join seed_hcc_hierarchy as hier
+left outer join seed_hcc_hierarchy as hier
   on sus.hcc_code = hier.hcc_code
   and sus.model_version = hier.model_version
-left join chronic_hccs as chronic
+left outer join chronic_hccs as chronic
   on sus.model_version = chronic.model_version
   and sus.hcc_code = chronic.hcc_code
   and {{ date_part('year', 'sus.recorded_date') }} = chronic.payment_year - 1
-left join get_risk_code rcode
+left outer join get_risk_code as rcode
   on sus.person_id = rcode.person_id
   and sus.payer = rcode.payer
   and {{ date_part('year', 'sus.recorded_date') }} = rcode.payment_year - 1
   and sus.model_version = rcode.model_version
   and rcode.month_order = 1
-left join eligible_claims as elig
+left outer join eligible_claims as elig
   on sus.person_id = elig.person_id
   and sus.payer = elig.payer
   and sus.claim_id = elig.claim_id
-left join medical_claims as med
+left outer join medical_claims as med
   on  sus.person_id = med.person_id
   and sus.payer = med.payer
   and sus.claim_id = med.claim_id
 -- Only include benes eligible for gap closure
-left join {{ ref('hcc_recapture__stg_eligible_benes') }} as elig_bene
+left outer join {{ ref('hcc_recapture__stg_eligible_benes') }} as elig_bene
   on sus.person_id = elig_bene.person_id
   and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
   and sus.payer = elig_bene.payer

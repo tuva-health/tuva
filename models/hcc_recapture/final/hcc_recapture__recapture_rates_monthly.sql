@@ -9,7 +9,7 @@ select distinct
       person_id
     , payer
     , payment_year
-    , date_from_parts(payment_year, month(recorded_date),1) as payment_year_month
+    , date_from_parts(payment_year, month(recorded_date), 1) as payment_year_month
     , recorded_date
     , model_version
     , hcc_code
@@ -17,8 +17,7 @@ select distinct
     , recapture_flag
     , row_number() over (partition by person_id, payer, payment_year, model_version, hcc_code order by recorded_date asc) as earliest_hcc_code
 from {{ ref('hcc_recapture__hcc_status') }}
-where 1=1
-  and gap_status not in ('inappropriate for recapture', 'new')
+where gap_status not in ('inappropriate for recapture', 'new')
   and gap_status is not null
   and suspect_hcc_flag = 0
 )

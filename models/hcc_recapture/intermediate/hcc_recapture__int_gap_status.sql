@@ -102,19 +102,19 @@ full outer join recapturable_hccs as recap
     and base.collection_year = recap.collection_year
     and base.model_version = recap.model_version
     and base.hcc_code = recap.hcc_code
-left join equiv_coef as equiv
+left outer join equiv_coef as equiv
   on base.model_version = equiv.model_version
   and base.hcc_hierarchy_group = equiv.hcc_hierarchy_group
   and base.hcc_code = equiv.hcc_code
   and base.risk_model_code = equiv.risk_model_code
-left join best_past_rank as grp
+left outer join best_past_rank as grp
     on base.person_id = grp.person_id
     and base.payer = grp.payer
     and base.collection_year = grp.collection_year
     and base.model_version = grp.model_version
     and base.hcc_hierarchy_group = grp.hcc_hierarchy_group
     and grp.best_past_rank = grp.hcc_hierarchy_group_rank
-left join best_current_rank as current_year_hier
+left outer join best_current_rank as current_year_hier
     on recap.person_id = current_year_hier.person_id
     and recap.payer = current_year_hier.payer
     and recap.collection_year = current_year_hier.collection_year
@@ -217,7 +217,7 @@ select distinct
     -- Apply hierarchies (i.e. if the hierarchy is not the min hierarchy, then remove it)
     , case when bgap.hcc_hierarchy_group is not null and mhier.hcc_hierarchy_group is null then 1 else 0 end as filtered_out_by_hierarchy
 from best_gap_status as bgap
-left join min_open_hierarchy as mhier
+left outer join min_open_hierarchy as mhier
   on bgap.person_id = mhier.person_id
   and bgap.payer = mhier.payer
   and bgap.payment_year = mhier.payment_year

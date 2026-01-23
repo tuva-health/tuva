@@ -54,7 +54,7 @@ select
     , base.condition_type
     , base.suspect_hcc_flag
 from base
-left join min_hierarchy as mhier
+left outer join min_hierarchy as mhier
     on base.person_id = mhier.person_id
     and base.payer = mhier.payer
     and base.collection_year = mhier.collection_year
@@ -63,6 +63,5 @@ left join min_hierarchy as mhier
     and base.hcc_hierarchy_group = mhier.hcc_hierarchy_group
     and base.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
     and base.suspect_hcc_flag = mhier.suspect_hcc_flag
-where 1=1
-    -- Apply hierarchies
-    and mhier.hcc_hierarchy_group is not null
+-- Apply hierarchies
+where mhier.hcc_hierarchy_group is not null

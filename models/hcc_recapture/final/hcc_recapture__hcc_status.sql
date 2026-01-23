@@ -24,6 +24,7 @@ select distinct
     , gap.gap_status
     , gap.recapture_flag
 from {{ ref('hcc_recapture__int_hccs') }} as stg
+-- noqa: disable=ambiguous.join
 left join {{ ref('hcc_recapture__gap_status') }} as gap
   on stg.person_id = gap.person_id
   and stg.payer = gap.payer
@@ -34,4 +35,5 @@ left join {{ ref('hcc_recapture__gap_status') }} as gap
           when gap.gap_status = 'open' then stg.collection_year + 2
           else stg.collection_year + 1
       end) = gap.payment_year
+-- noqa: enable=ambiguous.join      
 where eligible_bene = 1
