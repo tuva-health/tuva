@@ -44,13 +44,16 @@ inner join month_start_and_end_dates as b
 )
 
 select
-  row_number() over (
-    order by
-      person_id
-    , year_month
-    , payer
-    , {{ quote_column('plan') }}
-    , data_source
-    ) as member_month_key
+  cast(
+    {{ dbt_utils.generate_surrogate_key([
+        'person_id',
+        'member_id',
+        'year_month',
+        'payer',
+        quote_column('plan'),
+        'data_source'
+    ]) }}
+    as {{ dbt.type_string() }}
+  ) as member_month_key
 , *
 from joined

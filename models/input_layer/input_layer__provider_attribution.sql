@@ -14,6 +14,7 @@ from {{ ref('provider_attribution') }}
 {% if target.type == 'fabric' %}
 select top 0
       cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer
@@ -31,6 +32,7 @@ select top 0
 {% else %}
 select
       cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer

@@ -7,6 +7,7 @@
 
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
+    , cast(member_id as {{ dbt.type_string() }}) as member_id
     , cast(year_month as {{ dbt.type_string() }}) as year_month
     , cast(payer as {{ dbt.type_string() }}) as payer
     , {{ quote_column('plan') }}
@@ -27,6 +28,7 @@ from {{ ref('input_layer__provider_attribution') }}
 {% if target.type == 'fabric' %}
 select top 0
       cast(null as {{ dbt.type_string() }} ) person_id
+    , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
@@ -43,6 +45,7 @@ select top 0
 {% else %}
 select
       cast(null as {{ dbt.type_string() }} ) person_id
+    , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}

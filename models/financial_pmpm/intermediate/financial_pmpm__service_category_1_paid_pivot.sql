@@ -6,6 +6,7 @@
 with service_cat_1 as (
   select
     person_id
+  , member_id
   , year_month
   , payer
   , {{ quote_column('plan') }}
@@ -15,6 +16,7 @@ with service_cat_1 as (
   from {{ ref('financial_pmpm__patient_spend_with_service_categories') }}
   group by
     person_id
+  , member_id
   , year_month
   , payer
   , {{ quote_column('plan') }}
@@ -24,6 +26,7 @@ with service_cat_1 as (
 
 select
   person_id
+, member_id
 , year_month
 , payer
 , {{ quote_column('plan') }}
@@ -41,6 +44,7 @@ select
 from service_cat_1
 group by
   person_id
+, member_id
 , year_month
 , payer
 , {{ quote_column('plan') }}
