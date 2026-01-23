@@ -31,8 +31,8 @@ WITH RECURSIVE hierarchy AS (
         h.model_version,
         h.hcc_hierarchy_group_rank + 1 AS hcc_hierarchy_group_rank,
         h.path || ' -> ' || t.hcc_code AS path
-    FROM {{ ref('cms_hcc__disease_hierarchy') }} t
-    INNER JOIN hierarchy h 
+    FROM {{ ref('cms_hcc__disease_hierarchy') }} as t
+    INNER JOIN hierarchy as h
         ON  t.hcc_code = h.hccs_to_exclude
         and t.model_version = h.model_version
     WHERE h.hcc_hierarchy_group_rank < 100  -- Prevent infinite loops

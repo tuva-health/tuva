@@ -6,7 +6,7 @@
 with eligible_hccs as (
     select 
         * 
-    from {{ ref('hcc_recapture__int_hccs') }} 
+    from {{ ref('hcc_recapture__int_hccs') }}
 )
 
 -- Get recapturable HCCs within the past 2 years
@@ -216,8 +216,8 @@ select distinct
     , bgap.suspect_hcc_flag
     -- Apply hierarchies (i.e. if the hierarchy is not the min hierarchy, then remove it)
     , case when bgap.hcc_hierarchy_group is not null and mhier.hcc_hierarchy_group is null then 1 else 0 end as filtered_out_by_hierarchy
-from best_gap_status bgap
-left join min_open_hierarchy mhier
+from best_gap_status as bgap
+left join min_open_hierarchy as mhier
     on bgap.person_id = mhier.person_id
     and bgap.payer = mhier.payer
     and bgap.payment_year = mhier.payment_year
@@ -226,7 +226,7 @@ left join min_open_hierarchy mhier
     and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
     and bgap.suspect_hcc_flag = mhier.suspect_hcc_flag
 -- Join eligible benes again here to capture new rows with open gaps
-inner join {{ ref('hcc_recapture__stg_eligible_benes')}} elig
+inner join {{ ref('hcc_recapture__stg_eligible_benes')}} as elig
   on bgap.person_id = elig.person_id
   and bgap.payment_year = elig.collection_year + 1
   and bgap.payer = elig.payer

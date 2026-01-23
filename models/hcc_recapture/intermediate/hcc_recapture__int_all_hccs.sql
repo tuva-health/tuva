@@ -12,14 +12,35 @@ with seed_hcc_hierarchy as (
     from {{ ref('hcc_recapture__stg_hierarchy') }}
 )
 
+, hcc_diagnosis as (
+    select
+          payment_year
+        , diagnosis_code
+        , cms_hcc_v28 as hcc_code
+        , 'CMS-HCC-V28' as model_version
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where cms_hcc_v28_flag = 'Yes'
+
+    union all
+
+    select
+          payment_year
+        , diagnosis_code
+        , cms_hcc_v24 as hcc_code
+        , 'CMS-HCC-V24' as model_version
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where cms_hcc_v24_flag = 'Yes'
+)
+
 , chronic_hccs as (
-    select 1 as hcc_code, 1 as model_version, 1 as chronic_flag, 1 as acute_flag
-    -- select 
-    --     mpgs.hcc_code
-    --     , model_version
-    --     , case when acute_condition_flag = 'N' then 1 else 0 end as chronic_flag
-    --     , case when acute_condition_flag = 'Y' then 1 else 0 end as acute_flag
-    -- from mpgs
+select distinct
+      diag.hcc_code
+    , diag.payment_year
+    , diag.model_version
+    , 1 as chronic_flag
+from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as hier
+inner join hcc_diagnosis as diag
+    on hier.code = diag.diagnosis_code
 )
 
 , get_risk_code as (
@@ -117,9 +138,10 @@ from include_suspect_hccs as sus
 left join seed_hcc_hierarchy as hier
     on sus.hcc_code = hier.hcc_code
     and sus.model_version = hier.model_version
-left join chronic_hccs chronic
+left join chronic_hccs as chronic
     on sus.model_version = chronic.model_version
     and sus.hcc_code = chronic.hcc_code
+    and {{ date_part('year', 'sus.recorded_date') }} = chronic.payment_year - 1
 left join get_risk_code rcode
     on sus.person_id = rcode.person_id
     and sus.payer = rcode.payer
@@ -135,7 +157,7 @@ left join medical_claims as med
     and sus.payer = med.payer
     and sus.claim_id = med.claim_id
 -- Only include benes eligible for gap closure
-left join {{ ref('hcc_recapture__stg_eligible_benes')}} elig_bene
+left join {{ ref('hcc_recapture__stg_eligible_benes')}} as elig_bene
     on sus.person_id = elig_bene.person_id
     and {{ date_part('year', 'sus.recorded_date') }}  = elig_bene.collection_year
     and sus.payer = elig_bene.payer
