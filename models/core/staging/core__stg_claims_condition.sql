@@ -7,7 +7,7 @@
 -- This dbt model creates the condition table in core.
 -- *************************************************
 
--- The code needs to be brought in like this since a single diagnosis column can have multiple different diagnosis
+-- The codes need to be brought in like this since a single diagnosis column can have multiple different diagnosis
 -- TODO: Add test to ensure all diagnosis in the medical claim are being brought through and none are being lost
 with combine_diag_poa as (
  select
