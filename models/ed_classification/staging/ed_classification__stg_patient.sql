@@ -13,4 +13,5 @@ select
     , zip_code
     , latitude
     , longitude
+    , data_source
 from {{ ref('core__patient') }}

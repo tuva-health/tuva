@@ -1,9 +1,9 @@
-{% test warn_if_null_percentage_above_zero(model, column_name) %}
+{% test warn_if_null_percentage_is_100(model, column_name) %}
 
 {#-
     Calculates the percentage of NULL values in a column using ANSI SQL.
-    Passes if the percentage is 0%.
-    Warns if the percentage is between 0% and 100%.
+    Passes if the percentage is < 100%.
+    Warns if the percentage is 100%.
     Includes the column name, error description (with formatted percentage),
     and a query to find NULL rows in the output.
 
@@ -43,7 +43,7 @@ calculation AS (
                 {% endif %}
         END AS null_percentage_raw
     FROM validation
-    WHERE null_rows > 0
+    WHERE total_rows = null_rows
 
 ),
 
