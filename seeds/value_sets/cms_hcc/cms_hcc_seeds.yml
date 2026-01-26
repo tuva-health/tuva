@@ -235,6 +235,42 @@ seeds:
       - name: hccs_to_exclude
         description: HCC codes to exclude from the hierarchy
 
+  - name: cms_hcc__disease_hierarchy_flat
+    description: >
+      Disease hierarchies by model version. Extracted from rate announcement
+      documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_disease_hierarchy_flat
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        hcc_hierarchy_group: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        hcc_hierarchy_group_rank: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: hcc_code
+        description: The hierarchical condition category code.
+      - name: model_version
+        description: >
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+      - name: hcc_hierarchy_group
+        description: >
+          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
+          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
+      - name: hcc_hierarchy_group_rank
+        description: >
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
+
   - name: cms_hcc__disease_interaction_factors
     description: >
       Disease interaction factors by model version and risk segment. Extracted  from rate announcement documents on cms.gov.
