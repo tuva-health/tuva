@@ -1,36 +1,6 @@
 version: 2
 
 models:
-  - name: hcc_recapture__stg_hierarchy
-    description: Adds `hcc_hierarchy_group` and `hcc_hierarchy_group_rank` by using a recursive CTE to group all HCCs and rank them. Lower rank indicates higher priority.
-    config:
-      schema: hcc_recapture
-      alias: stg_hierarchy
-      tags: ["hcc_recapture", "staging"]
-      materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - hcc_code
-            - model_version
-            - hcc_hierarchy_group
-            - hcc_hierarchy_group_rank
-    columns:
-      - name: hcc_code
-        description: The hierarchical condition category code.
-      - name: model_version
-        description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
-          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-      - name: hcc_hierarchy_group
-        description: >
-          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
-          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
-      - name: hcc_hierarchy_group_rank
-        description: >
-          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
-          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
   - name: hcc_recapture__stg_coef_hier
     description: >
       Combine HCC hierarchy rankings with coefficients and add risk model code. Long-term risk model code should be added directly to the

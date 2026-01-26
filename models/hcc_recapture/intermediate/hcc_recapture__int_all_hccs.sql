@@ -8,7 +8,7 @@ with seed_hcc_hierarchy as (
         , hcc_code
         , hcc_hierarchy_group
         , hcc_hierarchy_group_rank
-    from {{ ref('hcc_recapture__stg_hierarchy') }}
+    from {{ ref('cms_hcc__disease_hierarchy_flat') }}
 )
 
 , hcc_diagnosis as (
