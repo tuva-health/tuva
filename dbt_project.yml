@@ -258,7 +258,7 @@ seeds:
         cms_hcc__disease_hierarchy:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.16.0','cms_hcc_disease_hierarchy.csv',compression=true,null_marker=true) }}"
         cms_hcc__disease_hierarchy_flat:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.16.1','cms_hcc_disease_hierarchy_flat.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.16.1','cms_hcc_disease_hierarchy_flat.csv',compression=true,null_marker=true,headers=true) }}"
         cms_hcc__disease_interaction_factors:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.16.0','cms_hcc_disease_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__enrollment_interaction_factors:
