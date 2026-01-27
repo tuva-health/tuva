@@ -253,7 +253,7 @@ seeds:
         hcc_hierarchy_group: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         hcc_hierarchy_group_rank: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          integer
     columns:
       - name: hcc_code
         description: The hierarchical condition category code.
