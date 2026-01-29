@@ -8,7 +8,13 @@ select distinct
       person_id
     , payer
     , payment_year
-    , cast(concat(cast(payment_year as {{ dbt.type_string() }}),'-',cast({{ date_part('month', 'recorded_date') }} as {{ dbt.type_string() }}),'-','1') as date) as payment_year_month
+    , cast(
+        concat(
+            cast(payment_year as {{ dbt.type_string() }}), '-',
+            cast({{ date_part('month', 'recorded_date') }} as {{ dbt.type_string() }}), '-',
+            '1'
+        ) as date
+    ) as payment_year_month
     , recorded_date
     , model_version
     , hcc_code
