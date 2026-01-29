@@ -8,7 +8,7 @@ with eligible_hccs as (
     from {{ ref('hcc_recapture__int_hccs') }}
 )
 
--- Get recapturable HCCs within the past 2 years
+-- Get recapturable HCCs within the prior year
 , recapturable_hccs as (
 select distinct
       person_id
