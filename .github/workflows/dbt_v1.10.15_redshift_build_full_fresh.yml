@@ -1,0 +1,49 @@
+name: Redshift CICD Full Refresh
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from UI
+
+jobs:
+  dbt_run:
+    name: dbt full refresh and test on Redshift
+    runs-on: ubuntu-latest
+
+    env:
+      # Environment variables
+      DBT_PROJECT_DIR: "." 
+      PYTHON_VERSION: "3.10"
+      DBT_CORE_VERSION: "1.10.15"
+      
+      # Connection variables
+      DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+      DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+      DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+      DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt and Redshift adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
+
+      - name: Install dbt dependencies
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt deps --profiles-dir ./integration_tests/profiles/redshift
+
+      - name: Test Connection
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt debug --profiles-dir ./integration_tests/profiles/redshift
+
+      - name: Build dbt models
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt build --full-refresh --profiles-dir ./integration_tests/profiles/redshift

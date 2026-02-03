@@ -1,0 +1,59 @@
+name: Fabric CICD Full Refresh
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from UI
+
+jobs:
+  dbt_run:
+    name: dbt full refresh and test on Fabric
+    runs-on: ubuntu-latest
+
+    env:
+      # Environment variables
+      PYTHON_VERSION: "3.10"
+      DBT_PROJECT_DIR: "."
+      DBT_CORE_VERSION: "1.10.15"
+      # Fabric connection variables
+      DBT_FABRIC_CI_SERVER: ${{ secrets.DBT_FABRIC_CI_SERVER }}
+      DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
+      DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
+      DBT_FABRIC_CI_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
+      DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
+      DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
+      
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install ODBC Driver 18 for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Install dbt-core and Fabric adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-fabric
+
+      - name: Install dbt dependencies
+        run: dbt deps --profiles-dir ./integration_tests/profiles/fabric
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Test connection
+        run: dbt debug --profiles-dir ./integration_tests/profiles/fabric
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Build dbt models (full-refresh)
+        run: |
+          dbt build --full-refresh --profiles-dir ./integration_tests/profiles/fabric
+        working-directory: ${{ env.DBT_PROJECT_DIR }}

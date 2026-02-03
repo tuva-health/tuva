@@ -1,0 +1,50 @@
+name: Databricks CICD Full Refresh
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from UI
+
+jobs:
+  dbt_run:
+    runs-on: ubuntu-latest
+
+    env:
+      # Environment variables
+      PYTHON_VERSION: "3.10"
+      DBT_PROJECT_DIR: "."
+      DBT_CORE_VERSION: "1.10.15"
+      # Databricks connection variables
+      DBT_DATABRICKS_CI_HOST: ${{ secrets.DBT_DATABRICKS_CI_HOST }}
+      DBT_DATABRICKS_CI_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_CI_HTTP_PATH }}
+      DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
+      DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+#      Certifi addresses a known certificate issue with databricks and dbt
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.10.15 dbt-databricks
+          # Install SSL certificates fix
+          pip install certifi
+
+      - name: Load dbt dependencies
+        run: dbt deps --profiles-dir ./integration_tests/profiles/databricks
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Test connection
+        run: dbt debug --profiles-dir ./integration_tests/profiles/databricks
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Build dbt models (full-refresh)
+        run: |
+          dbt build --full-refresh --profiles-dir ./integration_tests/profiles/databricks
+        working-directory: ${{ env.DBT_PROJECT_DIR }}

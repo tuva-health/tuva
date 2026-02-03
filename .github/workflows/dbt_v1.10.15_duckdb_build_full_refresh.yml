@@ -1,0 +1,48 @@
+name: DuckDB/MotherDuck CICD Full Refresh
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from UI
+
+jobs:
+  dbt_run:
+    name: dbt full refresh and test on DuckDB/MotherDuck
+    runs-on: ubuntu-latest
+
+    env:
+      # Environment variables
+      PYTHON_VERSION: "3.10"
+      DBT_PROJECT_DIR: "."
+      DBT_CORE_VERSION: "1.10.15"
+      
+      # Connection variables
+      DBT_MOTHERDUCK_CI_PATH: ${{ secrets.DBT_MOTHERDUCK_CI_PATH }}
+      DBT_MOTHERDUCK_CI_DATABASE: "my_db"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ env.DBT_CORE_VERSION}} dbt-duckdb
+
+      - name: Install dbt dependencies
+        run: dbt deps --profiles-dir ./integration_tests/profiles/duckdb
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Test Connection
+        run: dbt debug --profiles-dir ./integration_tests/profiles/duckdb
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+
+      - name: Build dbt models (full-refresh)
+        run: |
+          dbt build --full-refresh --profiles-dir ./integration_tests/profiles/duckdb
+        working-directory: ${{ env.DBT_PROJECT_DIR }}

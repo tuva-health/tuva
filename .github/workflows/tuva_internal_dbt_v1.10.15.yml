@@ -1,11 +1,11 @@
 name: tuva_internal_dbt_v1.10.15
 on:
-  pull_request:
-    branches:
-      - main
-      - 'minor-release*'
-      - 'release*'
-  workflow_dispatch:  # for manual triggering
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - 'minor-release*'
+  #     - 'release*'
+  # workflow_dispatch:  # for manual triggering
 
 concurrency:
   # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
