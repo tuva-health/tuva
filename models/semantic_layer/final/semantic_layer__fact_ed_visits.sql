@@ -7,7 +7,7 @@ SELECT
     e.encounter_id
   , e.person_id
   , {{ dbt.concat(["e.person_id", "'|'", the_tuva_project.yyyymm("e.encounter_start_date")]) }} as member_month_sk
-  , coalesce(s.ed_classification_order, 99) as ed_classification_order
+  , coalesce(try_cast(s.ed_classification_order as integer), 99) as ed_classification_order
   , coalesce(s.ed_classification_description, 'Unclassified') as ed_classification_description
   , case when try_cast(s.ed_classification_order as integer) <= 3 then 1 else 0 end as avoidable
   , case when try_cast(s.ed_classification_order as integer) <= 3 then s.ed_classification_description else null end as avoidable_description

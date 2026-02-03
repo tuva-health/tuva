@@ -6,6 +6,18 @@
     strftime('%Y%m', cast({{ date }} as date))
 {%- endmacro %}
 
+{% macro bigquery__yyyymm(date) -%}
+    format_date('%Y%m', cast({{ date }} as date))
+{%- endmacro %}
+
+{% macro databricks__yyyymm(date) -%}
+    date_format(cast({{ date }} as date), 'yyyyMM')
+{%- endmacro %}
+
+{% macro fabric__yyyymm(date) -%}
+    format(cast({{ date }} as date), 'yyyyMM')
+{%- endmacro %}
+
 {% macro default__yyyymm(date) -%}
     to_char({{ date }}, 'YYYYMM')
 {%- endmacro %}

@@ -9,7 +9,7 @@
       , py.year_nbr
       , py.person_id
       , py.payer
-      , py.plan
+      , {{ column_ref('py', 'plan') }} as plan
       , py.data_source
       , ep.paid_amount_pred
       , ep.outpatient_paid_amount_pred
