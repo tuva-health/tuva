@@ -37,13 +37,10 @@ jobs:
           pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
 
       - name: Install dbt dependencies
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: dbt deps --profiles-dir ./integration_tests/profiles/redshift
 
       - name: Test Connection
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: dbt debug --profiles-dir ./integration_tests/profiles/redshift
 
       - name: Build dbt models
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: dbt build --full-refresh --profiles-dir ./integration_tests/profiles/redshift

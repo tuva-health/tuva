@@ -47,13 +47,10 @@ jobs:
 
       - name: Install dbt dependencies
         run: dbt deps --profiles-dir ./integration_tests/profiles/fabric
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Test connection
         run: dbt debug --profiles-dir ./integration_tests/profiles/fabric
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Build dbt models (full-refresh)
         run: |
           dbt build --full-refresh --profiles-dir ./integration_tests/profiles/fabric
-        working-directory: ${{ env.DBT_PROJECT_DIR }}

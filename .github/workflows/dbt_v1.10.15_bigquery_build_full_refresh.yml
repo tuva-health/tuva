@@ -36,17 +36,13 @@ jobs:
       - name: Create BigQuery credentials file
         run: |
           echo "${{ env.DBT_BIGQUERY_CI_TOKEN }}" | base64 --decode > ./creds.json
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Install dbt dependencies
         run: dbt deps --profiles-dir ./integration_tests/profiles/bigquery
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Test Connection
         run: dbt debug --profiles-dir ./integration_tests/profiles/bigquery
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Build dbt models (full-refresh)
         run: |
           dbt build --full-refresh --profiles-dir ./integration_tests/profiles/bigquery
-        working-directory: ${{ env.DBT_PROJECT_DIR }}

@@ -36,13 +36,10 @@ jobs:
 
       - name: Install dbt dependencies
         run: dbt deps --profiles-dir ./integration_tests/profiles/duckdb
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Test Connection
         run: dbt debug --profiles-dir ./integration_tests/profiles/duckdb
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
 
       - name: Build dbt models (full-refresh)
         run: |
           dbt build --full-refresh --profiles-dir ./integration_tests/profiles/duckdb
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
