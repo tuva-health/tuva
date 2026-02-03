@@ -46,13 +46,10 @@ jobs:
           pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-snowflake
 
       - name: Install dbt dependencies
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt deps --profiles-dir ./profiles/snowflake
+        run: dbt deps --profiles-dir ./integration_tests/profiles/snowflake
 
       - name: Test Connection
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt debug --profiles-dir ./profiles/snowflake
+        run: dbt debug --profiles-dir ./integration_tests/profiles/snowflake
 
       - name: Run build models
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt build --full-refresh --profiles-dir ./profiles/snowflake
+        run: dbt build --full-refresh --profiles-dir ./integration_tests/profiles/snowflake
