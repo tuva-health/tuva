@@ -15,7 +15,7 @@
 {%- endmacro %}
 
 {% macro fabric__yyyymm(date) -%}
-    format(cast({{ date }} as date), 'yyyyMM')
+    cast(format(cast({{ date }} as date), 'yyyyMM') as varchar(4000))
 {%- endmacro %}
 
 {% macro default__yyyymm(date) -%}
