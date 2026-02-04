@@ -83,7 +83,7 @@ WITH monthly_patient_costs AS (
 
 monthly_patient_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+       {{yyyymm("collection_end_date")}} AS year_month
       , person_id
       , normalized_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
@@ -91,18 +91,18 @@ monthly_patient_risk_cte AS (
 
 monthly_population_risk_cte AS (
     SELECT
-        TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
+       {{yyyymm("collection_end_date")}} AS year_month
       , AVG(normalized_risk_score) AS monthly_avg_risk_score
     FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
     GROUP BY
-        TO_CHAR(collection_end_date, 'YYYYMM')
+        {{yyyymm("collection_end_date")}}
 ),
 combined_data_cte AS (
     SELECT
         mm.person_id
       , mm.data_source
-      , {{ dbt.concat(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
-      , {{ dbt.concat(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
+      , {{ concat_strings(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
+      , {{ concat_strings(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
       , mm.year_month
       , 1 AS member_months_value
       , mpr.normalized_risk_score
@@ -199,8 +199,8 @@ SELECT
   , SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr) AS total_year_months
   , CASE
       WHEN SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr) > 0
-      THEN CAST(cd.member_months_value AS DECIMAL(10,4)) / SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr)
-      ELSE 0
+      THEN CAST(cd.member_months_value AS {{ dbt.type_numeric() }}) / SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr)
+      ELSE CAST(0 AS {{ dbt.type_numeric() }})
     END AS MonthAllocationFactor
   , cd.data_source
   , cd.patient_source_key
@@ -275,5 +275,5 @@ SELECT
   , cd.medical_paid
   , cd.total_allowed
   , cd.medical_allowed
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM combined_data_cte as cd

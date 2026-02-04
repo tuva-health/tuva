@@ -74,8 +74,10 @@ select
     {% endfor %}
     , cast(med.data_source as {{ dbt.type_string() }}) as data_source
     , cast(med.in_network_flag as int) as in_network_flag
-    , {{ try_to_cast_date('med.file_date', 'YYYY-MM-DD') }} as file_date
-    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
+    , cast(med.file_date as {{ dbt.type_timestamp() }}) as file_date
+    , cast(med.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
+    , cast(med.file_name as {{ dbt.type_string() }}) as file_name
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} as med
 left outer join {{ ref('normalized_input__int_admit_source_final') }} as ad_source
     on med.claim_id = ad_source.claim_id

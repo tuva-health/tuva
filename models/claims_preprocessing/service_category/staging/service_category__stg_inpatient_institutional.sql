@@ -60,7 +60,7 @@ select distinct
     a.claim_id
   , a.data_source
   , 'inpatient' as service_type
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as a
 inner join bill_type_requirement as d
   on a.claim_id = d.claim_id
@@ -76,7 +76,7 @@ select distinct
     a.claim_id
   , a.data_source
   , 'inpatient' as service_type
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as a
 inner join drg_requirement as c
   on a.claim_id = c.claim_id

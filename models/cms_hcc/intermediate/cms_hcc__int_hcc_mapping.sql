@@ -15,6 +15,7 @@ with conditions as (
 
     select
           person_id
+        , payer
         , condition_code
         , payment_year
         , collection_start_date
@@ -34,6 +35,20 @@ with conditions as (
         , cms_hcc_v28_flag
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
 
+    union all
+
+    -- Adding a mapping for the next year copying the current year mappings
+    select
+          payment_year + 1 as payment_year
+        , diagnosis_code
+        , cms_hcc_v24
+        , cms_hcc_v24_flag
+        , cms_hcc_v28
+        , cms_hcc_v28_flag
+    from {{ ref('cms_hcc__icd_10_cm_mappings') }}
+    where payment_year = (select max(payment_year) as payment_year from {{ ref('cms_hcc__icd_10_cm_mappings') }})
+
+
 )
 
 /* casting hcc_code to avoid formatting changes during union */
@@ -41,6 +56,7 @@ with conditions as (
 
     select distinct
           conditions.person_id
+        , conditions.payer
         , conditions.condition_code
         , conditions.payment_year
         , conditions.collection_start_date
@@ -59,6 +75,7 @@ with conditions as (
 
     select distinct
           conditions.person_id
+        , conditions.payer
         , conditions.condition_code
         , conditions.payment_year
         , conditions.collection_start_date
@@ -85,6 +102,7 @@ with conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(condition_code as {{ dbt.type_string() }}) as condition_code
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(model_version as {{ dbt.type_string() }}) as model_version
@@ -97,11 +115,12 @@ with conditions as (
 
 select
       person_id
+    , payer
     , condition_code
     , hcc_code
     , model_version
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

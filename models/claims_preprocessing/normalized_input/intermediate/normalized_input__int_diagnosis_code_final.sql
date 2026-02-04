@@ -12,7 +12,7 @@ select
     {% for i in diagnosis_cols %}
     , max(case when column_name = 'diagnosis_code_{{ i }}' then diagnosis_code else null end) as diagnosis_code_{{ i }}
     {% endfor %}
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__int_diagnosis_code_intermediate') }}
 group by
     claim_id

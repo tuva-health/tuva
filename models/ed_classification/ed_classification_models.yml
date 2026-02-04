@@ -19,12 +19,14 @@ models:
         description: Unique identifier for the emergency_department encounter.
       - name: ed_classification_description
         description: ED classification category.
-        meta:
-          terminology: https://thetuvaproject.com/value-sets/ed-classification
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/value-sets/ed-classification
       - name: ed_classification_order
         description: The order of the classification.
-        meta:
-          terminology: https://thetuvaproject.com/value-sets/ed-classification
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/value-sets/ed-classification
       - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_end_date
@@ -33,11 +35,11 @@ models:
         description: Year and month of the encounter end date.
       - name: primary_diagnosis_code
         description: >
-          Primary diagnosis code for the encounter. If from claims the primary 
-          diagnosis code comes from the institutional claim.
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-10-cm
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-10-cm
+            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
       - name: paid_amount
@@ -48,9 +50,10 @@ models:
         description: The total charge amount across all claims for the encounter.
       - name: facility_id
         description: The ID for the facility where the encounter occurred.
-        meta:
-          terminology: https://thetuvaproject.com/terminology/provider
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/provider
+            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: facility_name
         description: The name of the facility.
       - name: facility_state
@@ -65,8 +68,9 @@ models:
 #        description: The longitude of the facility.
       - name: patient_sex
         description: The sex of the patient.
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: patient_age
         description: The age of the patient at the time of the encounter.
       - name: patient_zip_code
@@ -77,12 +81,9 @@ models:
         description: The longitude for the patient.
       - name: patient_race
         description: The race of the patient.
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
-
-
-# Intermediate
-
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
   - name: ed_classification__int_filter_encounter_with_classification
     config:
       schema: |
@@ -122,4 +123,3 @@ models:
         {% else %}ed_classification{%- endif -%}
       tags: ed_classification
       materialized: ephemeral
-

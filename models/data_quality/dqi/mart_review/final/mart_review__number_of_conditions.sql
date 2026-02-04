@@ -23,6 +23,6 @@ select p.person_id
             "'|'",
             'p.data_source']) }} as patient_source_key
        , coalesce(cte.numofconditions, 0) as numofconditions
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__patient') }} as p
 left outer join cte on p.person_id = cte.person_id and p.data_source = cte.data_source

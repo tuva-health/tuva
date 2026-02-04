@@ -9,7 +9,7 @@
       , py.year_nbr
       , py.person_id
       , py.payer
-      , py.plan
+      , {{ column_ref('py', 'plan') }} as {{ quote_column('plan') }}
       , py.data_source
       , ep.paid_amount_pred
       , ep.outpatient_paid_amount_pred
@@ -82,7 +82,7 @@
       , ep.inpatient_psych_count_pred
       , ep.inpatient_rehabilitation_count_pred
       , ep.inpatient_skilled_nursing_count_pred
-      , '{{ var('tuva_last_run') }}' as tuva_last_run
+      , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     FROM {{ source('expected_values','person_year') }} as py
     INNER JOIN {{ source('expected_values', 'encounter_predictions') }} as ep
       ON py.benchmark_key = ep.benchmark_key
@@ -96,7 +96,7 @@
     , cast(null as DECIMAL) AS year_nbr
     , cast(null as {{ dbt.type_string() }}) AS person_id
     , cast(null as {{ dbt.type_string() }}) AS payer
-    , cast(null as {{ dbt.type_string() }}) AS plan
+    , cast(null as {{ dbt.type_string() }}) AS {{ quote_column('plan') }}
     , cast(null as {{ dbt.type_string() }}) AS data_source
     , cast(null as DECIMAL) AS paid_amount_pred
     , cast(null as DECIMAL) AS outpatient_paid_amount_pred
@@ -166,4 +166,4 @@
     , cast(null as DECIMAL) AS inpatient_psych_count_pred
     , cast(null as DECIMAL) AS inpatient_rehabilitation_count_pred
     , cast(null as DECIMAL) AS inpatient_skilled_nursing_count_pred
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run

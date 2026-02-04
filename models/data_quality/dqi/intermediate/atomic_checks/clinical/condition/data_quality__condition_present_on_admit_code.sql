@@ -18,6 +18,6 @@ select
           else null
     end as invalid_reason
     ,cast(m.present_on_admit_code as {{ dbt.type_string() }}) as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('condition') }} as m
 left outer join {{ ref('terminology__present_on_admission') }} as term on m.present_on_admit_code = term.present_on_admit_code

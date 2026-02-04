@@ -16,5 +16,5 @@ select
   , service_category_1
   , service_category_2
   , service_category_3
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from cte

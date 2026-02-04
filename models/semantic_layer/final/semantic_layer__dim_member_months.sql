@@ -7,8 +7,8 @@ WITH data_with_sks AS (
   SELECT
       mm.person_id
     , mm.data_source
-    , {{ dbt.concat(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
-    , {{ dbt.concat(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
+    , {{ concat_strings(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
+    , {{ concat_strings(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
     , mm.year_month
     , mm.payer
     , mm.{{ quote_column('plan') }}
@@ -40,5 +40,5 @@ SELECT
   , dws.custom_attributed_provider_practice
   , dws.custom_attributed_provider_organization
   , dws.custom_attributed_provider_lob
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM data_with_sks as dws

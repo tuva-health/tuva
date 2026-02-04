@@ -62,7 +62,7 @@ order by drill_down_key) as row_number_value
 
 select
     *
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from
     duplicates_summary
 where row_number_value <= 5
@@ -72,7 +72,7 @@ union all
 select
     *
     , 0 as duplicate_count
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from
     random_sample
 where

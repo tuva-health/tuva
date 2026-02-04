@@ -7,6 +7,7 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -21,6 +22,7 @@ with egfr_labs as (
     select distinct
           hcc_code
         , hcc_description
+        , cast('CMS-HCC-V28' as {{ dbt.type_string() }}) as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
@@ -29,7 +31,9 @@ with egfr_labs as (
 
     select distinct
           person_id
+        , payer
         , data_source
+        , model_version
         , hcc_code
         , current_year_billed
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
@@ -46,11 +50,13 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , max(result_date) as max_result_date
     from egfr_labs
     group by
           person_id
+        , payer
         , data_source
 
 )
@@ -59,6 +65,7 @@ with egfr_labs as (
 
     select
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , max_lab_date.max_result_date
         , max(egfr_labs.result_date) as lookback_result_date
@@ -69,6 +76,7 @@ with egfr_labs as (
     where egfr_labs.result_date <= {{ dateadd('day', -90, 'max_result_date') }}
     group by
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , max_lab_date.max_result_date
 
@@ -81,6 +89,7 @@ with egfr_labs as (
 
     select
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , egfr_labs.code_type
         , egfr_labs.code
@@ -89,12 +98,14 @@ with egfr_labs as (
         , row_number() over (
             partition by
                   egfr_labs.person_id
+                , egfr_labs.payer
                 , egfr_labs.data_source
             order by egfr_labs.result desc
         ) as row_num
     from egfr_labs
         inner join lab_lookback
         on egfr_labs.person_id = lab_lookback.person_id
+        and egfr_labs.payer = lab_lookback.payer
         and egfr_labs.data_source = lab_lookback.data_source
     where egfr_labs.result_date >= lab_lookback.lookback_result_date
 
@@ -113,11 +124,13 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code as lab_code
         , result_date
         , result
+        , cast('CMS-HCC-V28' as {{ dbt.type_string() }}) as model_version
         , case
             when result between 0 and 14 then '326'
             when result between 15 and 29 then '327'
@@ -148,10 +161,12 @@ with egfr_labs as (
 
     select
           unioned.person_id
+        , unioned.payer
         , unioned.data_source
         , unioned.result_date
         , unioned.result
         , unioned.lab_code
+        , unioned.model_version
         , unioned.hcc_code
         , unioned.contributing_factor
         , seed_hcc_descriptions.hcc_description
@@ -159,10 +174,13 @@ with egfr_labs as (
     from unioned
         inner join seed_hcc_descriptions
             on unioned.hcc_code = seed_hcc_descriptions.hcc_code
+            and unioned.model_version = seed_hcc_descriptions.model_version
         left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
+            and unioned.payer = billed_hccs.payer
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+            and unioned.model_version = billed_hccs.model_version
 
 )
 
@@ -170,10 +188,12 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , result_date
         , result
         , lab_code
+        , model_version
         , hcc_code
         , hcc_description
         , contributing_factor
@@ -188,10 +208,12 @@ with egfr_labs as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(result_date as date) as result_date
         , cast(result as {{ dbt.type_numeric() }}) as result
         , cast(lab_code as {{ dbt.type_string() }}) as lab_code
+        , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         {% if target.type == 'fabric' %}
@@ -208,15 +230,17 @@ with egfr_labs as (
 
 select
       person_id
+    , payer
     , data_source
     , result_date
     , result
     , lab_code
+    , model_version
     , hcc_code
     , hcc_description
     , current_year_billed
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

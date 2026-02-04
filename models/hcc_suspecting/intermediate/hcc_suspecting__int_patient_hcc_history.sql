@@ -7,12 +7,14 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , recorded_date
         , condition_type
         , icd_10_cm_code
         , hcc_code
         , hcc_description
+        , model_version
     from {{ ref('hcc_suspecting__int_all_conditions') }}
     where hcc_code is not null
 
@@ -22,7 +24,9 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
+        , model_version
         , hcc_code
         , hcc_description
         , min(recorded_date) as first_recorded
@@ -31,6 +35,8 @@ with all_conditions as (
     where hcc_code is not null
     group by
           person_id
+        , payer
+        , model_version
         , hcc_code
         , hcc_description
         , data_source
@@ -41,7 +47,9 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
+        , model_version
         , hcc_code
         , hcc_description
         , max(recorded_date) as last_billed
@@ -50,9 +58,11 @@ with all_conditions as (
     and lower(condition_type) <> 'problem'
     group by
           person_id
+        , payer
         , hcc_code
         , hcc_description
         , data_source
+        , model_version
 
 )
 
@@ -60,7 +70,9 @@ with all_conditions as (
 
     select
           hcc_grouped.person_id
+        , hcc_grouped.payer
         , hcc_grouped.data_source
+        , hcc_grouped.model_version
         , hcc_grouped.hcc_code
         , hcc_grouped.hcc_description
         , hcc_grouped.first_recorded
@@ -75,6 +87,8 @@ with all_conditions as (
     from hcc_grouped
          left outer join hcc_billed
          on hcc_grouped.person_id = hcc_billed.person_id
+         and hcc_grouped.payer = hcc_billed.payer
+         and hcc_grouped.model_version = hcc_billed.model_version
          and hcc_grouped.hcc_code = hcc_billed.hcc_code
          and hcc_grouped.data_source = hcc_billed.data_source
 
@@ -84,10 +98,12 @@ with all_conditions as (
 
     select distinct
           all_conditions.person_id
+        , all_conditions.payer
         , all_conditions.data_source
         , all_conditions.recorded_date
         , all_conditions.condition_type
         , all_conditions.icd_10_cm_code
+        , all_conditions.model_version
         , all_conditions.hcc_code
         , all_conditions.hcc_description
         , add_flag.first_recorded
@@ -109,6 +125,8 @@ with all_conditions as (
     from all_conditions
          left outer join add_flag
             on all_conditions.person_id = add_flag.person_id
+            and all_conditions.payer = add_flag.payer
+            and all_conditions.model_version = add_flag.model_version
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
 
@@ -118,10 +136,12 @@ with all_conditions as (
 
     select distinct
           person_id
+        , payer
         , data_source
         , recorded_date
         , condition_type
         , icd_10_cm_code
+        , model_version
         , hcc_code
         , hcc_description
         , first_recorded
@@ -148,10 +168,12 @@ with all_conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
         , cast(icd_10_cm_code as {{ dbt.type_string() }}) as icd_10_cm_code
+        , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(first_recorded as date) as first_recorded
@@ -171,10 +193,12 @@ with all_conditions as (
 
 select
       person_id
+    , payer
     , data_source
     , recorded_date
     , condition_type
     , icd_10_cm_code
+    , model_version
     , hcc_code
     , hcc_description
     , first_recorded
@@ -184,5 +208,5 @@ select
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

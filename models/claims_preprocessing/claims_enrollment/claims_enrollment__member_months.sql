@@ -24,12 +24,12 @@ with stg_eligibility as (
                   dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
-  from {{ ref('reference_data__calendar') }} as c
+  from {{ ref('reference_data__calendar') }}
   group by year, month, year_month
 )
 
 , joined as (
-select
+select distinct
   a.person_id
   , a.member_id
   , b.year_month

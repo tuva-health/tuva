@@ -6,9 +6,9 @@
 select
     encounter_id
   , person_id
-  , {{ dbt.concat(["person_id", "'|'", "data_source"]) }} as patient_source_key
-  , {{ dbt.concat(["person_id", "'|'", "TO_CHAR(encounter_start_date, 'YYYYMM')"]) }} as member_month_sk
-  , TO_CHAR(encounter_start_date, 'YYYYMM') as year_month
+  , {{ concat_strings(["person_id", "'|'", "data_source"]) }} as patient_source_key
+  , {{ concat_strings(["person_id", "'|'", the_tuva_project.yyyymm("encounter_start_date")]) }} as member_month_sk
+  , {{the_tuva_project.yyyymm("encounter_start_date")}} as year_month
   , eg.encounter_group_sk
   , et.encounter_type_sk
   , encounter_start_date
@@ -40,7 +40,7 @@ select
   , source_model
   , data_source
   , encounter_source_type
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('semantic_layer__stg_core__encounter') }} as e
 inner join {{ ref('semantic_layer__dim_encounter_group') }} as eg on e.encounter_group = eg.encounter_group
 inner join {{ ref('semantic_layer__dim_encounter_type') }} as et on e.encounter_type = et.encounter_type

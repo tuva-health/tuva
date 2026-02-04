@@ -50,6 +50,12 @@
 
 
 {% macro log_invocation_start() %}
+
+    {# Check if invocation autoupload is disabled #}
+    {% if var('disable_dbt_invocation_autoupload', false) %}
+        {% do log("Invocation autoupload is disabled, skipping invocation tracking", info=true) %}
+        {% do return('') %}
+    {% endif %}
     {# Check if Tuva resources are selected #}
     {% if not the_tuva_project.is_tuva_selected() %}
         {% do log("No Tuva resources selected, skipping invocation tracking", info=true) %}

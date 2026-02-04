@@ -48,14 +48,16 @@ seeds:
     columns:
       - name: icd_10_cm
         description: ICD-10-CM code
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-10-cm
       - name: description
         description: Description of the ICD-10-CM code
       - name: ccs_diagnosis_category
         description: CCS diagnosis category code
-        meta:
-          terminology: https://thetuvaproject.com/value-sets/ed-classification
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/value-sets/ed-classification
       - name: ccs_description
         description: Description of the CCS diagnosis category
 
@@ -92,8 +94,9 @@ seeds:
         tests:
           - unique
           - not_null
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-9-cm
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-9-cm
       - name: edcnnpa
         description: ED CNNPA category
       - name: edcnpa
@@ -144,8 +147,9 @@ seeds:
         tests:
           - unique
           - not_null
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-10-cm
       - name: edcnnpa
         description: ED CNNPA category
       - name: edcnpa

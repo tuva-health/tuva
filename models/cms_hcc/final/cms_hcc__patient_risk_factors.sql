@@ -5,6 +5,7 @@
 
 select
       person_id
+    , payer
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default
@@ -14,7 +15,7 @@ select
     , coefficient
     , model_version
     , payment_year
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('cms_hcc__patient_risk_factors_monthly') }}
 where collection_end_date = (
         select max(collection_end_date)

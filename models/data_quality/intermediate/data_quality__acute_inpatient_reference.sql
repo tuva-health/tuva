@@ -30,7 +30,7 @@ select m.analytics_concept
 ,m.analytics_measure
 ,data_source_value
 ,m.analytics_value
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join long_cte on long_cte.analytics_measure = m.analytics_measure
 and
@@ -45,7 +45,7 @@ select m.analytics_concept
 ,m.analytics_measure
 ,data_source_value
 ,m.analytics_value
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join long_cte on long_cte.analytics_measure = m.analytics_measure
 and

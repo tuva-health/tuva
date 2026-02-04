@@ -12,5 +12,5 @@ select
   , pce.brand_cost_per_unit
   , pce.generic_available
   , pce.generic_available_sk
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('pharmacy__pharmacy_claim_expanded') }} as pce

@@ -363,6 +363,6 @@ where e.encounter_type = 'acute inpatient'
 
 select final.*
 , coalesce(age_at_admit_with_null, h.avg_age_at_admit) as age_at_admit
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from final
 inner join handle_missing_age as h on final.data_source = h.data_source

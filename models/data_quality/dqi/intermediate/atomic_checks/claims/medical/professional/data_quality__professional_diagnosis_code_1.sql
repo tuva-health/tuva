@@ -28,6 +28,6 @@ select
         else null
     end as invalid_reason
     , {{ concat_custom(["m.diagnosis_code_1", "'|'", "coalesce(term.short_description, '')"]) }} as field_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from base as m
 left outer join {{ ref('terminology__icd_10_cm') }} as term on m.diagnosis_code_1 = term.icd_10_cm

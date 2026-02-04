@@ -7,7 +7,9 @@ with list as (
 
     select
           person_id
+        , payer
         , data_source
+        , model_version
         , hcc_code
         , hcc_description
         , reason
@@ -16,7 +18,9 @@ with list as (
         , row_number() over (
             partition by
                   person_id
+                , payer
                 , hcc_code
+                , model_version
             order by suspect_date desc
           ) as row_num
     from {{ ref('hcc_suspecting__list') }}
@@ -27,6 +31,8 @@ with list as (
 
     select
           person_id
+        , payer
+        , model_version
         , hcc_code
         , hcc_description
         , reason
@@ -41,6 +47,8 @@ with list as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(reason as {{ dbt.type_string() }}) as reason
@@ -52,10 +60,12 @@ with list as (
 
 select
       person_id
+    , payer
+    , model_version
     , hcc_code
     , hcc_description
     , reason
     , contributing_factor
     , latest_suspect_date
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

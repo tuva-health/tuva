@@ -7,7 +7,7 @@ select
   , e.person_id
   , e.year_number
   , e.encounter_id
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as e
 inner join {{ ref('pqi__value_sets') }} as hyp
   on e.primary_diagnosis_code = hyp.code

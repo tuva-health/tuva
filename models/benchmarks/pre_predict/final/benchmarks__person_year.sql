@@ -484,7 +484,7 @@ order by mm.person_id, mm.year_nbr) as benchmark_key
   , coalesce(phcc.hcc_186, 0) as hcc_186
   , coalesce(phcc.hcc_188, 0) as hcc_188
   , coalesce(phcc.hcc_189, 0) as hcc_189
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+, cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
 inner join {{ ref('benchmarks__stg_core__patient') }} as p

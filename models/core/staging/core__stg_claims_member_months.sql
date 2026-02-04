@@ -24,8 +24,7 @@ select
   , a.payer
   , a.{{ quote_column('plan') }}
   , a.data_source
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
   , b.payer_attributed_provider
   , b.payer_attributed_provider_practice
   , b.payer_attributed_provider_organization

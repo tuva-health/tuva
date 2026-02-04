@@ -104,7 +104,7 @@ select
 {% endfor %}
 
   -- run metadata stamp
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 
 from base as b
 left outer join {{ ref('benchmarks__pivot_condition') }} as pc

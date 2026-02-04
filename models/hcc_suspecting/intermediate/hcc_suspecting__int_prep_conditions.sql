@@ -7,6 +7,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , code_type
@@ -37,6 +39,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , 'icd-10-cm' as code_type
@@ -53,6 +57,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , code_type
@@ -75,6 +81,8 @@ with conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(claim_id as {{ dbt.type_string() }}) as claim_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
         , cast(code_type as {{ dbt.type_string() }}) as code_type
@@ -84,12 +92,15 @@ with conditions as (
 
 )
 
-select
+-- Need the distinct to remove cases where 2 snomed codes map to 1 ICD code for the same claim
+select distinct
       person_id
+    , payer
+    , claim_id
     , recorded_date
     , condition_type
     , code_type
     , code
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from add_data_types

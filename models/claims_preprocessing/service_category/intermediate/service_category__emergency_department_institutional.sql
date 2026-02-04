@@ -9,7 +9,7 @@ select distinct
     , med.data_source
     , 'emergency department' as service_category_2
     , 'emergency department' as service_category_3
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , '{{ this.name }}' as source_model_name
 from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
@@ -26,7 +26,7 @@ select distinct
     , med.data_source
     , 'emergency department' as service_category_2
     , 'emergency department' as service_category_3
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , '{{ this.name }}' as source_model_name
 from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as inp
