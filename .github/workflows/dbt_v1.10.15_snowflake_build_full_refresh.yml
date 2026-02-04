@@ -1,0 +1,55 @@
+name: Snowflake CICD Full Refresh
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from UI
+
+concurrency:
+  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
+  group: ci-testing
+  # Don't cancel in-progress runs automatically
+  cancel-in-progress: false
+
+jobs:
+  dbt_run:
+    name: dbt full refresh and test on Snowflake
+    runs-on: ubuntu-latest
+
+    env:
+      # Environment variables
+      DBT_PROJECT_DIR: "./integration_tests"
+      PYTHON_VERSION: "3.10"
+      DBT_CORE_VERSION: "1.10.15"
+
+      # Connection variables
+      DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
+      DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
+      DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}  
+      DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+      DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+      DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+      DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-snowflake
+
+      - name: Install dbt dependencies
+        run: dbt deps --profiles-dir ./integration_tests/profiles/snowflake
+
+      - name: Test Connection
+        run: dbt debug --profiles-dir ./integration_tests/profiles/snowflake
+
+      - name: Run build models
+        run: dbt build --full-refresh --profiles-dir ./integration_tests/profiles/snowflake

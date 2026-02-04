@@ -1,0 +1,13 @@
+default:
+  target: ci
+  outputs:
+    ci:
+      type: bigquery
+      method: service-account
+      keyfile: ./creds.json
+      project: "{{ env_var('DBT_BIGQUERY_CI_PROJECT') }}"
+      dataset: connector
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      priority: interactive
