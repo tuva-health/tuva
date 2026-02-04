@@ -1,0 +1,13 @@
+default:
+    target: ci
+    outputs:
+      ci:
+        type: databricks
+        host: "{{ env_var('DBT_DATABRICKS_CI_HOST') }}"
+        http_path: "{{ env_var('DBT_DATABRICKS_CI_HTTP_PATH') }}"
+        token: "{{ env_var('DBT_DATABRICKS_CI_TOKEN') }}"
+        catalog: "{{ env_var('DBT_DATABRICKS_CI_CATALOG') }}"
+        schema: default
+        threads: 8
+        connect_timeout: 60
+        connect_retries: 3
