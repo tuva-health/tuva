@@ -15,6 +15,8 @@ select
   , claim_line_number as procedure_sequence_id
   , person_id
   , member_id
+  , payer
+  , {{ quote_column('plan') }}
   , coalesce(claim_line_start_date
            , claim_start_date
            , admission_date
@@ -46,6 +48,8 @@ select
   , {{ i }} as procedure_sequence_id
   , person_id
   , member_id
+  , payer
+  , {{ quote_column('plan') }}
   , procedure_date_{{ i }} as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_{{ i }} as source_code
@@ -115,6 +119,8 @@ select distinct
     , cast(unpivot_cte.practitioner_npi as {{ dbt.type_string() }}) as practitioner_id
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
+    , cast(unpivot_cte.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and

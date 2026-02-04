@@ -7,6 +7,8 @@ select
       encounter_id
     , claim_id
     , person_id
+    , payer
+    , {{ quote_column('plan') }}
     , normalized_code
     , code_description
     , ccsr_category

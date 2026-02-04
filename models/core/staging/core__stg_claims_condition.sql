@@ -14,6 +14,7 @@ with unpivot_cte as (
         claim_id
         , claim_line_number
         , payer
+        , {{ quote_column('plan') }}
         , person_id
         , member_id
         , coalesce(admission_date
@@ -76,6 +77,7 @@ select distinct
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
+    , cast(unpivot_cte.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and

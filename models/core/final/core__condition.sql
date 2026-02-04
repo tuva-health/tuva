@@ -12,12 +12,12 @@ with all_conditions as (
     select *
     from {{ ref('core__stg_claims_condition') }}
     union all
-    select cond.*, 'clinical source' as payer
+    select cond.*, 'clinical source' as payer, cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     from {{ ref('core__stg_clinical_condition') }} as cond
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-    select *, 'clinical source' as payer
+    select *, 'clinical source' as payer, cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     from {{ ref('core__stg_clinical_condition') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -34,6 +34,7 @@ with all_conditions as (
 select
     all_conditions.condition_id
   , all_conditions.payer
+  , all_conditions.{{ quote_column('plan') }}
   , all_conditions.person_id
   , all_conditions.member_id
   , all_conditions.patient_id
@@ -91,6 +92,7 @@ left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
 select
     all_conditions.condition_id
   , all_conditions.payer
+  , all_conditions.{{ quote_column('plan') }}
   , all_conditions.person_id
   , all_conditions.member_id
   , all_conditions.patient_id

@@ -8,6 +8,7 @@ with hcc_history_suspects as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -26,6 +27,7 @@ with hcc_history_suspects as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -42,6 +44,7 @@ with hcc_history_suspects as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -58,6 +61,7 @@ with hcc_history_suspects as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -74,6 +78,7 @@ with hcc_history_suspects as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -102,6 +107,7 @@ with hcc_history_suspects as (
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(payer as {{ dbt.type_string() }}) as payer
+    , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast(model_version as {{ dbt.type_string() }}) as model_version
     , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code

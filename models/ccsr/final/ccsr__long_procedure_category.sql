@@ -19,6 +19,8 @@ select distinct
       procedures.encounter_id
     , procedures.claim_id
     , procedures.person_id
+    , procedures.payer
+    , procedures.{{ quote_column('plan') }}
     , procedures.normalized_code
     , ccsr__procedure_category_map.code_description
     , ccsr__procedure_category_map.ccsr_parent_category
