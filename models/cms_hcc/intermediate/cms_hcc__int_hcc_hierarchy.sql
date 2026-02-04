@@ -97,7 +97,7 @@ with hcc_mapping as (
         , hccs_with_hierarchy.collection_start_date
         , hccs_with_hierarchy.collection_end_date
         , hccs_with_hierarchy.hcc_code
-        , min(hcc_mapping.hcc_code) as top_level_hcc
+        , min(cast(hcc_mapping.hcc_code as integer)) as top_level_hcc_num
     from hccs_with_hierarchy
         left outer join hcc_mapping
             on hcc_mapping.person_id = hccs_with_hierarchy.person_id
@@ -131,7 +131,7 @@ with hcc_mapping as (
         , collection_start_date
         , collection_end_date
         , case
-            when top_level_hcc is not null then top_level_hcc
+            when top_level_hcc_num is not null then cast(top_level_hcc_num as {{ dbt.type_string() }})
             else hcc_code
           end as hcc_code
     from hierarchy_applied
@@ -171,7 +171,7 @@ with hcc_mapping as (
             and hcc_mapping.payment_year = hierarchy_applied.payment_year
             and hcc_mapping.collection_end_date = hierarchy_applied.collection_end_date
     where lower_level_inclusions.hcc_code is null
-        and hierarchy_applied.top_level_hcc is null
+        and hierarchy_applied.top_level_hcc_num is null
 
 )
 
