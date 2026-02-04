@@ -9,7 +9,7 @@
       , py.year_nbr
       , py.person_id
       , py.payer
-      , py.plan
+      , {{ column_ref('py', 'plan') }} as {{ quote_column('plan') }}
       , py.data_source
       , ep.paid_amount_pred
       , ep.outpatient_paid_amount_pred
@@ -96,7 +96,7 @@
     , cast(null as DECIMAL) AS year_nbr
     , cast(null as {{ dbt.type_string() }}) AS person_id
     , cast(null as {{ dbt.type_string() }}) AS payer
-    , cast(null as {{ dbt.type_string() }}) AS plan
+    , cast(null as {{ dbt.type_string() }}) AS {{ quote_column('plan') }}
     , cast(null as {{ dbt.type_string() }}) AS data_source
     , cast(null as DECIMAL) AS paid_amount_pred
     , cast(null as DECIMAL) AS outpatient_paid_amount_pred

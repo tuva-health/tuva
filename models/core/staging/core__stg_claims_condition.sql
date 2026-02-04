@@ -7,33 +7,60 @@
 -- This dbt model creates the condition table in core.
 -- *************************************************
 
-with unpivot_cte as (
+-- The codes need to be brought in like this since a single diagnosis column can have multiple different diagnosis
+-- TODO: Add test to ensure all diagnosis in the medical claim are being brought through and none are being lost
+with combine_diag_poa as (
+ select
+      diag.claim_id
+    , diag.data_source
+    , diag.diagnosis_code_type as source_code_type
+    , diag.diagnosis_code as source_code
+    , cast('discharge_diagnosis' as {{ dbt.type_string() }}) as condition_type
+    {% if target.type == 'fabric' %}
+    , reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) as diagnosis_rank
+    {% else %}
+    , {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} as diagnosis_rank
+    {% endif %}
+    , poa.normalized_code as present_on_admit_code
+ from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} as diag
+  -- noqa: disable=ambiguous.join 
+ left join {{ ref('normalized_input__int_present_on_admit_voting') }} as poa
+    on diag.claim_id = poa.claim_id
+    and diag.data_source = poa.data_source
+    {% if target.type == 'fabric' %}
+    and reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) = reverse(left(reverse(poa.column_name), charindex('_', reverse(poa.column_name)) - 1))
+    {% else %}
+    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
+    {% endif %}
+  -- noqa: enable=ambiguous.join
+)
 
-  {% for i in range(1, 26) %}
-  select
-        claim_id
-        , claim_line_number
-        , payer
-        , person_id
-        , member_id
-        , coalesce(admission_date
-                 , claim_start_date
-                 , discharge_date
-                 , claim_end_date
-          ) as recorded_date
-        , 'discharge_diagnosis' as condition_type
-        , diagnosis_code_type as source_code_type
-        , diagnosis_code_{{ i }} as source_code
-        , {{ i }} as diagnosis_rank
-        , diagnosis_poa_{{ i }} as present_on_admit_code
-        , data_source
-  from {{ ref('normalized_input__medical_claim') }}
-  where diagnosis_code_{{ i }} is not null
-  {% if not loop.last %}
-  union all
-  {% endif %}
-  {% endfor %}
-
+, unpivot_cte as (
+select
+      code.claim_id
+    , med.claim_line_number
+    , med.payer
+    , med.person_id
+    , med.member_id
+    , coalesce(med.admission_date
+             , med.claim_start_date
+             , med.discharge_date
+             , med.claim_end_date
+      ) as recorded_date
+    , code.data_source
+    , code.source_code_type
+    , code.source_code
+    , code.condition_type
+    , code.diagnosis_rank
+    , code.present_on_admit_code
+-- Using this CTE since normalized_input__medical_claim is missing diagnosis due to the max
+-- in normalized_input__int_diagnosis_code_final. Some diagnosis columns have more than 1 diagnosis
+-- and we want all possible diagnosis.
+from combine_diag_poa as code
+inner join {{ ref('normalized_input__medical_claim') }} as med
+    on code.claim_id = med.claim_id
+    and code.data_source = med.data_source
+where code.source_code is not null
 )
 
 select distinct

@@ -863,7 +863,7 @@ Date the medication was prescribed.
 {% enddocs %}
 
 {% docs prescribing_provider_id %}
-ID for the provider that wrote the prescription (e.g. priamry care physician).
+ID for the provider that wrote the prescription (e.g., primary care physician).
 {% enddocs %}
 
 {% docs prescribing_provider_name %}
@@ -1223,7 +1223,7 @@ State for the patient (most recent known address).
 {% enddocs %}
 
 {% docs fips_state_abbreviation %}
-Abbreviated form of the state for the patient (most recient known address).
+Abbreviated form of the state for the patient (most recent known address).
 {% enddocs %}
 
 {% docs hedis_measure_id %}

@@ -1,0 +1,8 @@
+default:
+  target: ci
+  outputs:
+    ci:
+      type: duckdb
+      path: "{{ env_var('DBT_MOTHERDUCK_CI_PATH') }}"
+      threads: 4
+
