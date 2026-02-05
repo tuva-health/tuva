@@ -5,6 +5,8 @@
 select
       procedure_id
     , person_id
+    , payer
+    , {{ quote_column('plan') }}
     , claim_id
     , encounter_id
     , normalized_code_type

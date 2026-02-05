@@ -14,6 +14,8 @@
 
 select
     aa.encounter_id
+    , aa.payer
+    , aa.{{ quote_column('plan') }}
     , aa.normalized_code as procedure_code
     , case
         when bb.icd_10_pcs is null then 0

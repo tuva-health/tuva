@@ -6,6 +6,8 @@
 
 select
     person_id
+    , payer
+    , {{ quote_column('plan') }}
     , normalized_code
     , recorded_date
 from {{ ref('core__condition') }}

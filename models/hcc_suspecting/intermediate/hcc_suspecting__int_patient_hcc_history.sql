@@ -8,6 +8,7 @@ with all_conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , recorded_date
         , condition_type
@@ -25,6 +26,7 @@ with all_conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -36,6 +38,7 @@ with all_conditions as (
     group by
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , model_version
         , hcc_code
         , hcc_description
@@ -48,6 +51,7 @@ with all_conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -59,6 +63,7 @@ with all_conditions as (
     group by
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , hcc_code
         , hcc_description
         , data_source
@@ -71,6 +76,7 @@ with all_conditions as (
     select
           hcc_grouped.person_id
         , hcc_grouped.payer
+        , hcc_grouped.{{ quote_column('plan') }}
         , hcc_grouped.data_source
         , hcc_grouped.model_version
         , hcc_grouped.hcc_code
@@ -88,6 +94,7 @@ with all_conditions as (
          left outer join hcc_billed
          on hcc_grouped.person_id = hcc_billed.person_id
          and hcc_grouped.payer = hcc_billed.payer
+         and hcc_grouped.{{ quote_column('plan') }} = hcc_billed.{{ quote_column('plan') }}
          and hcc_grouped.model_version = hcc_billed.model_version
          and hcc_grouped.hcc_code = hcc_billed.hcc_code
          and hcc_grouped.data_source = hcc_billed.data_source
@@ -99,6 +106,7 @@ with all_conditions as (
     select distinct
           all_conditions.person_id
         , all_conditions.payer
+        , all_conditions.{{ quote_column('plan') }}
         , all_conditions.data_source
         , all_conditions.recorded_date
         , all_conditions.condition_type
@@ -126,6 +134,7 @@ with all_conditions as (
          left outer join add_flag
             on all_conditions.person_id = add_flag.person_id
             and all_conditions.payer = add_flag.payer
+            and all_conditions.{{ quote_column('plan') }} = add_flag.{{ quote_column('plan') }}
             and all_conditions.model_version = add_flag.model_version
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
@@ -137,6 +146,7 @@ with all_conditions as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , recorded_date
         , condition_type
@@ -169,6 +179,7 @@ with all_conditions as (
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
@@ -194,6 +205,7 @@ with all_conditions as (
 select
       person_id
     , payer
+    , {{ quote_column('plan') }}
     , data_source
     , recorded_date
     , condition_type

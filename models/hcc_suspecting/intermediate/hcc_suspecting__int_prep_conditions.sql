@@ -8,6 +8,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , claim_id
         , recorded_date
         , condition_type
@@ -40,6 +41,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , claim_id
         , recorded_date
         , condition_type
@@ -58,6 +60,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , claim_id
         , recorded_date
         , condition_type
@@ -82,6 +85,7 @@ with conditions as (
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , cast(claim_id as {{ dbt.type_string() }}) as claim_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
@@ -96,6 +100,7 @@ with conditions as (
 select distinct
       person_id
     , payer
+    , {{ quote_column('plan') }}
     , claim_id
     , recorded_date
     , condition_type

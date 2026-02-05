@@ -13,6 +13,8 @@ with chronic_conditions as (
 
     select
           person_id
+        , payer
+        , {{ quote_column('plan') }}
         , claim_id
         , recorded_date as start_date
         , normalized_code_type as code_type
@@ -53,6 +55,8 @@ with chronic_conditions as (
 
     select
           patient_conditions.person_id
+        , patient_conditions.payer
+        , patient_conditions.{{ quote_column('plan') }}
         , patient_conditions.claim_id
         , patient_conditions.start_date
         , patient_conditions.data_source
@@ -72,6 +76,8 @@ with chronic_conditions as (
 
     select
           patient_ms_drgs.person_id
+        , cast(null as {{ dbt.type_string() }}) as payer
+        , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , patient_ms_drgs.claim_id
         , patient_ms_drgs.start_date
         , patient_ms_drgs.data_source
@@ -91,6 +97,8 @@ with chronic_conditions as (
 
     select
           patient_procedures.person_id
+        , cast(null as {{ dbt.type_string() }}) as payer
+        , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , patient_procedures.claim_id
         , patient_procedures.start_date
         , patient_procedures.data_source
@@ -143,6 +151,8 @@ with chronic_conditions as (
 
 select distinct
       cast(inclusions_unioned.person_id as {{ dbt.type_string() }}) as person_id
+    , cast(inclusions_unioned.payer as {{ dbt.type_string() }}) as payer
+    , cast(inclusions_unioned.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast(inclusions_unioned.claim_id as {{ dbt.type_string() }}) as claim_id
     , cast(inclusions_unioned.start_date as date) as start_date
     , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }}) as chronic_condition_type
