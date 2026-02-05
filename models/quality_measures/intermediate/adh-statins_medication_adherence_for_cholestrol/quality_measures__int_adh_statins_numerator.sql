@@ -165,8 +165,8 @@ or use the current rx_fill_date
       , dispensing_date
       , days_supply
       , adjusted_fill_date
-      , least(
-            {{ dbt.dateadd (
+      , {{ least(
+            dbt.dateadd (
                 datepart = "day"
               , interval = -1
               , from_date_or_timestamp =
@@ -175,9 +175,9 @@ or use the current rx_fill_date
                       , interval = "days_supply"
                       , from_date_or_timestamp = "adjusted_fill_date"
               )
-            ) }}
-          , performance_period_end
-      ) as actual_end_date
+            )
+          , "performance_period_end"
+      ) }} as actual_end_date
     from adjusted_fill_dates
     inner join performance_end
       on adjusted_fill_dates.adjusted_fill_date <= performance_end.performance_period_end

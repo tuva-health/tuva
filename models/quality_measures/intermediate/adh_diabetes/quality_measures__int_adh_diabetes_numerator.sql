@@ -161,8 +161,8 @@ order by dispensing_date) as previous_ndc
       , dispensing_date
       , days_supply
       , adjusted_start_date
-      , least(
-            {{ dbt.dateadd (
+      , {{ least(
+            dbt.dateadd (
                 datepart = "day"
               , interval = -1
               , from_date_or_timestamp =
@@ -171,9 +171,9 @@ order by dispensing_date) as previous_ndc
                       , interval = "days_supply"
                       , from_date_or_timestamp = "adjusted_start_date"
               )
-            ) }}
-          , performance_period_end
-      ) as final_end_date
+            )
+          , "performance_period_end"
+      ) }} as final_end_date
     from adjusted_fills
     inner join performance_end
       on adjusted_fills.adjusted_start_date <= performance_end.performance_period_end
