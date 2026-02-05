@@ -1,0 +1,12 @@
+default:
+  target: ci
+  outputs:
+    ci:
+      type: redshift
+      host: "{{ env_var('DBT_REDSHIFT_CI_HOST') }}"
+      user: "{{ env_var('DBT_REDSHIFT_CI_USER') }}"
+      password: "{{ env_var('DBT_REDSHIFT_CI_PASSWORD') }}"
+      dbname: "{{ env_var('DBT_REDSHIFT_CI_DATABASE') }}"
+      schema: public
+      port: 5439
+      threads: 4

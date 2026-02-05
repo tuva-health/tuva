@@ -101,8 +101,8 @@ combined_data_cte AS (
     SELECT
         mm.person_id
       , mm.data_source
-      , {{ dbt.concat(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
-      , {{ dbt.concat(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
+      , {{ concat_strings(["mm.person_id", "'|'", "mm.data_source"]) }} AS patient_source_key
+      , {{ concat_strings(["mm.person_id", "'|'", "mm.year_month"]) }} as member_month_sk
       , mm.year_month
       , 1 AS member_months_value
       , mpr.normalized_risk_score
@@ -199,8 +199,8 @@ SELECT
   , SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr) AS total_year_months
   , CASE
       WHEN SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr) > 0
-      THEN CAST(cd.member_months_value AS DECIMAL(10,4)) / SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr)
-      ELSE CAST(0 AS DECIMAL(10,4))
+      THEN CAST(cd.member_months_value AS {{ dbt.type_numeric() }}) / SUM(cd.member_months_value) OVER (PARTITION BY cd.person_id, cd.year_nbr)
+      ELSE CAST(0 AS {{ dbt.type_numeric() }})
     END AS MonthAllocationFactor
   , cd.data_source
   , cd.patient_source_key
