@@ -5,7 +5,7 @@
 
 SELECT 
     p.person_id
-  , {{ dbt.concat(["p.person_id", "'|'", "p.data_source"]) }} as person_sk
+  , {{ concat_strings(["p.person_id", "'|'", "p.data_source"]) }} as person_sk
   , p.name_suffix
   , p.first_name
   , p.middle_name

@@ -6,13 +6,11 @@
 SELECT
     e.encounter_id
   , e.person_id
-  , {{ dbt.concat(["e.person_id", "'|'", year_month('e.encounter_start_date')]) }} as member_month_sk
-  , coalesce({{ dbt.safe_cast('s.ed_classification_order', dbt.type_int()) }}, 99) as ed_classification_order
+  , {{ concat_strings(["e.person_id", "'|'", the_tuva_project.yyyymm("e.encounter_start_date")]) }} as member_month_sk
+  , coalesce({{ try_to_cast_int('s.ed_classification_order') }}, 99) as ed_classification_order
   , coalesce(s.ed_classification_description, 'Unclassified') as ed_classification_description
-  , case when {{ dbt.safe_cast('s.ed_classification_order', dbt.type_int()) }} <= 3 then 1 else 0 end as avoidable
-  , case when s.encounter_id is null then 'Unclassified'
-        when {{ dbt.safe_cast('s.ed_classification_order', dbt.type_int()) }} <= 3 then s.ed_classification_description
-        else 'Non-Avoidable' end as avoidable_category
+  , case when {{ try_to_cast_int('s.ed_classification_order') }} <= 3 then 1 else 0 end as avoidable
+  , case when {{ try_to_cast_int('s.ed_classification_order') }} <= 3 then s.ed_classification_description else null end as avoidable_description
   , e.paid_amount
   , e.allowed_amount
   , e.charge_amount
