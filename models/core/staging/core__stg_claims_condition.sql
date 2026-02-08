@@ -23,7 +23,7 @@ with combine_diag_poa as (
     {% endif %}
     , poa.normalized_code as present_on_admit_code
  from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} as diag
-  -- noqa: disable=ambiguous.join 
+  -- noqa: disable=ambiguous.join
  left join {{ ref('normalized_input__int_present_on_admit_voting') }} as poa
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
@@ -40,6 +40,7 @@ select
       code.claim_id
     , med.claim_line_number
     , med.payer
+    , med.{{ quote_column('plan') }}
     , med.person_id
     , med.member_id
     , coalesce(med.admission_date
@@ -103,6 +104,7 @@ select distinct
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
+    , cast(unpivot_cte.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and

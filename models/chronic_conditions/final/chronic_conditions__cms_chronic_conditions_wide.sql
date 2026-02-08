@@ -16,6 +16,8 @@ with chronic_conditions as (
 
     select
           chronic_conditions_unioned.person_id
+        , chronic_conditions_unioned.payer
+        , chronic_conditions_unioned.{{ quote_column('plan') }}
         , chronic_conditions.condition_column_name
         , 1 as condition_count
     from {{ ref('chronic_conditions__cms_chronic_conditions_long') }} as chronic_conditions_unioned
@@ -26,6 +28,8 @@ with chronic_conditions as (
 
 select
       p.person_id
+    , conditions.payer
+    , conditions.{{ quote_column('plan') }}
     , {{ dbt_utils.pivot(
           column='condition_column_name'
         , values=dbt_utils.get_column_values(
@@ -44,3 +48,5 @@ from {{ ref('cms_chronic_conditions__stg_core__patient') }} as p
         on p.person_id = conditions.person_id
 group by
     p.person_id
+    , conditions.payer
+    , conditions.{{ quote_column('plan') }}

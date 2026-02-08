@@ -4,6 +4,8 @@
 }}
 select
       person_id
+    , payer
+    , {{ quote_column('plan') }}
     , encounter_id
     , procedure_date
     , source_code_type

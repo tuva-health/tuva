@@ -5,6 +5,8 @@
 
 select
       person_id
+    , payer
+    , {{ quote_column('plan') }}
     , normalized_code
     , recorded_date
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run

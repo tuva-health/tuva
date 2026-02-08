@@ -8,6 +8,8 @@
 with cte as (
     select distinct
         a.person_id
+        , a.payer
+        , a.{{ quote_column('plan') }}
         , cal.year as year_nbr
     {% if target.type == 'bigquery' %}
         -- BigQuery syntax: Use "'" to represent a single quote character in a string
@@ -28,6 +30,8 @@ with cte as (
 , condition_flags as (
 select
  person_id as condition_person_id
+, payer as condition_payer
+, {{ quote_column('plan') }} as condition_plan
 , year_nbr as condition_year_nbr
 , max(case when cleaned_concept_name = 'hip_fracture' then 1 else 0 end) as hip_fracture
 , max(case when cleaned_concept_name = 'type_1_diabetes_mellitus' then 1 else 0 end) as type_1_diabetes_mellitus
@@ -103,11 +107,15 @@ select
 , max(case when cleaned_concept_name = 'gastroesophageal_reflux' then 1 else 0 end) as gastroesophageal_reflux
 from cte
  group by person_id
+, payer
+, {{ quote_column('plan') }}
 , year_nbr
 )
 
 select
 f.condition_person_id as person_id
+, f.condition_payer as payer
+, f.condition_plan as {{ quote_column('plan') }}
 , f.condition_year_nbr as year_nbr
 , coalesce(hip_fracture, 0) as hip_fracture
 , coalesce(type_1_diabetes_mellitus, 0) as type_1_diabetes_mellitus

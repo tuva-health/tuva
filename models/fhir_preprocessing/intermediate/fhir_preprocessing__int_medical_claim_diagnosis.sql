@@ -6,6 +6,8 @@ with staging as (
 
     select
           medical_claim.claim_id
+        , claim_condition.payer
+        , claim_condition.{{ quote_column('plan') }}
         , claim_condition.condition_rank as eob_diagnosis_sequence
         , case
             when lower(claim_condition.normalized_code_type) = 'icd-10-cm' then 'ICD10'

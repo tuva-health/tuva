@@ -4,6 +4,8 @@
 }}
 select distinct
       cast(condition.person_id as {{ dbt.type_string() }} ) as patient_internal_id
+    , cast(condition.payer as {{ dbt.type_string() }} ) as payer
+    , cast(condition.{{ quote_column('plan') }} as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
     , cast(condition.condition_id as {{ dbt.type_string() }} ) as resource_internal_id
     , cast(condition.encounter_id as {{ dbt.type_string() }} ) as encounter_internal_id
     , 'encounter-diagnosis' as condition_category

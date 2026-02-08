@@ -8,6 +8,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , claim_id
         , recorded_date
         , condition_type
@@ -74,6 +75,7 @@ where seed_2.payment_year = (select max(payment_year) as payment_year from seed_
     select
           conditions.person_id
         , conditions.payer
+        , conditions.{{ quote_column('plan') }}
         , conditions.claim_id
         , conditions.recorded_date
         , conditions.condition_type
@@ -97,6 +99,7 @@ where seed_2.payment_year = (select max(payment_year) as payment_year from seed_
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , cast(claim_id as {{ dbt.type_string() }}) as claim_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
@@ -112,6 +115,7 @@ where seed_2.payment_year = (select max(payment_year) as payment_year from seed_
 select
       person_id
     , payer
+    , {{ quote_column('plan') }}
     , claim_id
     , recorded_date
     , condition_type

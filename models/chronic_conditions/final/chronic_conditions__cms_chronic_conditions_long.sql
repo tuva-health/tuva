@@ -27,6 +27,8 @@ with conditions_unioned as (
 
 select
       person_id
+    , payer
+    , {{ quote_column('plan') }}
     , claim_id
     , start_date
     , chronic_condition_type

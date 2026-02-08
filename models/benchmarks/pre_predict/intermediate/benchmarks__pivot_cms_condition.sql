@@ -7,6 +7,8 @@
 with cte as (
     select distinct
         a.person_id
+        , a.payer
+        , a.{{ quote_column('plan') }}
         , cal.year as year_nbr
     {% if target.type == 'bigquery' %}
         -- BigQuery syntax: Use "'" to represent a single quote character in a string
@@ -25,6 +27,8 @@ with cte as (
 , condition_flags as (
 select
  person_id as condition_person_id
+, payer as condition_payer
+, {{ quote_column('plan') }} as condition_plan
 , year_nbr as condition_year_nbr
 , max(case when cleaned_concept_name = 'acute_myocardial_infarction' then 1 else 0 end) as cms_acute_myocardial_infarction
 , max(case when cleaned_concept_name = 'adhd_conduct_disorders_and_hyperkinetic_syndrome' then 1 else 0 end) as cms_adhd_conduct_disorders_and_hyperkinetic_syndrome
@@ -105,12 +109,16 @@ select
 from cte
 group by
 person_id
+, payer
+, {{ quote_column('plan') }}
 , year_nbr
 
 )
 
 select
 f.condition_person_id as person_id
+, f.condition_payer as payer
+, f.condition_plan as {{ quote_column('plan') }}
 , f.condition_year_nbr as year_nbr
 , coalesce(cms_acute_myocardial_infarction, 0) as cms_acute_myocardial_infarction
 , coalesce(cms_adhd_conduct_disorders_and_hyperkinetic_syndrome, 0) as cms_adhd_conduct_disorders_and_hyperkinetic_syndrome

@@ -25,6 +25,8 @@ select
       condition.encounter_id
     , condition.claim_id
     , condition.person_id
+    , condition.payer
+    , condition.{{ quote_column('plan') }}
     , condition.normalized_code
     , ccsr__dx_vertical_pivot.code_description
     , condition.condition_rank

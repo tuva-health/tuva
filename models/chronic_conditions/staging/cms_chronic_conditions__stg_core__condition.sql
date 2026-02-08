@@ -6,6 +6,8 @@
 select
       claim_id
     , person_id
+    , payer
+    , {{ quote_column('plan') }}
     , recorded_date
     , normalized_code_type
     , normalized_code

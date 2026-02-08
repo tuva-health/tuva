@@ -8,6 +8,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , recorded_date
         , condition_type
         , code_type
@@ -43,6 +44,7 @@ with conditions as (
     select distinct
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -57,6 +59,7 @@ with conditions as (
     select
           conditions.person_id
         , conditions.payer
+        , conditions.{{ quote_column('plan') }}
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -67,6 +70,7 @@ with conditions as (
             partition by
                   conditions.person_id
                 , conditions.payer
+                , conditions.{{ quote_column('plan') }}
                 , conditions.data_source
             order by
                   conditions.recorded_date desc
@@ -88,6 +92,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , recorded_date
         , condition_type
         , code_type
@@ -104,6 +109,7 @@ with conditions as (
     select
           conditions.person_id
         , conditions.payer
+        , conditions.{{ quote_column('plan') }}
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -114,6 +120,7 @@ with conditions as (
             partition by
                   conditions.person_id
                 , conditions.payer
+                , conditions.{{ quote_column('plan') }}
                 , conditions.data_source
             order by
                   conditions.recorded_date desc
@@ -131,6 +138,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , recorded_date
         , condition_type
         , code_type
@@ -147,6 +155,7 @@ with conditions as (
     select
           diabetes_dedupe.person_id
         , diabetes_dedupe.payer
+        , diabetes_dedupe.{{ quote_column('plan') }}
         , diabetes_dedupe.data_source
         , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
@@ -161,6 +170,7 @@ with conditions as (
         inner join ckd_stage_1_or_2_dedupe
             on diabetes_dedupe.person_id = ckd_stage_1_or_2_dedupe.person_id
             and diabetes_dedupe.payer = ckd_stage_1_or_2_dedupe.payer
+            and diabetes_dedupe.{{ quote_column('plan') }} = ckd_stage_1_or_2_dedupe.{{ quote_column('plan') }}
             and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
             and {{ date_part('year', 'diabetes_dedupe.recorded_date') }} = {{ date_part('year', 'ckd_stage_1_or_2_dedupe.recorded_date') }}
@@ -181,6 +191,7 @@ with conditions as (
     select
           unioned.person_id
         , unioned.payer
+        , unioned.{{ quote_column('plan') }}
         , unioned.data_source
         , unioned.model_version
         , unioned.hcc_code
@@ -196,6 +207,7 @@ with conditions as (
         left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
             and unioned.payer = billed_hccs.payer
+            and unioned.{{ quote_column('plan') }} = billed_hccs.{{ quote_column('plan') }}
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
             and unioned.model_version = billed_hccs.model_version
@@ -207,6 +219,7 @@ with conditions as (
     select
           person_id
         , payer
+        , {{ quote_column('plan') }}
         , data_source
         , model_version
         , hcc_code
@@ -243,6 +256,7 @@ with conditions as (
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
@@ -268,6 +282,7 @@ with conditions as (
 select
       person_id
     , payer
+    , {{ quote_column('plan') }}
     , data_source
     , model_version
     , hcc_code

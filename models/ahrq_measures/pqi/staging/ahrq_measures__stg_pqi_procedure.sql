@@ -6,6 +6,8 @@ select
     normalized_code_type
   , normalized_code
   , encounter_id
+  , payer
+  , {{ quote_column('plan') }}
   , data_source
 from
     {{ ref('core__procedure') }}

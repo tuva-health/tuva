@@ -6,6 +6,7 @@
 select
       person_id
     , payer
+    , {{ quote_column('plan') }}
     , data_source
     , model_version
     , hcc_code

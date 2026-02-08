@@ -6,6 +6,8 @@ with add_sequence as (
 
     select
           claim_id
+        , payer
+        , {{ quote_column('plan') }}
         , procedure_id
         , row_number() over(
             partition by claim_id
@@ -19,6 +21,8 @@ with add_sequence as (
 
     select
           medical_claim.claim_id
+        , add_sequence.payer
+        , add_sequence.{{ quote_column('plan') }}
         , add_sequence.eob_procedure_sequence
         , case
             when lower(claim_procedure.normalized_code_type) = 'icd-10-pcs' then 'ICD10PCS'

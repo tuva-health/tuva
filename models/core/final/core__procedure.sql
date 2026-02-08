@@ -10,11 +10,13 @@ with all_procedures as (
 
 select * from {{ ref('core__stg_claims_procedure') }}
 union all
-select * from {{ ref('core__stg_clinical_procedure') }}
+select *, cast(null as {{ dbt.type_string() }}) as payer, cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
+from {{ ref('core__stg_clinical_procedure') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_clinical_procedure') }}
+select *, cast(null as {{ dbt.type_string() }}) as payer, cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
+from {{ ref('core__stg_clinical_procedure') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
@@ -27,6 +29,8 @@ select * from {{ ref('core__stg_claims_procedure') }}
 
 select
     all_procedures.procedure_id
+  , all_procedures.payer
+  , all_procedures.{{ quote_column('plan') }}
   , all_procedures.person_id
   , all_procedures.member_id
   , all_procedures.patient_id
@@ -83,6 +87,8 @@ left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
 
 select
     all_procedures.procedure_id
+  , all_procedures.payer
+  , all_procedures.{{ quote_column('plan') }}
   , all_procedures.person_id
   , all_procedures.member_id
   , all_procedures.patient_id

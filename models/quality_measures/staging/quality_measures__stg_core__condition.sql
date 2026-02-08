@@ -4,6 +4,8 @@
 }}
 select
       person_id
+    , payer
+    , {{ quote_column('plan') }}
     , claim_id
     , encounter_id
     , recorded_date

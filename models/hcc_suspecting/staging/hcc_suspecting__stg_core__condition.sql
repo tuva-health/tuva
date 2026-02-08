@@ -7,6 +7,7 @@ select distinct
       claim_id
     , person_id
     , payer
+    , {{ quote_column('plan') }}
     , recorded_date
     , condition_type
     , lower(normalized_code_type) as code_type
