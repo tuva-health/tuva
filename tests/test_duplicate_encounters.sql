@@ -1,5 +1,14 @@
 -- Code to find duplicate encounters
 -- Tests 3/4 conditions in the acute_inpatient__generate_encounter_id model (which is duplicated across other encounter models)
+
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool,
+     tags = ['dqi', 'tuva_dqi_sev_4', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
+            'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification',
+            'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission'],
+   )
+}}
 with duplicate_start_date as (
 select 
       person_id
@@ -54,4 +63,4 @@ union
 select person_id from duplicate_end_date
 union
 select person_id from overlapping_encounters
-;
+
