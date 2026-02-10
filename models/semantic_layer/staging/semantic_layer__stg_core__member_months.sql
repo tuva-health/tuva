@@ -17,4 +17,5 @@ SELECT
   , mm.custom_attributed_provider_practice
   , mm.custom_attributed_provider_organization
   , mm.custom_attributed_provider_lob
+  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 FROM {{ ref('core__member_months') }} mm

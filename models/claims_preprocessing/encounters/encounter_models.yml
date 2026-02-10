@@ -1058,7 +1058,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters

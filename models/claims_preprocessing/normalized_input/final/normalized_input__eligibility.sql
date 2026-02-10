@@ -46,8 +46,10 @@ select
   , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity
   , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
   , cast(elig.file_date as {{ dbt.type_timestamp() }}) as file_date
+  , cast(elig.file_name as {{ dbt.type_string() }}) as file_name
   , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig', strip_prefix=false) }}
 from {{ ref('normalized_input__stg_eligibility') }} as elig
 left outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm
   on elig.person_id_key = date_norm.person_id_key

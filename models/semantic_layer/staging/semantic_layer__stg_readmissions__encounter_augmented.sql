@@ -4,5 +4,5 @@
 }}
 
 SELECT
-  *
-FROM {{ ref('readmissions__encounter_augmented') }} as ea 
+  ea.*
+FROM {{ ref('readmissions__encounter_augmented') }} as ea

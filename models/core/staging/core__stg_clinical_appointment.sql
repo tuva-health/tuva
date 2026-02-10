@@ -3,7 +3,7 @@
    )
 }}
 
-select
+{%- set tuva_core_columns -%}
       cast(appointment_id as {{ dbt.type_string() }}) as appointment_id
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(patient_id as {{ dbt.type_string() }}) as patient_id
@@ -34,6 +34,19 @@ select
     , cast(normalized_cancellation_reason_code_type as {{ dbt.type_string() }}) as normalized_cancellation_reason_code_type
     , cast(normalized_cancellation_reason_code as {{ dbt.type_string() }}) as normalized_cancellation_reason_code
     , cast(normalized_cancellation_reason_description as {{ dbt.type_string() }}) as normalized_cancellation_reason_description
-    , cast(data_source as {{ dbt.type_string() }}) as data_source
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__appointment'), strip_prefix=false) }}
+{%- endset %}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('input_layer__appointment') }}

@@ -53,6 +53,7 @@ select
     , cast(pharm.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    {{ select_extension_columns(ref('input_layer__pharmacy_claim'), alias='pharm', strip_prefix=false) }}
 from {{ ref('normalized_input__stg_pharmacy_claim') }} as pharm
 left outer join {{ ref('terminology__provider') }} as pres
       on pharm.prescribing_provider_npi = pres.npi

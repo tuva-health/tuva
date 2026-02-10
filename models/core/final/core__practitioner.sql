@@ -4,18 +4,59 @@
    )
 }}
 
+{%- set tuva_core_columns -%}
+      practitioner_id
+    , npi
+    , first_name
+    , last_name
+    , practice_affiliation
+    , specialty
+    , sub_specialty
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , data_source
+    , tuva_last_run
+{%- endset -%}
+
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_claims_practitioner') }}
-union all
-select * from {{ ref('core__stg_clinical_practitioner') }}
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__practitioner')) }}
+{%- endset -%}
+
+with prac as (
+    {{ smart_union([ref('core__stg_claims_practitioner'), ref('core__stg_clinical_practitioner')], source_index=none) }}
+)
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
+from prac
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_clinical_practitioner') }}
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__practitioner')) }}
+{%- endset -%}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
+from {{ ref('core__stg_clinical_practitioner') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_claims_practitioner') }}
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__practitioner')) }}
+{%- endset -%}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
+from {{ ref('core__stg_claims_practitioner') }}
 
 {%- endif %}
