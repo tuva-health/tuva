@@ -637,7 +637,7 @@ models:
                 values: ['Continuing', 'New', 'Institutional', 'ESRD', null]
       - name: hospice_flag
         description: Whether the patient is in hospice.
-        data_tests:
+        tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
@@ -645,7 +645,7 @@ models:
                 tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']        
       - name: institutional_snp_flag
         description: Whether the patient is in a special needs plan (SNP) and required to be in nursing home level care. 
-        data_tests:
+        tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
@@ -653,7 +653,7 @@ models:
                 tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
       - name: long_term_institutional_flag
         description: Whether the patient is in an institutional setting for longer than 30 days.
-        data_tests:
+        tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
