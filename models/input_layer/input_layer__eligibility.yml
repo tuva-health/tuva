@@ -641,24 +641,30 @@ models:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
-                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']        
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi    
       - name: institutional_snp_flag
         description: Whether the patient is in a special needs plan (SNP) and required to be in nursing home level care. 
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
-                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi    
       - name: long_term_institutional_flag
         description: Whether the patient is in an institutional setting for longer than 30 days.
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
-                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi    
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
         tests:
