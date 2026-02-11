@@ -4477,7 +4477,11 @@ models:
       tags:
         - claims_preprocessing
         - encounters
-
+    columns:
+      - name: facility_id
+        description: '{{ doc("encounter_id") }}'
+        data_tests:
+          - not_null # Needs to not be null since it is used for a case statement in encounters to assign encounter IDs
   - name: encounters__prof_and_lower_priority
     description: adding in lower priority institutional claims in one location with professional for grouping to higher level encounters
     config:

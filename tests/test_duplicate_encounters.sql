@@ -14,12 +14,14 @@ select
       person_id
     , encounter_type
     , encounter_start_date
+    , facility_id
     , count(*)
 from {{ ref('core__encounter') }}
 group by 
       person_id
     , encounter_type
     , encounter_start_date
+    , facility_id
 having
     count(*) > 1
 )
@@ -29,12 +31,14 @@ select
       person_id
     , encounter_type
     , encounter_end_date
+    , facility_id
     , count(*)
 from {{ ref('core__encounter') }}
 group by 
       person_id
     , encounter_type
     , encounter_end_date
+    , facility_id
 having
     count(*) > 1
 )
@@ -56,6 +60,7 @@ inner join {{ ref('core__encounter') }} e2
 -- overlapping condition: e2 starts during e1's stay
 where e2.encounter_start_date between e1.encounter_start_date and e1.encounter_end_date
     and e2.encounter_start_date != e1.encounter_start_date  -- exclude same-day starts (handled in duplicate_start_date)
+    and e2.facility_id = e1.facility_id
 )
 
 select person_id from duplicate_start_date

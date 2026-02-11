@@ -53,22 +53,22 @@ order by end_date, start_date, claim_id) as row_num
     , case
       -- Condition 1: Exact End Date Match (Catches duplicates/corrections)
       when aa.end_date = bb.end_date
-        and coalesce(aa.facility_id,'') = coalesce(bb.facility_id,'') then 1
+        and aa.facility_id = bb.facility_id then 1
 
       -- Condition 2: Consecutive Stay with Transfer (Catches month-end billing)
       when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-        and coalesce(aa.facility_id,'') = coalesce(bb.facility_id,'')
+        and aa.facility_id = bb.facility_id
         and aa.discharge_disposition_code = '30' then 1
 
       -- Condition 3: Same-Day Start / Superseded Claim
       when aa.start_date = bb.start_date
-        and coalesce(aa.facility_id,'') = coalesce(bb.facility_id,'')
+        and aa.facility_id = bb.facility_id
         and aa.discharge_disposition_code = '30' then 1
 
       -- Condition 4: General Overlapping Stay
       when aa.end_date <> bb.end_date
         and aa.end_date > bb.start_date
-        and coalesce(aa.facility_id,'') = coalesce(bb.facility_id,'') then 1
+        and aa.facility_id = bb.facility_id then 1
       else 0
     end as merge_flag
   from add_row_num as aa
