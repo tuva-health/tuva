@@ -106,3 +106,6 @@ select
 from duplicate_encounter_cts dup
 inner join encounter_cts enc
     on dup.encounter_type = enc.encounter_type
+-- Encounter types with over 5% of people with duplicate encounters will be flagged. This is likely indicative of an error in mapping to Tuva or an issue in the
+-- encounter grouping logic.
+where ratio >= .05
