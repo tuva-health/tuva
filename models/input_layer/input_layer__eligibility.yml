@@ -635,6 +635,30 @@ models:
                 tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               arguments:
                 values: ['Continuing', 'New', 'Institutional', 'ESRD', null]
+      - name: hospice_flag
+        description: Whether the patient is in hospice.
+        data_tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: error
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']        
+      - name: institutional_snp_flag
+        description: Whether the patient is in a special needs plan (SNP) and required to be in nursing home level care. 
+        data_tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: error
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
+      - name: long_term_institutional_flag
+        description: Whether the patient is in an institutional setting for longer than 30 days.
+        data_tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: error
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
         tests:
@@ -897,6 +921,7 @@ models:
         config:
           meta:
             data_type: varchar
+      -             
       - name: data_source
         description: User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, "BCBS Tennessee". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.
         tests:

@@ -73,6 +73,11 @@ with claim_start_end as (
         when (aa.is_professional = 1 or bb.is_professional = 1)
          and {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} >= bb.start_date then 1
 
+        -- Condition 5: Same-Day Start / Superseded Claim
+        when aa.start_date = bb.start_date
+          and aa.facility_id = bb.facility_id
+          and aa.discharge_disposition_code = '30' then 1
+
         else 0
       end as merge_flag
   from add_row_num as aa
