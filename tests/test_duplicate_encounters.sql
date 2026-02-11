@@ -70,7 +70,7 @@ inner join encounters_npi_continuity e2
 where e2.encounter_start_date between e1.encounter_start_date and e1.encounter_end_date
     and e2.encounter_start_date != e1.encounter_start_date  -- exclude same-day starts (handled in duplicate_start_date)
     and e2.facility_id = e1.facility_id
-    and e2.encounter_typen = e1.encounter_type
+    and e2.encounter_type = e1.encounter_type
 )
 
 , duplicate_encounters as (
