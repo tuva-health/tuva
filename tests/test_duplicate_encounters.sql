@@ -9,14 +9,22 @@
             'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission'],
    )
 }}
-with duplicate_start_date as (
+
+-- Limit to only encounters with patient/date/NPI continuity
+with encounters_npi_continuity as (
+select *
+from {{ ref('core__encounter') }}
+where encounter_type in ('acute inpatient', 'inpatient hospice', 'inpatient psych', 'inpatient skilled nursing', 'inpatient substance use', 'inpatient rehabilitation')
+)
+
+, duplicate_start_date as (
 select 
       person_id
     , encounter_type
     , encounter_start_date
     , facility_id
     , count(*)
-from {{ ref('core__encounter') }}
+from encounters_npi_continuity
 group by 
       person_id
     , encounter_type
@@ -26,6 +34,7 @@ having
     count(*) > 1
 )
 
+
 , duplicate_end_date as (
 select 
       person_id
@@ -33,7 +42,7 @@ select
     , encounter_end_date
     , facility_id
     , count(*)
-from {{ ref('core__encounter') }}
+from encounters_npi_continuity
 group by 
       person_id
     , encounter_type
@@ -53,8 +62,8 @@ select
     , e2.encounter_id as encounter_id_2
     , e2.encounter_start_date as start_date_2
     , e2.encounter_end_date as end_date_2
-from {{ ref('core__encounter') }} e1
-inner join {{ ref('core__encounter') }} e2
+from encounters_npi_continuity e1
+inner join encounters_npi_continuity e2
     on e1.person_id = e2.person_id
     and e1.encounter_id != e2.encounter_id  -- avoid duplicate pairs
 -- overlapping condition: e2 starts during e1's stay
@@ -63,9 +72,37 @@ where e2.encounter_start_date between e1.encounter_start_date and e1.encounter_e
     and e2.facility_id = e1.facility_id
 )
 
-select person_id from duplicate_start_date
+, duplicate_encounters as (
+select person_id, encounter_type from duplicate_start_date
 union
-select person_id from duplicate_end_date
+select person_id, encounter_type from duplicate_end_date
 union
-select person_id from overlapping_encounters
+select person_id, encounter_type from overlapping_encounters
+)
 
+, duplicate_encounter_cts as (
+select 
+      encounter_type
+    , count(distinct person_id) as ct
+from duplicate_encounters
+group by 
+    encounter_type
+)
+
+, encounter_cts as (
+select 
+      encounter_type
+    , count(distinct person_id) as total_ct
+from encounters_npi_continuity
+group by 
+      encounter_type    
+)
+
+select 
+      dup.encounter_type
+    , ct
+    , total_ct
+    , ct/total_ct as ratio
+from duplicate_encounter_cts dup
+inner join encounter_cts enc
+    on dup.encounter_type = enc.encounter_type
