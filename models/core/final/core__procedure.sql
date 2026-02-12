@@ -4,13 +4,19 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__procedure')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , all_procedures.data_source
+    , all_procedures.tuva_last_run
+{%- endset -%}
 
 with all_procedures as (
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select * from {{ ref('core__stg_claims_procedure') }}
-union all
-select * from {{ ref('core__stg_clinical_procedure') }}
+{{ smart_union([ref('core__stg_claims_procedure'), ref('core__stg_clinical_procedure')]) }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
@@ -61,19 +67,19 @@ select
   , all_procedures.modifier_4
   , all_procedures.modifier_5
   , all_procedures.practitioner_id
-  , all_procedures.data_source
-  , all_procedures.tuva_last_run
+  {{ tuva_extension_columns }}
+  {{ tuva_metadata_columns }}
 from all_procedures
-left outer join {{ ref('terminology__icd_10_pcs') }} as icd10
+left join {{ ref('terminology__icd_10_pcs') }} as icd10
     on all_procedures.source_code_type = 'icd-10-pcs'
         and all_procedures.source_code = icd10.icd_10_pcs
-left outer join {{ ref('terminology__icd_9_pcs') }} as icd9
+left join {{ ref('terminology__icd_9_pcs') }} as icd9
     on all_procedures.source_code_type = 'icd-9-pcs'
         and all_procedures.source_code = icd9.icd_9_pcs
-left outer join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
+left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on all_procedures.source_code_type = 'hcpcs'
         and all_procedures.source_code = hcpcs.hcpcs
-left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on all_procedures.source_code_type = 'snomed-ct'
         and all_procedures.source_code = snomed_ct.snomed_ct
 
@@ -121,22 +127,22 @@ select
   , all_procedures.modifier_4
   , all_procedures.modifier_5
   , all_procedures.practitioner_id
-  , all_procedures.data_source
-  , all_procedures.tuva_last_run
+  {{ tuva_extension_columns }}
+  {{ tuva_metadata_columns }}
 from all_procedures
-left join {{ ref('terminology__icd_10_pcs') }} icd10
+left join {{ ref('terminology__icd_10_pcs') }} as icd10
     on all_procedures.source_code_type = 'icd-10-pcs'
         and all_procedures.source_code = icd10.icd_10_pcs
-left join {{ ref('terminology__icd_9_pcs') }} icd9
+left join {{ ref('terminology__icd_9_pcs') }} as icd9
     on all_procedures.source_code_type = 'icd-9-pcs'
         and all_procedures.source_code = icd9.icd_9_pcs
-left join {{ ref('terminology__hcpcs_level_2') }} hcpcs
+left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on all_procedures.source_code_type = 'hcpcs'
         and all_procedures.source_code = hcpcs.hcpcs
-left join {{ ref('terminology__snomed_ct') }} snomed_ct
+left join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on all_procedures.source_code_type = 'snomed-ct'
         and all_procedures.source_code = snomed_ct.snomed_ct
-left join {{ ref('custom_mapped') }} custom_mapped
+left join {{ ref('custom_mapped') }} as custom_mapped
     on ( lower(all_procedures.source_code_type) = lower(custom_mapped.source_code_type)
         or ( all_procedures.source_code_type is null and custom_mapped.source_code_type is null)
         )

@@ -153,4 +153,5 @@ select
     , file_name
     , file_date
     , ingest_datetime
+    {{ select_extension_columns(ref('input_layer__medical_claim'), strip_prefix=false) }}
 from {{ ref('input_layer__medical_claim') }}

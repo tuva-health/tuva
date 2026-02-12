@@ -4,6 +4,15 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__immunization')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , immune.data_source
+    , immune.tuva_last_run
+{%- endset -%}
+
 {% if var('enable_normalize_engine',false) != true %}
 
 
@@ -40,8 +49,8 @@ select
     , coalesce(immunization_route.description, immune.route) as route
     , immune.location_id
     , immune.practitioner_id
-    , immune.data_source
-    , immune.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_immunization') }} as immune
 left outer join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
@@ -82,7 +91,7 @@ select
         immune.normalized_description
         , cvx.long_description
         , custom_mapped.normalized_description
-        ) normalized_description
+        ) as normalized_description
   , case  when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
         when cvx.cvx is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
@@ -98,9 +107,9 @@ select
     , coalesce(immunization_route.description, immune.route) as route
     , immune.location_id
     , immune.practitioner_id
-    , immune.data_source
-    , immune.tuva_last_run
-From  {{ ref('core__stg_clinical_immunization') }} as immune
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
+from {{ ref('core__stg_clinical_immunization') }} as immune
 left outer join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx

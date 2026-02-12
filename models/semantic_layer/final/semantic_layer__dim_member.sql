@@ -28,5 +28,5 @@ SELECT
   , p.data_source
   , p.age
   , p.age_group
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , p.tuva_last_run
 FROM {{ ref('semantic_layer__stg_core__patient')}} as p
