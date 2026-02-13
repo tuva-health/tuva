@@ -67,7 +67,7 @@ order by end_date, start_date, claim_id) as row_num
 
       -- Condition 4: General Overlapping Stay
       when aa.end_date <> bb.end_date
-        and aa.end_date >= bb.start_date
+        and aa.end_date > bb.start_date
         and aa.facility_id = bb.facility_id then 1
       else 0
     end as merge_flag
