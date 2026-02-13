@@ -60,7 +60,7 @@ select
   , cast(discharge_disposition_description as {{ dbt.type_string() }}) as discharge_disposition_description
   , cast(null as {{ dbt.type_string() }}) as attending_provider_id
   , cast(null as {{ dbt.type_string() }}) as attending_provider_name
-  , cast(facility_id) as {{ dbt.type_string() }} as facility_id
+  , cast(facility_id as {{ dbt.type_string() }}) as facility_id
   , cast(facility_name as {{ dbt.type_string() }}) as facility_name
   , cast(facility_type as {{ dbt.type_string() }}) as facility_type
   , cast(coalesce(observation_flag, 0) as {{ dbt.type_int() }}) as observation_flag
