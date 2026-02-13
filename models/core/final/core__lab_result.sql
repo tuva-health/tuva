@@ -4,6 +4,15 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__lab_result')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , labs.data_source
+    , labs.tuva_last_run
+{%- endset -%}
+
 {% if var('enable_normalize_engine',false) != true %}
 
 select
@@ -76,19 +85,19 @@ select
     , labs.normalized_abnormal_flag
     , labs.specimen
     , labs.ordering_practitioner_id
-    , labs.data_source
-    , labs.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_lab_result') }} as labs
-    left outer join {{ ref('terminology__loinc') }} as loinc
+    left join {{ ref('terminology__loinc') }} as loinc
         on labs.source_order_type = 'loinc'
         and labs.source_order_code = loinc.loinc
-    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+    left join {{ ref('terminology__snomed_ct') }} as snomed_ct
         on labs.source_order_type = 'snomed-ct'
         and labs.source_order_code = snomed_ct.snomed_ct
-    left outer join {{ ref('terminology__loinc') }} as loinc_component
+    left join {{ ref('terminology__loinc') }} as loinc_component
         on labs.source_component_type = 'loinc'
         and labs.source_component_code = loinc_component.loinc
-    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
+    left join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
         on labs.source_component_type = 'snomed-ct'
         and labs.source_component_code = snomed_ct_component.snomed_ct
 
@@ -123,7 +132,7 @@ select
         , loinc.long_common_name
         , snomed_ct.description
         , custom_mapped_order.normalized_description
-      ) normalized_order_description
+      ) as normalized_order_description
     , case
         when labs.normalized_component_type is not null then labs.normalized_component_type
         when loinc_component.loinc is not null then 'loinc'
@@ -170,25 +179,25 @@ select
     , labs.normalized_abnormal_flag
     , labs.specimen
     , labs.ordering_practitioner_id
-    , labs.data_source
-    , labs.tuva_last_run
-From  {{ ref('core__stg_clinical_lab_result') }} as labs
-    left outer join {{ ref('terminology__loinc') }} as loinc
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
+from {{ ref('core__stg_clinical_lab_result') }} as labs
+    left join {{ ref('terminology__loinc') }} as loinc
         on labs.source_order_type = 'loinc'
         and labs.source_order_code = loinc.loinc
-    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+    left join {{ ref('terminology__snomed_ct') }} as snomed_ct
         on labs.source_order_type = 'snomed-ct'
         and labs.source_order_code = snomed_ct.snomed_ct
-    left outer join {{ ref('terminology__loinc') }} as loinc_component
+    left join {{ ref('terminology__loinc') }} as loinc_component
         on labs.source_component_type = 'loinc'
         and labs.source_component_code = loinc_component.loinc
-    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
+    left join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
         on labs.source_component_type = 'snomed-ct'
         and labs.source_component_code = snomed_ct_component.snomed_ct
-    left outer join {{ ref('custom_mapped') }} as custom_mapped_order
+    left join {{ ref('custom_mapped') }} as custom_mapped_order
         on lower(labs.source_order_type) = lower(custom_mapped_order.source_code_type)
         and labs.source_order_code = custom_mapped_order.source_code
-    left outer join {{ ref('custom_mapped') }} as custom_mapped_component
+    left join {{ ref('custom_mapped') }} as custom_mapped_component
         on lower(labs.source_component_type) = lower(custom_mapped_component.source_code_type)
         and labs.source_component_code = custom_mapped_component.source_code
 {% endif %}

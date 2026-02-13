@@ -4,8 +4,8 @@
    )
 }}
 
-select
-    cast(location_id as {{ dbt.type_string() }}) as location_id
+{%- set tuva_core_columns -%}
+      cast(location_id as {{ dbt.type_string() }}) as location_id
     , cast(npi as {{ dbt.type_string() }}) as npi
     , cast(name as {{ dbt.type_string() }}) as name
     , cast(facility_type as {{ dbt.type_string() }}) as facility_type
@@ -16,6 +16,19 @@ select
     , cast(zip_code as {{ dbt.type_string() }}) as zip_code
     , cast(latitude as {{ dbt.type_float() }}) as latitude
     , cast(longitude as {{ dbt.type_float() }}) as longitude
-    , cast(data_source as {{ dbt.type_string() }}) as data_source
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__location'), strip_prefix=false) }}
+{%- endset %}
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('input_layer__location') }}

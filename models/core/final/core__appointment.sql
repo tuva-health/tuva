@@ -4,6 +4,15 @@
    )
 }}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__appointment')) }}
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
+    , appts.data_source
+    , appts.tuva_last_run
+{%- endset -%}
+
 {% if var('enable_normalize_engine',false) != true %}
 
 select
@@ -91,8 +100,8 @@ select
             , snomed_ct.snomed_ct
         ) is not null then 'automatic'
       end as mapping_method
-    , appts.data_source
-    , appts.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_appointment') }} as appts
     left outer join {{ ref('terminology__appointment_cancellation_reason') }} as appointment_cancellation_reason
         on appts.source_cancellation_reason_code = appointment_cancellation_reason.code
@@ -204,8 +213,8 @@ select
             , custom_mapped_reason_code.normalized_code
         ) is not null then 'custom'
       end as mapping_method
-    , appts.data_source
-    , appts.tuva_last_run
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_appointment') }} as appts
     left outer join {{ ref('terminology__appointment_cancellation_reason') }} as appointment_cancellation_reason
         on appts.source_cancellation_reason_code = appointment_cancellation_reason.code

@@ -66,8 +66,8 @@ where lower(aa.entity_type_description) = 'individual'
 select
     cast(npi as {{ dbt.type_string() }}) as practitioner_id
     , cast(npi as {{ dbt.type_string() }}) as npi
-    , cast(provider_first_name as {{ dbt.type_string() }}) as provider_first_name
-    , cast(provider_last_name as {{ dbt.type_string() }}) as provider_last_name
+    , cast(provider_first_name as {{ dbt.type_string() }}) as first_name
+    , cast(provider_last_name as {{ dbt.type_string() }}) as last_name
     , cast(parent_organization_name as {{ dbt.type_string() }}) as practice_affiliation
     , cast(primary_specialty_description as {{ dbt.type_string() }}) as specialty
     , cast(null as {{ dbt.type_string() }}) as sub_specialty

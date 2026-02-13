@@ -17,7 +17,7 @@ SELECT
   , e.claim_count
   , e.inst_claim_count
   , e.prof_claim_count
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , e.tuva_last_run
 FROM {{ ref('semantic_layer__stg_core__encounter') }} as e
 LEFT JOIN {{ ref('semantic_layer__stg_ed_classification__summary')}} as s
     ON e.encounter_id = s.encounter_id

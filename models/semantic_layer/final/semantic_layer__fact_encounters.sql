@@ -40,7 +40,7 @@ select
   , source_model
   , data_source
   , encounter_source_type
-  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+  , e.tuva_last_run
 from {{ ref('semantic_layer__stg_core__encounter') }} as e
 inner join {{ ref('semantic_layer__dim_encounter_group') }} as eg on e.encounter_group = eg.encounter_group
 inner join {{ ref('semantic_layer__dim_encounter_type') }} as et on e.encounter_type = et.encounter_type

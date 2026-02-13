@@ -3,12 +3,7 @@
    )
 }}
 
-with tuva_last_run as (
-    select
-       cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
-       , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
-)
-select
+{%- set tuva_core_columns -%}
       cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
@@ -46,6 +41,25 @@ select
             else '90+'
         end as {{ dbt.type_string() }}
     ) as age_group
+{%- endset -%}
+
+{%- set tuva_metadata_columns -%}
     , tuva_last_run_datetime as tuva_last_run
+{%- endset %}
+
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__patient'), strip_prefix=false) }}
+{%- endset %}
+
+with tuva_last_run as (
+    select
+       cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
+     , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
+)
+
+select
+    {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
+    {{ tuva_metadata_columns }}
 from {{ ref('input_layer__patient') }}
 cross join tuva_last_run
