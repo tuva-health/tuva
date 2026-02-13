@@ -1213,6 +1213,7 @@ models:
               description: The encounter grouper depends on this field and will not work correctly if this is not provided. Set to a blank string if not available.
               config:
                 severity: error
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: warn
