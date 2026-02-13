@@ -65,7 +65,7 @@ with claim_start_end as (
 
         -- 3) general overlap at the same facility
         when aa.end_date <> bb.end_date
-         and aa.end_date > bb.start_date
+         and aa.end_date >= bb.start_date
          and aa.facility_id = bb.facility_id then 1
 
         -- 4) liberal rule when at least one is PROFESSIONAL:
