@@ -1209,6 +1209,10 @@ models:
       - name: facility_npi
         description: 'Facility NPI for the claim (typically represents the facility where services were performed). This field is a string that contains NPI (National Provider Identifier) values. facility_npi typically represents the location where specific services were delivered. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
         tests:
+          - not_null:
+              description: The encounter grouper depends on this field and will not work correctly if this is not provided. Set to a blank string if not available.
+              config:
+                severity: error
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: warn
