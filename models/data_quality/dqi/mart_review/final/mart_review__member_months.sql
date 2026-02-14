@@ -15,6 +15,7 @@ select m.*
     ]) }} as patient_data_source_key
 from {{ ref('core__member_months') }} as m
 left outer join {{ ref('financial_pmpm__pmpm_prep') }} as p on m.person_id = p.person_id
+    and m.member_id = p.member_id
     and m.data_source = p.data_source
     and m.year_month = p.year_month
     and m.payer = p.payer
