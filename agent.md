@@ -17,10 +17,25 @@ The Tuva Project runs entirely in SQL using dbt.
 
 The Tuva Project follows this layered architecture:
 
-- input layer: raw source data that conforms (i.e. is mapped to) Tuva's standard input layer data model
-- claims preprocessing: claims normalization, service categories, and encounter groups
-- core: core claims and clinical data tables
-- data marts: higher level measures and groupers for analytics
+## Input Layer
+
+The Input Layer is the data model raw claims and clinical datasets must conform to before they can be processed by the Tuva package.  Users map (i.e. write SQL that transforms their raw data) their raw data to the Input Layer.  The Tuva package refs the Input Layer tables.
+
+## Claims Preprocessing
+
+Runs immediately after the Input Layer, normalizing claims, running service categories and encounter groupers.
+
+## Core
+
+The Core Data Model includes cleaned claims and clinical tables.
+
+## Data Marts
+
+Advanced data marts for measures, groupers, and risk models.
+
+## Terminology & Value Sets
+
+Terminology and value sets (and reference data) are stored in AWS S3 and loaded via post hooks.  
 
 # Development
 
