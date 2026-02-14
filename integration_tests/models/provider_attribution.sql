@@ -41,7 +41,7 @@ select
     , patient_id
     , year_month
     , payer
-    , plan
+    , {{ the_tuva_project.quote_column('plan') }}
     , payer_attributed_provider
     , payer_attributed_provider_practice
     , payer_attributed_provider_organization
