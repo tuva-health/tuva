@@ -10,7 +10,7 @@
     , person_id
     , member_id
     , payer
-    , plan
+    , {{ the_tuva_project.quote_column('plan') }}
     , prescribing_provider_npi
     , dispensing_provider_npi
     , dispensing_date

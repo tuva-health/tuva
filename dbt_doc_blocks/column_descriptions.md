@@ -567,7 +567,7 @@ Identifier that links a patient to a particular insurance product or health plan
 {% enddocs %}
 
 {% docs member_month_key %}
-The unique combination of person_id, year_month, payer, plan, and data source.
+The unique combination of person_id, member_id, year_month, payer, plan, and data source.
 {% enddocs %}
 
 {% docs middle_name %}
