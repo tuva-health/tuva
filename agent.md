@@ -62,3 +62,5 @@ All SQL should be written in the most general purpose syntax because Tuva has to
 - Microsoft Fabric
 - Redshift
 - DuckDB
+
+Build the project requires loading seed files from a public s3 repo.  So you will need access to the internet to do `dbt seed` or `dbt build`.
