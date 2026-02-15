@@ -1,47 +1,38 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.9.x&color=orange)
 
-![diagram](./the_tuva_project.jpg)
+![diagram](./the-tuva-project-3.jpg)
 
-## 🧰  What is the Tuva Project?
-The Tuva Project code base includes a core data model, data marts, terminology 
-sets, and data quality tests for doing healthcare analytics.
+## What is the Tuva Project?
+The Tuva Project is a collection of tools for transforming raw healthcare data into analytics-ready data.  The main Tuva package (i.e. this repo) is a dbt package that includes the following components:
+- Input Layer
+- Claims Preprocessing
+- Core Data Model
+- Data Marts
+- Terminology & Value Sets
 
-**Explore the project:**
+Detailed documentation of this package and related tools, including data dictionaries, can be found at www.thetuvaproject.com.
 
-- [Code](./models)
-- [Terminology Sets](seeds/terminology)*
-- [Value Sets](seeds/value_sets)
-- [Data Dictionaries / DAG](https://tuva-health.github.io/tuva/#!/overview/)
-- [Knowledge Base](https://thetuvaproject.com/)
+## Agentic Workflow
 
-*Note: In many cases the actual terminology sets are too large to maintain on 
-GitHub, so we host them in a public AWS S3 bucket. Executing dbt build will 
-load the terminology sets from S3.
+We are increasingly using agents to use and further develop this package.  You can find context for agents in [agent.md](agent.md).
 
-Check out our Quickstart guide [here](./QUICKSTART.md).
-<br/><br/>
+## Contributing
 
-## 🔌  Supported Data Warehouses and dbt Versions
-- BigQuery
-- Databricks
-- DuckDB
-- Redshift
-- Snowflake
-- Microsoft Fabric
+This is the recommended setup for development:
+- Python 3.10 or later
+- duckdb
+- dbt (dbt-core and dbt-duckdb)
 
+Connect duckdb and dbt via your profile.yml.
 
-This package supports dbt version `1.9.x` or higher.
-<br/><br/>
+Use tuva/integration_tests as your development project.  Configure the dbt_project.yml in this folder to connect to duckdb.
 
-## 🙋🏻‍♀️ Contributing
-We created the Tuva Project to be a place where healthcare data practitioners 
-can share their knowledge about doing healthcare analytics.  If you have ideas 
-for improvements or find bugs, we highly encourage and welcome feedback! Feel 
-free to create an issue or ping us on Slack. 
+Run the package from integration_tests.  This will:
+- Load dev data from seed files stored in the project
+- Build the entire pipeline in your duckdb instance
 
-Check out our Contribution guide [here](./CONTRIBUTING.md).
-<br/><br/>
+From there we recommend iterating with your preferred coding agent using [agent.md](agent.md).
 
-## 🤝 Community
-Join our growing community of healthcare data people in [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-35lhyb3as-moCo~~7A3el1oG1vSyIPHQ)!
-<br/><br/>
+Hello and welcome! Thank you so much for taking the time to contribute to the Tuva Project. People like you are helping to build a community of healthcare data practitioners that shares knowledge and tools. Whether it’s fixing a bug, submitting an idea, updating the docs, or sharing your healthcare knowledge, you can make an impact!
+
+In this guide, you will get an overview of the contribution workflow, from how to contribute, setting up your development environment, testing, and creating a pull request.

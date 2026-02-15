@@ -92,7 +92,7 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: '{{ doc("member_id") }}'
+        description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
