@@ -64,3 +64,5 @@ All SQL should be written in the most general purpose syntax because Tuva has to
 - DuckDB
 
 Build the project requires loading seed files from a public s3 repo.  So you will need access to the internet to do `dbt seed` or `dbt build`.
+
+Prior to pushing any changes to GitHub, you need to make sure the integration_tests/dbt_project.yml profile is set to "default".  This is because GitHub CI uses this, so if it's set to something else then CI will fail.

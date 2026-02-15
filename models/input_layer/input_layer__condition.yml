@@ -59,7 +59,7 @@ models:
                   - dqi_quality_measures
                   - dqi_readmission
       - name: payer
-        description: '{{ doc("payer") }}'
+        description: 'Name of the payer (i.e. health insurer) providing coverage.'
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -69,7 +69,7 @@ models:
                   - tuva_dqi_sev_1
                   - dqi
       - name: person_id
-        description: '{{ doc("person_id") }}'
+        description: 'Unique identifier for each person in the dataset.'
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
