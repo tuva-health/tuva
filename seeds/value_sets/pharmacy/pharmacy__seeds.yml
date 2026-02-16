@@ -1,6 +1,28 @@
 version: 2
 
 seeds:
+  - name: pharmacy__product_to_ingredient
+    description: product to ingredient mapping from rxnorm
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy{% else %}pharmacy{%- endif -%}
+      alias: product_to_ingredient
+      tags:
+        - pharmacy
+
+      enabled: "{{ var('pharmacy',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        ndc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}        
+        product_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        product_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        ingredient_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ingredient_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+  
   - name: pharmacy__rxnorm_generic_available
     description: brand rxcuis from rxnorm with some additional columns added in
     config:
