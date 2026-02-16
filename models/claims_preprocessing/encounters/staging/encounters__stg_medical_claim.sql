@@ -57,7 +57,7 @@ with ccs_release_year as (
     , m.billing_id
     , m.rendering_id
     , rend.primary_specialty_description as rend_primary_specialty_description
-    , coalesce(m.facility_id,'') as facility_id
+    , m.facility_id
     , m.discharge_disposition_code
     , m.paid_amount
     , m.charge_amount
