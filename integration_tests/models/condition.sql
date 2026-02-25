@@ -6,6 +6,7 @@
 
 {%- set tuva_columns -%}
       condition_id
+    , payer
     , person_id
     , patient_id
     , encounter_id
