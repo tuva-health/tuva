@@ -58,7 +58,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('eligibility_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('eligibility_seed') }}
 
 {%- else -%}
 

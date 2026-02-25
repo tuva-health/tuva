@@ -38,6 +38,13 @@
     , ingest_datetime
 {%- endset -%}
 
+{# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}
+{%- set tuva_synthetic_extensions -%}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_procedure_id #}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_person_id #}
+    {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_patient_id #}
+{%- endset -%}
+
 {% if var('use_synthetic_data') == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
@@ -59,9 +66,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as modifier_4
 , cast(null as {{ dbt.type_string() }}) as modifier_5
 , cast(null as {{ dbt.type_string() }}) as practitioner_id
-, cast(null as {{ dbt.type_string() }}) as x_temp_procedure_id
-, cast(null as {{ dbt.type_string() }}) as x_temp_person_id
-, cast(null as {{ dbt.type_string() }}) as zzz_temp_patient_id
+{{ tuva_synthetic_extensions }}
 , cast(null as {{ dbt.type_string() }}) as data_source
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
