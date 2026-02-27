@@ -44,7 +44,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('pharmacy_claim_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('pharmacy_claim_seed') }}
 
 {%- else -%}
 

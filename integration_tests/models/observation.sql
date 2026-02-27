@@ -41,7 +41,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('observation_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('observation_seed') }}
 
 {%- else -%}
 

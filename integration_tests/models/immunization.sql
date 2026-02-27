@@ -42,7 +42,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('immunization_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('immunization_seed') }}
 
 {%- else -%}
 
