@@ -11,6 +11,7 @@ models:
       materialized: table
     description: >
       This final model displays the list of suspecting conditions per patient,  data_source, hcc, and diagnosis code with the reason and contributing  factors.
+      It is filtered by current_year_billed.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -36,6 +37,48 @@ models:
           Date when the suspecting condition, observation, result, etc.  was recorded or billed.
       - name: tuva_last_run
         description: The date the model was run.
+
+  - name: hcc_suspecting__list_all
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: list_all
+      tags: hcc_suspecting
+      materialized: table
+    description: >
+      This final model displays the list of suspecting conditions per patient,  data_source, hcc, and diagnosis code with the reason and contributing  factors.
+    columns:
+      - name: person_id
+        description: Unique ID for the patient.
+      - name: payer
+        description: Name of the payer.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+      - name: model_version
+        description: The CMS model version of the HCC code.
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: reason
+        description: Standardized reason for the suspecting condition.
+      - name: contributing_factor
+        description: >
+          Description of the contributing factor(s) for the suspecting condition.
+      - name: suspect_date
+        description: >
+          Date when the suspecting condition, observation, result, etc.  was recorded or billed.
+      - name: current_year_billed
+        description: >
+          Flag indicating that the HCC has been billed during the payment year.      
+      - name: tuva_last_run
+        description: The date the model was run.        
 
   - name: hcc_suspecting__list_rollup
     config:
