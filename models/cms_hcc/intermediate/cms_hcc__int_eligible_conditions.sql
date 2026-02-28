@@ -60,6 +60,15 @@ with medical_claims as (
         , hcpcs_cpt_code
     from {{ ref('cms_hcc__cpt_hcpcs') }}
 
+    union all
+    
+    -- Adding a mapping for the next year copying the current year mappings
+    select
+          payment_year + 1 as collection_year
+        , hcpcs_cpt_code
+    from {{ ref('cms_hcc__cpt_hcpcs') }}
+    where payment_year = (select max(payment_year) as payment_year from {{ ref('cms_hcc__cpt_hcpcs') }})
+
 )
 
 , professional_claims as (
