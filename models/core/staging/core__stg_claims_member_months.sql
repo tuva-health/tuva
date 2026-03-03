@@ -37,6 +37,7 @@ select
 from final_before_attribution_fields as a
 left outer join {{ ref('financial_pmpm__stg_provider_attribution') }} as b
 on a.person_id = b.person_id
+and a.member_id = b.member_id
 and a.year_month = b.year_month
 and a.payer = b.payer
 and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}

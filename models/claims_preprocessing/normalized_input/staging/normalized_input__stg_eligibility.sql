@@ -9,6 +9,7 @@ select
       person_id
     , {{ concat_custom([
         "person_id",
+        "coalesce(cast(member_id as " ~ dbt.type_string() ~ "),'')",
         "coalesce(data_source,'')",
         "coalesce(payer,'')",
         "coalesce(" ~ quote_column('plan') ~ ",'')",

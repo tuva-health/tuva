@@ -52,7 +52,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('appointment_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('appointment_seed') }}
 
 {%- else -%}
 

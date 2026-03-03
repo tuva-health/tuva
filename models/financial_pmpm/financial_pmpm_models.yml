@@ -17,6 +17,7 @@ models:
           arguments:
             combination_of_columns:
               - person_id
+              - member_id
               - year_month
               - payer
               - data_source
@@ -26,6 +27,8 @@ models:
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.
       - name: payer

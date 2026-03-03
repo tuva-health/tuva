@@ -11,7 +11,7 @@
     , person_id
     , member_id
     , payer
-    , plan
+    , {{ the_tuva_project.quote_column('plan') }}
     , claim_start_date
     , claim_end_date
     , claim_line_start_date
@@ -168,7 +168,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('medical_claim_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('medical_claim_seed') }}
 
 {%- else -%}
 

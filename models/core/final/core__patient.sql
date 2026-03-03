@@ -1,6 +1,6 @@
 {{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
- | as_bool
+     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
+            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
    )
 }}
 

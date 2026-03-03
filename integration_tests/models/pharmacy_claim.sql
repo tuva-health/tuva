@@ -10,7 +10,7 @@
     , person_id
     , member_id
     , payer
-    , plan
+    , {{ the_tuva_project.quote_column('plan') }}
     , prescribing_provider_npi
     , dispensing_provider_npi
     , dispensing_date
@@ -44,7 +44,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('pharmacy_claim_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('pharmacy_claim_seed') }}
 
 {%- else -%}
 

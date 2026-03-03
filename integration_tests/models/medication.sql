@@ -41,6 +41,13 @@
     , ingest_datetime
 {%- endset -%}
 
+{# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}
+{%- set tuva_synthetic_extensions -%}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_rxnorm_code #}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_source_code_type #}
+    {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_source_code #}
+{%- endset -%}
+
 {% if var('use_synthetic_data') == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
@@ -65,9 +72,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as quantity_unit
 , cast(null as {{ dbt.type_int() }}) as days_supply
 , cast(null as {{ dbt.type_string() }}) as practitioner_id
-, cast(null as {{ dbt.type_string() }}) as x_temp_rxnorm_code
-, cast(null as {{ dbt.type_string() }}) as x_temp_source_code_type
-, cast(null as {{ dbt.type_string() }}) as zzz_temp_source_code
+{{ tuva_synthetic_extensions }}
 , cast(null as {{ dbt.type_string() }}) as data_source
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime

@@ -1,6 +1,6 @@
 {{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
- | as_bool
+     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
+            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
    )
 }}
 
@@ -54,7 +54,7 @@ from {{ ref('core__stg_clinical_location') }}
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__location')) }}
+{# No extension columns — input_layer__location is clinical-only #}
 {%- endset -%}
 
 select

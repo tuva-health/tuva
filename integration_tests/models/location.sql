@@ -31,6 +31,13 @@
     , ingest_datetime
 {%- endset -%}
 
+{# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}
+{%- set tuva_synthetic_extensions -%}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_state #}
+    {# , cast(null as {{ dbt.type_string() }}) as x_temp_parent_organization #}
+    {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_facility_type #}
+{%- endset -%}
+
 {% if var('use_synthetic_data') == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
@@ -45,9 +52,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as zip_code
 , cast(null as {{ dbt.type_float() }}) as latitude
 , cast(null as {{ dbt.type_float() }}) as longitude
-, cast(null as {{ dbt.type_string() }}) as x_temp_state
-, cast(null as {{ dbt.type_string() }}) as x_temp_parent_organization
-, cast(null as {{ dbt.type_string() }}) as zzz_temp_facility_type
+{{ tuva_synthetic_extensions }}
 , cast(null as {{ dbt.type_string() }}) as data_source
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime

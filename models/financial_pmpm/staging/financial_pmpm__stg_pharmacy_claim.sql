@@ -6,6 +6,7 @@
 
 select
     person_id
+    , member_id
     , dispensing_date
     , paid_date
     , paid_amount

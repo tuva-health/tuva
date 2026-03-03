@@ -17,7 +17,7 @@
     , enrollment_end_date
     , payer
     , payer_type
-    , plan
+    , {{ the_tuva_project.quote_column('plan') }}
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
@@ -58,7 +58,11 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select * from {{ ref('eligibility_seed') }}
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ ref('eligibility_seed') }}
 
 {%- else -%}
 

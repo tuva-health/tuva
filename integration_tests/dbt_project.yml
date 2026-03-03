@@ -57,7 +57,6 @@ vars:
   # quality_measures_enabled: false
   # readmissions_enabled: true
   # fhir_preprocessing_enabled: true # defaults to false
-  # hedis_enabled: true # defaults to false
 
 
 model-paths: ["models"]
@@ -79,26 +78,22 @@ dispatch:
 seeds:
   integration_tests:
     appointment_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','appointment.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','appointment.csv',headers=true) }}"
     eligibility_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.16.0','eligibility.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.16.0','eligibility.csv',headers=true) }}"
     immunization_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','immunization.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','immunization.csv',headers=true) }}"
     lab_result_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','lab_result.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','lab_result.csv',headers=true) }}"
     medical_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','medical_claim.csv',headers=true) }}"
+      +batch_size: 200
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','medical_claim.csv',headers=true) }}"
     observation_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','observation.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','observation.csv',headers=true) }}"
     pharmacy_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','pharmacy_claim.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','pharmacy_claim.csv',headers=true) }}"
     provider_attribution_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','provider_attribution.csv',headers=true) }}"
-    # optional mart data
-    hedis_cql_engine_log_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','hedis_cql_engine_log.csv',headers=true) }}"
-    hedis_measure_report_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','hedis_measure_report.csv',headers=true) }}"
+      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','provider_attribution.csv',headers=true) }}"
 
 
 models:

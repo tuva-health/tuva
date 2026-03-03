@@ -5,6 +5,7 @@
 
 {%- set tuva_core_columns -%}
       cast(condition_id as {{ dbt.type_string() }}) as condition_id
+    , cast(payer as {{ dbt.type_string() }}) as payer
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(null as {{ dbt.type_string() }}) as member_id
     , cast(patient_id as {{ dbt.type_string() }}) as patient_id

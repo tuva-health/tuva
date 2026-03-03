@@ -27,6 +27,7 @@ models:
           arguments:
             combination_of_columns:
               - person_id
+              - member_id
               - payer
               - '{{ ''"plan"'' if (target.type == ''fabric'') else ''plan'' }}'
               - year_month
@@ -90,6 +91,29 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: member_id
+        description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_financial_pmpm
+          - not_null:
+              config:
+                severity: error
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_financial_pmpm
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: year_month
         description: Unique year-month in the dataset computed from eligibility.
         tests:

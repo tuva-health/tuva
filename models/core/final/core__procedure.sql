@@ -1,11 +1,13 @@
 {{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
- | as_bool
+     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
+            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
    )
 }}
 
 {%- set tuva_extension_columns -%}
+{% if var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool %}
     {{ select_extension_columns(ref('input_layer__procedure')) }}
+{% endif %}
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
