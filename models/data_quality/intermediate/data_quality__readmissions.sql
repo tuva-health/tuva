@@ -27,7 +27,8 @@ with disqualified_unpivot as (
     'died_flag',
     'diagnosis_ccs',
     'disqualified_encounter_flag',
-    'tuva_last_run'
+    'tuva_last_run',
+    'data_source'
 ]
     ) }}
 )
