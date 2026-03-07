@@ -14,7 +14,7 @@ Detailed documentation of this package and related tools, including data diction
 
 ## Agentic Workflow
 
-We are increasingly using agents to use and further develop this package.  You can find context for agents in [agent.md](agent.md).
+We are increasingly using agents to use and further develop this package. You can find context for agents in [AGENTS.md](AGENTS.md).
 
 ## Contributing
 
@@ -31,7 +31,7 @@ Run the package from integration_tests.  This will:
 - Load dev data from seed files stored in the project
 - Build the entire pipeline in your duckdb instance
 
-From there we recommend iterating with your preferred coding agent using [agent.md](agent.md).
+From there we recommend iterating with your preferred coding agent using [AGENTS.md](AGENTS.md).
 
 Hello and welcome! Thank you so much for taking the time to contribute to the Tuva Project. People like you are helping to build a community of healthcare data practitioners that shares knowledge and tools. Whether it’s fixing a bug, submitting an idea, updating the docs, or sharing your healthcare knowledge, you can make an impact!
 

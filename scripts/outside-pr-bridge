@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/outside-pr-bridge <pr-number> [--skip-local-build] [--no-watch] [--repo owner/repo]
+
+Purpose:
+  Bridge an external PR into a branch/PR in the base repo so CI runs.
+
+Flow:
+  1) Fetch PR head from refs/pull/<n>/head
+  2) Check out local validation branch
+  3) Run local DuckDB dbt validation (unless --skip-local-build)
+  4) Push a codex/outside-pr-<n>-ci-<timestamp> branch to origin
+  5) Open PR to main (or reuse existing PR for branch)
+  6) Watch checks (unless --no-watch)
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 1
+fi
+
+PR_NUMBER=""
+SKIP_LOCAL_BUILD=0
+NO_WATCH=0
+REPO_OVERRIDE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --skip-local-build)
+      SKIP_LOCAL_BUILD=1
+      shift
+      ;;
+    --no-watch)
+      NO_WATCH=1
+      shift
+      ;;
+    --repo)
+      if [[ $# -lt 2 ]]; then
+        echo "--repo requires a value like owner/repo" >&2
+        exit 1
+      fi
+      REPO_OVERRIDE="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [[ -z "${PR_NUMBER}" ]]; then
+        PR_NUMBER="$1"
+        shift
+      else
+        echo "Unexpected argument: $1" >&2
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if [[ -z "${PR_NUMBER}" || ! "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
+  echo "First positional argument must be a numeric PR number." >&2
+  exit 1
+fi
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Working tree is not clean. Commit/stash before running outside-pr bridge." >&2
+  exit 1
+fi
+
+if [[ ! -x "./scripts/dbt-local" ]]; then
+  echo "Missing executable scripts/dbt-local" >&2
+  exit 1
+fi
+
+gh auth status >/dev/null
+
+if [[ -n "${REPO_OVERRIDE}" ]]; then
+  REPO="${REPO_OVERRIDE}"
+else
+  REPO="$(gh repo view --json nameWithOwner --jq '.nameWithOwner')"
+fi
+
+ORIG_URL="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json url --jq '.url')"
+ORIG_TITLE="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json title --jq '.title')"
+HEAD_OID="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json headRefOid --jq '.headRefOid')"
+IS_CROSS_REPO="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json isCrossRepository --jq '.isCrossRepository')"
+
+LOCAL_BRANCH="codex/outside-pr-${PR_NUMBER}-local"
+CI_BRANCH="codex/outside-pr-${PR_NUMBER}-ci-$(date +%Y%m%d-%H%M%S)"
+
+echo "Repo: ${REPO}"
+echo "Original PR: ${ORIG_URL}"
+echo "Original title: ${ORIG_TITLE}"
+echo "Original head OID: ${HEAD_OID}"
+echo "Original isCrossRepository: ${IS_CROSS_REPO}"
+
+echo "Fetching PR head into local branch context..."
+git fetch origin "pull/${PR_NUMBER}/head"
+git checkout -B "${LOCAL_BRANCH}" FETCH_HEAD
+
+if [[ "${SKIP_LOCAL_BUILD}" -eq 0 ]]; then
+  echo "Running local validation via scripts/dbt-local..."
+  ./scripts/dbt-local deps
+  ./scripts/dbt-local build --full-refresh
+else
+  echo "Skipping local dbt validation (--skip-local-build)."
+fi
+
+echo "Creating CI bridge branch: ${CI_BRANCH}"
+git checkout -B "${CI_BRANCH}"
+git push -u origin "${CI_BRANCH}"
+
+EXISTING_PR_NUMBER="$(
+  gh pr list \
+    --repo "${REPO}" \
+    --head "${CI_BRANCH}" \
+    --state open \
+    --json number \
+    --jq '.[0].number // empty'
+)"
+
+if [[ -n "${EXISTING_PR_NUMBER}" ]]; then
+  NEW_PR_NUMBER="${EXISTING_PR_NUMBER}"
+  NEW_PR_URL="$(gh pr view "${NEW_PR_NUMBER}" --repo "${REPO}" --json url --jq '.url')"
+  echo "Reusing existing bridge PR: ${NEW_PR_URL}"
+else
+  PR_TITLE="[outside-pr ${PR_NUMBER}] ${ORIG_TITLE}"
+  PR_BODY=$(
+    cat <<EOF
+Bridge PR to run CI for external contribution.
+
+Source PR: ${ORIG_URL}
+Source head commit: ${HEAD_OID}
+
+This branch mirrors the external PR head so CI can run in ${REPO}.
+EOF
+  )
+
+  NEW_PR_URL="$(
+    gh pr create \
+      --repo "${REPO}" \
+      --base main \
+      --head "${CI_BRANCH}" \
+      --title "${PR_TITLE}" \
+      --body "${PR_BODY}"
+  )"
+  NEW_PR_NUMBER="$(basename "${NEW_PR_URL}")"
+  echo "Created bridge PR: ${NEW_PR_URL}"
+fi
+
+if [[ "${NO_WATCH}" -eq 0 ]]; then
+  echo "Watching CI checks for PR #${NEW_PR_NUMBER}..."
+  gh pr checks "${NEW_PR_NUMBER}" --repo "${REPO}" --watch
+else
+  echo "Skipping check watch (--no-watch)."
+fi
+
+cat <<EOF
+
+Done.
+- Source PR: ${ORIG_URL}
+- Bridge branch: ${CI_BRANCH}
+- Bridge PR: ${NEW_PR_URL}
+EOF
