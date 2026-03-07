@@ -189,7 +189,7 @@ models:
             - 'Y': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
             - 'N': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
       - name: gap_status
-        desription: >
+        description: >
           definitions for gap_status:
             - 'closed using higher coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is greater than the prior year HCC
             - 'closed': the specific HCC in question has been observed in a risk adjustable claim during the collection year.
@@ -206,6 +206,6 @@ models:
           The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
           coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
       - name: filtered_out_by_hierarchy
-        desription: >
+        description: >
           This is a 1 if this HCC gets filtered out due to a hierarchy being applied or not. The hierarchy is re-applied in this model due to interactions between
           open HCCs and closed HCCs originating in different collection years.
