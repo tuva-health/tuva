@@ -10,12 +10,12 @@ Purpose:
   Bridge an external PR into a branch/PR in the base repo so CI runs.
 
 Flow:
-  1) Fetch PR head from refs/pull/<n>/head
-  2) Check out local validation branch
-  3) Run local DuckDB dbt validation (unless --skip-local-build)
-  4) Push a codex/outside-pr-<n>-ci-<timestamp> branch to origin
-  5) Open PR to main (or reuse existing PR for branch)
-  6) Watch checks (unless --no-watch)
+  1) Sync local main to clean origin/main
+  2) Fetch external PR refs and prefer refs/pull/<n>/merge
+  3) Check out local validation branch from clean-main merge context
+  4) Run local DuckDB dbt validation (unless --skip-local-build)
+  5) Push a codex/outside-pr-<n>-ci-<timestamp> branch to origin
+  6) Open PR to main and watch checks (unless --no-watch)
 EOF
 }
 
@@ -72,6 +72,13 @@ fi
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
+for cmd in git gh; do
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    echo "Missing required command: ${cmd}" >&2
+    exit 1
+  fi
+done
+
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "Working tree is not clean. Commit/stash before running outside-pr bridge." >&2
   exit 1
@@ -104,9 +111,29 @@ echo "Original title: ${ORIG_TITLE}"
 echo "Original head OID: ${HEAD_OID}"
 echo "Original isCrossRepository: ${IS_CROSS_REPO}"
 
-echo "Fetching PR head into local branch context..."
-git fetch origin "pull/${PR_NUMBER}/head"
-git checkout -B "${LOCAL_BRANCH}" FETCH_HEAD
+echo "Syncing local main with origin/main..."
+git fetch origin main
+if git show-ref --verify --quiet refs/heads/main; then
+  git checkout main
+  git pull --ff-only origin main
+else
+  git checkout -B main origin/main
+fi
+MAIN_OID="$(git rev-parse origin/main)"
+
+echo "Fetching external PR refs..."
+git fetch origin "pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}/head"
+SOURCE_REF="refs/remotes/origin/pr/${PR_NUMBER}/head"
+SOURCE_KIND="head"
+
+if git fetch origin "pull/${PR_NUMBER}/merge:refs/remotes/origin/pr/${PR_NUMBER}/merge" >/dev/null 2>&1; then
+  SOURCE_REF="refs/remotes/origin/pr/${PR_NUMBER}/merge"
+  SOURCE_KIND="merge"
+fi
+
+echo "Creating local validation branch from ${SOURCE_KIND} ref..."
+git checkout -B "${LOCAL_BRANCH}" "${SOURCE_REF}"
+SOURCE_OID="$(git rev-parse "${SOURCE_REF}")"
 
 if [[ "${SKIP_LOCAL_BUILD}" -eq 0 ]]; then
   echo "Running local validation via scripts/dbt-local..."
@@ -120,47 +147,40 @@ echo "Creating CI bridge branch: ${CI_BRANCH}"
 git checkout -B "${CI_BRANCH}"
 git push -u origin "${CI_BRANCH}"
 
-EXISTING_PR_NUMBER="$(
-  gh pr list \
-    --repo "${REPO}" \
-    --head "${CI_BRANCH}" \
-    --state open \
-    --json number \
-    --jq '.[0].number // empty'
-)"
-
-if [[ -n "${EXISTING_PR_NUMBER}" ]]; then
-  NEW_PR_NUMBER="${EXISTING_PR_NUMBER}"
-  NEW_PR_URL="$(gh pr view "${NEW_PR_NUMBER}" --repo "${REPO}" --json url --jq '.url')"
-  echo "Reusing existing bridge PR: ${NEW_PR_URL}"
-else
-  PR_TITLE="[outside-pr ${PR_NUMBER}] ${ORIG_TITLE}"
-  PR_BODY=$(
-    cat <<EOF
+PR_TITLE="[outside-pr ${PR_NUMBER}] ${ORIG_TITLE}"
+PR_BODY=$(
+  cat <<EOF
 Bridge PR to run CI for external contribution.
 
 Source PR: ${ORIG_URL}
 Source head commit: ${HEAD_OID}
+Bridge source ref: ${SOURCE_KIND}
+Bridge source commit: ${SOURCE_OID}
+Base main commit at bridge time: ${MAIN_OID}
 
 This branch mirrors the external PR head so CI can run in ${REPO}.
 EOF
-  )
+)
 
-  NEW_PR_URL="$(
-    gh pr create \
-      --repo "${REPO}" \
-      --base main \
-      --head "${CI_BRANCH}" \
-      --title "${PR_TITLE}" \
-      --body "${PR_BODY}"
-  )"
-  NEW_PR_NUMBER="$(basename "${NEW_PR_URL}")"
-  echo "Created bridge PR: ${NEW_PR_URL}"
-fi
+NEW_PR_URL="$(
+  gh pr create \
+    --repo "${REPO}" \
+    --base main \
+    --head "${CI_BRANCH}" \
+    --title "${PR_TITLE}" \
+    --body "${PR_BODY}"
+)"
+NEW_PR_NUMBER="$(basename "${NEW_PR_URL}")"
+echo "Created bridge PR: ${NEW_PR_URL}"
 
 if [[ "${NO_WATCH}" -eq 0 ]]; then
   echo "Watching CI checks for PR #${NEW_PR_NUMBER}..."
-  gh pr checks "${NEW_PR_NUMBER}" --repo "${REPO}" --watch
+  if ! gh pr checks "${NEW_PR_NUMBER}" --repo "${REPO}" --watch; then
+    echo "One or more CI checks failed." >&2
+    echo "Troubleshoot on branch ${CI_BRANCH}, push fixes, then rerun:" >&2
+    echo "  gh pr checks ${NEW_PR_NUMBER} --repo ${REPO} --watch" >&2
+    exit 2
+  fi
 else
   echo "Skipping check watch (--no-watch)."
 fi

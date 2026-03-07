@@ -56,10 +56,14 @@ Outside contributor bridge helper:
 ## Git and PR Workflow
 
 - Never commit directly to `main`.
+- Start every new feature/bug task from a clean, up-to-date `main`:
+  - Preferred: `scripts/start-dev-branch <topic>`
+  - Equivalent manual flow: clean working tree -> `git fetch origin main` -> `git checkout main` -> `git pull --ff-only origin main` -> create `codex/<topic>` branch
 - Create branches using `codex/<topic>`.
 - Make focused commits with clear messages.
 - Push branch and open PR to `main`.
-- Monitor CI checks and address failures/comments.
+- Monitor CI checks until all required checks pass.
+- If any check fails, troubleshoot, fix, push, and continue monitoring until green.
 - Never merge to `main`; the user merges.
 
 ## Seed/Data Safety
@@ -105,12 +109,13 @@ task: outside-pr <pr-number>
 
 Deterministic flow:
 
-1. Fetch source PR head locally from `pull/<pr-number>/head`.
-2. Run local validation in DuckDB (`scripts/dbt-local deps` and `scripts/dbt-local build --full-refresh`).
-3. If local validation fails, stop and report failures. Do not create bridge PR.
-4. If local validation passes, push a bridge branch named `codex/outside-pr-<pr-number>-ci-<timestamp>`.
-5. Open a new PR to `main` with title prefix `[outside-pr <pr-number>]` and body linking the source PR.
-6. Monitor CI checks and iterate until all required checks are green.
+1. Sync local `main` to clean `origin/main`.
+2. Fetch source PR refs and prefer `pull/<pr-number>/merge` so validation runs in clean-main merge context.
+3. Run local validation in DuckDB (`scripts/dbt-local deps` and `scripts/dbt-local build --full-refresh`).
+4. If local validation fails, stop and report failures. Do not create bridge PR.
+5. If local validation passes, push a bridge branch named `codex/outside-pr-<pr-number>-ci-<timestamp>`.
+6. Open a new PR to `main` with title prefix `[outside-pr <pr-number>]` and body linking the source PR.
+7. Monitor CI checks until all required checks are green; if any fail, troubleshoot/fix/push and continue until green.
 
 Use `scripts/outside-pr-bridge <pr-number>` to execute this flow.
 

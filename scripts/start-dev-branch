@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/start-dev-branch <topic>
+
+Purpose:
+  Start new Tuva development work from a clean, up-to-date main branch.
+
+Example:
+  scripts/start-dev-branch claim-type-fix
+  -> creates/switches to codex/claim-type-fix from origin/main
+EOF
+}
+
+if [[ $# -ne 1 || "$1" == "-h" || "$1" == "--help" ]]; then
+  usage
+  exit $([[ $# -eq 1 ]] && echo 0 || echo 1)
+fi
+
+TOPIC_RAW="$1"
+TOPIC="$(echo "${TOPIC_RAW}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/--+/-/g')"
+
+if [[ -z "${TOPIC}" ]]; then
+  echo "Topic '${TOPIC_RAW}' is invalid after normalization." >&2
+  exit 1
+fi
+
+BRANCH="codex/${TOPIC}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Working tree is not clean. Commit/stash before starting a new branch." >&2
+  exit 1
+fi
+
+git fetch origin main
+
+if git show-ref --verify --quiet refs/heads/main; then
+  git checkout main
+  git pull --ff-only origin main
+else
+  git checkout -B main origin/main
+fi
+
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+  echo "Branch already exists: ${BRANCH}" >&2
+  exit 1
+fi
+
+git checkout -b "${BRANCH}" origin/main
+
+echo "Ready: ${BRANCH} (from origin/main @ $(git rev-parse --short origin/main))"
