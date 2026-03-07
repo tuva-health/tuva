@@ -57,6 +57,12 @@ with demographics as (
 
 )
 
+/*
+    New Enrollee (NE) and SNP New Enrollee (SNPNE) models are
+    demographic-only regressions with zero disease HCC variables
+    (CMS SAS V2425P1M.TXT lines 207-270, V2825T1M.TXT lines 191-254).
+    Exclude new enrollees from disease factor scoring.
+*/
 , demographics_with_hccs as (
 
     select
@@ -82,6 +88,7 @@ with demographics as (
             and demographics.model_version = hcc_hierarchy.model_version
             and demographics.payment_year = hcc_hierarchy.payment_year
             and demographics.collection_end_date = hcc_hierarchy.collection_end_date
+    where demographics.enrollment_status != 'New'
 
 )
 
