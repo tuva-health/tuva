@@ -5,6 +5,10 @@ on:
       - main
   workflow_dispatch: # Allows manual trigger from UI
 
+concurrency:
+  group: databricks-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dbt_run:
     runs-on: ubuntu-latest
@@ -19,6 +23,7 @@ jobs:
       DBT_DATABRICKS_CI_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_CI_HTTP_PATH }}
       DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
       DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
+      DBT_DATABRICKS_CI_SCHEMA: ci_${{ github.run_id }}
 
     steps:
       - uses: actions/checkout@v4
