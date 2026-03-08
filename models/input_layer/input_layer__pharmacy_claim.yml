@@ -642,13 +642,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
+          - not_null:
+              description: data_source must not be null.
               config:
-                severity: warn
+                severity: error
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_5
+                  - tuva_dqi_sev_1
                   - dqi
         config:
           meta:
