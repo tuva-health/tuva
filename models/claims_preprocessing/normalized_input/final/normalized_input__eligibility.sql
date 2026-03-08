@@ -25,6 +25,7 @@ select
   , cast(elig.enrollment_status as {{ dbt.type_string() }}) as enrollment_status
   , cast(elig.hospice_flag as {{ dbt.type_int() }}) as hospice_flag
   , cast(elig.institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
+  , cast(elig.medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator
   , cast(elig.long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag
   , cast(elig.group_id as {{ dbt.type_string() }}) as group_id
   , cast(elig.group_name as {{ dbt.type_string() }}) as group_name

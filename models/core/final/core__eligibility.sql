@@ -22,6 +22,7 @@
     , enrollment_status
     , hospice_flag
     , institutional_snp_flag
+    , medicaid_indicator
     , long_term_institutional_flag
     , subscriber_relation
     , group_id
