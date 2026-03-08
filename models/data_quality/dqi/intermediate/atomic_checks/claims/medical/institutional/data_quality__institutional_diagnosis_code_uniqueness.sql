@@ -69,7 +69,7 @@ claim_duplicates as (
           d.claim_id
         , d.data_source
         , {{ dbt.listagg(
-              measure="d.diagnosis_code || ' (' || cast(d.occurrences as " ~ dbt.type_string() ~ ") || 'x)'",
+              measure=dbt.concat(["d.diagnosis_code", "' ('", "cast(d.occurrences as " ~ dbt.type_string() ~ ")", "'x)'"]),
               delimiter_text="', '",
               order_by_clause="order by d.diagnosis_code"
            ) }} as duplicate_codes
