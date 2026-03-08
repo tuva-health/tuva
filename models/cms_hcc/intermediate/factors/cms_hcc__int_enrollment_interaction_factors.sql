@@ -14,6 +14,7 @@ with demographics as (
         , medicaid_status
         , dual_status
         , orec
+        , originally_disabled_flag
         , institutional_status
         , model_version
         , payment_year
@@ -63,16 +64,7 @@ with demographics as (
             and demographics.institutional_status = seed_interaction_factors.institutional_status
             and demographics.model_version = seed_interaction_factors.model_version
     where demographics.institutional_status = 'No'
-        and demographics.orec = 'Disabled'
-        and demographics.age_group in (
-              '65-69'
-            , '70-74'
-            , '75-79'
-            , '80-84'
-            , '85-89'
-            , '90-94'
-            , '>=95'
-        )
+        and demographics.originally_disabled_flag = 'Yes'
 
 )
 

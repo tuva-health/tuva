@@ -13,26 +13,8 @@ with members as (
         , age_group
         , medicaid_status
         , dual_status
-        /* HACK: Adhoc fix for new enrollees and <65 years old. They are being given coefficient = 0, but really should be given what is currently listed as 'Aged'.
-        However, 'Aged' is an incorrect label here and should be updated to null given the labels in the SAS code look like this: NE_NMCAID_NORIGDIS_NEF0_34.
-        The SAS code NE_NMCAID_NORIGDIS_NEF0_34 simply says 'New Enrollee, Not Medicaid, Not Originally Disabled, Female, 0-34'. Not Originally Disabled != Aged.
-        Here is the definition for originally disabled per the SAS code:
-            %* disabled;
-            DISABL = (&AGEF < 65 & &OREC ne "0");
-            %* originally disabled;
-            ORIGDS  = (&OREC = '1')*(DISABL = 0);
-        This means that < 65 is just disabled and not originally disabled.
-        All in all, this is a hack to use the correct coefficient for New enrolles < 65. The correct coefficient is 'Aged'. However, the seed file needs to be
-        updated for these members so there is a coefficient value instead of 0.
-       */
-        , case
-            when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
-            when enrollment_status = 'New' and age_group = '35-44' then 'Aged'
-            when enrollment_status = 'New' and age_group = '45-54' then 'Aged'
-            when enrollment_status = 'New' and age_group = '55-59' then 'Aged'
-            when enrollment_status = 'New' and age_group = '60-64' then 'Aged'
-            else orec
-         end as orec
+        , orec
+        , originally_disabled_flag
         , institutional_status
         , enrollment_status_default
         , medicaid_dual_status_default
@@ -82,6 +64,11 @@ with members as (
 
 )
 
+/*
+    NE seed uses orec to distinguish ORIGDIS vs NORIGDIS:
+      - 'Disabled' in seed = originally disabled (OREC=1, age 65+)
+      - 'Aged' in seed = not originally disabled (everyone else)
+*/
 , new_enrollees as (
     select
           members.person_id
@@ -92,6 +79,7 @@ with members as (
         , members.medicaid_status
         , members.dual_status
         , members.orec
+        , members.originally_disabled_flag
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
@@ -110,7 +98,10 @@ with members as (
         and members.gender = seed_demographic_factors.gender
         and members.age_group = seed_demographic_factors.age_group
         and members.medicaid_status = seed_demographic_factors.medicaid_status
-        and members.orec = seed_demographic_factors.orec
+        and case
+                when members.originally_disabled_flag = 'Yes' then 'Disabled'
+                else 'Aged'
+            end = seed_demographic_factors.orec
     where members.enrollment_status = 'New'
 )
 
@@ -124,6 +115,7 @@ with members as (
         , members.medicaid_status
         , members.dual_status
         , members.orec
+        , members.originally_disabled_flag
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
@@ -143,8 +135,7 @@ with members as (
         and members.age_group = seed_demographic_factors.age_group
         and members.medicaid_status = seed_demographic_factors.medicaid_status
         and members.dual_status = seed_demographic_factors.dual_status
-            /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-        and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
+        and members.orec = seed_demographic_factors.orec
         and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
 )
@@ -160,6 +151,7 @@ with members as (
         , members.medicaid_status
         , members.dual_status
         , members.orec
+        , members.originally_disabled_flag
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
@@ -199,6 +191,7 @@ with members as (
         , cast(dual_status as {{ dbt.type_string() }}) as dual_status
         , cast(orec as {{ dbt.type_string() }}) as orec
         , cast(institutional_status as {{ dbt.type_string() }}) as institutional_status
+        , cast(originally_disabled_flag as {{ dbt.type_string() }}) as originally_disabled_flag
         {% if target.type == 'fabric' %}
             , cast(enrollment_status_default as bit) as enrollment_status_default
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
@@ -230,6 +223,7 @@ select
     , dual_status
     , orec
     , institutional_status
+    , originally_disabled_flag
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default
