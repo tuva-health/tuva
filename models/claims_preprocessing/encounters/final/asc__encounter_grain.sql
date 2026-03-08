@@ -117,7 +117,7 @@ select d.encounter_id
 , tot.encounter_type
 , tot.encounter_group
 , {{ dbt.datediff("birth_date","d.encounter_start_date","day") }} / 365 as admit_age
-, {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day") }} as length_of_stay
+, {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day") }} + 1 as length_of_stay
 , e.gender
 , e.race
 , hp.diagnosis_code_type as primary_diagnosis_code_type
