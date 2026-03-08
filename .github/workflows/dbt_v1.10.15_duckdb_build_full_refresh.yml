@@ -5,6 +5,11 @@ on:
       - main
   workflow_dispatch: # Allows manual trigger from UI
 
+concurrency:
+  # Ensure only one DuckDB workflow runs at a time to prevent database conflicts
+  group: ci-duckdb
+  cancel-in-progress: false
+
 jobs:
   dbt_run:
     name: dbt full refresh and test on DuckDB/MotherDuck
