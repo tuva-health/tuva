@@ -20,8 +20,8 @@
     , cast(state as {{ dbt.type_string() }}) as state
     , cast(zip_code as {{ dbt.type_string() }}) as zip_code
     , cast(null as {{ dbt.type_string() }}) as county
-    , cast(null as {{ dbt.type_float() }}) as latitude
-    , cast(null as {{ dbt.type_float() }}) as longitude
+    , cast(null as {{ dbt.type_numeric() }}) as latitude
+    , cast(null as {{ dbt.type_numeric() }}) as longitude
     , cast(phone as {{ dbt.type_string() }}) as phone
     , cast(email as {{ dbt.type_string() }}) as email
     , cast(ethnicity as {{ dbt.type_string() }}) as ethnicity
