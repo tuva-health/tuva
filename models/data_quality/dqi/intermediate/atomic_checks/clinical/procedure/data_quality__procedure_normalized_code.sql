@@ -40,7 +40,7 @@ with icd9 as (
            else null end as invalid_reason
     , cast(normalized_code as {{ dbt.type_string() }}) as field_value
 from {{ ref('procedure') }} as m
-left outer join {{ ref('terminology__icd_10_pcs') }} as term on m.normalized_code = term.icd_10_pcs
+left outer join {{ ref('terminology__icd_10_pcs') }} as term on replace(m.normalized_code, '.', '') = term.icd_10_pcs
 where
     m.normalized_code_type = 'icd_10_pcs'
 )

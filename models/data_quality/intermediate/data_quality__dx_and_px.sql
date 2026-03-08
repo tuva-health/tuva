@@ -323,9 +323,9 @@ with unpivot_diagnosis as(
         end as invalid_diagnosis
     from unpivot_diagnosis dx
     left join {{ ref('terminology__icd_10_cm') }} icd10
-        on dx.diagnosis_code = icd10.icd_10_cm
+        on replace(dx.diagnosis_code, '.', '') = icd10.icd_10_cm
     left join {{ ref('terminology__icd_9_cm') }} icd9
-        on dx.diagnosis_code = icd9.icd_9_cm
+        on replace(dx.diagnosis_code, '.', '') = icd9.icd_9_cm
     where diagnosis_column = 'DIAGNOSIS_CODE_1'
     and diagnosis_code is not null
     )x
@@ -366,9 +366,9 @@ with unpivot_diagnosis as(
         end as invalid_diagnosis
     from unpivot_diagnosis dx
     left join {{ ref('terminology__icd_10_cm') }} icd10
-        on dx.diagnosis_code = icd10.icd_10_cm
+        on replace(dx.diagnosis_code, '.', '') = icd10.icd_10_cm
     left join {{ ref('terminology__icd_9_cm') }} icd9
-    on dx.diagnosis_code = icd9.icd_9_cm
+    on replace(dx.diagnosis_code, '.', '') = icd9.icd_9_cm
     where diagnosis_column <> 'DIAGNOSIS_CODE_1'
     and diagnosis_code is not null
     )x
@@ -392,9 +392,9 @@ with unpivot_diagnosis as(
         end as invalid_procedure
     from unpivot_procedure px
     left join {{ ref('terminology__icd_10_pcs') }} icd10
-        on px.procedure_code = icd10.icd_10_pcs
+        on replace(px.procedure_code, '.', '') = icd10.icd_10_pcs
     left join {{ ref('terminology__icd_9_pcs') }} icd9
-    on px.procedure_code = icd9.icd_9_pcs
+    on replace(px.procedure_code, '.', '') = icd9.icd_9_pcs
     where px.procedure_code is not null
     )x
     where invalid_procedure = 1
