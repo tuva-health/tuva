@@ -5,6 +5,11 @@ on:
       - main
   workflow_dispatch: # Allows manual trigger from UI
 
+concurrency:
+  # Ensure only one Databricks workflow runs at a time to prevent database conflicts
+  group: ci-databricks
+  cancel-in-progress: false
+
 jobs:
   dbt_run:
     runs-on: ubuntu-latest
