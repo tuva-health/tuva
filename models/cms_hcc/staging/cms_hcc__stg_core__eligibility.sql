@@ -15,3 +15,5 @@ select distinct
     , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__eligibility') }}
+where lower(payer_type) = 'medicare'
+   or payer_type is null
