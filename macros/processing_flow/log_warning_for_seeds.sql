@@ -1,6 +1,11 @@
 -- macros/log_warning_for_seeds.sql
 {% macro log_warning_for_seeds() %}
 
+    {%- set dbt_command = flags.WHICH -%}
+    {% if dbt_command not in ['seed', 'build', 'run'] %}
+        {% do return('') %}
+    {% endif %}
+
     {% set seeds = get_selected_seeds() %}
 
     {% for seed in seeds %}
