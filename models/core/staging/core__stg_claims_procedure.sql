@@ -17,6 +17,8 @@
         "'_'",
         "unpivot_cte.procedure_sequence_id",
         "'_'",
+        "CAST(COALESCE(unpivot_cte.source_code_type, 'unknown') AS " ~ dbt.type_string() ~ ")",
+        "'_'",
         "unpivot_cte.source_code",
         "case when unpivot_cte.modifier_1 is not null then CONCAT('_', unpivot_cte.modifier_1) else '' end",
         "case when unpivot_cte.modifier_2 is not null then CONCAT('_', unpivot_cte.modifier_2) else '' end",
