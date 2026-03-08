@@ -18,6 +18,8 @@
         "'_'",
         "CAST(unpivot_cte.diagnosis_rank AS " ~ dbt.type_string() ~ ")",
         "'_'",
+        "CAST(COALESCE(unpivot_cte.source_code_type, 'unknown') AS " ~ dbt.type_string() ~ ")",
+        "'_'",
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
