@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_DIR="${REPO_ROOT}/integration_tests"
+PROFILES_DIR="${DBT_PROFILES_DIR:-$HOME/.dbt}"
+PROFILE="${TUVA_DBT_PROFILE:-${DBT_PROFILE:-}}"
+
+if [[ ! -d "${PROJECT_DIR}" ]]; then
+  echo "integration_tests project not found at ${PROJECT_DIR}" >&2
+  exit 1
+fi
+
+if [[ ! -f "${PROFILES_DIR}/profiles.yml" ]]; then
+  echo "No dbt profiles.yml found at ${PROFILES_DIR}/profiles.yml" >&2
+  echo "Set DBT_PROFILES_DIR or create ~/.dbt/profiles.yml for local development." >&2
+  exit 1
+fi
+
+if [[ -z "${PROFILE}" ]]; then
+  if grep -qE '^[[:space:]]*default:' "${PROFILES_DIR}/profiles.yml"; then
+    PROFILE="default"
+  elif grep -qE '^[[:space:]]*tuva_dev:' "${PROFILES_DIR}/profiles.yml"; then
+    PROFILE="tuva_dev"
+  else
+    echo "Could not determine dbt profile for local Tuva development." >&2
+    echo "Set TUVA_DBT_PROFILE (or DBT_PROFILE) to one of your local profile names." >&2
+    echo "Available profiles:" >&2
+    awk '/^[^[:space:]][^:]*:/{name=$1; sub(/:$/,"",name); print "  - " name}' "${PROFILES_DIR}/profiles.yml" >&2
+    exit 1
+  fi
+fi
+
+if [[ $# -eq 0 ]]; then
+  exec dbt
+fi
+
+if [[ "${1}" == -* ]]; then
+  exec dbt "$@"
+fi
+
+CMD="$1"
+shift
+
+exec dbt "${CMD}" \
+  --project-dir "${PROJECT_DIR}" \
+  --profiles-dir "${PROFILES_DIR}" \
+  --profile "${PROFILE}" \
+  "$@"

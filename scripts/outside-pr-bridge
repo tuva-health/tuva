@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/outside-pr-bridge <pr-number> [--skip-local-build] [--no-watch] [--repo owner/repo]
+
+Purpose:
+  Bridge an external PR into a branch/PR in the base repo so CI runs.
+
+Flow:
+  1) Sync local main to clean origin/main
+  2) Fetch external PR refs and prefer refs/pull/<n>/merge
+  3) Check out local validation branch from clean-main merge context
+  4) Run local DuckDB dbt validation (unless --skip-local-build)
+  5) Push a codex/outside-pr-<n>-ci-<timestamp> branch to origin
+  6) Open PR to main and watch checks (unless --no-watch)
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 1
+fi
+
+PR_NUMBER=""
+SKIP_LOCAL_BUILD=0
+NO_WATCH=0
+REPO_OVERRIDE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --skip-local-build)
+      SKIP_LOCAL_BUILD=1
+      shift
+      ;;
+    --no-watch)
+      NO_WATCH=1
+      shift
+      ;;
+    --repo)
+      if [[ $# -lt 2 ]]; then
+        echo "--repo requires a value like owner/repo" >&2
+        exit 1
+      fi
+      REPO_OVERRIDE="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [[ -z "${PR_NUMBER}" ]]; then
+        PR_NUMBER="$1"
+        shift
+      else
+        echo "Unexpected argument: $1" >&2
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if [[ -z "${PR_NUMBER}" || ! "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
+  echo "First positional argument must be a numeric PR number." >&2
+  exit 1
+fi
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+for cmd in git gh; do
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    echo "Missing required command: ${cmd}" >&2
+    exit 1
+  fi
+done
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Working tree is not clean. Commit/stash before running outside-pr bridge." >&2
+  exit 1
+fi
+
+if [[ ! -x "./scripts/dbt-local" ]]; then
+  echo "Missing executable scripts/dbt-local" >&2
+  exit 1
+fi
+
+gh auth status >/dev/null
+
+if [[ -n "${REPO_OVERRIDE}" ]]; then
+  REPO="${REPO_OVERRIDE}"
+else
+  REPO="$(gh repo view --json nameWithOwner --jq '.nameWithOwner')"
+fi
+
+ORIG_URL="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json url --jq '.url')"
+ORIG_TITLE="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json title --jq '.title')"
+HEAD_OID="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json headRefOid --jq '.headRefOid')"
+IS_CROSS_REPO="$(gh pr view "${PR_NUMBER}" --repo "${REPO}" --json isCrossRepository --jq '.isCrossRepository')"
+
+LOCAL_BRANCH="codex/outside-pr-${PR_NUMBER}-local"
+CI_BRANCH="codex/outside-pr-${PR_NUMBER}-ci-$(date +%Y%m%d-%H%M%S)"
+
+echo "Repo: ${REPO}"
+echo "Original PR: ${ORIG_URL}"
+echo "Original title: ${ORIG_TITLE}"
+echo "Original head OID: ${HEAD_OID}"
+echo "Original isCrossRepository: ${IS_CROSS_REPO}"
+
+echo "Syncing local main with origin/main..."
+git fetch origin main
+if git show-ref --verify --quiet refs/heads/main; then
+  git checkout main
+  git pull --ff-only origin main
+else
+  git checkout -B main origin/main
+fi
+MAIN_OID="$(git rev-parse origin/main)"
+
+echo "Fetching external PR refs..."
+git fetch origin "pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}/head"
+SOURCE_REF="refs/remotes/origin/pr/${PR_NUMBER}/head"
+SOURCE_KIND="head"
+
+if git fetch origin "pull/${PR_NUMBER}/merge:refs/remotes/origin/pr/${PR_NUMBER}/merge" >/dev/null 2>&1; then
+  SOURCE_REF="refs/remotes/origin/pr/${PR_NUMBER}/merge"
+  SOURCE_KIND="merge"
+fi
+
+echo "Creating local validation branch from ${SOURCE_KIND} ref..."
+git checkout -B "${LOCAL_BRANCH}" "${SOURCE_REF}"
+SOURCE_OID="$(git rev-parse "${SOURCE_REF}")"
+
+if [[ "${SKIP_LOCAL_BUILD}" -eq 0 ]]; then
+  echo "Running local validation via scripts/dbt-local..."
+  ./scripts/dbt-local deps
+  ./scripts/dbt-local build --full-refresh
+else
+  echo "Skipping local dbt validation (--skip-local-build)."
+fi
+
+echo "Creating CI bridge branch: ${CI_BRANCH}"
+git checkout -B "${CI_BRANCH}"
+git push -u origin "${CI_BRANCH}"
+
+PR_TITLE="[outside-pr ${PR_NUMBER}] ${ORIG_TITLE}"
+PR_BODY=$(
+  cat <<EOF
+Bridge PR to run CI for external contribution.
+
+Source PR: ${ORIG_URL}
+Source head commit: ${HEAD_OID}
+Bridge source ref: ${SOURCE_KIND}
+Bridge source commit: ${SOURCE_OID}
+Base main commit at bridge time: ${MAIN_OID}
+
+This branch mirrors the external PR head so CI can run in ${REPO}.
+EOF
+)
+
+NEW_PR_URL="$(
+  gh pr create \
+    --repo "${REPO}" \
+    --base main \
+    --head "${CI_BRANCH}" \
+    --title "${PR_TITLE}" \
+    --body "${PR_BODY}"
+)"
+NEW_PR_NUMBER="$(basename "${NEW_PR_URL}")"
+echo "Created bridge PR: ${NEW_PR_URL}"
+
+if [[ "${NO_WATCH}" -eq 0 ]]; then
+  echo "Watching CI checks for PR #${NEW_PR_NUMBER}..."
+  if ! gh pr checks "${NEW_PR_NUMBER}" --repo "${REPO}" --watch; then
+    echo "One or more CI checks failed." >&2
+    echo "Troubleshoot on branch ${CI_BRANCH}, push fixes, then rerun:" >&2
+    echo "  gh pr checks ${NEW_PR_NUMBER} --repo ${REPO} --watch" >&2
+    exit 2
+  fi
+else
+  echo "Skipping check watch (--no-watch)."
+fi
+
+cat <<EOF
+
+Done.
+- Source PR: ${ORIG_URL}
+- Bridge branch: ${CI_BRANCH}
+- Bridge PR: ${NEW_PR_URL}
+EOF
