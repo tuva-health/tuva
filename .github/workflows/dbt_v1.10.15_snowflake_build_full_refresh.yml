@@ -6,9 +6,8 @@ on:
   workflow_dispatch: # Allows manual trigger from UI
 
 concurrency:
-  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
-  group: ci-testing
-  # Don't cancel in-progress runs automatically
+  # Ensure only one Snowflake workflow runs at a time to prevent database conflicts
+  group: ci-snowflake
   cancel-in-progress: false
 
 jobs:
