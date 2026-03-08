@@ -26,6 +26,7 @@ with stg_eligibility as (
         , elig.dual_status_code
         , elig.medicare_status_code
         , elig.enrollment_status
+        , elig.institutional_snp_flag
         , dates.collection_year
         , dates.payment_year
         , dates.collection_start_date
@@ -141,6 +142,7 @@ with stg_eligibility as (
         , stg_eligibility.original_reason_entitlement_code
         , stg_eligibility.dual_status_code
         , stg_eligibility.medicare_status_code
+        , stg_eligibility.institutional_snp_flag
         /* Defaulting to "New" enrollment status when missing */
         , case
             when stg_eligibility.enrollment_status is not null then stg_eligibility.enrollment_status
@@ -185,6 +187,7 @@ with stg_eligibility as (
         , dual_status_code
         , medicare_status_code
         , enrollment_status
+        , institutional_snp_flag
         , enrollment_status_default
         , case
             when enrollment_status = 'New' and payment_year_age between 0 and 34 then '0-34'
@@ -231,6 +234,7 @@ with stg_eligibility as (
         , collection_start_date
         , collection_end_date
         , enrollment_status
+        , institutional_snp_flag
         , case
             when gender = 'female' then 'Female'
             when gender = 'male' then 'Male'
@@ -323,6 +327,7 @@ with stg_eligibility as (
         , cast(orec as {{ dbt.type_string() }}) as orec
         , cast(institutional_status as {{ dbt.type_string() }}) as institutional_status
         , cast(originally_disabled_flag as {{ dbt.type_string() }}) as originally_disabled_flag
+        , cast(institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
         {% if target.type == 'fabric' %}
             , cast(enrollment_status_default as bit) as enrollment_status_default
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
@@ -352,6 +357,7 @@ select
     , orec
     , institutional_status
     , originally_disabled_flag
+    , institutional_snp_flag
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default

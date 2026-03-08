@@ -16,6 +16,7 @@ with members as (
         , orec
         , originally_disabled_flag
         , institutional_status
+        , institutional_snp_flag
         , enrollment_status_default
         , medicaid_dual_status_default
         , orec_default
@@ -42,6 +43,8 @@ with members as (
         , case
             -- ESRD
             when enrollment_status = 'ESRD' then 'ESRD'
+            -- SNP New Enrollee
+            when enrollment_status = 'SNP New' then 'SNPNE'
             -- New Enrollee
             when enrollment_status = 'New' then 'E'
             -- Long Term Institutional (INS)
@@ -103,6 +106,49 @@ with members as (
                 else 'Aged'
             end = seed_demographic_factors.orec
     where members.enrollment_status = 'New'
+        and coalesce(members.institutional_snp_flag, 0) != 1
+)
+
+/*
+    SNP New Enrollees use SNPNE-specific coefficients from the seed
+    (enrollment_status = 'SNP New'). Same join structure as regular NE
+    but for members enrolled in a Special Needs Plan.
+*/
+, snpne_enrollees as (
+    select
+          members.person_id
+        , members.payer
+        , members.enrollment_status
+        , members.gender
+        , members.age_group
+        , members.medicaid_status
+        , members.dual_status
+        , members.orec
+        , members.originally_disabled_flag
+        , members.institutional_status
+        , members.enrollment_status_default
+        , members.medicaid_dual_status_default
+        , members.orec_default
+        , members.institutional_status_default
+        , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
+        , seed_demographic_factors.model_version
+        , seed_demographic_factors.factor_type
+        , seed_demographic_factors.coefficient
+        , seed_demographic_factors.risk_model_code
+    from members
+    inner join seed_demographic_factors
+        on seed_demographic_factors.enrollment_status = 'SNP New'
+        and members.gender = seed_demographic_factors.gender
+        and members.age_group = seed_demographic_factors.age_group
+        and members.medicaid_status = seed_demographic_factors.medicaid_status
+        and case
+                when members.originally_disabled_flag = 'Yes' then 'Disabled'
+                else 'Aged'
+            end = seed_demographic_factors.orec
+    where members.enrollment_status = 'New'
+        and members.institutional_snp_flag = 1
 )
 
 , continuing_enrollees as (
@@ -174,6 +220,8 @@ with members as (
 
 , unioned as (
     select * from new_enrollees
+    union all
+    select * from snpne_enrollees
     union all
     select * from continuing_enrollees
     union all
