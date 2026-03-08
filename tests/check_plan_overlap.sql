@@ -35,14 +35,36 @@ with plan_counts as (
     group by {{ quote_column('plan') }}
 )
 
+, table_presence as (
+    select
+        max(case when source_table = 'pharmacy_claim' then 1 else 0 end) as has_pharmacy
+        , max(case when source_table = 'medical_claim' then 1 else 0 end) as has_medical
+    from (
+        select distinct 'pharmacy_claim' as source_table
+        from {{ ref('pharmacy_claim') }}
+        where {{ quote_column('plan') }} is not null
+
+        union all
+
+        select distinct 'medical_claim' as source_table
+        from {{ ref('medical_claim') }}
+        where {{ quote_column('plan') }} is not null
+    ) as table_check
+)
+
 , incomplete_overlap as (
     select
-        {{ quote_column('plan') }}
-        , in_pharmacy_claim
-        , in_medical_claim
-        , in_eligibility
+        plan_counts.{{ quote_column('plan') }}
+        , plan_counts.in_pharmacy_claim
+        , plan_counts.in_medical_claim
+        , plan_counts.in_eligibility
     from plan_counts
-    where in_eligibility > 0 and not (in_pharmacy_claim > 0 and in_medical_claim > 0)
+    cross join table_presence
+    where plan_counts.in_eligibility > 0
+      and not (
+          (plan_counts.in_pharmacy_claim > 0 or table_presence.has_pharmacy = 0)
+          and (plan_counts.in_medical_claim > 0 or table_presence.has_medical = 0)
+      )
 )
 
 select * from incomplete_overlap
