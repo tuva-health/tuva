@@ -126,12 +126,17 @@ with demographics as (
     from hcc_counts_normalized
         inner join seed_payment_hcc_count_factors
             on hcc_counts_normalized.enrollment_status = seed_payment_hcc_count_factors.enrollment_status
-            and hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
-            and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
-            and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
             and hcc_counts_normalized.institutional_status = seed_payment_hcc_count_factors.institutional_status
             and hcc_counts_normalized.hcc_count_string = seed_payment_hcc_count_factors.payment_hcc_count
             and hcc_counts_normalized.model_version = seed_payment_hcc_count_factors.model_version
+            and (
+                hcc_counts_normalized.institutional_status = 'Yes'
+                or (
+                    hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
+                    and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
+                    and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
+                )
+            )
 
 )
 
