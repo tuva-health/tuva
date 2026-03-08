@@ -90,11 +90,53 @@ with conditions as (
 
 )
 
+/*
+    V28 Heart Interaction Patch (CMS SAS V2825T1M.TXT lines 448-450):
+    CC223 (Heart Failure, without CC specification) must be zeroed when
+    no sibling heart CCs (CC221, CC222, CC224, CC225, CC226) are present.
+    This runs before hierarchy suppression. V28 only — not applicable to V24.
+*/
+, v28_heart_sibling as (
+
+    select distinct
+          person_id
+        , payer
+        , payment_year
+        , collection_end_date
+    from v28_mapped
+    where hcc_code in ('221', '222', '224', '225', '226')
+
+)
+
+, v28_heart_patch as (
+
+    select
+          v28_mapped.person_id
+        , v28_mapped.payer
+        , v28_mapped.condition_code
+        , v28_mapped.payment_year
+        , v28_mapped.collection_start_date
+        , v28_mapped.collection_end_date
+        , v28_mapped.model_version
+        , v28_mapped.hcc_code
+    from v28_mapped
+        left join v28_heart_sibling
+            on v28_mapped.person_id = v28_heart_sibling.person_id
+            and v28_mapped.payer = v28_heart_sibling.payer
+            and v28_mapped.payment_year = v28_heart_sibling.payment_year
+            and v28_mapped.collection_end_date = v28_heart_sibling.collection_end_date
+    where not (
+        v28_mapped.hcc_code = '223'
+        and v28_heart_sibling.person_id is null
+    )
+
+)
+
 , unioned as (
 
     select * from v24_mapped
     union all
-    select * from v28_mapped
+    select * from v28_heart_patch
 
 )
 
