@@ -82,6 +82,13 @@ jobs:
             const desired = `ci:${mode}`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
+            const repoFullName = `${owner}/${repo}`.toLowerCase();
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: issue_number
+            });
 
             const { data: existing } = await github.rest.issues.listLabelsOnIssue({
               owner,
@@ -101,11 +108,14 @@ jobs:
               labels: keep
             });
 
+            const headRepoFullName = (pr.head.repo?.full_name || "").toLowerCase();
+            const dispatchRef = headRepoFullName === repoFullName ? pr.head.ref : "main";
+
             await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "dbt_ci_modes.yml",
-              ref: "main",
+              ref: dispatchRef,
               inputs: {
                 pr_number: String(issue_number),
                 mode
@@ -116,5 +126,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `CI mode set to \`${mode}\` via \`${desired}\`. Triggered Tuva CI now.`
+              body: `CI mode set to \`${mode}\` via \`${desired}\`. Triggered Tuva CI now (ref: \`${dispatchRef}\`).`
             });
