@@ -16,6 +16,7 @@ with members as (
         , orec
         , originally_disabled_flag
         , institutional_status
+        , institutional_snp_flag
         , enrollment_status_default
         , medicaid_dual_status_default
         , orec_default
@@ -60,7 +61,30 @@ with members as (
             when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
         end as risk_model_code
     from {{ ref('cms_hcc__demographic_factors') }}
-    where plan_segment is null /* data not available */
+    where plan_segment is null
+
+)
+
+/*
+    SNPNE coefficients are stored with plan_segment = 'C-SNP' in the seed.
+    These are distinct from regular NE coefficients and apply to members
+    enrolled in a Special Needs Plan.
+*/
+, seed_snpne_factors as (
+    select
+          model_version
+        , factor_type
+        , enrollment_status
+        , gender
+        , age_group
+        , medicaid_status
+        , dual_status
+        , orec
+        , institutional_status
+        , coefficient
+        , cast('SNPNE' as {{ dbt.type_string() }}) as risk_model_code
+    from {{ ref('cms_hcc__demographic_factors') }}
+    where plan_segment = 'C-SNP'
 
 )
 
@@ -103,6 +127,48 @@ with members as (
                 else 'Aged'
             end = seed_demographic_factors.orec
     where members.enrollment_status = 'New'
+        and coalesce(members.institutional_snp_flag, 0) != 1
+)
+
+/*
+    SNP New Enrollees use SNPNE-specific coefficients (plan_segment = 'C-SNP'
+    in the seed). Same join structure as regular NE but for members enrolled
+    in a Special Needs Plan.
+*/
+, snpne_enrollees as (
+    select
+          members.person_id
+        , members.payer
+        , members.enrollment_status
+        , members.gender
+        , members.age_group
+        , members.medicaid_status
+        , members.dual_status
+        , members.orec
+        , members.originally_disabled_flag
+        , members.institutional_status
+        , members.enrollment_status_default
+        , members.medicaid_dual_status_default
+        , members.orec_default
+        , members.institutional_status_default
+        , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
+        , seed_snpne_factors.model_version
+        , seed_snpne_factors.factor_type
+        , seed_snpne_factors.coefficient
+        , seed_snpne_factors.risk_model_code
+    from members
+    inner join seed_snpne_factors
+        on members.gender = seed_snpne_factors.gender
+        and members.age_group = seed_snpne_factors.age_group
+        and members.medicaid_status = seed_snpne_factors.medicaid_status
+        and case
+                when members.originally_disabled_flag = 'Yes' then 'Disabled'
+                else 'Aged'
+            end = seed_snpne_factors.orec
+    where members.enrollment_status = 'New'
+        and members.institutional_snp_flag = 1
 )
 
 , continuing_enrollees as (
@@ -174,6 +240,8 @@ with members as (
 
 , unioned as (
     select * from new_enrollees
+    union all
+    select * from snpne_enrollees
     union all
     select * from continuing_enrollees
     union all
