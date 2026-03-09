@@ -1,0 +1,204 @@
+name: DBT CI Modes
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  resolve_mode:
+    name: Resolve CI Mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.resolve.outputs.mode }}
+      adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
+    steps:
+      - name: Resolve mode, labels, and large-mode guard
+        id: resolve
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = (context.payload.pull_request.labels || []).map((l) => l.name);
+            const ciLabels = labels.filter((name) => /^ci:(small|medium|large)$/.test(name));
+
+            if (ciLabels.length > 1) {
+              core.setFailed(`Multiple CI mode labels found: ${ciLabels.join(", ")}. Keep only one of ci:small, ci:medium, ci:large.`);
+              return;
+            }
+
+            const mode = ciLabels.length === 1 ? ciLabels[0].replace("ci:", "") : "small";
+            const adapters =
+              mode === "small"
+                ? ["snowflake"]
+                : ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"];
+
+            const seedPrefixes = ["seeds/", "integration_tests/seeds/"];
+            const seedExact = new Set([
+              "dbt_project.yml",
+              "integration_tests/dbt_project.yml",
+              "integration_tests/seeds/_seeds.yml",
+              "integration_tests/models/_sources.yml",
+              "macros/cross_database_utils/load_seed.sql"
+            ]);
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100
+            });
+            const changed = files.map((f) => f.filename);
+            const requiresLarge = changed.some((path) =>
+              seedExact.has(path) || seedPrefixes.some((prefix) => path.startsWith(prefix))
+            );
+
+            if (requiresLarge && mode !== "large") {
+              const sample = changed
+                .filter((path) => seedExact.has(path) || seedPrefixes.some((prefix) => path.startsWith(prefix)))
+                .slice(0, 8)
+                .join(", ");
+              core.setFailed(
+                `This PR modifies seed/config/load-seed files (${sample}). Use /ci large so CI refreshes baseline schemas.`
+              );
+              return;
+            }
+
+            core.info(`Resolved CI mode: ${mode}`);
+            core.info(`Adapters: ${adapters.join(", ")}`);
+
+            core.setOutput("mode", mode);
+            core.setOutput("adapter_matrix", JSON.stringify(adapters));
+
+  run_dbt:
+    name: CI / ${{ matrix.adapter }} / ${{ needs.resolve_mode.outputs.mode }}
+    needs: resolve_mode
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: ${{ fromJson(needs.resolve_mode.outputs.adapter_matrix) }}
+    concurrency:
+      group: ci-${{ matrix.adapter }}
+      cancel-in-progress: false
+    env:
+      PYTHON_VERSION: "3.10"
+      DBT_PROJECT_DIR: "./integration_tests"
+      DBT_CORE_VERSION: "1.10.15"
+
+      DBT_BIGQUERY_CI_TOKEN: ${{ secrets.DBT_BIGQUERY_CI_TOKEN }}
+      DBT_BIGQUERY_CI_PROJECT: ${{ secrets.DBT_BIGQUERY_CI_PROJECT }}
+
+      DBT_DATABRICKS_CI_HOST: ${{ secrets.DBT_DATABRICKS_CI_HOST }}
+      DBT_DATABRICKS_CI_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_CI_HTTP_PATH }}
+      DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
+      DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
+
+      DBT_MOTHERDUCK_CI_PATH: ${{ secrets.DBT_MOTHERDUCK_CI_PATH }}
+      DBT_MOTHERDUCK_CI_DATABASE: "my_db"
+
+      DBT_FABRIC_CI_SERVER: ${{ secrets.DBT_FABRIC_CI_SERVER }}
+      DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
+      DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
+      DBT_FABRIC_CI_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
+      DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
+      DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
+
+      DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+      DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+      DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+      DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}
+
+      DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
+      DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
+      DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
+      DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+      DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+      DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+      DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install ODBC Driver 18 for SQL Server
+        if: ${{ matrix.adapter == 'fabric' }}
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Install dbt adapter
+        run: |
+          python -m pip install --upgrade pip
+          case "${{ matrix.adapter }}" in
+            snowflake)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-snowflake
+              ;;
+            bigquery)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-bigquery
+              ;;
+            databricks)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-databricks
+              pip install certifi
+              ;;
+            fabric)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-fabric
+              ;;
+            redshift)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
+              ;;
+            duckdb)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb
+              ;;
+            *)
+              echo "Unsupported adapter: ${{ matrix.adapter }}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Create BigQuery credentials file
+        if: ${{ matrix.adapter == 'bigquery' }}
+        run: |
+          echo "${{ env.DBT_BIGQUERY_CI_TOKEN }}" | base64 --decode > ./creds.json
+
+      - name: Install dbt dependencies
+        run: dbt deps --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
+
+      - name: Test connection
+        run: dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
+
+      - name: Assert baseline seed schemas exist for run-only modes
+        if: ${{ needs.resolve_mode.outputs.mode != 'large' }}
+        run: |
+          dbt run-operation assert_ci_seed_baseline_ready \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
+
+      - name: Run dbt (mode-aware)
+        run: |
+          if [[ "${{ needs.resolve_mode.outputs.mode }}" == "large" ]]; then
+            dbt build --full-refresh \
+              --project-dir ./integration_tests \
+              --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
+          else
+            dbt run \
+              --project-dir ./integration_tests \
+              --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
+          fi
