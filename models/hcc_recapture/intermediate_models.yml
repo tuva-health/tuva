@@ -22,6 +22,7 @@ models:
             - rendering_npi
             - claim_id
             - condition_type
+            - reason
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -33,9 +34,9 @@ models:
         description: The date the claim was originally recorded. Based on admission date, but if null then filled in by claim start date followed by claim end date.
       - name: model_version
         description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
-          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment        
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
       - name: hcc_code
         description: The hierarchical condition category code.
       - name: hcc_description
@@ -52,13 +53,13 @@ models:
           For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
       - name: hcc_hierarchy_group_rank
         description: >
-          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are
           coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
       - name: risk_model_code
         description: >
           There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
           This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
-          the 2025 CMS risk adjustment software.      
+          the 2025 CMS risk adjustment software.
       - name: eligible_bene
         description: A 1 is indicated for a beneficiary who is in the eligibility files. A 0 is indicated if they are not in the eligibility files.
       - name: rendering_npi

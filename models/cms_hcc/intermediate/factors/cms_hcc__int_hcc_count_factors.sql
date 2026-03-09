@@ -11,7 +11,7 @@ with demographics as (
         , enrollment_status
         , medicaid_status
         , dual_status
-        , case when age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else orec end as orec
+        , orec
         , institutional_status
         , model_version
         , payment_year
@@ -126,12 +126,17 @@ with demographics as (
     from hcc_counts_normalized
         inner join seed_payment_hcc_count_factors
             on hcc_counts_normalized.enrollment_status = seed_payment_hcc_count_factors.enrollment_status
-            and hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
-            and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
-            and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
             and hcc_counts_normalized.institutional_status = seed_payment_hcc_count_factors.institutional_status
             and hcc_counts_normalized.hcc_count_string = seed_payment_hcc_count_factors.payment_hcc_count
             and hcc_counts_normalized.model_version = seed_payment_hcc_count_factors.model_version
+            and (
+                hcc_counts_normalized.institutional_status = 'Yes'
+                or (
+                    hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
+                    and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
+                    and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
+                )
+            )
 
 )
 

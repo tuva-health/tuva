@@ -30,4 +30,4 @@ select
     , {{ concat_custom(["m.diagnosis_code_1", "'|'", "coalesce(term.short_description, '')"]) }} as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from base as m
-left outer join {{ ref('terminology__icd_10_cm') }} as term on m.diagnosis_code_1 = term.icd_10_cm
+left outer join {{ ref('terminology__icd_10_cm') }} as term on replace(m.diagnosis_code_1, '.', '') = term.icd_10_cm

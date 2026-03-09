@@ -157,7 +157,11 @@ select
 , tot.claim_count
 , tot.inst_claim_count
 , tot.prof_claim_count
-, {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} as length_of_stay
+, case
+    when {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} = 0
+    then 1
+    else {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }}
+  end as length_of_stay
 , case
     when c.discharge_disposition_code = '20' then 1
     else 0

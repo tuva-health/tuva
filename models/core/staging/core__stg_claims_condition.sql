@@ -18,6 +18,8 @@
         "'_'",
         "CAST(unpivot_cte.diagnosis_rank AS " ~ dbt.type_string() ~ ")",
         "'_'",
+        "CAST(COALESCE(unpivot_cte.source_code_type, 'unknown') AS " ~ dbt.type_string() ~ ")",
+        "'_'",
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
@@ -36,11 +38,12 @@
     , cast(null as {{ dbt.type_string() }}) as source_description
     , cast(
         case
-        when icd.icd_10_cm is not null then 'icd-10-cm'
+        when icd10.icd_10_cm is not null then 'icd-10-cm'
+        when icd9.icd_9_cm is not null then 'icd-9-cm'
         end as {{ dbt.type_string() }}
       ) as normalized_code_type
-    , cast(icd.icd_10_cm as {{ dbt.type_string() }}) as normalized_code
-    , cast(icd.long_description as {{ dbt.type_string() }}) as normalized_description
+    , cast(coalesce(icd10.icd_10_cm, icd9.icd_9_cm) as {{ dbt.type_string() }}) as normalized_code
+    , cast(coalesce(icd10.long_description, icd9.long_description) as {{ dbt.type_string() }}) as normalized_description
     , cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }}) as condition_rank
     , cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }}) as present_on_admit_code
     , cast(poa.present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
@@ -112,7 +115,9 @@ select distinct
     {{ tuva_core_columns }}
     {{ tuva_metadata_columns }}
 from unpivot_cte
-left outer join {{ ref('terminology__icd_10_cm') }} as icd
-    on unpivot_cte.source_code = icd.icd_10_cm
+left outer join {{ ref('terminology__icd_10_cm') }} as icd10
+    on unpivot_cte.source_code = icd10.icd_10_cm
+left outer join {{ ref('terminology__icd_9_cm') }} as icd9
+    on unpivot_cte.source_code = icd9.icd_9_cm
 left outer join {{ ref('terminology__present_on_admission') }} as poa
     on unpivot_cte.present_on_admit_code = poa.present_on_admit_code
