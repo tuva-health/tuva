@@ -257,7 +257,8 @@ jobs:
               pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
               ;;
             duckdb)
-              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb
+              # MotherDuck currently supports DuckDB up to 1.4.4 in CI.
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==1.4.4
               ;;
             *)
               echo "Unsupported adapter: ${{ matrix.adapter }}" >&2
