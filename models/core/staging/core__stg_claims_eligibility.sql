@@ -40,6 +40,7 @@
        , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
        , cast(hospice_flag as {{ dbt.type_int() }}) as hospice_flag
        , cast(institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
+       , cast(medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator
        , cast(long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag
        , cast(subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
        , cast(group_id as {{ dbt.type_string() }}) as group_id

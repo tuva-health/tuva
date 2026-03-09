@@ -655,6 +655,16 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi    
+      - name: medicaid_indicator
+        description: Indicates whether the patient has Medicaid coverage (1 = Yes, 0 = No). This is independent of dual-eligible status and corresponds to the CMS NEMCAID field on the Monthly Membership Report. When provided, it is used for New Enrollee risk score calculations. If not provided, Medicaid status is derived from dual_status_code.
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
       - name: long_term_institutional_flag
         description: Whether the patient is in an institutional setting for longer than 30 days.
         tests:
@@ -664,7 +674,7 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
-                  - dqi    
+                  - dqi
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
         tests:
