@@ -10,6 +10,8 @@ with demographics as (
         , payer
         , enrollment_status
         , institutional_status
+        , orec
+        , age_group
         , model_version
         , payment_year
         , collection_start_date
@@ -54,6 +56,8 @@ with demographics as (
         , demographics.payer
         , demographics.enrollment_status
         , demographics.institutional_status
+        , demographics.orec
+        , demographics.age_group
         , demographics.model_version
         , demographics.payment_year
         , demographics.collection_start_date
@@ -87,6 +91,14 @@ with demographics as (
             and demographics_with_hccs.institutional_status = seed_interaction_factors.institutional_status
             and demographics_with_hccs.hcc_code = seed_interaction_factors.hcc_code
             and demographics_with_hccs.model_version = seed_interaction_factors.model_version
+    /*
+       CMS SAS: DISABL = (AGEF < 65 & OREC ne "0")
+       Disabled interaction factors only apply to members who are under 65
+       with a non-aged OREC. Members 65+ or with OREC=0 are not disabled
+       and should not receive these interaction coefficients.
+    */
+    where demographics_with_hccs.age_group not in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95')
+      and demographics_with_hccs.orec != 'Aged'
 
 )
 
