@@ -75,6 +75,7 @@
 {%- set tuva_metadata_columns -%}
     , data_source
     , file_date
+    , ingest_datetime
     , file_name
     , tuva_last_run
 {%- endset %}
