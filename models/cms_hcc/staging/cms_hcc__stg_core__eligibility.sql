@@ -13,6 +13,7 @@ select distinct
     , medicare_status_code
     , enrollment_status
     , medicaid_indicator
+    , long_term_institutional_flag
     , institutional_snp_flag
     , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
