@@ -1,11 +1,21 @@
 name: Tuva CI
 run-name: >-
-  Tuva CI / Mode: ${{
+  Tuva CI / PR #${{
+    github.event_name == 'workflow_dispatch' &&
+    github.event.inputs.pr_number ||
+    github.event.pull_request.number
+  }} / Mode: ${{
+    github.event_name == 'workflow_dispatch' &&
+    (github.event.inputs.mode == 'large' && 'Large' ||
+    github.event.inputs.mode == 'medium' && 'Medium' ||
+    'Small') ||
     contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') && 'Large' ||
     contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium') && 'Medium' ||
     'Small'
   }} / DW: ${{
-    (contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') ||
+    ((github.event_name == 'workflow_dispatch' &&
+    (github.event.inputs.mode == 'large' || github.event.inputs.mode == 'medium')) ||
+    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') ||
     contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium')) &&
     'All 6 Warehouses' ||
     'Snowflake'
@@ -19,8 +29,20 @@ on:
       - opened
       - synchronize
       - reopened
-      - labeled
-      - unlabeled
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to run against
+        required: true
+        type: string
+      mode:
+        description: CI mode to run
+        required: true
+        type: choice
+        options:
+          - small
+          - medium
+          - large
 
 permissions:
   contents: read
@@ -31,8 +53,10 @@ jobs:
     name: Resolve CI Mode
     runs-on: ubuntu-latest
     outputs:
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
       mode: ${{ steps.resolve.outputs.mode }}
       adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
+      checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
     steps:
       - name: Resolve mode, labels, and large-mode guard
         id: resolve
@@ -40,7 +64,46 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const labels = (context.payload.pull_request.labels || []).map((l) => l.name);
+            const { owner, repo } = context.repo;
+            const eventName = context.eventName;
+            const isDispatch = eventName === "workflow_dispatch";
+            const inputs = context.payload.inputs || {};
+
+            let prNumber;
+            let requestedMode = null;
+            let labels = [];
+
+            if (isDispatch) {
+              const rawPrNumber = String(inputs.pr_number || "").trim();
+              if (!/^\d+$/.test(rawPrNumber)) {
+                core.setFailed(`Invalid workflow_dispatch input pr_number: "${rawPrNumber}".`);
+                return;
+              }
+
+              prNumber = Number(rawPrNumber);
+              requestedMode = String(inputs.mode || "").trim().toLowerCase();
+              if (!["small", "medium", "large"].includes(requestedMode)) {
+                core.setFailed(`Invalid workflow_dispatch input mode: "${requestedMode}". Use one of small, medium, large.`);
+                return;
+              }
+
+              const { data: pr } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: prNumber
+              });
+
+              if (pr.base.ref !== "main") {
+                core.setFailed(`PR #${prNumber} does not target main (targets ${pr.base.ref}).`);
+                return;
+              }
+
+              labels = (pr.labels || []).map((l) => l.name);
+            } else {
+              prNumber = context.payload.pull_request.number;
+              labels = (context.payload.pull_request.labels || []).map((l) => l.name);
+            }
+
             const ciLabels = labels.filter((name) => /^ci:(small|medium|large)$/.test(name));
 
             if (ciLabels.length > 1) {
@@ -48,7 +111,7 @@ jobs:
               return;
             }
 
-            const mode = ciLabels.length === 1 ? ciLabels[0].replace("ci:", "") : "small";
+            const mode = requestedMode || (ciLabels.length === 1 ? ciLabels[0].replace("ci:", "") : "small");
             const adapters =
               mode === "small"
                 ? ["snowflake"]
@@ -64,9 +127,9 @@ jobs:
             ]);
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
+              owner,
+              repo,
+              pull_number: prNumber,
               per_page: 100
             });
             const changed = files.map((f) => f.filename);
@@ -85,11 +148,14 @@ jobs:
               return;
             }
 
+            core.info(`PR number: ${prNumber}`);
             core.info(`Resolved CI mode: ${mode}`);
             core.info(`Adapters: ${adapters.join(", ")}`);
 
+            core.setOutput("pr_number", String(prNumber));
             core.setOutput("mode", mode);
             core.setOutput("adapter_matrix", JSON.stringify(adapters));
+            core.setOutput("checkout_ref", `refs/pull/${prNumber}/merge`);
 
   run_dbt:
     name: >-
@@ -113,8 +179,8 @@ jobs:
       matrix:
         adapter: ${{ fromJson(needs.resolve_mode.outputs.adapter_matrix) }}
     concurrency:
-      group: ci-${{ matrix.adapter }}
-      cancel-in-progress: false
+      group: ci-pr-${{ needs.resolve_mode.outputs.pr_number }}-${{ matrix.adapter }}
+      cancel-in-progress: true
     env:
       PYTHON_VERSION: "3.10"
       DBT_PROJECT_DIR: "./integration_tests"
@@ -154,6 +220,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve_mode.outputs.checkout_ref }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -189,7 +257,8 @@ jobs:
               pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
               ;;
             duckdb)
-              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb
+              # MotherDuck currently supports DuckDB up to 1.4.4 in CI.
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==1.4.4
               ;;
             *)
               echo "Unsupported adapter: ${{ matrix.adapter }}" >&2
