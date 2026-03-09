@@ -12,7 +12,7 @@
 
 
 with all_providers_in_claims_dataset as (
-select distinct facility_id as npi
+select distinct facility_npi as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}

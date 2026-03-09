@@ -9,7 +9,7 @@ select
     , encounter_type
     , person_id
     , encounter_end_date
-    , facility_id
+    , facility_npi
     , primary_diagnosis_code_type
     , primary_diagnosis_code
     , primary_diagnosis_description

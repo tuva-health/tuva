@@ -20,7 +20,7 @@
     , discharge_disposition_description
     , attending_provider_id
     , attending_provider_name
-    , facility_id
+    , facility_npi
     , facility_name
     , primary_diagnosis_code_type
     , primary_diagnosis_code
@@ -71,7 +71,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as discharge_disposition_description
 , cast(null as {{ dbt.type_string() }}) as attending_provider_id
 , cast(null as {{ dbt.type_string() }}) as attending_provider_name
-, cast(null as {{ dbt.type_string() }}) as facility_id
+, cast(null as {{ dbt.type_string() }}) as facility_npi
 , cast(null as {{ dbt.type_string() }}) as facility_name
 , cast(null as {{ dbt.type_string() }}) as primary_diagnosis_code_type
 , cast(null as {{ dbt.type_string() }}) as primary_diagnosis_code

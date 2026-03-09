@@ -60,7 +60,7 @@ select distinct old_encounter_id
     , stg.claim_type
     , stg.diagnosis_code_1
     , stg.diagnosis_code_type
-    , stg.facility_id
+    , stg.facility_npi
     , stg.billing_id
     , stg.hcpcs_code
     , stg.ccs_category

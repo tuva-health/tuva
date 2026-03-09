@@ -48,7 +48,7 @@ select
     , cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }}) as billing_id
     , cast(med.billing_tin as {{ dbt.type_string() }}) as billing_tin
     , cast(coalesce(med_npi.normalized_billing_name, undetermined.billing_name) as {{ dbt.type_string() }}) as billing_name
-    , cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }}) as facility_id
+    , cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }}) as facility_npi
     , cast(coalesce(med_npi.normalized_facility_name, undetermined.facility_name) as {{ dbt.type_string() }}) as facility_name
     , cast(med.paid_date as date) as paid_date
     , cast(med.paid_amount as {{ dbt.type_numeric() }}) as paid_amount

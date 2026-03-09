@@ -46,7 +46,7 @@ select
   , mc.billing_id
   , mc.billing_tin
   , mc.billing_name
-  , mc.facility_id
+  , mc.facility_npi
   , mc.facility_name
   , mc.paid_date
   , mc.paid_amount

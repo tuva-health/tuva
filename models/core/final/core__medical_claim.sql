@@ -53,7 +53,7 @@
     , billing_id
     , billing_tin
     , billing_name
-    , facility_id
+    , facility_npi
     , facility_name
     , paid_date
     , paid_amount
