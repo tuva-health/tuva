@@ -61,7 +61,7 @@ select distinct old_encounter_id
     , stg.diagnosis_code_1
     , stg.diagnosis_code_type
     , stg.facility_npi
-    , stg.billing_id
+    , stg.billing_npi
     , stg.hcpcs_code
     , stg.ccs_category
     , stg.ccs_category_description

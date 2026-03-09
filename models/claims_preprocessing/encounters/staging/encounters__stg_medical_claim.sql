@@ -54,8 +54,8 @@ with ccs_release_year as (
     , p.primary_taxonomy_code
     , p.primary_specialty_description
     , n.modality
-    , m.billing_id
-    , m.rendering_id
+    , m.billing_npi
+    , m.rendering_npi
     , rend.primary_specialty_description as rend_primary_specialty_description
     , m.facility_npi
     , m.discharge_disposition_code
@@ -77,7 +77,7 @@ with ccs_release_year as (
   left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
   left outer join {{ ref('terminology__place_of_service') }} as pos on m.place_of_service_code = pos.place_of_service_code
   left outer join {{ ref('terminology__bill_type') }} as bt on m.bill_type_code = bt.bill_type_code
-  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_id = rend.npi
+  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_npi = rend.npi
 )
 
 select
@@ -126,8 +126,8 @@ select
   , f.primary_taxonomy_code
   , f.primary_specialty_description
   , f.modality
-  , f.billing_id
-  , f.rendering_id
+  , f.billing_npi
+  , f.rendering_npi
   , f.rend_primary_specialty_description
   , f.facility_npi
   , f.discharge_disposition_code

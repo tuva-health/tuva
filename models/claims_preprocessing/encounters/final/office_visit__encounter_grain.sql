@@ -62,15 +62,15 @@ order by sum(paid_amount) desc) as paid_order
 
 , highest_paid_physician as (
   select encounter_id
-  , billing_id
+  , billing_npi
   , row_number() over (partition by encounter_id
 order by sum(paid_amount) desc) as paid_order
   , sum(paid_amount) as paid_amount
   from {{ ref('office_visits__int_detail_values') }}
-  where billing_id is not null
+  where billing_npi is not null
   group by
    encounter_id
-  , billing_id
+  , billing_npi
 )
 
 , highest_paid_hcpc as (
@@ -122,7 +122,7 @@ select d.encounter_id
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , hf.facility_npi as facility_npi
 , b.provider_organization_name as facility_name
-, phy.billing_id
+, phy.billing_npi
 , {{ concat_custom(["b2.provider_first_name", "' '", "b2.provider_last_name"]) }} as provider_name
 , b2.primary_specialty_description as provider_specialty
 , sc.lab_flag
@@ -160,7 +160,7 @@ left outer join patient as e
 left outer join {{ ref('terminology__provider') }} as b
   on hf.facility_npi = b.npi
 left outer join {{ ref('terminology__provider') }} as b2
-  on phy.billing_id = b2.npi
+  on phy.billing_npi = b2.npi
 left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm
   and hp.diagnosis_code_type = 'icd-10-cm'

@@ -71,10 +71,10 @@ select
   , mc.hcpcs_modifier_3
   , mc.hcpcs_modifier_4
   , mc.hcpcs_modifier_5
-  , mc.rendering_id
+  , mc.rendering_npi
   , mc.rendering_tin
   , mc.rendering_name
-  , mc.billing_id
+  , mc.billing_npi
   , mc.billing_tin
   , mc.billing_name
   , mc.facility_npi

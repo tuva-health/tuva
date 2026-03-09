@@ -49,7 +49,7 @@ with ccs_release_year as (
   left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
   left outer join {{ ref('terminology__place_of_service') }} as pos on m.place_of_service_code = pos.place_of_service_code
   left outer join {{ ref('terminology__bill_type') }} as bt on m.bill_type_code = bt.bill_type_code
-  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_id = rend.npi
+  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_npi = rend.npi
 )
 
 select

@@ -42,10 +42,10 @@ select
     , cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }}) as hcpcs_modifier_3
     , cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }}) as hcpcs_modifier_4
     , cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }}) as hcpcs_modifier_5
-    , cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }}) as rendering_id
+    , cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }}) as rendering_npi
     , cast(med.rendering_tin as {{ dbt.type_string() }}) as rendering_tin
     , cast(coalesce(med_npi.normalized_rendering_name, undetermined.rendering_name) as {{ dbt.type_string() }}) as rendering_name
-    , cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }}) as billing_id
+    , cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }}) as billing_npi
     , cast(med.billing_tin as {{ dbt.type_string() }}) as billing_tin
     , cast(coalesce(med_npi.normalized_billing_name, undetermined.billing_name) as {{ dbt.type_string() }}) as billing_name
     , cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }}) as facility_npi
