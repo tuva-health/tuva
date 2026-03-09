@@ -272,9 +272,9 @@ with stg_eligibility as (
            When OREC is missing, latest Medicare status is used as a proxy.
         */
         , case
-            when original_reason_entitlement_code in ('0', '2') then 'Aged'
-            when original_reason_entitlement_code in ('1', '3') and payment_year_age >= 65 then 'Aged'
-            when original_reason_entitlement_code in ('1', '3') then 'Disabled'
+            when original_reason_entitlement_code = '0' then 'Aged'
+            when original_reason_entitlement_code in ('1', '2', '3') and payment_year_age >= 65 then 'Aged'
+            when original_reason_entitlement_code in ('1', '2', '3') then 'Disabled'
             when original_reason_entitlement_code is null and medicare_status_code in ('10', '11', '31') then 'Aged'
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') and payment_year_age >= 65 then 'Aged'
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') then 'Disabled'
