@@ -1,4 +1,15 @@
-name: DBT CI Modes
+name: Tuva CI
+run-name: >-
+  Tuva CI / Mode: ${{
+    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') && 'Large' ||
+    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium') && 'Medium' ||
+    'Small'
+  }} / DW: ${{
+    (contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') ||
+    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium')) &&
+    'All 6 Warehouses' ||
+    'Snowflake'
+  }}
 
 on:
   pull_request:
@@ -81,7 +92,20 @@ jobs:
             core.setOutput("adapter_matrix", JSON.stringify(adapters));
 
   run_dbt:
-    name: CI / ${{ matrix.adapter }} / ${{ needs.resolve_mode.outputs.mode }}
+    name: >-
+      Mode: ${{
+        needs.resolve_mode.outputs.mode == 'small' && 'Small' ||
+        needs.resolve_mode.outputs.mode == 'medium' && 'Medium' ||
+        'Large'
+      }} / DW: ${{
+        matrix.adapter == 'snowflake' && 'Snowflake' ||
+        matrix.adapter == 'bigquery' && 'BigQuery' ||
+        matrix.adapter == 'databricks' && 'Databricks' ||
+        matrix.adapter == 'fabric' && 'Fabric' ||
+        matrix.adapter == 'redshift' && 'Redshift' ||
+        matrix.adapter == 'duckdb' && 'DuckDB/MotherDuck' ||
+        matrix.adapter
+      }}
     needs: resolve_mode
     runs-on: ubuntu-latest
     strategy:
