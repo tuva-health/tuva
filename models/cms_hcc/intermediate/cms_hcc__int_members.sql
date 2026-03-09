@@ -252,7 +252,6 @@ with stg_eligibility as (
         */
         , case
             when medicaid_indicator = 1 then 'Yes'
-            when medicaid_indicator = 0 then 'No'
             when dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
             else 'No'
           end as medicaid_status
