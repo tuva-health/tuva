@@ -26,6 +26,7 @@ with stg_eligibility as (
         , elig.dual_status_code
         , elig.medicare_status_code
         , elig.enrollment_status
+        , elig.medicaid_indicator
         , elig.institutional_snp_flag
         , dates.collection_year
         , dates.payment_year
@@ -142,6 +143,7 @@ with stg_eligibility as (
         , stg_eligibility.original_reason_entitlement_code
         , stg_eligibility.dual_status_code
         , stg_eligibility.medicare_status_code
+        , stg_eligibility.medicaid_indicator
         , stg_eligibility.institutional_snp_flag
         /* Defaulting to "New" enrollment status when missing */
         , case
@@ -187,6 +189,7 @@ with stg_eligibility as (
         , dual_status_code
         , medicare_status_code
         , enrollment_status
+        , medicaid_indicator
         , institutional_snp_flag
         , enrollment_status_default
         , case
@@ -241,7 +244,14 @@ with stg_eligibility as (
             else null
           end as gender
         , age_group
+        /*
+           CMS NEMCAID indicator: when the medicaid_indicator field is
+           provided in the input layer, use it directly. Otherwise fall
+           back to the dual_status_code derivation. This matters for
+           New Enrollees who may have Medicaid without being dual-eligible.
+        */
         , case
+            when medicaid_indicator = 1 then 'Yes'
             when dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
             else 'No'
           end as medicaid_status
@@ -283,10 +293,10 @@ with stg_eligibility as (
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
-                when dual_status_code is null then 1
+                when medicaid_indicator is null and dual_status_code is null then 1
                 else 0
             {% else %}
-                when dual_status_code is null then true
+                when medicaid_indicator is null and dual_status_code is null then true
                 else false
             {% endif %}
           end as medicaid_dual_status_default

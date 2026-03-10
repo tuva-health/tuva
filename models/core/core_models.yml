@@ -438,10 +438,77 @@ models:
             data_type: varchar
       - name: enrollment_status
         description: >
-          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.          
+          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
         config:
           meta:
             data_type: varchar
+      - name: hospice_flag
+        description: Whether the patient is in hospice.
+        config:
+          meta:
+            data_type: integer
+      - name: snp_type
+        description: >
+          Special Needs Plan type (C-SNP, D-SNP, I-SNP). Null when non-SNP.
+        config:
+          meta:
+            data_type: varchar
+      - name: medicaid_indicator
+        description: >
+          Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS NEMCAID field.
+          Used for New Enrollee risk score calculations when dual_status_code is insufficient.
+        config:
+          meta:
+            data_type: integer
+      - name: long_term_institutional_flag
+        description: Whether the patient is in an institutional setting for longer than 30 days.
+        config:
+          meta:
+            data_type: integer
+      - name: part_d_raf_type
+        description: >
+          Part D Risk Adjustment Factor type (CE, NE, PE, NP).
+          Null when no Part D coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: low_income_subsidy_indicator
+        description: >
+          Low Income Subsidy (Extra Help) flag (Y/N).
+          Null when no Part D coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: metal_level
+        description: >
+          ACA metal tier (P/G/S/B/C). Null when non-ACA.
+        config:
+          meta:
+            data_type: varchar
+      - name: csr_indicator
+        description: >
+          Cost Sharing Reduction variant indicator (1-11). Null when non-ACA.
+        config:
+          meta:
+            data_type: integer
+      - name: enrollment_duration_months
+        description: >
+          Number of months covered during the benefit year (1-12). Null when non-ACA.
+        config:
+          meta:
+            data_type: integer
+      - name: esrd_status
+        description: >
+          ESRD clinical status (dialysis, graft, transplant). Null when non-ESRD.
+        config:
+          meta:
+            data_type: varchar
+      - name: transplant_duration_months
+        description: >
+          Months since kidney transplant. Null when non-ESRD or non-transplant.
+        config:
+          meta:
+            data_type: integer
       - name: fips_state_code
         description: FIPS code for the state the patient lives in (most recent known address).
         config:
