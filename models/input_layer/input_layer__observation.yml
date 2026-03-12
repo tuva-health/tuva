@@ -3,6 +3,7 @@ models:
   - name: input_layer__observation
     description: |
       The observation table contains information on measurements other than lab tests e.g. blood pressure, height, and weight.
+    mapping_instructions: ''
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -11,6 +12,8 @@ models:
     columns:
       - name: observation_id
         description: Unique identifier for each observation in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -66,6 +69,8 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -85,6 +90,8 @@ models:
                   - dqi_quality_measures
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -95,6 +102,8 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -116,6 +125,8 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -139,6 +150,8 @@ models:
             data_type: varchar
       - name: panel_id
         description: Unique identifier for the panel.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -160,6 +173,8 @@ models:
             data_type: varchar
       - name: observation_date
         description: Date the observation was recorded.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -205,6 +220,8 @@ models:
             data_type: date
       - name: observation_type
         description: Type of observation.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -244,6 +261,8 @@ models:
             data_type: varchar
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -286,6 +305,8 @@ models:
             data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -309,6 +330,8 @@ models:
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -330,6 +353,8 @@ models:
             data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -353,6 +378,8 @@ models:
             data_type: varchar
       - name: normalized_code
         description: The normalized code.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -376,6 +403,8 @@ models:
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -399,6 +428,8 @@ models:
             data_type: varchar
       - name: result
         description: The result of the record (e.g., lab test, observation, etc).
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -422,6 +453,8 @@ models:
             data_type: varchar
       - name: source_units
         description: Source units of the lab test.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -443,6 +476,8 @@ models:
             data_type: varchar
       - name: normalized_units
         description: Normalized units of the lab test.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -464,6 +499,8 @@ models:
             data_type: varchar
       - name: source_reference_range_low
         description: The low end of the reference range from the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -485,6 +522,8 @@ models:
             data_type: varchar
       - name: source_reference_range_high
         description: The high end of the reference range from the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -506,6 +545,8 @@ models:
             data_type: varchar
       - name: normalized_reference_range_low
         description: The normalized low end of the reference range.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -527,6 +568,8 @@ models:
             data_type: varchar
       - name: normalized_reference_range_high
         description: The normalized high end of the reference range.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -548,6 +591,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -570,6 +615,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -583,6 +630,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

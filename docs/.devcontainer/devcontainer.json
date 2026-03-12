@@ -1,0 +1,19 @@
+{
+    "name": "Tuva docs dev container",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "shutdownAction": "none",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app/docs,type=bind",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "files.insertFinalNewline": true,
+                "files.trimTrailingWhitespace": true
+            },
+            "extensions": []
+        }
+    }
+}
