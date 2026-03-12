@@ -3,6 +3,7 @@ models:
   - name: input_layer__medication
     description: |
       The medication table contains information on medications ordered and/or administered during a patient encounter.
+    mapping_instructions: ''
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -11,6 +12,8 @@ models:
     columns:
       - name: medication_id
         description: Unique identifier for each medication in the table.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -66,6 +69,8 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -85,6 +90,8 @@ models:
                   - dqi_quality_measures
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -95,6 +102,8 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -116,6 +125,8 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -139,6 +150,8 @@ models:
             data_type: varchar
       - name: dispensing_date
         description: Date the medication was dispensed.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -183,6 +196,8 @@ models:
             data_type: date
       - name: prescribing_date
         description: Date the medication was prescribed.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -227,6 +242,8 @@ models:
             data_type: date
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -263,6 +280,8 @@ models:
             data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -286,6 +305,8 @@ models:
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -307,6 +328,8 @@ models:
             data_type: varchar
       - name: ndc_code
         description: National drug code associated with the medication.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -338,6 +361,8 @@ models:
             data_type: varchar
       - name: ndc_description
         description: Description for the NDC.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -359,6 +384,8 @@ models:
             data_type: varchar
       - name: rxnorm_code
         description: RxNorm code associated with the medication.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -393,6 +420,8 @@ models:
             data_type: varchar
       - name: rxnorm_description
         description: Description for the RxNorm code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -414,6 +443,8 @@ models:
             data_type: varchar
       - name: atc_code
         description: ATC code for the medication.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -435,6 +466,8 @@ models:
             data_type: varchar
       - name: atc_description
         description: Description for the ATC code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -456,6 +489,8 @@ models:
             data_type: varchar
       - name: route
         description: The route used to administer the medication and/or vaccine.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -477,6 +512,8 @@ models:
             data_type: varchar
       - name: strength
         description: The strength of the medication.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -498,6 +535,8 @@ models:
             data_type: varchar
       - name: quantity
         description: The quantity of the medication.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -519,6 +558,8 @@ models:
             data_type: number
       - name: quantity_unit
         description: The units for the quantity.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -540,6 +581,8 @@ models:
             data_type: varchar
       - name: days_supply
         description: The number of days supply included.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -568,6 +611,8 @@ models:
             data_type: number
       - name: practitioner_id
         description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -589,6 +634,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -611,6 +658,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -624,6 +673,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

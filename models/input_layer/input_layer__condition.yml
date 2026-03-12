@@ -2,6 +2,7 @@ version: 2
 models:
   - name: input_layer__condition
     description: "The condition table contains information related to medical conditions \npatients have been officially diagnosed with or are suspected of having\ne.g. they may have symptoms indicative of the condition.  This includes \nproblems, admitting diagnosis codes, and billable diagnoses.\n"
+    mapping_instructions: ''
     config:
       schema: "{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}\n"
       tags: input_layer
@@ -9,6 +10,8 @@ models:
     columns:
       - name: condition_id
         description: Unique identifier for each condition in the table.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -60,6 +63,8 @@ models:
                   - dqi_readmission
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -70,6 +75,8 @@ models:
                   - dqi
       - name: person_id
         description: 'Unique identifier for each person in the dataset.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -84,6 +91,8 @@ models:
             is_primary_key: true
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -99,6 +108,8 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -113,6 +124,8 @@ models:
             data_type: varchar
       - name: claim_id
         description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -127,6 +140,8 @@ models:
             data_type: varchar
       - name: recorded_date
         description: Date when the condition was recorded.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -176,6 +191,8 @@ models:
             data_type: date
       - name: onset_date
         description: Date when the condition first occurred.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -217,6 +234,8 @@ models:
             data_type: date
       - name: resolved_date
         description: Date when the condition was resolved.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -262,6 +281,8 @@ models:
             data_type: date
       - name: status
         description: Status of the record (e.g., condition, test, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -283,6 +304,8 @@ models:
             data_type: varchar
       - name: condition_type
         description: The type of condition i.e. problem, admitting, or billing.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -304,6 +327,8 @@ models:
             data_type: varchar
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -339,6 +364,8 @@ models:
             data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -362,6 +389,8 @@ models:
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -375,6 +404,8 @@ models:
             data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -390,6 +421,8 @@ models:
             data_type: varchar
       - name: normalized_code
         description: The normalized code.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -405,6 +438,8 @@ models:
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -418,6 +453,8 @@ models:
             data_type: varchar
       - name: condition_rank
         description: The numerical ranking of a diagnosis code in a claim.  Principle  diagnosis code is given a ranking of 1. Claims data typically has a  strict ranking of conditions whereas medical records will often not  have this information or the information won't be accurate.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -439,6 +476,8 @@ models:
             data_type: number
       - name: present_on_admit_code
         description: The present_on_admit_code related to the condition.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -452,6 +491,8 @@ models:
             data_type: varchar
       - name: present_on_admit_description
         description: The description of the present_on_admit_code for the condition.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -465,6 +506,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -487,6 +530,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -500,6 +545,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

@@ -1,0 +1,242 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  /* --ifm-color-primary: #07405c; */
+  --ifm-color-primary-dark: #ffcc05;
+  --ifm-color-primary-darker: #66b1e2;
+  --ifm-color-primary-darkest: #1f7aa9;
+  --ifm-color-primary-light: #15b593;
+  /* --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e; */
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+html {
+  scroll-behavior: smooth;
+}
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.header-github-link:hover {
+  opacity: 0.6;
+}
+
+.header-github-link::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E")
+    no-repeat;
+}
+
+[data-theme='dark'] .header-github-link::before {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E")
+    no-repeat;
+}
+
+.header-slack-link:hover {
+  opacity: 0.6;
+}
+
+.header-slack-link::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background: url("/img/slack-logo.svg");
+  background-size: 24px 24px; /* set the size of the background image */
+}
+
+.header-youtube-link:hover {
+  opacity: 0.6;
+}
+
+.header-youtube-link::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background: url("/img/youtube-logo.svg");
+  background-size: 24px 24px; /* set the size of the background image */
+}
+
+.header-tuva-link:hover {
+  opacity: 0.6;
+}
+
+.header-tuva-link::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background: url("/img/favicon.ico");
+  background-size: 24px 24px; /* set the size of the background image */
+}
+
+
+table.dataTable tbody td, table.dataTable thead th {
+  border: none;
+}
+
+table.dataTable thead th {
+  background-color: #ffffff
+}
+
+
+[data-theme='dark'] table.dataTable thead th {
+  background-color: #1b1b1d
+}
+
+table.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.markdown table {
+  width: 100%; /* Make table width 100% of container */
+}
+
+
+/* Adjust the font size for the second column in the ahrq-table */
+.ahrq-table th:nth-child(2),
+.ahrq-table td:nth-child(2) {
+  font-size: 0.95em;
+}
+
+.ahrq-table th:nth-child(3),
+.ahrq-table td:nth-child(3) {
+  width: 100%;
+  font-size: 0.9em;
+}
+
+/* New CSS rules to adjust the width of the entire table */
+.wide-table {
+  width: 100%;
+  table-layout: auto;
+}
+[data-theme='dark'] .table-container thead.sticky th {
+    background-color: #333;
+    color: white;
+}
+
+.wide-table th:nth-child(2),
+.wide-table td:nth-child(2) {
+  width: 100%;
+  font-size: 0.97em;
+}
+
+/* data_dictionary_table */
+.data_dictionary_table {
+  width: 100%;
+}
+.data_dictionary_table th:nth-child(3),
+.data_dictionary_table td:nth-child(3) {
+  font-size: 0.9em;
+  width: 38%;
+}
+.data_dictionary_table th:nth-child(4),
+.data_dictionary_table td:nth-child(4) {
+  font-size: 0.95em;
+}
+
+
+/* Dark mode styles for row highlighting */
+[data-theme='dark'] .table-container tbody tr:hover {
+    background-color: #444;
+}
+
+#hidden-heading{
+  display: none;
+}
+
+.hide-h4 h4 {
+  opacity: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+}
+
+
+
+/* src/css/custom.css */
+
+/* Add vertical spacing above each Part heading */
+.theme-doc-sidebar-menu :is(
+  .menu__list-item.sidebar-chapter,
+  .menu__list-item-collapsible.sidebar-chapter,
+  .menu__link.sidebar-chapter
+) {
+  margin-top: 18px !important; /* adjust spacing as needed */
+}
+
+/* If the label renders as a link, make sure margin applies */
+.theme-doc-sidebar-menu .menu__link.sidebar-chapter {
+  display: block !important;
+}
+
+/* Don’t add space above the very first Part */
+.theme-doc-sidebar-menu .menu__list
+  :is(
+    .menu__list-item.sidebar-chapter,
+    .menu__list-item-collapsible.sidebar-chapter,
+    .menu__link.sidebar-chapter
+  ):first-child {
+  margin-top: 0 !important;
+}
+
+/* Make Part headings bold */
+.theme-doc-sidebar-menu :is(
+  .menu__list-item.sidebar-chapter > .menu__list-item-collapsible > .menu__link,
+  .menu__list-item-collapsible.sidebar-chapter > .menu__link,
+  .menu__link.sidebar-chapter
+) {
+  font-weight: 700 !important; /* bold text */
+  font-size: 1.10rem !important; /* increase font size (adjust up/down) */
+}
+
+/* Docs sidebar section headings (Core Platform, Additional Tools, Miscellaneous) */
+.theme-doc-sidebar-menu :is(
+  .menu__list-item.sidebar-section,
+  .menu__list-item-collapsible.sidebar-section,
+  .menu__link.sidebar-section
+) {
+  margin-top: 18px !important;
+}
+
+.theme-doc-sidebar-menu :is(
+  .menu__list-item.sidebar-section > .menu__list-item-collapsible > .menu__link,
+  .menu__list-item-collapsible.sidebar-section > .menu__link,
+  .menu__link.sidebar-section
+) {
+  font-weight: 700 !important;
+  font-size: 1.02rem !important;
+}
+
+.theme-doc-sidebar-menu
+  :is(.menu__list-item.sidebar-section, .menu__list-item-collapsible.sidebar-section)
+  .menu__link {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/* Hide external-link icon for specific navbar links */
+a.navbar-no-ext-icon svg[aria-label="(opens in new tab)"],
+a.navbar-no-ext-icon [class*="iconExternalLink"] {
+  display: none !important;
+}
