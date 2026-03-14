@@ -5,7 +5,7 @@ title: "CMS-HCCs"
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/cms_hcc)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/cms_hcc)
 
 The CMS-HCC data mart implements v24 and v28 versions of the CMS-HCC risk model.  The full documentation of these models can be found on CMS's website.
 

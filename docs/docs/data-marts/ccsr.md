@@ -4,7 +4,7 @@ title: "CCSR"
 ---
 
 ## Methods
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/ccsr)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/ccsr)
 
 The CCSR data mart implements [AHRQ's Clinical Classifications Software Refined](https://hcup-us.ahrq.gov/toolssoftware/ccsr/ccs_refined.jsp) diagnosis and procedure grouper.  This is a very commonly used tool to group ICD-10-CM and ICD-10-PCS diagnosis and procedure codes into higher-level categories.  Full documentation for this grouper can be found on AHRQ's website via the link above.
 

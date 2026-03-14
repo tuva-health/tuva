@@ -5,7 +5,7 @@ title: "Quality Measures"
 
 ## Overview
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/quality_measures)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/quality_measures)
 
 The Quality Measures data mart is where we are building publicly available quality measures. The following measures are currently built into the data mart, in addition to readmission and AHRQ QIs which are their own data mart.
 

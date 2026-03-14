@@ -7,7 +7,7 @@ toc_max_heading_level: 4
 
 ## Overview
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/fhir_preprocessing)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/fhir_preprocessing)
 
 In the Tuva Project, we have built a FHIR preprocessing mart designed to streamline the transformation of healthcare data into a FHIR-ready format. This mart transforms data from the Tuva Core Data Model into standardized tables aligned with FHIR resources,
 ready to be exported as CSVs, making it easier to generate valid FHIR patient bundles.

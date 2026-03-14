@@ -1,10 +1,9 @@
 ---
 id: data-quality-overview
-title: "Overview"
-hide_title: true
+title: "2. Data Quality"
+sidebar_label: "Overview"
+github_path: "/tuva/models/data_quality"
 ---
-
-# 3. Data Quality
 
 Data Quality is one of the main focus areas of the Tuva Project.  Every healthcare dataset contains numerous data quality issues, so it's imperative that you have a strong suite of data quality tests and tools to diagnose these issues and understand their impact on analytics.
 

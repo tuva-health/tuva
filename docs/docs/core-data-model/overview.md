@@ -1,12 +1,10 @@
 ---
 id: overview
-title: "Overview"
-hide_title: true
+title: "5. Core Data Model"
+github_path: "/tuva/models/core"
 hide_table_of_contents: true
 slug: /core-data-model
 ---
-
-# 2. Core Data Model
 
 import InputLayerDictionaryTable from '@site/src/components/InputLayerDictionaryTable';
 
@@ -117,5 +115,3 @@ The Core Data Model is a common data model designed for unifying claims and clin
   showMappingInstructions={false}
   showRequiredForDataMart={false}
 />
-
-

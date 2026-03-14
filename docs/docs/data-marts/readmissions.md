@@ -5,7 +5,7 @@ title: "Readmissions"
 
 ## Overview
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/readmissions)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/readmissions)
 
 Hospital readmissions are one of the most common healthcare concepts.  They are also one of the most complicated concepts to define and implement as code.  Here we provide a general overview of how to calculate a hospital readmission measure.
 

@@ -6,7 +6,7 @@ import AttributionSampleDashboard from '@site/src/components/AttributionSampleDa
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/tuva_provider_attribution)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/provider_attribution)
 
 Provider attribution assigns each person to the provider who most plausibly
 manages their primary care. Organizations use attribution for panel

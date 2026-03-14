@@ -16,7 +16,7 @@ Additionally, the mart provides recapture rates and a lot of detail into the typ
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/hcc_recapture)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/hcc_recapture)
 
 The HCC recapture data mart identifies gaps for patients who either an HCC coded or are suspected of an HCC in a collection year.
 

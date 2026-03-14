@@ -1,14 +1,12 @@
 ---
 id: terminology
-title: "6. Terminology"
-hide_title: true
+title: "7. Terminology"
+github_path: "/tuva/seeds"
 description: The Tuva Project makes it easy to load useful terminology sets like ICD-10 codes directly into your data warehouse where you need them for analytics.
 ---
 
 import { JsonDataTable } from '@site/src/components/JsonDataTable';
 import { JsonDataTableNoTerm } from '@site/src/components/JsonDataTableNoTerm';
-
-# 6. Terminology 
 
 Terminology includes code sets (e.g. ICD-10-CM, HCPCS), value sets (e.g. the ICD-10-CM codes that define Type 2 Diabetes), and reference datasets (e.g. provider NPI lookups).
 
