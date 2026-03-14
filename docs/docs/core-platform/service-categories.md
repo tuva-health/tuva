@@ -1,13 +1,12 @@
 ---
 id: service-categories
-title: "Service Category Grouper"
+title: "Service Categories"
+github_path: "/tuva/models/claims_preprocessing/service_category"
 toc_min_heading_level: 2
 toc_max_heading_level: 4
 ---
 
 ## Methods
-
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/claims_preprocessing/service_category)
 
 In the Tuva Project, we've created a service category grouper to help us analyze payment and utilization metrics. We use it to categorize medical claim lines.
 
@@ -725,4 +724,3 @@ order by service_category_1
 ,service_category_2
 ```
 </details>
-

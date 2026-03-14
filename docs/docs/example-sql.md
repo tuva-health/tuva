@@ -4,7 +4,7 @@ title: "Example SQL"
 toc_max_heading_level: 2
 ---
 
-The following SQL queries run against the Tuva data model.  These queries were built and tested using **Snowflake** and **Tuva version 0.15.4**.
+The following SQL queries run against the Tuva data model. These queries were built and tested using **DuckDB local** and **Tuva version 0.17.1**.
 
 ## Acute Inpatient
 
@@ -28,7 +28,7 @@ where encounter_type = 'acute inpatient'
 
 ```sql
 select 
-  date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+  strftime(encounter_end_date, '%Y%m') as year_month
 , count(1) as count
 from core.encounter
 where encounter_type = 'acute inpatient'
@@ -113,7 +113,7 @@ If you have claims data, and specifically eligibility and enrollment data, you c
 with acute_inpatient as (
 select 
   data_source
-, date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+, strftime(encounter_end_date, '%Y%m') as year_month
 , count(1) as acute_inpatient_visits
 from core.encounter
 where encounter_type = 'acute inpatient'
@@ -151,7 +151,7 @@ Besides looking at the total number of visits normalized for eligibility, it's c
 with acute_inpatient as (
 select 
   data_source
-, date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+, strftime(encounter_end_date, '%Y%m') as year_month
 , sum(length_of_stay) as sum_length_of_stay
 from core.encounter
 where encounter_type = 'acute inpatient'
@@ -179,7 +179,7 @@ order by 1,2
 </details>
 
 ### Paid and Allowed Amounts
-If you have claims data, you can calculate the paid and allowed amounts spent on acute inpatient visits.  Because the encounter grouper in [Encounter Types](../data-marts/encounter-types) groups multiple claims into distinct visits, this allows you to analyze the paid and allowed amounts per visit, as opposed to per claim.
+If you have claims data, you can calculate the paid and allowed amounts spent on acute inpatient visits.  Because the encounter grouper in [Encounter Grouper](../core-platform/encounter-grouper) groups multiple claims into distinct visits, this allows you to analyze the paid and allowed amounts per visit, as opposed to per claim.
 
 <details>
   <summary>Total Paid and Allowed Amounts</summary>
@@ -198,7 +198,7 @@ where encounter_type = 'acute inpatient'
 
 ```sql
 select
-  date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+  strftime(encounter_end_date, '%Y%m') as year_month
 , sum(paid_amount) as paid_amount
 , sum(allowed_amount) as allowed_amount
 from core.encounter
@@ -216,7 +216,7 @@ Length of stay is computed as the difference between discharge date and admissio
 
 ```sql
 select 
-  date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+  strftime(encounter_end_date, '%Y%m') as year_month
 , avg(length_of_stay) as alos
 from core.encounter
 where encounter_type = 'acute inpatient'
@@ -235,7 +235,7 @@ Mortality is computed by counting the number of discharges with a discharge disp
 with mortality_flag as (
 select
   data_source
-, date_part(year, encounter_end_date) || lpad(date_part(month, encounter_end_date),2,0) as year_month
+, strftime(encounter_end_date, '%Y%m') as year_month
 , case
     when discharge_disposition_code = 20 then 1
     else 0
@@ -268,11 +268,11 @@ The 30-day readmission rate is calculated by following CMS's readmission methodo
 with readmit as 
 (
 select
-to_char(discharge_date, 'YYYYMM') as year_month
+strftime(discharge_date, '%Y%m') as year_month
 , sum(case when index_admission_flag = 1 then 1 else 0 end) as index_admissions
 , sum(case when index_admission_flag = 1 and unplanned_readmit_30_flag = 1 then 1 else 0 end) as readmissions
 from readmissions.readmission_summary
-group by to_char(discharge_date, 'YYYYMM')
+group by strftime(discharge_date, '%Y%m')
 )
 
 select 
@@ -706,7 +706,7 @@ with patient_age as (
 select
   data_source
 , person_id
-, floor(datediff(day, birth_date, current_date)/365) as age
+, floor(datediff('day', birth_date, current_date)/365) as age
 from core.patient
 )
 
@@ -798,14 +798,14 @@ Analyzing ED claims data helps identify high utilizers of emergency services, of
 with ed as (
 select 
   data_source
-  ,TO_CHAR(encounter_end_date, 'YYYYMM') AS year_month
+  ,strftime(encounter_end_date, '%Y%m') AS year_month
   ,COUNT(*) AS ed_visits
   ,AVG(paid_amount) as avg_paid_amount
   ,sum(paid_amount) as total_paid_amount
 from core.encounter
 where encounter_type = 'emergency department'
 group by data_source
- ,TO_CHAR(encounter_end_date, 'YYYYMM') 
+ ,strftime(encounter_end_date, '%Y%m') 
 )
 
 , member_months as (
@@ -859,13 +859,13 @@ order by data_source
 ```sql
 select 
 data_source
-, TO_CHAR(encounter_end_date, 'YYYY') AS year_nbr
+, strftime(encounter_end_date, '%Y') AS year_nbr
 , person_id
 , COUNT(*) AS ed_visits
 from core.encounter
 where encounter_type = 'emergency department'
 group by data_source
-, TO_CHAR(encounter_end_date, 'YYYY')
+, strftime(encounter_end_date, '%Y')
 , person_id
 ORDER BY ed_visits desc
 , year_nbr
@@ -1010,16 +1010,16 @@ order by visit_count desc
 with enc as 
 (
 select e.person_id
-,left(year_month,4) as year_nbr
-,data_source
+,strftime(e.encounter_end_date, '%Y') as year_nbr
+,e.data_source
 ,count(distinct e.encounter_id) as potentially_preventable
 ,sum(e.paid_amount) as paid_amount
 from core.encounter e 
 inner join ed_classification.summary s on e.encounter_id = s.encounter_id
 where ed_classification_description in ('Emergent, Primary Care Treatable','Non-Emergent','Emergent, ED Care Needed, Preventable/Avoidable')
 group by e.person_id
-,data_source
-,left(year_month,4) 
+,e.data_source
+,strftime(e.encounter_end_date, '%Y') 
 )
 
 ,member_year as (
@@ -1083,18 +1083,19 @@ select
 P.ccsr_category
 , P.ccsr_category_description
 , P.ccsr_parent_category
-, B.body_system
+, P.body_system
 , count(*) as visit_count
 , sum(cast(e.paid_amount as decimal(18,2))) as paid_amount
 , cast(sum(e.paid_amount)/count(*) as decimal(18,2))as paid_per_visit
 from core.encounter e 
-left join ccsr.dx_vertical_pivot P ON e.primary_diagnosis_code = p.Code
-    and p.ccsr_category_rank = 1
-left join CCSR._value_set_dxccsr_v2023_1_body_systems B ON P.CCSR_PARENT_CATEGORY = B.CCSR_PARENT_CATEGORY
+left join ccsr.long_condition_category P
+  on e.encounter_id = p.encounter_id
+ and p.condition_rank = 1
+ and p.ccsr_category_rank = 1
 group by P.ccsr_category
 , P.ccsr_category_description
 , P.ccsr_parent_category
-, B.body_system
+, P.body_system
 order by visit_count desc
 
 ```
@@ -1157,7 +1158,7 @@ data_source
 , cast(sum(medical_paid) as decimal(18,2)) as medical_paid
 , count(*) as member_months
 , cast(sum(medical_paid)/count(*) as decimal(18,2)) as pmpm
-from tuva_synthetic.financial_pmpm.pmpm_prep
+from financial_pmpm.pmpm_prep
 group by 
 data_source
 , year_month
@@ -1199,7 +1200,7 @@ data_source
 ,medical_claims as (
 select 
   mc.data_source
-  , to_char(claim_start_date, 'YYYYMM') AS year_month
+  , strftime(claim_start_date, '%Y%m') AS year_month
   , claim_type
   , cast(sum(paid_amount) as decimal(18,2)) AS paid_amount
 from core.medical_claim mc
@@ -1207,9 +1208,9 @@ inner join core.member_months mm on mc.person_id = mm.person_id
 and
 mc.data_source = mm.data_source
 and
-to_char(mc.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(mc.claim_start_date, '%Y%m') = mm.year_month
 group by mc.data_source
-, to_char(claim_start_date, 'YYYYMM')
+, strftime(claim_start_date, '%Y%m')
 , claim_type
 )
 
@@ -1262,22 +1263,22 @@ where ccm.person_id is null
 select 
   mc.data_source
   , mc.person_id
-  , to_char(claim_start_date, 'YYYYMM') AS year_month
+  , strftime(claim_start_date, '%Y%m') AS year_month
   , cast(sum(paid_amount) as decimal(18,2)) AS paid_amount
 from core.medical_claim mc
 inner join core.member_months mm on mc.person_id = mm.person_id
 and
 mc.data_source = mm.data_source
 and
-to_char(mc.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(mc.claim_start_date, '%Y%m') = mm.year_month
 group by mc.data_source
 , mc.person_id
-, to_char(claim_start_date, 'YYYYMM')
+, strftime(claim_start_date, '%Y%m')
 )
 
 select 
 mm.data_source
-//,mm.year_month uncomment to view at month level
+-- ,mm.year_month uncomment to view at month level
 ,cc.condition
 ,count(*) as member_months
 ,sum(mc.paid_amount) as paid_amount
@@ -1291,7 +1292,7 @@ and
 mm.data_source = mc.data_source
 group by 
 mm.data_source
-//,mm.year_month
+-- ,mm.year_month
 ,cc.condition
 order by member_months desc
 ```
@@ -1312,12 +1313,12 @@ with medical_claim as
 select 
   data_source
   , person_id
-  , to_char(claim_start_date, 'YYYYMM') AS year_month
+  , strftime(claim_start_date, '%Y%m') AS year_month
   , cast(sum(paid_amount) as decimal(18,2)) AS paid_amount
 from core.medical_claim
 GROUP BY data_source
 , person_id
-, to_char(claim_start_date, 'YYYYMM')
+, strftime(claim_start_date, '%Y%m')
 )
 
 select mm.data_source
@@ -1333,8 +1334,8 @@ and
 mm.year_month = mc.year_month
 group by mm.data_source
 , mm.year_month
-order by data_source
-,year_month
+order by mm.data_source
+,mm.year_month
 ```
 </details>
 
@@ -1387,7 +1388,7 @@ left join core.member_months mm on mc.person_id = mm.person_id
 and
 mc.data_source = mm.data_source
 and
-to_char(mc.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(mc.claim_start_date, '%Y%m') = mm.year_month
 GROUP BY mc.data_source
 ```
 </details>
@@ -1405,12 +1406,12 @@ with pharmacy_claim as
 select 
   data_source
   , person_id
-  , to_char(paid_date, 'YYYYMM') AS year_month
+  , strftime(paid_date, '%Y%m') AS year_month
   , cast(sum(paid_amount) as decimal(18,2)) AS paid_amount
 from core.pharmacy_claim
 GROUP BY data_source
 , person_id
-, to_char(paid_date, 'YYYYMM')
+, strftime(paid_date, '%Y%m')
 )
 
 select mm.data_source
@@ -1426,8 +1427,8 @@ and
 mm.year_month = mc.year_month
 group by mm.data_source
 , mm.year_month
-order by data_source
-,year_month
+order by mm.data_source
+,mm.year_month
 ```
 </details>
 
@@ -1479,7 +1480,7 @@ left join core.member_months mm on mc.person_id = mm.person_id
 and
 mc.data_source = mm.data_source
 and
-to_char(mc.paid_date, 'YYYYMM') = mm.year_month
+strftime(mc.paid_date, '%Y%m') = mm.year_month
 GROUP BY mc.data_source
 
 ```
@@ -1641,7 +1642,7 @@ Analyzing primary care utilization in claims data is crucial for understanding h
 with primary_care as (
 select 
 m.data_source
-,TO_CHAR(claim_start_date, 'YYYYMM') AS year_month
+,strftime(claim_start_date, '%Y%m') AS year_month
 ,sum(paid_amount) as primary_care_paid_amount
 from core.medical_claim m
 inner join core.practitioner p on coalesce(m.rendering_id,m.billing_id) = p.npi
@@ -1649,11 +1650,11 @@ inner join core.member_months mm on m.person_id = mm.person_id
 and
 m.data_source = mm.data_source
 and
-to_char(m.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(m.claim_start_date, '%Y%m') = mm.year_month
 where service_category_2 in ('Office Visit','Outpatient Hospital or Clinic')
 and
 p.specialty in ('Family Medicine','Internal Medicine','Obstetrics & Gynecology','Pediatric Medicine','Physician Assistant','Nurse Practitioner')
-group by TO_CHAR(claim_start_date, 'YYYYMM')
+group by strftime(claim_start_date, '%Y%m')
 ,m.data_source
 )
 
@@ -1697,7 +1698,7 @@ with primary_care as
 (
 select 
 m.data_source
-,TO_CHAR(claim_start_date, 'YYYY') AS year_nbr
+,strftime(claim_start_date, '%Y') AS year_nbr
 ,count(distinct claim_id) as visit_count
 ,m.person_id
 from core.medical_claim m
@@ -1706,11 +1707,11 @@ inner join core.member_months mm on m.person_id = mm.person_id
 and
 m.data_source = mm.data_source
 and
-to_char(m.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(m.claim_start_date, '%Y%m') = mm.year_month
 where service_category_2 in ('Office Visit','Outpatient Hospital or Clinic')
 and
 p.specialty in ('Family Medicine','Internal Medicine','Obstetrics & Gynecology','Pediatric Medicine','Physician Assistant','Nurse Practitioner')
-group by TO_CHAR(claim_start_date, 'YYYY')
+group by strftime(claim_start_date, '%Y')
 ,m.data_source
 ,m.person_id
 )
@@ -1750,7 +1751,7 @@ with primary_care as
 (
 select 
 m.data_source
-,TO_CHAR(claim_start_date, 'YYYY') AS year_nbr
+,strftime(claim_start_date, '%Y') AS year_nbr
 ,count(distinct claim_id) as visit_count
 ,m.person_id
 from core.medical_claim m
@@ -1759,11 +1760,11 @@ inner join core.member_months mm on m.person_id = mm.person_id
 and
 m.data_source = mm.data_source
 and
-to_char(m.claim_start_date, 'YYYYMM') = mm.year_month
+strftime(m.claim_start_date, '%Y%m') = mm.year_month
 where service_category_2 in ('Office Visit','Outpatient Hospital or Clinic')
 and
 p.specialty in ('Family Medicine','Internal Medicine','Obstetrics & Gynecology','Pediatric Medicine','Physician Assistant','Nurse Practitioner')
-group by TO_CHAR(claim_start_date, 'YYYY')
+group by strftime(claim_start_date, '%Y')
 ,m.data_source
 ,m.person_id
 )
@@ -1790,8 +1791,8 @@ group by
 my.data_source
 ,my.year_nbr
 order by 
-year_nbr
-,data_source
+my.year_nbr
+,my.data_source
 ;
 ```
 
@@ -1805,7 +1806,7 @@ year_nbr
 ```sql
 select 
 coalesce(m.rendering_id,m.billing_id) as primary_care_provider_npi
-,p.provider_first_name || ' '|| provider_last_name as primary_care_provider_name
+,p.first_name || ' '|| p.last_name as primary_care_provider_name
 ,count(distinct claim_id) as visit_count
 ,sum(paid_amount) as paid_amount
 from core.medical_claim m
@@ -1814,7 +1815,7 @@ where service_category_2 in ('Office Visit','Outpatient Hospital or Clinic')
 and
 p.specialty in ('Family Medicine','Internal Medicine','Obstetrics & Gynecology','Pediatric Medicine','Physician Assistant','Nurse Practitioner')
 group by coalesce(m.rendering_id,m.billing_id) 
-,p.provider_first_name || ' '|| provider_last_name
+,p.first_name || ' '|| p.last_name
 order by visit_count desc
 ```
 </details>
@@ -1851,14 +1852,14 @@ with uc as
 (
 select mc.person_id
 ,mc.data_source
-,to_char(claim_start_date, 'yyyy') as year_nbr
+,strftime(claim_start_date, '%Y') as year_nbr
 ,count(distinct concat(mc.person_id,mc.data_source,claim_start_date)) as visits
 ,sum(mc.paid_amount) as paid_amount
 from core.medical_claim mc
 where service_category_2 = 'Urgent Care'
 group by mc.person_id
 ,mc.data_source
-,to_char(claim_start_date, 'yyyy')
+,strftime(claim_start_date, '%Y')
 )
 
 ,member_year as (
@@ -1886,7 +1887,7 @@ and
 uc.person_id = my.person_id
 group by my.data_source
 ,my.year_nbr
-order by data_source
+order by my.data_source
 ,my.year_nbr
 
 ```
@@ -1900,7 +1901,7 @@ order by data_source
 with enc as 
 (
 select mc.person_id
-,to_char(claim_start_date, 'yyyy') as year_nbr
+,strftime(claim_start_date, '%Y') as year_nbr
 ,mc.data_source
 ,count(distinct concat(mc.person_id,mc.data_source,claim_start_date)) as urgent_care
 ,sum(mc.paid_amount) as paid_amount
@@ -1908,7 +1909,7 @@ from core.medical_claim mc
 where service_category_2 = 'Urgent Care'
 group by mc.person_id
 ,mc.data_source
-,to_char(claim_start_date, 'yyyy')
+,strftime(claim_start_date, '%Y')
 )
 
 ,member_year as (
@@ -1947,7 +1948,7 @@ group by my.data_source
 with uc as 
 (
 select mc.person_id
-,to_char(claim_start_date, 'yyyy') as year_nbr
+,strftime(claim_start_date, '%Y') as year_nbr
 ,mc.data_source
 ,count(distinct concat(mc.person_id,mc.data_source,claim_start_date)) as visits
 ,sum(mc.paid_amount) as paid_amount
@@ -1955,19 +1956,19 @@ from core.medical_claim mc
 where service_category_2 = 'Urgent Care'
 group by mc.person_id
 ,mc.data_source
-,to_char(claim_start_date, 'yyyy')
+,strftime(claim_start_date, '%Y')
 )
 
 ,ed as (
 select e.person_id
-,to_char(encounter_start_date, 'yyyy') as year_nbr
+,strftime(encounter_start_date, '%Y') as year_nbr
 ,data_source
 ,count(distinct e.encounter_id) as visits
 ,sum(e.paid_amount) as paid_amount
 from core.encounter e 
 group by e.person_id
 ,data_source
-,to_char(encounter_start_date, 'yyyy')
+,strftime(encounter_start_date, '%Y')
 )
 
 ,member_year as (
@@ -2059,7 +2060,7 @@ order by ed_visits desc
 with uc as 
 (
 select mc.person_id
-,to_char(claim_start_date, 'yyyy') as year_nbr
+,strftime(claim_start_date, '%Y') as year_nbr
 ,mc.data_source
 ,count(distinct concat(mc.person_id,mc.data_source,claim_start_date)) as visits
 ,sum(mc.paid_amount) as paid_amount
@@ -2067,19 +2068,19 @@ from core.medical_claim mc
 where service_category_2 = 'Urgent Care'
 group by mc.person_id
 ,mc.data_source
-,to_char(claim_start_date, 'yyyy')
+,strftime(claim_start_date, '%Y')
 )
 
 ,ed as (
 select e.person_id
-,to_char(encounter_start_date, 'yyyy') as year_nbr
+,strftime(encounter_start_date, '%Y') as year_nbr
 ,data_source
 ,count(distinct e.encounter_id) as visits
 ,sum(e.paid_amount) as paid_amount
 from core.encounter e 
 group by e.person_id
 ,data_source
-,to_char(encounter_start_date, 'yyyy')
+,strftime(encounter_start_date, '%Y')
 )
 
 ,member_year as (

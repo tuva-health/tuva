@@ -5,7 +5,7 @@ const sidebars = {
     "getting-started",
     {
       type: "category",
-      label: "Core Platform",
+      label: "Tuva Core Platform",
       className: "sidebar-section",
       collapsible: false,
       collapsed: false,
@@ -16,13 +16,50 @@ const sidebars = {
           label: "1. Input Layer",
         },
         {
+          type: "category",
+          label: "2. Data Quality",
+          collapsed: true,
+          items: [
+            "data-quality-overview",
+            "data-pipeline-tests",
+            "data-quality-dashboard",
+          ],
+        },
+        {
           type: "doc",
-          id: "core-data-model/overview",
-          label: "2. Core Data Model",
+          id: "core-platform/normalization",
+          label: "3. Normalization",
         },
         {
           type: "category",
-          label: "3. Data Marts",
+          label: "4. Claims Preprocessing",
+          collapsed: true,
+          items: [
+            {
+              type: "doc",
+              id: "core-platform/claims-preprocessing",
+              label: "Overview",
+            },
+            {
+              type: "doc",
+              id: "core-platform/service-categories",
+              label: "Service Categories",
+            },
+            {
+              type: "doc",
+              id: "core-platform/encounter-grouper",
+              label: "Encounter Grouper",
+            },
+          ],
+        },
+        {
+          type: "doc",
+          id: "core-data-model/overview",
+          label: "5. Core Data Model",
+        },
+        {
+          type: "category",
+          label: "6. Data Marts",
           collapsed: true,
           items: [
             "data-marts/overview",
@@ -31,7 +68,6 @@ const sidebars = {
             "data-marts/chronic-conditions",
             "data-marts/cms-hccs",
             "data-marts/ed-classification",
-            "data-marts/encounter-types",
             "data-marts/fhir-preprocessing",
             "data-marts/financial-pmpm",
             "data-marts/hcc-recapture",
@@ -44,23 +80,12 @@ const sidebars = {
             },
             "data-marts/quality-measures",
             "data-marts/readmissions",
-            "data-marts/service-categories",
-          ],
-        },
-        {
-          type: "category",
-          label: "4. Data Quality",
-          collapsed: true,
-          items: [
-            "data-quality-overview",
-            "data-pipeline-tests",
-            "data-quality-dashboard",
           ],
         },
         {
           type: "doc",
           id: "terminology",
-          label: "5. Terminology & Value Sets",
+          label: "7. Terminology & Value Sets",
         },
       ],
     },

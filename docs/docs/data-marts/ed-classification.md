@@ -5,7 +5,7 @@ title: "ED Classification"
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/ed_classification)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/ed_classification)
 
 The ED Classification data mart implements the 2017 update to the original [NYU ED Classification Algorithm](https://wagner.nyu.edu/faculty/billings/nyued-background) to identify potentially preventable ED visits.
 

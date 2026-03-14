@@ -5,7 +5,7 @@ title: "Pharmacy"
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/pharmacy/)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/pharmacy/)
 
 Understanding pharmacy spend in healthcare data is crucial for identifying cost trends and optimizing medication management. It allows healthcare providers and payers to track drug utilization, assess the efficacy of formulary decisions, and implement strategies to enhance patient care while controlling costs.
 

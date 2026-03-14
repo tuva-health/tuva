@@ -5,7 +5,7 @@ title: "Financial PMPM"
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/financial_pmpm)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/financial_pmpm)
 
 The Financial PMPM data mart computes member months and stratifies population paid and allowed amounts by member months and service categories across various payers and plans.
 

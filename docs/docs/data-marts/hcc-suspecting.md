@@ -5,7 +5,7 @@ title: "HCC Suspecting"
 
 ## Methods
 
-[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/hcc_suspecting)
+[Code on Github](https://github.com/tuva-health/tuva/tree/main/models/data_marts/hcc_suspecting)
 
 The HCC Suspecting data mart identifies patients suspected of having a chronic 
 condition but doesn't have the HCC recorded in the payment year. We use 
