@@ -7,6 +7,7 @@ models:
       attributed provider (typically determined by the user). Fields related to each attributed provider (practice, 
       organization, line of business) are also present.  This table allows you to input a custom attribution assigment from 
       another system.  You can also use the Provider Attribution data mart to do this assignment by using your claims data.
+    mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
           config:
@@ -40,6 +41,8 @@ models:
     columns:
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -79,6 +82,8 @@ models:
             is_primary_key: true
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -93,6 +98,8 @@ models:
             data_type: varchar
       - name: member_id
         description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -116,6 +123,8 @@ models:
             is_primary_key: true
       - name: year_month
         description: Unique year-month in the dataset computed from eligibility.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -155,6 +164,8 @@ models:
             is_primary_key: true
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -170,6 +181,8 @@ models:
             is_primary_key: true
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -185,6 +198,8 @@ models:
             is_primary_key: true
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -224,6 +239,8 @@ models:
             is_primary_key: true
       - name: payer_attributed_provider
         description: Unique identifier for the provider assigned to this patient-year_month by the payer.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -238,6 +255,8 @@ models:
             data_type: varchar
       - name: payer_attributed_provider_practice
         description: Name of the practice for the payer attributed provider.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -252,6 +271,8 @@ models:
             data_type: varchar
       - name: payer_attributed_provider_organization
         description: Name of the organization for the payer attributed provider.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -266,6 +287,8 @@ models:
             data_type: varchar
       - name: payer_attributed_provider_lob
         description: Name of the line of business for the payer attributed provider (e.g. medicare, medicaid, commercial).
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -280,6 +303,8 @@ models:
             data_type: varchar
       - name: custom_attributed_provider
         description: Unique identifier for the provider assigned to this patient-year_month by the user.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -294,6 +319,8 @@ models:
             data_type: varchar
       - name: custom_attributed_provider_practice
         description: Name of the practice for the attributed provider assigned by the user.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -308,6 +335,8 @@ models:
             data_type: varchar
       - name: custom_attributed_provider_organization
         description: Name of the organization for the attributed provider assigned by the user.
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -322,6 +351,8 @@ models:
             data_type: varchar
       - name: custom_attributed_provider_lob
         description: Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).
+        mapping_instructions: ''
+        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
