@@ -3,6 +3,7 @@ models:
   - name: input_layer__immunization
     description: |
       The immunization table contains information about immunizations administered to patients.
+    mapping_instructions: ''
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -11,6 +12,8 @@ models:
     columns:
       - name: immunization_id
         description: Unique identifier for each immunization.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -36,6 +39,8 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -53,6 +58,8 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -66,6 +73,8 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -79,6 +88,8 @@ models:
             data_type: varchar
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -92,6 +103,8 @@ models:
             data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -105,6 +118,8 @@ models:
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -118,6 +133,8 @@ models:
             data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -131,6 +148,8 @@ models:
             data_type: varchar
       - name: normalized_code
         description: The normalized code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -144,6 +163,8 @@ models:
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -157,6 +178,8 @@ models:
             data_type: varchar
       - name: status
         description: Status of the record (e.g., condition, test, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -170,6 +193,8 @@ models:
             data_type: varchar
       - name: status_reason
         description: Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -183,6 +208,8 @@ models:
             data_type: varchar
       - name: occurrence_date
         description: Date the event occured or was to be occured.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -205,6 +232,8 @@ models:
             data_type: date
       - name: source_dose
         description: The quantity of vaccine product that was administered.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -218,6 +247,8 @@ models:
             data_type: varchar
       - name: normalized_dose
         description: Normalized quantity of vaccine product that was administered.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -231,6 +262,8 @@ models:
             data_type: varchar
       - name: lot_number
         description: Lot number of the vaccine product.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -244,6 +277,8 @@ models:
             data_type: varchar
       - name: body_site
         description: The body site where the vaccine was administered.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -257,6 +292,8 @@ models:
             data_type: varchar
       - name: route
         description: The route used to administer the medication and/or vaccine.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -270,6 +307,8 @@ models:
             data_type: varchar
       - name: location_id
         description: Unique identifier for each location.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -283,6 +322,8 @@ models:
             data_type: varchar
       - name: practitioner_id
         description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -296,6 +337,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -310,6 +353,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -323,6 +368,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

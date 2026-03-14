@@ -1,14 +1,13 @@
 name: Tuva CI
 run-name: >-
-  Tuva CI / Mode: ${{
-    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') && 'Large' ||
-    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium') && 'Medium' ||
-    'Small'
-  }} / DW: ${{
-    (contains(join(github.event.pull_request.labels.*.name, ','), 'ci:large') ||
-    contains(join(github.event.pull_request.labels.*.name, ','), 'ci:medium')) &&
-    'All 6 Warehouses' ||
-    'Snowflake'
+  Tuva CI / PR #${{
+    github.event_name == 'workflow_dispatch' &&
+    github.event.inputs.pr_number ||
+    github.event.pull_request.number
+  }} / ${{
+    github.event_name == 'workflow_dispatch' &&
+    format('{0}-{1}', github.event.inputs.operation, github.event.inputs.target) ||
+    'run-snowflake'
   }}
 
 on:
@@ -17,45 +16,130 @@ on:
       - main
     types:
       - opened
-      - synchronize
-      - reopened
-      - labeled
-      - unlabeled
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to run against
+        required: true
+        type: string
+      operation:
+        description: CI operation to run
+        required: true
+        type: choice
+        default: run
+        options:
+          - run
+          - build
+      target:
+        description: Warehouse target
+        required: true
+        type: choice
+        default: snowflake
+        options:
+          - all
+          - snowflake
+          - bigquery
+          - databricks
+          - fabric
+          - redshift
+          - duckdb
 
 permissions:
   contents: read
   pull-requests: read
 
 jobs:
-  resolve_mode:
-    name: Resolve CI Mode
+  resolve_request:
+    name: Resolve CI Request
     runs-on: ubuntu-latest
     outputs:
-      mode: ${{ steps.resolve.outputs.mode }}
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      operation: ${{ steps.resolve.outputs.operation }}
+      target: ${{ steps.resolve.outputs.target }}
       adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
+      checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
     steps:
-      - name: Resolve mode, labels, and large-mode guard
+      - name: Resolve operation, target, and guardrails
         id: resolve
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const labels = (context.payload.pull_request.labels || []).map((l) => l.name);
-            const ciLabels = labels.filter((name) => /^ci:(small|medium|large)$/.test(name));
+            const { owner, repo } = context.repo;
+            const isDispatch = context.eventName === "workflow_dispatch";
+            const inputs = context.payload.inputs || {};
 
-            if (ciLabels.length > 1) {
-              core.setFailed(`Multiple CI mode labels found: ${ciLabels.join(", ")}. Keep only one of ci:small, ci:medium, ci:large.`);
+            const validOperations = new Set(["run", "build"]);
+            const validTargets = new Set([
+              "all",
+              "snowflake",
+              "bigquery",
+              "databricks",
+              "fabric",
+              "redshift",
+              "duckdb"
+            ]);
+
+            const adaptersByTarget = {
+              all: ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"],
+              snowflake: ["snowflake"],
+              bigquery: ["bigquery"],
+              databricks: ["databricks"],
+              fabric: ["fabric"],
+              redshift: ["redshift"],
+              duckdb: ["duckdb"]
+            };
+
+            let prNumber;
+            let operation;
+            let target;
+
+            if (isDispatch) {
+              const rawPrNumber = String(inputs.pr_number || "").trim();
+              if (!/^\d+$/.test(rawPrNumber)) {
+                core.setFailed(`Invalid workflow_dispatch input pr_number: "${rawPrNumber}".`);
+                return;
+              }
+              prNumber = Number(rawPrNumber);
+
+              operation = String(inputs.operation || "").trim().toLowerCase();
+              if (!validOperations.has(operation)) {
+                core.setFailed(`Invalid workflow_dispatch input operation: "${operation}".`);
+                return;
+              }
+
+              target = String(inputs.target || "").trim().toLowerCase();
+              if (!validTargets.has(target)) {
+                core.setFailed(`Invalid workflow_dispatch input target: "${target}".`);
+                return;
+              }
+            } else {
+              prNumber = context.payload.pull_request.number;
+              operation = "run";
+              target = "snowflake";
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber
+            });
+
+            if (pr.base.ref !== "main") {
+              core.setFailed(`PR #${prNumber} does not target main (targets ${pr.base.ref}).`);
               return;
             }
 
-            const mode = ciLabels.length === 1 ? ciLabels[0].replace("ci:", "") : "small";
-            const adapters =
-              mode === "small"
-                ? ["snowflake"]
-                : ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"];
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
+            const changed = files.map((f) => f.filename);
 
-            const seedPrefixes = ["seeds/", "integration_tests/seeds/"];
-            const seedExact = new Set([
+            const runGuardPrefixes = ["seeds/", "integration_tests/seeds/"];
+            const runGuardExact = new Set([
               "dbt_project.yml",
               "integration_tests/dbt_project.yml",
               "integration_tests/seeds/_seeds.yml",
@@ -63,40 +147,39 @@ jobs:
               "macros/cross_database_utils/load_seed.sql"
             ]);
 
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              per_page: 100
-            });
-            const changed = files.map((f) => f.filename);
-            const requiresLarge = changed.some((path) =>
-              seedExact.has(path) || seedPrefixes.some((prefix) => path.startsWith(prefix))
+            const requiresBuild = changed.some(
+              (path) =>
+                runGuardExact.has(path) ||
+                runGuardPrefixes.some((prefix) => path.startsWith(prefix))
             );
 
-            if (requiresLarge && mode !== "large") {
+            if (isDispatch && operation === "run" && requiresBuild) {
               const sample = changed
-                .filter((path) => seedExact.has(path) || seedPrefixes.some((prefix) => path.startsWith(prefix)))
+                .filter(
+                  (path) =>
+                    runGuardExact.has(path) ||
+                    runGuardPrefixes.some((prefix) => path.startsWith(prefix))
+                )
                 .slice(0, 8)
                 .join(", ");
+
               core.setFailed(
-                `This PR modifies seed/config/load-seed files (${sample}). Use /ci large so CI refreshes baseline schemas.`
+                `This PR changes seed/config files (${sample}). Use a build command (` +
+                  "`/ci build`, `/ci build-snowflake`, etc.) so CI runs `dbt build --full-refresh`."
               );
               return;
             }
 
-            core.info(`Resolved CI mode: ${mode}`);
-            core.info(`Adapters: ${adapters.join(", ")}`);
-
-            core.setOutput("mode", mode);
-            core.setOutput("adapter_matrix", JSON.stringify(adapters));
+            core.setOutput("pr_number", String(prNumber));
+            core.setOutput("operation", operation);
+            core.setOutput("target", target);
+            core.setOutput("adapter_matrix", JSON.stringify(adaptersByTarget[target]));
+            core.setOutput("checkout_ref", `refs/pull/${prNumber}/merge`);
 
   run_dbt:
     name: >-
-      Mode: ${{
-        needs.resolve_mode.outputs.mode == 'small' && 'Small' ||
-        needs.resolve_mode.outputs.mode == 'medium' && 'Medium' ||
-        'Large'
+      ${{
+        needs.resolve_request.outputs.operation == 'build' && 'Build' || 'Run'
       }} / DW: ${{
         matrix.adapter == 'snowflake' && 'Snowflake' ||
         matrix.adapter == 'bigquery' && 'BigQuery' ||
@@ -106,15 +189,15 @@ jobs:
         matrix.adapter == 'duckdb' && 'DuckDB/MotherDuck' ||
         matrix.adapter
       }}
-    needs: resolve_mode
+    needs: resolve_request
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        adapter: ${{ fromJson(needs.resolve_mode.outputs.adapter_matrix) }}
+        adapter: ${{ fromJson(needs.resolve_request.outputs.adapter_matrix) }}
     concurrency:
-      group: ci-${{ matrix.adapter }}
-      cancel-in-progress: false
+      group: ci-pr-${{ needs.resolve_request.outputs.pr_number }}-${{ matrix.adapter }}
+      cancel-in-progress: true
     env:
       PYTHON_VERSION: "3.10"
       DBT_PROJECT_DIR: "./integration_tests"
@@ -154,6 +237,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve_request.outputs.checkout_ref }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -208,16 +293,16 @@ jobs:
       - name: Test connection
         run: dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
 
-      - name: Assert baseline seed schemas exist for run-only modes
-        if: ${{ needs.resolve_mode.outputs.mode != 'large' }}
+      - name: Assert baseline seed schemas exist for run modes
+        if: ${{ needs.resolve_request.outputs.operation == 'run' }}
         run: |
           dbt run-operation assert_ci_seed_baseline_ready \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
 
-      - name: Run dbt (mode-aware)
+      - name: Execute dbt
         run: |
-          if [[ "${{ needs.resolve_mode.outputs.mode }}" == "large" ]]; then
+          if [[ "${{ needs.resolve_request.outputs.operation }}" == "build" ]]; then
             dbt build --full-refresh \
               --project-dir ./integration_tests \
               --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
