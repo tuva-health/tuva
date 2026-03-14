@@ -1,0 +1,111 @@
+name: CI Command
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  handle_ci_command:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ci') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse command and authorize
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = (context.payload.comment.body || "").trim();
+            const match = body.match(/^\/ci\s+(run|build)(?:-(snowflake|bigquery|databricks|fabric|redshift|duckdb))?\s*$/i);
+
+            if (!match) {
+              core.setOutput("allowed", "false");
+              core.setOutput(
+                "message",
+                "Invalid command. Use `/ci run`, `/ci build`, or `/ci <run|build>-<snowflake|bigquery|databricks|fabric|redshift|duckdb>`."
+              );
+              return;
+            }
+
+            const operation = match[1].toLowerCase();
+            const target = (match[2] || "all").toLowerCase();
+            const assoc = (context.payload.comment.author_association || "").toUpperCase();
+            const isRepoCollaborator = ["OWNER", "MEMBER", "COLLABORATOR"].includes(assoc);
+            const isMaintainer = ["OWNER", "MEMBER"].includes(assoc);
+
+            if (!isRepoCollaborator) {
+              core.setOutput("allowed", "false");
+              core.setOutput("message", "You are not authorized to run CI commands on this repository.");
+              return;
+            }
+
+            if (operation === "build" && target === "all" && !isMaintainer) {
+              core.setOutput("allowed", "false");
+              core.setOutput("message", "Only repository maintainers can run `/ci build` (all warehouses).");
+              return;
+            }
+
+            core.setOutput("allowed", "true");
+            core.setOutput("operation", operation);
+            core.setOutput("target", target);
+
+      - name: Respond to invalid or unauthorized command
+        if: ${{ steps.parse.outputs.allowed != 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const message = ${{ toJSON(steps.parse.outputs.message) }};
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
+
+      - name: Dispatch CI workflow
+        if: ${{ steps.parse.outputs.allowed == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const operation = `${{ steps.parse.outputs.operation }}`;
+            const target = `${{ steps.parse.outputs.target }}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const repoFullName = `${owner}/${repo}`.toLowerCase();
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: issue_number
+            });
+
+            const headRepoFullName = (pr.head.repo?.full_name || "").toLowerCase();
+            const dispatchRef = headRepoFullName === repoFullName ? pr.head.ref : "main";
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: "dbt_ci_modes.yml",
+              ref: dispatchRef,
+              inputs: {
+                pr_number: String(issue_number),
+                operation,
+                target
+              }
+            });
+
+            const mode = `${operation}-${target}`;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `Triggered Tuva CI with \`${mode}\` (ref: \`${dispatchRef}\`).`
+            });

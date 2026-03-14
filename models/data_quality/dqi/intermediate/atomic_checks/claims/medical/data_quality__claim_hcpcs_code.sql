@@ -14,11 +14,14 @@ select
     , 'HCPCS_CODE' as field_name
     , case
           when term.hcpcs is not null then 'valid'
+          when m.hcpcs_code is not null and {{ the_tuva_project.length('m.hcpcs_code') }} = 5 and substring(m.hcpcs_code, 1, 1) = 'D' then 'valid'
           when m.hcpcs_code is not null then 'invalid'
           else 'null'
     end as bucket_name
     , case
-        when m.hcpcs_code is not null and term.hcpcs is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
+        when m.hcpcs_code is not null and term.hcpcs is null
+            and not ({{ the_tuva_project.length('m.hcpcs_code') }} = 5 and substring(m.hcpcs_code, 1, 1) = 'D')
+            then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
         else null
      end as invalid_reason
     , {{ concat_custom(["m.hcpcs_code", "'|'", "coalesce(term.short_description, '')"]) }} as field_value
