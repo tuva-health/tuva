@@ -38,7 +38,7 @@ with claim_start_end as (
     , end_date
     , discharge_disposition_code
     , facility_id
-    , row_number() over (partition by patient_data_source_id
+    , rank() over (partition by patient_data_source_id
 order by end_date, start_date, claim_id) as row_num
   from base
 )

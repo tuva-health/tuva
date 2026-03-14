@@ -39,7 +39,7 @@ with claim_start_end as (
     , facility_id
     , claim_type
     , case when claim_type = 'professional' then 1 else 0 end as is_professional
-    , row_number() over (
+    , rank() over (
         partition by patient_data_source_id
         order by end_date, start_date, claim_id
       ) as row_num
