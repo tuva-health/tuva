@@ -1,0 +1,83 @@
+---
+id: clinical-concepts
+title: "Clinical Concepts"
+---
+
+import { JsonDataTable } from '@site/src/components/JsonDataTable';
+import ExpandableTable from '@site/src/components/ExpandableTable';
+
+This is a list of all the Clinical Concepts in the Tuva CCL.  Please click a concept for a detailed scope.
+
+<ExpandableTable dataSourceUrl="https://tuva-public-resources.s3.amazonaws.com/value-sets/clinical_concepts.json" />
+
+## Overview
+
+The Clinical Concept Library (CCL) is a collection of value sets defined using atomic-level healthcare terminologies (e.g. ICD-10-CM, RxNorm), and associated content, that define clinical concepts important in research and analytics.  Here we describe the design, function, and policies that govern the CCL.
+
+The policies articulated here are not (except where noted) intended to be rigidly followed, but rather, are guidelines intended to base the CCL on a firm foundation of clinical informatics and content management best practices and ensure a degree of consistency across the content scope even as the community of people working on this content grows over time.
+
+In addition, this is intended to be a living document, as new members of the Tuva community and new use cases will over time require new approaches.  The intent is that when a decision is made regarding how to handle some aspect of CCL content that is reasonable to generalize to other similar cases, it will be recorded here.
+
+Lastly, these policies apply only to Tuva-developed CCL content; The CCL includes content copied from external sources (such provenance is explicitly asserted in the content), and external content is of course subject to the content development approaches of its author(s), whatever those may be.
+
+### Tuning for Specificity
+
+CCL value sets should be constructed in a manner that favors specificity over sensitivity.  Specifically, a code should be included in a value set if and only if it definitively implies the concept to which the value corresponds.
+
+For example, in a value set for a concept “venous thrombosis”, a code for “thrombophlebitis of common iliac vein” would be included, since it implies that there is a thrombosis (blood clot) in a vein.  However, a code for “phlebitis or thrombophlebitis of vein of upper limb” would not be included since the code might be applied in cases where phlebitis (inflammation of a vein) is present but thrombosis is not.
+
+### Semantic Scope
+
+As noted above, a code should be included in a value set if it definitively implies the concept to which the value corresponds.  The semantic scope of “codes that imply a concept” includes, but is broader than, semantic children of the concept.  For example, a code for “diabetic ketoacidosis” would be included in a value set for the concept “diabetes mellitus” since it implies the presence of diabetes mellitus,  even though it does not constitute a subtype of diabetes mellitus and thus, isn’t, strictly speaking a semantic child of it.
+
+### Completeness
+
+Value sets should be curated such that, if any codes from a given standardized vocabulary are included for a given concept, then all appropriate codes from that vocabulary are included for that concept.
+
+### Coding System Policies
+
+ICD-10-CM codes in the CCL should be expressed without decimal points, e.g. "M8088XA", rather than "M80.88XA".
+Value sets that include ICD-10-CM codes should include both full ICD-10-CM codes (which are are used for billing in the United States) and so-called “header codes” (also known as “non-billable” codes), which are stems of the full codes, since header codes may appear in clinical information systems even though they are not used for billing transactions.
+
+### Versioning
+
+The CCL is versioned via GitHub along with all releases of the Tuva Project.
+
+
+## Data Architecture
+
+The CCL is made up of 3 data tables:
+
+- **clinical_concept**
+- **value_set_members**
+- **coding_systems**
+
+**High-level ERD**
+
+![CCL ERD](/img/ccl_erd.jpg)
+
+## clinical_concepts
+
+The **clinical_concept** table contains one record per clinical concept (e.g. asthma, metformin, etc.).  Each clinical concept is expected to be associated with content from **value_set_members** that identifies the codes from one or more standardized clinical vocabularies that imply the concept.  If the concept represented by a clinical_concept row is felt no longer to be needed or valid, it should be changed to status “inactive” rather than deleted from the table.
+
+<JsonDataTable  jsonPath="nodes.seed\.the_tuva_project\.clinical_concept_library__clinical_concepts.columns" />
+
+<a href="https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/tuva_clinical_concepts.csv_0_0_0.csv.gz">Download CSV</a>
+
+## value_set_members
+
+For a given concept, **value_set_members** contains the codes from one or more standardized vocabularies that imply the concept.  Eventually it may be necessary to expand the table design to cover “control exclusions” if needed for research use cases.
+
+If the value set membership represented by a value_set_members row is felt no longer to be needed or valid, it should be changed to status “inactive” rather than deleted from the table.
+
+<JsonDataTable  jsonPath="nodes.seed\.the_tuva_project\.clinical_concept_library__value_set_members.columns" />
+
+<a href="https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/tuva_value_set_members.csv_0_0_0.csv.gz">Download CSV</a>
+
+## coding_systems
+
+Defines standardized clinical vocabularies with which value_set_members content is associated.  While nearly all standardized clinical vocabularies are updated regularly, individual versions are not specified in this table.  However, different “flavors” of standardized vocabularies (e.g. ICD-10-CM vs. the international version of ICD-10 published by the World Health Organization) should be represented by separate rows.
+
+<JsonDataTable  jsonPath="nodes.seed\.the_tuva_project\.clinical_concept_library__coding_systems.columns" />
+
+<a href="https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/tuva_coding_systems.csv_0_0_0.csv.gz">Download CSV</a>

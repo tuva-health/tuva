@@ -8,6 +8,7 @@ models:
       eligibility data because they have to know whether a patient has coverage in order to 
       determine whether to pay a claim.  Eligibility data is used to calculate member months, 
       which are needed to calculate measures like PMPM.
+    mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
           config:
@@ -169,6 +170,8 @@ models:
     columns:
       - name: person_id
         description: 'Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical). The primary key for the eligibility table is person_id, member_id, enrollment_start_date, enrollment_end_date, and data_source. There are two commonly used data formats for eligibility (also known as enrollment) data: the eligibility span format and the member month format. The eligibility span format has one record per member eligibility span. An eligibility span is a time period when a member was enrolled with and therefore had insurance coverage by a health plan. An eligibility span has a start date and an end date. A person can have multiple eligibility spans. The member month format has one record per member per month of enrollment. For example, a person with a single eligibility span from 1/1/2020 through 3/31/2020 would have a single eligibility span record, but 3 member month records, one for each month. The eligibility table follows the eligibility span format.'
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -208,6 +211,8 @@ models:
             is_primary_key: true
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string; member_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -223,6 +228,8 @@ models:
             is_primary_key: true
       - name: subscriber_id
         description: Identifier that links a patient to a particular insurance product or health plan. This field is a string; subscriber_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system. This ID corresponds to the policyholder for the insurance plan, and can be 1:many with person_id or member_id.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -236,6 +243,8 @@ models:
             data_type: varchar
       - name: gender
         description: 'The gender of the patient. This field is a string that represents the biological sex of a member. It must take one of three accepted values according to the Tuva Project: male, female, and unknown.'
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -270,6 +279,8 @@ models:
             data_type: varchar
       - name: race
         description: The patient's race. This field is a string and corresponds to a members race.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -301,6 +312,8 @@ models:
             data_type: varchar
       - name: birth_date
         description: The birth date of the patient. This field is a date representing the birth date of a member.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
@@ -365,6 +378,8 @@ models:
             data_type: date
       - name: death_date
         description: Date the patient died if there is one. This field is a date containing the day a member died. If the member is alive, this field is null.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
@@ -404,6 +419,8 @@ models:
             data_type: date
       - name: death_flag
         description: A flag indicating if the patient has died. death_flag contains a flag indicating if a member has died; 1 for yes 0 for no. death_flag should be 1 if a death_date is populated. death_flag can be 1 and death_date null if only an indicator is available in the source data.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -441,6 +458,8 @@ models:
             data_type: boolean
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
@@ -484,6 +503,8 @@ models:
             is_primary_key: true
       - name: enrollment_end_date
         description: Date the patient's insurance eligibility ended.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
@@ -535,6 +556,8 @@ models:
             is_primary_key: true
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -558,6 +581,8 @@ models:
             is_primary_key: true
       - name: payer_type
         description: 'Type of payer (e.g. commercial, medicare, medicaid, etc.). This field is a string that contains the type of insurance provided by the payer. It must take one of the values contained in the payer_type terminology file: commercial, medicare, medicaid, and self-insured.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -589,6 +614,8 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded (e.g. select aetna bronze 1 as plan).
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -612,6 +639,8 @@ models:
             is_primary_key: true
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code. This field is a single-character string that contains a members original reason for Medicare entitlement. When available, mapping this field is particularly helpful for providing a more accurate risk score. If its not available, the CMS HCC mart will use medicare_status_code instead. The CMS HCC mart will default to a value of "Aged" when neither code is available. This field can take the values 0, 1, 2, or 3.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -653,6 +682,8 @@ models:
             data_type: varchar
       - name: dual_status_code
         description: Indicates whether the patient is dually eligible for Medicare and Medicaid. This field is a string that indicates whether a member is enrolled in both Medicare and Medicaid. Knowing whether a member is enrolled in both Medicare and Medicaid can help provide a more accurate risk score. If this status is not known, the CMS HCC mart will default to "Non" (non-dual) in risk score calculations. This field can take the values 00, 01, 02, 03, 04, 05, 06, 08, 09, or 10
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -690,6 +721,8 @@ models:
             data_type: varchar
       - name: medicare_status_code
         description: 'Indicates how the patient became eligible for Medicare. This field is a two-character string that indicates how a member currently qualifies for Medicare, and is used in risk score calculations when original_reason_entitlement_code is not present. medicare_status_code can take the following values: 00, 10, 11, 20, 21, 31, 40.'
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -722,6 +755,8 @@ models:
       - name: enrollment_status
         description: >
           Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -737,6 +772,8 @@ models:
                 values: ['Continuing', 'New', 'Institutional', 'ESRD', null]
       - name: hospice_flag
         description: Whether the patient is in hospice.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -750,6 +787,8 @@ models:
           Special Needs Plan type. C-SNP = Chronic condition SNP, D-SNP = Dual eligible SNP,
           I-SNP = Institutional SNP. Null when not enrolled in an SNP or non-Medicare.
           Replaces institutional_snp_flag (derivable as snp_type = 'I-SNP').
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -779,6 +818,8 @@ models:
           NEMCAID field on the Monthly Membership Report. When provided, it is
           used for New Enrollee risk score calculations. If not provided, Medicaid
           status is derived from dual_status_code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -803,6 +844,8 @@ models:
             data_type: integer
       - name: long_term_institutional_flag
         description: Whether the patient is in an institutional setting for longer than 30 days.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -817,6 +860,8 @@ models:
           NE = New Enrollee, PE = PACE Continuing, NP = PACE New.
           Determines PACE vs non-PACE and NE vs CE scoring path for RxHCC.
           Null when no Part D coverage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -842,6 +887,8 @@ models:
           Low Income Subsidy (Extra Help) flag. Y = receives LIS, N = no LIS.
           Drives the low-income coefficient selection in RxHCC scoring.
           Null when no Part D coverage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -867,6 +914,8 @@ models:
           ACA metal tier of the health plan. P = Platinum, G = Gold, S = Silver,
           B = Bronze, C = Catastrophic. Determines the base coefficient set for
           HHS-HCC scoring. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -891,6 +940,8 @@ models:
         description: >
           Cost Sharing Reduction variant indicator (1-11). Adjusts Silver-level
           risk scores for income-based cost-sharing subsidies. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -916,6 +967,8 @@ models:
           Number of months the enrollee was covered during the benefit year (1-12).
           Used as an enrollment duration adjustment factor in HHS-HCC risk score
           formula. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -940,6 +993,8 @@ models:
         description: >
           ESRD clinical status: dialysis, graft, or transplant. Determines which
           of the ESRD scoring models applies. Null when non-ESRD.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -965,6 +1020,8 @@ models:
           Months since kidney transplant at the start of the payment year.
           Used for transplant duration flags in ESRD scoring.
           Null when non-ESRD or non-transplant.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -978,6 +1035,8 @@ models:
             data_type: integer
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -991,6 +1050,8 @@ models:
             data_type: varchar
       - name: group_name
         description: The group name under which multiple members are enrolled for health coverage. This field is a string that corresponds to the group name under which multiple members are enrolled for health coverage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1004,6 +1065,8 @@ models:
             data_type: varchar
       - name: name_suffix
         description: The name suffixes (e.g., Sr., Jr., III.)
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1017,6 +1080,8 @@ models:
             data_type: varchar
       - name: first_name
         description: The first name of the patient. This field is a string that corresponds to the members first name.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1030,6 +1095,8 @@ models:
             data_type: varchar
       - name: middle_name
         description: The middle name of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1051,6 +1118,8 @@ models:
             data_type: varchar
       - name: last_name
         description: The last name of the patient. This field is a string that corresponds to the members last name.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1072,6 +1141,8 @@ models:
             data_type: varchar
       - name: social_security_number
         description: The social security number of the patient. This field is a string that corresponds to the members Social Security Number.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1085,6 +1156,8 @@ models:
             data_type: varchar
       - name: subscriber_relation
         description: The patient's relationship to the subscriber (e.g., self, spouse, child). This field is a string that represents a members relationship to the policyholder. This field may be highly variable across data sources.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1098,6 +1171,8 @@ models:
             data_type: varchar
       - name: address
         description: The street address of the record (e.g., facility location, patient, etc). This field is a string that represents the members address on file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1119,6 +1194,8 @@ models:
             data_type: varchar
       - name: city
         description: The city of the record (e.g., facility location, patient, etc). This field is a string that represents the city where the member resides.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1140,6 +1217,8 @@ models:
             data_type: varchar
       - name: state
         description: The state of the record (e.g., facility location, patient, etc). This field is a string that represents the state where the member resides.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1171,6 +1250,8 @@ models:
             data_type: varchar
       - name: zip_code
         description: The zip code of the record (e.g., facility location, patient, etc). This field is a string that represents the members zip code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1201,6 +1282,8 @@ models:
             data_type: varchar
       - name: phone
         description: The phone number for the patient. This field is a string that represents the members phone number.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1214,6 +1297,8 @@ models:
             data_type: varchar
       - name: email
         description: The email for the patient
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1227,6 +1312,8 @@ models:
             data_type: varchar
       - name: ethnicity
         description: The ethnicity of the patient
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1240,6 +1327,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, "BCBS Tennessee". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1263,6 +1352,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: 'The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.'
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1276,6 +1367,8 @@ models:
             data_type: varchar
       - name: file_date
         description: The date associated with the claims file, typically reflecting the reporting period of the claims data. This field is a date, corresponding to the date associated with a particular claims file and typically representing the reporting period of the claims data. Carriers may name files according to a specific pattern (e.g. "CarrierName_Eligibility_YYYYMMDD.csv"). In these cases, the file_date can be retrieved from the file_name. No matter how the information is represented, including it can be helpful, especially when tracking information across different claims files over time is relevant to your use cases.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1311,6 +1404,8 @@ models:
             data_type: date
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage. This field is a timestamp that corresponds to the date and time a source file landed in the data warehouse or cloud storage. If this information is available or easy to track, we recommend mapping it to ingest_datetime. A field like this is particularly useful when there may be multiple versions of the same claim line present across multiple files, but the most recent version of the claim line is the most relevant for your use case.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

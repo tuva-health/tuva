@@ -1,0 +1,123 @@
+language: en-US
+
+reviews:
+  profile: assertive
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+  review_status: true
+  commit_status: true
+  
+  # Focus on documentation files
+  path_filters:
+    - "docs/**"
+    - "blog/**"
+    - "docusaurus.config.js"
+    - "sidebars.js"
+    - "!node_modules/**"
+    - "!build/**"
+  
+  # Path-specific instructions for link checking
+  path_instructions:
+    - path: "docs/**/*.md"
+      instructions: |
+        When reviewing markdown files in the docs directory:
+        1. Verify all internal links point to valid files or routes
+        2. Check that links to other docs use correct relative paths (../ for parent, ./ for same directory)
+        3. Ensure anchor links (#section) match actual heading IDs in target files
+        4. If linking to a doc, verify the doc ID exists in sidebars.js or will exist after this PR
+        5. Links should not reference files that were deleted or moved without redirects
+    
+    - path: "docusaurus.config.js"
+      instructions: |
+        When reviewing docusaurus.config.js:
+        1. Verify all redirect configurations are valid
+        2. Check that redirect 'to' paths match actual routes in the site
+        3. Ensure no redirects point to non-existent pages
+        4. Verify redirect plugin is properly configured
+        5. Check that routeBasePath and other path settings are consistent with link patterns
+        6. CRITICAL: If any file paths or doc IDs are changed in this PR, verify that corresponding redirect entries exist in the redirects array. For example:
+           - If a file moves from docs/folder/input-layer.md to docs/input-layer.md (changing URL from /folder/input-layer to /input-layer)
+           - Then a redirect entry must exist: { from: '/folder/input-layer', to: '/input-layer' }
+        7. Check that all old URLs that might be indexed by search engines have redirect entries to their new locations
+  
+  # Tools for code quality
+  tools:
+    markdownlint:
+      enabled: true
+    eslint:
+      enabled: true
+    yamllint:
+      enabled: true
+  
+  # Pre-merge checks to ensure no broken links
+  pre_merge_checks:
+    # Custom check to detect broken links in markdown files
+    custom_checks:
+      - name: "No Broken Links"
+        mode: error
+        instructions: |
+          Analyze all markdown files in this PR for broken internal links. Check that:
+          1. All relative markdown links (e.g., [text](./path/to/file.md) or [text](../path/to/file.md)) point to files that exist in the repository
+          2. All absolute links to docs (e.g., [text](/docs/path) or [text](/path)) point to valid routes based on the Docusaurus configuration
+          3. All anchor links (e.g., #section-id) reference valid headings in the target files
+          4. Links to files that were moved or deleted in this PR are updated to point to their new locations
+          5. Links in docusaurus.config.js redirects point to valid paths
+          
+          For Docusaurus sites:
+          - Route base path is "/" (docs are at root)
+          - Check sidebars.js to verify doc IDs exist
+          - Verify redirect targets in docusaurus.config.js exist
+          - Check that moved/deleted files have corresponding redirects
+          
+          IMPORTANT: If any files were moved or renamed, verify that:
+          - Internal links in markdown files are updated to new paths
+          - Redirect entries exist in docusaurus.config.js for old URLs (see "Redirects Required for URL Changes" check)
+          
+          If any broken links are found, this check must fail and list all broken links with their locations.
+      
+      - name: "Redirects Required for URL Changes"
+        mode: error
+        instructions: |
+          CRITICAL: When any file path or doc ID changes that results in a different URL, a redirect MUST be added.
+          
+          Analyze the PR to identify:
+          1. Any files that were moved or renamed (check git file moves/renames)
+          2. Any doc IDs in sidebars.js that were changed
+          3. Any routeBasePath or other routing configuration changes in docusaurus.config.js
+          
+          For each URL change detected:
+          - Calculate the old URL path (e.g., /folder/input-layer)
+          - Calculate the new URL path (e.g., /input-layer)
+          - Verify that a redirect entry exists in docusaurus.config.js redirects array:
+            { from: '/old-path', to: '/new-path' }
+          
+          Examples:
+          - File moved from docs/connectors/input-layer.md to docs/input-layer.md
+            → Must have redirect: { from: '/connectors/input-layer', to: '/input-layer' }
+          - Doc ID changed in sidebars.js from "connectors/input-layer" to "input-layer"
+            → Must have redirect: { from: '/connectors/input-layer', to: '/input-layer' }
+          - Folder structure changed: docs/folder/page.md → docs/page.md
+            → Must have redirect: { from: '/folder/page', to: '/page' }
+          
+          This is critical for:
+          - SEO: Search engines may have indexed old URLs
+          - External links: Other sites may link to old URLs
+          - User bookmarks: Users may have bookmarked old URLs
+          
+          If a URL change is detected but no corresponding redirect exists, this check MUST FAIL.
+      
+      - name: "Redirect Configuration Valid"
+        mode: warning
+        instructions: |
+          Verify that any redirect configurations in docusaurus.config.js are valid.
+          Check that:
+          1. All redirect 'from' paths use correct format (starting with '/')
+          2. All redirect 'to' paths use correct format and point to valid routes
+          3. No circular redirects are created (A -> B -> A)
+          4. The redirect plugin configuration syntax is correct
+          5. All redirect 'to' paths point to pages that exist or will exist after this PR is merged
+          6. Redirect paths match the actual Docusaurus route structure (consider routeBasePath settings)

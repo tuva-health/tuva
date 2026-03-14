@@ -1,0 +1,87 @@
+/* General table styles */
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table:not(.sticky) {
+  margin-top: 40px;
+}
+
+thead {
+  background-color: #F2F2F2 !important;
+}
+
+[data-theme='dark'] thead {
+  background-color: #333; /* Dark mode */
+}
+
+th, td {
+  padding: 25px 0;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+th {
+  color: #fff;
+  position: sticky;
+  top:0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+[data-theme='dark'] th {
+  background-color: #333;
+  color: white;
+}
+
+.custom-expandable-table th.fixed-column,
+.custom-expandable-table td.fixed-column {
+  min-width: 195px !important;
+  max-width: 195px !important;
+  width: 195px !important;
+}
+
+.custom-expandable-table th.expandable-column,
+.custom-expandable-table td.expandable-column {
+  width: calc(100% - 195px) !important;
+}
+
+.custom-expandable-table th.wide-column,
+.custom-expandable-table td.wide-column {
+  min-width: 160px !important;
+  width: 20% !important;
+}
+
+.custom-expandable-table th.narrow-column,
+.custom-expandable-table td.narrow-column {
+  min-width: 90px !important;
+  width: 12% !important;
+}
+
+.custom-expandable-table th.description-column,
+.custom-expandable-table td.description-column {
+  width: calc(100% - 350px) !important;
+}
+
+.table-overview {
+  background-color: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+[data-theme='dark'] .table-overview {
+  background-color: #1f1f1f;
+  border-color: #333;
+}
+
+tr:hover {
+  background-color: #F2F2F2 !important;
+}
+
+[data-theme='dark'] tr:hover {
+  background-color: #333 !important;
+}
