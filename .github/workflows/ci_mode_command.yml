@@ -1,17 +1,18 @@
-name: CI Mode Command
+name: CI Command
 
 on:
   issue_comment:
     types: [created]
 
 permissions:
+  actions: write
   contents: read
   issues: write
   pull-requests: write
 
 jobs:
-  set_ci_mode:
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ci ') }}
+  handle_ci_command:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ci') }}
     runs-on: ubuntu-latest
     steps:
       - name: Parse command and authorize
@@ -21,41 +22,38 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const body = (context.payload.comment.body || "").trim();
-            const match = body.match(/^\/ci\s+(small|medium|large)\s*$/i);
+            const match = body.match(/^\/ci\s+(run|build)(?:-(snowflake|bigquery|databricks|fabric|redshift|duckdb))?\s*$/i);
+
             if (!match) {
-              core.setOutput("valid", "false");
               core.setOutput("allowed", "false");
-              core.setOutput("reason", "invalid");
-              core.setOutput("message", "Invalid command. Use `/ci small`, `/ci medium`, or `/ci large`.");
+              core.setOutput(
+                "message",
+                "Invalid command. Use `/ci run`, `/ci build`, or `/ci <run|build>-<snowflake|bigquery|databricks|fabric|redshift|duckdb>`."
+              );
               return;
             }
 
-            const mode = match[1].toLowerCase();
+            const operation = match[1].toLowerCase();
+            const target = (match[2] || "all").toLowerCase();
             const assoc = (context.payload.comment.author_association || "").toUpperCase();
             const isRepoCollaborator = ["OWNER", "MEMBER", "COLLABORATOR"].includes(assoc);
             const isMaintainer = ["OWNER", "MEMBER"].includes(assoc);
 
             if (!isRepoCollaborator) {
-              core.setOutput("valid", "true");
               core.setOutput("allowed", "false");
-              core.setOutput("reason", "permission");
-              core.setOutput("message", "You are not authorized to set CI mode on this repository.");
-              core.setOutput("mode", mode);
+              core.setOutput("message", "You are not authorized to run CI commands on this repository.");
               return;
             }
 
-            if (mode === "large" && !isMaintainer) {
-              core.setOutput("valid", "true");
+            if (operation === "build" && target === "all" && !isMaintainer) {
               core.setOutput("allowed", "false");
-              core.setOutput("reason", "large-restricted");
-              core.setOutput("message", "Only repository maintainers can run `/ci large`.");
-              core.setOutput("mode", mode);
+              core.setOutput("message", "Only repository maintainers can run `/ci build` (all warehouses).");
               return;
             }
 
-            core.setOutput("valid", "true");
             core.setOutput("allowed", "true");
-            core.setOutput("mode", mode);
+            core.setOutput("operation", operation);
+            core.setOutput("target", target);
 
       - name: Respond to invalid or unauthorized command
         if: ${{ steps.parse.outputs.allowed != 'true' }}
@@ -71,38 +69,43 @@ jobs:
               body: message
             });
 
-      - name: Set CI mode label
+      - name: Dispatch CI workflow
         if: ${{ steps.parse.outputs.allowed == 'true' }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const mode = `${{ steps.parse.outputs.mode }}`;
-            const desired = `ci:${mode}`;
+            const operation = `${{ steps.parse.outputs.operation }}`;
+            const target = `${{ steps.parse.outputs.target }}`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
+            const repoFullName = `${owner}/${repo}`.toLowerCase();
 
-            const { data: existing } = await github.rest.issues.listLabelsOnIssue({
+            const { data: pr } = await github.rest.pulls.get({
               owner,
               repo,
-              issue_number
+              pull_number: issue_number
             });
 
-            const keep = existing
-              .map((l) => l.name)
-              .filter((name) => !/^ci:(small|medium|large)$/.test(name));
-            keep.push(desired);
+            const headRepoFullName = (pr.head.repo?.full_name || "").toLowerCase();
+            const dispatchRef = headRepoFullName === repoFullName ? pr.head.ref : "main";
 
-            await github.rest.issues.setLabels({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
-              issue_number,
-              labels: keep
+              workflow_id: "dbt_ci_modes.yml",
+              ref: dispatchRef,
+              inputs: {
+                pr_number: String(issue_number),
+                operation,
+                target
+              }
             });
 
+            const mode = `${operation}-${target}`;
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
-              body: `CI mode set to \`${mode}\` via \`${desired}\`.`
+              body: `Triggered Tuva CI with \`${mode}\` (ref: \`${dispatchRef}\`).`
             });

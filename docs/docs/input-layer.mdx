@@ -1,0 +1,115 @@
+---
+id: input-layer
+title: "1. Input Layer"
+github_path: "/tuva/models/input_layer"
+hide_table_of_contents: true
+---
+
+import InputLayerDictionaryTable from '@site/src/components/InputLayerDictionaryTable';
+
+export const INPUT_LAYER_TABLE_OPTIONS = [
+  {
+    groupLabel: 'Claims',
+    label: 'eligibility',
+    modelName: 'input_layer__eligibility',
+    yamlPath: 'models/input_layer/input_layer__eligibility.yml',
+  },
+  {
+    groupLabel: 'Claims',
+    label: 'medical_claim',
+    modelName: 'input_layer__medical_claim',
+    yamlPath: 'models/input_layer/input_layer__medical_claim.yml',
+  },
+  {
+    groupLabel: 'Claims',
+    label: 'pharmacy_claim',
+    modelName: 'input_layer__pharmacy_claim',
+    yamlPath: 'models/input_layer/input_layer__pharmacy_claim.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'appointment',
+    modelName: 'input_layer__appointment',
+    yamlPath: 'models/input_layer/input_layer__appointment.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'condition',
+    modelName: 'input_layer__condition',
+    yamlPath: 'models/input_layer/input_layer__condition.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'encounter',
+    modelName: 'input_layer__encounter',
+    yamlPath: 'models/input_layer/input_layer__encounter.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'lab_result',
+    modelName: 'input_layer__lab_result',
+    yamlPath: 'models/input_layer/input_layer__lab_result.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'immunization',
+    modelName: 'input_layer__immunization',
+    yamlPath: 'models/input_layer/input_layer__immunization.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'location',
+    modelName: 'input_layer__location',
+    yamlPath: 'models/input_layer/input_layer__location.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'medication',
+    modelName: 'input_layer__medication',
+    yamlPath: 'models/input_layer/input_layer__medication.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'observation',
+    modelName: 'input_layer__observation',
+    yamlPath: 'models/input_layer/input_layer__observation.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'patient',
+    modelName: 'input_layer__patient',
+    yamlPath: 'models/input_layer/input_layer__patient.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'practitioner',
+    modelName: 'input_layer__practitioner',
+    yamlPath: 'models/input_layer/input_layer__practitioner.yml',
+  },
+  {
+    groupLabel: 'Clinical',
+    label: 'procedure',
+    modelName: 'input_layer__procedure',
+    yamlPath: 'models/input_layer/input_layer__procedure.yml',
+  },
+  {
+    groupLabel: 'Provider Attribution',
+    label: 'provider_attribution',
+    modelName: 'input_layer__provider_attribution',
+    yamlPath: 'models/input_layer/input_layer__provider_attribution.yml',
+  },
+];
+
+The Input Layer serves as the contract between source data and the Tuva dbt package.  It's designed to accomodate both claims and clinical data sources. Once source data has been mapped to the Input Layer in a dbt project and you import the Tuva package into that project, the rest of the Tuva package will run automatically when you execute `dbt build`.
+
+There are 3 main sub-parts to the Input Layer: Claims, Clinical, and Provider Attribution.  To use any sub-part you must create all the tables/models for that sub-part.  If you don't have data for all the tables/models you can create null columns or even entire null tables.
+
+To run any sub-part you'll need to set the appropriate vars in your dbt_project.yml:
+- claims_enabled: true
+- clinical_enabled: true
+- provider_attribution: false
+
+<InputLayerDictionaryTable
+  tableOptions={INPUT_LAYER_TABLE_OPTIONS}
+  defaultModelName="input_layer__eligibility"
+/>
