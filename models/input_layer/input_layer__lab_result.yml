@@ -5,6 +5,7 @@ models:
       The lab result table contains information about lab test results, 
       including the LOINC code and description, units, reference range, and 
       result.
+    mapping_instructions: ''
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -13,6 +14,8 @@ models:
     columns:
       - name: lab_result_id
         description: Unique identifier for each lab result.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -68,6 +71,8 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -99,6 +104,8 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -120,6 +127,8 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -141,6 +150,8 @@ models:
             data_type: varchar
       - name: accession_number
         description: The lab order number from the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -162,6 +173,8 @@ models:
             data_type: varchar
       - name: source_order_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -198,6 +211,8 @@ models:
             data_type: varchar
       - name: source_order_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -221,6 +236,8 @@ models:
             data_type: varchar
       - name: source_order_description
         description: Description of the source code in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -242,6 +259,8 @@ models:
             data_type: varchar
       - name: source_component_type
         description: The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: ['cms_hccs', 'quality_measures']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -268,6 +287,8 @@ models:
             data_type: varchar
       - name: source_component_code
         description: The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -289,6 +310,8 @@ models:
             data_type: varchar
       - name: source_component_description
         description: Description of the source code for the component in the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -302,6 +325,8 @@ models:
             data_type: varchar
       - name: normalized_order_type
         description: The normalized type of code.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -325,6 +350,8 @@ models:
             data_type: varchar
       - name: normalized_order_code
         description: The normalized code.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -348,6 +375,8 @@ models:
             data_type: varchar
       - name: normalized_order_description
         description: Normalized description of the code.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -369,6 +398,8 @@ models:
             data_type: varchar
       - name: normalized_component_type
         description: The normalized type of code for the component.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -383,6 +414,8 @@ models:
             data_type: varchar
       - name: normalized_component_code
         description: The normalized code for the component.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -396,6 +429,8 @@ models:
             data_type: varchar
       - name: normalized_component_description
         description: Normalized description of the code for the component.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -417,6 +452,8 @@ models:
             data_type: varchar
       - name: status
         description: Status of the record (e.g., condition, test, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -438,6 +475,8 @@ models:
             data_type: varchar
       - name: result
         description: The result of the record (e.g., lab test, observation, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -459,6 +498,8 @@ models:
             data_type: varchar
       - name: result_datetime
         description: Datetime of the test result.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -518,6 +559,8 @@ models:
             data_type: timestamp
       - name: collection_datetime
         description: Datetime the specimen was collected.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -577,6 +620,8 @@ models:
             data_type: timestamp
       - name: source_units
         description: Source units of the lab test.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -598,6 +643,8 @@ models:
             data_type: varchar
       - name: normalized_units
         description: Normalized units of the lab test.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -619,6 +666,8 @@ models:
             data_type: varchar
       - name: source_reference_range_low
         description: The low end of the reference range from the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -640,6 +689,8 @@ models:
             data_type: varchar
       - name: source_reference_range_high
         description: The high end of the reference range from the source system.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -661,6 +712,8 @@ models:
             data_type: varchar
       - name: normalized_reference_range_low
         description: The normalized low end of the reference range.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -682,6 +735,8 @@ models:
             data_type: varchar
       - name: normalized_reference_range_high
         description: The normalized high end of the reference range.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -703,6 +758,8 @@ models:
             data_type: varchar
       - name: source_abnormal_flag
         description: Indicates whether the result is abnormal or normal.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -724,6 +781,8 @@ models:
             data_type: number
       - name: normalized_abnormal_flag
         description: Normalized abnormal flag.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -745,6 +804,8 @@ models:
             data_type: number
       - name: specimen
         description: The type of specimen e.g. blood, plasma, urine.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -766,6 +827,8 @@ models:
             data_type: varchar
       - name: ordering_practitioner_id
         description: Unique identifier for the practitioner who ordered the lab test.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -787,6 +850,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -809,6 +874,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -822,6 +889,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

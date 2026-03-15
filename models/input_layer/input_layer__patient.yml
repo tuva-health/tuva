@@ -4,6 +4,7 @@ models:
     description: |
       The patient table contains demographic and geographic information on  patients.  Patients in this table may have more than 1 record,
       since their source system ID (i.e. patient_id) may change over time.
+    mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
           config:
@@ -46,6 +47,8 @@ models:
     columns:
       - name: person_id
         description: Unique identifier for each person in the dataset.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -85,6 +88,8 @@ models:
             is_primary_key: true
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
+        mapping_instructions: ''
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -124,6 +129,8 @@ models:
             is_primary_key: true
       - name: name_suffix
         description: The name suffixes (e.g., Sr., Jr., III.)
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -137,6 +144,8 @@ models:
             data_type: varchar
       - name: first_name
         description: The first name of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -158,6 +167,8 @@ models:
             data_type: varchar
       - name: middle_name
         description: The middle name of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -171,6 +182,8 @@ models:
             data_type: varchar
       - name: last_name
         description: The last name of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -192,6 +205,8 @@ models:
             data_type: varchar
       - name: sex
         description: The gender of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -227,6 +242,8 @@ models:
             data_type: varchar
       - name: race
         description: The patient's race.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -258,6 +275,8 @@ models:
             data_type: varchar
       - name: birth_date
         description: The birth date of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -303,6 +322,8 @@ models:
             data_type: date
       - name: death_date
         description: Date the patient died if there is one.
+        mapping_instructions: ''
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -339,6 +360,8 @@ models:
             data_type: date
       - name: death_flag
         description: A flag indicating if the patient has died.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -376,6 +399,8 @@ models:
             data_type: number
       - name: social_security_number
         description: The social security number of the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -389,6 +414,8 @@ models:
             data_type: varchar
       - name: address
         description: The street address of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -410,6 +437,8 @@ models:
             data_type: varchar
       - name: city
         description: The city of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -431,6 +460,8 @@ models:
             data_type: varchar
       - name: state
         description: The state of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -462,6 +493,8 @@ models:
             data_type: varchar
       - name: zip_code
         description: The zip code of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -483,6 +516,8 @@ models:
             data_type: varchar
       - name: county
         description: The county for the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -504,6 +539,8 @@ models:
             data_type: varchar
       - name: latitude
         description: The latitude of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -525,6 +562,8 @@ models:
             data_type: float
       - name: longitude
         description: The longitude of the record (e.g., facility location, patient, etc).
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -546,6 +585,8 @@ models:
             data_type: float
       - name: phone
         description: The phone number for the patient.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -559,6 +600,8 @@ models:
             data_type: varchar
       - name: email
         description: The email for the patient
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -572,6 +615,8 @@ models:
             data_type: varchar
       - name: ethnicity
         description: The ethnicity of the patient
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -585,6 +630,8 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -607,6 +654,8 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -620,6 +669,8 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        mapping_instructions: ''
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
