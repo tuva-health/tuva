@@ -29,7 +29,7 @@ select
     , aa.admit_date
     , aa.discharge_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.drg_code_type
     , aa.drg_code
     , aa.paid_amount
@@ -57,7 +57,7 @@ select
     , bb.admit_date as readmission_admit_date
     , bb.discharge_date as readmission_discharge_date
     , bb.discharge_disposition_code as readmission_discharge_disposition_code
-    , bb.facility_id as readmission_facility
+    , bb.facility_npi as readmission_facility
     , bb.drg_code_type as readmission_drg_code_type
     , bb.drg_code as readmission_drg
     , bb.length_of_stay as readmission_length_of_stay
