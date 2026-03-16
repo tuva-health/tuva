@@ -202,6 +202,7 @@ jobs:
       PYTHON_VERSION: "3.10"
       DBT_PROJECT_DIR: "./integration_tests"
       DBT_CORE_VERSION: "1.10.15"
+      DUCKDB_VERSION: "1.4.4"
 
       DBT_BIGQUERY_CI_TOKEN: ${{ secrets.DBT_BIGQUERY_CI_TOKEN }}
       DBT_BIGQUERY_CI_PROJECT: ${{ secrets.DBT_BIGQUERY_CI_PROJECT }}
@@ -274,7 +275,7 @@ jobs:
               pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-redshift
               ;;
             duckdb)
-              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==${{ env.DUCKDB_VERSION }}
               ;;
             *)
               echo "Unsupported adapter: ${{ matrix.adapter }}" >&2
