@@ -65,6 +65,7 @@ with stg_eligibility as (
         , patient.death_date
     from {{ ref('cms_hcc__stg_core__patient') }} as patient
     cross join payment_year_age_dates as dates
+    where patient.birth_date is not null
 
 )
 
@@ -172,6 +173,7 @@ with stg_eligibility as (
             on stg_eligibility.person_id = stg_patient.person_id
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
+        and stg_patient.payment_year_age is not null
 
 )
 
