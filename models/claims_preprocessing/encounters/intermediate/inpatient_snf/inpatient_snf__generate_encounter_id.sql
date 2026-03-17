@@ -19,7 +19,7 @@ with claim_start_end as (
     , enc.patient_data_source_id
     , c.start_date
     , c.end_date
-    , enc.facility_id
+    , enc.facility_npi
     , enc.discharge_disposition_code
   from {{ ref('encounters__stg_medical_claim') }} as enc
   inner join claim_start_end as c
@@ -37,7 +37,7 @@ with claim_start_end as (
     , start_date
     , end_date
     , discharge_disposition_code
-    , facility_id
+    , facility_npi
     , rank() over (partition by patient_data_source_id
 order by end_date, start_date, claim_id) as row_num
   from base
@@ -53,22 +53,22 @@ order by end_date, start_date, claim_id) as row_num
     , case
       -- Condition 1: Exact End Date Match (Catches duplicates/corrections)
       when aa.end_date = bb.end_date
-        and aa.facility_id = bb.facility_id then 1
+        and aa.facility_npi = bb.facility_npi then 1
 
       -- Condition 2: Consecutive Stay with Transfer (Catches month-end billing)
       when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-        and aa.facility_id = bb.facility_id
+        and aa.facility_npi = bb.facility_npi
         and aa.discharge_disposition_code = '30' then 1
 
       -- Condition 3: Same-Day Start / Superseded Claim
       when aa.start_date = bb.start_date
-        and aa.facility_id = bb.facility_id
+        and aa.facility_npi = bb.facility_npi
         and aa.discharge_disposition_code = '30' then 1
 
       -- Condition 4: General Overlapping Stay
       when aa.end_date <> bb.end_date
         and aa.end_date > bb.start_date
-        and aa.facility_id = bb.facility_id then 1
+        and aa.facility_npi = bb.facility_npi then 1
       else 0
     end as merge_flag
   from add_row_num as aa
@@ -113,7 +113,7 @@ order by end_date, start_date, claim_id) as row_num
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , case
         when bb.claim_id is null
@@ -158,7 +158,7 @@ order by end_date, start_date, claim_id) as row_num
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , aa.close_flag
     , bb.min_closing_row
@@ -175,7 +175,7 @@ order by end_date, start_date, claim_id) as row_num
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , aa.close_flag
     , aa.min_closing_row
@@ -192,7 +192,7 @@ select
   , start_date
   , end_date
   , discharge_disposition_code
-  , facility_id
+  , facility_npi
   , row_number() over (partition by encounter_id
 order by start_date, end_date, claim_id) as encounter_claim_number
   , row_number() over (partition by encounter_id

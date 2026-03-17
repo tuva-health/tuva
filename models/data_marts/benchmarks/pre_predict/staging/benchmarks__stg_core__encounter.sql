@@ -13,7 +13,7 @@ select
     , encounter_group
     , length_of_stay
     , discharge_disposition_code
-    , facility_id
+    , facility_npi
     , facility_name
     , drg_code_type
     , drg_code
