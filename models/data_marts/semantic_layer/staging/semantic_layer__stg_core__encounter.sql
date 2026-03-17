@@ -20,7 +20,7 @@ SELECT
   , e.discharge_disposition_description
   , e.attending_provider_id
   , e.attending_provider_name
-  , e.facility_id
+  , e.facility_npi
   , e.facility_name
   , e.facility_type
   , e.observation_flag

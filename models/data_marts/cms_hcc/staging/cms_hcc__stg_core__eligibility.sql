@@ -13,6 +13,7 @@ select distinct
     , medicare_status_code
     , enrollment_status
     , medicaid_indicator
+    , long_term_institutional_flag
     , case when snp_type = 'I-SNP' then 1 else 0 end as institutional_snp_flag
     , case when snp_type is not null then 1 else 0 end as snp_flag
     , data_source

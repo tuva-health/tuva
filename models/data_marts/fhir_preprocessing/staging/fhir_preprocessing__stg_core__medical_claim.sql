@@ -17,9 +17,9 @@ select
     , claim_line_start_date
     , payer
     , {{ quote_column('plan') }}
-    , billing_id
+    , billing_npi
     , billing_name
-    , rendering_id
+    , rendering_npi
     , rendering_name
     , admission_date
     , discharge_date
@@ -54,9 +54,9 @@ select
     , claim_line_start_date
     , payer
     , {{ quote_column('plan') }}
-    , billing_id
+    , billing_npi
     , billing_name
-    , rendering_id
+    , rendering_npi
     , rendering_name
     , admission_date
     , discharge_date
@@ -91,9 +91,9 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-    , cast(null as {{ dbt.type_string() }} ) as billing_id
+    , cast(null as {{ dbt.type_string() }} ) as billing_npi
     , cast(null as {{ dbt.type_string() }} ) as billing_name
-    , cast(null as {{ dbt.type_string() }} ) as rendering_id
+    , cast(null as {{ dbt.type_string() }} ) as rendering_npi
     , cast(null as {{ dbt.type_string() }} ) as rendering_name
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date

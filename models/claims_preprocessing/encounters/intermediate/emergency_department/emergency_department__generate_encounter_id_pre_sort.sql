@@ -19,7 +19,7 @@ with claim_start_end as (
     , enc.patient_data_source_id
     , c.start_date
     , c.end_date
-    , enc.facility_id
+    , enc.facility_npi
     , enc.discharge_disposition_code
     , enc.claim_type  -- 'institutional' | 'professional'
   from {{ ref('encounters__stg_medical_claim') }} as enc
@@ -36,7 +36,7 @@ with claim_start_end as (
     , start_date
     , end_date
     , discharge_disposition_code
-    , facility_id
+    , facility_npi
     , claim_type
     , case when claim_type = 'professional' then 1 else 0 end as is_professional
     , row_number() over (
@@ -56,17 +56,17 @@ with claim_start_end as (
     , case
         -- 1) exact end-date match at the same facility (dups/corrections)
         when aa.end_date = bb.end_date
-         and aa.facility_id = bb.facility_id then 1
+         and aa.facility_npi = bb.facility_npi then 1
 
         -- 2) consecutive stay with transfer (end_date + 1 day == next start_date and discharge '30')
         when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-         and aa.facility_id = bb.facility_id
+         and aa.facility_npi = bb.facility_npi
          and aa.discharge_disposition_code = '30' then 1
 
         -- 3) general overlap at the same facility
         when aa.end_date <> bb.end_date
          and aa.end_date >= bb.start_date
-         and aa.facility_id = bb.facility_id then 1
+         and aa.facility_npi = bb.facility_npi then 1
 
         -- 4) liberal rule when at least one is PROFESSIONAL:
         -- overlap OR 1-day gap; ignore facility/discharge as professional doesn't have these fields.
@@ -119,7 +119,7 @@ with claim_start_end as (
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , case
         when bb.claim_id is null
@@ -164,7 +164,7 @@ with claim_start_end as (
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , aa.close_flag
     , bb.min_closing_row
@@ -181,7 +181,7 @@ with claim_start_end as (
     , aa.start_date
     , aa.end_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.row_num
     , aa.close_flag
     , aa.min_closing_row

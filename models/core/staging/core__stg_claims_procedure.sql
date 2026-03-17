@@ -83,7 +83,7 @@ select
     ) as procedure_date
   , 'hcpcs' as source_code_type
   , hcpcs_code as source_code
-  , rendering_id as practitioner_npi
+  , rendering_npi as practitioner_npi
   , hcpcs_modifier_1 as modifier_1
   , hcpcs_modifier_2 as modifier_2
   , hcpcs_modifier_3 as modifier_3
@@ -109,7 +109,7 @@ select
   , procedure_date_{{ i }} as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_{{ i }} as source_code
-  , rendering_id as practitioner_npi
+  , rendering_npi as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3

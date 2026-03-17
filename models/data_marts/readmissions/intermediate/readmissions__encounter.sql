@@ -13,7 +13,7 @@ select
     , cast(encounter_start_date as date) as admit_date
     , cast(encounter_end_date as date) as discharge_date
     , cast(discharge_disposition_code as {{ dbt.type_string() }}) as discharge_disposition_code
-    , cast(facility_id as {{ dbt.type_string() }}) as facility_id
+    , cast(facility_npi as {{ dbt.type_string() }}) as facility_npi
     , cast(drg_code_type as {{ dbt.type_string() }}) as drg_code_type
     , cast(drg_code as {{ dbt.type_string() }}) as drg_code
     , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
