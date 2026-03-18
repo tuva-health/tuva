@@ -44,7 +44,10 @@
 
 {# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
-    {# , person_id as x_temp_person_id #}
+    , {{ dbt.concat([
+        "'claims_'",
+        "cast(person_id as " ~ dbt.type_string() ~ ")"
+    ]) }} as x_temp_record_origin
     {# , first_name as x_temp_first_name #}
     {# , payer_type as zzz_temp_payer_type #}
 {%- endset -%}

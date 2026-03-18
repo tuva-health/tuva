@@ -8,6 +8,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      meta:
+        dag:
+          node_type: input
       tags:
         - claims
         - input_layer
@@ -54,6 +57,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      meta:
+        dag:
+          node_type: input
       tags:
         - clinical
         - input_layer
@@ -142,6 +148,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      meta:
+        dag:
+          node_type: input
       tags:
         - clinical
         - input_layer

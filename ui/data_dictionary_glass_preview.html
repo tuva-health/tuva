@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tuva Data Dictionary Glass Concept</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+      :root {
+        --bg-top: #04131f;
+        --bg-bottom: #0f2a3b;
+        --bg-mid: #082031;
+        --bg-accent-1: rgba(131, 201, 255, 0.24);
+        --bg-accent-2: rgba(255, 215, 115, 0.18);
+        --bg-accent-3: rgba(121, 255, 205, 0.16);
+        --orb-1: rgba(129, 214, 255, 0.22);
+        --orb-2: rgba(255, 218, 112, 0.16);
+        --surface-1: rgba(255, 255, 255, 0.08);
+        --surface-2: rgba(255, 255, 255, 0.12);
+        --surface-3: rgba(255, 255, 255, 0.16);
+        --surface-strong: rgba(12, 33, 46, 0.78);
+        --border-soft: rgba(255, 255, 255, 0.12);
+        --border-strong: rgba(255, 255, 255, 0.22);
+        --surface-glass-top: rgba(255, 255, 255, 0.15);
+        --surface-glass-bottom: rgba(255, 255, 255, 0.06);
+        --surface-glass-accent: rgba(255, 255, 255, 0.06);
+        --surface-glass-shadow: rgba(255, 255, 255, 0.02);
+        --text-strong: #f4fbff;
+        --text-main: rgba(236, 246, 255, 0.9);
+        --text-muted: rgba(207, 222, 235, 0.68);
+        --text-on-accent: #0f2531;
+        --accent-ice: #9edcff;
+        --accent-aqua: #75c7f5;
+        --accent-warm: #ffd773;
+        --accent-lime: #b2f2c7;
+        --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.22);
+        --shadow-card: 0 18px 40px rgba(2, 11, 18, 0.2);
+        --radius-xl: 32px;
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --radius-sm: 14px;
+      }
+
+      body[data-theme="light"] {
+        --bg-top: #e8f3fb;
+        --bg-mid: #edf4f8;
+        --bg-bottom: #f8fbfd;
+        --bg-accent-1: rgba(114, 184, 232, 0.18);
+        --bg-accent-2: rgba(255, 204, 112, 0.16);
+        --bg-accent-3: rgba(138, 217, 201, 0.14);
+        --orb-1: rgba(106, 186, 239, 0.2);
+        --orb-2: rgba(255, 221, 142, 0.18);
+        --surface-1: rgba(255, 255, 255, 0.74);
+        --surface-2: rgba(255, 255, 255, 0.84);
+        --surface-3: rgba(255, 255, 255, 0.9);
+        --surface-strong: rgba(247, 251, 253, 0.92);
+        --border-soft: rgba(20, 64, 89, 0.08);
+        --border-strong: rgba(20, 64, 89, 0.16);
+        --surface-glass-top: rgba(255, 255, 255, 0.88);
+        --surface-glass-bottom: rgba(255, 255, 255, 0.6);
+        --surface-glass-accent: rgba(255, 255, 255, 0.46);
+        --surface-glass-shadow: rgba(255, 255, 255, 0.1);
+        --text-strong: #173246;
+        --text-main: rgba(26, 54, 73, 0.9);
+        --text-muted: rgba(49, 82, 103, 0.62);
+        --text-on-accent: #173246;
+        --accent-ice: #2f7aa6;
+        --accent-aqua: #4c94bf;
+        --accent-warm: #a46f12;
+        --accent-lime: #167059;
+        --shadow-soft: 0 24px 70px rgba(29, 66, 89, 0.12);
+        --shadow-card: 0 16px 36px rgba(29, 66, 89, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top left, var(--bg-accent-1), transparent 32%),
+          radial-gradient(circle at 78% 18%, var(--bg-accent-2), transparent 22%),
+          radial-gradient(circle at 35% 82%, var(--bg-accent-3), transparent 26%),
+          linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 44%, var(--bg-bottom) 100%);
+        color: var(--text-main);
+        font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+        overflow-x: hidden;
+        transition: background 220ms ease, color 220ms ease;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        pointer-events: none;
+        position: fixed;
+        inset: auto;
+        border-radius: 999px;
+        filter: blur(70px);
+        opacity: 0.6;
+        transform: translateZ(0);
+      }
+
+      body::before {
+        background: var(--orb-1);
+        height: 320px;
+        right: -80px;
+        top: 120px;
+        width: 320px;
+      }
+
+      body::after {
+        background: var(--orb-2);
+        bottom: -120px;
+        height: 280px;
+        left: -80px;
+        width: 280px;
+      }
+
+      .shell {
+        margin: 0 auto;
+        max-width: 1600px;
+        padding: 28px 24px 40px;
+        position: relative;
+      }
+
+      .glass {
+        backdrop-filter: blur(26px) saturate(140%);
+        -webkit-backdrop-filter: blur(26px) saturate(140%);
+        background:
+          linear-gradient(180deg, var(--surface-glass-top), var(--surface-glass-bottom)),
+          linear-gradient(135deg, var(--surface-glass-accent), var(--surface-glass-shadow));
+        border: 1px solid var(--border-soft);
+        box-shadow: var(--shadow-soft);
+        position: relative;
+      }
+
+      .glass::before {
+        content: "";
+        inset: 1px;
+        position: absolute;
+        border-radius: inherit;
+        border: 1px solid color-mix(in srgb, var(--border-soft) 65%, transparent);
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        color: var(--accent-ice);
+        display: inline-flex;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .hero {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        padding: 30px;
+      }
+
+      .hero-grid {
+        align-items: end;
+        display: grid;
+        gap: 22px;
+        grid-template-columns: minmax(0, 1.5fr) minmax(360px, 0.9fr);
+        margin-top: 14px;
+      }
+
+      .hero-copy h1 {
+        color: var(--text-strong);
+        font-size: clamp(2.4rem, 5vw, 4.9rem);
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        line-height: 0.92;
+        margin: 0 0 18px;
+        max-width: 10ch;
+      }
+
+      .hero-copy p {
+        color: var(--text-main);
+        font-size: 1.08rem;
+        line-height: 1.7;
+        margin: 0;
+        max-width: 66ch;
+      }
+
+      .hero-notes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .hero-note {
+        align-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        color: var(--text-main);
+        display: inline-flex;
+        font-size: 0.88rem;
+        font-weight: 600;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+
+      .hero-note .dot {
+        background: linear-gradient(135deg, var(--accent-warm), var(--accent-ice));
+        border-radius: 999px;
+        display: inline-block;
+        height: 8px;
+        width: 8px;
+      }
+
+      .hero-metrics {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric-card {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08)),
+          rgba(8, 24, 35, 0.38);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 22px;
+        box-shadow: var(--shadow-card);
+        min-height: 138px;
+        padding: 18px;
+      }
+
+      .metric-card strong {
+        color: var(--text-strong);
+        display: block;
+        font-size: 2.35rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin-top: 18px;
+      }
+
+      .metric-card span {
+        color: var(--text-muted);
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .metric-card p {
+        color: var(--text-main);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin: 8px 0 0;
+      }
+
+      .toolbar {
+        align-items: center;
+        border-radius: 28px;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(0, 1.1fr) auto auto auto;
+        margin-top: 18px;
+        padding: 16px;
+      }
+
+      .search {
+        align-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        display: flex;
+        gap: 12px;
+        min-height: 58px;
+        padding: 0 16px;
+      }
+
+      .search svg {
+        color: var(--text-muted);
+        flex: 0 0 auto;
+        height: 18px;
+        width: 18px;
+      }
+
+      .search input {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: var(--text-strong);
+        font: inherit;
+        outline: none;
+        width: 100%;
+      }
+
+      .search input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .pill-group {
+        align-items: center;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        border-radius: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-height: 58px;
+        padding: 8px;
+      }
+
+      .pill {
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        color: var(--text-muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 10px 14px;
+        transition:
+          background 160ms ease,
+          color 160ms ease,
+          border-color 160ms ease,
+          transform 160ms ease;
+      }
+
+      .pill:hover {
+        color: var(--text-main);
+        transform: translateY(-1px);
+      }
+
+      .pill.active {
+        background: linear-gradient(135deg, rgba(158, 220, 255, 0.2), rgba(255, 215, 115, 0.12));
+        border-color: rgba(158, 220, 255, 0.3);
+        color: var(--text-strong);
+      }
+
+      .workspace {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: 292px minmax(0, 1fr) 380px;
+        margin-top: 18px;
+      }
+
+      .panel {
+        border-radius: 30px;
+        min-height: 100px;
+        padding: 20px;
+      }
+
+      .navigator,
+      .inspector {
+        align-self: start;
+        position: sticky;
+        top: 20px;
+      }
+
+      .navigator h2,
+      .catalog h2,
+      .inspector h2 {
+        color: var(--text-strong);
+        font-size: 0.98rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        margin: 0 0 14px;
+        text-transform: uppercase;
+      }
+
+      .nav-block + .nav-block {
+        margin-top: 22px;
+      }
+
+      .nav-block-label {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+
+      .table-button {
+        appearance: none;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)),
+          rgba(7, 22, 33, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        color: inherit;
+        cursor: pointer;
+        display: block;
+        margin-bottom: 10px;
+        padding: 16px;
+        text-align: left;
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
+        width: 100%;
+      }
+
+      .table-button:hover {
+        border-color: rgba(255, 255, 255, 0.16);
+        transform: translateY(-1px);
+      }
+
+      .table-button.active {
+        background:
+          linear-gradient(180deg, rgba(158, 220, 255, 0.18), rgba(255, 255, 255, 0.06)),
+          rgba(8, 24, 35, 0.42);
+        border-color: rgba(158, 220, 255, 0.26);
+      }
+
+      .table-button .meta {
+        color: var(--text-muted);
+        display: flex;
+        font-size: 0.76rem;
+        font-weight: 700;
+        justify-content: space-between;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+
+      .table-button strong {
+        color: var(--text-strong);
+        display: block;
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+
+      .table-button p {
+        color: var(--text-main);
+        font-size: 0.9rem;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      .context {
+        border-radius: 32px;
+        margin-bottom: 16px;
+        padding: 24px;
+      }
+
+      .context-grid {
+        align-items: end;
+        display: grid;
+        gap: 20px;
+        grid-template-columns: minmax(0, 1.2fr) auto;
+      }
+
+      .context h3 {
+        color: var(--text-strong);
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: clamp(1.55rem, 2vw, 2.4rem);
+        font-weight: 600;
+        margin: 8px 0 10px;
+      }
+
+      .context p {
+        color: var(--text-main);
+        font-size: 0.98rem;
+        line-height: 1.68;
+        margin: 0;
+        max-width: 78ch;
+      }
+
+      .stat-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .stat-badge {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        min-width: 112px;
+        padding: 12px 14px;
+      }
+
+      .stat-badge span {
+        color: var(--text-muted);
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .stat-badge strong {
+        color: var(--text-strong);
+        display: block;
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin-top: 8px;
+      }
+
+      .pk-row,
+      .mart-row {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .section-tag {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .mono-chip,
+      .mart-chip,
+      .type-chip,
+      .pk-chip {
+        border-radius: 999px;
+        display: inline-flex;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .mono-chip {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text-strong);
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: 0.78rem;
+        padding: 9px 11px;
+      }
+
+      .mart-chip {
+        background: rgba(125, 198, 239, 0.12);
+        border: 1px solid rgba(125, 198, 239, 0.18);
+        color: var(--accent-ice);
+        font-size: 0.76rem;
+        padding: 8px 11px;
+      }
+
+      .column-grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .column-card {
+        appearance: none;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)),
+          rgba(7, 22, 33, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 26px;
+        color: inherit;
+        cursor: pointer;
+        display: block;
+        overflow: hidden;
+        padding: 18px 18px 16px;
+        position: relative;
+        text-align: left;
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          box-shadow 160ms ease;
+        width: 100%;
+      }
+
+      .column-card:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: var(--shadow-card);
+        transform: translateY(-1px);
+      }
+
+      .column-card.active {
+        border-color: rgba(158, 220, 255, 0.28);
+        box-shadow: 0 18px 50px rgba(5, 16, 26, 0.28);
+      }
+
+      .column-card-top {
+        align-items: flex-start;
+        display: flex;
+        gap: 14px;
+        justify-content: space-between;
+      }
+
+      .column-card h4 {
+        color: var(--text-strong);
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: 1rem;
+        margin: 4px 0 0;
+      }
+
+      .column-card p {
+        color: var(--text-main);
+        font-size: 0.94rem;
+        line-height: 1.68;
+        margin: 14px 0 0;
+      }
+
+      .field-section-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 14px;
+      }
+
+      .field-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 18px;
+        padding: 12px 13px;
+      }
+
+      .field-section-label {
+        color: var(--text-muted);
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .field-section p {
+        margin-top: 8px;
+      }
+
+      .theme-group {
+        min-width: 168px;
+      }
+
+      .theme-group .pill {
+        min-width: 68px;
+      }
+
+      .card-overline {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .type-chip {
+        align-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text-main);
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: 0.74rem;
+        padding: 9px 11px;
+      }
+
+      .pk-chip {
+        background: rgba(255, 215, 115, 0.12);
+        border: 1px solid rgba(255, 215, 115, 0.22);
+        color: var(--accent-warm);
+        font-size: 0.72rem;
+        margin-left: 10px;
+        padding: 7px 10px;
+        vertical-align: middle;
+      }
+
+      .card-footer {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-between;
+        margin-top: 16px;
+      }
+
+      .mart-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .ghost-link {
+        color: var(--accent-ice);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .inspector {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)),
+          var(--surface-strong);
+      }
+
+      .inspector-shell {
+        display: grid;
+        gap: 14px;
+      }
+
+      .inspector-header h3 {
+        color: var(--text-strong);
+        font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+        font-size: 1.12rem;
+        margin: 8px 0 10px;
+      }
+
+      .inspector-header p,
+      .detail-card p,
+      .detail-card li {
+        color: var(--text-main);
+        font-size: 0.94rem;
+        line-height: 1.7;
+      }
+
+      .detail-card {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        padding: 16px;
+      }
+
+      .detail-card h4 {
+        color: var(--text-strong);
+        font-size: 0.84rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        margin: 0 0 12px;
+        text-transform: uppercase;
+      }
+
+      .detail-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .detail-card li + li {
+        margin-top: 8px;
+      }
+
+      .helper {
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        line-height: 1.6;
+        margin-top: 8px;
+      }
+
+      .detail-list strong {
+        color: var(--text-strong);
+      }
+
+      .empty-state {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        border-radius: 24px;
+        color: var(--text-main);
+        padding: 22px;
+      }
+
+      @media (max-width: 1360px) {
+        .workspace {
+          grid-template-columns: 272px minmax(0, 1fr);
+        }
+
+        .inspector {
+          grid-column: 1 / -1;
+          position: static;
+        }
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid,
+        .context-grid,
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .navigator {
+          position: static;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          padding: 18px 14px 28px;
+        }
+
+        .hero,
+        .panel,
+        .context {
+          border-radius: 24px;
+          padding: 18px;
+        }
+
+        .hero-metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .field-section-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .pill-group {
+          justify-content: flex-start;
+        }
+
+        .card-footer {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .stat-strip {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero glass">
+        <span class="eyebrow">Concept Only / Not Production</span>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>Glass-first data dictionary for Tuva docs.</h1>
+            <p>
+              This direction keeps the searchability and density of the current dictionary, but
+              moves the experience away from a spreadsheet feel and toward a layered catalog. The
+              visual language leans into soft translucency, restrained chrome, and stronger content
+              hierarchy.
+            </p>
+            <div class="hero-notes">
+              <div class="hero-note"><span class="dot"></span>Apple-like layered translucency</div>
+              <div class="hero-note"><span class="dot"></span>Palantir-like discipline and contrast</div>
+              <div class="hero-note"><span class="dot"></span>Review artifact using sample Tuva fields</div>
+            </div>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric-card">
+              <span>Layout Shift</span>
+              <strong>Catalog</strong>
+              <p>Rows become field cards with a sticky inspector instead of an always-visible grid.</p>
+            </div>
+            <div class="metric-card">
+              <span>Visual Tone</span>
+              <strong>Glass</strong>
+              <p>Soft blur, lower saturation, and fewer competing chip colors make the surface calmer.</p>
+            </div>
+            <div class="metric-card">
+              <span>Density</span>
+              <strong>Searchable</strong>
+              <p>Table switching, mart filtering, and fast scanning remain first-class interactions.</p>
+            </div>
+            <div class="metric-card">
+              <span>Implementation</span>
+              <strong>Separate</strong>
+              <p>This file is only a concept prototype and is not wired into the docs app.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="toolbar glass">
+        <label class="search" for="fieldSearch">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M10.5 18a7.5 7.5 0 1 1 5.12-13l4.44 4.44-1.42 1.41-4.1-4.08A5.5 5.5 0 1 0 16 10.5c0 1.22-.4 2.36-1.07 3.28l4.07 4.08-1.41 1.42L13.16 15A7.46 7.46 0 0 1 10.5 18Z"
+              fill="currentColor"
+            />
+          </svg>
+          <input
+            id="fieldSearch"
+            type="search"
+            placeholder="Search column name, type, description, or mapping note"
+          />
+        </label>
+
+        <div class="pill-group" id="martFilter"></div>
+
+        <div class="pill-group">
+          <button class="pill active" data-mode="all">All fields</button>
+          <button class="pill" data-mode="required">Required only</button>
+        </div>
+
+        <div class="pill-group theme-group">
+          <button class="pill" data-theme-option="dark">Dark</button>
+          <button class="pill active" data-theme-option="light">Light</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="navigator glass panel">
+          <h2>Table Navigator</h2>
+          <div id="tableNav"></div>
+        </aside>
+
+        <section class="catalog">
+          <div class="context glass" id="tableContext"></div>
+          <div class="column-grid" id="columnGrid"></div>
+        </section>
+
+        <aside class="inspector glass panel">
+          <h2>Field Detail</h2>
+          <div class="inspector-shell" id="inspector"></div>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      const tables = [
+        {
+          id: "eligibility",
+          group: "Claims",
+          label: "input_layer__eligibility",
+          description:
+            "Coverage spans and member demographics that support member months, PMPM, quality, and risk analytics.",
+          primaryKeys: [
+            "person_id",
+            "member_id",
+            "enrollment_start_date",
+            "enrollment_end_date",
+            "data_source",
+          ],
+          columns: [
+            {
+              name: "person_id",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Unique identifier for each person in the dataset. Ideally this is a stable person-level UUID that can work across claims and clinical data.",
+              mapping:
+                "If you do not have a UUID, map the source patient identifier here and keep it stable across all source feeds.",
+              marts: [
+                "CCSR",
+                "CMS HCCs",
+                "Financial PMPM",
+                "Quality Measures",
+                "Readmissions",
+              ],
+            },
+            {
+              name: "member_id",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Identifier that links the person to a specific insurance product or health plan.",
+              mapping:
+                "Use the plan-specific member identifier assigned by the insurer. This can vary over time for the same person.",
+              marts: ["CMS HCCs", "Financial PMPM", "Quality Measures", "Readmissions"],
+            },
+            {
+              name: "enrollment_start_date",
+              type: "date",
+              primaryKey: true,
+              description:
+                "Start date for the member's eligibility span. The table follows the eligibility span format, not a month-per-row model.",
+              mapping:
+                "Prefer the actual coverage effective date. If source data is monthly, use the first day of the covered month.",
+              marts: ["Financial PMPM", "Quality Measures", "Readmissions"],
+            },
+            {
+              name: "enrollment_end_date",
+              type: "date",
+              primaryKey: true,
+              description:
+                "End date for the member's eligibility span and used with the start date to define the covered period.",
+              mapping:
+                "Prefer the actual termination date. If source data is monthly, use the last day of the covered month.",
+              marts: ["Financial PMPM", "Quality Measures", "Readmissions"],
+            },
+            {
+              name: "gender",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Biological sex value used by downstream marts that require demographic normalization.",
+              mapping:
+                "Normalize values to male, female, or unknown to match the Tuva dictionary and test expectations.",
+              marts: ["CMS HCCs"],
+            },
+            {
+              name: "birth_date",
+              type: "date",
+              primaryKey: false,
+              description:
+                "Date of birth for the member and a key input to age-dependent marts.",
+              mapping:
+                "Use full date precision when available instead of only year or month. Nulls materially reduce analytics quality.",
+              marts: ["CMS HCCs", "Quality Measures"],
+            },
+            {
+              name: "plan",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Plan identifier or name associated with the eligibility span.",
+              mapping:
+                "Keep source plan naming stable over time. If multiple plan fields exist, choose the member-facing coverage unit.",
+              marts: ["Financial PMPM"],
+            },
+            {
+              name: "data_source",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Name of the originating source system or data feed that produced the row.",
+              mapping:
+                "Use a concise but durable source label because it is part of the primary key set.",
+              marts: ["CCSR", "CMS HCCs", "Quality Measures", "Readmissions"],
+            },
+          ],
+        },
+        {
+          id: "medical-claim",
+          group: "Claims",
+          label: "input_layer__medical_claim",
+          description:
+            "Claim-level and line-level facts that feed grouping, service categorization, utilization, and cost analytics.",
+          primaryKeys: ["claim_id", "claim_line_number", "data_source"],
+          columns: [
+            {
+              name: "claim_id",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Identifier for the claim header that groups one or more medical claim lines together.",
+              mapping:
+                "Use the payer or adjudication claim identifier rather than a transient ingest identifier when possible.",
+              marts: ["CCSR", "ED Classification", "Readmissions", "Service Categories"],
+            },
+            {
+              name: "claim_line_number",
+              type: "integer",
+              primaryKey: true,
+              description:
+                "Line number within the claim. This distinguishes service lines that share a common claim_id.",
+              mapping:
+                "If the source lacks explicit line numbers, generate a deterministic sequence within each claim.",
+              marts: ["CCSR", "Service Categories"],
+            },
+            {
+              name: "person_id",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Stable person identifier used to connect claims back to longitudinal member and patient records.",
+              mapping:
+                "Map this to the same canonical person_id used in eligibility and patient.",
+              marts: ["CCSR", "CMS HCCs", "Readmissions", "Service Categories"],
+            },
+            {
+              name: "claim_start_date",
+              type: "date",
+              primaryKey: false,
+              description:
+                "Start date of the billed service span represented by the claim or claim line.",
+              mapping:
+                "Use the earliest service date on the line, not the received or paid date.",
+              marts: ["CCSR", "ED Classification", "Readmissions"],
+            },
+            {
+              name: "claim_end_date",
+              type: "date",
+              primaryKey: false,
+              description:
+                "End date of the billed service span represented by the claim or claim line.",
+              mapping:
+                "Use the latest service date on the line and keep it on or after claim_start_date.",
+              marts: ["CCSR", "Readmissions"],
+            },
+            {
+              name: "paid_amount",
+              type: "numeric",
+              primaryKey: false,
+              description:
+                "Net paid amount associated with the claim line after adjudication.",
+              mapping:
+                "Use a consistent post-adjudication amount field so downstream PMPM and utilization cost analytics reconcile cleanly.",
+              marts: ["Financial PMPM", "Service Categories"],
+            },
+          ],
+        },
+        {
+          id: "patient",
+          group: "Clinical",
+          label: "input_layer__patient",
+          description:
+            "Patient demographics and identity fields used to anchor clinical records and tie them back to the person-level record.",
+          primaryKeys: ["person_id", "patient_id"],
+          columns: [
+            {
+              name: "person_id",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Stable person identifier shared across the broader Tuva model and used to connect claims and clinical views.",
+              mapping:
+                "Use the same canonical person identifier as eligibility to avoid cross-domain duplication.",
+              marts: ["CCSR", "CMS HCCs", "Quality Measures", "Readmissions"],
+            },
+            {
+              name: "patient_id",
+              type: "varchar",
+              primaryKey: true,
+              description:
+                "Identifier from the source clinical system that uniquely identifies the patient within that system.",
+              mapping:
+                "Keep the source patient identifier intact and let person_id handle enterprise identity resolution.",
+              marts: ["CCSR", "CMS HCCs", "Quality Measures", "Readmissions"],
+            },
+            {
+              name: "first_name",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Patient first name as stored in the source clinical system.",
+              mapping:
+                "Preserve source casing and punctuation where possible rather than over-normalizing names.",
+              marts: [],
+            },
+            {
+              name: "last_name",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Patient last name as stored in the source clinical system.",
+              mapping:
+                "Prefer the legal or primary last name field used for patient identity matching.",
+              marts: [],
+            },
+            {
+              name: "sex",
+              type: "varchar",
+              primaryKey: false,
+              description:
+                "Patient sex field used by quality analytics where available from clinical sources.",
+              mapping:
+                "Normalize source values into a small controlled set instead of carrying source-specific codes through the docs surface.",
+              marts: ["Quality Measures"],
+            },
+            {
+              name: "birth_date",
+              type: "date",
+              primaryKey: false,
+              description:
+                "Date of birth for the patient and a foundational demographic field for longitudinal clinical analysis.",
+              mapping:
+                "Use full date precision when available and keep date formats normalized before loading into Tuva.",
+              marts: ["CMS HCCs", "Quality Measures"],
+            },
+            {
+              name: "death_date",
+              type: "date",
+              primaryKey: false,
+              description:
+                "Recorded date of death for the patient when known.",
+              mapping:
+                "Only populate when confirmed. Keep validation that death_date is on or after birth_date.",
+              marts: ["Quality Measures"],
+            },
+          ],
+        },
+      ];
+
+      const martOptions = ["All marts", "Quality Measures", "CMS HCCs", "Financial PMPM", "Readmissions"];
+
+      const urlTheme = new URLSearchParams(window.location.search).get("theme");
+      const initialTheme = urlTheme === "dark" ? "dark" : "light";
+
+      const state = {
+        tableId: "eligibility",
+        columnName: "person_id",
+        search: "",
+        mart: "All marts",
+        mode: "all",
+        theme: initialTheme,
+      };
+
+      const tableNav = document.getElementById("tableNav");
+      const tableContext = document.getElementById("tableContext");
+      const columnGrid = document.getElementById("columnGrid");
+      const inspector = document.getElementById("inspector");
+      const searchInput = document.getElementById("fieldSearch");
+      const martFilter = document.getElementById("martFilter");
+      document.body.dataset.theme = state.theme;
+
+      function currentTable() {
+        return tables.find((table) => table.id === state.tableId) || tables[0];
+      }
+
+      function visibleColumns() {
+        const table = currentTable();
+        const search = state.search.trim().toLowerCase();
+
+        return table.columns.filter((column) => {
+          const matchesSearch =
+            search.length === 0 ||
+            [column.name, column.type, column.description, column.mapping, column.marts.join(" ")]
+              .join(" ")
+              .toLowerCase()
+              .includes(search);
+
+          const matchesMart =
+            state.mart === "All marts" || column.marts.includes(state.mart);
+
+          const matchesMode = state.mode === "all" || column.marts.length > 0;
+
+          return matchesSearch && matchesMart && matchesMode;
+        });
+      }
+
+      function selectedColumn() {
+        const visible = visibleColumns();
+        const selected = visible.find((column) => column.name === state.columnName);
+        return selected || visible[0] || currentTable().columns[0];
+      }
+
+      function groupedTables() {
+        return tables.reduce((acc, table) => {
+          if (!acc[table.group]) {
+            acc[table.group] = [];
+          }
+          acc[table.group].push(table);
+          return acc;
+        }, {});
+      }
+
+      function renderMartFilter() {
+        martFilter.innerHTML = martOptions
+          .map(
+            (mart) => `
+              <button class="pill ${state.mart === mart ? "active" : ""}" data-mart="${mart}">
+                ${mart}
+              </button>
+            `
+          )
+          .join("");
+
+        martFilter.querySelectorAll("[data-mart]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.mart = button.dataset.mart;
+            render();
+          });
+        });
+      }
+
+      function renderTableNav() {
+        const grouped = groupedTables();
+        tableNav.innerHTML = Object.entries(grouped)
+          .map(
+            ([group, items]) => `
+              <div class="nav-block">
+                <div class="nav-block-label">${group}</div>
+                ${items
+                  .map(
+                    (table) => `
+                      <button class="table-button ${state.tableId === table.id ? "active" : ""}" data-table="${table.id}">
+                        <div class="meta">
+                          <span>${table.group}</span>
+                          <span>${table.columns.length} fields</span>
+                        </div>
+                        <strong>${table.label}</strong>
+                        <p>${table.description}</p>
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+          )
+          .join("");
+
+        tableNav.querySelectorAll("[data-table]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.tableId = button.dataset.table;
+            state.columnName = currentTable().columns[0].name;
+            render();
+          });
+        });
+      }
+
+      function renderTableContext() {
+        const table = currentTable();
+        const columns = visibleColumns();
+        const requiredCount = table.columns.filter((column) => column.marts.length > 0).length;
+        const martSet = new Set(table.columns.flatMap((column) => column.marts));
+
+        tableContext.innerHTML = `
+          <div class="context-grid">
+            <div>
+              <span class="eyebrow">${table.group} / Dictionary Surface</span>
+              <h3>${table.label}</h3>
+              <p>${table.description}</p>
+              <div class="pk-row">
+                <span class="section-tag">Primary Key</span>
+                ${table.primaryKeys.map((key) => `<span class="mono-chip">${key}</span>`).join("")}
+              </div>
+              <div class="mart-row">
+                <span class="section-tag">Frequent Marts</span>
+                ${Array.from(martSet)
+                  .slice(0, 5)
+                  .map((mart) => `<span class="mart-chip">${mart}</span>`)
+                  .join("")}
+              </div>
+            </div>
+            <div class="stat-strip">
+              <div class="stat-badge">
+                <span>Visible</span>
+                <strong>${columns.length}</strong>
+              </div>
+              <div class="stat-badge">
+                <span>Required</span>
+                <strong>${requiredCount}</strong>
+              </div>
+              <div class="stat-badge">
+                <span>Keys</span>
+                <strong>${table.primaryKeys.length}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderColumnGrid() {
+        const columns = visibleColumns();
+
+        if (!columns.length) {
+          columnGrid.innerHTML = `
+            <div class="empty-state">
+              No fields match the current search and mart filters. This concept keeps the interface quiet when the result set is empty instead of leaving a blank grid.
+            </div>
+          `;
+          return;
+        }
+
+        columnGrid.innerHTML = columns
+          .map(
+            (column) => `
+              <button class="column-card ${state.columnName === column.name ? "active" : ""}" data-column="${column.name}">
+                <div class="column-card-top">
+                  <div>
+                    <div class="card-overline">${column.primaryKey ? "Primary key field" : "Dictionary field"}</div>
+                    <h4>${column.name}${
+                      column.primaryKey ? '<span class="pk-chip">PK</span>' : ""
+                    }</h4>
+                  </div>
+                  <span class="type-chip">${column.type}</span>
+                </div>
+                <div class="field-section-grid">
+                  <div class="field-section">
+                    <span class="field-section-label">Description</span>
+                    <p>${column.description}</p>
+                  </div>
+                  <div class="field-section">
+                    <span class="field-section-label">Mapping Instructions</span>
+                    <p>${column.mapping}</p>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <div class="mart-chips">
+                    ${
+                      column.marts.length
+                        ? column.marts
+                            .slice(0, 4)
+                            .map((mart) => `<span class="mart-chip">${mart}</span>`)
+                            .join("")
+                        : '<span class="mart-chip">Reference only</span>'
+                    }
+                  </div>
+                  <span class="ghost-link">View details</span>
+                </div>
+              </button>
+            `
+          )
+          .join("");
+
+        columnGrid.querySelectorAll("[data-column]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.columnName = button.dataset.column;
+            renderInspector();
+            renderColumnGrid();
+          });
+        });
+      }
+
+      function renderInspector() {
+        const table = currentTable();
+        const column = selectedColumn();
+
+        inspector.innerHTML = `
+          <div class="inspector-header">
+            <span class="eyebrow">Focused Field</span>
+            <h3>${column.name}</h3>
+            <span class="type-chip">${column.type}</span>
+            ${column.primaryKey ? '<span class="pk-chip">Primary key</span>' : ""}
+            <p class="helper">
+              The inspector gives one field a premium, readable treatment instead of forcing users to expand rows inside a crowded grid.
+            </p>
+          </div>
+
+          <div class="detail-card">
+            <h4>Description</h4>
+            <p>${column.description}</p>
+          </div>
+
+          <div class="detail-card">
+            <h4>Mapping Instructions</h4>
+            <p>${column.mapping}</p>
+          </div>
+
+          <div class="detail-card detail-list">
+            <h4>Downstream Use</h4>
+            <ul>
+              <li><strong>Table:</strong> ${table.label}</li>
+              <li><strong>Required For:</strong> ${
+                column.marts.length ? column.marts.join(", ") : "No specific data mart tags"
+              }</li>
+              <li><strong>Primary Key:</strong> ${column.primaryKey ? "Yes" : "No"}</li>
+            </ul>
+          </div>
+
+          <div class="detail-card">
+            <h4>Design Notes</h4>
+            <p>
+              If this direction is approved, the production version could preserve the same underlying metadata loader and filters, while swapping the current dense row grid for a responsive navigator plus card stream.
+            </p>
+          </div>
+        `;
+      }
+
+      function renderModeButtons() {
+        document.querySelectorAll("[data-mode]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.mode === state.mode);
+          button.onclick = () => {
+            state.mode = button.dataset.mode;
+            render();
+          };
+        });
+      }
+
+      function renderThemeButtons() {
+        document.querySelectorAll("[data-theme-option]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.themeOption === state.theme);
+          button.onclick = () => {
+            state.theme = button.dataset.themeOption;
+            document.body.dataset.theme = state.theme;
+            renderThemeButtons();
+          };
+        });
+      }
+
+      function normalizeSelection() {
+        const columns = visibleColumns();
+        if (!columns.some((column) => column.name === state.columnName)) {
+          state.columnName = columns[0] ? columns[0].name : currentTable().columns[0].name;
+        }
+      }
+
+      function render() {
+        normalizeSelection();
+        renderMartFilter();
+        renderTableNav();
+        renderTableContext();
+        renderColumnGrid();
+        renderInspector();
+        renderModeButtons();
+        renderThemeButtons();
+      }
+
+      searchInput.addEventListener("input", (event) => {
+        state.search = event.target.value;
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
