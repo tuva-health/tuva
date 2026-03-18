@@ -213,8 +213,21 @@ seeds:
         enrollment_status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         hospice_flag: integer
-        institutional_snp_flag: integer
+        snp_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        medicaid_indicator: integer
         long_term_institutional_flag: integer
+        part_d_raf_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        low_income_subsidy_indicator: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        metal_level: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        csr_indicator: integer
+        enrollment_duration_months: integer
+        esrd_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        transplant_duration_months: integer
 
   - name: immunization_seed
     config:

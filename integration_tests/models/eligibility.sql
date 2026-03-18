@@ -23,8 +23,16 @@
     , medicare_status_code
     , enrollment_status
     , hospice_flag
-    , institutional_snp_flag
+    , snp_type
+    , medicaid_indicator
     , long_term_institutional_flag
+    , part_d_raf_type
+    , low_income_subsidy_indicator
+    , metal_level
+    , csr_indicator
+    , enrollment_duration_months
+    , esrd_status
+    , transplant_duration_months
     , group_id
     , group_name
     , name_suffix

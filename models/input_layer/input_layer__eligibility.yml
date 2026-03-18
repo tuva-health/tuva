@@ -62,6 +62,106 @@ models:
             column_B: birth_date
             or_equal: true
             row_condition: death_date is not null
+      - dbt_utils.expression_is_true:
+          description: transplant_duration_months requires esrd_status to be populated.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "transplant_duration_months is null or esrd_status is not null"
+      - dbt_utils.expression_is_true:
+          description: transplant_duration_months should only be populated when esrd_status is transplant or graft.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "transplant_duration_months is null or esrd_status in ('transplant', 'graft')"
+      - dbt_utils.expression_is_true:
+          description: csr_indicator requires metal_level to be populated (ACA field).
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "csr_indicator is null or metal_level is not null"
+      - dbt_utils.expression_is_true:
+          description: enrollment_duration_months requires metal_level to be populated (ACA field).
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "enrollment_duration_months is null or metal_level is not null"
+      - dbt_utils.expression_is_true:
+          description: esrd_status should only be populated when enrollment_status is ESRD.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "esrd_status is null or enrollment_status = 'ESRD'"
+      - dbt_utils.expression_is_true:
+          description: snp_type is a Medicare concept and should not be populated for non-Medicare payer types.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+              - dqi_cms_hccs
+          expression: "snp_type is null or lower(payer_type) = 'medicare' or payer_type is null"
+      - dbt_utils.expression_is_true:
+          description: part_d_raf_type is a Medicare Part D concept and should not be populated for non-Medicare payer types.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "part_d_raf_type is null or lower(payer_type) = 'medicare' or payer_type is null"
+      - dbt_utils.expression_is_true:
+          description: low_income_subsidy_indicator is a Medicare Part D concept and should not be populated for non-Medicare payer types.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "low_income_subsidy_indicator is null or lower(payer_type) = 'medicare' or payer_type is null"
+      - dbt_utils.expression_is_true:
+          description: ACA fields (metal_level) and Medicare fields should not coexist — a row cannot be both ACA and Medicare.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "metal_level is null or lower(payer_type) != 'medicare' or payer_type is null"
+      - dbt_utils.expression_is_true:
+          description: ACA fields (metal_level) and Medicare SNP type should not coexist on the same row.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "metal_level is null or snp_type is null"
+      - dbt_utils.expression_is_true:
+          description: ACA fields (metal_level) and Part D fields should not coexist on the same row.
+          config:
+            severity: warn
+            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_3
+              - dqi
+          expression: "metal_level is null or part_d_raf_type is null"
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -686,18 +786,66 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi    
-      - name: institutional_snp_flag
-        description: Whether the patient is in a special needs plan (SNP) and required to be in nursing home level care. 
+      - name: snp_type
+        description: >
+          Special Needs Plan type. C-SNP = Chronic condition SNP, D-SNP = Dual eligible SNP,
+          I-SNP = Institutional SNP. Null when not enrolled in an SNP or non-Medicare.
+          Replaces institutional_snp_flag (derivable as snp_type = 'I-SNP').
         mapping_instructions: ''
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
-                  - dqi    
+                  - dqi
+                  - dqi_cms_hccs
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_cms_hccs
+              arguments:
+                values: ['C-SNP', 'D-SNP', 'I-SNP']
+        config:
+          meta:
+            data_type: varchar
+      - name: medicaid_indicator
+        description: >
+          Indicates whether the patient has Medicaid coverage (1 = Yes, 0 = No).
+          This is independent of dual-eligible status and corresponds to the CMS
+          NEMCAID field on the Monthly Membership Report. When provided, it is
+          used for New Enrollee risk score calculations. If not provided, Medicaid
+          status is derived from dual_status_code.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_cms_hccs
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_cms_hccs
+              arguments:
+                values: [0, 1]
+        config:
+          meta:
+            data_type: integer
       - name: long_term_institutional_flag
         description: Whether the patient is in an institutional setting for longer than 30 days.
         mapping_instructions: ''
@@ -709,7 +857,186 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
-                  - dqi    
+                  - dqi
+      - name: part_d_raf_type
+        description: >
+          Part D Risk Adjustment Factor type. CE = Continuing Enrollee,
+          NE = New Enrollee, PE = PACE Continuing, NP = PACE New.
+          Determines PACE vs non-PACE and NE vs CE scoring path for RxHCC.
+          Null when no Part D coverage.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: ['CE', 'NE', 'PE', 'NP']
+        config:
+          meta:
+            data_type: varchar
+      - name: low_income_subsidy_indicator
+        description: >
+          Low Income Subsidy (Extra Help) flag. Y = receives LIS, N = no LIS.
+          Drives the low-income coefficient selection in RxHCC scoring.
+          Null when no Part D coverage.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: ['Y', 'N']
+        config:
+          meta:
+            data_type: varchar
+      - name: metal_level
+        description: >
+          ACA metal tier of the health plan. P = Platinum, G = Gold, S = Silver,
+          B = Bronze, C = Catastrophic. Determines the base coefficient set for
+          HHS-HCC scoring. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: ['P', 'G', 'S', 'B', 'C']
+        config:
+          meta:
+            data_type: varchar
+      - name: csr_indicator
+        description: >
+          Cost Sharing Reduction variant indicator (1-11). Adjusts Silver-level
+          risk scores for income-based cost-sharing subsidies. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        config:
+          meta:
+            data_type: integer
+      - name: enrollment_duration_months
+        description: >
+          Number of months the enrollee was covered during the benefit year (1-12).
+          Used as an enrollment duration adjustment factor in HHS-HCC risk score
+          formula. Null when non-ACA.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        config:
+          meta:
+            data_type: integer
+      - name: esrd_status
+        description: >
+          ESRD clinical status: dialysis, graft, or transplant. Determines which
+          of the ESRD scoring models applies. Null when non-ESRD.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - accepted_values:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                values: ['dialysis', 'graft', 'transplant']
+        config:
+          meta:
+            data_type: varchar
+      - name: transplant_duration_months
+        description: >
+          Months since kidney transplant at the start of the payment year.
+          Used for transplant duration flags in ESRD scoring.
+          Null when non-ESRD or non-transplant.
+        mapping_instructions: ''
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+        config:
+          meta:
+            data_type: integer
       - name: group_id
         description: The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.
         mapping_instructions: ''
