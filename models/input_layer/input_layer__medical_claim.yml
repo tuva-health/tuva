@@ -216,7 +216,7 @@ models:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A claim should not belong to two different people.
               config:
-                severity: warn
+                severity: error
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 meta:
                   dqi_test_description: A claim should not belong to two different people.
