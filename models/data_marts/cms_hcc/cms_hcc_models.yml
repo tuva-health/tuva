@@ -578,8 +578,6 @@ models:
         description: >
           Indicates what age group the patient is in. (e.g. "60-64").
           CMS guidance: Age is calculated as of Feb 1 of the payment year.
-        tests:
-          - not_null
       - name: medicaid_status
         description: Indicates whether the patient is enrolled in Medicaid.
       - name: dual_status
@@ -754,6 +752,11 @@ models:
         description: Biological sex of the patient.
       - name: birth_date
         description: Date the patient was born.
+        tests:
+          - not_null:
+              description: For CMS HCC, this field is required for calculating the demographic risk scores. Those without birth dates are filtered out.
+              config:
+                severity: warn
       - name: death_date
         description: The death date of the patient if there is one.
   - name: cms_hcc__stg_core__member_months
