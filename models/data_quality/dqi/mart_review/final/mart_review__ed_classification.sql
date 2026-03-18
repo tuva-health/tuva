@@ -34,7 +34,7 @@ select
         'p.ccsr_category_description'
     ]) }} as ccsr_parent_category_and_description
     , b.body_system
-    , e.facility_id
+    , e.facility_npi
     , e.allowed_amount
     , e.charge_amount
     , e.data_source
@@ -54,7 +54,7 @@ select
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__encounter') }} as e
 left outer join {{ ref('ed_classification__summary') }} as s on e.encounter_id = s.encounter_id
-left outer join cte on e.facility_id = cte.location_id
+left outer join cte on e.facility_npi = cte.location_id
 left outer join {{ ref('ccsr__dx_vertical_pivot') }} as p
   on e.primary_diagnosis_code = p.code
   and p.ccsr_category_rank = 1

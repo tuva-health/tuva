@@ -73,9 +73,9 @@ with eligibility as (
         , medical_claim.claim_end_date
         , medical_claim.paid_date
         , medical_claim.payer
-        , medical_claim.billing_id
+        , medical_claim.billing_npi
         , medical_claim.billing_name
-        , medical_claim.rendering_id
+        , medical_claim.rendering_npi
         , medical_claim.rendering_name
         , eligibility.eligibility_id
         , medical_claim.data_source
@@ -111,9 +111,9 @@ with eligibility as (
         , claim_end_date
         , paid_date
         , payer
-        , billing_id
+        , billing_npi
         , billing_name
-        , rendering_id
+        , rendering_npi
         , rendering_name
         , eligibility_id
         , data_source
@@ -142,8 +142,8 @@ with eligibility as (
         , cast(medical_claim.payer as {{ dbt.type_string() }} ) as organization_name
         /* required for FHIR validation, default to dummy practitioner */
         , coalesce(
-              cast(medical_claim.billing_id as {{ dbt.type_string() }} )
-            , cast(medical_claim.rendering_id as {{ dbt.type_string() }} )
+              cast(medical_claim.billing_npi as {{ dbt.type_string() }} )
+            , cast(medical_claim.rendering_npi as {{ dbt.type_string() }} )
             , '9999999999'
           ) as practitioner_internal_id
         , coalesce(

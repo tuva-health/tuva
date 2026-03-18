@@ -20,7 +20,7 @@
     , discharge_disposition_description
     , attending_provider_id
     , attending_provider_name
-    , facility_id
+    , facility_npi
     , facility_name
     , facility_type
     , observation_flag

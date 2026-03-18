@@ -26,6 +26,7 @@ with stg_eligibility as (
         , elig.dual_status_code
         , elig.medicare_status_code
         , elig.enrollment_status
+        , elig.long_term_institutional_flag
         , elig.institutional_snp_flag
         , dates.collection_year
         , dates.payment_year
@@ -64,6 +65,7 @@ with stg_eligibility as (
         , patient.death_date
     from {{ ref('cms_hcc__stg_core__patient') }} as patient
     cross join payment_year_age_dates as dates
+    where patient.birth_date is not null
 
 )
 
@@ -142,6 +144,7 @@ with stg_eligibility as (
         , stg_eligibility.original_reason_entitlement_code
         , stg_eligibility.dual_status_code
         , stg_eligibility.medicare_status_code
+        , stg_eligibility.long_term_institutional_flag
         , stg_eligibility.institutional_snp_flag
         /* Defaulting to "New" enrollment status when missing */
         , case
@@ -170,6 +173,7 @@ with stg_eligibility as (
             on stg_eligibility.person_id = stg_patient.person_id
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
+        and stg_patient.payment_year_age is not null
 
 )
 
@@ -186,6 +190,7 @@ with stg_eligibility as (
         , original_reason_entitlement_code
         , dual_status_code
         , medicare_status_code
+        , long_term_institutional_flag
         , enrollment_status
         , institutional_snp_flag
         , enrollment_status_default
@@ -278,8 +283,16 @@ with stg_eligibility as (
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') and payment_year_age >= 65 then 'Yes'
             else 'No'
           end as originally_disabled_flag
-        /* Defaulting everyone to non-institutional until logic is added */
-        , case when enrollment_status = 'Institutional' then 'Yes' else 'No' end as institutional_status
+        /*
+           Institutional status: use long_term_institutional_flag from
+           eligibility input.  Fall back to enrollment_status = 'Institutional'
+           when the flag is null.
+        */
+        , case
+            when long_term_institutional_flag = 1 then 'Yes'
+            when enrollment_status = 'Institutional' then 'Yes'
+            else 'No'
+          end as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
@@ -304,12 +317,16 @@ with stg_eligibility as (
                 else false
             {% endif %}
           end as orec_default
-        /* Setting default true until institutional logic is added */
-        {% if target.type == 'fabric' %}
-            , 1 as institutional_status_default
-        {% else %}
-            , true as institutional_status_default
-        {% endif %}
+        /* Default true when long_term_institutional_flag is not populated */
+        , case
+            {% if target.type == 'fabric' %}
+                when long_term_institutional_flag is null and enrollment_status != 'Institutional' then 1
+                else 0
+            {% else %}
+                when long_term_institutional_flag is null and enrollment_status != 'Institutional' then true
+                else false
+            {% endif %}
+          end as institutional_status_default
     from add_age_group
 
 )

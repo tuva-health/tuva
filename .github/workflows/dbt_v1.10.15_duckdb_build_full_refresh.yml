@@ -17,6 +17,7 @@ jobs:
       PYTHON_VERSION: "3.10"
       DBT_PROJECT_DIR: "./integration_tests"
       DBT_CORE_VERSION: "1.10.15"
+      DUCKDB_VERSION: "1.4.4"
       
       # Connection variables
       DBT_MOTHERDUCK_CI_PATH: ${{ secrets.DBT_MOTHERDUCK_CI_PATH }}
@@ -34,7 +35,7 @@ jobs:
       - name: Install dbt-core and DuckDB adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==${{ env.DBT_CORE_VERSION}} dbt-duckdb
+          pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==${{ env.DUCKDB_VERSION }}
 
       - name: Install dbt dependencies
         run: dbt deps --profiles-dir ./integration_tests/profiles/duckdb
