@@ -4,42 +4,6 @@
    )
 }}
 
-{%- set tuva_columns -%}
-      person_id
-    , member_id
-    , subscriber_id
-    , gender
-    , race
-    , birth_date
-    , death_date
-    , death_flag
-    , enrollment_start_date
-    , enrollment_end_date
-    , payer
-    , payer_type
-    , {{ the_tuva_project.quote_column('plan') }}
-    , original_reason_entitlement_code
-    , dual_status_code
-    , medicare_status_code
-    , enrollment_status
-    , hospice_flag
-    , group_id
-    , group_name
-    , name_suffix
-    , first_name
-    , middle_name
-    , last_name
-    , social_security_number
-    , subscriber_relation
-    , address
-    , city
-    , state
-    , zip_code
-    , phone
-    , email
-    , ethnicity
-{%- endset -%}
-
 {# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
     {# , person_id as x_temp_person_id #}
@@ -150,8 +114,25 @@
   {%- endif -%}
 {%- endset -%}
 
-select
-    {{ tuva_columns }}
+{%- set tuva_columns -%}
+      person_id
+    , member_id
+    , subscriber_id
+    , gender
+    , race
+    , birth_date
+    , death_date
+    , death_flag
+    , enrollment_start_date
+    , enrollment_end_date
+    , payer
+    , payer_type
+    , {{ the_tuva_project.quote_column('plan') }}
+    , original_reason_entitlement_code
+    , dual_status_code
+    , medicare_status_code
+    , enrollment_status
+    , hospice_flag
     , {{ snp_type_expr }} as snp_type
     , {{ medicaid_indicator_expr }} as medicaid_indicator
     , {{ long_term_institutional_flag_expr }} as long_term_institutional_flag
@@ -162,6 +143,25 @@ select
     , {{ enrollment_duration_months_expr }} as enrollment_duration_months
     , {{ esrd_status_expr }} as esrd_status
     , {{ transplant_duration_months_expr }} as transplant_duration_months
+    , group_id
+    , group_name
+    , name_suffix
+    , first_name
+    , middle_name
+    , last_name
+    , social_security_number
+    , subscriber_relation
+    , address
+    , city
+    , state
+    , zip_code
+    , phone
+    , email
+    , ethnicity
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ eligibility_relation }}
