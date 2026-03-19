@@ -13,7 +13,7 @@ models:
       - name: procedure_id
         description: The unique identifier for the performed procedure.
         mapping_instructions: ''
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -70,7 +70,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures', 'readmissions']
+        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -121,7 +121,7 @@ models:
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures', 'readmissions']
+        required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -148,7 +148,7 @@ models:
       - name: claim_id
         description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -210,7 +210,7 @@ models:
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         mapping_instructions: ''
-        required_for_data_marts: ['cms_hccs', 'quality_measures']
+        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -288,7 +288,7 @@ models:
       - name: normalized_code_type
         description: The normalized type of code.
         mapping_instructions: ''
-        required_for_data_marts: ['cms_chronic_conditions', 'readmissions']
+        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -317,7 +317,7 @@ models:
       - name: normalized_code
         description: The normalized code.
         mapping_instructions: ''
-        required_for_data_marts: ['cms_chronic_conditions', 'readmissions']
+        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -530,7 +530,7 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source.
         mapping_instructions: ''
-        required_for_data_marts: ['cms_chronic_conditions']
+        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

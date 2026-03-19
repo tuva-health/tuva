@@ -361,10 +361,12 @@
 }
 
 .input-dict-column-name {
-  align-items: center;
-  display: inline-flex;
+  align-items: flex-start;
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .input-dict-column-name code {
@@ -372,10 +374,16 @@
   border: 1px solid #c3d9ef;
   border-radius: 8px;
   color: #153a5b;
+  display: inline-block;
   font-size: 12px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.35;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: 6px 7px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .input-dict-pk-chip {
@@ -383,6 +391,7 @@
   border: 1px solid #efc56c;
   border-radius: 999px;
   color: #805b11;
+  flex: 0 0 auto;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -397,9 +406,13 @@
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 6px 9px;
   text-transform: lowercase;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .input-dict-type-empty {

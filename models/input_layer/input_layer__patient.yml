@@ -48,7 +48,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
+        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -89,7 +89,7 @@ models:
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
         mapping_instructions: ''
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -130,7 +130,7 @@ models:
       - name: name_suffix
         description: The name suffixes (e.g., Sr., Jr., III.)
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -145,7 +145,7 @@ models:
       - name: first_name
         description: The first name of the patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -168,7 +168,7 @@ models:
       - name: middle_name
         description: The middle name of the patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -183,7 +183,7 @@ models:
       - name: last_name
         description: The last name of the patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -206,7 +206,7 @@ models:
       - name: sex
         description: The gender of the patient.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -243,7 +243,7 @@ models:
       - name: race
         description: The patient's race.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -276,7 +276,7 @@ models:
       - name: birth_date
         description: The birth date of the patient.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -323,7 +323,7 @@ models:
       - name: death_date
         description: Date the patient died if there is one.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -361,7 +361,7 @@ models:
       - name: death_flag
         description: A flag indicating if the patient has died.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -415,7 +415,7 @@ models:
       - name: address
         description: The street address of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -438,7 +438,7 @@ models:
       - name: city
         description: The city of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -461,7 +461,7 @@ models:
       - name: state
         description: The state of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -494,7 +494,7 @@ models:
       - name: zip_code
         description: The zip code of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -517,7 +517,7 @@ models:
       - name: county
         description: The county for the patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -540,7 +540,7 @@ models:
       - name: latitude
         description: The latitude of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -563,7 +563,7 @@ models:
       - name: longitude
         description: The longitude of the record (e.g., facility location, patient, etc).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -586,7 +586,7 @@ models:
       - name: phone
         description: The phone number for the patient.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -601,7 +601,7 @@ models:
       - name: email
         description: The email for the patient
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -616,7 +616,7 @@ models:
       - name: ethnicity
         description: The ethnicity of the patient
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -631,7 +631,7 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'hcc_recapture', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

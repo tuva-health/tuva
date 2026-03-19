@@ -13,7 +13,7 @@ models:
       - name: medication_id
         description: Unique identifier for each medication in the table.
         mapping_instructions: ''
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -70,7 +70,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -91,7 +91,7 @@ models:
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -151,7 +151,7 @@ models:
       - name: dispensing_date
         description: Date the medication was dispensed.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -243,7 +243,7 @@ models:
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         mapping_instructions: ''
-        required_for_data_marts: ['cms_hccs', 'quality_measures']
+        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -281,7 +281,7 @@ models:
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -329,7 +329,7 @@ models:
       - name: ndc_code
         description: National drug code associated with the medication.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -385,7 +385,7 @@ models:
       - name: rxnorm_code
         description: RxNorm code associated with the medication.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -635,7 +635,7 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

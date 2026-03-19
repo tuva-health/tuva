@@ -15,7 +15,7 @@ models:
       - name: appointment_id
         description: Unique identifier for the appointment.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -48,7 +48,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -72,7 +72,7 @@ models:
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -95,7 +95,7 @@ models:
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -111,7 +111,7 @@ models:
       - name: source_appointment_type_code
         description: Appointment type code from the source.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -135,7 +135,7 @@ models:
       - name: source_appointment_type_description
         description: Appointment type description from the source.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -159,7 +159,7 @@ models:
       - name: normalized_appointment_type_code
         description: Normalized appointment type code.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -175,7 +175,7 @@ models:
       - name: normalized_appointment_type_description
         description: Normalized appointment type description.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -191,7 +191,7 @@ models:
       - name: start_datetime
         description: The start date/time of the appointment or service.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -238,7 +238,7 @@ models:
       - name: end_datetime
         description: The end date/time of the appointment or service.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -277,7 +277,7 @@ models:
       - name: duration
         description: Number of minutes that the appointment or service is to take.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -293,7 +293,7 @@ models:
       - name: location_id
         description: Unique identifier for each location.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -309,7 +309,7 @@ models:
       - name: practitioner_id
         description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -325,7 +325,7 @@ models:
       - name: source_status
         description: Status of the appointment from the source system.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -349,7 +349,7 @@ models:
       - name: normalized_status
         description: The normalized status of the appointment.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -365,7 +365,7 @@ models:
       - name: appointment_specialty
         description: Specialty of a practitioner that would be required to perform the service requested in this appointment.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -381,7 +381,7 @@ models:
       - name: reason
         description: Free text reason for the appointment or service.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -397,7 +397,7 @@ models:
       - name: source_reason_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -423,7 +423,7 @@ models:
       - name: source_reason_code
         description: The code in the source system for the appointment reason (e.g., ICD-10 code).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -439,7 +439,7 @@ models:
       - name: source_reason_description
         description: Description of the source code for the appointment reason in the source system (e.g., ICD-10 description).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -455,7 +455,7 @@ models:
       - name: normalized_reason_code_type
         description: The normalized type of code.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -481,7 +481,7 @@ models:
       - name: normalized_reason_code
         description: The normalized code for the appointment reason (e.g., ICD-10 code).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -497,7 +497,7 @@ models:
       - name: normalized_reason_description
         description: Normalized description of the code for the appointment reason (e.g., ICD-10 description).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -513,7 +513,7 @@ models:
       - name: cancellation_reason
         description: Free text reason why the appointment was cancelled.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -529,7 +529,7 @@ models:
       - name: source_cancellation_reason_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -555,7 +555,7 @@ models:
       - name: source_cancellation_reason_code
         description: The code in the source system for the cancellation reason.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -571,7 +571,7 @@ models:
       - name: source_cancellation_reason_description
         description: Description of the source code for the cancellation reason in the source system.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -587,7 +587,7 @@ models:
       - name: normalized_cancellation_reason_code_type
         description: The normalized type of code.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -613,7 +613,7 @@ models:
       - name: normalized_cancellation_reason_code
         description: The normalized code for the cancellation reason.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -629,7 +629,7 @@ models:
       - name: normalized_cancellation_reason_description
         description: Normalized description of the code for the cancellation reason.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -645,7 +645,7 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -662,7 +662,7 @@ models:
       - name: file_name
         description: The file name of the source file.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -678,7 +678,7 @@ models:
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
