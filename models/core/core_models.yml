@@ -315,7 +315,7 @@ models:
           meta:
             data_type: varchar
       - name: condition_rank
-        description: The numerical ranking of a diagnosis code in a claim.  Principle  diagnosis code is given a ranking of 1. Claims data typically has a  strict ranking of conditions whereas medical records will often not  have this information or the information won't be accurate.
+        description: The numerical ranking of the condition. For conditions derived from medical claims, condition_rank is set from the diagnosis code position on the claim, so diagnosis_code_1 becomes condition_rank = 1, diagnosis_code_2 becomes condition_rank = 2, and so on through diagnosis_code_25. For conditions sourced from the input layer condition table, this field is passed through without transformation from the mapped input value. A condition_rank of 1 indicates a primary diagnosis code, and any condition_rank greater than 1 indicates a secondary diagnosis code.
         data_type: integer
         config:
           meta:
