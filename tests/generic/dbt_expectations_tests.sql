@@ -178,10 +178,11 @@
       SELECT
         {% if group_by %}
           {% for g in group_by %}
-            {{ g }} AS group_by_col,
+            {{ g }}{% if not loop.last %},{% endif %}
           {% endfor %}
+          ,
         {% endif %}
-        COUNT(DISTINCT '{{ quote_column(column_name)}}' ) AS unique_value_count
+        COUNT(DISTINCT {{ quote_column(column_name) }} ) AS unique_value_count
       FROM filtered_data
       {% if group_by %}
       GROUP BY
@@ -191,9 +192,7 @@
       {% endif %}
     )
 
-    SELECT 
-      group_by_col
-      , unique_value_count
+    SELECT *
     FROM unique_values
     WHERE NOT (
       {% if min_value is not none %} unique_value_count {{ min_operator }} {{ min_value }}{% endif %}
