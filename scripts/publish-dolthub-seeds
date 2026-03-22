@@ -1,0 +1,513 @@
+#!/usr/bin/env python3
+"""Publish Tuva DoltHub databases to versioned S3 seed artifacts."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import gzip
+import http.client
+import io
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import urllib.error
+import urllib.request
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Iterable
+
+
+DEFAULT_OWNER = "tuva-health"
+DEFAULT_REF = "main"
+DEFAULT_BUCKET = "tuva-public-resources"
+HTTP_TIMEOUT_SECONDS = 60
+
+DATABASE_FOLDERS = {
+    "concept_library": "concept-library",
+    "reference_data": "reference-data",
+    "terminology": "terminology",
+    "value_sets": "value-sets",
+    "provider_data": "provider-data",
+    "synthetic_data": "synthetic-data",
+}
+
+REPO_TO_LOGICAL_DATABASE = {repo: logical for logical, repo in DATABASE_FOLDERS.items()}
+LOCAL_REPO_DIRS = {
+    "concept-library": "tuva-concept-library",
+    "reference-data": "tuva-reference-data",
+    "terminology": "tuva-terminology",
+    "value-sets": "tuva-value-sets",
+    "provider-data": "provider-data",
+    "synthetic-data": "tuva-synthetic-data",
+}
+
+
+@dataclass(frozen=True)
+class TableAsset:
+    logical_database: str
+    repo_database: str
+    table_name: str
+    expected_rows: int
+
+    @property
+    def relative_key(self) -> str:
+        return f"{self.repo_database}/{ARGS.version}/{self.table_name}.csv.gz"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Download the latest Tuva seed tables from public DoltHub repositories and "
+            "publish them to versioned S3 folders."
+        )
+    )
+    parser.add_argument(
+        "--version",
+        required=True,
+        help="Release version to publish, e.g. v0.18.0 or 0.18.0.",
+    )
+    parser.add_argument(
+        "--owner",
+        default=DEFAULT_OWNER,
+        help=f"DoltHub owner or organization. Defaults to {DEFAULT_OWNER}.",
+    )
+    parser.add_argument(
+        "--ref",
+        default=DEFAULT_REF,
+        help=f"DoltHub ref to read from. Defaults to {DEFAULT_REF}.",
+    )
+    parser.add_argument(
+        "--source",
+        choices=["dolthub", "local"],
+        default="dolthub",
+        help="Seed export source. Defaults to dolthub.",
+    )
+    parser.add_argument(
+        "--local-repo-root",
+        default=str(Path("/Users/aaronneiderhiser/code")),
+        help="Root folder containing local Dolt clones when --source local is used.",
+    )
+    parser.add_argument(
+        "--database",
+        action="append",
+        default=[],
+        help=(
+            "Optional logical database filter. Repeat for multiple values. "
+            "Accepted values: concept_library, reference_data, terminology, "
+            "value_sets, provider_data, synthetic_data."
+        ),
+    )
+    parser.add_argument(
+        "--table",
+        action="append",
+        default=[],
+        help=(
+            "Optional exact table-name filter. Repeat for multiple values. "
+            "Applied after database selection."
+        ),
+    )
+    parser.add_argument(
+        "--bucket",
+        action="append",
+        default=[],
+        help=(
+            "Optional S3 bucket override in the form logical_database=bucket-or-bucket/prefix. "
+            "Defaults to tuva-public-resources for any database not listed."
+        ),
+    )
+    parser.add_argument(
+        "--stage-dir",
+        help="Optional directory for staged gzip files and manifest output.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the publish plan without downloading or uploading anything.",
+    )
+    parser.add_argument(
+        "--download-only",
+        action="store_true",
+        help="Download and validate locally without uploading to S3.",
+    )
+    parser.add_argument(
+        "--keep-staged-files",
+        action="store_true",
+        help="Keep staged files after the script finishes. Requires --stage-dir.",
+    )
+    return parser.parse_args()
+
+
+def normalize_version(version: str) -> str:
+    normalized = version.strip()
+    if normalized.startswith("v"):
+        normalized = normalized[1:]
+    if not normalized:
+        raise ValueError("Version cannot be empty.")
+    return normalized
+
+
+def normalize_database_name(raw_name: str) -> str:
+    name = raw_name.strip()
+    name = name.replace("-", "_")
+    if name in DATABASE_FOLDERS:
+        return name
+    if raw_name in REPO_TO_LOGICAL_DATABASE:
+        return REPO_TO_LOGICAL_DATABASE[raw_name]
+    raise ValueError(
+        f"Unsupported database '{raw_name}'. Expected one of: {', '.join(sorted(DATABASE_FOLDERS))}."
+    )
+
+
+def normalize_bucket(raw_bucket: str) -> str:
+    bucket = raw_bucket.strip()
+    if bucket.startswith("s3://"):
+        bucket = bucket[5:]
+    return bucket.strip("/")
+
+
+def parse_bucket_overrides(items: Iterable[str]) -> dict[str, str]:
+    overrides: dict[str, str] = {}
+    for item in items:
+        if "=" not in item:
+            raise ValueError(
+                f"Invalid --bucket value '{item}'. Expected logical_database=bucket-or-prefix."
+            )
+        database, bucket = item.split("=", 1)
+        overrides[normalize_database_name(database)] = normalize_bucket(bucket)
+    return overrides
+
+
+def csv_endpoint(owner: str, repo_database: str, ref: str, table_name: str) -> str:
+    return f"https://www.dolthub.com/csv/{owner}/{repo_database}/{ref}/{table_name}"
+
+
+def local_repo_path(repo_database: str) -> Path:
+    return Path(ARGS.local_repo_root).resolve() / LOCAL_REPO_DIRS[repo_database]
+
+
+def open_url_with_retries(request: urllib.request.Request, attempts: int = 4):
+    delay_seconds = 1
+    last_error: Exception | None = None
+
+    for attempt in range(1, attempts + 1):
+        try:
+            return urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS)
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code < 500 or attempt == attempts:
+                raise
+        except urllib.error.URLError as exc:
+            last_error = exc
+            if attempt == attempts:
+                raise
+
+        time.sleep(delay_seconds)
+        delay_seconds *= 2
+
+    if last_error is not None:
+        raise last_error
+
+    raise RuntimeError("Failed to open URL and no error was captured.")
+
+
+def read_csv_rows(url: str) -> list[dict[str, str]]:
+    request = urllib.request.Request(
+        url,
+        headers={"user-agent": "tuva-dolthub-publisher/1.0"},
+    )
+    with open_url_with_retries(request) as response:
+        decoded = response.read().decode("utf-8")
+    return list(csv.DictReader(decoded.splitlines()))
+
+
+def read_local_sql_csv(repo_database: str, query: str) -> list[dict[str, str]]:
+    repo_path = local_repo_path(repo_database)
+    result = subprocess.run(
+        ["dolt", "sql", "-r", "csv", "-q", query],
+        cwd=str(repo_path),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return list(csv.DictReader(result.stdout.splitlines()))
+
+
+def quote_identifier(identifier: str) -> str:
+    return f"`{identifier.replace('`', '``')}`"
+
+
+def get_local_header_columns(repo_database: str, table_name: str) -> list[str]:
+    repo_path = local_repo_path(repo_database)
+    result = subprocess.run(
+        ["dolt", "sql", "-r", "csv", "-q", f"select * from {quote_identifier(table_name)} limit 0"],
+        cwd=str(repo_path),
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    reader = csv.reader(result.stdout.splitlines())
+    header_columns = next(reader, [])
+    return [column for column in header_columns if column != "__pk"]
+
+
+def build_local_export_query(table_name: str, columns: list[str]) -> str:
+    projected_columns = [
+        f"IFNULL(CAST({quote_identifier(column)} AS CHAR), '\\\\N') AS {quote_identifier(column)}"
+        for column in columns
+    ]
+    return f"select {', '.join(projected_columns)} from {quote_identifier(table_name)}"
+
+
+def get_assets_for_database(logical_database: str, owner: str, ref: str) -> list[TableAsset]:
+    repo_database = DATABASE_FOLDERS[logical_database]
+    if ARGS.source == "local":
+        catalog_rows = read_local_sql_csv(repo_database, "select * from asset_table_catalog")
+    else:
+        catalog_url = csv_endpoint(owner, repo_database, ref, "asset_table_catalog")
+        catalog_rows = read_csv_rows(catalog_url)
+
+    assets = [
+        TableAsset(
+            logical_database=logical_database,
+            repo_database=repo_database,
+            table_name=row["table_name"],
+            expected_rows=int(row["row_count"]),
+        )
+        for row in catalog_rows
+    ]
+    assets.append(
+        TableAsset(
+            logical_database=logical_database,
+            repo_database=repo_database,
+            table_name="asset_table_catalog",
+            expected_rows=len(catalog_rows),
+        )
+    )
+    if ARGS.table:
+        selected_tables = {table.strip() for table in ARGS.table if table.strip()}
+        assets = [asset for asset in assets if asset.table_name in selected_tables]
+
+    return sorted(assets, key=lambda asset: asset.table_name)
+
+
+def ensure_upload_prerequisites() -> None:
+    if shutil.which("aws") is None:
+        raise RuntimeError("AWS CLI is required for upload mode but was not found in PATH.")
+
+    subprocess.run(
+        ["aws", "sts", "get-caller-identity"],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> int:
+    if ARGS.source == "local":
+        return download_local_asset(asset, destination)
+
+    request = urllib.request.Request(
+        csv_endpoint(ARGS.owner, asset.repo_database, ARGS.ref, asset.table_name),
+        headers={"user-agent": "tuva-dolthub-publisher/1.0"},
+    )
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    delay_seconds = 1
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            row_count = 0
+            is_header = True
+            with open_url_with_retries(request) as response:
+                with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
+                    writer = csv.writer(gzip_file, lineterminator="\n")
+                    text_response = io.TextIOWrapper(response, encoding="utf-8", newline="")
+                    for row in csv.reader(text_response):
+                        writer.writerow(row)
+                        if is_header:
+                            is_header = False
+                        else:
+                            row_count += 1
+
+            return row_count
+        except (
+            csv.Error,
+            http.client.IncompleteRead,
+            TimeoutError,
+            urllib.error.HTTPError,
+            urllib.error.URLError,
+            UnicodeDecodeError,
+        ) as exc:
+            last_error = exc
+            if destination.exists():
+                destination.unlink()
+            if isinstance(exc, urllib.error.HTTPError) and exc.code < 500:
+                raise
+            if attempt == attempts:
+                raise
+            time.sleep(delay_seconds)
+            delay_seconds *= 2
+
+    if last_error is not None:
+        raise last_error
+
+    raise RuntimeError("Failed to download asset and no error was captured.")
+
+
+def download_local_asset(asset: TableAsset, destination: Path) -> int:
+    repo_path = local_repo_path(asset.repo_database)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    columns = get_local_header_columns(asset.repo_database, asset.table_name)
+    query = build_local_export_query(asset.table_name, columns)
+
+    process = subprocess.Popen(
+        ["dolt", "sql", "-r", "csv", "-q", query],
+        cwd=str(repo_path),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    row_count = 0
+    try:
+        assert process.stdout is not None
+        with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
+            writer = csv.writer(gzip_file, lineterminator="\n")
+            reader = csv.reader(process.stdout)
+            for index, row in enumerate(reader):
+                writer.writerow(row)
+                if index > 0:
+                    row_count += 1
+    finally:
+        stderr = process.communicate()[1]
+
+    if process.returncode != 0:
+        if destination.exists():
+            destination.unlink()
+        raise RuntimeError(
+            f"Local export failed for {asset.repo_database}.{asset.table_name}: {stderr.strip()}"
+        )
+
+    return row_count
+
+
+def upload_asset(path: Path, destination_uri: str) -> None:
+    subprocess.run(
+        ["aws", "s3", "cp", str(path), destination_uri, "--only-show-errors"],
+        check=True,
+    )
+
+
+def build_manifest_entry(asset: TableAsset, bucket: str, actual_rows: int, staged_path: Path) -> dict[str, str | int]:
+    destination_uri = f"s3://{bucket}/{asset.relative_key}"
+    if ARGS.source == "local":
+        source_reference = f"{local_repo_path(asset.repo_database)}/{asset.table_name}"
+    else:
+        source_reference = csv_endpoint(ARGS.owner, asset.repo_database, ARGS.ref, asset.table_name)
+    return {
+        "logical_database": asset.logical_database,
+        "repo_database": asset.repo_database,
+        "table_name": asset.table_name,
+        "expected_rows": asset.expected_rows,
+        "actual_rows": actual_rows,
+        "source_url": source_reference,
+        "staged_path": str(staged_path),
+        "destination_uri": destination_uri,
+    }
+
+
+def write_manifest(manifest: list[dict[str, str | int]], manifest_path: Path) -> None:
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
+def main() -> int:
+    selected_databases = (
+        [normalize_database_name(database) for database in ARGS.database]
+        if ARGS.database
+        else list(DATABASE_FOLDERS)
+    )
+    bucket_overrides = parse_bucket_overrides(ARGS.bucket)
+
+    if ARGS.keep_staged_files and not ARGS.stage_dir:
+        raise ValueError("--keep-staged-files requires --stage-dir.")
+
+    if not ARGS.dry_run and not ARGS.download_only:
+        ensure_upload_prerequisites()
+
+    stage_root_path: Path | None = None
+    temporary_directory: tempfile.TemporaryDirectory[str] | None = None
+    if ARGS.stage_dir:
+        stage_root_path = Path(ARGS.stage_dir).resolve()
+        stage_root_path.mkdir(parents=True, exist_ok=True)
+    elif not ARGS.dry_run:
+        temporary_directory = tempfile.TemporaryDirectory(prefix="tuva-dolthub-publish-")
+        stage_root_path = Path(temporary_directory.name)
+
+    manifest: list[dict[str, str | int]] = []
+
+    try:
+        for logical_database in selected_databases:
+            repo_database = DATABASE_FOLDERS[logical_database]
+            bucket = bucket_overrides.get(logical_database, DEFAULT_BUCKET)
+            assets = get_assets_for_database(logical_database, ARGS.owner, ARGS.ref)
+
+            for asset in assets:
+                staged_path = (
+                    Path("/dev/null")
+                    if stage_root_path is None
+                    else stage_root_path / asset.relative_key
+                )
+
+                if ARGS.dry_run:
+                    manifest.append(build_manifest_entry(asset, bucket, asset.expected_rows, staged_path))
+                    continue
+
+                actual_rows = download_asset(asset, staged_path)
+                if actual_rows != asset.expected_rows:
+                    raise RuntimeError(
+                        f"Row count mismatch for {asset.repo_database}.{asset.table_name}: "
+                        f"expected {asset.expected_rows}, got {actual_rows}."
+                    )
+
+                entry = build_manifest_entry(asset, bucket, actual_rows, staged_path)
+                manifest.append(entry)
+
+                if not ARGS.download_only:
+                    upload_asset(staged_path, entry["destination_uri"])
+
+                print(
+                    f"published {asset.repo_database}.{asset.table_name} "
+                    f"({actual_rows} rows) -> {entry['destination_uri']}"
+                    if not ARGS.download_only
+                    else f"downloaded {asset.repo_database}.{asset.table_name} ({actual_rows} rows)"
+                )
+
+        if stage_root_path is not None:
+            write_manifest(manifest, stage_root_path / "publish-manifest.json")
+        else:
+            print(json.dumps(manifest, indent=2))
+    finally:
+        if temporary_directory is not None and not ARGS.keep_staged_files:
+            temporary_directory.cleanup()
+
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        ARGS = parse_args()
+        ARGS.version = normalize_version(ARGS.version)
+        sys.exit(main())
+    except (ValueError, RuntimeError, urllib.error.URLError, subprocess.CalledProcessError) as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(1)
