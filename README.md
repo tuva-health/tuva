@@ -114,3 +114,23 @@ Optional inputs:
 
 The script publishes to the normalized layout:
 - `s3://<bucket>/<database-folder>/<version>/<table>.csv.gz`
+
+## Mirroring Seed Releases To GCS And Azure
+
+Use `scripts/mirror-seed-release` after an S3 publish to copy the same versioned release to GCS and Azure Blob Storage.
+
+Required access:
+- AWS CLI access to read `s3://tuva-public-resources`
+- `gsutil` access to write `gs://tuva-public-resources`
+- Azure `Storage Blob Data Contributor` or equivalent on storage account `tuvapublicresources`, container `tuva-public-resources`
+
+Example:
+
+```bash
+scripts/mirror-seed-release --version v0.18.0
+```
+
+The script mirrors:
+- `s3://tuva-public-resources/<database-folder>/<version>/...`
+- `gs://tuva-public-resources/<database-folder>/<version>/...`
+- `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`

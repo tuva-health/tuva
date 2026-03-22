@@ -1,0 +1,265 @@
+#!/usr/bin/env python3
+"""Mirror a published Tuva seed release from S3 to GCS and Azure Blob Storage."""
+
+from __future__ import annotations
+
+import argparse
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+
+DATABASE_FOLDERS = {
+    "concept_library": "concept-library",
+    "reference_data": "reference-data",
+    "terminology": "terminology",
+    "value_sets": "value-sets",
+    "provider_data": "provider-data",
+    "synthetic_data": "synthetic-data",
+}
+
+DEFAULT_SOURCE_BUCKET = "tuva-public-resources"
+DEFAULT_GCS_BUCKET = "tuva-public-resources"
+DEFAULT_AZURE_ACCOUNT = "tuvapublicresources"
+DEFAULT_AZURE_CONTAINER = "tuva-public-resources"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Copy a published versioned seed release from S3 to GCS and/or Azure Blob Storage."
+        )
+    )
+    parser.add_argument(
+        "--version",
+        required=True,
+        help="Release version to mirror, e.g. v0.18.0 or 0.18.0.",
+    )
+    parser.add_argument(
+        "--database",
+        action="append",
+        default=[],
+        help=(
+            "Optional logical database filter. Repeat for multiple values. "
+            "Accepted values: concept_library, reference_data, terminology, "
+            "value_sets, provider_data, synthetic_data."
+        ),
+    )
+    parser.add_argument(
+        "--target",
+        action="append",
+        choices=["gcs", "azure"],
+        default=[],
+        help="Mirror target. Repeat for both. Defaults to both gcs and azure.",
+    )
+    parser.add_argument(
+        "--source-bucket",
+        default=DEFAULT_SOURCE_BUCKET,
+        help=f"Source S3 bucket. Defaults to {DEFAULT_SOURCE_BUCKET}.",
+    )
+    parser.add_argument(
+        "--gcs-bucket",
+        default=DEFAULT_GCS_BUCKET,
+        help=f"Destination GCS bucket. Defaults to {DEFAULT_GCS_BUCKET}.",
+    )
+    parser.add_argument(
+        "--azure-account",
+        default=DEFAULT_AZURE_ACCOUNT,
+        help=f"Destination Azure storage account. Defaults to {DEFAULT_AZURE_ACCOUNT}.",
+    )
+    parser.add_argument(
+        "--azure-container",
+        default=DEFAULT_AZURE_CONTAINER,
+        help=f"Destination Azure container. Defaults to {DEFAULT_AZURE_CONTAINER}.",
+    )
+    parser.add_argument(
+        "--stage-dir",
+        help="Optional local staging directory. A temporary directory is used by default.",
+    )
+    parser.add_argument(
+        "--keep-staged-files",
+        action="store_true",
+        help="Keep staged files after the script completes. Requires --stage-dir.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the planned sync operations without copying any files.",
+    )
+    return parser.parse_args()
+
+
+def normalize_version(version: str) -> str:
+    normalized = version.strip()
+    if normalized.startswith("v"):
+        normalized = normalized[1:]
+    if not normalized:
+        raise ValueError("Version cannot be empty.")
+    return normalized
+
+
+def normalize_database_name(raw_name: str) -> str:
+    name = raw_name.strip().replace("-", "_")
+    if name not in DATABASE_FOLDERS:
+        raise ValueError(
+            f"Unsupported database '{raw_name}'. Expected one of: {', '.join(sorted(DATABASE_FOLDERS))}."
+        )
+    return name
+
+
+def selected_databases(items: list[str]) -> list[str]:
+    if not items:
+        return list(DATABASE_FOLDERS)
+    return [normalize_database_name(item) for item in items]
+
+
+def selected_targets(items: list[str]) -> list[str]:
+    if not items:
+        return ["gcs", "azure"]
+    return items
+
+
+def require_command(name: str) -> None:
+    if shutil.which(name) is None:
+        raise RuntimeError(f"Required command '{name}' was not found in PATH.")
+
+
+def run(command: list[str], *, dry_run: bool = False) -> None:
+    printable = " ".join(command)
+    print(printable)
+    if dry_run:
+        return
+    subprocess.run(command, check=True)
+
+
+def ensure_prerequisites(targets: list[str], dry_run: bool) -> None:
+    require_command("aws")
+    if "gcs" in targets:
+        require_command("gsutil")
+    if "azure" in targets:
+        require_command("az")
+
+    if dry_run:
+        return
+
+    subprocess.run(
+        ["aws", "sts", "get-caller-identity"],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    if "gcs" in targets:
+        subprocess.run(
+            ["gsutil", "ls", f"gs://{ARGS.gcs_bucket}"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+    if "azure" in targets:
+        subprocess.run(
+            [
+                "az",
+                "storage",
+                "container",
+                "show",
+                "--account-name",
+                ARGS.azure_account,
+                "--name",
+                ARGS.azure_container,
+                "--auth-mode",
+                "login",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+
+def sync_s3_prefix(database_folder: str, stage_root: Path, dry_run: bool) -> Path:
+    local_path = stage_root / database_folder / ARGS.version
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    s3_uri = f"s3://{ARGS.source_bucket}/{database_folder}/{ARGS.version}/"
+    run(["aws", "s3", "sync", s3_uri, str(local_path), "--only-show-errors"], dry_run=dry_run)
+    return local_path
+
+
+def sync_to_gcs(local_path: Path, database_folder: str, dry_run: bool) -> None:
+    destination = f"gs://{ARGS.gcs_bucket}/{database_folder}/{ARGS.version}"
+    run(["gsutil", "-m", "rsync", "-r", str(local_path), destination], dry_run=dry_run)
+
+
+def sync_to_azure(local_path: Path, database_folder: str, dry_run: bool) -> None:
+    run(
+        [
+            "az",
+            "storage",
+            "blob",
+            "upload-batch",
+            "--account-name",
+            ARGS.azure_account,
+            "--destination",
+            ARGS.azure_container,
+            "--destination-path",
+            f"{database_folder}/{ARGS.version}",
+            "--source",
+            str(local_path),
+            "--overwrite",
+            "true",
+            "--auth-mode",
+            "login",
+        ],
+        dry_run=dry_run,
+    )
+
+
+def main() -> int:
+    targets = selected_targets(ARGS.target)
+    databases = selected_databases(ARGS.database)
+
+    if ARGS.keep_staged_files and not ARGS.stage_dir:
+        raise ValueError("--keep-staged-files requires --stage-dir.")
+
+    ensure_prerequisites(targets, ARGS.dry_run)
+
+    temporary_directory: tempfile.TemporaryDirectory[str] | None = None
+    if ARGS.stage_dir:
+        stage_root = Path(ARGS.stage_dir).resolve()
+        stage_root.mkdir(parents=True, exist_ok=True)
+    else:
+        temporary_directory = tempfile.TemporaryDirectory(prefix="tuva-seed-mirror-")
+        stage_root = Path(temporary_directory.name)
+
+    try:
+        for database in databases:
+            database_folder = DATABASE_FOLDERS[database]
+            local_path = sync_s3_prefix(database_folder, stage_root, ARGS.dry_run)
+
+            if "gcs" in targets:
+                sync_to_gcs(local_path, database_folder, ARGS.dry_run)
+
+            if "azure" in targets:
+                sync_to_azure(local_path, database_folder, ARGS.dry_run)
+
+        print("mirror sync complete")
+    finally:
+        if temporary_directory is not None and not ARGS.keep_staged_files:
+            temporary_directory.cleanup()
+
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        ARGS = parse_args()
+        ARGS.version = normalize_version(ARGS.version)
+        sys.exit(main())
+    except (subprocess.CalledProcessError, RuntimeError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(1)
