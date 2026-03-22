@@ -389,7 +389,9 @@ FROM '{{ fabric_storage_root }}/{{ uri }}/{{ object_name }}'
 WITH (
     FILE_TYPE = 'CSV',
     FIELDTERMINATOR = ',',
-    ROWTERMINATOR = '\n'
+    ROWTERMINATOR = '\n',
+    FIELDQUOTE = '"',
+    ENCODING = 'UTF8'
     {% if compression == true %}, COMPRESSION = 'GZIP' {% else %} {% endif %}
     {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
 );
