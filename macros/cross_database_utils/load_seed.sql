@@ -219,15 +219,8 @@ pattern = '.*\/{{pattern}}.*';
 
 
 {% macro bigquery__load_seed(uri,pattern,compression,headers,null_marker) %}
-{%- set columns = adapter.get_columns_in_relation(this) -%}
-{%- set collist = [] -%}
-
-{% for col in columns %}
-  {% do collist.append(col.name ~ " " ~ col.dtype) %}
-{% endfor %}
-
 {% set sql %}
-load data overwrite {{ this }} ( {{collist|join(',')}} )
+load data overwrite {{ this }}
 from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
@@ -382,17 +375,16 @@ SELECT aws_s3.table_import_from_s3(
 
 {% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
-{% set uri_parts = uri.split('/') %}
-{% set bucket = uri_parts[0] %}
-{% set key_prefix = uri_parts[1:] | join('/') %}
+{% set fabric_storage_root = var('tuva_seed_fabric_storage_root', 'https://tuvapublicresources.blob.core.windows.net') | trim('/') %}
 {% set object_name = pattern ~ ('.gz' if compression else '') %}
 {% set sql %}
 COPY INTO {{ this }}
-FROM 'https://{{ bucket }}.s3.amazonaws.com/{{ key_prefix }}/{{ object_name }}'
+FROM '{{ fabric_storage_root }}/{{ uri }}/{{ object_name }}'
 WITH (
     FILE_TYPE = 'CSV',
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '\n'
+    {% if compression == true %}, COMPRESSION = 'GZIP' {% else %} {% endif %}
     {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
 );
 {% endset %}
