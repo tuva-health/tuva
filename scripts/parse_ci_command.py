@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shlex
 import sys
 from dataclasses import dataclass
@@ -14,12 +13,9 @@ WAREHOUSE_SET = set(WAREHOUSES)
 COLLABORATOR_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER"}
 VALID_SUBCOMMANDS = {"build", "compile", "debug", "run", "seed", "test"}
-FLAGS_WITH_VALUES = {"--exclude", "--selector", "--select", "--vars", "-s"}
+MULTI_VALUE_FLAGS = {"--exclude", "--select", "-s"}
+SINGLE_VALUE_FLAGS = {"--selector", "--vars"}
 BOOLEAN_FLAGS = {"--empty", "--fail-fast", "--full-refresh"}
-LEGACY_PATTERN = re.compile(
-    r"^/ci\s+(run|build)(?:-(snowflake|bigquery|databricks|fabric|redshift|duckdb))?\s*$",
-    re.IGNORECASE,
-)
 
 
 class ValidationError(ValueError):
@@ -129,7 +125,21 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
             idx += 1
             continue
 
-        value_flag = next((flag for flag in FLAGS_WITH_VALUES if lowered == flag), None)
+        value_flag = next((flag for flag in MULTI_VALUE_FLAGS if lowered == flag), None)
+        if value_flag is not None:
+            value_idx = idx + 1
+            values: list[str] = []
+            while value_idx < len(command_tokens) and not command_tokens[value_idx].startswith("-"):
+                values.append(command_tokens[value_idx])
+                value_idx += 1
+            if not values:
+                raise ValidationError(f"Flag `{token}` requires a value.")
+            normalized.append(value_flag)
+            normalized.extend(values)
+            idx = value_idx
+            continue
+
+        value_flag = next((flag for flag in SINGLE_VALUE_FLAGS if lowered == flag), None)
         if value_flag is not None:
             if idx + 1 >= len(command_tokens):
                 raise ValidationError(f"Flag `{token}` requires a value.")
@@ -137,7 +147,7 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
             idx += 2
             continue
 
-        value_flag = next((flag for flag in FLAGS_WITH_VALUES if lowered.startswith(flag + "=")), None)
+        value_flag = next((flag for flag in MULTI_VALUE_FLAGS | SINGLE_VALUE_FLAGS if lowered.startswith(flag + "=")), None)
         if value_flag is not None:
             normalized.append(lowered if lowered.startswith("-s=") else token)
             idx += 1
@@ -145,7 +155,7 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
 
         raise ValidationError(
             "Unsupported dbt argument "
-            f"`{token}`. Allowed flags: {', '.join(sorted(BOOLEAN_FLAGS | FLAGS_WITH_VALUES))}."
+            f"`{token}`. Allowed flags: {', '.join(sorted(BOOLEAN_FLAGS | MULTI_VALUE_FLAGS | SINGLE_VALUE_FLAGS))}."
         )
 
     return ValidatedCommand(
@@ -160,16 +170,6 @@ def parse_comment_body(body: str) -> ParsedRequest:
     stripped = body.strip()
     if not stripped.startswith("/ci"):
         raise ValidationError("CI commands must start with `/ci`.")
-
-    legacy_match = LEGACY_PATTERN.match(stripped)
-    if legacy_match:
-        operation = legacy_match.group(1).lower()
-        target = (legacy_match.group(2) or "all").lower()
-        return ParsedRequest(
-            command_tokens=["dbt", "build", "--full-refresh"] if operation == "build" else ["dbt", "run"],
-            targets=WAREHOUSES.copy() if target == "all" else [target],
-            source="legacy",
-        )
 
     tokens = _split_shell_words(stripped)
     if not tokens or tokens[0] != "/ci":

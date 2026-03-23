@@ -31,12 +31,9 @@ class ParseCiCommandTests(unittest.TestCase):
         )
         self.assertTrue(validated.refreshes_seeds)
 
-    def test_legacy_alias_is_preserved(self):
-        parsed = MODULE.parse_comment_body("/ci build-snowflake")
-        validated = MODULE.validate_dbt_command(parsed.command_tokens)
-
-        self.assertEqual(parsed.targets, ["snowflake"])
-        self.assertEqual(validated.command_tokens, ["dbt", "build", "--full-refresh"])
+    def test_legacy_alias_is_rejected(self):
+        with self.assertRaises(MODULE.ValidationError):
+            MODULE.parse_comment_body("/ci build-snowflake")
 
     def test_dispatch_resolution_uses_explicit_command(self):
         parsed = MODULE.resolve_dispatch_inputs(
@@ -50,6 +47,16 @@ class ParseCiCommandTests(unittest.TestCase):
         self.assertEqual(parsed.targets, ["bigquery", "fabric"])
         self.assertEqual(validated.subcommand, "build")
         self.assertFalse(validated.requires_seed_baseline)
+
+    def test_multiple_selector_values_are_allowed(self):
+        validated = MODULE.validate_dbt_command(
+            ["dbt", "build", "--select", "input_layer__eligibility", "tag:tuva_demo"]
+        )
+
+        self.assertEqual(
+            validated.command_tokens,
+            ["dbt", "build", "--select", "input_layer__eligibility", "tag:tuva_demo"],
+        )
 
     def test_invalid_warehouse_is_rejected(self):
         with self.assertRaises(MODULE.ValidationError):
