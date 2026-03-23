@@ -6,7 +6,11 @@ run-name: >-
     github.event.pull_request.number
   }} / ${{
     github.event_name == 'workflow_dispatch' &&
-    format('{0}-{1}', github.event.inputs.operation, github.event.inputs.target) ||
+    (
+      github.event.inputs.command_label != '' &&
+      github.event.inputs.command_label ||
+      format('{0}-{1}', github.event.inputs.operation, github.event.inputs.target)
+    ) ||
     'run-snowflake'
   }}
 
@@ -22,9 +26,24 @@ on:
         description: Pull request number to run against
         required: true
         type: string
+      dbt_command:
+        description: Full dbt command to execute, for example `dbt seed --select tag:tuva_demo`
+        required: false
+        type: string
+        default: ""
+      targets_csv:
+        description: Comma-separated warehouse list, or `all`
+        required: false
+        type: string
+        default: ""
+      command_label:
+        description: Short label for the run name
+        required: false
+        type: string
+        default: ""
       operation:
         description: CI operation to run
-        required: true
+        required: false
         type: choice
         default: run
         options:
@@ -32,7 +51,7 @@ on:
           - build
       target:
         description: Warehouse target
-        required: true
+        required: false
         type: choice
         default: snowflake
         options:
@@ -54,12 +73,27 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.resolve.outputs.pr_number }}
-      operation: ${{ steps.resolve.outputs.operation }}
-      target: ${{ steps.resolve.outputs.target }}
       adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
       checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
+      dbt_command_json: ${{ steps.validate.outputs.dbt_command_json }}
+      dbt_command_display: ${{ steps.validate.outputs.dbt_command }}
+      subcommand: ${{ steps.validate.outputs.subcommand }}
+      requires_seed_baseline: ${{ steps.validate.outputs.requires_seed_baseline }}
+      refreshes_seeds: ${{ steps.validate.outputs.refreshes_seeds }}
     steps:
-      - name: Resolve operation, target, and guardrails
+      - name: Checkout workflow utilities
+        uses: actions/checkout@v4
+
+      - name: Validate requested dbt command
+        id: validate
+        run: python scripts/parse_ci_command.py resolve-dispatch
+        env:
+          CI_DBT_COMMAND: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dbt_command || '' }}
+          CI_OPERATION: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.operation || 'run' }}
+          CI_TARGET: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target || 'snowflake' }}
+          CI_TARGETS_CSV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.targets_csv || '' }}
+
+      - name: Resolve target matrix and guardrails
         id: resolve
         uses: actions/github-script@v7
         with:
@@ -68,31 +102,13 @@ jobs:
             const { owner, repo } = context.repo;
             const isDispatch = context.eventName === "workflow_dispatch";
             const inputs = context.payload.inputs || {};
-
-            const validOperations = new Set(["run", "build"]);
-            const validTargets = new Set([
-              "all",
-              "snowflake",
-              "bigquery",
-              "databricks",
-              "fabric",
-              "redshift",
-              "duckdb"
-            ]);
-
-            const adaptersByTarget = {
-              all: ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"],
-              snowflake: ["snowflake"],
-              bigquery: ["bigquery"],
-              databricks: ["databricks"],
-              fabric: ["fabric"],
-              redshift: ["redshift"],
-              duckdb: ["duckdb"]
-            };
+            const requestedCommand = `${{ steps.validate.outputs.dbt_command }}`;
+            const requestedTargets = JSON.parse(String.raw`${{ steps.validate.outputs.targets_json }}`);
+            const subcommand = `${{ steps.validate.outputs.subcommand }}`;
+            const refreshesSeeds = `${{ steps.validate.outputs.refreshes_seeds }}` === "true";
+            const requiresSeedBaseline = `${{ steps.validate.outputs.requires_seed_baseline }}` === "true";
 
             let prNumber;
-            let operation;
-            let target;
 
             if (isDispatch) {
               const rawPrNumber = String(inputs.pr_number || "").trim();
@@ -101,22 +117,8 @@ jobs:
                 return;
               }
               prNumber = Number(rawPrNumber);
-
-              operation = String(inputs.operation || "").trim().toLowerCase();
-              if (!validOperations.has(operation)) {
-                core.setFailed(`Invalid workflow_dispatch input operation: "${operation}".`);
-                return;
-              }
-
-              target = String(inputs.target || "").trim().toLowerCase();
-              if (!validTargets.has(target)) {
-                core.setFailed(`Invalid workflow_dispatch input target: "${target}".`);
-                return;
-              }
             } else {
               prNumber = context.payload.pull_request.number;
-              operation = "run";
-              target = "snowflake";
             }
 
             const { data: pr } = await github.rest.pulls.get({
@@ -127,6 +129,15 @@ jobs:
 
             if (pr.base.ref !== "main") {
               core.setFailed(`PR #${prNumber} does not target main (targets ${pr.base.ref}).`);
+              return;
+            }
+
+            const repoFullName = `${owner}/${repo}`.toLowerCase();
+            const headRepoFullName = String(pr.head.repo.full_name || "").toLowerCase();
+            if (headRepoFullName !== repoFullName) {
+              core.setFailed(
+                `PR #${prNumber} comes from fork \`${pr.head.repo.full_name}\`. This secrets-backed CI workflow only runs on in-repo PRs. Use the outside contributor bridge workflow first.`
+              );
               return;
             }
 
@@ -153,7 +164,7 @@ jobs:
                 runGuardPrefixes.some((prefix) => path.startsWith(prefix))
             );
 
-            if (isDispatch && operation === "run" && requiresBuild) {
+            if (isDispatch && requiresBuild && requiresSeedBaseline && !refreshesSeeds) {
               const sample = changed
                 .filter(
                   (path) =>
@@ -164,22 +175,24 @@ jobs:
                 .join(", ");
 
               core.setFailed(
-                `This PR changes seed/config files (${sample}). Use a build command (` +
-                  "`/ci build`, `/ci build-snowflake`, etc.) so CI runs `dbt build --full-refresh`."
+                `This PR changes seed/config files (${sample}). Run a seed-refreshing command such as /ci dbt seed --select ... or /ci snowflake dbt build --full-refresh --select ... before running ${requestedCommand}.`
               );
               return;
             }
 
             core.setOutput("pr_number", String(prNumber));
-            core.setOutput("operation", operation);
-            core.setOutput("target", target);
-            core.setOutput("adapter_matrix", JSON.stringify(adaptersByTarget[target]));
+            core.setOutput("adapter_matrix", JSON.stringify(requestedTargets));
             core.setOutput("checkout_ref", `refs/pull/${prNumber}/merge`);
 
   run_dbt:
     name: >-
       ${{
-        needs.resolve_request.outputs.operation == 'build' && 'Build' || 'Run'
+        needs.resolve_request.outputs.subcommand == 'build' && 'Build' ||
+        needs.resolve_request.outputs.subcommand == 'seed' && 'Seed' ||
+        needs.resolve_request.outputs.subcommand == 'test' && 'Test' ||
+        needs.resolve_request.outputs.subcommand == 'compile' && 'Compile' ||
+        needs.resolve_request.outputs.subcommand == 'debug' && 'Debug' ||
+        'Run'
       }} / DW: ${{
         matrix.adapter == 'snowflake' && 'Snowflake' ||
         matrix.adapter == 'bigquery' && 'BigQuery' ||
@@ -202,7 +215,7 @@ jobs:
       PYTHON_VERSION: "3.10"
       DBT_PROJECT_DIR: "./integration_tests"
       DBT_CORE_VERSION: "1.10.15"
-      DUCKDB_VERSION: "1.4.4"
+      DUCKDB_VERSION: "1.4.1"
 
       DBT_BIGQUERY_CI_TOKEN: ${{ secrets.DBT_BIGQUERY_CI_TOKEN }}
       DBT_BIGQUERY_CI_PROJECT: ${{ secrets.DBT_BIGQUERY_CI_PROJECT }}
@@ -226,6 +239,7 @@ jobs:
       DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
       DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
       DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}
+      DBT_REDSHIFT_CI_THREADS: ${{ matrix.adapter == 'redshift' && needs.resolve_request.outputs.refreshes_seeds == 'true' && '1' || '4' }}
 
       DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
       DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
@@ -295,20 +309,32 @@ jobs:
         run: dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
 
       - name: Assert baseline seed schemas exist for run modes
-        if: ${{ needs.resolve_request.outputs.operation == 'run' }}
+        if: ${{ needs.resolve_request.outputs.requires_seed_baseline == 'true' }}
         run: |
           dbt run-operation assert_ci_seed_baseline_ready \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
 
       - name: Execute dbt
+        env:
+          DBT_COMMAND_JSON: ${{ needs.resolve_request.outputs.dbt_command_json }}
+          DBT_ADAPTER: ${{ matrix.adapter }}
         run: |
-          if [[ "${{ needs.resolve_request.outputs.operation }}" == "build" ]]; then
-            dbt build --full-refresh \
-              --project-dir ./integration_tests \
-              --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
-          else
-            dbt run \
-              --project-dir ./integration_tests \
-              --profiles-dir ./integration_tests/profiles/${{ matrix.adapter }}
-          fi
+          python - <<'PY'
+          import json
+          import os
+          import shlex
+          import subprocess
+
+          command = json.loads(os.environ["DBT_COMMAND_JSON"])
+          command.extend(
+              [
+                  "--project-dir",
+                  "./integration_tests",
+                  "--profiles-dir",
+                  f"./integration_tests/profiles/{os.environ['DBT_ADAPTER']}",
+              ]
+          )
+          print(f"Running: {shlex.join(command)}")
+          subprocess.run(command, check=True)
+          PY

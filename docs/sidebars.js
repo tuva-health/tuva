@@ -85,7 +85,7 @@ const sidebars = {
         {
           type: "doc",
           id: "terminology",
-          label: "7. Terminology & Value Sets",
+          label: "7. Data Assets",
         },
       ],
     },

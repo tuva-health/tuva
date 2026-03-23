@@ -15,6 +15,10 @@ vars:
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
   use_synthetic_data: true
+  synthetic_data_size: small
+  custom_bucket_name: tuva-public-resources
+  tuva_seed_version: "0.18.0"
+  tuva_seed_buckets: {}
 
 
   ## Update these vars to use your own data as input, do not comment out
@@ -73,27 +77,29 @@ clean-targets:
 dispatch:
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests', 'the_tuva_project']
+  - macro_namespace: 'dbt_utils'
+    search_order: ['integration_tests', 'the_tuva_project', 'dbt_utils']
 
 
 seeds:
   integration_tests:
     appointment_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','appointment.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('appointment') }}"
     eligibility_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.16.0','eligibility.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('eligibility') }}"
     immunization_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','immunization.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('immunization') }}"
     lab_result_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','lab_result.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('lab_result') }}"
     medical_claim_seed:
       +batch_size: 200
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','medical_claim.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('medical_claim') }}"
     observation_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','observation.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('observation') }}"
     pharmacy_claim_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','pharmacy_claim.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('pharmacy_claim') }}"
     provider_attribution_seed:
-      # +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','provider_attribution.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('provider_attribution') }}"
 
 
 models:

@@ -17,6 +17,30 @@
 {% endmacro %}
 
 
+{% macro reset_seed_relation() %}
+{{ return(adapter.dispatch('reset_seed_relation', 'the_tuva_project')()) }}
+{% endmacro %}
+
+
+{% macro default__reset_seed_relation() %}
+{% set sql %}
+truncate table {{ this }}
+{% endset %}
+
+{% call statement('seed_reset', fetch_result=false) %}
+{{ sql }}
+{% endcall %}
+{% endmacro %}
+
+
+{% macro duckdb__reset_seed_relation() %}
+{% endmacro %}
+
+
+{% macro athena__reset_seed_relation() %}
+{% endmacro %}
+
+
 {% macro duckdb__load_seed(uri,pattern,compression,headers,null_marker) %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
@@ -65,6 +89,7 @@
 
 
 {% macro redshift__load_seed(uri,pattern,compression,headers,null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
 {% set sql %}
 
 {% set access_key_part_1 = 'AKIA2EPVN' %}
@@ -98,7 +123,6 @@ copy  {{ this }}
 {{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
 {# debugging { log(results, True) } #}
 {% endif %}
-
 {% endmacro %}
 
 
@@ -156,6 +180,7 @@ copy  {{ this }}
 
 
 {% macro snowflake__load_seed(uri,pattern,compression,headers,null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
 {% set sql %}
 copy into {{ this }}
     from s3://{{ uri }}
@@ -193,6 +218,7 @@ pattern = '.*\/{{pattern}}.*';
 
 
 {% macro bigquery__load_seed(uri,pattern,compression,headers,null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
 
@@ -200,10 +226,8 @@ pattern = '.*\/{{pattern}}.*';
   {% do collist.append(col.name ~ " " ~ col.dtype) %}
 {% endfor %}
 
-{%- set cols = collist|join(',') -%}
-{# { log( cols,true) } #}
 {% set sql %}
-load data into {{ this }} ( {{collist|join(',')}} )
+load data into {{ this }} ( {{ collist|join(',') }} )
 from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
@@ -231,6 +255,7 @@ from files (format = 'csv',
 
 {% macro databricks__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% if execute %}
+{% do the_tuva_project.reset_seed_relation() %}
 
 {%- set s3_path = 's3://' ~ uri ~ '/' -%}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
@@ -311,6 +336,7 @@ COPY_OPTIONS (
 --
 -- TODO: revisit removing column list, I think it'll work fine with '' for cols
 {% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
 {%- for col in columns -%}
@@ -353,13 +379,19 @@ SELECT aws_s3.table_import_from_s3(
 
 
 {% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
+{% set fabric_storage_root = var('tuva_seed_fabric_storage_root', 'https://tuvapublicresources.blob.core.windows.net') | trim('/') %}
+{% set fabric_pattern = pattern %}
+{% if fabric_pattern.endswith('.csv.gz') %}
+  {% set fabric_pattern = fabric_pattern[:-3] %}
+{% endif %}
 {% set sql %}
 COPY INTO {{ this }}
-FROM 'https://tuvapublicresources.blob.core.windows.net/{{ uri }}/{{ pattern }}'
+FROM '{{ fabric_storage_root }}/{{ uri }}/{{ fabric_pattern }}'
 WITH (
-    FILE_TYPE = 'CSV',
-    FIELDTERMINATOR = ',',
-    ROWTERMINATOR = '\n'
+    FILE_TYPE = 'CSV'
+    , ENCODING = 'UTF8'
+    , FIELDQUOTE = '"'
     {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
 );
 {% endset %}
@@ -371,7 +403,7 @@ WITH (
 {# debugging { log(sql, True)} #}
 {% set results = load_result('fabricsql') %}
 {% set rows_loaded = results['response'].rows_affected|default(0) %}
-{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ fabric_pattern ~ "\n  rows: " ~ rows_loaded, True) }}
 {# debugging { log(results, True)} #}
 {% endif %}
 
