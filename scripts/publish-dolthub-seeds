@@ -20,6 +20,12 @@ import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
+import re
+
+try:
+    import yaml
+except ImportError as exc:
+    raise RuntimeError("PyYAML is required to run publish-dolthub-seeds.") from exc
 
 
 DEFAULT_OWNER = "tuva-health"
@@ -45,6 +51,26 @@ LOCAL_REPO_DIRS = {
     "provider-data": "provider-data",
     "synthetic-data": "tuva-synthetic-data",
 }
+
+SYNTHETIC_TABLE_TO_SEED_MODEL = {
+    "appointment": "appointment_seed",
+    "appointment_small": "appointment_seed",
+    "eligibility": "eligibility_seed",
+    "eligibility_small": "eligibility_seed",
+    "immunization": "immunization_seed",
+    "lab_result": "lab_result_seed",
+    "medical_claim": "medical_claim_seed",
+    "medical_claim_small": "medical_claim_seed",
+    "observation": "observation_seed",
+    "pharmacy_claim": "pharmacy_claim_seed",
+    "pharmacy_claim_small": "pharmacy_claim_seed",
+    "provider_attribution": "provider_attribution_seed",
+}
+
+HOOK_PATTERN = re.compile(
+    r"load_versioned_seed\('([^']+)'\s*,\s*'([^']+)'\)"
+)
+DATE_VALUE_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})(?:[ T].*)$")
 
 
 @dataclass(frozen=True)
@@ -265,6 +291,128 @@ def build_local_export_query(table_name: str, columns: list[str]) -> str:
     return f"select {', '.join(projected_columns)} from {quote_identifier(table_name)}"
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def iter_seed_configs(node, *, path: list[str] | None = None):
+    if path is None:
+        path = []
+
+    if isinstance(node, dict):
+        if "+post-hook" in node and path:
+            yield path[-1], node["+post-hook"]
+        for key, value in node.items():
+            yield from iter_seed_configs(value, path=path + [key])
+    elif isinstance(node, list):
+        for item in node:
+            yield from iter_seed_configs(item, path=path)
+
+
+def normalize_column_type_expression(expression: str) -> str:
+    return " ".join(expression.lower().split())
+
+
+def is_date_type(expression: str) -> bool:
+    normalized = normalize_column_type_expression(expression)
+    return "date" in normalized and "datetime" not in normalized and "timestamp" not in normalized
+
+
+def load_seed_column_types() -> dict[str, set[str]]:
+    seed_column_types: dict[str, set[str]] = {}
+
+    for path in sorted((repo_root() / "seeds").rglob("*.yml")):
+        document = yaml.safe_load(path.read_text()) or {}
+        for seed in document.get("seeds", []):
+            config = seed.get("config", {})
+            column_types = config.get("column_types", {})
+            date_columns = {
+                column_name
+                for column_name, expression in column_types.items()
+                if is_date_type(str(expression))
+            }
+            seed_column_types[seed["name"]] = date_columns
+
+    integration_seed_path = repo_root() / "integration_tests" / "seeds" / "_seeds.yml"
+    document = yaml.safe_load(integration_seed_path.read_text()) or {}
+    for seed in document.get("seeds", []):
+        config = seed.get("config", {})
+        column_types = config.get("column_types", {})
+        date_columns = {
+            column_name
+            for column_name, expression in column_types.items()
+            if is_date_type(str(expression))
+        }
+        seed_column_types[seed["name"]] = date_columns
+
+    return seed_column_types
+
+
+def build_external_date_column_map() -> dict[tuple[str, str], set[str]]:
+    seed_column_types = load_seed_column_types()
+    external_date_columns: dict[tuple[str, str], set[str]] = {}
+
+    dbt_project = yaml.safe_load((repo_root() / "dbt_project.yml").read_text()) or {}
+    for seed_model_name, hook in iter_seed_configs(dbt_project.get("seeds", {})):
+        match = HOOK_PATTERN.search(str(hook))
+        if not match:
+            continue
+        database, pattern = match.groups()
+        table_name = Path(pattern).stem
+        repo_database = DATABASE_FOLDERS[normalize_database_name(database)]
+        external_date_columns[(repo_database, table_name)] = set(
+            seed_column_types.get(seed_model_name, set())
+        )
+
+    for table_name, seed_model_name in SYNTHETIC_TABLE_TO_SEED_MODEL.items():
+        external_date_columns[("synthetic-data", table_name)] = set(
+            seed_column_types.get(seed_model_name, set())
+        )
+
+    return external_date_columns
+
+
+def normalize_date_value(value: str) -> str:
+    if value in {"", "\\N"}:
+        return value
+    match = DATE_VALUE_PATTERN.match(value)
+    if match:
+        return match.group(1)
+    return value
+
+
+def normalize_row(row: list[str], header: list[str], date_columns: set[str]) -> list[str]:
+    if not date_columns:
+        return row
+
+    normalized = list(row)
+    for index, column_name in enumerate(header):
+        if column_name in date_columns and index < len(normalized):
+            normalized[index] = normalize_date_value(normalized[index])
+    return normalized
+
+
+def write_normalized_csv_to_gzip(reader, destination: Path, date_columns: set[str]) -> int:
+    row_count = 0
+    header: list[str] | None = None
+
+    with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
+        writer = csv.writer(gzip_file, lineterminator="\n")
+        for row in reader:
+            if header is None:
+                header = row
+                writer.writerow(header)
+                continue
+
+            writer.writerow(normalize_row(row, header, date_columns))
+            row_count += 1
+
+    return row_count
+
+
+EXTERNAL_DATE_COLUMNS = build_external_date_column_map()
+
+
 def get_assets_for_database(logical_database: str, owner: str, ref: str) -> list[TableAsset]:
     repo_database = DATABASE_FOLDERS[logical_database]
     if ARGS.source == "local":
@@ -323,20 +471,16 @@ def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> i
 
     delay_seconds = 1
     last_error: Exception | None = None
+    date_columns = EXTERNAL_DATE_COLUMNS.get((asset.repo_database, asset.table_name), set())
     for attempt in range(1, attempts + 1):
         try:
-            row_count = 0
-            is_header = True
             with open_url_with_retries(request) as response:
-                with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
-                    writer = csv.writer(gzip_file, lineterminator="\n")
-                    text_response = io.TextIOWrapper(response, encoding="utf-8", newline="")
-                    for row in csv.reader(text_response):
-                        writer.writerow(row)
-                        if is_header:
-                            is_header = False
-                        else:
-                            row_count += 1
+                text_response = io.TextIOWrapper(response, encoding="utf-8", newline="")
+                row_count = write_normalized_csv_to_gzip(
+                    csv.reader(text_response),
+                    destination,
+                    date_columns,
+                )
 
             return row_count
         except (
@@ -377,16 +521,14 @@ def download_local_asset(asset: TableAsset, destination: Path) -> int:
         text=True,
     )
 
-    row_count = 0
+    date_columns = EXTERNAL_DATE_COLUMNS.get((asset.repo_database, asset.table_name), set())
     try:
         assert process.stdout is not None
-        with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
-            writer = csv.writer(gzip_file, lineterminator="\n")
-            reader = csv.reader(process.stdout)
-            for index, row in enumerate(reader):
-                writer.writerow(row)
-                if index > 0:
-                    row_count += 1
+        row_count = write_normalized_csv_to_gzip(
+            csv.reader(process.stdout),
+            destination,
+            date_columns,
+        )
     finally:
         stderr = process.communicate()[1]
 

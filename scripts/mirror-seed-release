@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import gzip
+import io
 import shutil
 import subprocess
 import sys
@@ -195,21 +198,39 @@ def sync_to_gcs(local_path: Path, database_folder: str, dry_run: bool) -> None:
     run(["gsutil", "-m", "rsync", "-r", str(local_path), destination], dry_run=dry_run)
 
 
-def sync_to_azure(local_path: Path, database_folder: str, dry_run: bool) -> None:
+def azure_blob_name(database_folder: str, local_path: Path, file_path: Path) -> str:
+    relative = file_path.relative_to(local_path)
+    relative_name = relative.as_posix()
+    if relative_name.endswith(".csv.gz"):
+        relative_name = relative_name[:-3]
+    return f"{database_folder}/{ARGS.version}/{relative_name}"
+
+
+def write_azure_ready_csv(source_path: Path, destination_path: Path) -> None:
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(source_path, "rt", encoding="utf-8", newline="") as source_file:
+        reader = csv.reader(source_file)
+        with destination_path.open("w", encoding="utf-8", newline="") as destination_file:
+            writer = csv.writer(destination_file, lineterminator="\n")
+            for row in reader:
+                writer.writerow(["" if value == "\\N" else value for value in row])
+
+
+def upload_azure_blob(source_file: Path, blob_name: str, dry_run: bool) -> None:
     run(
         [
             "az",
             "storage",
             "blob",
-            "upload-batch",
+            "upload",
             "--account-name",
             ARGS.azure_account,
-            "--destination",
+            "--container-name",
             ARGS.azure_container,
-            "--destination-path",
-            f"{database_folder}/{ARGS.version}",
-            "--source",
-            str(local_path),
+            "--name",
+            blob_name,
+            "--file",
+            str(source_file),
             "--overwrite",
             "true",
             "--auth-mode",
@@ -217,6 +238,26 @@ def sync_to_azure(local_path: Path, database_folder: str, dry_run: bool) -> None
         ],
         dry_run=dry_run,
     )
+
+
+def sync_to_azure(local_path: Path, database_folder: str, dry_run: bool) -> None:
+    temporary_directory = tempfile.TemporaryDirectory(prefix="tuva-seed-azure-")
+    try:
+        azure_stage_root = Path(temporary_directory.name)
+        for file_path in sorted(local_path.rglob("*")):
+            if not file_path.is_file():
+                continue
+
+            blob_name = azure_blob_name(database_folder, local_path, file_path)
+            if file_path.name.endswith(".csv.gz"):
+                azure_file = azure_stage_root / Path(blob_name)
+                if not dry_run:
+                    write_azure_ready_csv(file_path, azure_file)
+                upload_azure_blob(azure_file, blob_name, dry_run)
+            else:
+                upload_azure_blob(file_path, blob_name, dry_run)
+    finally:
+        temporary_directory.cleanup()
 
 
 def main() -> int:
