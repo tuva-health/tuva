@@ -58,6 +58,17 @@ jobs:
               pull_number: issue_number
             });
 
+            const headRepoFullName = String(pr.head.repo.full_name || "").toLowerCase();
+            if (headRepoFullName !== repoFullName) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: "Refusing to run `/ci` for a fork PR because this workflow uses repository secrets. Use the outside contributor bridge workflow to create an in-repo bridge PR first, then run `/ci` on that bridge PR."
+              });
+              return;
+            }
+
             const dispatchRef = "main";
 
             await github.rest.actions.createWorkflowDispatch({

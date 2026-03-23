@@ -132,6 +132,15 @@ jobs:
               return;
             }
 
+            const repoFullName = `${owner}/${repo}`.toLowerCase();
+            const headRepoFullName = String(pr.head.repo.full_name || "").toLowerCase();
+            if (headRepoFullName !== repoFullName) {
+              core.setFailed(
+                `PR #${prNumber} comes from fork \`${pr.head.repo.full_name}\`. This secrets-backed CI workflow only runs on in-repo PRs. Use the outside contributor bridge workflow first.`
+              );
+              return;
+            }
+
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner,
               repo,
