@@ -5,6 +5,7 @@ import json
 import os
 import shlex
 import sys
+import uuid
 from dataclasses import dataclass
 
 
@@ -58,7 +59,8 @@ def _write_outputs(values: dict[str, str]) -> None:
     if output_path:
         with open(output_path, "a", encoding="utf-8") as handle:
             for key, value in values.items():
-                handle.write(f"{key}={value}\n")
+                delimiter = f"EOF_{uuid.uuid4().hex}"
+                handle.write(f"{key}<<{delimiter}\n{value}\n{delimiter}\n")
     else:
         print(json.dumps(values, indent=2, sort_keys=True))
 

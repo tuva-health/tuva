@@ -58,8 +58,7 @@ jobs:
               pull_number: issue_number
             });
 
-            const headRepoFullName = (pr.head.repo?.full_name || "").toLowerCase();
-            const dispatchRef = headRepoFullName === repoFullName ? pr.head.ref : "main";
+            const dispatchRef = "main";
 
             await github.rest.actions.createWorkflowDispatch({
               owner,
