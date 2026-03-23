@@ -93,6 +93,10 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+dispatch:
+  - macro_namespace: 'dbt_utils'
+    search_order: ['the_tuva_project', 'dbt_utils']
+
 seeds:
   the_tuva_project:
     clinical_concept_library:

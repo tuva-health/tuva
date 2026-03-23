@@ -382,17 +382,17 @@ SELECT aws_s3.table_import_from_s3(
 {% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
 {% set fabric_storage_root = var('tuva_seed_fabric_storage_root', 'https://tuvapublicresources.blob.core.windows.net') | trim('/') %}
-{% set object_name = pattern ~ ('.gz' if compression else '') %}
+{% set fabric_pattern = pattern %}
+{% if fabric_pattern.endswith('.csv.gz') %}
+  {% set fabric_pattern = fabric_pattern[:-3] %}
+{% endif %}
 {% set sql %}
 COPY INTO {{ this }}
-FROM '{{ fabric_storage_root }}/{{ uri }}/{{ object_name }}'
+FROM '{{ fabric_storage_root }}/{{ uri }}/{{ fabric_pattern }}'
 WITH (
-    FILE_TYPE = 'CSV',
-    FIELDTERMINATOR = ',',
-    ROWTERMINATOR = '\n',
-    FIELDQUOTE = '"',
-    ENCODING = 'UTF8'
-    {% if compression == true %}, COMPRESSION = 'GZIP' {% else %} {% endif %}
+    FILE_TYPE = 'CSV'
+    , ENCODING = 'UTF8'
+    , FIELDQUOTE = '"'
     {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
 );
 {% endset %}
@@ -404,7 +404,7 @@ WITH (
 {# debugging { log(sql, True)} #}
 {% set results = load_result('fabricsql') %}
 {% set rows_loaded = results['response'].rows_affected|default(0) %}
-{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ fabric_pattern ~ "\n  rows: " ~ rows_loaded, True) }}
 {# debugging { log(results, True)} #}
 {% endif %}
 
