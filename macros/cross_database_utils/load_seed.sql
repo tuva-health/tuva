@@ -89,8 +89,9 @@ truncate table {{ this }}
 
 
 {% macro redshift__load_seed(uri,pattern,compression,headers,null_marker) %}
-{% do the_tuva_project.reset_seed_relation() %}
 {% set sql %}
+
+truncate table {{ this }};
 
 {% set access_key_part_1 = 'AKIA2EPVN' %}
 {% set access_key_part_2 = 'TV4GFRR5377' %}
@@ -113,17 +114,7 @@ copy  {{ this }}
 
 {% endset %}
 
-{% call statement('redsql',fetch_result=true) %}
-{{ sql }}
-{% endcall %}
-
-{% if execute %}
-{# debugging { log(sql, True)} #}
-{% set results = load_result('redsql') %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
-{# debugging { log(results, True) } #}
-{% endif %}
-
+{{ return(after_commit(sql)) }}
 {% endmacro %}
 
 
