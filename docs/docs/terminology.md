@@ -1,11 +1,13 @@
 ---
 id: terminology
 title: "7. Data Assets"
-github_path: "/tuva/seeds"
 description: The Tuva Project uses DoltHub as the source of truth for shared terminology, reference data, concept libraries, value sets, provider data, and synthetic data.
+hide_table_of_contents: true
 ---
 
 Tuva stores its shared data assets in public DoltHub repositories under the `tuva-health` organization. These repositories are the source of truth for the data assets that ship with the project and are loaded into supported workflows as needed.
+
+DoltHub is the source of truth, but these assets are distributed and loaded when you run Tuva through the Tuva dbt package by pulling them from AWS S3, Google Cloud Storage, or Azure Blob Storage depending on the data warehouse you are using.
 
 ## Data Asset Types
 
