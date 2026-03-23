@@ -1,23 +1,27 @@
 ---
 id: terminology
-title: "7. Terminology"
+title: "7. Data Assets"
 github_path: "/tuva/seeds"
-description: The Tuva Project makes it easy to load useful terminology sets like ICD-10 codes directly into your data warehouse where you need them for analytics.
+description: The Tuva Project uses DoltHub as the source of truth for shared terminology, reference data, concept libraries, value sets, provider data, and synthetic data.
 ---
 
-import { JsonDataTable } from '@site/src/components/JsonDataTable';
-import { JsonDataTableNoTerm } from '@site/src/components/JsonDataTableNoTerm';
+Tuva stores its shared data assets in public DoltHub repositories under the `tuva-health` organization. These repositories are the source of truth for the data assets that ship with the project and are loaded into supported workflows as needed.
 
-Terminology includes code sets (e.g. ICD-10-CM, HCPCS), value sets (e.g. the ICD-10-CM codes that define Type 2 Diabetes), and reference datasets (e.g. provider NPI lookups).
+## Data Asset Types
 
-These datasets are scattered all over the internet, maintained in different data formats, and updated on different frequencies.  The Tuva Community maintains these datasets and keeps them up to date.  
+- [Terminology](https://www.dolthub.com/repositories/tuva-health/terminology): Healthcare code systems and their associated descriptions, including assets such as ICD-10, SNOMED, HCPCS, NDC, and related dictionaries used throughout the Tuva project.
 
-When you run Tuva the Terminology datasets are automatically loaded into your cloud data warehouse.
+- [Reference Data](https://www.dolthub.com/repositories/tuva-health/reference-data): Shared supporting reference datasets used across Tuva, including reusable calendar tables, geographic crosswalks, code type references, and similar lookup assets.
 
-The Tuva Project leverages Terminology in data quality tests (e.g. are these ICD-10-CM codes valid?) and in data marts (e.g. definintions for chronic conditions).
+- [Concept Library](https://www.dolthub.com/repositories/tuva-health/concept-library): Tuva-defined healthcare concepts and the related value sets that back them, including concepts for conditions, diagnostics, and other internally maintained clinical definitions.
 
-Use the [Terminology Viewer](https://terminology.thetuvaproject.com) to view and search through all the datasets included in Terminology.
+- [Value Sets](https://www.dolthub.com/repositories/tuva-health/value-sets): Third-party-defined code groupings and value sets used by Tuva data marts such as CMS HCCs, CCSR, readmissions, quality measures, and other external methodologies.
 
+- [Provider Data](https://www.dolthub.com/repositories/tuva-health/provider-data): Provider-focused datasets derived from sources such as NPPES and NUCC taxonomy files, cleaned and reshaped into reusable provider assets for analytics and attribution workflows.
+
+- [Synthetic Data](https://www.dolthub.com/repositories/tuva-health/synthetic-data): Public synthetic datasets maintained by the Tuva project for testing, demos, and integration workflows. Tables with the `_small` suffix are reduced copies used for CI and faster validation workflows.
+
+These six repositories separate Tuva-defined concepts from third-party definitions while keeping each asset class versioned, queryable, and easy to maintain in one place.
 
 <!-- The **Last Updated** date in the table below is the date the codeset was released by maintainer or if not available, the date we loaded it to Tuva.
 
