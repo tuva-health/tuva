@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: metric_testing__summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: metric_testing_summary
+      tags:
+        - data_quality
+        - metric_testing
+      materialized: table
+    description: |
+      Metric testing summary table for regression checks across enabled input layer, core, and summary-style data mart outputs.
+    columns:
+      - name: metric_id
+        description: Stable identifier for the metric.
+        tests:
+          - unique
+          - not_null
+      - name: metric_name
+        description: Human-readable metric name.
+      - name: metric_description
+        description: Description of what the metric measures.
+      - name: metric_value
+        description: Numeric metric value computed from the current run.
+
+  - name: metric_testing__summary_diff
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: metric_testing_summary_diff
+      tags:
+        - data_quality
+        - metric_testing
+      materialized: table
+    description: |
+      Metric testing diff table that compares current metric values to the packaged baseline seed from a prior known-good run.
+    columns:
+      - name: metric_id
+        description: Stable identifier for the metric.
+        tests:
+          - unique
+          - not_null
+      - name: metric_name
+        description: Human-readable metric name.
+      - name: metric_description
+        description: Description of what the metric measures.
+      - name: metric_value
+        description: Numeric metric value computed from the current run.
+      - name: baseline_metric_value
+        description: Numeric metric value loaded from the packaged baseline seed.
+      - name: metric_diff
+        description: Difference between the current metric value and the packaged baseline metric value.

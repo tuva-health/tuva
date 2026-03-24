@@ -98,3 +98,36 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
       tags:
         - data_quality_audit
+
+  - name: data_quality__metric_testing_summary_baseline
+    description: >
+      Packaged baseline metrics from a prior known-good large synthetic run used by metric testing regression checks.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _value_set_metric_testing_summary_baseline
+      column_types:
+        metric_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        metric_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        metric_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+        metric_value: |
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+      tags:
+        - data_quality_audit
+        - metric_testing
+    columns:
+      - name: metric_id
+        description: Stable identifier for the packaged baseline metric.
+        tests:
+          - unique
+          - not_null
+      - name: metric_name
+        description: Human-readable metric name.
+      - name: metric_description
+        description: Description of what the metric measures.
+      - name: metric_value
+        description: Numeric metric value from the packaged baseline run.
