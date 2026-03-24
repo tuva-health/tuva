@@ -46,7 +46,11 @@ class ParseCiCommandTests(unittest.TestCase):
 
         self.assertEqual(parsed.targets, ["bigquery", "fabric"])
         self.assertEqual(validated.subcommand, "build")
-        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.requires_seed_baseline)
+        self.assertEqual(
+            validated.command_tokens,
+            ["dbt", "build", "--select", "tag:tuva_demo", "--exclude", "resource_type:seed"],
+        )
 
     def test_multiple_selector_values_are_allowed(self):
         validated = MODULE.validate_dbt_command(
@@ -55,7 +59,15 @@ class ParseCiCommandTests(unittest.TestCase):
 
         self.assertEqual(
             validated.command_tokens,
-            ["dbt", "build", "--select", "input_layer__eligibility", "tag:tuva_demo"],
+            [
+                "dbt",
+                "build",
+                "--select",
+                "input_layer__eligibility",
+                "tag:tuva_demo",
+                "--exclude",
+                "resource_type:seed",
+            ],
         )
 
     def test_invalid_warehouse_is_rejected(self):
@@ -78,6 +90,13 @@ class ParseCiCommandTests(unittest.TestCase):
         validated = MODULE.validate_dbt_command(parsed.command_tokens)
 
         MODULE._authorize_request("COLLABORATOR", parsed, validated)
+
+    def test_build_full_refresh_still_refreshes_seeds(self):
+        validated = MODULE.validate_dbt_command(["dbt", "build", "--full-refresh"])
+
+        self.assertEqual(validated.command_tokens, ["dbt", "build", "--full-refresh"])
+        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
 
 
 if __name__ == "__main__":

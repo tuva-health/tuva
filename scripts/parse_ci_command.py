@@ -160,11 +160,16 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
             f"`{token}`. Allowed flags: {', '.join(sorted(BOOLEAN_FLAGS | MULTI_VALUE_FLAGS | SINGLE_VALUE_FLAGS))}."
         )
 
+    has_full_refresh = "--full-refresh" in normalized
+
+    if subcommand == "build" and not has_full_refresh:
+        normalized.extend(["--exclude", "resource_type:seed"])
+
     return ValidatedCommand(
         command_tokens=normalized,
         subcommand=subcommand,
-        requires_seed_baseline=subcommand in {"run", "test"},
-        refreshes_seeds=subcommand in {"build", "seed"},
+        requires_seed_baseline=subcommand in {"run", "test"} or (subcommand == "build" and not has_full_refresh),
+        refreshes_seeds=subcommand == "seed" or (subcommand == "build" and has_full_refresh),
     )
 
 

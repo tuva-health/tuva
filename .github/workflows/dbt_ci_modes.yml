@@ -239,7 +239,7 @@ jobs:
       DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
       DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
       DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}
-      DBT_REDSHIFT_CI_THREADS: ${{ matrix.adapter == 'redshift' && '4' || '' }}
+      DBT_REDSHIFT_CI_THREADS: ${{ matrix.adapter == 'redshift' && '6' || '' }}
       DBT_REDSHIFT_CI_SEED_BATCH_SIZE: ${{ matrix.adapter == 'redshift' && '2000' || '' }}
 
       DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
