@@ -164,20 +164,84 @@ jobs:
                 runGuardPrefixes.some((prefix) => path.startsWith(prefix))
             );
 
-            if (isDispatch && requiresBuild && requiresSeedBaseline && !refreshesSeeds) {
-              const sample = changed
-                .filter(
-                  (path) =>
-                    runGuardExact.has(path) ||
-                    runGuardPrefixes.some((prefix) => path.startsWith(prefix))
-                )
-                .slice(0, 8)
-                .join(", ");
-
-              core.setFailed(
-                `This PR changes seed/config files (${sample}). Run a seed-refreshing command such as /ci dbt seed --select ... or /ci snowflake dbt build --full-refresh --select ... before running ${requestedCommand}.`
+            const touchesSeedState = (paths) =>
+              paths.some(
+                (path) =>
+                  runGuardExact.has(path) ||
+                  runGuardPrefixes.some((prefix) => path.startsWith(prefix))
               );
-              return;
+
+            async function hasReusableSeedRefresh(targetName) {
+              const titleNeedles = [
+                `PR #${prNumber} / ${targetName}: dbt seed`,
+                `PR #${prNumber} / ${targetName}: dbt build --full-refresh`,
+                `PR #${prNumber} / all: dbt seed`,
+                `PR #${prNumber} / all: dbt build --full-refresh`,
+              ];
+
+              const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                owner,
+                repo,
+                workflow_id: "dbt_ci_modes.yml",
+                event: "workflow_dispatch",
+                per_page: 100,
+              });
+
+              for (const run of runs) {
+                if (run.status !== "completed" || run.conclusion !== "success") {
+                  continue;
+                }
+
+                const displayTitle = String(run.display_title || "");
+                if (!titleNeedles.some((needle) => displayTitle.includes(needle))) {
+                  continue;
+                }
+
+                if (run.head_sha === pr.head.sha) {
+                  return true;
+                }
+
+                try {
+                  const comparison = await github.rest.repos.compareCommits({
+                    owner,
+                    repo,
+                    base: run.head_sha,
+                    head: pr.head.sha,
+                  });
+
+                  const comparisonPaths = (comparison.data.files || []).map((file) => file.filename);
+                  if (!touchesSeedState(comparisonPaths)) {
+                    return true;
+                  }
+                } catch (error) {
+                  core.info(
+                    `Unable to compare ${run.head_sha} to ${pr.head.sha} while checking seed baseline reuse: ${error.message}`
+                  );
+                }
+              }
+
+              return false;
+            }
+
+            if (isDispatch && requiresBuild && requiresSeedBaseline && !refreshesSeeds) {
+              const reusableTargets = [];
+              for (const targetName of requestedTargets) {
+                if (await hasReusableSeedRefresh(targetName)) {
+                  reusableTargets.push(targetName);
+                }
+              }
+
+              if (reusableTargets.length !== requestedTargets.length) {
+                const sample = changed
+                  .filter((path) => touchesSeedState([path]))
+                  .slice(0, 8)
+                  .join(", ");
+
+                core.setFailed(
+                  `This PR changes seed/config files (${sample}). Run a seed-refreshing command such as /ci dbt seed --select ... or /ci snowflake dbt build --full-refresh --select ... before running ${requestedCommand}.`
+                );
+                return;
+              }
             }
 
             core.setOutput("pr_number", String(prNumber));
