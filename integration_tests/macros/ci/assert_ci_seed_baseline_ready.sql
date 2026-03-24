@@ -10,7 +10,7 @@
     #}
     {% set required_relations = [
         {'schema': 'raw_data', 'identifier': 'eligibility'},
-        {'schema': 'provider-data', 'identifier': 'provider'},
+        {'schema': 'provider_data', 'identifier': 'provider'},
         {'schema': 'terminology', 'identifier': 'admit_type'},
         {'schema': 'reference_data', 'identifier': 'calendar'},
         {'schema': 'concept_library', 'identifier': 'clinical_concepts'}
@@ -34,7 +34,7 @@
         {% do exceptions.raise_compiler_error(
             "CI baseline seed schemas are not ready for run-only mode. Missing required objects: "
             ~ (missing | join(', '))
-            ~ ". Run `/ci large` on this PR to refresh `raw_data`, `provider-data`, `terminology`, `reference_data`, and `concept_library`."
+            ~ ". Run `/ci large` on this PR to refresh `raw_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
         ) %}
     {% endif %}
 

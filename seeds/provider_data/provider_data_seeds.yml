@@ -5,7 +5,7 @@ seeds:
     description: 'Seed containing other provider taxonomy codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider-data{% else %}provider-data{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
         - provider_data
         - claims_preprocessing
@@ -36,7 +36,7 @@ seeds:
     description: 'Seed containing provider information.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider-data{% else %}provider-data{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
         - provider_data
         - claims_preprocessing
@@ -144,7 +144,7 @@ seeds:
       https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider-data{% else %}provider-data{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: medicare_provider_and_supplier_taxonomy_crosswalk
       tags:
         - provider_data
@@ -163,7 +163,7 @@ seeds:
       Provider taxonomy codes from NPPES.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider-data{% else %}provider-data{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: provider_taxonomy_unpivot
       tags:
         - provider_data
