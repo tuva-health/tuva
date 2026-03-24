@@ -210,11 +210,11 @@ seeds:
       provider_data__medicare_provider_and_supplier_taxonomy_crosswalk:
         +post-hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
       provider_data__other_provider_taxonomy:
-        +post-hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
+        +post-hook: "{{ load_provider_data_seed('other_provider_taxonomy.csv') }}"
       provider_data__provider:
-        +post-hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
+        +post-hook: "{{ load_provider_data_seed('provider.csv') }}"
       provider_data__provider_taxonomy_unpivot:
-        +post-hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
+        +post-hook: "{{ load_provider_data_seed('provider_taxonomy_unpivot.csv') }}"
 
     value_sets:
       ccsr:
