@@ -4,7 +4,10 @@
 2. Choose a data source:
    1. To use synthetic demo data:
         -  Set use_synthetic_data to true
+        -  Set synthetic_data_size to `small` or `large` (`small` is the default)
+        -  Set tuva_seed_version and the appropriate S3 bucket vars when testing published artifacts
    3. To use your own data sources, update the vars in integration_tests/dbt_project.yml:
         - Set input_database and input_schema to your testing sources
 4. Run `dbt deps`.
-5. Run `dbt build`.
+5. Run `dbt seed`.
+6. Run `dbt build`.

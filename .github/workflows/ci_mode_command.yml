@@ -15,45 +15,15 @@ jobs:
     if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ci') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout workflow utilities
+        uses: actions/checkout@v4
+
       - name: Parse command and authorize
         id: parse
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const body = (context.payload.comment.body || "").trim();
-            const match = body.match(/^\/ci\s+(run|build)(?:-(snowflake|bigquery|databricks|fabric|redshift|duckdb))?\s*$/i);
-
-            if (!match) {
-              core.setOutput("allowed", "false");
-              core.setOutput(
-                "message",
-                "Invalid command. Use `/ci run`, `/ci build`, or `/ci <run|build>-<snowflake|bigquery|databricks|fabric|redshift|duckdb>`."
-              );
-              return;
-            }
-
-            const operation = match[1].toLowerCase();
-            const target = (match[2] || "all").toLowerCase();
-            const assoc = (context.payload.comment.author_association || "").toUpperCase();
-            const isRepoCollaborator = ["OWNER", "MEMBER", "COLLABORATOR"].includes(assoc);
-            const isMaintainer = ["OWNER", "MEMBER"].includes(assoc);
-
-            if (!isRepoCollaborator) {
-              core.setOutput("allowed", "false");
-              core.setOutput("message", "You are not authorized to run CI commands on this repository.");
-              return;
-            }
-
-            if (operation === "build" && target === "all" && !isMaintainer) {
-              core.setOutput("allowed", "false");
-              core.setOutput("message", "Only repository maintainers can run `/ci build` (all warehouses).");
-              return;
-            }
-
-            core.setOutput("allowed", "true");
-            core.setOutput("operation", operation);
-            core.setOutput("target", target);
+        run: python scripts/parse_ci_command.py parse-comment
+        env:
+          CI_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          CI_COMMENT_BODY: ${{ github.event.comment.body }}
 
       - name: Respond to invalid or unauthorized command
         if: ${{ steps.parse.outputs.allowed != 'true' }}
@@ -75,8 +45,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const operation = `${{ steps.parse.outputs.operation }}`;
-            const target = `${{ steps.parse.outputs.target }}`;
+            const dbtCommand = `${{ steps.parse.outputs.dbt_command }}`;
+            const commandLabel = `${{ steps.parse.outputs.command_label }}`;
+            const targetsCsv = `${{ steps.parse.outputs.targets_csv }}`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const repoFullName = `${owner}/${repo}`.toLowerCase();
@@ -87,8 +58,18 @@ jobs:
               pull_number: issue_number
             });
 
-            const headRepoFullName = (pr.head.repo?.full_name || "").toLowerCase();
-            const dispatchRef = headRepoFullName === repoFullName ? pr.head.ref : "main";
+            const headRepoFullName = String(pr.head.repo.full_name || "").toLowerCase();
+            if (headRepoFullName !== repoFullName) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: "Refusing to run `/ci` for a fork PR because this workflow uses repository secrets. Use the outside contributor bridge workflow to create an in-repo bridge PR first, then run `/ci` on that bridge PR."
+              });
+              return;
+            }
+
+            const dispatchRef = "main";
 
             await github.rest.actions.createWorkflowDispatch({
               owner,
@@ -97,15 +78,15 @@ jobs:
               ref: dispatchRef,
               inputs: {
                 pr_number: String(issue_number),
-                operation,
-                target
+                dbt_command: dbtCommand,
+                command_label: commandLabel,
+                targets_csv: targetsCsv
               }
             });
 
-            const mode = `${operation}-${target}`;
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
-              body: `Triggered Tuva CI with \`${mode}\` (ref: \`${dispatchRef}\`).`
+              body: `Triggered Tuva CI with \`${commandLabel}\` (ref: \`${dispatchRef}\`).`
             });

@@ -9,4 +9,4 @@ default:
       dbname: "{{ env_var('DBT_REDSHIFT_CI_DATABASE') }}"
       schema: public
       port: 5439
-      threads: 4
+      threads: "{{ env_var('DBT_REDSHIFT_CI_THREADS', '4') | int }}"

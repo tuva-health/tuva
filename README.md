@@ -28,7 +28,7 @@ Connect duckdb and dbt via your profile.yml.
 Use tuva/integration_tests as your development project.  Configure the dbt_project.yml in this folder to connect to duckdb.
 
 Run the package from integration_tests.  This will:
-- Load dev data from seed files stored in the project
+- Load package seed payloads from versioned S3 artifacts
 - Build the entire pipeline in your duckdb instance
 
 From there we recommend iterating with your preferred coding agent using [AGENTS.md](AGENTS.md).
@@ -90,8 +90,47 @@ Each mart can be independently enabled or disabled. When not set, these inherit 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `tuva_schema_prefix` | `None` | When set, all Tuva output schemas are prefixed with this value (e.g., `myprefix_core`). |
-| `custom_bucket_name` | `"tuva-public-resources"` | S3 bucket for seed data. Override to use a private bucket. |
+| `custom_bucket_name` | `"tuva-public-resources"` | Default S3 bucket for versioned seed data. Used for any database without an explicit override. |
+| `tuva_seed_version` | `"0.18.0"` | Versioned S3 folder used for package seed payloads. Leading `v` is optional. |
+| `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `enable_input_layer_testing` | `true` | Run DQI data quality tests on the input layer. |
 | `enable_legacy_data_quality` | `false` | Build legacy (pre-DQI) data quality models. |
 | `enable_normalize_engine` | `false` | Enable the normalize engine for custom code mapping. Set to `"unmapped"` to list unmapped codes, or `true` to also integrate custom mappings. |
 | `provider_attribution_as_of_date` | None | Reference date for provider attribution calculations. |
+
+## Publishing Versioned Seed Artifacts
+
+Use `scripts/publish-dolthub-seeds` to publish the latest public DoltHub databases to versioned S3 folders.
+
+Required inputs:
+- `--version v0.18.0`
+- AWS CLI credentials via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+
+Optional inputs:
+- `--bucket reference_data=my-bucket`
+- `--bucket value_sets=my-other-bucket/prefix`
+- `--database terminology`
+- `--download-only`
+
+The script publishes to the normalized layout:
+- `s3://<bucket>/<database-folder>/<version>/<table>.csv.gz`
+
+## Mirroring Seed Releases To GCS And Azure
+
+Use `scripts/mirror-seed-release` after an S3 publish to copy the same versioned release to GCS and Azure Blob Storage.
+
+Required access:
+- AWS CLI access to read `s3://tuva-public-resources`
+- `gsutil` access to write `gs://tuva-public-resources`
+- Azure `Storage Blob Data Contributor` or equivalent on storage account `tuvapublicresources`, container `tuva-public-resources`
+
+Example:
+
+```bash
+scripts/mirror-seed-release --version v0.18.0
+```
+
+The script mirrors:
+- `s3://tuva-public-resources/<database-folder>/<version>/...`
+- `gs://tuva-public-resources/<database-folder>/<version>/...`
+- `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`

@@ -6,13 +6,19 @@ import './inputLayerDictionary.css';
 const ALL_TABLES_VALUE = '__all_tables__';
 const ALL_DATA_MARTS_VALUE = '__all_data_marts__';
 const DATA_MART_LABEL_OVERRIDES = {
+  ahrq_measures: 'AHRQ Measures',
+  claims_enrollment: 'Claims Enrollment',
   ccsr: 'CCSR',
   cms_chronic_conditions: 'CMS Chronic Conditions',
   cms_hccs: 'CMS HCCs',
   ed_classification: 'ED Classification',
   financial_pmpm: 'Financial PMPM',
+  hcc_recapture: 'HCC Recapture',
+  hcc_suspecting: 'HCC Suspecting',
+  provider_attribution: 'Provider Attribution',
   quality_measures: 'Quality Measures',
   readmissions: 'Readmissions',
+  semantic_layer: 'Semantic Layer',
   service_categories: 'Service Categories',
   tuva_chronic_conditions: 'Tuva Chronic Conditions',
 };

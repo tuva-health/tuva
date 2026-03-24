@@ -17,7 +17,7 @@ models:
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'financial_pmpm', 'quality_measures', 'readmissions', 'service_categories', 'tuva_chronic_conditions']
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -74,7 +74,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -113,7 +113,7 @@ models:
       - name: encounter_type
         description: Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -148,7 +148,7 @@ models:
       - name: encounter_start_date
         description: Date when the encounter started.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -182,7 +182,7 @@ models:
       - name: encounter_end_date
         description: Date when the encounter ended.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -216,7 +216,7 @@ models:
       - name: length_of_stay
         description: Length of the encounter calculated as encounter_end_date - encounter_start_date.
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -232,7 +232,7 @@ models:
       - name: admit_source_code
         description: Indicates where the patient was before the healthcare encounter (inpatient claims only).
         mapping_instructions: ''
-        required_for_data_marts: ['quality_measures']
+        required_for_data_marts: ['ahrq_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -267,7 +267,7 @@ models:
       - name: admit_source_description
         description: Description of the admit_source_code for the encounter.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -282,7 +282,7 @@ models:
       - name: admit_type_code
         description: Indicates the type of admission (inpatient claims only).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -307,7 +307,7 @@ models:
       - name: admit_type_description
         description: Description of the admit_type_code for the encounter.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -322,7 +322,7 @@ models:
       - name: discharge_disposition_code
         description: Indicates the type of setting the patient was discharged to (institutional inpatient claims only).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -347,7 +347,7 @@ models:
       - name: discharge_disposition_description
         description: Description of the discharge_disposition_code for the encounter.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -362,7 +362,7 @@ models:
       - name: attending_provider_id
         description: ID for the attending provider on the encounter.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -377,7 +377,7 @@ models:
       - name: attending_provider_name
         description: Name of the attending provider on the encounter.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -392,7 +392,7 @@ models:
       - name: facility_npi
         description: Facility NPI for the claim (the organizational NPI of the facility where services were performed).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -407,7 +407,7 @@ models:
       - name: facility_name
         description: Facility name.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -422,7 +422,7 @@ models:
       - name: primary_diagnosis_code_type
         description: The type of condition code reported in the source system e.g. ICD-10-CM.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -447,7 +447,7 @@ models:
       - name: primary_diagnosis_code
         description: Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -462,7 +462,7 @@ models:
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -477,7 +477,7 @@ models:
       - name: drg_code_type
         description: The DRG system used for the claim.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -492,7 +492,7 @@ models:
       - name: drg_code
         description: The DRG code on the claim.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -517,7 +517,7 @@ models:
       - name: drg_description
         description: The description for the DRG code used on the claim.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -532,7 +532,7 @@ models:
       - name: paid_amount
         description: The total amount paid by the insurer.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -555,7 +555,7 @@ models:
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient).
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -570,7 +570,7 @@ models:
       - name: charge_amount
         description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -585,7 +585,7 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source.
         mapping_instructions: ''
-        required_for_data_marts: []
+        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
