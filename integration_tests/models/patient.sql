@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+     enabled = var('clinical_enabled', False)
  | as_bool
    )
 }}
@@ -49,8 +49,6 @@
     {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_last_name #}
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 cast(null as {{ dbt.type_string() }}) as person_id
 , cast(null as {{ dbt.type_string() }}) as patient_id
@@ -79,13 +77,3 @@ cast(null as {{ dbt.type_string() }}) as person_id
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
 {{ limit_zero() }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'patient') }}
-
-{%- endif %}

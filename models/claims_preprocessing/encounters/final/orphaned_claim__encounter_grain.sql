@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -163,7 +163,7 @@ and
 pos.paid_order = 1
 left outer join patient as e
   on d.patient_data_source_id = e.patient_data_source_id
-left outer join {{ ref('terminology__provider') }} as b
+left outer join {{ ref('provider_data__provider') }} as b
   on hf.facility_npi = b.npi
 left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm

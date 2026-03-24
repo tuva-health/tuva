@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -34,7 +34,7 @@ select
 from {{ ref('ed_classification__int_filter_encounter_with_classification') }} as class
 inner join {{ ref('ed_classification__categories') }} as cat
     on class.classification = cat.classification
-left outer join {{ ref('terminology__provider') }} as fac_prov
+left outer join {{ ref('provider_data__provider') }} as fac_prov
     on class.facility_npi = fac_prov.npi
 left outer join {{ ref('ed_classification__stg_patient') }} as pat
     on class.person_id = pat.person_id

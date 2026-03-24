@@ -55,5 +55,5 @@ select distinct -- to bring to claim_id grain
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from base as m
 left outer join claim_grain as cg on m.claim_id = cg.claim_id and m.data_source = cg.data_source
-left outer join {{ ref('terminology__provider') }} as term on m.rendering_npi = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.rendering_npi = term.npi
 left outer join claim_agg as agg on m.claim_id = agg.claim_id and m.data_source = agg.data_source

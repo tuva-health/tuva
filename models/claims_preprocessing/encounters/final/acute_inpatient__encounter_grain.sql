@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -176,7 +176,7 @@ left outer join institutional_claim_details as c
   on x.encounter_id = c.encounter_id
 left outer join patient as e
   on c.patient_data_source_id = e.patient_data_source_id
-left outer join {{ ref('terminology__provider') }} as b
+left outer join {{ ref('provider_data__provider') }} as b
   on c.facility_npi = b.npi
 left outer join {{ ref('terminology__discharge_disposition') }} as g
   on c.discharge_disposition_code = g.discharge_disposition_code

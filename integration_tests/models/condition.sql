@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+     enabled = var('clinical_enabled', False)
  | as_bool
    )
 }}
@@ -49,8 +49,6 @@
     {# , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as zzz_temp_recorded_date #}
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
   cast(null as {{ dbt.type_string() }}) as condition_id
 , cast(null as {{ dbt.type_string() }}) as payer
@@ -77,13 +75,3 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
 {{ limit_zero() }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'condition') }}
-
-{%- endif %}

@@ -24,4 +24,4 @@ select distinct -- to bring to claim_ID grain
     , cast(m.prescribing_provider_npi as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('pharmacy_claim') }} as m
-left outer join {{ ref('terminology__provider') }} as term on m.prescribing_provider_npi = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.prescribing_provider_npi = term.npi

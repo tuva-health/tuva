@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -70,14 +70,14 @@ with ccs_release_year as (
   inner join {{ ref('encounters__patient_data_source_id') }} as d on m.person_id = d.person_id
     and m.data_source = d.data_source
   left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as dx on m.diagnosis_code_1 = dx.icd_10_cm_code
-  left outer join {{ ref('terminology__provider') }} as p on m.facility_npi = p.npi
+  left outer join {{ ref('provider_data__provider') }} as p on m.facility_npi = p.npi
   left outer join {{ ref('terminology__nitos') }} as n on m.hcpcs_code = n.hcpcs_code
   left outer join {{ ref('terminology__ms_drg') }} as msdrg on m.drg_code_type = 'ms-drg' and m.drg_code = msdrg.ms_drg_code
   left outer join {{ ref('terminology__apr_drg') }} as aprdrg on m.drg_code_type = 'apr-drg' and m.drg_code = aprdrg.apr_drg_code
   left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
   left outer join {{ ref('terminology__place_of_service') }} as pos on m.place_of_service_code = pos.place_of_service_code
   left outer join {{ ref('terminology__bill_type') }} as bt on m.bill_type_code = bt.bill_type_code
-  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_npi = rend.npi
+  left outer join {{ ref('provider_data__provider') }} as rend on m.rendering_npi = rend.npi
 )
 
 select

@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
-            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
+     enabled = (var('claims_enabled', False) | as_bool)
+            or (var('clinical_enabled', False) | as_bool)
    )
 }}
 
@@ -35,7 +35,7 @@
     , unioned.tuva_last_run
 {%- endset -%}
 
-{% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 {# When both claims and clinical enabled, use eligibility extensions (claims takes priority) #}
 {%- set tuva_extension_columns -%}
@@ -71,7 +71,7 @@ left outer join person_list_to_exclude_because_in_claims as pltebic
 where _source = 2
   and pltebic.person_id is null
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
 {%- set tuva_core_columns_clinical -%}
       person_id
@@ -114,7 +114,7 @@ select
     {{ tuva_metadata_columns_clinical }}
 from {{ ref('core__stg_clinical_patient') }}
 
-{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
 {%- set tuva_core_columns_claims -%}
       person_id

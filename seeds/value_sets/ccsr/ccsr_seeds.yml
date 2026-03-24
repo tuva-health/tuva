@@ -11,7 +11,7 @@ seeds:
       alias: _value_set_dxccsr_v2023_1_body_systems
       tags:
         - ccsr
-      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         body_system: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -38,7 +38,7 @@ seeds:
       alias: _value_set_dxccsr_v2023_1_cleaned_map
       tags:
         - ccsr
-      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         icd_10_cm_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -127,7 +127,7 @@ seeds:
       alias: _value_set_prccsr_v2023_1_cleaned_map
       tags:
         - ccsr
-      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         icd_10_pcs: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

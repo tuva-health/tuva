@@ -1,16 +1,15 @@
 version: 2
 
 seeds:
-  - name: appointment_seed
+  - name: raw_data__appointment
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: appointment
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         appointment_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -78,16 +77,15 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: eligibility_seed
+  - name: raw_data__eligibility
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: eligibility
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -172,16 +170,15 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         transplant_duration_months: integer
 
-  - name: immunization_seed
+  - name: raw_data__immunization
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: immunization
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         immunization_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -229,16 +226,15 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         
-  - name: lab_result_seed
+  - name: raw_data__lab_result
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: lab_result
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         lab_result_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -310,16 +306,15 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
 
-  - name: medical_claim_seed
+  - name: raw_data__medical_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: medical_claim
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -582,16 +577,15 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: observation_seed
+  - name: raw_data__observation
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: observation
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         observation_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -639,16 +633,15 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: pharmacy_claim_seed
+  - name: raw_data__pharmacy_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: pharmacy_claim
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -693,16 +686,15 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: provider_attribution_seed
+  - name: raw_data__provider_attribution
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {% else %}raw_data{%- endif -%}
+      alias: provider_attribution
       tags:
         - attribution
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}

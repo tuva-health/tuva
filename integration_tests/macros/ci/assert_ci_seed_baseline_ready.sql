@@ -4,14 +4,16 @@
         {{ return('') }}
     {% endif %}
 
-    {#
+    {# 
       Run-only CI modes depend on these preloaded schemas.
       We validate one canonical relation per schema to keep this precheck fast.
     #}
     {% set required_relations = [
-        {'schema': '_tuva_synthetic', 'identifier': 'eligibility_seed'},
+        {'schema': 'raw_data', 'identifier': 'eligibility'},
+        {'schema': 'provider-data', 'identifier': 'provider'},
         {'schema': 'terminology', 'identifier': 'admit_type'},
-        {'schema': 'reference_data', 'identifier': 'calendar'}
+        {'schema': 'reference_data', 'identifier': 'calendar'},
+        {'schema': 'concept_library', 'identifier': 'clinical_concepts'}
     ] %}
 
     {% set db_name = target.database if target.database is not none else none %}
@@ -32,7 +34,7 @@
         {% do exceptions.raise_compiler_error(
             "CI baseline seed schemas are not ready for run-only mode. Missing required objects: "
             ~ (missing | join(', '))
-            ~ ". Run `/ci large` on this PR to refresh `_tuva_synthetic`, `terminology`, and `reference_data`."
+            ~ ". Run `/ci large` on this PR to refresh `raw_data`, `provider-data`, `terminology`, `reference_data`, and `concept_library`."
         ) %}
     {% endif %}
 

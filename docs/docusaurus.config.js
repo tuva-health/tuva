@@ -253,6 +253,18 @@ const config = {
             from: '/getting-started/synthetic-data-demo',
             to: '/getting-started',
           },
+          {
+            from: '/archive/getting-started/contributing',
+            to: '/getting-started',
+          },
+          {
+            from: '/getting-started/contributing',
+            to: '/getting-started',
+          },
+          {
+            from: '/contributing',
+            to: '/getting-started',
+          },
           
           // Deleted more pages
           {

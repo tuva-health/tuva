@@ -3,7 +3,7 @@
    )
 }}
 
-{% if var('claims_enabled', var('tuva_marts_enabled',False)) == true and var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% if var('claims_enabled', False) == true and var('clinical_enabled', False) == true -%}
 
 select
       pharmacy_claim_id
@@ -24,7 +24,7 @@ select
     , data_source
 from {{ ref('core__pharmacy_claim') }}
 
-{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
 select
       pharmacy_claim_id
@@ -45,7 +45,7 @@ select
     , data_source
 from {{ ref('core__pharmacy_claim') }}
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
       cast(null as {{ dbt.type_string() }} ) as pharmacy_claim_id

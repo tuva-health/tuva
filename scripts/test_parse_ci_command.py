@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "parse_ci_command.py"
+MODULE_PATH = pathlib.Path(__file__).resolve().with_name("parse_ci_command.py")
 SPEC = importlib.util.spec_from_file_location("parse_ci_command", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None

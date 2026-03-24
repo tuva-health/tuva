@@ -1,9 +1,9 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
+     enabled = var('claims_enabled', var('clinical_enabled', False)) | as_bool
    )
 }}
 
-{% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 with lab_order as (
 
@@ -50,7 +50,7 @@ select distinct
     , code
 from unioned
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
 with lab_order as (
 
@@ -97,7 +97,7 @@ select distinct
     , code
 from unioned
 
-{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
       cast(null as {{ dbt.type_string() }} ) as person_id

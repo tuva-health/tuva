@@ -38,7 +38,7 @@ Follow this workflow for all work in this repository unless the user explicitly 
 - Run dbt from `integration_tests` using local profiles from `~/.dbt` (or `DBT_PROFILES_DIR` if set).
 - Set `TUVA_DBT_PROFILE` (or `DBT_PROFILE`) for local profile selection when needed.
 - Keep `integration_tests/dbt_project.yml` on `profile: default` before push.
-- For data model and seed feature/bug work, validate using the shipped synthetic seed data in `integration_tests/seeds/*` on local DuckDB (do not set `use_synthetic_data: false` unless explicitly requested).
+- For data model and seed feature/bug work, validate using the shipped synthetic seed definitions in `integration_tests/seeds/*` on local DuckDB.
 
 ## Standard Local Docs Commands
 
@@ -54,7 +54,7 @@ Use the repo wrapper:
 - `scripts/dbt-local deps`
 - `scripts/dbt-local debug`
 - `scripts/dbt-local build --select <selector>`
-- `scripts/dbt-local build --full-refresh --vars '{use_synthetic_data: true}'` before push for model/seed feature or bug work
+- `scripts/dbt-local build --full-refresh` before push for model/seed feature or bug work
 
 Equivalent explicit form:
 
@@ -118,7 +118,7 @@ For each user task:
 2. Implement code changes directly.
 3. Validate locally by change type and report exact commands/results:
    - docs changes: `cd docs && npm ci && npm run build`
-   - data model/seed changes: run `scripts/dbt-local` commands from `integration_tests` with local DuckDB and `use_synthetic_data: true`
+   - data model/seed changes: run `scripts/dbt-local` commands from `integration_tests` with local DuckDB
    - CI workflow changes: run available local workflow lint/syntax checks and confirm `/ci run|build[-warehouse]` behavior plus PR-open `run-snowflake` default
 4. Push/open PR and monitor CI until required checks are green by default, then report final status.
 

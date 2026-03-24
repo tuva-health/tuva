@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -32,11 +32,11 @@ select distinct
     end as normalized_facility_name
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} as med
-left outer join {{ ref('terminology__provider') }} as rend_prov
+left outer join {{ ref('provider_data__provider') }} as rend_prov
   on med.rendering_npi = rend_prov.npi
-left outer join {{ ref('terminology__provider') }} as bill_prov
+left outer join {{ ref('provider_data__provider') }} as bill_prov
   on med.billing_npi = bill_prov.npi
-left outer join {{ ref('terminology__provider') }} as fac_prov
+left outer join {{ ref('provider_data__provider') }} as fac_prov
   on med.facility_npi = fac_prov.npi
   and fac_prov.entity_type_description = 'Organization'
   and med.claim_type = 'institutional'

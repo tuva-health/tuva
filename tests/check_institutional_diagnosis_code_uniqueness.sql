@@ -1,7 +1,7 @@
 -- This test verifies that any institutional claim flagged as having duplicate
 -- diagnosis codes actually has at least one code repeated across positions.
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool,
      tags = ['dqi', 'tuva_dqi_sev_4'],
      severity = 'warn'
