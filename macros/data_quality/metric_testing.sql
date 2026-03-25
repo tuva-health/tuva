@@ -210,6 +210,7 @@
 select
     cast(null as {{ dbt.type_string() }}) as metric_id
   , cast(null as {{ dbt.type_string() }}) as metric_name
+  , cast(null as {{ dbt.type_string() }}) as metric_data_mart
   , cast(null as {{ dbt.type_numeric() }}) as metric_value
 where 1 = 0
 {% endmacro %}
@@ -219,10 +220,16 @@ where 1 = 0
     {% set metric_key = metric_group ~ '__' ~ model_name ~ '__row_count' %}
     {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Row count for ' ~ model_name %}
+    {% if metric_group == 'data_mart' %}
+        {% set metric_data_mart = model_name.split('__')[0] %}
+    {% else %}
+        {% set metric_data_mart = metric_group %}
+    {% endif %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
   , cast(count(*) as {{ dbt.type_numeric() }}) as metric_value
 from {{ ref(model_name) }}
 {% endmacro %}
@@ -232,10 +239,12 @@ from {{ ref(model_name) }}
     {% set metric_key = metric_group ~ '__' ~ model_name ~ '__distinct_' ~ column_name ~ '_count' %}
     {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Distinct ' ~ column_name ~ ' count for ' ~ model_name %}
+    {% set metric_data_mart = metric_group %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
   , cast(count(distinct {{ column_name }}) as {{ dbt.type_numeric() }}) as metric_value
 from {{ ref(model_name) }}
 {% endmacro %}
@@ -245,10 +254,12 @@ from {{ ref(model_name) }}
     {% set metric_key = 'input_to_core_diff__' ~ suffix ~ '__row_count' %}
     {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Row count diff for ' ~ suffix %}
+    {% set metric_data_mart = 'input_layer, core' %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
   , cast(core_metrics.core_row_count - input_metrics.input_row_count as {{ dbt.type_numeric() }}) as metric_value
 from (
     select cast(count(*) as {{ dbt.type_numeric() }}) as input_row_count

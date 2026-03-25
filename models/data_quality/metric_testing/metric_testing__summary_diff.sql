@@ -22,6 +22,7 @@ with baseline_metrics as (
 select
     current_metrics.metric_id
   , current_metrics.metric_name
+  , current_metrics.metric_data_mart
   , current_metrics.metric_value
   , baseline_metrics.metric_value as baseline_metric_value
   , case
