@@ -114,13 +114,14 @@
 {% macro get_metric_testing_input_core_pairs() %}
     {% set input_models = get_metric_testing_models('input_layer') %}
     {% set core_models = get_metric_testing_models('core_final') %}
+    {% set allowed_suffixes = ['eligibility', 'medical_claim', 'pharmacy_claim'] %}
     {% set ns = namespace(pairs=[]) %}
 
     {% for input_model in input_models %}
         {% set suffix = input_model | replace('input_layer__', '') %}
         {% set core_model = 'core__' ~ suffix %}
 
-        {% if core_model in core_models %}
+        {% if core_model in core_models and suffix in allowed_suffixes %}
             {% do ns.pairs.append({
                 'suffix': suffix,
                 'input_model': input_model,
@@ -130,6 +131,32 @@
     {% endfor %}
 
     {{ return(ns.pairs) }}
+{% endmacro %}
+
+
+{% macro get_metric_testing_encounter_type_definitions() %}
+    {% set encounter_types = [
+        {'encounter_type': 'acute inpatient', 'slug': 'acute_inpatient'},
+        {'encounter_type': 'ambulance - orphaned', 'slug': 'ambulance_orphaned'},
+        {'encounter_type': 'ambulatory surgery center', 'slug': 'ambulatory_surgery_center'},
+        {'encounter_type': 'dme - orphaned', 'slug': 'dme_orphaned'},
+        {'encounter_type': 'emergency department', 'slug': 'emergency_department'},
+        {'encounter_type': 'home health', 'slug': 'home_health'},
+        {'encounter_type': 'lab - orphaned', 'slug': 'lab_orphaned'},
+        {'encounter_type': 'office visit', 'slug': 'office_visit'},
+        {'encounter_type': 'office visit - other', 'slug': 'office_visit_other'},
+        {'encounter_type': 'office visit injections', 'slug': 'office_visit_injections'},
+        {'encounter_type': 'office visit pt/ot/st', 'slug': 'office_visit_pt_ot_st'},
+        {'encounter_type': 'office visit radiology', 'slug': 'office_visit_radiology'},
+        {'encounter_type': 'orphaned claim', 'slug': 'orphaned_claim'},
+        {'encounter_type': 'outpatient hospital or clinic', 'slug': 'outpatient_hospital_or_clinic'},
+        {'encounter_type': 'outpatient injections', 'slug': 'outpatient_injections'},
+        {'encounter_type': 'outpatient radiology', 'slug': 'outpatient_radiology'},
+        {'encounter_type': 'outpatient surgery', 'slug': 'outpatient_surgery'},
+        {'encounter_type': 'urgent care', 'slug': 'urgent_care'}
+    ] %}
+
+    {{ return(encounter_types) }}
 {% endmacro %}
 
 
@@ -166,29 +193,42 @@
         'core__core__pharmacy_claim__row_count': '00029',
         'core__core__practitioner__row_count': '00030',
         'core__core__procedure__row_count': '00031',
-        'input_to_core_diff__appointment__row_count': '00032',
-        'input_to_core_diff__condition__row_count': '00033',
-        'input_to_core_diff__eligibility__row_count': '00034',
-        'input_to_core_diff__encounter__row_count': '00035',
-        'input_to_core_diff__immunization__row_count': '00036',
-        'input_to_core_diff__lab_result__row_count': '00037',
-        'input_to_core_diff__location__row_count': '00038',
-        'input_to_core_diff__medical_claim__row_count': '00039',
-        'input_to_core_diff__medication__row_count': '00040',
-        'input_to_core_diff__observation__row_count': '00041',
-        'input_to_core_diff__patient__row_count': '00042',
-        'input_to_core_diff__pharmacy_claim__row_count': '00043',
-        'input_to_core_diff__practitioner__row_count': '00044',
-        'input_to_core_diff__procedure__row_count': '00045',
-        'data_mart__ahrq_measures__pqi_summary__row_count': '00046',
-        'data_mart__ccsr__procedure_summary__row_count': '00047',
-        'data_mart__ed_classification__summary__row_count': '00048',
-        'data_mart__hcc_suspecting__summary__row_count': '00049',
-        'data_mart__quality_measures__summary_counts__row_count': '00050',
-        'data_mart__quality_measures__summary_long__row_count': '00051',
-        'data_mart__quality_measures__summary_wide__row_count': '00052',
-        'data_mart__readmissions__readmission_summary__row_count': '00053',
-        'core__core__medical_claim__distinct_claim_id_count': '00054'
+        'input_to_core_diff__eligibility__row_count': '00032',
+        'input_to_core_diff__medical_claim__row_count': '00033',
+        'input_to_core_diff__pharmacy_claim__row_count': '00034',
+        'data_mart__ahrq_measures__pqi_summary__row_count': '00035',
+        'data_mart__ccsr__procedure_summary__row_count': '00036',
+        'data_mart__ed_classification__summary__row_count': '00037',
+        'data_mart__hcc_suspecting__summary__row_count': '00038',
+        'data_mart__quality_measures__summary_counts__row_count': '00039',
+        'data_mart__quality_measures__summary_long__row_count': '00040',
+        'data_mart__quality_measures__summary_wide__row_count': '00041',
+        'data_mart__readmissions__readmission_summary__row_count': '00042',
+        'core__core__medical_claim__distinct_claim_id_count': '00043',
+        'core__core__encounter__encounter_type__acute_inpatient__distinct_encounter_id_count': '00044',
+        'core__core__encounter__encounter_type__ambulance_orphaned__distinct_encounter_id_count': '00045',
+        'core__core__encounter__encounter_type__ambulatory_surgery_center__distinct_encounter_id_count': '00046',
+        'core__core__encounter__encounter_type__dme_orphaned__distinct_encounter_id_count': '00047',
+        'core__core__encounter__encounter_type__emergency_department__distinct_encounter_id_count': '00048',
+        'core__core__encounter__encounter_type__home_health__distinct_encounter_id_count': '00049',
+        'core__core__encounter__encounter_type__lab_orphaned__distinct_encounter_id_count': '00050',
+        'core__core__encounter__encounter_type__office_visit__distinct_encounter_id_count': '00051',
+        'core__core__encounter__encounter_type__office_visit_other__distinct_encounter_id_count': '00052',
+        'core__core__encounter__encounter_type__office_visit_injections__distinct_encounter_id_count': '00053',
+        'core__core__encounter__encounter_type__office_visit_pt_ot_st__distinct_encounter_id_count': '00054',
+        'core__core__encounter__encounter_type__office_visit_radiology__distinct_encounter_id_count': '00055',
+        'core__core__encounter__encounter_type__orphaned_claim__distinct_encounter_id_count': '00056',
+        'core__core__encounter__encounter_type__outpatient_hospital_or_clinic__distinct_encounter_id_count': '00057',
+        'core__core__encounter__encounter_type__outpatient_injections__distinct_encounter_id_count': '00058',
+        'core__core__encounter__encounter_type__outpatient_radiology__distinct_encounter_id_count': '00059',
+        'core__core__encounter__encounter_type__outpatient_surgery__distinct_encounter_id_count': '00060',
+        'core__core__encounter__encounter_type__urgent_care__distinct_encounter_id_count': '00061',
+        'input_layer__input_layer__medical_claim__sum_paid_amount': '00062',
+        'input_layer__input_layer__pharmacy_claim__sum_paid_amount': '00063',
+        'core__core__medical_claim__sum_paid_amount': '00064',
+        'core__core__pharmacy_claim__sum_paid_amount': '00065',
+        'input_to_core_diff__medical_claim__sum_paid_amount': '00066',
+        'input_to_core_diff__pharmacy_claim__sum_paid_amount': '00067'
     } %}
 
     {{ return(metric_id_map) }}
@@ -250,6 +290,42 @@ from {{ ref(model_name) }}
 {% endmacro %}
 
 
+{% macro metric_testing_count_distinct_where_select(metric_group, model_name, column_name, where_column_name, where_value, where_value_slug) %}
+    {% set metric_key = metric_group ~ '__' ~ model_name ~ '__' ~ where_column_name ~ '__' ~ where_value_slug ~ '__distinct_' ~ column_name ~ '_count' %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
+    {% set metric_name = 'Distinct ' ~ column_name ~ ' count for ' ~ where_value ~ ' encounters' %}
+    {% set metric_data_mart = metric_group %}
+
+select
+    cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
+  , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
+  , cast(
+        count(
+            distinct case
+                when {{ where_column_name }} = '{{ where_value }}' then {{ column_name }}
+            end
+        ) as {{ dbt.type_numeric() }}
+    ) as metric_value
+from {{ ref(model_name) }}
+{% endmacro %}
+
+
+{% macro metric_testing_sum_select(metric_group, model_name, column_name) %}
+    {% set metric_key = metric_group ~ '__' ~ model_name ~ '__sum_' ~ column_name %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
+    {% set metric_name = 'Sum ' ~ column_name ~ ' for ' ~ model_name %}
+    {% set metric_data_mart = metric_group %}
+
+select
+    cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
+  , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
+  , cast(coalesce(sum({{ column_name }}), 0) as {{ dbt.type_numeric() }}) as metric_value
+from {{ ref(model_name) }}
+{% endmacro %}
+
+
 {% macro metric_testing_input_core_diff_select(suffix, input_model, core_model) %}
     {% set metric_key = 'input_to_core_diff__' ~ suffix ~ '__row_count' %}
     {% set metric_id = get_metric_testing_metric_id(metric_key) %}
@@ -267,6 +343,28 @@ from (
 ) as input_metrics
 cross join (
     select cast(count(*) as {{ dbt.type_numeric() }}) as core_row_count
+    from {{ ref(core_model) }}
+) as core_metrics
+{% endmacro %}
+
+
+{% macro metric_testing_input_core_sum_diff_select(suffix, input_model, core_model, column_name) %}
+    {% set metric_key = 'input_to_core_diff__' ~ suffix ~ '__sum_' ~ column_name %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
+    {% set metric_name = 'Sum ' ~ column_name ~ ' diff for ' ~ suffix %}
+    {% set metric_data_mart = 'input_layer, core' %}
+
+select
+    cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
+  , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
+  , cast('{{ metric_data_mart }}' as {{ dbt.type_string() }}) as metric_data_mart
+  , cast(core_metrics.core_metric_value - input_metrics.input_metric_value as {{ dbt.type_numeric() }}) as metric_value
+from (
+    select cast(coalesce(sum({{ column_name }}), 0) as {{ dbt.type_numeric() }}) as input_metric_value
+    from {{ ref(input_model) }}
+) as input_metrics
+cross join (
+    select cast(coalesce(sum({{ column_name }}), 0) as {{ dbt.type_numeric() }}) as core_metric_value
     from {{ ref(core_model) }}
 ) as core_metrics
 {% endmacro %}
