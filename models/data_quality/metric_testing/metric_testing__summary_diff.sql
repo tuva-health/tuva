@@ -9,15 +9,11 @@ with baseline_metrics as (
     {% if baseline_relation is not none %}
     select
         metric_id
-      , metric_name
-      , metric_description
       , metric_value
     from {{ ref('data_quality__metric_testing_summary_baseline') }}
     {% else %}
     select
         cast(null as {{ dbt.type_string() }}) as metric_id
-      , cast(null as {{ dbt.type_string() }}) as metric_name
-      , cast(null as {{ dbt.type_string() }}) as metric_description
       , cast(null as {{ dbt.type_numeric() }}) as metric_value
     where 1 = 0
     {% endif %}
@@ -26,7 +22,6 @@ with baseline_metrics as (
 select
     current_metrics.metric_id
   , current_metrics.metric_name
-  , current_metrics.metric_description
   , current_metrics.metric_value
   , baseline_metrics.metric_value as baseline_metric_value
   , case

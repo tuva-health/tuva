@@ -112,8 +112,6 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         metric_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        metric_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
         metric_value: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
       tags:
@@ -127,7 +125,5 @@ seeds:
           - not_null
       - name: metric_name
         description: Human-readable metric name.
-      - name: metric_description
-        description: Description of what the metric measures.
       - name: metric_value
         description: Numeric metric value from the packaged baseline run.

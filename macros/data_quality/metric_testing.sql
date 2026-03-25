@@ -133,53 +133,122 @@
 {% endmacro %}
 
 
+{% macro get_metric_testing_metric_id_map() %}
+    {% set metric_id_map = {
+        'input_layer__input_layer__appointment__row_count': '00001',
+        'input_layer__input_layer__condition__row_count': '00002',
+        'input_layer__input_layer__eligibility__row_count': '00003',
+        'input_layer__input_layer__encounter__row_count': '00004',
+        'input_layer__input_layer__immunization__row_count': '00005',
+        'input_layer__input_layer__lab_result__row_count': '00006',
+        'input_layer__input_layer__location__row_count': '00007',
+        'input_layer__input_layer__medical_claim__row_count': '00008',
+        'input_layer__input_layer__medication__row_count': '00009',
+        'input_layer__input_layer__observation__row_count': '00010',
+        'input_layer__input_layer__patient__row_count': '00011',
+        'input_layer__input_layer__pharmacy_claim__row_count': '00012',
+        'input_layer__input_layer__practitioner__row_count': '00013',
+        'input_layer__input_layer__procedure__row_count': '00014',
+        'input_layer__input_layer__provider_attribution__row_count': '00015',
+        'core__core__appointment__row_count': '00016',
+        'core__core__condition__row_count': '00017',
+        'core__core__eligibility__row_count': '00018',
+        'core__core__encounter__row_count': '00019',
+        'core__core__immunization__row_count': '00020',
+        'core__core__lab_result__row_count': '00021',
+        'core__core__location__row_count': '00022',
+        'core__core__medical_claim__row_count': '00023',
+        'core__core__medication__row_count': '00024',
+        'core__core__member_months__row_count': '00025',
+        'core__core__observation__row_count': '00026',
+        'core__core__patient__row_count': '00027',
+        'core__core__person_id_crosswalk__row_count': '00028',
+        'core__core__pharmacy_claim__row_count': '00029',
+        'core__core__practitioner__row_count': '00030',
+        'core__core__procedure__row_count': '00031',
+        'input_to_core_diff__appointment__row_count': '00032',
+        'input_to_core_diff__condition__row_count': '00033',
+        'input_to_core_diff__eligibility__row_count': '00034',
+        'input_to_core_diff__encounter__row_count': '00035',
+        'input_to_core_diff__immunization__row_count': '00036',
+        'input_to_core_diff__lab_result__row_count': '00037',
+        'input_to_core_diff__location__row_count': '00038',
+        'input_to_core_diff__medical_claim__row_count': '00039',
+        'input_to_core_diff__medication__row_count': '00040',
+        'input_to_core_diff__observation__row_count': '00041',
+        'input_to_core_diff__patient__row_count': '00042',
+        'input_to_core_diff__pharmacy_claim__row_count': '00043',
+        'input_to_core_diff__practitioner__row_count': '00044',
+        'input_to_core_diff__procedure__row_count': '00045',
+        'data_mart__ahrq_measures__pqi_summary__row_count': '00046',
+        'data_mart__ccsr__procedure_summary__row_count': '00047',
+        'data_mart__ed_classification__summary__row_count': '00048',
+        'data_mart__hcc_suspecting__summary__row_count': '00049',
+        'data_mart__quality_measures__summary_counts__row_count': '00050',
+        'data_mart__quality_measures__summary_long__row_count': '00051',
+        'data_mart__quality_measures__summary_wide__row_count': '00052',
+        'data_mart__readmissions__readmission_summary__row_count': '00053',
+        'core__core__medical_claim__distinct_claim_id_count': '00054'
+    } %}
+
+    {{ return(metric_id_map) }}
+{% endmacro %}
+
+
+{% macro get_metric_testing_metric_id(metric_key) %}
+    {% set metric_id_map = get_metric_testing_metric_id_map() %}
+
+    {% if metric_key not in metric_id_map %}
+        {% do exceptions.raise_compiler_error('Missing metric testing ID for metric key: ' ~ metric_key) %}
+    {% endif %}
+
+    {{ return(metric_id_map[metric_key]) }}
+{% endmacro %}
+
+
 {% macro metric_testing_empty_result() %}
 select
     cast(null as {{ dbt.type_string() }}) as metric_id
   , cast(null as {{ dbt.type_string() }}) as metric_name
-  , cast(null as {{ dbt.type_string() }}) as metric_description
   , cast(null as {{ dbt.type_numeric() }}) as metric_value
 where 1 = 0
 {% endmacro %}
 
 
 {% macro metric_testing_row_count_select(metric_group, model_name) %}
-    {% set metric_id = metric_group ~ '__' ~ model_name ~ '__row_count' %}
+    {% set metric_key = metric_group ~ '__' ~ model_name ~ '__row_count' %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Row count for ' ~ model_name %}
-    {% set metric_description = 'Count of rows in ' ~ model_name %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
-  , cast('{{ metric_description }}' as {{ dbt.type_string() }}) as metric_description
   , cast(count(*) as {{ dbt.type_numeric() }}) as metric_value
 from {{ ref(model_name) }}
 {% endmacro %}
 
 
 {% macro metric_testing_count_distinct_select(metric_group, model_name, column_name) %}
-    {% set metric_id = metric_group ~ '__' ~ model_name ~ '__distinct_' ~ column_name ~ '_count' %}
+    {% set metric_key = metric_group ~ '__' ~ model_name ~ '__distinct_' ~ column_name ~ '_count' %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Distinct ' ~ column_name ~ ' count for ' ~ model_name %}
-    {% set metric_description = 'Count of distinct ' ~ column_name ~ ' values in ' ~ model_name %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
-  , cast('{{ metric_description }}' as {{ dbt.type_string() }}) as metric_description
   , cast(count(distinct {{ column_name }}) as {{ dbt.type_numeric() }}) as metric_value
 from {{ ref(model_name) }}
 {% endmacro %}
 
 
 {% macro metric_testing_input_core_diff_select(suffix, input_model, core_model) %}
-    {% set metric_id = 'input_to_core_diff__' ~ suffix ~ '__row_count' %}
+    {% set metric_key = 'input_to_core_diff__' ~ suffix ~ '__row_count' %}
+    {% set metric_id = get_metric_testing_metric_id(metric_key) %}
     {% set metric_name = 'Row count diff for ' ~ suffix %}
-    {% set metric_description = 'Difference between ' ~ core_model ~ ' and ' ~ input_model ~ ' row counts; expected 0' %}
 
 select
     cast('{{ metric_id }}' as {{ dbt.type_string() }}) as metric_id
   , cast('{{ metric_name }}' as {{ dbt.type_string() }}) as metric_name
-  , cast('{{ metric_description }}' as {{ dbt.type_string() }}) as metric_description
   , cast(core_metrics.core_row_count - input_metrics.input_row_count as {{ dbt.type_numeric() }}) as metric_value
 from (
     select cast(count(*) as {{ dbt.type_numeric() }}) as input_row_count
