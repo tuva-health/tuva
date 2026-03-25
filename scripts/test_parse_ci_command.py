@@ -46,10 +46,11 @@ class ParseCiCommandTests(unittest.TestCase):
 
         self.assertEqual(parsed.targets, ["bigquery", "fabric"])
         self.assertEqual(validated.subcommand, "build")
-        self.assertTrue(validated.requires_seed_baseline)
+        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
         self.assertEqual(
             validated.command_tokens,
-            ["dbt", "build", "--select", "tag:tuva_demo", "--exclude", "resource_type:seed"],
+            ["dbt", "build", "--select", "tag:tuva_demo"],
         )
 
     def test_multiple_selector_values_are_allowed(self):
@@ -65,10 +66,10 @@ class ParseCiCommandTests(unittest.TestCase):
                 "--select",
                 "input_layer__eligibility",
                 "tag:tuva_demo",
-                "--exclude",
-                "resource_type:seed",
             ],
         )
+        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
 
     def test_invalid_warehouse_is_rejected(self):
         with self.assertRaises(MODULE.ValidationError):
