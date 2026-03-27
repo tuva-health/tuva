@@ -114,6 +114,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: normalized_input_eligibility
+      meta:
+        dag:
+          node_type: intermediate
       materialized: table
       tags:
         - normalized_input
@@ -1165,6 +1168,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: _int_normalized_input_eligibility_dates_normalize
+      meta:
+        dag:
+          node_type: intermediate
       materialized: table
       tags:
         - normalized_input
@@ -1353,6 +1359,9 @@ models:
 ##    Staging
   - name: normalized_input__stg_eligibility
     config:
+      meta:
+        dag:
+          node_type: intermediate
       materialized: ephemeral
       tags:
         - normalized_input
@@ -1375,6 +1384,9 @@ models:
 
   - name: normalized_input__int_eligibility_state_normalize
     config:
+      meta:
+        dag:
+          node_type: intermediate
       materialized: ephemeral
       tags:
         - normalized_input

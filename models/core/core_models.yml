@@ -2,12 +2,21 @@ version: 2
 models:
   - name: core__appointment
     description: |
-      The core appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed,  or scheduled events.
+      The core appointment table contains normalized information related to appointments at a healthcare facility. This table may include canceled, completed, or scheduled appointments.
+    grain: One record per appointment per patient.
+    transformation_steps: |-
+      This model transforms the input layer by:
+      1. Casting every appointment field to its core data type
+      2. Left joining appointment type, appointment status, and appointment cancellation reason terminology tables to populate the _norm columns
+      3. Pulling through extension columns from input_layer__appointment
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: appointment
+      meta:
+        dag:
+          node_type: output
       tags: core
       materialized: table
     columns:
@@ -38,30 +47,6 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_appointment_type_code
-        description: Appointment type code from the source.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: source_appointment_type_description
-        description: Appointment type description from the source.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: normalized_appointment_type_code
-        description: Normalized appointment type code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: normalized_appointment_type_description
-        description: Normalized appointment type description.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
       - name: start_datetime
         description: The start date/time of the appointment or service.
         config:
@@ -73,75 +58,70 @@ models:
           meta:
             data_type: timestamp
       - name: duration
-        description: Number of minutes that the appointment or service is to take.
+        description: Number of minutes the appointment is expected to take.
         config:
           meta:
             data_type: number
       - name: location_id
-        description: Unique identifier for each location.
+        description: Unique identifier for the location where the appointment is scheduled.
         config:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner associated with the appointment.
         config:
           meta:
             data_type: varchar
-      - name: source_status
-        description: Status of the appointment from the source system.
+      - name: type_code
+        description: Appointment type code from the source.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_description
+        description: Appointment type description from the source.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_code_norm
+        description: Normalized appointment type code derived downstream from the source appointment type.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_description_norm
+        description: Normalized appointment type description derived downstream from the source appointment type.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: status_code
+        description: Status code of the appointment from the source system.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
-      - name: normalized_status
-        description: The normalized status of the appointment.
+      - name: status_description
+        description: Human-readable description of the appointment status from the source system.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
-      - name: appointment_specialty
-        description: Specialty of a practitioner that would be required to perform the service requested in this appointment.
+      - name: status_code_norm
+        description: Normalized status code derived downstream from the source status.
         config:
           meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-status
+            data_type: varchar
+      - name: status_description_norm
+        description: Normalized appointment status description derived downstream from the source status.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
       - name: reason
         description: Free text reason for the appointment or service.
-        config:
-          meta:
-            data_type: varchar
-      - name: source_reason_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: source_reason_code
-        description: The code in the source system for the appointment reason (e.g., ICD-10 code).
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-            data_type: varchar
-      - name: source_reason_description
-        description: Description of the source code for the appointment reason in the source system (e.g., ICD-10 description).
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_reason_code_type
-        description: The normalized type of code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: normalized_reason_code
-        description: The normalized code for the appointment reason (e.g., ICD-10 code).
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-            data_type: varchar
-      - name: normalized_reason_description
-        description: Normalized description of the code for the appointment reason (e.g., ICD-10 description).
         config:
           meta:
             data_type: varchar
@@ -150,46 +130,17 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_cancellation_reason_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: source_cancellation_reason_code
-        description: The code in the source system for the cancellation reason.
+      - name: cancellation_reason_code_norm
+        description: Normalized code for the appointment cancellation reason.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
             data_type: varchar
-      - name: source_cancellation_reason_description
-        description: Description of the source code for the cancellation reason in the source system.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: normalized_cancellation_reason_code_type
-        description: The normalized type of code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: normalized_cancellation_reason_code
-        description: The normalized code for the cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: normalized_cancellation_reason_description
+      - name: cancellation_reason_description_norm
         description: Normalized description of the code for the cancellation reason.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
-        config:
-          meta:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
@@ -2013,6 +1964,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: patient
+      meta:
+        dag:
+          node_type: output
       tags: core
       materialized: table
     columns:
@@ -2640,17 +2594,6 @@ models:
         - core
         - core_stage_claims
       materialized: view
-  - name: core__stg_claims_patient
-    description: Staging core claims patients
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_patient
-      tags:
-        - core
-        - core_stage_claims
-      materialized: table
   - name: core__stg_claims_condition
     description: Staging core claims conditions
     config:
@@ -2706,17 +2649,21 @@ models:
         - core
         - core_stage_claims
       materialized: table
-  - name: core__stg_clinical_appointment
-    description: Staging core clinical appointments
+  - name: core__stg_patient
+    description: Staging core patient records with claims and clinical
+      precedence resolved before final age calculations.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_clinical_appointment
+      alias: _stg_patient
+      meta:
+        dag:
+          node_type: intermediate
       tags:
         - core
-        - core_stage_clinical
-      materialized: view
+        - core_stage
+      materialized: table
   - name: core__stg_clinical_condition
     description: Staging core clinical conditions
     config:
@@ -2788,17 +2735,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_observation
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_patient
-    description: Staging core clinical patients
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_patient
       tags:
         - core
         - core_stage_clinical

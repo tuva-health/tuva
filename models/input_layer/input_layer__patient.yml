@@ -42,6 +42,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+      meta:
+        dag:
+          node_type: intermediate
       tags: input_layer
       materialized: view
     columns:
