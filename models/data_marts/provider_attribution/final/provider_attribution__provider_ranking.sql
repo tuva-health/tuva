@@ -313,22 +313,7 @@ order by s.step) as step_choice_rank
     , sum(arc.allowed_amount) as allowed_amount
     , count(distinct arc.encounter_id) as visits
   from {{ ref('provider_attribution__int_person_years') }} as py
-  inner join (
-    select
-        e.person_id
-      , e.provider_id
-      , e.encounter_id
-      , e.claim_year_month_int
-      , e.allowed_amount
-      , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket
-      , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty
-    from eligible_all_claims as e
-    inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp
-      on cast(e.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})
-     and lower(trim(sp.entity_type_description)) = 'individual'
-    left outer join {{ ref('provider_attribution__provider_classification') }} as pc
-      on e.provider_id = pc.provider_id
-  ) as arc
+  inner join all_rendering_claims as arc
     on py.person_id = arc.person_id
    and arc.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
                                    and (py.performance_year * 100 + 12)
