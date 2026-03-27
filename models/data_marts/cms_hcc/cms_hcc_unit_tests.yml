@@ -1,0 +1,515 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING MODELS
+  # =========================================================================
+
+  - name: test_stg_condition_deduplicates_by_rank
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__condition
+    description: "DISTINCT removes duplicates caused by different condition_rank values"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {claim_id: 'CLM1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', data_source: 'src1', condition_rank: 1}
+          - {claim_id: 'CLM1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', data_source: 'src1', condition_rank: 2}
+    expect:
+      rows:
+        - {claim_id: 'CLM1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge', code_type: 'icd-10-cm', code: 'E1165', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_eligibility_filters_to_medicare
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__eligibility
+    description: "Only records with payer_type='medicare' or null pass through"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', payer_type: 'medicare', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: '10', enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, snp_type: null, data_source: 's1'}
+          - {person_id: 'P2', payer: 'COM', payer_type: 'commercial', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, snp_type: null, data_source: 's1'}
+          - {person_id: 'P3', payer: 'UNK', payer_type: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, snp_type: null, data_source: 's1'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: '10', enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, institutional_snp_flag: 0, snp_flag: 0, data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P3', payer: 'UNK', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, institutional_snp_flag: 0, snp_flag: 0, data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_eligibility_snp_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__eligibility
+    description: "I-SNP sets institutional_snp_flag=1; any SNP sets snp_flag=1"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', payer_type: 'medicare', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', snp_type: 'I-SNP', data_source: 's1'}
+          - {person_id: 'P2', payer: 'MCR', payer_type: 'medicare', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', snp_type: 'D-SNP', data_source: 's1'}
+          - {person_id: 'P3', payer: 'MCR', payer_type: 'medicare', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', snp_type: null, data_source: 's1'}
+    expect:
+      rows:
+        - {person_id: 'P1', institutional_snp_flag: 1, snp_flag: 1, payer: 'MCR', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', institutional_snp_flag: 0, snp_flag: 1, payer: 'MCR', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P3', institutional_snp_flag: 0, snp_flag: 0, payer: 'MCR', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, medicaid_indicator: null, long_term_institutional_flag: null, data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__medical_claim
+    description: "Medical claim staging passes through and renames columns correctly"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_line_number: '1', claim_type: 'professional', person_id: 'P1', payer: 'MCR', claim_start_date: '2023-06-01', claim_end_date: '2023-06-15', bill_type_code: null, hcpcs_code: '99213', rendering_npi: 'NPI1', data_source: 's1'}
+    expect:
+      rows:
+        - {claim_id: 'CLM1', claim_line_number: '1', claim_type: 'professional', person_id: 'P1', payer: 'MCR', claim_start_date: '2023-06-01', claim_end_date: '2023-06-15', bill_type_code: null, hcpcs_code: '99213', rendering_npi: 'NPI1', data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__patient
+    description: "Patient staging passes through columns correctly"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1954-01-01', death_date: null}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'female', birth_date: '1954-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_member_months_deduplicates_plans
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__stg_core__member_months
+    description: "DISTINCT removes plan-level duplicates from member months"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', year_month: '2023-01', data_source: 's1', plan: 'PlanA'}
+          - {person_id: 'P1', payer: 'MCR', year_month: '2023-01', data_source: 's1', plan: 'PlanB'}
+          - {person_id: 'P1', payer: 'MCR', year_month: '2023-02', data_source: 's1', plan: 'PlanA'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', year_month: '2023-01', data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', payer: 'MCR', year_month: '2023-02', data_source: 's1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # MONTHLY COLLECTION DATES
+  # =========================================================================
+
+  # =========================================================================
+  # HCC MAPPING (includes V28 Heart Patch test - Defect #1)
+  # =========================================================================
+
+  - name: test_hcc_mapping_v24_basic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_hcc_mapping
+    description: "ICD-10 code maps to V24 HCC when cms_hcc_v24_flag=Yes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_eligible_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', condition_code: 'E1165', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows:
+          - {payment_year: 2024, diagnosis_code: 'E1165', cms_hcc_v24: '18', cms_hcc_v24_flag: 'Yes', cms_hcc_v28: '37', cms_hcc_v28_flag: 'Yes'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', condition_code: 'E1165', hcc_code: '18', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', payer: 'MCR', condition_code: 'E1165', hcc_code: '37', model_version: 'CMS-HCC-V28', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_mapping_v28_heart_patch_removes_isolated_cc223
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_hcc_mapping
+    description: "Defect #1: V28 CC223 is removed when no sibling heart CCs (221,222,224,225,226) present"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_eligible_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', condition_code: 'I5020', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows:
+          - {payment_year: 2024, diagnosis_code: 'I5020', cms_hcc_v24: '85', cms_hcc_v24_flag: 'Yes', cms_hcc_v28: '223', cms_hcc_v28_flag: 'Yes'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', condition_code: 'I5020', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_mapping_v28_heart_patch_keeps_cc223_with_sibling
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_hcc_mapping
+    description: "V28 CC223 is kept when sibling heart CC (e.g. CC221) is also present"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_eligible_conditions')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', condition_code: 'I5020', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          - {person_id: 'P2', payer: 'MCR', condition_code: 'I110', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows:
+          - {payment_year: 2024, diagnosis_code: 'I5020', cms_hcc_v24: null, cms_hcc_v24_flag: 'No', cms_hcc_v28: '223', cms_hcc_v28_flag: 'Yes'}
+          - {payment_year: 2024, diagnosis_code: 'I110', cms_hcc_v24: null, cms_hcc_v24_flag: 'No', cms_hcc_v28: '221', cms_hcc_v28_flag: 'Yes'}
+    expect:
+      rows:
+        - {person_id: 'P2', payer: 'MCR', condition_code: 'I5020', hcc_code: '223', model_version: 'CMS-HCC-V28', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', payer: 'MCR', condition_code: 'I110', hcc_code: '221', model_version: 'CMS-HCC-V28', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC HIERARCHY
+  # =========================================================================
+
+  - name: test_hcc_hierarchy_suppression_and_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_hcc_hierarchy
+    description: "Parent HCC suppresses child; child survives when parent absent; non-hierarchy HCCs pass through"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_hcc_mapping')
+        rows:
+          # P1 has both parent (17) and child (18) -> only 17 survives
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '17', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '18', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          # P2 has only child (18) without parent -> 18 survives
+          - {person_id: 'P2', payer: 'MCR', hcc_code: '18', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          # P3 has HCC not in hierarchy -> passes through
+          - {person_id: 'P3', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disease_hierarchy')
+        rows:
+          - {model_version: 'CMS-HCC-V24', hcc_code: '17', description: 'Diabetes with Acute Complications', hccs_to_exclude: '18'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', hcc_code: '17', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', payer: 'MCR', hcc_code: '18', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P3', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # DEMOGRAPHIC FACTORS
+  # =========================================================================
+
+  - name: test_demographic_factors_continuing_community_aged
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_demographic_factors
+    description: "Continuing Non-Dual Aged female gets CNA demographic coefficient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_members')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', gender: 'Female', age_group: '70-74', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', originally_disabled_flag: 'No', institutional_snp_flag: 0, enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__demographic_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Demographic', enrollment_status: 'Continuing', gender: 'Female', age_group: '70-74', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', coefficient: 0.421, plan_segment: null}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', gender: 'Female', age_group: '70-74', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', originally_disabled_flag: 'No', enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, coefficient: 0.421, factor_type: 'Demographic', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_demographic_factors_new_enrollee
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_demographic_factors
+    description: "New Enrollee gets NE demographic coefficient with risk_model_code E"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_members')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', enrollment_status: 'New', gender: 'Male', age_group: '35-44', medicaid_status: 'No', dual_status: 'Non', orec: 'Disabled', institutional_status: 'No', originally_disabled_flag: 'No', institutional_snp_flag: 0, enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, payment_year: 2025, collection_start_date: '2024-01-01', collection_end_date: '2024-12-31'}
+      - input: ref('cms_hcc__demographic_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Demographic', enrollment_status: 'New', gender: 'Male', age_group: '35-44', medicaid_status: 'No', dual_status: null, orec: 'Aged', institutional_status: null, coefficient: 0.555, plan_segment: null}
+    expect:
+      rows:
+        - {person_id: 'P2', payer: 'MCR', enrollment_status: 'New', gender: 'Male', age_group: '35-44', medicaid_status: 'No', dual_status: 'Non', orec: 'Disabled', institutional_status: 'No', originally_disabled_flag: 'No', enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, coefficient: 0.555, factor_type: 'Demographic', risk_model_code: 'E', model_version: 'CMS-HCC-V24', payment_year: 2025, collection_start_date: '2024-01-01', collection_end_date: '2024-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # DISEASE FACTORS (Defect #2: NE exclusion)
+  # =========================================================================
+
+  - name: test_disease_factors_continuing_gets_coefficient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disease_factors
+    description: "Continuing enrollee with HCC receives disease coefficient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', gender: 'Female', age_group: '70-74', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, risk_model_code: 'CNA', collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '19', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disease', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', hcc_code: '19', description: 'Diabetes without Complication', coefficient: 0.105}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', hcc_code: '19', hcc_description: 'Diabetes without Complication', risk_model_code: 'CNA', coefficient: 0.105, factor_type: 'Disease', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_disease_factors_new_enrollee_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disease_factors
+    description: "Defect #2: New Enrollee must NOT receive disease HCC coefficients"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', enrollment_status: 'New', gender: 'Male', age_group: '35-44', medicaid_status: 'No', dual_status: 'Non', orec: 'Disabled', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, risk_model_code: 'E', collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', hcc_code: '19', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disease', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', hcc_code: '19', description: 'Diabetes without Complication', coefficient: 0.105}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # DISEASE INTERACTION FACTORS
+  # =========================================================================
+
+  - name: test_disease_interaction_both_hccs_present
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disease_interaction_factors
+    description: "Interaction factor assigned when patient has both HCCs in the pair"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '47', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disease_interaction_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disease Interaction', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', short_name: 'HCC47_HCC85', description: 'Immune x Diabetes', hcc_code_1: '47', hcc_code_2: '85', coefficient: 0.121}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', hcc_code_1: '47', hcc_code_2: '85', description: 'Immune x Diabetes', coefficient: 0.121, factor_type: 'Disease Interaction', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_disease_interaction_missing_one_hcc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disease_interaction_factors
+    description: "No interaction when patient only has one of the two required HCCs"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '47', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disease_interaction_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disease Interaction', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', short_name: 'HCC47_HCC85', description: 'Immune x Diabetes', hcc_code_1: '47', hcc_code_2: '85', coefficient: 0.121}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # DISABLED INTERACTION FACTORS
+  # =========================================================================
+
+  - name: test_disabled_interaction_under65_disabled
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disabled_interaction_factors
+    description: "Under-65 disabled member with matching HCC gets disabled interaction factor"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', institutional_status: 'No', orec: 'Disabled', age_group: '55-59', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disabled_interaction_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disabled Interaction', enrollment_status: 'Continuing', institutional_status: 'No', short_name: 'DISABLED_HCC85', description: 'Disabled x Diabetes', hcc_code: '85', coefficient: 0.103}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', description: 'Disabled x Diabetes', coefficient: 0.103, factor_type: 'Disabled Interaction', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_disabled_interaction_excluded_for_aged_65plus
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_disabled_interaction_factors
+    description: "Aged 65+ member does NOT get disabled interaction even with matching HCC"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', enrollment_status: 'Continuing', institutional_status: 'No', orec: 'Aged', age_group: '70-74', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__disabled_interaction_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Disabled Interaction', enrollment_status: 'Continuing', institutional_status: 'No', short_name: 'DISABLED_HCC85', description: 'Disabled x Diabetes', hcc_code: '85', coefficient: 0.103}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # ENROLLMENT INTERACTION FACTORS
+  # =========================================================================
+
+  - name: test_enrollment_interaction_originally_disabled
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_enrollment_interaction_factors
+    description: "Originally disabled non-institutional member gets enrollment interaction"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', gender: 'Male', age_group: '70-74', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', originally_disabled_flag: 'Yes', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__enrollment_interaction_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'Enrollment Interaction', gender: 'Male', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', institutional_status: 'No', description: 'Originally Disabled Male', coefficient: 0.110}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', description: 'Originally Disabled Male', coefficient: 0.110, factor_type: 'Enrollment Interaction', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC COUNT FACTORS
+  # =========================================================================
+
+  - name: test_hcc_count_factors_three_hccs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__int_hcc_count_factors
+    description: "Patient with 3 payment HCCs gets the corresponding count factor"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_hcc_hierarchy')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '17', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '85', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', payer: 'MCR', hcc_code: '111', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__payment_hcc_count_factors')
+        rows:
+          - {model_version: 'CMS-HCC-V24', factor_type: 'HCC Count', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', payment_hcc_count: '3', description: 'HCC Count 3', coefficient: 0.052}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', description: 'HCC Count 3', coefficient: 0.052, factor_type: 'HCC Count', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # PATIENT RISK SCORES MONTHLY
+  # =========================================================================
+
+  - name: test_risk_scores_monthly_aggregates_factor_types
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__patient_risk_scores_monthly
+    description: "Sums risk scores across factor types for same person/period"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_scores_monthly_by_factor_type')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', risk_model_code: 'CNA', enrollment_status: 'Continuing', enrollment_status_default: false, orec_default: false, factor_type: 'Demographic', v24_risk_score: 0.5, v28_risk_score: null, blended_risk_score: 0.5, normalized_risk_score: 0.447, payment_risk_score: 0.421, payment_risk_score_weighted_by_months: 5.052, member_months: 12, payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', risk_model_code: 'CNA', enrollment_status: 'Continuing', enrollment_status_default: false, orec_default: false, factor_type: 'Disease', v24_risk_score: 0.3, v28_risk_score: null, blended_risk_score: 0.3, normalized_risk_score: 0.268, payment_risk_score: 0.252, payment_risk_score_weighted_by_months: 3.024, member_months: 12, payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', risk_model_code: 'CNA', enrollment_status: 'Continuing', enrollment_status_default: false, orec_default: false, v24_risk_score: 0.8, v28_risk_score: null, blended_risk_score: 0.8, normalized_risk_score: 0.715, payment_risk_score: 0.673, payment_risk_score_weighted_by_months: 8.076, member_months: 12, payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # PATIENT RISK SCORES (annual - filters to max collection_end_date)
+  # =========================================================================
+
+  - name: test_risk_scores_filters_to_max_collection_date
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__patient_risk_scores
+    description: "Annual risk scores select only the row with max collection_end_date for the payment year"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        cms_hcc_payment_year: 2023
+    given:
+      - input: ref('cms_hcc__patient_risk_scores_monthly')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', v24_risk_score: 0.3, v28_risk_score: null, blended_risk_score: 0.3, normalized_risk_score: 0.268, payment_risk_score: 0.252, payment_risk_score_weighted_by_months: 3.024, member_months: 12, payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-06-30', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', v24_risk_score: 0.8, v28_risk_score: null, blended_risk_score: 0.8, normalized_risk_score: 0.715, payment_risk_score: 0.673, payment_risk_score_weighted_by_months: 8.076, member_months: 12, payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', v24_risk_score: 0.8, v28_risk_score: null, blended_risk_score: 0.8, normalized_risk_score: 0.715, payment_risk_score: 0.673, payment_risk_score_weighted_by_months: 8.076, member_months: 12, payment_year: 2023, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # PATIENT RISK FACTORS (annual - filters to max collection_end_date)
+  # =========================================================================
+
+  - name: test_risk_factors_filters_to_max_collection_date
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__patient_risk_factors
+    description: "Annual risk factors select only rows with max collection_end_date for the payment year"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        cms_hcc_payment_year: 2023
+    given:
+      - input: ref('cms_hcc__patient_risk_factors_monthly')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', risk_model_code: 'CNA', enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, factor_type: 'Demographic', risk_factor_description: 'Demo factor', coefficient: 0.421, model_version: 'CMS-HCC-V24', payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-06-30', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', enrollment_status: 'Continuing', risk_model_code: 'CNA', enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, factor_type: 'Demographic', risk_factor_description: 'Demo factor', coefficient: 0.421, model_version: 'CMS-HCC-V24', payment_year: 2023, collection_start_date: '2022-01-01', collection_end_date: '2022-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', enrollment_status_default: false, medicaid_dual_status_default: true, orec_default: false, institutional_status_default: true, factor_type: 'Demographic', risk_factor_description: 'Demo factor', coefficient: 0.421, model_version: 'CMS-HCC-V24', payment_year: 2023, tuva_last_run: '2024-01-01 00:00:00'}
+

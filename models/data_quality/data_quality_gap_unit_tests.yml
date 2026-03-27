@@ -1,0 +1,727 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGE MODELS
+  # =========================================================================
+
+  - name: test_eligibility_dq_stage_expands_spans_to_months
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_dq_stage
+    description: >
+      Expands eligibility enrollment spans into monthly rows by
+      joining to a calendar table. A span covering Jan-Mar 2023
+      produces three monthly rows.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-03-31', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, full_date: '2023-01-01'}
+          - {year_month_int: 202301, full_date: '2023-01-31'}
+          - {year_month_int: 202302, full_date: '2023-02-01'}
+          - {year_month_int: 202302, full_date: '2023-02-28'}
+          - {year_month_int: 202303, full_date: '2023-03-01'}
+          - {year_month_int: 202303, full_date: '2023-03-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: 202301, month_start_date: '2023-01-01', month_end_date: '2023-01-31', payer: 'MCR', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', year_month: 202302, month_start_date: '2023-02-01', month_end_date: '2023-02-28', payer: 'MCR', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', year_month: 202303, month_start_date: '2023-03-01', month_end_date: '2023-03-31', payer: 'MCR', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS
+  # =========================================================================
+
+  - name: test_eligibility_missing_person_id_detects_nulls_and_blanks
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_missing_person_id
+    description: >
+      Counts eligibility spans where person_id is null or blank.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', person_id: 'P1'}
+          - {member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', person_id: null}
+          - {member_id: 'M3', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', person_id: ''}
+    expect:
+      rows:
+        - {data_quality_check: 'Missing person_id', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_eligibility_missing_payer_detects_missing
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_missing_payer
+    description: >
+      Detects eligibility spans with missing payer_type, missing
+      payer name, and invalid payer_type values.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', payer_type: 'commercial'}
+          - {member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: null, plan: 'PlanB', payer_type: null}
+          - {member_id: 'M3', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'Aetna', plan: 'PlanC', payer_type: 'INVALID_TYPE'}
+      - input: ref('terminology__payer_type')
+        rows:
+          - {payer_type: 'commercial'}
+    expect:
+      rows:
+        - {data_quality_check: 'Missing payer type', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'Missing payer name', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'Payer type does not join to terminology table', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_person_id_missing_and_orphaned
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_person_id
+    description: >
+      Detects medical claims with missing person_id, multiple
+      person_ids per claim, and orphaned claims without matching
+      eligibility.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', person_id: 'P1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-15'}
+          - {claim_id: 'MC2', person_id: null, claim_start_date: '2023-06-01', claim_end_date: '2023-06-15'}
+          - {claim_id: 'MC3', person_id: 'P99', claim_start_date: '2023-06-01', claim_end_date: '2023-06-15'}
+      - input: ref('data_quality__eligibility_dq_stage')
+        rows:
+          - {person_id: 'P1', month_start_date: '2023-06-01', month_end_date: '2023-06-30'}
+    expect:
+      rows:
+        - {data_quality_check: 'multiple medical_claim person_ids', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing medical_claim person_id', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'orphaned medical_claim claims', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_inst_header_fields_missing_and_invalid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_inst_header_fields
+    description: >
+      Detects missing and invalid bill_type_code, drg_code, and
+      discharge_disposition_code on institutional claims. DRG checks
+      only apply to inpatient claims (joined to inpatient_dq_stage).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_type: 'institutional', bill_type_code: '111', discharge_disposition_code: '01', drg_code: '470', drg_code_type: 'ms-drg'}
+          - {claim_id: 'MC2', claim_type: 'institutional', bill_type_code: null, discharge_disposition_code: null, drg_code: null, drg_code_type: null}
+          - {claim_id: 'MC3', claim_type: 'institutional', bill_type_code: 'INVALID', discharge_disposition_code: 'INVALID', drg_code: 'INVALID', drg_code_type: 'ms-drg'}
+      - input: ref('data_quality__inpatient_dq_stage')
+        rows:
+          - {claim_id: 'MC1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'MC3', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__bill_type')
+        rows:
+          - {bill_type_code: '111'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470', ms_drg_description: 'Major Joint'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+    expect:
+      rows:
+        - {data_quality_check: 'invalid bill_type_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid drg_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid discharge_disposition_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing bill_type_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing drg_code', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing discharge_disposition_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'bill_type_code multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'drg_code multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'discharge_disposition_code multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_chronic_conditions_none_percent
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__chronic_conditions_none
+    description: >
+      Calculates the percentage of patients who do not have any
+      chronic conditions in the CMS chronic conditions model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+          - {person_id: 'P3'}
+          - {person_id: 'P4'}
+      - input: ref('chronic_conditions__cms_chronic_conditions_long')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_measure: 'Percent of patients without chronic conditions', analytics_value: 25.0}
+    expect:
+      rows:
+        - {data_quality_check: 'Percent of patients without chronic conditions', result_count: 50, medicare_lds_reference: 25.0, normally_zero: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_cms_hcc_reference_avg_risk_score
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__cms_hcc_reference
+    description: >
+      Computes the average normalized risk score from CMS-HCC
+      patient risk scores and joins to reference data.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('cms_hcc__patient_risk_scores')
+        rows:
+          - {person_id: 'P1', normalized_risk_score: 1.0}
+          - {person_id: 'P2', normalized_risk_score: 2.0}
+          - {person_id: 'P3', normalized_risk_score: 3.0}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'cms-hcc', analytics_measure: 'normalized risk score', analytics_value: 1.5}
+          - {analytics_concept: 'readmissions', analytics_measure: 'readmission rate', analytics_value: 0.1}
+    expect:
+      rows:
+        - {analytics_concept: 'cms-hcc', analytics_measure: 'normalized risk score', data_source_value: 2.0, analytics_value: 1.5, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_quality_measures_reference_joins_performance_rate
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__quality_measures_reference
+    description: >
+      Joins quality measure performance rates to reference data
+      for comparison.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('quality_measures__summary_counts')
+        rows:
+          - {measure_name: 'Breast Cancer Screening', performance_rate: 0.75}
+          - {measure_name: 'Colorectal Cancer Screening', performance_rate: 0.60}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'quality measures', analytics_measure: 'Breast Cancer Screening', analytics_value: 0.80}
+          - {analytics_concept: 'quality measures', analytics_measure: 'Controlling Blood Pressure', analytics_value: 0.65}
+    expect:
+      rows:
+        - {analytics_concept: 'quality measures', analytics_measure: 'Breast Cancer Screening', data_source_value: 0.75, analytics_value: 0.80, tuva_last_run: '2024-01-01 00:00:00'}
+        - {analytics_concept: 'quality measures', analytics_measure: 'Controlling Blood Pressure', data_source_value: null, analytics_value: 0.65, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_reference_calculates_readmit_rate
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__readmissions_reference
+    description: >
+      Calculates the readmission rate from index admissions and
+      joins to reference data.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('readmissions__readmission_summary')
+        rows:
+          - {encounter_id: 'E1', index_admission_flag: 1, unplanned_readmit_30_flag: 1}
+          - {encounter_id: 'E2', index_admission_flag: 1, unplanned_readmit_30_flag: 0}
+          - {encounter_id: 'E3', index_admission_flag: 1, unplanned_readmit_30_flag: 0}
+          - {encounter_id: 'E4', index_admission_flag: 1, unplanned_readmit_30_flag: 1}
+          - {encounter_id: 'E5', index_admission_flag: 0, unplanned_readmit_30_flag: 0}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'readmissions', analytics_measure: 'readmission rate', analytics_value: 0.15}
+    expect:
+      rows:
+        - {analytics_concept: 'readmissions', analytics_measure: 'readmission rate', data_source_value: 0.5, analytics_value: 0.15, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_acute_inpatient_reference_los_and_mortality
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__acute_inpatient_reference
+    description: >
+      Calculates average length of stay and mortality rate for
+      acute inpatient encounters and joins to reference data.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'acute inpatient', length_of_stay: 4, discharge_disposition_code: '01'}
+          - {encounter_id: 'E2', encounter_type: 'acute inpatient', length_of_stay: 6, discharge_disposition_code: '20'}
+          - {encounter_id: 'E3', encounter_type: 'emergency department', length_of_stay: 0, discharge_disposition_code: '01'}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'acute inpatient', analytics_measure: 'length of stay', analytics_value: 4.5}
+          - {analytics_concept: 'acute inpatient', analytics_measure: 'mortality rate', analytics_value: 0.02}
+    expect:
+      rows:
+        - {analytics_concept: 'acute inpatient', analytics_measure: 'length of stay', data_source_value: 5.0, analytics_value: 4.5, tuva_last_run: '2024-01-01 00:00:00'}
+        - {analytics_concept: 'acute inpatient', analytics_measure: 'mortality rate', data_source_value: 0.5, analytics_value: 0.02, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_encounters_cost_and_utilization_pkpy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__encounters_cost_and_utilization
+    description: >
+      Calculates PKPY (per-thousand-per-year) and paid-per-encounter
+      metrics by encounter type, using member months as the
+      denominator.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P2', year_month: '202301'}
+          - {person_id: 'P1', year_month: '202302'}
+          - {person_id: 'P2', year_month: '202302'}
+          - {person_id: 'P1', year_month: '202303'}
+          - {person_id: 'P2', year_month: '202303'}
+          - {person_id: 'P1', year_month: '202304'}
+          - {person_id: 'P2', year_month: '202304'}
+          - {person_id: 'P1', year_month: '202305'}
+          - {person_id: 'P2', year_month: '202305'}
+          - {person_id: 'P1', year_month: '202306'}
+          - {person_id: 'P2', year_month: '202306'}
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'inpatient', encounter_type: 'acute inpatient', paid_amount: 10000.00}
+          - {encounter_id: 'E2', encounter_group: 'inpatient', encounter_type: 'acute inpatient', paid_amount: 20000.00}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'encounters cost and utilization PKPY', analytics_measure: 'acute inpatient', analytics_value: 100.0}
+          - {analytics_concept: 'encounters cost and utilization paid per', analytics_measure: 'acute inpatient', analytics_value: 12000.0}
+    expect:
+      rows:
+        - {analytics_concept: 'encounters cost and utilization PKPY', encounter_group: 'inpatient', analytics_measure: 'acute inpatient', data_source_value: 2000.0, analytics_value: 100.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {analytics_concept: 'encounters cost and utilization paid per', encounter_group: 'inpatient', analytics_measure: 'acute inpatient', data_source_value: 15000.0, analytics_value: 12000.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_calculates_annual_pmpm
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__financial_pmpm
+    description: >
+      Calculates member months and total PMPM by year from
+      the financial_pmpm prep table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', year_month: '202301', total_paid: 500.00}
+          - {person_id: 'P1', year_month: '202302', total_paid: 300.00}
+          - {person_id: 'P2', year_month: '202301', total_paid: 200.00}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, year: 2023}
+          - {year_month_int: 202302, year: 2023}
+    expect:
+      rows:
+        - {member_months: 3, year_number: 2023}
+
+  - name: test_service_categories_pmpm_calculation
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__service_categories_pmpm
+    description: >
+      Calculates PMPM by service category using total paid and
+      overall member months, joined to reference data.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1', service_category_2: 'Inpatient', paid_amount: 1000.00}
+          - {claim_id: 'MC2', service_category_2: 'Inpatient', paid_amount: 500.00}
+          - {claim_id: 'MC3', service_category_2: 'Office Visit', paid_amount: 200.00}
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+          - {person_id: 'P3'}
+      - input: ref('data_quality__reference_mart_analytics')
+        rows:
+          - {analytics_concept: 'service categories pmpm', analytics_measure: 'Inpatient', analytics_value: 400.0}
+          - {analytics_concept: 'service categories pmpm', analytics_measure: 'Office Visit', analytics_value: 50.0}
+    expect:
+      rows:
+        - {analytics_concept: 'service categories pmpm', analytics_measure: 'Inpatient', data_source_value: 500.0, analytics_value: 400.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {analytics_concept: 'service categories pmpm', analytics_measure: 'Office Visit', data_source_value: 66.66666666666667, analytics_value: 50.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINAL MODELS
+  # =========================================================================
+
+  - name: test_analytics_populated_counts_tables
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__analytics_populated
+    description: >
+      Counts records in each analytics table (chronic conditions,
+      CMS-HCC, service categories, financial PMPM, readmissions,
+      quality measures, acute inpatient, and ED visits).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('chronic_conditions__tuva_chronic_conditions_long')
+        rows:
+          - {person_id: 'P1', condition: 'Diabetes'}
+          - {person_id: 'P2', condition: 'Asthma'}
+      - input: ref('cms_hcc__patient_risk_factors')
+        rows:
+          - {person_id: 'P1', factor_type: 'Demographic'}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'MC1'}
+          - {claim_id: 'MC2'}
+          - {claim_id: 'MC3'}
+      - input: ref('financial_pmpm__pmpm_payer')
+        rows:
+          - {year_month: '202301'}
+      - input: ref('readmissions__readmission_summary')
+        rows:
+          - {encounter_id: 'E1'}
+          - {encounter_id: 'E2'}
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {measure_id: 'M1'}
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'acute inpatient'}
+          - {encounter_id: 'E2', encounter_type: 'emergency department'}
+          - {encounter_id: 'E3', encounter_type: 'emergency department'}
+    expect:
+      rows:
+        - {table_name: 'tuva_chronic_condition_long', record_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'cms_hcc__patient_risk_factors', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'service_category__service_category_grouper', record_count: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'financial_pmpm__pmpm_payer', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'readmissions__readmission_summary', record_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'quality_measures__summary_long', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'acute_inpatient_visits', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'ed_visits', record_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_encounters_cost_and_utilization_trend
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__encounters_cost_and_utilization_trend
+    description: >
+      Calculates PKPY and paid-per-encounter trends by year_month.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P2', year_month: '202301'}
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'inpatient', encounter_type: 'acute inpatient', paid_amount: 10000.00, encounter_start_date: '2023-01-15'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-15', year_month_int: 202301}
+    expect:
+      rows:
+        - {year_month: '202301', encounter_group: 'inpatient', encounter_type: 'acute inpatient', pkpy: 6000.0, paid_per: 10000.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_service_category_pmpm_trend
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__service_category_pmpm_trend
+    description: >
+      Calculates service category PMPM trends by year_month, using
+      member months as the denominator.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P2', year_month: '202301'}
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1', service_category_1: 'Inpatient', service_category_2: 'Acute Inpatient', paid_amount: 1000.00, claim_start_date: '2023-01-15'}
+          - {claim_id: 'MC2', service_category_1: 'Inpatient', service_category_2: 'Acute Inpatient', paid_amount: 500.00, claim_start_date: '2023-01-20'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-15', year_month_int: 202301}
+          - {full_date: '2023-01-20', year_month_int: 202301}
+    expect:
+      rows:
+        - {year_month: '202301', service_category_1: 'Inpatient', service_category_2: 'Acute Inpatient', total_paid: 1500.0, pmpm: 750.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_data_loss_compares_input_to_core
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__data_loss
+    description: >
+      Compares record counts, patient counts, and dollar amounts
+      between input layer and core layer for medical, pharmacy,
+      and eligibility tables.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', person_id: 'P1', paid_amount: 100.00, allowed_amount: 120.00, member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+          - {claim_id: 'MC2', person_id: 'P2', paid_amount: 200.00, allowed_amount: 250.00, member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', person_id: 'P1', paid_amount: 50.00, allowed_amount: 60.00}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+          - {person_id: 'P2', member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+      - input: ref('data_quality__eligibility_dq_stage')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1', person_id: 'P1', paid_amount: 100.00, allowed_amount: 120.00}
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', person_id: 'P1', paid_amount: 50.00, allowed_amount: 60.00}
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+    expect:
+      rows:
+        - {table_name: 'medical_claim', metric: 'Total Unique Patients', input_layer_value: 2, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Unique Claims', input_layer_value: 2, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Records', input_layer_value: 2, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Paid Amount', input_layer_value: 300.0, core_value: 100.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Allowed Amount', input_layer_value: 370.0, core_value: 120.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Unique Patients', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Unique Claims', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Records', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Paid Amount', input_layer_value: 50.0, core_value: 50.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Allowed Amount', input_layer_value: 60.0, core_value: 60.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Unique Patients', input_layer_value: 2, core_value: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Unique Eligibility Spans', input_layer_value: 2, core_value: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Member Months', input_layer_value: 2, core_value: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_data_loss_ignores_duplicate_rows_in_distinct_counts
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__data_loss
+    description: >
+      Duplicate input rows should not inflate distinct patient or
+      span counts, but they should still increase raw record counts.
+      This catches fanout regressions in the count logic.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', person_id: 'P1', paid_amount: 100.00, allowed_amount: 110.00}
+          - {claim_id: 'MC1', person_id: 'P1', paid_amount: 100.00, allowed_amount: 110.00}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', person_id: 'P2', paid_amount: 50.00, allowed_amount: 55.00}
+          - {claim_id: 'RX1', person_id: 'P2', paid_amount: 50.00, allowed_amount: 55.00}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA'}
+      - input: ref('data_quality__eligibility_dq_stage')
+        rows:
+          - {person_id: 'P1'}
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1', person_id: 'P1', paid_amount: 100.00, allowed_amount: 110.00}
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', person_id: 'P2', paid_amount: 50.00, allowed_amount: 55.00}
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1'}
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1'}
+    expect:
+      rows:
+        - {table_name: 'medical_claim', metric: 'Total Unique Patients', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Unique Claims', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Records', input_layer_value: 2, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Paid Amount', input_layer_value: 200.0, core_value: 100.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'medical_claim', metric: 'Total Allowed Amount', input_layer_value: 220.0, core_value: 110.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Unique Patients', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Unique Claims', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Records', input_layer_value: 2, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Paid Amount', input_layer_value: 100.0, core_value: 50.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', metric: 'Total Allowed Amount', input_layer_value: 110.0, core_value: 55.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Unique Patients', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Unique Eligibility Spans', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', metric: 'Total Member Months', input_layer_value: 1, core_value: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_analytics_checks_summary_coalesces_null_results
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__analytics_checks_summary
+    description: >
+      Coalesces null result_count and normally_zero values to stable
+      defaults while preserving non-null analytics checks.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('data_quality__readmissions')
+        rows:
+          - {data_quality_check: 'readmissions rate', result_count: null, normally_zero: null}
+      - input: ref('data_quality__quality_measures')
+        rows:
+          - {data_quality_check: 'quality measure numerator zero', result_count: 2, normally_zero: 0}
+      - input: ref('data_quality__ed_classification')
+        rows:
+          - {data_quality_check: 'ed classification missing pc_treatable', result_count: 1, normally_zero: null}
+    expect:
+      rows:
+        - {data_quality_check: 'readmissions rate', result_count: 0, normally_zero: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'quality measure numerator zero', result_count: 2, normally_zero: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'ed classification missing pc_treatable', result_count: 1, normally_zero: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_analytics_reference_summary_unions_reference_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__analytics_reference_summary
+    description: >
+      Preserves analytics reference rows from multiple source models
+      without altering the measured values.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        enable_legacy_data_quality: true
+        claims_enabled: true
+    given:
+      - input: ref('data_quality__readmissions_reference')
+        rows:
+          - {analytics_concept: 'readmissions', analytics_measure: 'readmission rate', data_source_value: 0.25, analytics_value: 0.15, value_rank: 1}
+      - input: ref('data_quality__quality_measures_reference')
+        rows:
+          - {analytics_concept: 'quality measures', analytics_measure: 'Breast Cancer Screening', data_source_value: 0.75, analytics_value: 0.80, value_rank: 2}
+    expect:
+      rows:
+        - {analytics_concept: 'readmissions', analytics_measure: 'readmission rate', data_source_value: 0.25, analytics_value: 0.15, value_rank: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {analytics_concept: 'quality measures', analytics_measure: 'Breast Cancer Screening', data_source_value: 0.75, analytics_value: 0.8, value_rank: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_data_quality_detail_unions_claims_and_clinical
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__data_quality_detail
+    description: >
+      When both claims and clinical are enabled, the detail model unions
+      both sources, stamping clinical rows with claim_type='CLINICAL'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+    given:
+      - input: ref('data_quality__data_quality_claims_detail')
+        rows:
+          - {data_source: 'src1', source_date: '2023-01-01', table_name: 'eligibility', drill_down_key: 'member_id', drill_down_value: 'M1', claim_type: 'ELIGIBILITY', field_name: 'birth_date', bucket_name: 'valid', invalid_reason: null, field_value: '1960-01-01', summary_sk: 'SK1'}
+      - input: ref('data_quality__data_quality_clinical_detail')
+        rows:
+          - {data_source: 'src2', source_date: '2023-02-01', table_name: 'lab_result', drill_down_key: 'lab_result_id', drill_down_value: 'LR1', field_name: 'result', bucket_name: 'valid', invalid_reason: null, field_value: '200', summary_sk: 'SK200'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'eligibility', claim_type: 'ELIGIBILITY', field_name: 'birth_date', bucket_name: 'valid', drill_down_value: 'M1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_source: 'src2', table_name: 'lab_result', claim_type: 'CLINICAL', field_name: 'result', bucket_name: 'valid', drill_down_value: 'LR1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # DATA QUALITY FOR PBI — Claims-only path
+  # =========================================================================
+
+  - name: test_data_quality_for_pbi_claims_only
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__data_quality_for_pbi
+    description: >
+      In claims-only mode, the PBI model passes through claims PBI data
+      with the original claim_type intact.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('data_quality__data_quality_claims_for_pbi')
+        rows:
+          - {summary_sk: 1, data_source: 'src1', table_name: 'medical_claim', claim_type: 'INSTITUTIONAL', field_name: 'bill_type_code', bucket_name: 'valid', invalid_reason: null, drill_down_key: 'claim_id', drill_down_value: 'MC1', field_value: '111', frequency: 5}
+    expect:
+      rows:
+        - {summary_sk: 1, data_source: 'src1', table_name: 'medical_claim', claim_type: 'INSTITUTIONAL', field_name: 'bill_type_code', bucket_name: 'valid', frequency: 5, tuva_last_run: '2024-01-01 00:00:00'}
+

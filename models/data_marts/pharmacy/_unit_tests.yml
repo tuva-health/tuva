@@ -1,0 +1,323 @@
+version: 2
+
+unit_tests:
+
+  - name: test_pharmacy__stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the staging model passes through pharmacy claim fields
+      and joins NDC terminology for FDA description.
+    model: pharmacy__stg_pharmacy_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - ndc_code: '12345678901'
+            data_source: 'claims_a'
+            paid_amount: 100.00
+            allowed_amount: 120.00
+            claim_id: 'rx_001'
+            claim_line_number: 1
+            person_id: 'patient_1'
+            member_id: 'member_1'
+            prescribing_provider_id: 'prov_1'
+            dispensing_provider_id: 'prov_2'
+            dispensing_date: '2024-01-15'
+            quantity: 30
+            days_supply: 30
+            refills: 2
+            paid_date: '2024-01-20'
+          - ndc_code: '99999999999'
+            data_source: 'claims_a'
+            paid_amount: 50.00
+            allowed_amount: 60.00
+            claim_id: 'rx_002'
+            claim_line_number: 1
+            person_id: 'patient_2'
+            member_id: 'member_2'
+            prescribing_provider_id: 'prov_3'
+            dispensing_provider_id: 'prov_4'
+            dispensing_date: '2024-02-01'
+            quantity: 60
+            days_supply: 60
+            refills: 0
+            paid_date: '2024-02-05'
+      - input: ref('terminology__ndc')
+        rows:
+          - ndc: '12345678901'
+            fda_description: 'Brand Drug 10mg Tablet'
+            rxcui: 'RXCUI_100'
+          - ndc: '99999999999'
+            fda_description: 'Generic Drug 20mg Capsule'
+            rxcui: 'RXCUI_200'
+    expect:
+      rows:
+        - ndc_code: '12345678901'
+          ndc_description: 'Brand Drug 10mg Tablet'
+          data_source: 'claims_a'
+          rxcui: 'RXCUI_100'
+          paid_amount: 100.00
+          allowed_amount: 120.00
+          claim_id: 'rx_001'
+          claim_line_number: 1
+          person_id: 'patient_1'
+          member_id: 'member_1'
+          prescribing_provider_id: 'prov_1'
+          dispensing_provider_id: 'prov_2'
+          dispensing_date: '2024-01-15'
+          quantity: 30
+          days_supply: 30
+          refills: 2
+          paid_date: '2024-01-20'
+        - ndc_code: '99999999999'
+          ndc_description: 'Generic Drug 20mg Capsule'
+          data_source: 'claims_a'
+          rxcui: 'RXCUI_200'
+          paid_amount: 50.00
+          allowed_amount: 60.00
+          claim_id: 'rx_002'
+          claim_line_number: 1
+          person_id: 'patient_2'
+          member_id: 'member_2'
+          prescribing_provider_id: 'prov_3'
+          dispensing_provider_id: 'prov_4'
+          dispensing_date: '2024-02-01'
+          quantity: 60
+          days_supply: 60
+          refills: 0
+          paid_date: '2024-02-05'
+
+  - name: test_pharmacy__stg_pharmacy_claim_ndc_not_found
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify staging handles claims where NDC code has no matching
+      terminology entry, yielding null description and rxcui.
+    model: pharmacy__stg_pharmacy_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - ndc_code: '00000000000'
+            data_source: 'claims_a'
+            paid_amount: 25.00
+            allowed_amount: 30.00
+            claim_id: 'rx_003'
+            claim_line_number: 1
+            person_id: 'patient_3'
+            member_id: 'member_3'
+            prescribing_provider_id: 'prov_5'
+            dispensing_provider_id: 'prov_6'
+            dispensing_date: '2024-03-01'
+            quantity: 10
+            days_supply: 10
+            refills: 0
+            paid_date: '2024-03-05'
+      - input: ref('terminology__ndc')
+        rows: []
+    expect:
+      rows:
+        - ndc_code: '00000000000'
+          ndc_description: null
+          data_source: 'claims_a'
+          rxcui: null
+          paid_amount: 25.00
+          allowed_amount: 30.00
+          claim_id: 'rx_003'
+          claim_line_number: 1
+          person_id: 'patient_3'
+          member_id: 'member_3'
+          prescribing_provider_id: 'prov_5'
+          dispensing_provider_id: 'prov_6'
+          dispensing_date: '2024-03-01'
+          quantity: 10
+          days_supply: 10
+          refills: 0
+          paid_date: '2024-03-05'
+
+  - name: test_pharmacy__int_brand_with_generic_available_basic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the intermediate model correctly identifies brand drugs
+      that have a generic available based on SCD/GPCK TTY and
+      marketing date in the past.
+    model: pharmacy__int_brand_with_generic_available
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__rxnorm_generic_available')
+        rows:
+          - product_rxcui: 'RXCUI_100'
+            ndc: '55555555555'
+            ndc_product_tty: 'SCD'
+            product_startmarketingdate: '2020-01-01'
+          - product_rxcui: 'RXCUI_200'
+            ndc: '66666666666'
+            ndc_product_tty: 'GPCK'
+            product_startmarketingdate: '2023-06-01'
+          - product_rxcui: 'RXCUI_300'
+            ndc: '77777777777'
+            ndc_product_tty: 'SBD'
+            product_startmarketingdate: '2020-01-01'
+    expect:
+      rows:
+        - brand_with_generic_available: 'RXCUI_100'
+        - brand_with_generic_available: 'RXCUI_200'
+
+  - name: test_pharmacy__int_brand_with_generic_available_future_date
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify that generics with a future marketing date are excluded.
+    model: pharmacy__int_brand_with_generic_available
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__rxnorm_generic_available')
+        rows:
+          - product_rxcui: 'RXCUI_400'
+            ndc: '88888888888'
+            ndc_product_tty: 'SCD'
+            product_startmarketingdate: '2099-01-01'
+    expect:
+      rows: []
+
+  - name: test_pharmacy__int_generic_cost_by_ndc_basic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the generic cost by NDC model correctly joins generic
+      available data with claims current cost for generic drugs.
+    model: pharmacy__int_generic_cost_by_ndc
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__rxnorm_generic_available')
+        rows:
+          - product_rxcui: 'RXCUI_100'
+            ndc: '55555555555'
+      - input: ref('pharmacy__int_claims_current_cost')
+        rows:
+          - ndc_code: '55555555555'
+            ndc_description: 'Generic Drug 10mg'
+            data_source: 'claims_a'
+            rxcui: 'RXCUI_GEN'
+            brand_vs_generic: 'generic'
+            generic_available: null
+            paid_amount: 300.00
+            claim_count: 3
+            cost_per_claim: 100.00
+            total_units: 90
+            cost_per_unit: 3.33
+            tuva_last_run: '2024-01-01 00:00:00'
+    expect:
+      rows:
+        - brand_rxcui: 'RXCUI_100'
+          data_source: 'claims_a'
+          generic_ndc_code: '55555555555'
+          paid_amount: 300.00
+          claim_count: 3
+          total_units: 90
+          cost_per_unit: 3.33
+          prescribed_atleast_one_generic_history: 1
+
+  - name: test_pharmacy__int_generic_cost_by_ndc_no_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify that a generic NDC with zero claims gets
+      prescribed_atleast_one_generic_history = 0.
+    model: pharmacy__int_generic_cost_by_ndc
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__rxnorm_generic_available')
+        rows:
+          - product_rxcui: 'RXCUI_200'
+            ndc: '66666666666'
+      - input: ref('pharmacy__int_claims_current_cost')
+        rows:
+          - ndc_code: '66666666666'
+            ndc_description: 'Generic Drug 20mg'
+            data_source: 'claims_a'
+            rxcui: 'RXCUI_GEN2'
+            brand_vs_generic: 'generic'
+            generic_available: null
+            paid_amount: 0.00
+            claim_count: 0
+            cost_per_claim: 0.00
+            total_units: 0
+            cost_per_unit: null
+            tuva_last_run: '2024-01-01 00:00:00'
+    expect:
+      rows:
+        - brand_rxcui: 'RXCUI_200'
+          data_source: 'claims_a'
+          generic_ndc_code: '66666666666'
+          paid_amount: 0.00
+          claim_count: 0
+          total_units: 0
+          cost_per_unit: null
+          prescribed_atleast_one_generic_history: 0
+
+  - name: test_pharmacy__int_generic_cost_aggregation
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the generic cost model aggregates across multiple NDCs
+      for the same brand rxcui and computes weighted average cost.
+    model: pharmacy__int_generic_cost
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__rxnorm_generic_available')
+        rows:
+          - product_rxcui: 'RXCUI_100'
+            ndc: '55555555555'
+          - product_rxcui: 'RXCUI_100'
+            ndc: '66666666666'
+      - input: ref('pharmacy__int_claims_current_cost')
+        rows:
+          - ndc_code: '55555555555'
+            ndc_description: 'Generic A'
+            data_source: 'claims_a'
+            rxcui: 'RXCUI_GEN_A'
+            brand_vs_generic: 'generic'
+            generic_available: null
+            paid_amount: 200.00
+            claim_count: 2
+            cost_per_claim: 100.00
+            total_units: 100
+            cost_per_unit: 2.00
+            tuva_last_run: '2024-01-01 00:00:00'
+          - ndc_code: '66666666666'
+            ndc_description: 'Generic B'
+            data_source: 'claims_a'
+            rxcui: 'RXCUI_GEN_B'
+            brand_vs_generic: 'generic'
+            generic_available: null
+            paid_amount: 300.00
+            claim_count: 3
+            cost_per_claim: 100.00
+            total_units: 100
+            cost_per_unit: 3.00
+            tuva_last_run: '2024-01-01 00:00:00'
+    expect:
+      rows:
+        - brand_rxcui: 'RXCUI_100'
+          data_source: 'claims_a'
+          prescribed_atleast_one_generic_history: 1
+          generic_average_cost_per_unit: 2.50
+
+

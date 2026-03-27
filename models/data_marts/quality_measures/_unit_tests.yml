@@ -1,0 +1,171 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_counts
+  # =========================================================================
+
+  - name: test_quality_measures_summary_counts_aggregates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_counts
+    description: "Summary counts aggregates denominator, numerator, exclusion sums and computes performance rate per measure"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: '2023-06-15', evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, performance_flag: 0, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P3', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 1, performance_flag: null, evidence_date: null, evidence_value: null, exclusion_date: '2023-03-01', exclusion_reason: 'Hospice', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', denominator_sum: 3, numerator_sum: 1, exclusion_sum: 1, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_wide
+  # =========================================================================
+
+  - name: test_quality_measures_summary_wide_pivots_measures
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_wide
+    description: "Summary wide pivots each measure_id into a column per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, performance_flag: 0, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', cqm_438: 1, cqm_130: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__patient
+  # =========================================================================
+
+  - name: test_quality_measures_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__patient
+    description: "Patient staging passes through key demographics"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_counts - multiple measures
+  # =========================================================================
+
+  - name: test_quality_measures_summary_counts_multiple_measures
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_counts
+    description: "Summary counts produces separate rows for different measures"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: '2023-06-15', evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: '2023-07-01', evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', denominator_sum: 1, numerator_sum: 1, exclusion_sum: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', denominator_sum: 1, numerator_sum: 1, exclusion_sum: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_counts - null measure_id filtered
+  # =========================================================================
+
+  - name: test_quality_measures_summary_counts_filters_null_measure_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_counts
+    description: "Summary counts filters out rows where measure_id is null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: null, numerator_flag: null, exclusion_flag: null, performance_flag: null, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: null, performance_period_end: null, measure_id: null, measure_name: null, measure_version: null, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: '2023-06-15', evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0420', measure_name: 'Pain Assessment', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {measure_id: 'NQF0420', measure_name: 'Pain Assessment', denominator_sum: 1, numerator_sum: 1, exclusion_sum: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_wide - exclusion nulls performance
+  # =========================================================================
+
+  - name: test_quality_measures_summary_wide_exclusion_nullifies_performance
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_wide
+    description: "Summary wide shows null performance_flag for excluded patients"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 1, performance_flag: null, evidence_date: null, evidence_value: null, exclusion_date: '2023-03-01', exclusion_reason: 'Hospice', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence Diabetes', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', adh_diabetes: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - FINAL: summary_wide - multiple patients
+  # =========================================================================
+
+  - name: test_quality_measures_summary_wide_multiple_patients
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__summary_wide
+    description: "Summary wide produces one row per patient with all measure columns"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, performance_flag: 1, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, performance_flag: 0, evidence_date: null, evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', supd: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', supd: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__patient - deceased patient
+  # =========================================================================
+
+  - name: test_quality_measures_stg_patient_with_death_date
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__patient
+    description: "Patient staging passes through death_date for deceased patients"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1950-03-15', death_date: '2023-09-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'male', birth_date: '1950-03-15', death_date: '2023-09-01', tuva_last_run: '2024-01-01 00:00:00'}

@@ -1,0 +1,1924 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING MODELS
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # encounters__stg_medical_claim
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_stg_medical_claim_joins_service_category
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_medical_claim
+    description: >
+      Joins medical claims to service category grouper and patient_data_source_id,
+      producing enriched claim lines with service category and patient identifiers.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', admission_date: null, discharge_date: null, claim_start_date: '2023-01-01', claim_end_date: '2023-01-01', claim_line_start_date: '2023-01-01', claim_line_end_date: '2023-01-01', bill_type_code: null, hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, drg_code_type: null, drg_code: null, admit_source_code: null, admit_type_code: null, place_of_service_code: '11', revenue_center_code: null, diagnosis_code_type: 'icd-10-cm', diagnosis_code_1: 'J06.9', billing_npi: 'NPI1', rendering_npi: 'NPI2', facility_npi: 'NPI3', discharge_disposition_code: null, paid_amount: 100.00, charge_amount: 150.00, allowed_amount: 120.00, data_source: 'src1'}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, duplicate_row_number: 1, service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit', data_source: 'src1'}
+      - input: ref('encounters__patient_data_source_id')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', patient_data_source_id: 1}
+      - input: ref('ccsr__dxccsr_v2023_1_cleaned_map')
+        rows: []
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__nitos')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__revenue_center')
+        rows: []
+      - input: ref('terminology__place_of_service')
+        rows: []
+      - input: ref('terminology__bill_type')
+        rows: []
+      - input: ref('terminology__ccs_services_procedures')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', patient_data_source_id: 1, claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit', paid_amount: 100.00, data_source: 'src1'}
+
+  - name: test_gap_stg_medical_claim_ignores_lower_priority_service_category_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_medical_claim
+    description: >
+      The join to service_category__service_category_grouper should only keep
+      duplicate_row_number = 1 so a single claim line does not fan out.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', admission_date: null, discharge_date: null, claim_start_date: '2023-01-01', claim_end_date: '2023-01-01', claim_line_start_date: '2023-01-01', claim_line_end_date: '2023-01-01', bill_type_code: null, hcpcs_code: '99213', drg_code_type: null, drg_code: null, admit_source_code: null, admit_type_code: null, place_of_service_code: '11', revenue_center_code: null, diagnosis_code_type: 'icd-10-cm', diagnosis_code_1: 'J06.9', billing_npi: 'NPI1', rendering_npi: 'NPI2', facility_npi: 'NPI3', discharge_disposition_code: null, paid_amount: 100.00, charge_amount: 150.00, allowed_amount: 120.00, data_source: 'src1'}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 1, service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit'}
+          - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 2, service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department'}
+      - input: ref('encounters__patient_data_source_id')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', patient_data_source_id: 1}
+      - input: ref('ccsr__dxccsr_v2023_1_cleaned_map')
+        rows: []
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__nitos')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__revenue_center')
+        rows: []
+      - input: ref('terminology__place_of_service')
+        rows: []
+      - input: ref('terminology__bill_type')
+        rows: []
+      - input: ref('terminology__ccs_services_procedures')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', patient_data_source_id: 1, claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit', paid_amount: 100.00, data_source: 'src1'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Prof Claims (inpatient types)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # acute_inpatient__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_acute_inpatient_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: acute_inpatient__prof_claims
+    description: >
+      Matches professional claims to acute inpatient encounters by date overlap,
+      assigning claim_attribution_number to prevent duplicate attribution.
+    given:
+      - input: ref('acute_inpatient__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('acute_inpatient__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-05'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-02', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-05', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_hospice__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_hospice_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_hospice__prof_claims
+    description: >
+      Matches professional claims to inpatient hospice encounters by date overlap.
+    given:
+      - input: ref('inpatient_hospice__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_hospice__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-02-01', encounter_end_date: '2023-02-10'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-02-03', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-02-01', encounter_end_date: '2023-02-10', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_psych__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_psych_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_psych__prof_claims
+    description: >
+      Matches professional claims to inpatient psych encounters by date overlap.
+    given:
+      - input: ref('inpatient_psych__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_psych__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-03-01', encounter_end_date: '2023-03-14'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-03-05', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-03-01', encounter_end_date: '2023-03-14', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_rehab__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_rehab_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_rehab__prof_claims
+    description: >
+      Matches professional claims to inpatient rehab encounters by date overlap.
+    given:
+      - input: ref('inpatient_rehab__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_rehab__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-04-01', encounter_end_date: '2023-04-20'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-04-10', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-04-01', encounter_end_date: '2023-04-20', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_long_term__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_long_term_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_long_term__prof_claims
+    description: >
+      Matches professional claims to inpatient long term encounters by date overlap.
+    given:
+      - input: ref('inpatient_long_term__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_long_term__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-05-01', encounter_end_date: '2023-05-30'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-05-15', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-05-01', encounter_end_date: '2023-05-30', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_snf__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_snf_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_snf__prof_claims
+    description: >
+      Matches professional claims to inpatient SNF encounters by date overlap.
+    given:
+      - input: ref('inpatient_snf__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_snf__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-21'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-06-10', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-21', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # -------------------------------------------------------------------------
+  # inpatient_substance_use__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_substance_use_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_substance_use__prof_claims
+    description: >
+      Matches professional claims to inpatient substance use encounters by date overlap.
+    given:
+      - input: ref('inpatient_substance_use__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, encounter_claim_number: 1}
+      - input: ref('inpatient_substance_use__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-14'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-07-05', data_source: 'src1'}
+      - input: ref('encounters__prof_and_lower_priority')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-14', claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Emergency Department
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # emergency_department__generate_encounter_id_pre_sort
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_ed_generate_encounter_id_pre_sort
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: emergency_department__generate_encounter_id_pre_sort
+    description: >
+      Groups ED claims into encounters by merging overlapping claims at the
+      same facility for the same patient, producing encounter_id assignments.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ED1', patient_data_source_id: 1, start_date: '2023-01-01', end_date: '2023-01-01', service_category_2: 'emergency department', facility_npi: 'NPI1', discharge_disposition_code: null, claim_type: 'institutional'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, claim_id: 'ED1', start_date: '2023-01-01', end_date: '2023-01-01', close_flag: 1}
+
+  # -------------------------------------------------------------------------
+  # emergency_department__generate_encounter_id
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_ed_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: emergency_department__generate_encounter_id
+    description: >
+      Assigns dense_rank encounter_id and claim ordering within each encounter
+      from the pre-sorted ED claims.
+    given:
+      - input: ref('emergency_department__generate_encounter_id_pre_sort')
+        rows:
+          - {patient_data_source_id: 1, claim_id: 'ED1', start_date: '2023-01-01', end_date: '2023-01-01', discharge_disposition_code: null, facility_npi: 'NPI1', row_num: 1, close_flag: 1, min_closing_row: 1, encounter_id: 'ED1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, claim_id: 'ED1', start_date: '2023-01-01', end_date: '2023-01-01', encounter_claim_number: 1, encounter_id: 1, original_anchor_claim: 'ED1'}
+
+  # -------------------------------------------------------------------------
+  # emergency_department__prof_claims
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_ed_prof_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: emergency_department__prof_claims
+    description: >
+      Matches professional and outpatient institutional claims to ED encounters
+      by date overlap, producing claim_attribution_number to avoid duplicates.
+    given:
+      - input: ref('emergency_department__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, patient_data_source_id: 1, claim_id: 'ED_INST1', encounter_claim_number: 1, start_date: '2023-01-01', end_date: '2023-01-01'}
+      - input: ref('emergency_department__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, claim_line_id: 'PROF1|1', patient_data_source_id: 1, start_date: '2023-01-01', data_source: 'src1'}
+      - input: ref('encounters__stg_professional')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, claim_line_id: 'PROF1|1', data_source: 'src1'}
+      - input: ref('encounters__stg_outpatient_institutional')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, claim_id: 'PROF1', claim_line_number: 1, claim_attribution_number: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - ASC Start/End Dates
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # asc__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_asc_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: asc__start_end_dates
+    description: >
+      Computes encounter start (min) and end (max) dates for ASC encounters
+      grouped by patient_data_source_id and old_encounter_id.
+    given:
+      - input: ref('asc__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, old_encounter_id: 1, start_date: '2023-01-10', end_date: '2023-01-10'}
+          - {patient_data_source_id: 1, old_encounter_id: 1, start_date: '2023-01-10', end_date: '2023-01-11'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, old_encounter_id: 1, encounter_start_date: '2023-01-10', encounter_end_date: '2023-01-11'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Institutional Claim Lines
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # encounters__int_institutional_claim_lines
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_int_institutional_claim_lines
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__int_institutional_claim_lines
+    description: >
+      Unions institutional encounter types (acute inpatient, ED, hospice, etc.)
+      with their claim_line_number from stg_medical_claim.
+    given:
+      - input: ref('acute_inpatient__generate_encounter_id')
+        rows:
+          - {claim_id: 'INST1', encounter_id: 1}
+      - input: ref('emergency_department__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_hospice__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_psych__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_rehab__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_long_term__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_snf__generate_encounter_id')
+        rows: []
+      - input: ref('inpatient_substance_use__generate_encounter_id')
+        rows: []
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'INST1', claim_line_number: 1}
+    expect:
+      rows:
+        - {claim_id: 'INST1', claim_line_number: 1, encounter_id: 1, encounter_type: 'acute inpatient', encounter_group: 'inpatient', priority_number: 0}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Combined Claim Line Crosswalk
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # encounters__combined_claim_line_crosswalk
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_combined_claim_line_crosswalk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__combined_claim_line_crosswalk
+    description: >
+      Unions all encounter type crosswalks and assigns new encounter_id via
+      dense_rank, plus claim_line_attribution_number for deduplication.
+    given:
+      - input: ref('acute_inpatient__prof_claims')
+        rows: []
+      - input: ref('emergency_department__prof_claims')
+        rows: []
+      - input: ref('inpatient_psych__prof_claims')
+        rows: []
+      - input: ref('inpatient_rehab__prof_claims')
+        rows: []
+      - input: ref('inpatient_long_term__prof_claims')
+        rows: []
+      - input: ref('inpatient_snf__prof_claims')
+        rows: []
+      - input: ref('inpatient_substance_use__prof_claims')
+        rows: []
+      - input: ref('office_visits__int_office_visits_claim_line')
+        rows: []
+      - input: ref('urgent_care__match_claims_to_anchor')
+        rows:
+          - {claim_id: 'UC1', claim_line_number: 1, old_encounter_id: 1}
+      - input: ref('outpatient_psych__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_rehab__match_claims_to_anchor')
+        rows: []
+      - input: ref('asc__match_claims_to_anchor')
+        rows: []
+      - input: ref('dialysis__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospice__match_claims_to_anchor')
+        rows: []
+      - input: ref('home_health__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_surgery__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_injections__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_ptotst__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_substance_use__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_radiology__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospital_or_clinic__match_claims_to_anchor')
+        rows: []
+      - input: ref('encounters__int_institutional_claim_lines')
+        rows: []
+      - input: ref('lab__match_claims_to_anchor')
+        rows: []
+      - input: ref('dme__match_claims_to_anchor')
+        rows: []
+      - input: ref('ambulance__match_claims_to_anchor')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'UC1', claim_line_number: 1, encounter_type: 'urgent care', encounter_group: 'outpatient', priority_number: 9, claim_line_attribution_number: 1}
+
+  - name: test_gap_combined_claim_line_crosswalk_prioritizes_lower_priority_claim_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__combined_claim_line_crosswalk
+    description: >
+      If the same claim line appears in multiple encounter sources, the
+      lower priority_number should receive claim_line_attribution_number = 1.
+    given:
+      - input: ref('acute_inpatient__prof_claims')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, encounter_id: 10, claim_attribution_number: 1}
+      - input: ref('emergency_department__prof_claims')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, encounter_id: 20, claim_attribution_number: 1}
+      - input: ref('inpatient_psych__prof_claims')
+        rows: []
+      - input: ref('inpatient_rehab__prof_claims')
+        rows: []
+      - input: ref('inpatient_long_term__prof_claims')
+        rows: []
+      - input: ref('inpatient_snf__prof_claims')
+        rows: []
+      - input: ref('inpatient_substance_use__prof_claims')
+        rows: []
+      - input: ref('office_visits__int_office_visits_claim_line')
+        rows: []
+      - input: ref('urgent_care__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_psych__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_rehab__match_claims_to_anchor')
+        rows: []
+      - input: ref('asc__match_claims_to_anchor')
+        rows: []
+      - input: ref('dialysis__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospice__match_claims_to_anchor')
+        rows: []
+      - input: ref('home_health__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_surgery__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_injections__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_ptotst__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_substance_use__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_radiology__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospital_or_clinic__match_claims_to_anchor')
+        rows: []
+      - input: ref('encounters__int_institutional_claim_lines')
+        rows: []
+      - input: ref('lab__match_claims_to_anchor')
+        rows: []
+      - input: ref('dme__match_claims_to_anchor')
+        rows: []
+      - input: ref('ambulance__match_claims_to_anchor')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, old_encounter_id: 10, encounter_id: 1, encounter_type: 'acute inpatient', encounter_group: 'inpatient', priority_number: 0, claim_line_attribution_number: 1}
+        - {claim_id: 'C1', claim_line_number: 1, old_encounter_id: 10, encounter_id: 2, encounter_type: 'emergency department', encounter_group: 'outpatient', priority_number: 1, claim_line_attribution_number: 2}
+        - {claim_id: 'C1', claim_line_number: 1, old_encounter_id: 20, encounter_id: 3, encounter_type: 'emergency department', encounter_group: 'outpatient', priority_number: 1, claim_line_attribution_number: 3}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Office Visits
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_int_office_visits
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits
+    description: >
+      Identifies office-based claims from the professional service category
+      and assigns an old_encounter_id via dense_rank by patient + date.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-15', service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit'}
+      - input: ref('service_category__combined_professional')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, service_category_1: 'office-based'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based visit', service_category_3: 'office-based visit', old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_em
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_em
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_em
+    description: >
+      Filters office visits to those with service_category_2 = 'office-based visit'.
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV2', claim_line_number: 1, service_category_2: 'office-based surgery', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_surgery
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_surgery
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_surgery
+    description: >
+      Filters office visits to those with service_category_2 = 'office-based surgery'.
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based surgery', old_encounter_id: 1}
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV2', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_ptotst
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_ptotst
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_ptotst
+    description: >
+      Filters office visits to those with service_category_2 = 'office-based pt/ot/st'.
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based pt/ot/st', old_encounter_id: 1}
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV2', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_telehealth
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_telehealth
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_telehealth
+    description: >
+      Filters office visits to those with service_category_2 = 'telehealth visit'.
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'telehealth visit', old_encounter_id: 1}
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV2', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_injections
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_injections
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_injections
+    description: >
+      Filters office visits to those with HCPCS codes starting with 'J' (injections).
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, hcpcs_code: 'J1234'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_radiology
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_radiology
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_radiology
+    description: >
+      Identifies radiology claims within office visits by joining to the
+      service_category radiology model, assigning new encounter IDs.
+    given:
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'RAD1', claim_line_number: 1, service_category_2: 'office-based visit', old_encounter_id: 1}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'RAD1', claim_line_number: 1, hcpcs_code: '71046'}
+      - input: ref('service_category__office_based_radiology')
+        rows:
+          - {claim_id: 'RAD1', claim_line_number: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-15', claim_id: 'RAD1', claim_line_number: 1, hcpcs_code: '71046'}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_union
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_union
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_union
+    description: >
+      Unions all office visit subtypes (radiology, surgery, injections, pt/ot/st,
+      E/M, telehealth, other) with assigned encounter_type and priority_number.
+    given:
+      - input: ref('office_visits__int_office_visits_radiology')
+        rows: []
+      - input: ref('office_visits__int_office_visits_surgery')
+        rows: []
+      - input: ref('office_visits__int_office_visits_injections')
+        rows: []
+      - input: ref('office_visits__int_office_visits_ptotst')
+        rows: []
+      - input: ref('office_visits__int_office_visits_em')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+      - input: ref('office_visits__int_office_visits_telehealth')
+        rows: []
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1}
+    expect:
+      rows:
+        - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit', priority_number: 4}
+        - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit - other', priority_number: 9999}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_encounter_ranking
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_encounter_ranking
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_encounter_ranking
+    description: >
+      Ranks encounter types within each old_encounter_id by priority_number,
+      so the highest priority type (lowest number) gets relative_rank = 1.
+    given:
+      - input: ref('office_visits__int_office_visits_union')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit', priority_number: 4}
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit - other', priority_number: 9999}
+    expect:
+      rows:
+        - {old_encounter_id: 1, encounter_type: 'office visit', priority_number: 4, relative_rank: 1}
+        - {old_encounter_id: 1, encounter_type: 'office visit - other', priority_number: 9999, relative_rank: 2}
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_office_visits_claim_line
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_claim_line
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_office_visits_claim_line
+    description: >
+      Assigns the winning encounter_type (relative_rank=1) to each claim line
+      in the office visits union.
+    given:
+      - input: ref('office_visits__int_office_visits_union')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit', priority_number: 4}
+          - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit - other', priority_number: 9999}
+      - input: ref('office_visits__int_office_visits_encounter_ranking')
+        rows:
+          - {old_encounter_id: 1, encounter_type: 'office visit', relative_rank: 1}
+          - {old_encounter_id: 1, encounter_type: 'office visit - other', relative_rank: 2}
+    expect:
+      rows:
+        - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit'}
+        - {claim_id: 'OV1', claim_line_number: 1, old_encounter_id: 1, encounter_type: 'office visit'}
+
+  # =========================================================================
+  # FINAL MODELS - Encounter Grain
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # acute_inpatient__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_acute_inpatient_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: acute_inpatient__encounter_grain
+    description: >
+      Produces one row per acute inpatient encounter with demographics,
+      diagnosis, cost totals, and service category flags.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-01-01', end_date: '2023-01-05', diagnosis_code_1: 'J18.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '193', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 5000.00, allowed_amount: 4500.00, charge_amount: 8000.00, service_category_3: 'medical', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'acute inpatient', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('acute_inpatient__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-05'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1960-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, service_category_2: 'acute inpatient'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'acute inpatient', encounter_group: 'inpatient', total_paid_amount: 5000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # emergency_department__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_ed_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: emergency_department__encounter_grain
+    description: >
+      Produces one row per ED encounter with demographics, costs, and flags.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ED1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-01-01', end_date: '2023-01-01', diagnosis_code_1: 'R10.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: null, drg_code: null, admit_source_code: '7', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 2000.00, allowed_amount: 1800.00, charge_amount: 3500.00, service_category_3: 'emergency department', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'ED1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'emergency department', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('emergency_department__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-01'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1960-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'ED1', claim_line_number: 1, service_category_2: 'emergency department'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'emergency department', encounter_group: 'outpatient', total_paid_amount: 2000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_hospice__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_hospice_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_hospice__encounter_grain
+    description: >
+      Produces one row per inpatient hospice encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'HOS1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-02-01', end_date: '2023-02-10', diagnosis_code_1: 'C34.90', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: null, drg_code: null, admit_source_code: '1', admit_type_code: '3', discharge_disposition_code: '40', paid_amount: 8000.00, allowed_amount: 7500.00, charge_amount: 12000.00, service_category_3: 'inpatient hospice', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'HOS1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient hospice', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_hospice__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-02-01', encounter_end_date: '2023-02-10'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1940-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'HOS1', claim_line_number: 1, service_category_2: 'inpatient hospice'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient hospice', encounter_group: 'inpatient', total_paid_amount: 8000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_psych__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_psych_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_psych__encounter_grain
+    description: >
+      Produces one row per inpatient psych encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PSY1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-03-01', end_date: '2023-03-14', diagnosis_code_1: 'F32.1', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '885', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 9000.00, allowed_amount: 8500.00, charge_amount: 15000.00, service_category_3: 'inpatient psych', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'PSY1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient psych', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_psych__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-03-01', encounter_end_date: '2023-03-14'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1980-01-01', gender: 'female', race: 'black', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'PSY1', claim_line_number: 1, service_category_2: 'inpatient psych'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient psych', encounter_group: 'inpatient', total_paid_amount: 9000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_rehab__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_rehab_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_rehab__encounter_grain
+    description: >
+      Produces one row per inpatient rehab encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'REH1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-04-01', end_date: '2023-04-20', diagnosis_code_1: 'I63.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '945', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 12000.00, allowed_amount: 11000.00, charge_amount: 18000.00, service_category_3: 'inpatient rehab', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'REH1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient rehabilitation', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_rehab__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-04-01', encounter_end_date: '2023-04-20'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1955-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'REH1', claim_line_number: 1, service_category_2: 'inpatient rehabilitation'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient rehabilitation', encounter_group: 'inpatient', total_paid_amount: 12000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_long_term__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_long_term_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_long_term__encounter_grain
+    description: >
+      Produces one row per inpatient long term acute care encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'LT1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-05-01', end_date: '2023-05-30', diagnosis_code_1: 'J96.10', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '207', admit_source_code: '4', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 25000.00, allowed_amount: 24000.00, charge_amount: 40000.00, service_category_3: 'inpatient long term', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'LT1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient long term acute care', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_long_term__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-05-01', encounter_end_date: '2023-05-30'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1950-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'LT1', claim_line_number: 1, service_category_2: 'inpatient long term'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient long term acute care', encounter_group: 'inpatient', total_paid_amount: 25000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_snf__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_snf_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_snf__encounter_grain
+    description: >
+      Produces one row per inpatient skilled nursing facility encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'SNF1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-06-01', end_date: '2023-06-21', diagnosis_code_1: 'S72.001A', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '536', admit_source_code: '4', admit_type_code: '3', discharge_disposition_code: '01', paid_amount: 15000.00, allowed_amount: 14000.00, charge_amount: 22000.00, service_category_3: 'inpatient snf', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'SNF1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient skilled nursing', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_snf__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-21'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1945-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'SNF1', claim_line_number: 1, service_category_2: 'inpatient snf'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient skilled nursing', encounter_group: 'inpatient', total_paid_amount: 15000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_substance_use__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_inpatient_substance_use_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_substance_use__encounter_grain
+    description: >
+      Produces one row per inpatient substance use encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'SU1', claim_line_number: 1, claim_type: 'institutional', patient_data_source_id: 1, start_date: '2023-07-01', end_date: '2023-07-14', diagnosis_code_1: 'F10.239', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '896', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', paid_amount: 7000.00, allowed_amount: 6500.00, charge_amount: 11000.00, service_category_3: 'inpatient substance use', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'SU1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'inpatient substance use', encounter_group: 'inpatient', claim_line_attribution_number: 1}
+      - input: ref('inpatient_substance_use__start_end_dates')
+        rows:
+          - {encounter_id: 1, encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-14'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1985-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'SU1', claim_line_number: 1, service_category_2: 'inpatient substance use'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__discharge_disposition')
+        rows: []
+      - input: ref('terminology__admit_source')
+        rows: []
+      - input: ref('terminology__admit_type')
+        rows: []
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'inpatient substance use', encounter_group: 'inpatient', total_paid_amount: 7000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # ambulance__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_ambulance_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ambulance__encounter_grain
+    description: >
+      Produces one row per orphaned ambulance encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ambulance__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-01-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'AMB1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-01-01', end_date: '2023-01-01', diagnosis_code_1: 'R06.9', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '41', place_of_service_description: 'Ambulance - Land', paid_amount: 800.00, allowed_amount: 700.00, charge_amount: 1200.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'AMB1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'ambulance - orphaned', encounter_group: 'other', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1970-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'AMB1', claim_line_number: 1, service_category_2: 'ambulance'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'ambulance - orphaned', encounter_group: 'other', total_paid_amount: 800.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # asc__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_asc_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: asc__encounter_grain
+    description: >
+      Produces one row per ambulatory surgery center encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('asc__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-01-10'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ASC1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-01-10', end_date: '2023-01-10', diagnosis_code_1: 'M17.11', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', place_of_service_code: '24', place_of_service_description: 'ASC', paid_amount: 3000.00, allowed_amount: 2800.00, charge_amount: 5000.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'ASC1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'ambulatory surgery center', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1965-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'ASC1', claim_line_number: 1, service_category_2: 'ambulatory surgery center'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('asc__start_end_dates')
+        rows:
+          - {patient_data_source_id: 1, old_encounter_id: 1, encounter_start_date: '2023-01-10', encounter_end_date: '2023-01-10'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'ambulatory surgery center', encounter_group: 'outpatient', total_paid_amount: 3000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # dialysis__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_dialysis_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dialysis__encounter_grain
+    description: >
+      Produces one row per dialysis encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('dialysis__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-01-05'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DIA1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-01-05', end_date: '2023-01-05', diagnosis_code_1: 'N18.6', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', paid_amount: 500.00, allowed_amount: 450.00, charge_amount: 800.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'DIA1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'dialysis', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1960-01-01', gender: 'male', race: 'black', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'DIA1', claim_line_number: 1, service_category_2: 'dialysis'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'dialysis', encounter_group: 'outpatient', total_paid_amount: 500.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # dme__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_dme_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dme__encounter_grain
+    description: >
+      Produces one row per orphaned DME encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('dme__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-01-20'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DME1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-01-20', end_date: '2023-01-20', diagnosis_code_1: 'J44.1', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '12', place_of_service_description: 'Home', paid_amount: 200.00, allowed_amount: 180.00, charge_amount: 350.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'DME1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'dme - orphaned', encounter_group: 'other', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1955-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'DME1', claim_line_number: 1, service_category_2: 'durable medical equipment'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'dme - orphaned', encounter_group: 'other', total_paid_amount: 200.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # home_health__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_home_health_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: home_health__encounter_grain
+    description: >
+      Produces one row per home health encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('home_health__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-02-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'HH1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-02-15', end_date: '2023-02-15', diagnosis_code_1: 'I50.9', diagnosis_code_type: 'icd-10-cm', facility_npi: null, paid_amount: 300.00, allowed_amount: 280.00, charge_amount: 450.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'HH1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'home health', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1950-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'HH1', claim_line_number: 1, service_category_2: 'home health'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'home health', encounter_group: 'outpatient', total_paid_amount: 300.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # lab__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_lab_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: lab__encounter_grain
+    description: >
+      Produces one row per orphaned lab encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('lab__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-03-10'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'LAB1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-03-10', end_date: '2023-03-10', diagnosis_code_1: 'R73.09', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '81', place_of_service_description: 'Independent Lab', paid_amount: 50.00, allowed_amount: 45.00, charge_amount: 80.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'LAB1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'lab - orphaned', encounter_group: 'other', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1975-01-01', gender: 'female', race: 'asian', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'LAB1', claim_line_number: 1, service_category_2: 'lab'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'lab - orphaned', encounter_group: 'other', total_paid_amount: 50.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_hospice__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_hospice_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospice__encounter_grain
+    description: >
+      Produces one row per outpatient hospice encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_hospice__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-04-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OHOS1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-04-01', end_date: '2023-04-01', diagnosis_code_1: 'C25.9', diagnosis_code_type: 'icd-10-cm', facility_npi: null, paid_amount: 400.00, allowed_amount: 380.00, charge_amount: 600.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OHOS1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient hospice', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1940-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OHOS1', claim_line_number: 1, service_category_2: 'outpatient hospice'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient hospice', encounter_group: 'outpatient', total_paid_amount: 400.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_hospital_or_clinic__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_hospital_or_clinic_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospital_or_clinic__encounter_grain
+    description: >
+      Produces one row per outpatient hospital or clinic encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_hospital_or_clinic__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-04-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OHC1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-04-15', end_date: '2023-04-15', diagnosis_code_1: 'M54.5', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', place_of_service_code: '22', place_of_service_description: 'Outpatient Hospital', paid_amount: 250.00, allowed_amount: 230.00, charge_amount: 400.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OHC1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient hospital or clinic', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1970-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OHC1', claim_line_number: 1, service_category_2: 'outpatient hospital or clinic'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient hospital or clinic', encounter_group: 'outpatient', total_paid_amount: 250.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_psych__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_psych_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_psych__encounter_grain
+    description: >
+      Produces one row per outpatient psych encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_psych__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-05-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OPS1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-05-01', end_date: '2023-05-01', diagnosis_code_1: 'F41.1', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '53', place_of_service_description: 'Community MH Center', paid_amount: 150.00, allowed_amount: 140.00, charge_amount: 250.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OPS1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient psych', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1990-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OPS1', claim_line_number: 1, service_category_2: 'outpatient psych'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient psych', encounter_group: 'outpatient', total_paid_amount: 150.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_rehab__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_rehab_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_rehab__encounter_grain
+    description: >
+      Produces one row per outpatient rehab encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_rehab__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-05-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OR1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-05-15', end_date: '2023-05-15', diagnosis_code_1: 'M79.3', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '62', place_of_service_description: 'CORF', paid_amount: 120.00, allowed_amount: 110.00, charge_amount: 200.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OR1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient rehabilitation', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1980-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OR1', claim_line_number: 1, service_category_2: 'outpatient rehabilitation'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient rehabilitation', encounter_group: 'outpatient', total_paid_amount: 120.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_surgery__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_surgery_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_surgery__encounter_grain
+    description: >
+      Produces one row per outpatient surgery encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_surgery__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-06-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OSURG1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-06-01', end_date: '2023-06-01', diagnosis_code_1: 'H25.10', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', place_of_service_code: '22', place_of_service_description: 'Outpatient Hospital', paid_amount: 2500.00, allowed_amount: 2300.00, charge_amount: 4000.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OSURG1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient surgery', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1958-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OSURG1', claim_line_number: 1, service_category_2: 'outpatient surgery'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient surgery', encounter_group: 'outpatient', total_paid_amount: 2500.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_injections__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_injections_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_injections__encounter_grain
+    description: >
+      Produces one row per outpatient injections encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_injections__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-06-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'INJ1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-06-15', end_date: '2023-06-15', diagnosis_code_1: 'M25.50', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '11', place_of_service_description: 'Office', paid_amount: 350.00, allowed_amount: 320.00, charge_amount: 550.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'INJ1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient injections', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1970-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'INJ1', claim_line_number: 1, service_category_2: 'outpatient injections'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient injections', encounter_group: 'outpatient', total_paid_amount: 350.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_ptotst__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_ptotst_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_ptotst__encounter_grain
+    description: >
+      Produces one row per outpatient PT/OT/ST encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_ptotst__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-07-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PT1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-07-01', end_date: '2023-07-01', diagnosis_code_1: 'M54.5', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '11', place_of_service_description: 'Office', paid_amount: 100.00, allowed_amount: 90.00, charge_amount: 160.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'PT1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient pt/ot/st', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1985-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'PT1', claim_line_number: 1, service_category_2: 'outpatient pt/ot/st'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient pt/ot/st', encounter_group: 'outpatient', total_paid_amount: 100.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_radiology__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_radiology_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_radiology__encounter_grain
+    description: >
+      Produces one row per outpatient radiology encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_radiology__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-07-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'RAD1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-07-15', end_date: '2023-07-15', diagnosis_code_1: 'R10.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', place_of_service_code: '22', place_of_service_description: 'Outpatient Hospital', paid_amount: 600.00, allowed_amount: 550.00, charge_amount: 900.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'RAD1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient radiology', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1975-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'RAD1', claim_line_number: 1, service_category_2: 'outpatient radiology'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient radiology', encounter_group: 'outpatient', total_paid_amount: 600.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # outpatient_substance_use__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_outpatient_substance_use_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_substance_use__encounter_grain
+    description: >
+      Produces one row per outpatient substance use encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('outpatient_substance_use__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-08-01'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OSU1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-08-01', end_date: '2023-08-01', diagnosis_code_1: 'F10.10', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '57', place_of_service_description: 'Non-res SU Facility', paid_amount: 200.00, allowed_amount: 180.00, charge_amount: 320.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OSU1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'outpatient substance use', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1990-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OSU1', claim_line_number: 1, service_category_2: 'outpatient substance use'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'outpatient substance use', encounter_group: 'outpatient', total_paid_amount: 200.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # urgent_care__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_urgent_care_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: urgent_care__encounter_grain
+    description: >
+      Produces one row per urgent care encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('urgent_care__generate_encounter_id')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-08-15'}
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'UC1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-08-15', end_date: '2023-08-15', diagnosis_code_1: 'J06.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', place_of_service_code: '20', place_of_service_description: 'Urgent Care', paid_amount: 180.00, allowed_amount: 160.00, charge_amount: 280.00, data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'UC1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'urgent care', encounter_group: 'outpatient', claim_line_attribution_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1995-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'UC1', claim_line_number: 1, service_category_2: 'urgent care'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'urgent care', encounter_group: 'outpatient', total_paid_amount: 180.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # office_visit__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visit_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visit__encounter_grain
+    description: >
+      Produces one row per office visit encounter, using the detail_values
+      intermediate model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('office_visits__int_detail_values')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, encounter_id: 1, encounter_start_date: '2023-01-15', encounter_type: 'office visit', encounter_group: 'office based', diagnosis_code_1: 'J06.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', billing_npi: 'NPI2', hcpcs_code: '99213', ccs_category: '126', ccs_category_description: 'Other upper respiratory infections', paid_amount: 150.00, allowed_amount: 130.00, charge_amount: 250.00, data_source: 'src1', encounter_row_number: 1}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1985-01-01', gender: 'female', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, service_category_2: 'office-based visit'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'office visit', encounter_group: 'office based', total_paid_amount: 150.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # orphaned_claim__encounter_grain
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_orphaned_claim_encounter_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: orphaned_claim__encounter_grain
+    description: >
+      Produces one row per orphaned claim encounter.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ORPH1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-09-01', end_date: '2023-09-01', diagnosis_code_1: 'Z00.00', diagnosis_code_type: 'icd-10-cm', facility_npi: null, place_of_service_code: '99', place_of_service_description: 'Other', paid_amount: 75.00, allowed_amount: 70.00, charge_amount: 120.00, data_source: 'src1'}
+      - input: ref('encounters__orphaned_claims')
+        rows:
+          - {claim_id: 'ORPH1', claim_line_number: 1, encounter_id: 1, encounter_type: 'orphaned claim', encounter_group: 'other'}
+      - input: ref('encounters__stg_eligibility')
+        rows:
+          - {patient_data_source_id: 1, birth_date: '1980-01-01', gender: 'male', race: 'white', patient_row_num: 1}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'ORPH1', claim_line_number: 1, service_category_2: 'other'}
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_type: 'orphaned claim', encounter_group: 'other', total_paid_amount: 75.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Office Visits Detail Values
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # office_visits__int_detail_values
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_office_visits_int_detail_values
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: office_visits__int_detail_values
+    description: >
+      Joins office-based claims from stg_medical_claim to the combined
+      crosswalk and encounter dates, producing detail values for final
+      office visit encounter grain.
+    given:
+      - input: ref('office_visits__int_office_visits_surgery')
+        rows: []
+      - input: ref('office_visits__int_office_visits_injections')
+        rows: []
+      - input: ref('office_visits__int_office_visits_radiology')
+        rows: []
+      - input: ref('office_visits__int_office_visits')
+        rows:
+          - {old_encounter_id: 1, start_date: '2023-01-15'}
+      - input: ref('office_visits__int_office_visits_em')
+        rows: []
+      - input: ref('office_visits__int_office_visits_telehealth')
+        rows: []
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, claim_type: 'professional', patient_data_source_id: 1, start_date: '2023-01-15', end_date: '2023-01-15', paid_amount: 150.00, allowed_amount: 130.00, charge_amount: 250.00, diagnosis_code_1: 'J06.9', diagnosis_code_type: 'icd-10-cm', facility_npi: 'NPI1', billing_npi: 'NPI2', hcpcs_code: '99213', ccs_category: '126', ccs_category_description: 'URI', data_source: 'src1'}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'OV1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'office visit - other', encounter_group: 'office based', claim_line_attribution_number: 1}
+    expect:
+      rows:
+        - {claim_id: 'OV1', claim_line_number: 1, encounter_id: 1, encounter_type: 'office visit - other', encounter_group: 'office based', paid_amount: 150.00}

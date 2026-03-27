@@ -1,0 +1,1401 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING MODELS
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__stg_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_stg_professional_filters_professional_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__stg_professional
+    description: >
+      Only claims with claim_type = 'professional' pass through.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'institutional', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', service_type: 'professional', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__stg_outpatient_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_stg_outpatient_institutional_excludes_inpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__stg_outpatient_institutional
+    description: >
+      Institutional claims not classified as inpatient are outpatient.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', data_source: 'src1'}
+          - {claim_id: 'C2', claim_type: 'institutional', data_source: 'src1'}
+          - {claim_id: 'C3', claim_type: 'professional', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C2', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__stg_office_based
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_stg_office_based_filters_by_pos
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__stg_office_based
+    description: >
+      Professional claims with place_of_service_code 11, 02, or 10 are
+      classified as office-based.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '11', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', place_of_service_code: '02', data_source: 'src1'}
+          - {claim_id: 'C3', claim_line_number: 1, claim_line_id: 'C3|1', claim_type: 'professional', place_of_service_code: '23', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C3', claim_line_number: 1, claim_line_id: 'C3|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', service_type: 'office based', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', service_type: 'office based', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Professional claim type
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__acute_inpatient_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_acute_inpatient_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__acute_inpatient_professional
+    description: >
+      Professional claims with place_of_service_code = '21' are classified
+      as acute inpatient. HCPCS codes determine delivery type.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '21', hcpcs_code: '99213', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', place_of_service_code: '21', hcpcs_code: '59400', data_source: 'src1'}
+          - {claim_id: 'C3', claim_line_number: 1, claim_line_id: 'C3|1', claim_type: 'professional', place_of_service_code: '11', hcpcs_code: '99213', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'acute inpatient - other', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'l/d - vaginal delivery', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__ambulance_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_ambulance_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__ambulance_professional
+    description: >
+      Professional claims with ambulance HCPCS codes (A0425-A0436) or
+      POS 41/42 are classified as ambulance.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', hcpcs_code: 'A0429', place_of_service_code: '11', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', hcpcs_code: '99213', place_of_service_code: '41', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__ambulatory_surgery_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_ambulatory_surgery_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__ambulatory_surgery_professional
+    description: >
+      Professional claims with POS = '24' are classified as ASC.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '24', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'ambulatory surgery center', service_category_3: 'ambulatory surgery center', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__emergency_department_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_emergency_department_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__emergency_department_professional
+    description: >
+      Professional claims with POS 23 or ED HCPCS codes are classified
+      as emergency department.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '23', hcpcs_code: '99213', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', place_of_service_code: '11', hcpcs_code: '99284', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__home_health_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_home_health_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__home_health_professional
+    description: >
+      Professional claims with POS 12 are classified as home health.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '12', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'home health', service_category_3: 'home health', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_hospice_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_hospice_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_hospice_professional
+    description: >
+      Professional claims with POS 34 are classified as inpatient hospice.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '34', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'inpatient hospice', service_category_3: 'inpatient hospice', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_hospice_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_hospice_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_hospice_professional
+    description: >
+      Professional claims with hospice HCPCS codes are classified as outpatient hospice.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', hcpcs_code: 'Q5001', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient hospice', service_category_3: 'outpatient hospice', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_psychiatric_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_psychiatric_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_psychiatric_professional
+    description: >
+      Professional claims with POS 51 or 56 are classified as inpatient psychiatric.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '51', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'inpatient psychiatric', service_category_3: 'inpatient psychiatric', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_rehab_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_rehab_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_rehab_professional
+    description: >
+      Professional claims with POS 61 are classified as inpatient rehabilitation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '61', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'inpatient rehabilitation', service_category_3: 'inpatient rehabilitation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_substance_use_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_substance_use_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_substance_use_professional
+    description: >
+      Professional claims with POS 55 are classified as inpatient substance use.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '55', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'inpatient substance use', service_category_3: 'inpatient substance use', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_psychiatric_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_psychiatric_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_psychiatric_professional
+    description: >
+      Professional claims with POS 52 or 53 are classified as outpatient psychiatric.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '52', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient psychiatric', service_category_3: 'outpatient psychiatric', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_rehab_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_rehab_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_rehab_professional
+    description: >
+      Professional claims with POS 62 are classified as outpatient rehabilitation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '62', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient rehabilitation', service_category_3: 'outpatient rehabilitation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_hospital_or_clinic_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_hospital_or_clinic_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_hospital_or_clinic_professional
+    description: >
+      Professional claims with outpatient hospital/clinic POS codes
+      are classified as outpatient hospital or clinic.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '22', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient hospital or clinic', service_category_3: 'outpatient hospital or clinic', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__lab_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_lab_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__lab_professional
+    description: >
+      Professional claims with POS 81 or lab CCS categories are classified as lab.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '81', ccs_category: '999', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', place_of_service_code: '11', ccs_category: '233', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'ancillary', service_category_2: 'lab', service_category_3: 'lab', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'ancillary', service_category_2: 'lab', service_category_3: 'lab', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__dme_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_dme_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__dme_professional
+    description: >
+      Professional claims with CCS category 243 are classified as DME.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', ccs_category: '243', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'ancillary', service_category_2: 'durable medical equipment', service_category_3: 'durable medical equipment', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__dialysis_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_dialysis_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__dialysis_professional
+    description: >
+      Professional claims with POS 65 or dialysis CCS categories are
+      classified as dialysis.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '65', ccs_category: null, data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'dialysis', service_category_3: 'dialysis', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__urgent_care_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_urgent_care_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__urgent_care_professional
+    description: >
+      Professional claims with POS 20 or urgent care HCPCS codes are
+      classified as urgent care.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '20', hcpcs_code: '99213', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'urgent care', service_category_3: 'urgent care', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__pharmacy_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_pharmacy_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__pharmacy_professional
+    description: >
+      Professional claims with CCS category 240 are classified as pharmacy.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', ccs_category: '240', place_of_service_code: '11', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'office-based', service_category_2: 'pharmacy', service_category_3: 'pharmacy', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__observation_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_observation_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__observation_professional
+    description: >
+      Professional claims with observation HCPCS codes are classified as observation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', hcpcs_code: 'G0378', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'observation', service_category_3: 'observation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_substance_use_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_substance_use_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_substance_use_professional
+    description: >
+      Professional claims with POS 57/58 are classified as outpatient substance use.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '57', default_ccsr_category_description_op: null, data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient substance use', service_category_3: 'outpatient substance use', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_radiology_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_radiology_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_radiology_professional
+    description: >
+      Professional claims with non-null modality and POS != 11 are
+      classified as outpatient radiology with modality-based service_category_3.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', modality: 'Magnetic resonance', place_of_service_code: '22', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', modality: 'Nuclear medicine', place_of_service_code: '22', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient radiology', service_category_3: 'mri', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'outpatient', service_category_2: 'outpatient radiology', service_category_3: 'pet', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_skilled_nursing_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_skilled_nursing_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_skilled_nursing_professional
+    description: >
+      Professional claims with POS 31/32 that are not DME are classified
+      as skilled nursing.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '31', data_source: 'src1'}
+      - input: ref('service_category__dme_professional')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'inpatient', service_category_2: 'skilled nursing', service_category_3: 'skilled nursing', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Institutional claim type (header level)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__acute_inpatient_institutional_other
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_acute_inpatient_institutional_other
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__acute_inpatient_institutional_other
+    description: >
+      All inpatient institutional claims get a fallback classification
+      of acute inpatient - other.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'acute inpatient - other', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_psychiatric_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_psychiatric_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_psychiatric_institutional
+    description: >
+      Inpatient institutional claims with psychiatric taxonomy codes
+      are classified as inpatient psychiatric.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '283Q00000X', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'inpatient psychiatric', service_category_3: 'inpatient psychiatric', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_rehab_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_rehab_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_rehab_institutional
+    description: >
+      Inpatient institutional claims with rehabilitation taxonomy codes
+      are classified as inpatient rehabilitation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '283X00000X', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'inpatient rehabilitation', service_category_3: 'inpatient rehabilitation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_long_term_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_long_term_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_long_term_institutional
+    description: >
+      Inpatient institutional claims with LTAC taxonomy code are classified
+      as inpatient long term acute care.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '282E00000X', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'inpatient long term acute care', service_category_3: 'inpatient long term acute care', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_hospice_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_hospice_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_hospice_institutional
+    description: >
+      Inpatient institutional claims with bill type code starting with '82'
+      are classified as inpatient hospice.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '821', revenue_center_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'inpatient hospice', service_category_3: 'inpatient hospice', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_skilled_nursing_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_skilled_nursing_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_skilled_nursing_institutional
+    description: >
+      Institutional claims with bill type starting with '21' are Part A
+      and '22' are Part B skilled nursing.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '211', data_source: 'src1'}
+          - {claim_id: 'C2', claim_type: 'institutional', bill_type_code: '221', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'skilled nursing', service_category_3: 'inpatient part A', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'skilled nursing', service_category_3: 'inpatient part B', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__inpatient_substance_use_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_inpatient_substance_use_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__inpatient_substance_use_institutional
+    description: >
+      Inpatient institutional claims with substance use taxonomy codes
+      are classified as inpatient substance use.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '324500000X', default_ccsr_category_description_ip: null, data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'inpatient substance use', service_category_3: 'inpatient substance use', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Institutional (header level)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__home_health_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_home_health_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__home_health_institutional
+    description: >
+      Institutional claims with home health bill type codes (32-38) are
+      classified as home health.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '321', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'home health', service_category_3: 'home health', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_skilled_nursing_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_skilled_nursing_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_skilled_nursing_institutional
+    description: >
+      Institutional claims with bill type starting with '23' or '28'
+      are classified as outpatient skilled nursing.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '231', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'skilled nursing', service_category_3: 'skilled nursing', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_substance_use_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_substance_use_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_substance_use_institutional
+    description: >
+      Outpatient institutional claims with substance use taxonomy codes or
+      CCSR categories are classified as outpatient substance use.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '324500000X', default_ccsr_category_description_op: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient substance use', service_category_3: 'outpatient substance use', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_surgery_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_surgery_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_surgery_institutional
+    description: >
+      Outpatient institutional claims with surgical CCS categories are
+      classified as outpatient surgery.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', ccs_category: '50', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_radiology_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_radiology_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_radiology_institutional
+    description: >
+      Outpatient institutional claims with non-null modality are classified
+      as outpatient radiology with modality-based service_category_3.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', modality: 'Computerized tomography', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient radiology', service_category_3: 'ct', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_physical_therapy_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_physical_therapy_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_physical_therapy_institutional
+    description: >
+      Outpatient institutional claims with PT/OT/ST CCS categories are
+      classified as outpatient pt/ot/st.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', ccs_category: '213', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient pt/ot/st', service_category_3: 'outpatient pt/ot/st', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_rehab_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_rehab_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_rehab_institutional
+    description: >
+      Outpatient institutional claims with rehabilitation taxonomy codes
+      are classified as outpatient rehabilitation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', primary_taxonomy_code: '283X00000X', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient rehabilitation', service_category_3: 'outpatient rehabilitation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_psychiatric_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_psychiatric_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_psychiatric_institutional
+    description: >
+      Outpatient institutional claims with psychiatric revenue center codes
+      or taxonomy codes are classified as outpatient psychiatric.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', revenue_center_code: '0905', primary_taxonomy_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient psychiatric', service_category_3: 'outpatient psychiatric', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Line-level institutional
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__ambulance_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_ambulance_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__ambulance_institutional
+    description: >
+      Outpatient institutional claims with ambulance HCPCS codes or
+      revenue center 0540 are classified as ambulance.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'institutional', hcpcs_code: 'A0429', revenue_center_code: null, data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'institutional', hcpcs_code: null, revenue_center_code: '0540', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__dme_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_dme_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__dme_institutional
+    description: >
+      Outpatient institutional claims with CCS category 243 are classified as DME.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'institutional', ccs_category: '243', data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'ancillary', service_category_2: 'durable medical equipment', service_category_3: 'durable medical equipment', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__lab_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_lab_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__lab_institutional
+    description: >
+      Outpatient institutional claims with lab bill type or CCS categories
+      are classified as lab.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', bill_type_code: '141', ccs_category: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'ancillary', service_category_2: 'lab', service_category_3: 'lab', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__observation_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_observation_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__observation_institutional
+    description: >
+      Institutional claims with observation revenue center code or HCPCS
+      are classified as observation.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', revenue_center_code: '0762', hcpcs_code: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'observation', service_category_3: 'observation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Office-based (professional subcategories)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__office_based_visit_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_office_based_visit_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__office_based_visit_professional
+    description: >
+      Office-based claims with POS 11 and CCS 227 are classified as
+      office-based visit; POS 02/10 as telehealth visit.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '11', ccs_category: '227', data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', claim_type: 'professional', place_of_service_code: '02', ccs_category: null, data_source: 'src1'}
+      - input: ref('service_category__stg_office_based')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_line_id: 'C2|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'office-based', service_category_2: 'office-based visit', service_category_3: 'office-based visit', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C2|1', service_category_1: 'office-based', service_category_2: 'telehealth visit', service_category_3: 'telehealth visit', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__office_based_radiology
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_office_based_radiology
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__office_based_radiology
+    description: >
+      Office-based claims with modality and POS 11 are classified with
+      modality-specific service_category_3.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '11', modality: 'Magnetic resonance', data_source: 'src1'}
+      - input: ref('service_category__stg_office_based')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'office-based', service_category_2: 'office-based radiology', service_category_3: 'mri', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__office_based_physical_therapy_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_office_based_physical_therapy_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__office_based_physical_therapy_professional
+    description: >
+      Office-based claims with PT/OT/ST CCS categories and POS 11 are
+      classified as office-based pt/ot/st.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '11', ccs_category: '213', rend_primary_specialty_description: null, data_source: 'src1'}
+      - input: ref('service_category__stg_office_based')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'office-based', service_category_2: 'office-based pt/ot/st', service_category_3: 'office-based pt/ot/st', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_physical_therapy_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_physical_therapy_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_physical_therapy_professional
+    description: >
+      Professional claims with PT/OT/ST CCS categories and POS != 11
+      are classified as outpatient pt/ot/st.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', place_of_service_code: '22', ccs_category: '213', primary_specialty_description: null, data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'outpatient pt/ot/st', service_category_3: 'outpatient pt/ot/st', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_surgery_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_surgery_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_surgery_professional
+    description: >
+      Professional claims with surgical CCS categories and outpatient
+      POS codes are classified as outpatient surgery.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', ccs_category: '50', place_of_service_code: '22', data_source: 'src1'}
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # -------------------------------------------------------------------------
+  # service_category__dialysis_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_dialysis_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__dialysis_institutional
+    description: >
+      Outpatient institutional claims with dialysis bill type code (72)
+      are classified as dialysis.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '721', primary_taxonomy_code: null, ccs_category: null, revenue_center_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'dialysis', service_category_3: 'dialysis', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__emergency_department_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_emergency_department_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__emergency_department_institutional
+    description: >
+      Outpatient institutional claims with ED revenue center codes are
+      classified as emergency department.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', revenue_center_code: '0450', hcpcs_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_hospice_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_hospice_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_hospice_institutional
+    description: >
+      Outpatient institutional claims with bill type starting with '81'
+      are classified as outpatient hospice.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '811', hcpcs_code: null, revenue_center_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('service_category__home_health_institutional')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient hospice', service_category_3: 'outpatient hospice', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__ambulatory_surgery_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_ambulatory_surgery_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__ambulatory_surgery_institutional
+    description: >
+      Outpatient institutional claims with ASC revenue center codes (0490/0499)
+      or ASC taxonomy code are classified as ambulatory surgery center.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', revenue_center_code: '0490', primary_taxonomy_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'ambulatory surgery center', service_category_3: 'ambulatory surgery center', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__urgent_care_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_urgent_care_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__urgent_care_institutional
+    description: >
+      Institutional claims with urgent care revenue center and bill type
+      are classified as urgent care.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', revenue_center_code: '0456', bill_type_code: '131', hcpcs_code: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'urgent care', service_category_3: 'urgent care', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__outpatient_hospital_or_clinic_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_outpatient_hospital_or_clinic_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__outpatient_hospital_or_clinic_institutional
+    description: >
+      Outpatient institutional claims with hospital outpatient bill type
+      codes (13, 71, etc.) are classified as outpatient hospital or clinic.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_type: 'institutional', bill_type_code: '131', ccs_category: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'outpatient hospital or clinic', service_category_3: 'outpatient hospital or clinic', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__pharmacy_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_sc_pharmacy_institutional_outpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__pharmacy_institutional
+    description: >
+      Outpatient institutional claims with pharmacy revenue center codes
+      are classified as pharmacy.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', revenue_center_code: '0250', ccs_category: null, data_source: 'src1'}
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'outpatient', service_category_2: 'pharmacy', service_category_3: 'pharmacy', tuva_last_run: '2024-01-01 00:00:00'}

@@ -1,0 +1,378 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # HCC RECAPTURE - STAGING: stg_eligible_benes
+  # =========================================================================
+
+  - name: test_hcc_recapture_stg_eligible_benes_excludes_esrd
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_eligible_benes
+    description: "Eligible beneficiaries exclude ESRD enrollment status and flatten to person/year"
+    given:
+      - input: ref('cms_hcc__int_members')
+        rows:
+          - {person_id: 'P1', collection_end_date: '2023-12-31', payer: 'MCR', enrollment_status: 'Aged'}
+          - {person_id: 'P1', collection_end_date: '2023-11-30', payer: 'MCR', enrollment_status: 'Aged'}
+          - {person_id: 'P2', collection_end_date: '2023-12-31', payer: 'MCR', enrollment_status: 'ESRD'}
+    expect:
+      rows:
+        - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+
+  - name: test_hcc_recapture_stg_eligible_benes_multiple_years
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_eligible_benes
+    description: "Beneficiaries with months in different years produce one row per year"
+    given:
+      - input: ref('cms_hcc__int_members')
+        rows:
+          - {person_id: 'P1', collection_end_date: '2022-12-31', payer: 'MCR', enrollment_status: 'Aged'}
+          - {person_id: 'P1', collection_end_date: '2023-06-30', payer: 'MCR', enrollment_status: 'Aged'}
+    expect:
+      rows:
+        - {person_id: 'P1', collection_year: 2022, payer: 'MCR'}
+        - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+
+  - name: test_hcc_recapture_stg_eligible_benes_all_esrd_empty
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_eligible_benes
+    description: "When all beneficiaries are ESRD, result is empty"
+    given:
+      - input: ref('cms_hcc__int_members')
+        rows:
+          - {person_id: 'P1', collection_end_date: '2023-12-31', payer: 'MCR', enrollment_status: 'ESRD'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC RECAPTURE - STAGING: stg_coef_hier
+  # =========================================================================
+
+  - name: test_hcc_recapture_stg_coef_hier_joins_hierarchy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_coef_hier
+    description: "Coefficient hierarchy staging joins disease factors to disease hierarchy flat for hierarchy group"
+    given:
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No'}
+      - input: ref('cms_hcc__disease_hierarchy_flat')
+        rows:
+          - {model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1}
+    expect:
+      rows:
+        - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', risk_model_code: 'CNA'}
+
+  - name: test_hcc_recapture_stg_coef_hier_no_hierarchy_defaults
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_coef_hier
+    description: "HCCs without hierarchy get 'no hierarchy' group and rank 1"
+    given:
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {coefficient: 0.150, model_version: 'CMS-HCC-V24', hcc_code: 'HCC99', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No'}
+      - input: ref('cms_hcc__disease_hierarchy_flat')
+        rows: []
+    expect:
+      rows:
+        - {coefficient: 0.150, model_version: 'CMS-HCC-V24', hcc_code: 'HCC99', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+
+  - name: test_hcc_recapture_stg_coef_hier_institutional_status
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_coef_hier
+    description: "Institutional enrollees get risk_model_code INS"
+    given:
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {coefficient: 0.400, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'Yes'}
+      - input: ref('cms_hcc__disease_hierarchy_flat')
+        rows:
+          - {model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1}
+    expect:
+      rows:
+        - {model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', risk_model_code: 'INS'}
+
+  - name: test_hcc_recapture_stg_coef_hier_dual_full_aged
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__stg_coef_hier
+    description: "Full dual aged enrollees get risk_model_code CFA"
+    given:
+      - input: ref('cms_hcc__disease_factors')
+        rows:
+          - {coefficient: 0.350, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', enrollment_status: 'Continuing', medicaid_status: 'Yes', dual_status: 'Full', orec: 'Aged', institutional_status: 'No'}
+      - input: ref('cms_hcc__disease_hierarchy_flat')
+        rows:
+          - {model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1}
+    expect:
+      rows:
+        - {model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', risk_model_code: 'CFA'}
+
+  # =========================================================================
+  # HCC RECAPTURE - INTERMEDIATE: int_hccs (hierarchy application)
+  # =========================================================================
+
+  - name: test_hcc_recapture_int_hccs_applies_hierarchy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_hccs
+    description: "int_hccs applies hierarchy by keeping only the min rank within each hierarchy group"
+    given:
+      - input: ref('hcc_recapture__int_all_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC18', hcc_description: 'Diabetes w/o complication', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 2, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1}
+
+  - name: test_hcc_recapture_int_hccs_filters_non_chronic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_hccs
+    description: "Non-chronic HCCs are filtered out"
+    given:
+      - input: ref('hcc_recapture__int_all_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 0, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+    expect:
+      rows: []
+
+  - name: test_hcc_recapture_int_hccs_filters_non_eligible_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_hccs
+    description: "Non-eligible claims are filtered out"
+    given:
+      - input: ref('hcc_recapture__int_all_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 0, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+    expect:
+      rows: []
+
+  - name: test_hcc_recapture_int_hccs_no_hierarchy_passes_through
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_hccs
+    description: "HCCs without hierarchy group pass through without being filtered"
+    given:
+      - input: ref('hcc_recapture__int_all_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC99', hcc_description: 'Standalone HCC', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC99', hcc_hierarchy_group: 'no hierarchy'}
+
+  # =========================================================================
+  # HCC RECAPTURE - FINAL: gap_status
+  # =========================================================================
+
+  - name: test_hcc_recapture_gap_status_filters_hierarchy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__gap_status
+    description: "Gap status filters out records suppressed by hierarchy (filtered_out_by_hierarchy = 0)"
+    given:
+      - input: ref('hcc_recapture__int_gap_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC19', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'closed', suspect_hcc_flag: 0, filtered_out_by_hierarchy: 0, hcc_hierarchy_group: 'G1', hcc_hierarchy_group_rank: 1}
+          - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC18', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'open', suspect_hcc_flag: 0, filtered_out_by_hierarchy: 1, hcc_hierarchy_group: 'G1', hcc_hierarchy_group_rank: 2}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC19', model_version: 'CMS-HCC-V24', payment_year: 2024, gap_status: 'closed', suspect_hcc_flag: 0}
+
+  - name: test_hcc_recapture_gap_status_multiple_statuses
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__gap_status
+    description: "Gap status passes through various gap_status values for non-hierarchied records"
+    given:
+      - input: ref('hcc_recapture__int_gap_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC19', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'closed', suspect_hcc_flag: 0, filtered_out_by_hierarchy: 0, hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1}
+          - {person_id: 'P2', payer: 'MCR', hcc_code: 'HCC85', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'open', suspect_hcc_flag: 0, filtered_out_by_hierarchy: 0, hcc_hierarchy_group: 'HF', hcc_hierarchy_group_rank: 1}
+          - {person_id: 'P3', payer: 'MCR', hcc_code: 'HCC99', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'new', suspect_hcc_flag: 0, filtered_out_by_hierarchy: 0, hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', gap_status: 'closed', suspect_hcc_flag: 0}
+        - {person_id: 'P2', hcc_code: 'HCC85', gap_status: 'open', suspect_hcc_flag: 0}
+        - {person_id: 'P3', hcc_code: 'HCC99', gap_status: 'new', suspect_hcc_flag: 0}
+
+  # =========================================================================
+  # HCC RECAPTURE - FINAL: hcc_status
+  # =========================================================================
+
+  - name: test_hcc_recapture_hcc_status_joins_gap
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__hcc_status
+    description: "HCC status joins int_hccs to gap_status for eligible beneficiaries"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__gap_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC19', risk_model_code: 'CNA', model_version: 'CMS-HCC-V24', payment_year: 2024, recapture_flag: 1, gap_status: 'closed', suspect_hcc_flag: 0}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', gap_status: 'closed'}
+
+  - name: test_hcc_recapture_hcc_status_excludes_non_eligible_benes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__hcc_status
+    description: "Non-eligible beneficiaries are excluded from hcc_status"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 0, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__gap_status')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_hcc_recapture_hcc_status_no_gap_match
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__hcc_status
+    description: "When no gap_status match exists, gap_status and recapture_flag are null"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__gap_status')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', gap_status: null, recapture_flag: null}
+
+  # =========================================================================
+  # HCC RECAPTURE - FINAL: recapture_rates
+  # =========================================================================
+
+  - name: test_hcc_recapture_rates_computes_rate
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates
+    description: "Recapture rates compute closed/open/total HCCs and recapture_rate = closed/total"
+    given:
+      - input: ref('hcc_recapture__recapture_rates_monthly')
+        rows:
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 5, open_hccs: 3, total_hccs: 8, recapture_rate: 0.625}
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-02-01', closed_hccs: 10, open_hccs: 2, total_hccs: 12, recapture_rate: 0.833}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, closed_hccs: 15, open_hccs: 5, total_hccs: 20}
+
+  - name: test_hcc_recapture_rates_multiple_payers
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates
+    description: "Recapture rates aggregate separately per payer"
+    given:
+      - input: ref('hcc_recapture__recapture_rates_monthly')
+        rows:
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 5, open_hccs: 3, total_hccs: 8, recapture_rate: 0.625}
+          - {payer: 'BCBS', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 2, open_hccs: 6, total_hccs: 8, recapture_rate: 0.25}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, closed_hccs: 5, open_hccs: 3, total_hccs: 8}
+        - {payer: 'BCBS', payment_year: 2024, closed_hccs: 2, open_hccs: 6, total_hccs: 8}
+
+  # =========================================================================
+  # HCC RECAPTURE - FINAL: recapture_rates_monthly
+  # =========================================================================
+
+  - name: test_hcc_recapture_rates_monthly_aggregates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly
+    description: "Monthly recapture rates aggregate closed/open HCCs by payer/payment_year/month"
+    given:
+      - input: ref('hcc_recapture__hcc_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', payment_year: 2024, recorded_date: '2023-06-15', claim_id: 'C1', rendering_npi: 'NPI1', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, suspect_hcc_flag: 0, risk_model_code: 'CNA', eligible_claim_indicator: 1, eligible_bene: 1, reason: 'Prior coding', gap_status: 'closed', recapture_flag: 1}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', payment_year: 2024, recorded_date: '2023-06-15', claim_id: 'C2', rendering_npi: 'NPI1', model_version: 'CMS-HCC-V24', hcc_code: 'HCC85', hcc_description: 'CHF', hcc_hierarchy_group: 'HF', hcc_hierarchy_group_rank: 1, suspect_hcc_flag: 0, risk_model_code: 'CNA', eligible_claim_indicator: 1, eligible_bene: 1, reason: 'Prior coding', gap_status: 'open', recapture_flag: 1}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, closed_hccs: 1, open_hccs: 1, total_hccs: 2}
+
+  - name: test_hcc_recapture_rates_monthly_excludes_inappropriate
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly
+    description: "Records with gap_status 'inappropriate for recapture' or 'new' are excluded"
+    given:
+      - input: ref('hcc_recapture__hcc_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', payment_year: 2024, recorded_date: '2023-06-15', claim_id: 'C1', rendering_npi: 'NPI1', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, suspect_hcc_flag: 0, risk_model_code: 'CNA', eligible_claim_indicator: 1, eligible_bene: 1, reason: 'Prior coding', gap_status: 'inappropriate for recapture', recapture_flag: 0}
+          - {person_id: 'P2', payer: 'MCR', data_source: 'src1', payment_year: 2024, recorded_date: '2023-07-01', claim_id: 'C2', rendering_npi: 'NPI2', model_version: 'CMS-HCC-V24', hcc_code: 'HCC85', hcc_description: 'CHF', hcc_hierarchy_group: 'HF', hcc_hierarchy_group_rank: 1, suspect_hcc_flag: 0, risk_model_code: 'CNA', eligible_claim_indicator: 1, eligible_bene: 1, reason: 'Prior coding', gap_status: 'new', recapture_flag: 1}
+    expect:
+      rows: []
+
+  - name: test_hcc_recapture_rates_monthly_excludes_suspect_hccs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly
+    description: "Suspect HCCs (suspect_hcc_flag = 1) are excluded from monthly rates"
+    given:
+      - input: ref('hcc_recapture__hcc_status')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', payment_year: 2024, recorded_date: '2023-06-15', claim_id: 'C1', rendering_npi: 'NPI1', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, suspect_hcc_flag: 1, risk_model_code: 'CNA', eligible_claim_indicator: 1, eligible_bene: 1, reason: 'Medication suspect', gap_status: 'closed', recapture_flag: 1}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC RECAPTURE - FINAL: recapture_rates_monthly_ytd
+  # =========================================================================
+
+  - name: test_hcc_recapture_rates_monthly_ytd_running_total
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly_ytd
+    description: "Monthly YTD computes running totals of closed/open HCCs"
+    given:
+      - input: ref('hcc_recapture__recapture_rates_monthly')
+        rows:
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 5, open_hccs: 3, total_hccs: 8, recapture_rate: 0.625}
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-02-01', closed_hccs: 3, open_hccs: 1, total_hccs: 4, recapture_rate: 0.75}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', ytd_closed_hccs: 5, yearly_total_hccs: 12}
+        - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-02-01', ytd_closed_hccs: 8, yearly_total_hccs: 12}
+
+  - name: test_hcc_recapture_rates_monthly_ytd_single_month
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly_ytd
+    description: "Single month YTD equals the monthly values"
+    given:
+      - input: ref('hcc_recapture__recapture_rates_monthly')
+        rows:
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-03-01', closed_hccs: 10, open_hccs: 5, total_hccs: 15, recapture_rate: 0.667}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-03-01', monthly_closed_hccs: 10, monthly_open_hccs: 5, ytd_closed_hccs: 10, ytd_open_hccs: 5, yearly_total_hccs: 15}
+
+  - name: test_hcc_recapture_rates_monthly_ytd_multiple_payers
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__recapture_rates_monthly_ytd
+    description: "YTD running totals are computed independently per payer"
+    given:
+      - input: ref('hcc_recapture__recapture_rates_monthly')
+        rows:
+          - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 5, open_hccs: 3, total_hccs: 8, recapture_rate: 0.625}
+          - {payer: 'BCBS', payment_year: 2024, payment_year_month: '2024-01-01', closed_hccs: 2, open_hccs: 6, total_hccs: 8, recapture_rate: 0.25}
+    expect:
+      rows:
+        - {payer: 'MCR', payment_year: 2024, payment_year_month: '2024-01-01', ytd_closed_hccs: 5, yearly_total_hccs: 8}
+        - {payer: 'BCBS', payment_year: 2024, payment_year_month: '2024-01-01', ytd_closed_hccs: 2, yearly_total_hccs: 8}

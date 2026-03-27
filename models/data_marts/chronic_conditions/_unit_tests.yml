@@ -1,0 +1,312 @@
+version: 2
+
+unit_tests:
+
+  - name: test_tuva_chronic_conditions__stg_core__condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the Tuva chronic conditions staging model passes through
+      person_id, normalized_code, and recorded_date from core condition.
+    model: tuva_chronic_conditions__stg_core__condition
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - person_id: 'patient_1'
+            normalized_code: 'E11.65'
+            recorded_date: '2024-01-15'
+          - person_id: 'patient_2'
+            normalized_code: 'I10'
+            recorded_date: '2024-02-01'
+    expect:
+      rows:
+        - person_id: 'patient_1'
+          normalized_code: 'E11.65'
+          recorded_date: '2024-01-15'
+        - person_id: 'patient_2'
+          normalized_code: 'I10'
+          recorded_date: '2024-02-01'
+
+  - name: test_tuva_chronic_conditions__stg_core__patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the Tuva chronic conditions patient staging passes
+      through person_id from core patient.
+    model: tuva_chronic_conditions__stg_core__patient
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - person_id: 'patient_1'
+          - person_id: 'patient_2'
+    expect:
+      rows:
+        - person_id: 'patient_1'
+        - person_id: 'patient_2'
+
+  - name: test_cms_chronic_conditions__stg_core__condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS staging condition model passes through fields
+      and filters to only claims with a claim_id.
+    model: cms_chronic_conditions__stg_core__condition
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - claim_id: 'clm_001'
+            person_id: 'patient_1'
+            recorded_date: '2024-01-15'
+            normalized_code_type: 'icd-10-cm'
+            normalized_code: 'E11.65'
+            data_source: 'claims_a'
+          - claim_id: null
+            person_id: 'patient_2'
+            recorded_date: '2024-02-01'
+            normalized_code_type: 'icd-10-cm'
+            normalized_code: 'I10'
+            data_source: 'claims_a'
+    expect:
+      rows:
+        - claim_id: 'clm_001'
+          person_id: 'patient_1'
+          recorded_date: '2024-01-15'
+          normalized_code_type: 'icd-10-cm'
+          normalized_code: 'E11.65'
+          data_source: 'claims_a'
+
+  - name: test_cms_chronic_conditions__stg_core__medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS staging medical claim model passes through
+      claim and DRG fields.
+    model: cms_chronic_conditions__stg_core__medical_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - claim_id: 'clm_010'
+            person_id: 'patient_1'
+            claim_start_date: '2024-01-15'
+            drg_code_type: 'ms-drg'
+            drg_code: '470'
+            data_source: 'claims_a'
+    expect:
+      rows:
+        - claim_id: 'clm_010'
+          person_id: 'patient_1'
+          claim_start_date: '2024-01-15'
+          drg_code_type: 'ms-drg'
+          drg_code: '470'
+          data_source: 'claims_a'
+
+  - name: test_cms_chronic_conditions__stg_core__patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS staging patient model passes through person_id.
+    model: cms_chronic_conditions__stg_core__patient
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - person_id: 'patient_1'
+          - person_id: 'patient_2'
+    expect:
+      rows:
+        - person_id: 'patient_1'
+        - person_id: 'patient_2'
+
+  - name: test_cms_chronic_conditions__stg_core__pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify CMS staging pharmacy claim passes through claim_id,
+      person_id, paid_date, ndc_code, and data_source.
+    model: cms_chronic_conditions__stg_core__pharmacy_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - claim_id: 'rx_001'
+            person_id: 'patient_1'
+            paid_date: '2024-01-20'
+            ndc_code: '12345678901'
+            data_source: 'claims_a'
+          - claim_id: 'rx_002'
+            person_id: 'patient_2'
+            paid_date: '2024-02-15'
+            ndc_code: '99999999999'
+            data_source: 'claims_b'
+    expect:
+      rows:
+        - claim_id: 'rx_001'
+          person_id: 'patient_1'
+          paid_date: '2024-01-20'
+          ndc_code: '12345678901'
+          data_source: 'claims_a'
+        - claim_id: 'rx_002'
+          person_id: 'patient_2'
+          paid_date: '2024-02-15'
+          ndc_code: '99999999999'
+          data_source: 'claims_b'
+
+  - name: test_cms_chronic_conditions__stg_core__procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify CMS staging procedure passes through and filters
+      to only rows with a claim_id.
+    model: cms_chronic_conditions__stg_core__procedure
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - claim_id: 'clm_020'
+            person_id: 'patient_1'
+            procedure_date: '2024-01-15'
+            normalized_code_type: 'hcpcs'
+            normalized_code: 'G0438'
+            data_source: 'claims_a'
+          - claim_id: null
+            person_id: 'patient_2'
+            procedure_date: '2024-02-01'
+            normalized_code_type: 'cpt'
+            normalized_code: '99213'
+            data_source: 'claims_a'
+    expect:
+      rows:
+        - claim_id: 'clm_020'
+          person_id: 'patient_1'
+          procedure_date: '2024-01-15'
+          normalized_code_type: 'hcpcs'
+          normalized_code: 'G0438'
+          data_source: 'claims_a'
+
+  - name: test_chronic_conditions__cms_chronic_conditions_long_union
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS long format unions conditions from the all,
+      HIV/AIDS, and OUD intermediate models.
+    model: chronic_conditions__cms_chronic_conditions_long
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('chronic_conditions__cms_chronic_conditions_all')
+        rows:
+          - person_id: 'patient_1'
+            claim_id: 'clm_001'
+            start_date: '2024-01-15'
+            chronic_condition_type: 'CMS Type'
+            condition_category: 'Metabolic'
+            condition: 'Diabetes'
+            data_source: 'claims_a'
+            tuva_last_run: '2024-01-01 00:00:00'
+      - input: ref('chronic_conditions__cms_chronic_conditions_hiv_aids')
+        rows:
+          - person_id: 'patient_2'
+            claim_id: 'clm_002'
+            start_date: '2024-02-01'
+            chronic_condition_type: 'CMS Type'
+            condition_category: 'Infectious'
+            condition: 'HIV/AIDS'
+            data_source: 'claims_a'
+            tuva_last_run: '2024-01-01 00:00:00'
+      - input: ref('chronic_conditions__cms_chronic_conditions_oud')
+        rows:
+          - person_id: 'patient_3'
+            claim_id: 'clm_003'
+            start_date: '2024-03-01'
+            chronic_condition_type: 'CMS Type'
+            condition_category: 'Substance Use'
+            condition: 'Opioid Use Disorder (OUD)'
+            data_source: 'claims_a'
+            tuva_last_run: '2024-01-01 00:00:00'
+    expect:
+      rows:
+        - person_id: 'patient_1'
+          claim_id: 'clm_001'
+          start_date: '2024-01-15'
+          chronic_condition_type: 'CMS Type'
+          condition_category: 'Metabolic'
+          condition: 'Diabetes'
+          data_source: 'claims_a'
+        - person_id: 'patient_2'
+          claim_id: 'clm_002'
+          start_date: '2024-02-01'
+          chronic_condition_type: 'CMS Type'
+          condition_category: 'Infectious'
+          condition: 'HIV/AIDS'
+          data_source: 'claims_a'
+        - person_id: 'patient_3'
+          claim_id: 'clm_003'
+          start_date: '2024-03-01'
+          chronic_condition_type: 'CMS Type'
+          condition_category: 'Substance Use'
+          condition: 'Opioid Use Disorder (OUD)'
+          data_source: 'claims_a'
+
+  - name: test_chronic_conditions__cms_chronic_conditions_long_deduplication
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS long format deduplicates when the same condition
+      appears in multiple intermediate models.
+    model: chronic_conditions__cms_chronic_conditions_long
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('chronic_conditions__cms_chronic_conditions_all')
+        rows:
+          - person_id: 'patient_1'
+            claim_id: 'clm_001'
+            start_date: '2024-01-15'
+            chronic_condition_type: 'CMS Type'
+            condition_category: 'Metabolic'
+            condition: 'Diabetes'
+            data_source: 'claims_a'
+            tuva_last_run: '2024-01-01 00:00:00'
+      - input: ref('chronic_conditions__cms_chronic_conditions_hiv_aids')
+        rows:
+          - person_id: 'patient_1'
+            claim_id: 'clm_001'
+            start_date: '2024-01-15'
+            chronic_condition_type: 'CMS Type'
+            condition_category: 'Metabolic'
+            condition: 'Diabetes'
+            data_source: 'claims_a'
+            tuva_last_run: '2024-01-01 00:00:00'
+      - input: ref('chronic_conditions__cms_chronic_conditions_oud')
+        rows: []
+    expect:
+      rows:
+        - person_id: 'patient_1'
+          claim_id: 'clm_001'
+          start_date: '2024-01-15'
+          chronic_condition_type: 'CMS Type'
+          condition_category: 'Metabolic'
+          condition: 'Diabetes'
+          data_source: 'claims_a'
+
+

@@ -1,0 +1,317 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING: stg_core__condition
+  # =========================================================================
+
+  - name: test_fhir_stg_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__condition
+    description: "Condition staging passes through core condition columns"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {condition_id: 'COND1', person_id: 'P1', claim_id: null, encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: '2023-06-10', resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 DM', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {condition_id: 'COND1', person_id: 'P1', encounter_id: 'E1', normalized_code: 'E1165', condition_rank: 1, data_source: 'src1'}
+
+  - name: test_fhir_stg_condition_preserves_claim_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__condition
+    description: "Condition staging preserves claim_id column for downstream filtering"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {condition_id: 'COND1', person_id: 'P1', claim_id: 'CLM1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'I10', normalized_description: 'HTN', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {condition_id: 'COND1', person_id: 'P1', claim_id: 'CLM1', normalized_code: 'I10', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__encounter
+  # =========================================================================
+
+  - name: test_fhir_stg_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__encounter
+    description: "Encounter staging passes through encounter columns"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_group: 'inpatient', encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', encounter_group: 'inpatient', encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-15', data_source: 'src1'}
+
+  - name: test_fhir_stg_encounter_multiple_groups
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__encounter
+    description: "Encounter staging passes through multiple encounter groups correctly"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_group: 'inpatient', encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-15', data_source: 'src1'}
+          - {person_id: 'P2', encounter_id: 'E2', encounter_group: 'outpatient', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-01', data_source: 'src1'}
+          - {person_id: 'P3', encounter_id: 'E3', encounter_group: 'office based', encounter_start_date: '2023-08-01', encounter_end_date: '2023-08-01', data_source: 'src2'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', encounter_group: 'inpatient', data_source: 'src1'}
+        - {encounter_id: 'E2', encounter_group: 'outpatient', data_source: 'src1'}
+        - {encounter_id: 'E3', encounter_group: 'office based', data_source: 'src2'}
+
+  # =========================================================================
+  # STAGING: stg_core__patient
+  # =========================================================================
+
+  - name: test_fhir_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__patient
+    description: "Patient staging passes through person_id, name, sex, race, birth_date, data_source"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', race: 'white', birth_date: '1960-01-01', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', race: 'white', birth_date: '1960-01-01', data_source: 'src1'}
+
+  - name: test_fhir_stg_patient_null_race
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__patient
+    description: "Patient staging passes through null race without modification"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', first_name: 'Jane', last_name: 'Smith', sex: 'female', race: null, birth_date: '1975-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'Jane', last_name: 'Smith', sex: 'female', race: null, birth_date: '1975-06-15', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__procedure
+  # =========================================================================
+
+  - name: test_fhir_stg_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__procedure
+    description: "Procedure staging passes through core procedure columns"
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {procedure_id: 'PROC1', person_id: 'P1', claim_id: null, encounter_id: 'E1', normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN0ZZ', normalized_description: 'Excision sigmoid', source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: 'NPI1', data_source: 'src1'}
+    expect:
+      rows:
+        - {procedure_id: 'PROC1', person_id: 'P1', normalized_code: '0DBN0ZZ', data_source: 'src1'}
+
+  - name: test_fhir_stg_procedure_preserves_claim_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__procedure
+    description: "Procedure staging preserves claim_id for downstream EOB filtering"
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {procedure_id: 'PROC1', person_id: 'P1', claim_id: 'CLM1', encounter_id: 'E1', normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN0ZZ', normalized_description: 'Excision', source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: 'NPI1', data_source: 'src1'}
+    expect:
+      rows:
+        - {procedure_id: 'PROC1', person_id: 'P1', claim_id: 'CLM1', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__observation
+  # =========================================================================
+
+  - name: test_fhir_stg_observation_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__observation
+    description: "Observation staging passes through core observation columns"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', encounter_id: 'E1', observation_type: 'vital-signs', normalized_code_type: 'LOINC', normalized_code: '8480-6', normalized_description: 'Systolic BP', source_code_type: null, source_code: null, source_description: null, observation_date: '2023-06-15', result: '120', normalized_units: 'mmHg', source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {observation_id: 'OBS1', person_id: 'P1', normalized_code: '8480-6', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__medication
+  # =========================================================================
+
+  - name: test_fhir_stg_medication_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__medication
+    description: "Medication staging passes through core medication columns"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'NDC', ndc_code: '00000000001', ndc_description: 'Aspirin', rxnorm_code: null, rxnorm_description: null, days_supply: 30, dispensing_date: '2023-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', ndc_code: '00000000001', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__eligibility
+  # =========================================================================
+
+  - name: test_fhir_stg_eligibility_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__eligibility
+    description: "Eligibility staging passes through core eligibility columns"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'Aetna', plan: 'Gold', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: 'self', subscriber_id: 'SUB1', data_source: 'src1'}
+    expect:
+      rows:
+        - {eligibility_id: 'ELG1', person_id: 'P1', payer: 'Aetna', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__pharmacy_claim
+  # =========================================================================
+
+  - name: test_fhir_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__pharmacy_claim
+    description: "Pharmacy claim staging passes through core pharmacy claim columns"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {pharmacy_claim_id: 'PC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, payer: 'MCR', plan: 'PlanA', dispensing_provider_id: 'NPI1', dispensing_provider_name: 'Pharmacy A', dispensing_date: '2023-06-15', paid_date: '2023-07-01', days_supply: 30, refills: 2, paid_amount: 50.00, in_network_flag: 1, ndc_code: '00000000001', data_source: 'src1'}
+    expect:
+      rows:
+        - {pharmacy_claim_id: 'PC1', person_id: 'P1', claim_id: 'C1', ndc_code: '00000000001', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__medical_claim
+  # =========================================================================
+
+  - name: test_fhir_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__medical_claim
+    description: "Medical claim staging passes through core medical claim columns"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', encounter_group: 'inpatient', claim_start_date: '2023-06-10', claim_end_date: '2023-06-15', claim_line_start_date: '2023-06-10', payer: 'MCR', plan: 'PlanA', billing_npi: 'NPI1', billing_name: 'Dr Smith', rendering_npi: 'NPI2', rendering_name: 'Dr Jones', admission_date: '2023-06-10', discharge_date: '2023-06-15', bill_type_code: '111', revenue_center_code: '0100', revenue_center_description: 'Room', place_of_service_code: '21', place_of_service_description: 'Inpatient', hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, paid_date: '2023-07-01', paid_amount: 500, in_network_flag: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {medical_claim_id: 'MC1', person_id: 'P1', claim_id: 'C1', claim_type: 'institutional', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: stg_core__lab_result
+  # =========================================================================
+
+  - name: test_fhir_stg_lab_result_order_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__lab_result
+    description: "Lab result staging selects order-level data when component code is null"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'F', normalized_order_type: 'loinc', normalized_order_code: '2345-7', normalized_order_description: 'Glucose', source_order_type: null, source_order_code: null, source_order_description: null, normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, source_component_type: null, source_component_code: null, source_component_description: null, result_datetime: '2023-06-15', result: '120', normalized_units: 'mg/dL', source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR1', person_id: 'P1', code_type: 'loinc', code: '2345-7', result: '120', data_source: 'src1'}
+
+  - name: test_fhir_stg_lab_result_component_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__stg_core__lab_result
+    description: "Lab result staging selects component-level data when component code is present"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'F', normalized_order_type: 'loinc', normalized_order_code: '24323-8', normalized_order_description: 'BMP', source_order_type: null, source_order_code: null, source_order_description: null, normalized_component_type: 'loinc', normalized_component_code: '2345-7', normalized_component_description: 'Glucose', source_component_type: null, source_component_code: null, source_component_description: null, result_datetime: '2023-06-15', result: '120', normalized_units: 'mg/dL', source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR1', person_id: 'P1', code_type: 'loinc', code: '2345-7', description: 'Glucose', data_source: 'src1'}
+
+  # =========================================================================
+  # INTERMEDIATE: int_pharmacy_claim_eob
+  # =========================================================================
+
+  - name: test_fhir_int_pharmacy_claim_eob_type_pharmacy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_pharmacy_claim_eob
+    description: "Pharmacy claim EOB sets eob_type_code to 'pharmacy' and null subtypes"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'MCR', plan: 'PlanA', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: 'self', subscriber_id: 'SUB1', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__stg_core__pharmacy_claim')
+        rows:
+          - {pharmacy_claim_id: 'PC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, payer: 'MCR', plan: 'PlanA', dispensing_provider_id: 'NPI1', dispensing_provider_name: 'PharmA', dispensing_date: '2023-06-15', paid_date: '2023-06-20', days_supply: 30, refills: 0, paid_amount: 50.00, in_network_flag: 1, ndc_code: '00000000001', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_supporting_info')
+        rows: []
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_item')
+        rows: []
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_total')
+        rows: []
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'PC1', eob_type_code: 'pharmacy', eob_subtype_code: null, eob_billable_period_start: null, eob_billable_period_end: null, data_source: 'src1'}
+
+  - name: test_fhir_int_pharmacy_claim_eob_dummy_practitioner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_pharmacy_claim_eob
+    description: "Pharmacy claim EOB defaults to dummy practitioner when dispensing_provider_id is null"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows: []
+      - input: ref('fhir_preprocessing__stg_core__pharmacy_claim')
+        rows:
+          - {pharmacy_claim_id: 'PC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, payer: 'MCR', plan: 'PlanA', dispensing_provider_id: null, dispensing_provider_name: null, dispensing_date: '2023-06-15', paid_date: '2023-06-20', days_supply: 30, refills: 0, paid_amount: 50.00, in_network_flag: 1, ndc_code: '00000000001', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_supporting_info')
+        rows: []
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_item')
+        rows: []
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_total')
+        rows: []
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', practitioner_internal_id: '9999999999', practitioner_name_text: 'Dummy Practitioner', data_source: 'src1'}

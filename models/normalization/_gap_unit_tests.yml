@@ -1,0 +1,44 @@
+version: 2
+
+unit_tests:
+
+  ## ══════════════════════════════════════════════════════════
+  ## UNDETERMINED CLAIM TYPE MODEL
+  ## ══════════════════════════════════════════════════════════
+
+  - name: test_int_diagnosis_code_final_multiple_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify diagnosis code final handles multiple claims independently
+    model: normalized_input__int_diagnosis_code_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_diagnosis_code_intermediate')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'diagnosis_code_1', diagnosis_code: 'E1165'}
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'diagnosis_code_1', diagnosis_code: 'I10'}
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'diagnosis_code_2', diagnosis_code: 'J189'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', diagnosis_code_1: 'E1165', diagnosis_code_2: null, tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'CLM002', data_source: 'claims_a', diagnosis_code_1: 'I10', diagnosis_code_2: 'J189', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_medical_date_aggregation_multiple_lines
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify date aggregation picks min start and max end across multiple lines
+    model: normalized_input__int_medical_date_aggregation
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_medical_claim_date_normalize')
+        rows:
+          - {claim_id: 'CLM001', claim_line_number: 1, claim_type: 'institutional', data_source: 'claims_a', normalized_claim_start_date: '2024-01-15', normalized_claim_end_date: '2024-01-18', normalized_admission_date: '2024-01-15', normalized_discharge_date: '2024-01-18'}
+          - {claim_id: 'CLM001', claim_line_number: 2, claim_type: 'institutional', data_source: 'claims_a', normalized_claim_start_date: '2024-01-16', normalized_claim_end_date: '2024-01-20', normalized_admission_date: '2024-01-16', normalized_discharge_date: '2024-01-20'}
+          - {claim_id: 'CLM001', claim_line_number: 3, claim_type: 'institutional', data_source: 'claims_a', normalized_claim_start_date: '2024-01-14', normalized_claim_end_date: '2024-01-19', normalized_admission_date: '2024-01-14', normalized_discharge_date: '2024-01-19'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', minimum_claim_start_date: '2024-01-14', maximum_claim_end_date: '2024-01-20', minimum_admission_date: '2024-01-14', maximum_discharge_date: '2024-01-20', tuva_last_run: '2024-01-01 00:00:00'}

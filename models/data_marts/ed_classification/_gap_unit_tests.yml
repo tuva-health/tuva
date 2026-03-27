@@ -1,0 +1,93 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # ED CLASSIFICATION - STAGING: stg_encounter
+  # =========================================================================
+
+  - name: test_ed_classification_stg_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_encounter
+    description: "Staging passes through core encounter fields for ED classification"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J06.9', primary_diagnosis_description: 'URI', paid_amount: 500, allowed_amount: 400, charge_amount: 600}
+    expect:
+      rows:
+        - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', primary_diagnosis_code: 'J06.9'}
+
+  - name: test_ed_classification_stg_encounter_multiple_types
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_encounter
+    description: "Staging passes through all encounter types without filtering"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J06.9', primary_diagnosis_description: 'URI', paid_amount: 500, allowed_amount: 400, charge_amount: 600}
+          - {encounter_id: 'E2', encounter_type: 'inpatient', person_id: 'P2', encounter_end_date: '2023-06-16', facility_npi: 'NPI2', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'I21.0', primary_diagnosis_description: 'MI', paid_amount: 5000, allowed_amount: 4000, charge_amount: 6000}
+    expect:
+      rows:
+        - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1'}
+        - {encounter_id: 'E2', encounter_type: 'inpatient', person_id: 'P2'}
+
+  - name: test_ed_classification_stg_encounter_preserves_amounts
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_encounter
+    description: "Staging preserves paid, allowed, and charge amounts"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J06.9', primary_diagnosis_description: 'URI', paid_amount: 500.50, allowed_amount: 400.25, charge_amount: 600.75}
+    expect:
+      rows:
+        - {encounter_id: 'E1', paid_amount: 500.50, allowed_amount: 400.25, charge_amount: 600.75}
+
+  # =========================================================================
+  # ED CLASSIFICATION - STAGING: stg_patient
+  # =========================================================================
+
+  - name: test_ed_classification_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_patient
+    description: "Staging passes through core patient fields for ED classification"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', race: 'white', state: 'NY', zip_code: '10001', latitude: 40.7128, longitude: -74.0060, data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', zip_code: '10001', data_source: 'src1'}
+
+  - name: test_ed_classification_stg_patient_null_demographics
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_patient
+    description: "Staging passes through patient with null demographic fields"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: null, birth_date: null, race: null, state: null, zip_code: null, latitude: null, longitude: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: null, birth_date: null, race: null, zip_code: null, data_source: 'src1'}
+
+  - name: test_ed_classification_stg_patient_multiple_patients
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__stg_patient
+    description: "Staging passes through multiple patient records"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', race: 'white', state: 'NY', zip_code: '10001', latitude: 40.7128, longitude: -74.0060, data_source: 'src1'}
+          - {person_id: 'P2', sex: 'female', birth_date: '1985-05-15', race: 'black', state: 'CA', zip_code: '90210', latitude: 34.0901, longitude: -118.4065, data_source: 'src2'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'male', state: 'NY', data_source: 'src1'}
+        - {person_id: 'P2', sex: 'female', state: 'CA', data_source: 'src2'}

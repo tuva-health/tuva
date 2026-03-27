@@ -1,0 +1,509 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - INTERMEDIATE: int_person_years
+  # =========================================================================
+
+  - name: test_provider_attribution_person_years_extracts_year
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_person_years
+    description: "Person years are derived from member months by extracting the 4-digit year from year_month"
+    given:
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P1', year_month: '202302'}
+          - {person_id: 'P1', year_month: '202401'}
+          - {person_id: 'P2', year_month: '202301'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2023}
+        - {person_id: 'P1', performance_year: 2024}
+        - {person_id: 'P2', performance_year: 2023}
+
+  - name: test_provider_attribution_person_years_deduplicates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_person_years
+    description: >
+      Multiple member months in the same year for the same person should
+      produce only one person-year row.
+    given:
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P1', year_month: '202302'}
+          - {person_id: 'P1', year_month: '202303'}
+          - {person_id: 'P1', year_month: '202304'}
+          - {person_id: 'P1', year_month: '202305'}
+          - {person_id: 'P1', year_month: '202306'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2023}
+
+  - name: test_provider_attribution_person_years_multiple_people_years
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_person_years
+    description: >
+      Each unique person/year combination from member months should produce
+      exactly one person-year row, supporting multiple people and years.
+    given:
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202201'}
+          - {person_id: 'P1', year_month: '202301'}
+          - {person_id: 'P2', year_month: '202201'}
+          - {person_id: 'P2', year_month: '202301'}
+          - {person_id: 'P3', year_month: '202301'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2022}
+        - {person_id: 'P1', performance_year: 2023}
+        - {person_id: 'P2', performance_year: 2022}
+        - {person_id: 'P2', performance_year: 2023}
+        - {person_id: 'P3', performance_year: 2023}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - INTERMEDIATE: provider_classification
+  # =========================================================================
+
+  - name: test_provider_attribution_classification_assigns_bucket
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_classification
+    description: "Provider classification maps NPI to pcp/specialist/npp bucket via taxonomy crosswalk with priority ranking"
+    given:
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI1', primary_taxonomy_code: 'TAX1', primary_specialty_description: 'Internal Medicine', entity_type_description: 'Individual'}
+      - input: ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')
+        rows:
+          - {provider_taxonomy_code: 'TAX1', medicare_specialty_code: '11'}
+      - input: ref('cms_provider_attribution__provider_specialty_assignment_codes')
+        rows:
+          - {specialty_code: '11', primary_care_physician_step1: 'yes', specialist_physician_step_2: 'no', physician: 1}
+    expect:
+      rows:
+        - {provider_id: 'NPI1', prov_specialty: 'Internal Medicine', provider_bucket: 'pcp'}
+
+  - name: test_provider_attribution_classification_specialist_bucket
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_classification
+    description: >
+      A physician whose specialty code is not flagged as PCP step-1 but is
+      flagged as specialist step-2 should be classified as specialist.
+    given:
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI2', primary_taxonomy_code: 'TAX2', primary_specialty_description: 'Cardiology', entity_type_description: 'Individual'}
+      - input: ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')
+        rows:
+          - {provider_taxonomy_code: 'TAX2', medicare_specialty_code: '06'}
+      - input: ref('cms_provider_attribution__provider_specialty_assignment_codes')
+        rows:
+          - {specialty_code: '06', primary_care_physician_step1: 'no', specialist_physician_step_2: 'yes', physician: 1}
+    expect:
+      rows:
+        - {provider_id: 'NPI2', prov_specialty: 'Cardiology', provider_bucket: 'specialist'}
+
+  - name: test_provider_attribution_classification_npp_bucket
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_classification
+    description: >
+      A non-physician provider (physician=0) should be classified as npp
+      regardless of step-1 or step-2 flags.
+    given:
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI3', primary_taxonomy_code: 'TAX3', primary_specialty_description: 'Nurse Practitioner', entity_type_description: 'Individual'}
+      - input: ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')
+        rows:
+          - {provider_taxonomy_code: 'TAX3', medicare_specialty_code: '50'}
+      - input: ref('cms_provider_attribution__provider_specialty_assignment_codes')
+        rows:
+          - {specialty_code: '50', primary_care_physician_step1: 'no', specialist_physician_step_2: 'no', physician: 0}
+    expect:
+      rows:
+        - {provider_id: 'NPI3', prov_specialty: 'Nurse Practitioner', provider_bucket: 'npp'}
+
+  - name: test_provider_attribution_classification_excludes_organizations
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_classification
+    description: >
+      Organization entity types should be excluded from provider classification
+      since only individuals are eligible for attribution.
+    given:
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI4', primary_taxonomy_code: 'TAX4', primary_specialty_description: 'Hospital', entity_type_description: 'Organization'}
+      - input: ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')
+        rows:
+          - {provider_taxonomy_code: 'TAX4', medicare_specialty_code: '11'}
+      - input: ref('cms_provider_attribution__provider_specialty_assignment_codes')
+        rows:
+          - {specialty_code: '11', primary_care_physician_step1: 'yes', specialist_physician_step_2: 'no', physician: 1}
+    expect:
+      rows: []
+
+  - name: test_provider_attribution_classification_priority_pcp_over_specialist
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_classification
+    description: >
+      When a provider maps to both PCP and specialist via multiple taxonomy
+      crosswalk entries, the PCP bucket should win due to priority ranking.
+    given:
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI5', primary_taxonomy_code: 'TAX5', primary_specialty_description: 'Family Medicine', entity_type_description: 'Individual'}
+      - input: ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')
+        rows:
+          - {provider_taxonomy_code: 'TAX5', medicare_specialty_code: '08'}
+          - {provider_taxonomy_code: 'TAX5', medicare_specialty_code: '38'}
+      - input: ref('cms_provider_attribution__provider_specialty_assignment_codes')
+        rows:
+          - {specialty_code: '08', primary_care_physician_step1: 'yes', specialist_physician_step_2: 'no', physician: 1}
+          - {specialty_code: '38', primary_care_physician_step1: 'no', specialist_physician_step_2: 'yes', physician: 1}
+    expect:
+      rows:
+        - {provider_id: 'NPI5', prov_specialty: 'Family Medicine', provider_bucket: 'pcp'}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - INTERMEDIATE: int_primary_care_claims
+  # =========================================================================
+
+  - name: test_provider_attribution_primary_care_claims_filters_hcpcs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_primary_care_claims
+    description: "Primary care claims filters to eligible HCPCS codes and joins provider bucket"
+    given:
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', allowed_amount: 500, paid_amount: 400, rendering_npi: 'NPI1', hcpcs_code: '99213', data_source: 'src1'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('cms_provider_attribution__primary_care_hcpcs_codes')
+        rows:
+          - {hcpcs_code: '99213'}
+      - input: ref('provider_attribution__provider_classification')
+        rows:
+          - {provider_id: 'NPI1', prov_specialty: 'Internal Medicine', provider_bucket: 'pcp'}
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI1', primary_taxonomy_code: 'TAX1', primary_specialty_description: 'Internal Medicine', entity_type_description: 'Individual'}
+    expect:
+      rows:
+        - {person_id: 'P1', provider_id: 'NPI1', provider_bucket: 'pcp', hcpcs_code: '99213'}
+
+  - name: test_provider_attribution_primary_care_claims_excludes_non_primary_hcpcs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_primary_care_claims
+    description: >
+      Claims with HCPCS codes not in the primary care list should be excluded
+      from the primary care claims result.
+    given:
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', allowed_amount: 500, paid_amount: 400, rendering_npi: 'NPI1', hcpcs_code: '99999', data_source: 'src1'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('cms_provider_attribution__primary_care_hcpcs_codes')
+        rows:
+          - {hcpcs_code: '99213'}
+      - input: ref('provider_attribution__provider_classification')
+        rows:
+          - {provider_id: 'NPI1', prov_specialty: 'Internal Medicine', provider_bucket: 'pcp'}
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI1', primary_taxonomy_code: 'TAX1', primary_specialty_description: 'Internal Medicine', entity_type_description: 'Individual'}
+    expect:
+      rows: []
+
+  - name: test_provider_attribution_primary_care_claims_excludes_unenrolled
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_primary_care_claims
+    description: >
+      Claims in a month where the person has no member month record should
+      be excluded, ensuring only enrolled claims are considered.
+    given:
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', allowed_amount: 500, paid_amount: 400, rendering_npi: 'NPI1', hcpcs_code: '99213', data_source: 'src1'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301'}
+      - input: ref('cms_provider_attribution__primary_care_hcpcs_codes')
+        rows:
+          - {hcpcs_code: '99213'}
+      - input: ref('provider_attribution__provider_classification')
+        rows:
+          - {provider_id: 'NPI1', prov_specialty: 'Internal Medicine', provider_bucket: 'pcp'}
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI1', primary_taxonomy_code: 'TAX1', primary_specialty_description: 'Internal Medicine', entity_type_description: 'Individual'}
+    expect:
+      rows: []
+
+  - name: test_provider_attribution_primary_care_claims_fallback_to_paid_amount
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_primary_care_claims
+    description: >
+      When allowed_amount is zero, the model should fall back to paid_amount
+      via the coalesce(nullif(allowed_amount, 0), paid_amount, 0) expression.
+    given:
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', allowed_amount: 0, paid_amount: 350, rendering_npi: 'NPI1', hcpcs_code: '99213', data_source: 'src1'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('cms_provider_attribution__primary_care_hcpcs_codes')
+        rows:
+          - {hcpcs_code: '99213'}
+      - input: ref('provider_attribution__provider_classification')
+        rows:
+          - {provider_id: 'NPI1', prov_specialty: 'Internal Medicine', provider_bucket: 'pcp'}
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI1', primary_taxonomy_code: 'TAX1', primary_specialty_description: 'Internal Medicine', entity_type_description: 'Individual'}
+    expect:
+      rows:
+        - {person_id: 'P1', provider_id: 'NPI1', allowed_amount: 350, hcpcs_code: '99213'}
+
+  - name: test_provider_attribution_primary_care_claims_unclassified_provider
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__int_primary_care_claims
+    description: >
+      When a provider is not in the classification table, the bucket should
+      default to other_individual and specialty falls back to the provider table.
+    given:
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', allowed_amount: 200, paid_amount: 150, rendering_npi: 'NPI9', hcpcs_code: '99213', data_source: 'src1'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('cms_provider_attribution__primary_care_hcpcs_codes')
+        rows:
+          - {hcpcs_code: '99213'}
+      - input: ref('provider_attribution__provider_classification')
+        rows: []
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows:
+          - {npi: 'NPI9', primary_taxonomy_code: 'TAX9', primary_specialty_description: 'General Practice', entity_type_description: 'Individual'}
+    expect:
+      rows:
+        - {person_id: 'P1', provider_id: 'NPI9', provider_bucket: 'other_individual', prov_specialty: 'General Practice', hcpcs_code: '99213'}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - FINAL: assigned_beneficiaries_yearly
+  # =========================================================================
+
+  - name: test_provider_attribution_yearly_picks_rank_1
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__assigned_beneficiaries_yearly
+    description: "Yearly assignment picks ranking=1 from provider_ranking for scope='yearly'; missing beneficiaries get fallback"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('provider_attribution__int_person_years')
+        rows:
+          - {person_id: 'P1', performance_year: 2023}
+          - {person_id: 'P2', performance_year: 2023}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, first_day_of_month: '2023-01-01', last_day_of_month: '2023-01-31', full_date: '2023-01-01'}
+          - {year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31', full_date: '2023-12-01'}
+      - input: ref('provider_attribution__provider_ranking')
+        rows:
+          - {person_id: 'P1', performance_year: 2023, as_of_date: null, provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Internal Med', step: 1, step_description: '12-month PCP/NPP primary-care HCPCS', allowed_amount: 500, visits: 3, scope: 'yearly', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 1, attribution_key: 'yearly|2023|P1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', performance_year: 2023, as_of_date: null, provider_id: 'NPI2', provider_bucket: 'specialist', prov_specialty: 'Cardiology', step: 2, step_description: '12-month specialist primary-care HCPCS', allowed_amount: 200, visits: 1, scope: 'yearly', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 2, attribution_key: 'yearly|2023|P1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2023, provider_id: 'NPI1', provider_bucket: 'pcp', assigned_step: 1, attribution_key: 'yearly|2023|P1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', performance_year: 2023, provider_id: '9999999999', provider_bucket: 'no_eligible_history', assigned_step: 0, attribution_key: 'yearly|2023|P2', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_provider_attribution_yearly_ignores_current_scope
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__assigned_beneficiaries_yearly
+    description: >
+      Yearly assignment should only use records with scope='yearly' from
+      provider_ranking, ignoring scope='current' records entirely.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('provider_attribution__int_person_years')
+        rows:
+          - {person_id: 'P1', performance_year: 2023}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, first_day_of_month: '2023-01-01', last_day_of_month: '2023-01-31', full_date: '2023-01-01'}
+          - {year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31', full_date: '2023-12-01'}
+      - input: ref('provider_attribution__provider_ranking')
+        rows:
+          - {person_id: 'P1', performance_year: null, as_of_date: '2023-12-31', provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Internal Med', step: 1, step_description: '12-month PCP/NPP primary-care HCPCS', allowed_amount: 500, visits: 3, scope: 'current', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 1, attribution_key: 'current|20231231|P1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2023, provider_id: '9999999999', provider_bucket: 'no_eligible_history', assigned_step: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_provider_attribution_yearly_multiple_years
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__assigned_beneficiaries_yearly
+    description: >
+      A person with enrollment in multiple years should get independent
+      yearly assignments; each year should have its own assigned provider or fallback.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('provider_attribution__int_person_years')
+        rows:
+          - {person_id: 'P1', performance_year: 2022}
+          - {person_id: 'P1', performance_year: 2023}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {year_month_int: 202201, first_day_of_month: '2022-01-01', last_day_of_month: '2022-01-31', full_date: '2022-01-01'}
+          - {year_month_int: 202212, first_day_of_month: '2022-12-01', last_day_of_month: '2022-12-31', full_date: '2022-12-01'}
+          - {year_month_int: 202301, first_day_of_month: '2023-01-01', last_day_of_month: '2023-01-31', full_date: '2023-01-01'}
+          - {year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31', full_date: '2023-12-01'}
+      - input: ref('provider_attribution__provider_ranking')
+        rows:
+          - {person_id: 'P1', performance_year: 2022, as_of_date: null, provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Family Med', step: 1, step_description: '12-month PCP/NPP primary-care HCPCS', allowed_amount: 300, visits: 2, scope: 'yearly', lookback_start_date: '2022-01-01', lookback_end_date: '2022-12-31', ranking: 1, attribution_key: 'yearly|2022|P1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', performance_year: 2023, as_of_date: null, provider_id: 'NPI2', provider_bucket: 'specialist', prov_specialty: 'Cardiology', step: 2, step_description: '12-month specialist primary-care HCPCS', allowed_amount: 600, visits: 4, scope: 'yearly', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 1, attribution_key: 'yearly|2023|P1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2022, provider_id: 'NPI1', provider_bucket: 'pcp', assigned_step: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', performance_year: 2023, provider_id: 'NPI2', provider_bucket: 'specialist', assigned_step: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - FINAL: assigned_beneficiaries_current
+  # =========================================================================
+
+  - name: test_provider_attribution_current_picks_rank_1
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__assigned_beneficiaries_current
+    description: "Current assignment picks ranking=1 from provider_ranking for scope='current'"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_as_of_date: '2023-12-31'
+    given:
+      - input: ref('provider_attribution__int_primary_care_claims')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', claim_year: 2023, claim_month: 6, claim_year_month: '202306', claim_year_month_int: 202306, allowed_amount: 500, provider_id: 'NPI1', hcpcs_code: '99213', provider_bucket: 'pcp', prov_specialty: 'Internal Medicine'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+          - {full_date: '2023-12-31', year: 2023, month: 12, year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('provider_attribution__provider_ranking')
+        rows:
+          - {person_id: 'P1', performance_year: null, as_of_date: '2023-12-31', provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Internal Med', step: 1, step_description: '12-month PCP/NPP primary-care HCPCS', allowed_amount: 500, visits: 3, scope: 'current', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 1, attribution_key: 'current|20231231|P1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', provider_id: 'NPI1', provider_bucket: 'pcp', assigned_step: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_provider_attribution_current_fallback_no_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__assigned_beneficiaries_current
+    description: >
+      An eligible beneficiary with no matching provider ranking records
+      should receive the fallback provider assignment with step 0.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_as_of_date: '2023-12-31'
+    given:
+      - input: ref('provider_attribution__int_primary_care_claims')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, encounter_id: 'E1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', claim_year: 2023, claim_month: 6, claim_year_month: '202306', claim_year_month_int: 202306, allowed_amount: 500, provider_id: 'NPI1', hcpcs_code: '99213', provider_bucket: 'pcp', prov_specialty: 'Internal Medicine'}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1, year_month_int: 202301, first_day_of_month: '2023-01-01', last_day_of_month: '2023-01-31'}
+          - {full_date: '2023-06-01', year: 2023, month: 6, year_month_int: 202306, first_day_of_month: '2023-06-01', last_day_of_month: '2023-06-30'}
+          - {full_date: '2023-12-31', year: 2023, month: 12, year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P2', year_month: '202306'}
+      - input: ref('provider_attribution__provider_ranking')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P2', provider_id: '9999999999', provider_bucket: 'no_eligible_history', assigned_step: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION - FINAL: provider_ranking
+  # =========================================================================
+
+  - name: test_provider_attribution_provider_ranking_collapses_to_earliest_step
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: provider_attribution__provider_ranking
+    description: "Provider ranking collapses multiple qualifying steps for the same person/provider down to the earliest step"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_as_of_date: '2023-12-31'
+    given:
+      - input: ref('provider_attribution__int_person_years')
+        rows:
+          - {person_id: 'P1', performance_year: 2023}
+      - input: ref('provider_attribution__int_primary_care_claims')
+        rows:
+          - {person_id: 'P1', provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Internal Medicine', encounter_id: 'E1', claim_id: 'C1', claim_year: 2023, claim_year_month_int: 202306, claim_end_date: '2023-06-15', allowed_amount: 400}
+          - {person_id: 'P1', provider_id: 'NPI1', provider_bucket: 'specialist', prov_specialty: 'Internal Medicine', encounter_id: 'E2', claim_id: 'C2', claim_year: 2023, claim_year_month_int: 202303, claim_end_date: '2023-03-15', allowed_amount: 150}
+      - input: ref('provider_attribution__stg_reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, first_day_of_month: '2023-01-01', last_day_of_month: '2023-01-31', full_date: '2023-01-01'}
+          - {year_month_int: 202312, first_day_of_month: '2023-12-01', last_day_of_month: '2023-12-31', full_date: '2023-12-01'}
+      - input: ref('provider_attribution__stg_core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202306'}
+      - input: ref('provider_attribution__stg_core__medical_claim')
+        rows: []
+      - input: ref('provider_attribution__stg_terminology__provider')
+        rows: []
+      - input: ref('provider_attribution__provider_classification')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', performance_year: 2023, as_of_date: null, provider_id: 'NPI1', provider_bucket: 'pcp', prov_specialty: 'Internal Medicine', step: 1, step_description: '12-month PCP/NPP primary-care HCPCS', allowed_amount: 400, visits: 1, scope: 'yearly', lookback_start_date: '2023-01-01', lookback_end_date: '2023-12-31', ranking: 1, attribution_key: 'yearly|2023|P1', tuva_last_run: '2024-01-01 00:00:00'}
+

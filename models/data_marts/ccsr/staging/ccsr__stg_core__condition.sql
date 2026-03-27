@@ -3,7 +3,7 @@
    )
 }}
 
-select
+select distinct
     encounter_id
     , claim_id
     , person_id

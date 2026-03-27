@@ -1,0 +1,340 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_core__patient
+  # =========================================================================
+
+  - name: test_benchmarks_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__patient
+    description: "Patient staging passes through person_id, sex, birth_date, state, race"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-05-01', state: 'CA', race: 'white'}
+          - {person_id: 'P2', sex: 'male', birth_date: '1975-11-15', state: 'NY', race: 'black'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'female', birth_date: '1960-05-01', state: 'CA', race: 'white'}
+        - {person_id: 'P2', sex: 'male', birth_date: '1975-11-15', state: 'NY', race: 'black'}
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_core__member_months
+  # =========================================================================
+
+  - name: test_benchmarks_stg_member_months_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__member_months
+    description: "Member months staging passes through key columns"
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_benchmarks_stg_member_months_multiple_persons
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__member_months
+    description: "Member months staging handles multiple persons and months"
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P2', year_month: '202301', payer: 'MCD', plan: 'PlanB', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P2', year_month: '202301', payer: 'MCD', plan: 'PlanB', data_source: 'src1'}
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_core__condition
+  # =========================================================================
+
+  - name: test_benchmarks_stg_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__condition
+    description: "Condition staging passes through normalized_code and recorded_date"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {person_id: 'P1', normalized_code: 'E11.65', recorded_date: '2023-06-15'}
+    expect:
+      rows:
+        - {person_id: 'P1', normalized_code: 'E11.65', recorded_date: '2023-06-15'}
+
+  - name: test_benchmarks_stg_condition_multiple_conditions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__condition
+    description: "Condition staging passes through multiple conditions for same person"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {person_id: 'P1', normalized_code: 'E11.65', recorded_date: '2023-06-15'}
+          - {person_id: 'P1', normalized_code: 'I10', recorded_date: '2023-07-01'}
+          - {person_id: 'P2', normalized_code: 'J44.1', recorded_date: '2023-08-10'}
+    expect:
+      rows:
+        - {person_id: 'P1', normalized_code: 'E11.65', recorded_date: '2023-06-15'}
+        - {person_id: 'P1', normalized_code: 'I10', recorded_date: '2023-07-01'}
+        - {person_id: 'P2', normalized_code: 'J44.1', recorded_date: '2023-08-10'}
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_core__medical_claim
+  # =========================================================================
+
+  - name: test_benchmarks_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__medical_claim
+    description: "Medical claim staging passes through key columns for benchmarks"
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', paid_amount: 500, data_source: 'src1', payer: 'MCR', plan: 'PlanA', claim_end_date: '2023-06-15', encounter_type: 'acute inpatient', encounter_group: 'inpatient', enrollment_flag: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', paid_amount: 500, data_source: 'src1', payer: 'MCR', encounter_type: 'acute inpatient', enrollment_flag: 1}
+
+  - name: test_benchmarks_stg_medical_claim_multiple_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__medical_claim
+    description: "Medical claim staging passes through multiple claims with different encounter types"
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', paid_amount: 5000, data_source: 'src1', payer: 'MCR', plan: 'PlanA', claim_end_date: '2023-06-15', encounter_type: 'acute inpatient', encounter_group: 'inpatient', enrollment_flag: 1}
+          - {person_id: 'P1', encounter_id: 'E2', paid_amount: 200, data_source: 'src1', payer: 'MCR', plan: 'PlanA', claim_end_date: '2023-07-01', encounter_type: 'office visit', encounter_group: 'office based', enrollment_flag: 1}
+          - {person_id: 'P2', encounter_id: 'E3', paid_amount: 800, data_source: 'src1', payer: 'MCD', plan: 'PlanB', claim_end_date: '2023-08-10', encounter_type: 'emergency department', encounter_group: 'outpatient', enrollment_flag: 0}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', paid_amount: 5000, encounter_type: 'acute inpatient', enrollment_flag: 1}
+        - {person_id: 'P1', encounter_id: 'E2', paid_amount: 200, encounter_type: 'office visit', enrollment_flag: 1}
+        - {person_id: 'P2', encounter_id: 'E3', paid_amount: 800, encounter_type: 'emergency department', enrollment_flag: 0}
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_reference_data__calendar
+  # =========================================================================
+
+  - name: test_benchmarks_stg_calendar_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_reference_data__calendar
+    description: "Calendar staging passes through full_date, year, year_month_int, first_day_of_month"
+    given:
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-15', year: 2023, year_month_int: 202306, first_day_of_month: '2023-06-01'}
+    expect:
+      rows:
+        - {full_date: '2023-06-15', year: 2023, year_month_int: 202306, first_day_of_month: '2023-06-01'}
+
+  # =========================================================================
+  # BENCHMARKS - STAGING: stg_core__encounter
+  # =========================================================================
+
+  - name: test_benchmarks_stg_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__encounter
+    description: "Encounter staging passes through encounter columns for benchmarks"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', data_source: 'src1', encounter_start_date: '2023-06-10', encounter_type: 'acute inpatient', encounter_group: 'inpatient', length_of_stay: 5, discharge_disposition_code: '01', facility_npi: 'FAC1', facility_name: 'Hospital A', drg_code_type: 'ms-drg', drg_code: '470', drg_description: 'Major joint', paid_amount: 25000, primary_diagnosis_code: 'I2510'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', data_source: 'src1', encounter_type: 'acute inpatient', length_of_stay: 5}
+
+  - name: test_benchmarks_stg_encounter_multiple_types
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__encounter
+    description: "Encounter staging handles different encounter types"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', data_source: 'src1', encounter_start_date: '2023-06-10', encounter_type: 'acute inpatient', encounter_group: 'inpatient', length_of_stay: 5, discharge_disposition_code: '01', facility_npi: 'FAC1', facility_name: 'Hospital A', drg_code_type: 'ms-drg', drg_code: '470', drg_description: 'Major joint', paid_amount: 25000, primary_diagnosis_code: 'I2510'}
+          - {encounter_id: 'E2', person_id: 'P1', data_source: 'src1', encounter_start_date: '2023-07-01', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, discharge_disposition_code: null, facility_npi: 'FAC2', facility_name: 'Clinic B', drg_code_type: null, drg_code: null, drg_description: null, paid_amount: 200, primary_diagnosis_code: 'E1165'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'acute inpatient', length_of_stay: 5}
+        - {encounter_id: 'E2', person_id: 'P1', encounter_type: 'office visit', length_of_stay: 0}
+
+  # =========================================================================
+  # INTERMEDIATE: pivot_hcc
+  # =========================================================================
+
+  - name: test_benchmarks_pivot_hcc_flags_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__pivot_hcc
+    description: "HCC pivot creates binary flags per HCC code per person per year"
+    given:
+      - input: ref('benchmarks__stg_cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', hcc_code: '85', collection_end_date: '2023-12-31'}
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-06-30'}
+      - input: ref('benchmarks__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+          - {full_date: '2023-06-30', year: 2023, year_month_int: 202306, first_day_of_month: '2023-06-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_nbr: 2023, hcc_19: 1, hcc_85: 1}
+
+  - name: test_benchmarks_pivot_hcc_no_hcc_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__pivot_hcc
+    description: "HCC pivot returns no rows when all hcc_code values are null"
+    given:
+      - input: ref('benchmarks__stg_cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: null, collection_end_date: '2023-12-31'}
+      - input: ref('benchmarks__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+    expect:
+      rows: []
+
+  - name: test_benchmarks_pivot_hcc_multiple_persons
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__pivot_hcc
+    description: "HCC pivot correctly separates flags by person and year"
+    given:
+      - input: ref('benchmarks__stg_cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-12-31'}
+          - {person_id: 'P2', hcc_code: '85', collection_end_date: '2023-12-31'}
+          - {person_id: 'P2', hcc_code: '19', collection_end_date: '2022-12-31'}
+      - input: ref('benchmarks__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+          - {full_date: '2022-12-31', year: 2022, year_month_int: 202212, first_day_of_month: '2022-12-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_nbr: 2023, hcc_19: 1, hcc_85: 0}
+        - {person_id: 'P2', year_nbr: 2023, hcc_85: 1, hcc_19: 0}
+        - {person_id: 'P2', year_nbr: 2022, hcc_19: 1, hcc_85: 0}
+
+  # =========================================================================
+  # STAGING: stg_cms_hcc__int_disease_factors
+  # =========================================================================
+
+  - name: test_benchmarks_stg_disease_factors_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_cms_hcc__int_disease_factors
+    description: "Disease factors staging passes through person_id, hcc_code, and collection_end_date"
+    given:
+      - input: ref('cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-12-31'}
+          - {person_id: 'P2', hcc_code: '85', collection_end_date: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-12-31'}
+        - {person_id: 'P2', hcc_code: '85', collection_end_date: '2023-12-31'}
+
+  # =========================================================================
+  # POST-PREDICT: unpivot_inpatient
+  # =========================================================================
+
+  - name: test_benchmarks_unpivot_inpatient_cross_join
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient
+    description: "Unpivot inpatient cross joins discharge locations and expected vs actual"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'home', discharge_pred_proba_snf: 0.1, discharge_pred_proba_home: 0.6, discharge_pred_proba_home_health: 0.1, discharge_pred_proba_expired: 0.05, discharge_pred_proba_transfer_other_facility: 0.05, discharge_pred_proba_ipt_rehab: 0.05, discharge_pred_proba_hospice: 0.02, discharge_pred_proba_other: 0.03}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'expected', discharge_location_long: 0.1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'expected', discharge_location_long: 0.6}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home health', eva: 'expected', discharge_location_long: 0.1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home health', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'expected', discharge_location_long: 0.05}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'expected', discharge_location_long: 0.05}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'ipt rehab', eva: 'expected', discharge_location_long: 0.05}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'ipt rehab', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'hospice', eva: 'expected', discharge_location_long: 0.02}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'hospice', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'expected', discharge_location_long: 0.03}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'actual', discharge_location_long: 0}
+
+  - name: test_benchmarks_unpivot_inpatient_actual_matches_location
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient
+    description: "Unpivot inpatient sets actual=1 only for the matching discharge location"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'snf', discharge_pred_proba_snf: 0.8, discharge_pred_proba_home: 0.1, discharge_pred_proba_home_health: 0.02, discharge_pred_proba_expired: 0.02, discharge_pred_proba_transfer_other_facility: 0.02, discharge_pred_proba_ipt_rehab: 0.02, discharge_pred_proba_hospice: 0.01, discharge_pred_proba_other: 0.01}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'expected', discharge_location_long: 0.8}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'expected', discharge_location_long: 0.1}
+
+  # =========================================================================
+  # POST-PREDICT: unpivot_inpatient_prospective
+  # =========================================================================
+
+  - name: test_benchmarks_unpivot_inpatient_prospective_cross_join
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient_prospective
+    description: "Unpivot inpatient prospective cross joins discharge locations and expected vs actual"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient_prospective')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'snf', discharge_pred_proba_snf: 0.7, discharge_pred_proba_home: 0.1, discharge_pred_proba_home_health: 0.05, discharge_pred_proba_expired: 0.05, discharge_pred_proba_transfer_other_facility: 0.03, discharge_pred_proba_ipt_rehab: 0.03, discharge_pred_proba_hospice: 0.02, discharge_pred_proba_other: 0.02}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'expected', discharge_location_long: 0.7}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'expected', discharge_location_long: 0.1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home health', eva: 'expected', discharge_location_long: 0.05}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home health', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'expected', discharge_location_long: 0.05}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'expected', discharge_location_long: 0.03}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'ipt rehab', eva: 'expected', discharge_location_long: 0.03}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'ipt rehab', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'hospice', eva: 'expected', discharge_location_long: 0.02}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'hospice', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'expected', discharge_location_long: 0.02}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'actual', discharge_location_long: 0}

@@ -1,0 +1,628 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: patient
+  # =========================================================================
+
+  - name: test_fhir_patient_maps_race_unk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__patient
+    description: "Patient model maps null race to 'UNK' and passes through other fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__patient')
+        rows:
+          - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', race: null, birth_date: '1960-01-01', data_source: 'src1'}
+          - {person_id: 'P2', first_name: 'Jane', last_name: 'Smith', sex: 'female', race: 'white', birth_date: '1975-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', name_first: 'John', name_last: 'Doe', gender: 'male', race: 'UNK', birth_date: '1960-01-01', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {patient_internal_id: 'P2', name_first: 'Jane', name_last: 'Smith', gender: 'female', race: 'white', birth_date: '1975-06-15', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_patient_renames_columns
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__patient
+    description: "Patient model renames person_id to patient_internal_id, first_name to name_first, last_name to name_last, sex to gender"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__patient')
+        rows:
+          - {person_id: 'P99', first_name: 'Alice', last_name: 'Brown', sex: 'female', race: 'black', birth_date: '1990-03-20', data_source: 'src2'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P99', name_first: 'Alice', name_last: 'Brown', gender: 'female', race: 'black', birth_date: '1990-03-20', data_source: 'src2', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: condition
+  # =========================================================================
+
+  - name: test_fhir_condition_maps_code_system_and_adds_dot
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model maps icd-10-cm to ICD10, inserts dot in codes > 3 chars, and filters claim conditions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: '2023-06-10', resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', claim_id: null, data_source: 'src1', condition_rank: 1}
+          - {person_id: 'P2', condition_id: 'COND2', encounter_id: 'E2', recorded_date: '2023-07-01', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'I10', claim_id: null, data_source: 'src1', condition_rank: 1}
+          - {person_id: 'P3', condition_id: 'COND3', encounter_id: 'E3', recorded_date: '2023-08-01', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'J441', claim_id: 'CLM1', data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'inpatient', encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-15', person_id: 'P1', data_source: 'src1'}
+          - {encounter_id: 'E2', encounter_group: 'outpatient', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-01', person_id: 'P2', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'COND1', condition_code: 'E11.65', condition_code_system: 'ICD10', encounter_class_code: 'IMP', tuva_last_run: '2024-01-01 00:00:00'}
+        - {patient_internal_id: 'P2', resource_internal_id: 'COND2', condition_code: 'I10', condition_code_system: 'ICD10', encounter_class_code: 'AMB', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_condition_filters_claim_conditions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model excludes conditions with a non-null claim_id since those belong in EOB"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'I10', claim_id: 'CLM1', data_source: 'src1', condition_rank: 1}
+          - {person_id: 'P2', condition_id: 'COND2', encounter_id: 'E2', recorded_date: '2023-07-01', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'E119', claim_id: null, data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E2', encounter_group: 'outpatient', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-01', person_id: 'P2', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P2', resource_internal_id: 'COND2', condition_code: 'E11.9', condition_code_system: 'ICD10', encounter_class_code: 'AMB', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_condition_filters_null_code_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model filters out conditions where normalized_code_type is null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: null, normalized_code: 'SOME', claim_id: null, data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'outpatient', encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows: []
+
+  - name: test_fhir_condition_maps_icd9_code_system
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model maps icd-9-cm to ICD9 code system"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-9-cm', normalized_code: '250.00', claim_id: null, data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'office based', encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'COND1', condition_code: '250.00', condition_code_system: 'ICD9', encounter_class_code: 'AMB', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_condition_encounter_class_other
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model maps encounter groups other than inpatient/outpatient/office based to 'other'"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'I10', claim_id: null, data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'snf', encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'COND1', condition_code: 'I10', condition_code_system: 'ICD10', encounter_class_code: 'other', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_condition_onset_defaults_to_recorded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__condition
+    description: "Condition model defaults onset_date to recorded_date when onset_date is null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__condition')
+        rows:
+          - {person_id: 'P1', condition_id: 'COND1', encounter_id: 'E1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', normalized_code_type: 'icd-10-cm', normalized_code: 'I10', claim_id: null, data_source: 'src1', condition_rank: 1}
+      - input: ref('fhir_preprocessing__stg_core__encounter')
+        rows:
+          - {encounter_id: 'E1', encounter_group: 'outpatient', encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', condition_onset_datetime: '2023-06-15', condition_recorded_datetime: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: procedure
+  # =========================================================================
+
+  - name: test_fhir_procedure_maps_code_system
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__procedure
+    description: "Procedure model maps icd-10-pcs to ICD10 code system and filters out claim procedures"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', procedure_id: 'PROC1', normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN0ZZ', normalized_description: 'Excision sigmoid colon', source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: 'NPI1', claim_id: null, data_source: 'src1'}
+          - {person_id: 'P2', procedure_id: 'PROC2', normalized_code_type: 'icd-10-pcs', normalized_code: '0HBT0ZZ', normalized_description: 'Excision breast', source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-07-01', practitioner_id: 'NPI2', claim_id: 'CLM1', data_source: 'src1'}
+          - {person_id: 'P3', procedure_id: null, normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN0ZZ', normalized_description: null, source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-08-01', practitioner_id: null, claim_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'PROC1', procedure_code_system: 'ICD10', procedure_code: '0DBN0ZZ', procedure_status: 'completed', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_procedure_filters_null_procedure_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__procedure
+    description: "Procedure model filters out rows with null procedure_id"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', procedure_id: null, normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN0ZZ', normalized_description: null, source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: null, claim_id: null, data_source: 'src1'}
+    expect:
+      rows: []
+
+  - name: test_fhir_procedure_filters_null_code_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__procedure
+    description: "Procedure model filters out rows where normalized_code_type is null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', procedure_id: 'PROC1', normalized_code_type: null, normalized_code: null, normalized_description: null, source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: null, claim_id: null, data_source: 'src1'}
+    expect:
+      rows: []
+
+  - name: test_fhir_procedure_uses_source_code_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__procedure
+    description: "Procedure model falls back to source_code_type and source_code when normalized values are null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', procedure_id: 'PROC1', normalized_code_type: null, normalized_code: null, normalized_description: null, source_code_type: 'icd-10-pcs', source_code: 'ABC123', source_description: 'Some proc', procedure_date: '2023-06-15', practitioner_id: 'NPI1', claim_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'PROC1', procedure_code_system: 'ICD10', procedure_code: 'ABC123', procedure_display: 'Some proc', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_procedure_maps_icd9_pcs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__procedure
+    description: "Procedure model maps icd-9-pcs to ICD9 code system"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', procedure_id: 'PROC1', normalized_code_type: 'icd-9-pcs', normalized_code: '99.04', normalized_description: 'Transfusion', source_code_type: null, source_code: null, source_description: null, procedure_date: '2023-06-15', practitioner_id: 'NPI1', claim_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'PROC1', procedure_code_system: 'ICD9', procedure_code: '99.04', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: coverage
+  # =========================================================================
+
+  - name: test_fhir_coverage_joins_type_list
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__coverage
+    description: "Coverage model joins intermediate coverage to coverage type list"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__int_coverage')
+        rows:
+          - {patient_internal_id: 'P1', resource_internal_id: 'COV1', organization_name: 'Aetna', coverage_plan: 'Gold', coverage_period_start: '2023-01-01', coverage_period_end: '2023-12-31', coverage_relationship: 'self', coverage_status: 'active', coverage_subscriber_id: 'SUB1', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_coverage_type')
+        rows:
+          - {patient_internal_id: 'P1', resource_internal_id: 'COV1', coverage_type_list: 'medical'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'COV1', organization_name: 'Aetna', coverage_plan: 'Gold', coverage_type_list: 'medical', coverage_status: 'active', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_coverage_null_type_list
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__coverage
+    description: "Coverage model handles missing coverage type list gracefully with null via left join"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__int_coverage')
+        rows:
+          - {patient_internal_id: 'P1', resource_internal_id: 'COV1', organization_name: 'Aetna', coverage_plan: 'Gold', coverage_period_start: '2023-01-01', coverage_period_end: '2023-12-31', coverage_relationship: 'self', coverage_status: 'active', coverage_subscriber_id: 'SUB1', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_coverage_type')
+        rows: []
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'COV1', organization_name: 'Aetna', coverage_plan: 'Gold', coverage_type_list: null, coverage_status: 'active', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: medication_dispense
+  # =========================================================================
+
+  - name: test_fhir_medication_dispense_maps_ndc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__medication_dispense
+    description: "Medication dispense maps NDC codes to NDC code system and sets status to completed"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'NDC', ndc_code: '00000000001', ndc_description: 'Aspirin 325mg', rxnorm_code: null, rxnorm_description: null, days_supply: 30, dispensing_date: '2023-06-15', data_source: 'src1'}
+          - {medication_id: 'MED2', person_id: 'P2', source_code_type: 'RXNORM', ndc_code: null, ndc_description: null, rxnorm_code: '1049502', rxnorm_description: 'Lisinopril 10mg', days_supply: 90, dispensing_date: '2023-07-01', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MED1', medication_dispense_status: 'completed', medication_code_system: 'NDC', medication_code: '00000000001', medication_code_display: 'Aspirin 325mg', medication_dispense_days_supply_value: 30, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {patient_internal_id: 'P2', resource_internal_id: 'MED2', medication_dispense_status: 'completed', medication_code_system: 'RXNORM', medication_code: '1049502', medication_code_display: 'Lisinopril 10mg', medication_dispense_days_supply_value: 90, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_medication_dispense_ndc_over_rxnorm
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__medication_dispense
+    description: "When both NDC and RXNORM codes present, NDC takes priority"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'NDC', ndc_code: '11111111111', ndc_description: 'Aspirin', rxnorm_code: '1049502', rxnorm_description: 'Aspirin RX', days_supply: 30, dispensing_date: '2023-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MED1', medication_code_system: 'NDC', medication_code: '11111111111', medication_code_display: 'Aspirin', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_fhir_medication_dispense_source_code_type_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__medication_dispense
+    description: "When no NDC or RXNORM code, medication_code_system falls back to source_code_type"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__stg_core__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'CUSTOM', ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, days_supply: 14, dispensing_date: '2023-06-15', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MED1', medication_code_system: 'CUSTOM', medication_code: null, medication_code_display: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: observation (union of lab_result + observation)
+  # =========================================================================
+
+  - name: test_fhir_observation_unions_lab_and_obs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__observation
+    description: "Observation model unions lab results and observations into a single output"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__int_lab_result')
+        rows:
+          - {patient_internal_id: 'P1', resource_internal_id: 'LR1', encounter_internal_id: 'E1', observation_status: 'final', observation_category: 'laboratory', observation_code_system: 'LOINC', observation_code: '2345-7', observation_code_text: 'Glucose', observation_datetime: '2023-06-15', observation_value: '120', observation_value_units: 'mg/dL', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_observation')
+        rows:
+          - {patient_internal_id: 'P2', resource_internal_id: 'OBS1', encounter_internal_id: 'E2', observation_status: 'final', observation_category: 'vital-signs', observation_code_system: 'LOINC', observation_code: '8480-6', observation_code_text: 'Systolic BP', observation_datetime: '2023-06-15', observation_value: '140', observation_value_units: 'mmHg', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_category: 'laboratory', observation_code: '2345-7', observation_value: '120', tuva_last_run: '2024-01-01 00:00:00'}
+        - {patient_internal_id: 'P2', observation_category: 'vital-signs', observation_code: '8480-6', observation_value: '140', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FHIR PREPROCESSING - FINAL: explanation_of_benefit (union of medical + pharmacy)
+  # =========================================================================
+
+  - name: test_fhir_eob_unions_medical_and_pharmacy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__explanation_of_benefit
+    description: "EOB model unions medical and pharmacy claim EOBs"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('fhir_preprocessing__int_medical_claim_eob')
+        rows:
+          - {patient_internal_id: 'P1', resource_internal_id: 'MC1', unique_claim_id: 'C1', eob_type_code: 'institutional', eob_subtype_code: 'inpatient', eob_billable_period_start: '2023-06-10', eob_billable_period_end: '2023-06-15', eob_created: '2023-07-01', organization_name: 'Aetna', practitioner_internal_id: 'NPI1', practitioner_name_text: 'Dr Smith', coverage_internal_id: 'COV1', eob_diagnosis_list: null, eob_procedure_list: null, eob_supporting_info_list: null, eob_item_list: null, eob_total_list: null, data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_pharmacy_claim_eob')
+        rows:
+          - {patient_internal_id: 'P2', resource_internal_id: 'PC1', unique_claim_id: 'C2', eob_type_code: 'pharmacy', eob_subtype_code: null, eob_billable_period_start: null, eob_billable_period_end: null, eob_created: '2023-07-01', organization_name: 'CVS', practitioner_internal_id: 'NPI2', practitioner_name_text: 'Pharmacist', coverage_internal_id: 'COV2', eob_diagnosis_list: null, eob_procedure_list: null, eob_supporting_info_list: null, eob_item_list: null, eob_total_list: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MC1', eob_type_code: 'institutional', tuva_last_run: '2024-01-01 00:00:00'}
+        - {patient_internal_id: 'P2', resource_internal_id: 'PC1', eob_type_code: 'pharmacy', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE: int_coverage
+  # =========================================================================
+
+  - name: test_fhir_int_coverage_maps_payer_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_coverage
+    description: "Coverage intermediate maps commercial payer_type to PPO product type"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'Aetna', plan: 'Gold', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: 'self', subscriber_id: 'SUB1', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', organization_name: 'Aetna', coverage_plan: 'Gold', coverage_relationship: 'self', coverage_status: 'active', coverage_subscriber_id: 'SUB1', coverage_type_product: 'PPO', data_source: 'src1'}
+
+  - name: test_fhir_int_coverage_maps_medicare
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_coverage
+    description: "Coverage intermediate maps medicare payer_type to MCR product type"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'medicare', payer: 'CMS', plan: 'PartA', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: null, subscriber_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', organization_name: 'CMS', coverage_relationship: 'self', coverage_status: 'active', coverage_type_product: 'MCR', data_source: 'src1'}
+
+  - name: test_fhir_int_coverage_maps_medicaid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_coverage
+    description: "Coverage intermediate maps medicaid payer_type to MCD product type"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'medicaid', payer: 'State', plan: 'MCD', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: null, subscriber_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', organization_name: 'State', coverage_relationship: 'self', coverage_status: 'active', coverage_type_product: 'MCD', data_source: 'src1'}
+
+  - name: test_fhir_int_coverage_defaults_subscriber_relation
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_coverage
+    description: "Coverage intermediate defaults null subscriber_relation to 'self'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'Blue', plan: 'PPO', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: null, subscriber_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', coverage_relationship: 'self', data_source: 'src1'}
+
+  - name: test_fhir_int_coverage_subscriber_id_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_coverage
+    description: "Coverage intermediate falls back to member_id when subscriber_id is null"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'Blue', plan: 'PPO', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: 'self', subscriber_id: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', coverage_subscriber_id: 'M1', data_source: 'src1'}
+
+  # =========================================================================
+  # INTERMEDIATE: int_lab_result
+  # =========================================================================
+
+  - name: test_fhir_int_lab_result_maps_status
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_lab_result
+    description: "Lab result intermediate maps status values and uppercases code_type"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'F', code_type: 'loinc', code: '2345-7', description: 'Glucose', result_datetime: '2023-06-15 10:00:00', result: '120', units: 'mg/dL', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_status: 'final', observation_category: 'laboratory', observation_code_system: 'LOINC', observation_code: '2345-7', observation_value: '120', data_source: 'src1'}
+
+  - name: test_fhir_int_lab_result_maps_preliminary_status
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_lab_result
+    description: "Lab result intermediate maps 'P' status to 'preliminary'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'P', code_type: 'loinc', code: '2345-7', description: 'Glucose', result_datetime: '2023-06-15 10:00:00', result: '100', units: 'mg/dL', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_status: 'preliminary', observation_code: '2345-7', data_source: 'src1'}
+
+  - name: test_fhir_int_lab_result_maps_corrected_status
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_lab_result
+    description: "Lab result intermediate maps 'C' status to 'corrected'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'C', code_type: 'loinc', code: '2345-7', description: 'Glucose', result_datetime: '2023-06-15 10:00:00', result: '110', units: 'mg/dL', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_status: 'corrected', observation_code: '2345-7', data_source: 'src1'}
+
+  - name: test_fhir_int_lab_result_maps_cancelled_status
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_lab_result
+    description: "Lab result intermediate maps 'D' status to 'cancelled'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', encounter_id: 'E1', status: 'D', code_type: 'loinc', code: '2345-7', description: 'Glucose', result_datetime: '2023-06-15 10:00:00', result: null, units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_status: 'cancelled', observation_code: '2345-7', data_source: 'src1'}
+
+  # =========================================================================
+  # INTERMEDIATE: int_observation
+  # =========================================================================
+
+  - name: test_fhir_int_observation_maps_category
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_observation
+    description: "Observation intermediate maps observation_type to FHIR categories"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', encounter_id: 'E1', observation_type: 'vital-signs', normalized_code_type: 'LOINC', normalized_code: '8480-6', normalized_description: 'Systolic BP', source_code_type: null, source_code: null, source_description: null, observation_date: '2023-06-15', result: '120', normalized_units: 'mmHg', source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_status: 'final', observation_category: 'vital-signs', observation_code_system: 'LOINC', observation_code: '8480-6', observation_value: '120', data_source: 'src1'}
+
+  - name: test_fhir_int_observation_maps_social_history
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_observation
+    description: "Observation intermediate maps 'social-history' type to social-history category"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', encounter_id: 'E1', observation_type: 'social-history', normalized_code_type: 'LOINC', normalized_code: '72166-2', normalized_description: 'Smoking status', source_code_type: null, source_code: null, source_description: null, observation_date: '2023-06-15', result: 'current', normalized_units: null, source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_category: 'social-history', observation_code: '72166-2', data_source: 'src1'}
+
+  - name: test_fhir_int_observation_maps_unknown_type_to_other
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_observation
+    description: "Observation intermediate maps unknown observation_type to 'other'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', encounter_id: 'E1', observation_type: 'unknown_type', normalized_code_type: 'LOINC', normalized_code: '99999-9', normalized_description: 'Unknown', source_code_type: null, source_code: null, source_description: null, observation_date: '2023-06-15', result: '42', normalized_units: null, source_units: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_category: 'other', observation_code: '99999-9', data_source: 'src1'}
+
+  - name: test_fhir_int_observation_uses_source_code_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_observation
+    description: "Observation intermediate falls back to source_code when normalized_code is null"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', encounter_id: 'E1', observation_type: 'vital-signs', normalized_code_type: null, normalized_code: null, normalized_description: null, source_code_type: 'CUSTOM', source_code: 'BP_SYS', source_description: 'Systolic BP', observation_date: '2023-06-15', result: '130', normalized_units: null, source_units: 'mmHg', data_source: 'src1'}
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', observation_code_system: 'CUSTOM', observation_code: 'BP_SYS', observation_code_text: 'Systolic BP', observation_value_units: 'mmHg', data_source: 'src1'}
+
+  # =========================================================================
+  # INTERMEDIATE: int_medical_claim_eob
+  # =========================================================================
+
+  - name: test_fhir_int_medical_claim_eob_maps_subtype
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_medical_claim_eob
+    description: "Medical claim EOB maps inpatient encounter_group to 'inpatient' subtype, others to 'outpatient'"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows:
+          - {eligibility_id: 'ELG1', person_id: 'P1', member_id: 'M1', payer_type: 'commercial', payer: 'MCR', plan: 'PlanA', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', subscriber_relation: 'self', subscriber_id: 'SUB1', data_source: 'src1'}
+      - input: ref('fhir_preprocessing__stg_core__medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', encounter_group: 'inpatient', claim_start_date: '2023-06-10', claim_end_date: '2023-06-15', claim_line_start_date: '2023-06-10', payer: 'MCR', plan: 'PlanA', billing_npi: 'NPI1', billing_name: 'Dr Smith', rendering_npi: null, rendering_name: null, admission_date: '2023-06-10', discharge_date: '2023-06-15', bill_type_code: '111', revenue_center_code: '0100', revenue_center_description: 'Room', place_of_service_code: '21', place_of_service_description: 'Inpatient', hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, paid_date: '2023-07-01', paid_amount: 500, in_network_flag: 1, data_source: 'src1'}
+          - {medical_claim_id: 'MC2', person_id: 'P1', claim_id: 'C2', claim_line_number: 1, claim_type: 'professional', encounter_group: 'outpatient', claim_start_date: '2023-07-01', claim_end_date: '2023-07-01', claim_line_start_date: '2023-07-01', payer: 'MCR', plan: 'PlanA', billing_npi: 'NPI2', billing_name: 'Dr Jones', rendering_npi: null, rendering_name: null, admission_date: null, discharge_date: null, bill_type_code: null, revenue_center_code: null, revenue_center_description: null, place_of_service_code: '11', place_of_service_description: 'Office', hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, paid_date: '2023-07-15', paid_amount: 150, in_network_flag: 1, data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_medical_claim_diagnosis')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_procedure')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_supporting_info')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_item')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_total')
+        rows: []
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MC1', unique_claim_id: 'C1', eob_type_code: 'institutional', eob_subtype_code: 'inpatient', data_source: 'src1'}
+        - {patient_internal_id: 'P1', resource_internal_id: 'MC2', unique_claim_id: 'C2', eob_type_code: 'professional', eob_subtype_code: 'outpatient', data_source: 'src1'}
+
+  - name: test_fhir_int_medical_claim_eob_dummy_practitioner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: fhir_preprocessing__int_medical_claim_eob
+    description: "Medical claim EOB defaults to dummy practitioner when both billing and rendering NPI are null"
+    given:
+      - input: ref('fhir_preprocessing__stg_core__eligibility')
+        rows: []
+      - input: ref('fhir_preprocessing__stg_core__medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', encounter_group: 'outpatient', claim_start_date: '2023-06-10', claim_end_date: '2023-06-10', claim_line_start_date: '2023-06-10', payer: 'MCR', plan: 'PlanA', billing_npi: null, billing_name: null, rendering_npi: null, rendering_name: null, admission_date: null, discharge_date: null, bill_type_code: null, revenue_center_code: null, revenue_center_description: null, place_of_service_code: null, place_of_service_description: null, hcpcs_code: null, hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, paid_date: null, paid_amount: 100, in_network_flag: null, data_source: 'src1'}
+      - input: ref('fhir_preprocessing__int_medical_claim_diagnosis')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_procedure')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_supporting_info')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_item')
+        rows: []
+      - input: ref('fhir_preprocessing__int_medical_claim_total')
+        rows: []
+    expect:
+      rows:
+        - {patient_internal_id: 'P1', resource_internal_id: 'MC1', practitioner_internal_id: '9999999999', practitioner_name_text: 'Dummy Practitioner', data_source: 'src1'}

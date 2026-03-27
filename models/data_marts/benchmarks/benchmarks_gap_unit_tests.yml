@@ -1,0 +1,181 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING: stg_cms_hcc__int_disease_factors (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_stg_disease_factors_null_hcc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_cms_hcc__int_disease_factors
+    description: "Disease factors staging passes through rows even when hcc_code is null"
+    given:
+      - input: ref('cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: null, collection_end_date: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: null, collection_end_date: '2023-12-31'}
+
+  # =========================================================================
+  # STAGING: stg_reference_data__calendar (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_stg_calendar_multiple_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_reference_data__calendar
+    description: "Calendar staging handles dates spanning multiple years"
+    given:
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2022-12-31', year: 2022, year_month_int: 202212, first_day_of_month: '2022-12-01'}
+          - {full_date: '2023-01-01', year: 2023, year_month_int: 202301, first_day_of_month: '2023-01-01'}
+          - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+    expect:
+      rows:
+        - {full_date: '2022-12-31', year: 2022, year_month_int: 202212, first_day_of_month: '2022-12-01'}
+        - {full_date: '2023-01-01', year: 2023, year_month_int: 202301, first_day_of_month: '2023-01-01'}
+        - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+
+  # =========================================================================
+  # INTERMEDIATE: pivot_hcc (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_pivot_hcc_deduplicates_same_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__pivot_hcc
+    description: "HCC pivot deduplicates when same HCC code appears multiple times in same year for same person"
+    given:
+      - input: ref('benchmarks__stg_cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-03-31'}
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-06-30'}
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2023-09-30'}
+      - input: ref('benchmarks__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2023-03-31', year: 2023, year_month_int: 202303, first_day_of_month: '2023-03-01'}
+          - {full_date: '2023-06-30', year: 2023, year_month_int: 202306, first_day_of_month: '2023-06-01'}
+          - {full_date: '2023-09-30', year: 2023, year_month_int: 202309, first_day_of_month: '2023-09-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_nbr: 2023, hcc_19: 1}
+
+  - name: test_benchmarks_pivot_hcc_different_years_separate
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__pivot_hcc
+    description: "HCC pivot creates separate rows for different years"
+    given:
+      - input: ref('benchmarks__stg_cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', hcc_code: '19', collection_end_date: '2022-12-31'}
+          - {person_id: 'P1', hcc_code: '85', collection_end_date: '2023-12-31'}
+      - input: ref('benchmarks__stg_reference_data__calendar')
+        rows:
+          - {full_date: '2022-12-31', year: 2022, year_month_int: 202212, first_day_of_month: '2022-12-01'}
+          - {full_date: '2023-12-31', year: 2023, year_month_int: 202312, first_day_of_month: '2023-12-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', year_nbr: 2022, hcc_19: 1, hcc_85: 0}
+        - {person_id: 'P1', year_nbr: 2023, hcc_19: 0, hcc_85: 1}
+
+  # =========================================================================
+  # POST-PREDICT: unpivot_inpatient (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_unpivot_inpatient_expired_location
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient
+    description: "Unpivot inpatient correctly maps actual discharge to expired"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'expired', discharge_pred_proba_snf: 0.1, discharge_pred_proba_home: 0.1, discharge_pred_proba_home_health: 0.1, discharge_pred_proba_expired: 0.3, discharge_pred_proba_transfer_other_facility: 0.1, discharge_pred_proba_ipt_rehab: 0.1, discharge_pred_proba_hospice: 0.1, discharge_pred_proba_other: 0.1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'expired', eva: 'expected', discharge_location_long: 0.3}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'actual', discharge_location_long: 0}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'snf', eva: 'actual', discharge_location_long: 0}
+
+  - name: test_benchmarks_unpivot_inpatient_other_discharge
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient
+    description: "Unpivot inpatient maps other discharge location correctly"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'other', discharge_pred_proba_snf: 0.0, discharge_pred_proba_home: 0.2, discharge_pred_proba_home_health: 0.0, discharge_pred_proba_expired: 0.0, discharge_pred_proba_transfer_other_facility: 0.0, discharge_pred_proba_ipt_rehab: 0.0, discharge_pred_proba_hospice: 0.0, discharge_pred_proba_other: 0.8}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'other', eva: 'expected', discharge_location_long: 0.8}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'expected', discharge_location_long: 0.2}
+
+  # =========================================================================
+  # POST-PREDICT: unpivot_inpatient_prospective (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_unpivot_inpatient_prospective_transfer_location
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__unpivot_inpatient_prospective
+    description: "Unpivot inpatient prospective correctly maps actual discharge to transfer/other facility"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('benchmarks__predict_inpatient_prospective')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', actual_discharge_location: 'transfer/other facility', discharge_pred_proba_snf: 0.1, discharge_pred_proba_home: 0.1, discharge_pred_proba_home_health: 0.05, discharge_pred_proba_expired: 0.05, discharge_pred_proba_transfer_other_facility: 0.5, discharge_pred_proba_ipt_rehab: 0.1, discharge_pred_proba_hospice: 0.05, discharge_pred_proba_other: 0.05}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'actual', discharge_location_long: 1}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'transfer/other facility', eva: 'expected', discharge_location_long: 0.5}
+        - {encounter_id: 'E1', person_id: 'P1', discharge_location: 'home', eva: 'actual', discharge_location_long: 0}
+
+  # =========================================================================
+  # STAGING: stg_core__patient (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_stg_patient_null_fields
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__patient
+    description: "Patient staging handles null optional fields"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: null, birth_date: null, state: null, race: null}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: null, birth_date: null, state: null, race: null}
+
+  # =========================================================================
+  # STAGING: stg_core__condition (gap/edge cases)
+  # =========================================================================
+
+  - name: test_benchmarks_stg_condition_null_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: benchmarks__stg_core__condition
+    description: "Condition staging passes through rows even with null normalized_code"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {person_id: 'P1', normalized_code: null, recorded_date: '2023-06-15'}
+    expect:
+      rows:
+        - {person_id: 'P1', normalized_code: null, recorded_date: '2023-06-15'}

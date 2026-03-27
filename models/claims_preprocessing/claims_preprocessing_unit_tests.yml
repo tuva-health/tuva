@@ -1,0 +1,380 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # CLAIMS ENROLLMENT MODELS
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # claims_enrollment__member_months
+  # -------------------------------------------------------------------------
+
+  - name: test_member_months_generates_months_within_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      Generates one member_month row for each calendar month that overlaps
+      with the enrollment period.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-15', enrollment_end_date: '2023-03-10', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-15', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+          - {full_date: '2023-02-01', year: 2023, month: 2}
+          - {full_date: '2023-02-28', year: 2023, month: 2}
+          - {full_date: '2023-03-01', year: 2023, month: 3}
+          - {full_date: '2023-03-10', year: 2023, month: 3}
+          - {full_date: '2023-03-31', year: 2023, month: 3}
+          - {full_date: '2023-04-01', year: 2023, month: 4}
+          - {full_date: '2023-04-30', year: 2023, month: 4}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202303', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_excludes_non_overlapping_months
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      Enrollment spanning only part of January should not generate a
+      February member month.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-01-31', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+          - {full_date: '2023-02-01', year: 2023, month: 2}
+          - {full_date: '2023-02-28', year: 2023, month: 2}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_deduplicates_duplicate_eligibility_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      Duplicate eligibility rows should not fan out member months because the
+      output grain is distinct on person, member, month, payer, plan, and data_source.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-03-31', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-03-31', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+          - {full_date: '2023-02-01', year: 2023, month: 2}
+          - {full_date: '2023-02-28', year: 2023, month: 2}
+          - {full_date: '2023-03-01', year: 2023, month: 3}
+          - {full_date: '2023-03-31', year: 2023, month: 3}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202303', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_single_day_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      A single-day enrollment (start == end) should still generate one
+      member month row for the calendar month containing that date.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-06-15', enrollment_end_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-01', year: 2023, month: 6}
+          - {full_date: '2023-06-15', year: 2023, month: 6}
+          - {full_date: '2023-06-30', year: 2023, month: 6}
+          - {full_date: '2023-07-01', year: 2023, month: 7}
+          - {full_date: '2023-07-31', year: 2023, month: 7}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202306', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_overlapping_spans_same_person
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      Two overlapping enrollment spans for the same person/plan should
+      produce deduplicated member months, not double-counted rows.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-03-31', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-02-15', enrollment_end_date: '2023-04-30', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+          - {full_date: '2023-02-01', year: 2023, month: 2}
+          - {full_date: '2023-02-15', year: 2023, month: 2}
+          - {full_date: '2023-02-28', year: 2023, month: 2}
+          - {full_date: '2023-03-01', year: 2023, month: 3}
+          - {full_date: '2023-03-31', year: 2023, month: 3}
+          - {full_date: '2023-04-01', year: 2023, month: 4}
+          - {full_date: '2023-04-30', year: 2023, month: 4}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202303', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202304', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_gap_between_enrollment_spans
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      An enrollment gap (Jan-Feb, then Apr-May) should produce member months
+      only for the enrolled months, skipping March entirely.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-02-28', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-04-01', enrollment_end_date: '2023-05-31', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+          - {full_date: '2023-02-01', year: 2023, month: 2}
+          - {full_date: '2023-02-28', year: 2023, month: 2}
+          - {full_date: '2023-03-01', year: 2023, month: 3}
+          - {full_date: '2023-03-31', year: 2023, month: 3}
+          - {full_date: '2023-04-01', year: 2023, month: 4}
+          - {full_date: '2023-04-30', year: 2023, month: 4}
+          - {full_date: '2023-05-01', year: 2023, month: 5}
+          - {full_date: '2023-05-31', year: 2023, month: 5}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202304', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202305', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_member_months_different_payers_separate_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      The same person enrolled with two different payers in the same month
+      should produce separate member month rows per payer.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-01-31', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCD', plan: 'PlanB', data_source: 'src1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-01-31', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-01-01', year: 2023, month: 1}
+          - {full_date: '2023-01-31', year: 2023, month: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCD', plan: 'PlanB', data_source: 'src1'}
+
+  - name: test_member_months_cross_year_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__member_months
+    description: >
+      Enrollment spanning December to January of the next year generates
+      member months in both years with correct year_month codes.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', enrollment_start_date: '2023-12-01', enrollment_end_date: '2024-01-31', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-12-01', year: 2023, month: 12}
+          - {full_date: '2023-12-31', year: 2023, month: 12}
+          - {full_date: '2024-01-01', year: 2024, month: 1}
+          - {full_date: '2024-01-31', year: 2024, month: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', year_month: '202312', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', year_month: '202401', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+
+  # -------------------------------------------------------------------------
+  # claims_enrollment__flag_claims_with_enrollment
+  # -------------------------------------------------------------------------
+
+  - name: test_flag_claims_matching_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_claims_with_enrollment
+    description: >
+      Claims that match an enrollment member month via person_id, member_id,
+      payer, plan, data_source, and year_month are returned.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: '2023-01-15', claim_start_date: null, admission_date: null}
+          - {claim_id: 'C2', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: '2023-04-15', claim_start_date: null, admission_date: null}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk1', person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', inferred_claim_start_year_month: '202301', inferred_claim_start_column_used: 'claim_line_start_date', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_flag_claims_uses_fallback_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_claims_with_enrollment
+    description: >
+      When claim_line_start_date is null, falls back to claim_start_date,
+      then admission_date.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: null, claim_start_date: '2023-02-10', admission_date: null}
+          - {claim_id: 'C2', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: null, claim_start_date: null, admission_date: '2023-03-05'}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk2', person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {member_month_key: 'mmk3', person_id: 'P1', member_id: 'M1', year_month: '202303', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk2', inferred_claim_start_year_month: '202302', inferred_claim_start_column_used: 'claim_start_date', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C2', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk3', inferred_claim_start_year_month: '202303', inferred_claim_start_column_used: 'admission_date', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_flag_claims_multiple_lines_same_claim
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_claims_with_enrollment
+    description: >
+      Multiple claim lines for the same claim_id should each independently
+      match enrollment and produce separate output rows.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: '2023-01-10', claim_start_date: null, admission_date: null}
+          - {claim_id: 'C1', claim_line_number: 2, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', claim_line_start_date: '2023-01-10', claim_start_date: null, admission_date: null}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk1', person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', inferred_claim_start_year_month: '202301', inferred_claim_start_column_used: 'claim_line_start_date', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'C1', claim_line_number: 2, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', inferred_claim_start_year_month: '202301', inferred_claim_start_column_used: 'claim_line_start_date', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # claims_enrollment__flag_rx_claims_with_enrollment
+  # -------------------------------------------------------------------------
+
+  - name: test_flag_rx_claims_matching_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_rx_claims_with_enrollment
+    description: >
+      Pharmacy claims that match an enrollment member month via
+      person_id, member_id, payer, plan, data_source, and paid_year_month
+      are returned.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', paid_date: '2023-01-20'}
+          - {claim_id: 'RX2', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', paid_date: '2023-05-20'}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk1', person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', paid_year_month: '202301', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_flag_rx_claims_excludes_unenrolled_months
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_rx_claims_with_enrollment
+    description: >
+      Pharmacy claims paid in months without enrollment should be excluded
+      from the result set entirely.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', paid_date: '2023-06-15'}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk1', person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows: []
+
+  - name: test_flag_rx_claims_multiple_lines_same_claim
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: claims_enrollment__flag_rx_claims_with_enrollment
+    description: >
+      Multiple claim lines for the same pharmacy claim should each
+      independently match enrollment.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', paid_date: '2023-01-10'}
+          - {claim_id: 'RX1', claim_line_number: 2, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', paid_date: '2023-01-10'}
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - {member_month_key: 'mmk1', person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', paid_year_month: '202301', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'RX1', claim_line_number: 2, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_month_key: 'mmk1', paid_year_month: '202301', tuva_last_run: '2024-01-01 00:00:00'}

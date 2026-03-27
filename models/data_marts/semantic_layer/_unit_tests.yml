@@ -1,0 +1,92 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # SEMANTIC LAYER - DIMENSION: dim_encounter_group
+  # =========================================================================
+
+  - name: test_semantic_layer_dim_encounter_group_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__dim_encounter_group
+    description: "Encounter group dimension passes through data from seed with tuva_last_run appended"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounter_group_sk')
+        rows:
+          - {encounter_group_sk: 'sk1', encounter_group: 'inpatient'}
+          - {encounter_group_sk: 'sk2', encounter_group: 'outpatient'}
+    expect:
+      rows:
+        - {encounter_group_sk: 'sk1', encounter_group: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_group_sk: 'sk2', encounter_group: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # SEMANTIC LAYER - DIMENSION: dim_encounter_type
+  # =========================================================================
+
+  - name: test_semantic_layer_dim_encounter_type_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__dim_encounter_type
+    description: "Encounter type dimension passes through seed data with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounter_type_sk')
+        rows:
+          - {encounter_type_sk: 'sk1', encounter_type: 'acute inpatient'}
+    expect:
+      rows:
+        - {encounter_type_sk: 'sk1', encounter_type: 'acute inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # SEMANTIC LAYER - DIMENSION: dim_service_category
+  # =========================================================================
+
+  - name: test_semantic_layer_dim_service_category_distinct
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__dim_service_category
+    description: "Service category dimension produces distinct service category combinations with surrogate key"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__service_categories')
+        rows:
+          - {service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: null}
+          - {service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: null}
+          - {service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: null}
+    expect:
+      rows:
+        - {service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: null, tuva_last_run: '2024-01-01 00:00:00'}
+        - {service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # SEMANTIC LAYER - FACT: fact_encounter_service_bridge
+  # =========================================================================
+
+  - name: test_semantic_layer_fact_encounter_service_bridge_distinct
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__fact_encounter_service_bridge
+    description: "Encounter service bridge selects distinct encounter_id and service_category_sk from fact_claims"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('semantic_layer__fact_claims')
+        rows:
+          - {encounter_id: 'E1', service_category_sk: 'sk1', medical_claim_id: 'MC1'}
+          - {encounter_id: 'E1', service_category_sk: 'sk1', medical_claim_id: 'MC2'}
+          - {encounter_id: 'E1', service_category_sk: 'sk2', medical_claim_id: 'MC3'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', service_category_sk: 'sk1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E1', service_category_sk: 'sk2', tuva_last_run: '2024-01-01 00:00:00'}
+

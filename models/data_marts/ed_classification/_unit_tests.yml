@@ -1,0 +1,157 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # ED CLASSIFICATION - INTERMEDIATE: int_filter_encounter_with_classification
+  # =========================================================================
+
+  - name: test_ed_classification_filter_picks_greatest_probability
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Classification is assigned based on the highest probability column using GREATEST"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J06.9', primary_diagnosis_description: 'URI', paid_amount: 500, allowed_amount: 400, charge_amount: 600, edcnnpa: 0.88, edcnpa: 0.05, epct: 0.02, noner: 0.01, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+          - {encounter_id: 'E2', encounter_type: 'emergency department', person_id: 'P2', encounter_end_date: '2023-06-16', facility_npi: 'NPI2', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'S52.0', primary_diagnosis_description: 'Fracture', paid_amount: 700, allowed_amount: 600, charge_amount: 800, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.95, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+          - {encounter_id: 'E3', encounter_type: 'emergency department', person_id: 'P3', encounter_end_date: '2023-06-17', facility_npi: 'NPI3', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'Z99.9', primary_diagnosis_description: 'Unclassified', paid_amount: 200, allowed_amount: 150, charge_amount: 300, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 0}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'edcnnpa'}
+        - {encounter_id: 'E2', classification: 'injury'}
+
+  - name: test_ed_classification_filter_breaks_probability_ties_deterministically
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Ties fall through the CASE order after GREATEST, so edcnnpa wins over later categories"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J06.9', primary_diagnosis_description: 'URI', paid_amount: 500, allowed_amount: 400, charge_amount: 600, edcnnpa: 0.5, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.5, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'edcnnpa'}
+
+  - name: test_ed_classification_filter_excludes_uncaptured_encounters
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounters with ed_classification_capture=0 are excluded from classification results"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'Z99.9', primary_diagnosis_description: 'Unknown', paid_amount: 200, allowed_amount: 150, charge_amount: 300, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 0}
+    expect:
+      rows: []
+
+  - name: test_ed_classification_filter_psych_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest psych probability is classified as psych"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'F20.0', primary_diagnosis_description: 'Schizophrenia', paid_amount: 1000, allowed_amount: 800, charge_amount: 1200, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.0, psych: 0.92, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'psych'}
+
+  - name: test_ed_classification_filter_alcohol_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest alcohol probability is classified as alcohol"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'F10.20', primary_diagnosis_description: 'Alcohol dependence', paid_amount: 800, allowed_amount: 600, charge_amount: 900, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.0, psych: 0.0, alcohol: 0.85, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'alcohol'}
+
+  - name: test_ed_classification_filter_drug_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest drug probability is classified as drug"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'F11.20', primary_diagnosis_description: 'Opioid dependence', paid_amount: 800, allowed_amount: 600, charge_amount: 900, edcnnpa: 0.0, edcnpa: 0.0, epct: 0.0, noner: 0.0, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.78, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'drug'}
+
+  - name: test_ed_classification_filter_epct_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest epct probability is classified as epct"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J02.9', primary_diagnosis_description: 'Pharyngitis', paid_amount: 300, allowed_amount: 250, charge_amount: 400, edcnnpa: 0.10, edcnpa: 0.10, epct: 0.70, noner: 0.05, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'epct'}
+
+  - name: test_ed_classification_filter_noner_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest noner probability is classified as noner"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'R10.9', primary_diagnosis_description: 'Abdominal pain', paid_amount: 400, allowed_amount: 350, charge_amount: 500, edcnnpa: 0.05, edcnpa: 0.05, epct: 0.05, noner: 0.80, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'noner'}
+
+  - name: test_ed_classification_filter_edcnpa_classification
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "Encounter with highest edcnpa probability is classified as edcnpa"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'I21.0', primary_diagnosis_description: 'MI', paid_amount: 2000, allowed_amount: 1800, charge_amount: 2500, edcnnpa: 0.10, edcnpa: 0.80, epct: 0.02, noner: 0.01, injury: 0.0, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'edcnpa'}
+
+  - name: test_ed_classification_filter_tie_edcnpa_vs_injury
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "When edcnpa ties with injury at the greatest value, CASE order gives edcnpa priority"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'T14.90', primary_diagnosis_description: 'Injury', paid_amount: 600, allowed_amount: 500, charge_amount: 700, edcnnpa: 0.0, edcnpa: 0.5, epct: 0.0, noner: 0.0, injury: 0.5, psych: 0.0, alcohol: 0.0, drug: 0.0, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'edcnpa'}
+
+  - name: test_ed_classification_filter_tie_all_equal
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ed_classification__int_filter_encounter_with_classification
+    description: "When all probabilities are equal non-zero, CASE order gives edcnnpa priority"
+    given:
+      - input: ref('ed_classification__int_map_primary_dx')
+        rows:
+          - {encounter_id: 'E1', encounter_type: 'emergency department', person_id: 'P1', encounter_end_date: '2023-06-15', facility_npi: 'NPI1', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'R69', primary_diagnosis_description: 'Unknown', paid_amount: 200, allowed_amount: 150, charge_amount: 250, edcnnpa: 0.125, edcnpa: 0.125, epct: 0.125, noner: 0.125, injury: 0.125, psych: 0.125, alcohol: 0.125, drug: 0.125, ed_classification_capture: 1}
+    expect:
+      rows:
+        - {encounter_id: 'E1', classification: 'edcnnpa'}
+
+  # =========================================================================
+  # ED CLASSIFICATION - FINAL: summary
+  # =========================================================================
+

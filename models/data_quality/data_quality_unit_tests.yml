@@ -1,0 +1,660 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGE MODELS
+  # =========================================================================
+
+  - name: test_inpatient_dq_stage_identifies_inpatient_by_bill_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__inpatient_dq_stage
+    description: >
+      Claims with institutional claim_type and bill_type_code starting with
+      '11' or '12' are identified as inpatient claims.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_type: 'institutional', bill_type_code: '111', drg_code: null, drg_code_type: null}
+          - {claim_id: 'CLM2', claim_type: 'institutional', bill_type_code: '121', drg_code: null, drg_code_type: null}
+          - {claim_id: 'CLM3', claim_type: 'institutional', bill_type_code: '131', drg_code: null, drg_code_type: null}
+          - {claim_id: 'CLM4', claim_type: 'professional', bill_type_code: null, drg_code: null, drg_code_type: null}
+      - input: ref('terminology__ms_drg')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'CLM1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'CLM2', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_inpatient_dq_stage_identifies_inpatient_by_drg
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__inpatient_dq_stage
+    description: >
+      Claims with a valid ms_drg code are identified as inpatient claims
+      even without a matching bill_type_code.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'CLM5', claim_type: 'institutional', bill_type_code: '999', drg_code: '470', drg_code_type: 'ms-drg'}
+          - {claim_id: 'CLM6', claim_type: 'institutional', bill_type_code: '999', drg_code: 'INVALID', drg_code_type: 'ms-drg'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470', ms_drg_description: 'Major Joint Replacement'}
+    expect:
+      rows:
+        - {claim_id: 'CLM5', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS
+  # =========================================================================
+
+  - name: test_primary_key_check_detects_pharmacy_pk_errors
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__primary_key_check
+    description: >
+      Detects primary key violations in pharmacy_claim when the same
+      claim_id + claim_line_number + data_source appears more than once.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'RX1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'RX2', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', plan: 'Plan1', data_source: 'src1'}
+    expect:
+      rows:
+        - {data_quality_check: 'pk errors pharmacy claim', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors medical claim', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors eligibility', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_primary_key_check_detects_medical_pk_errors
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__primary_key_check
+    description: >
+      Detects primary key violations in medical_claim when the same
+      claim_id + claim_line_number + data_source appears more than once.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'MC1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'MC1', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', plan: 'Plan1', data_source: 'src1'}
+    expect:
+      rows:
+        - {data_quality_check: 'pk errors pharmacy claim', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors medical claim', result_count: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors eligibility', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_primary_key_check_no_violations
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__primary_key_check
+    description: >
+      When all tables have unique primary keys, all result_counts should be 0.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'RX2', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_line_number: '1', data_source: 'src1'}
+          - {claim_id: 'MC2', claim_line_number: '1', data_source: 'src1'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', plan: 'Plan1', data_source: 'src1'}
+          - {person_id: 'P2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', plan: 'Plan1', data_source: 'src1'}
+    expect:
+      rows:
+        - {data_quality_check: 'pk errors pharmacy claim', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors medical claim', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'pk errors eligibility', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_date_checks_missing_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_date_checks
+    description: >
+      Detects claims with missing paid_date and missing dispensing_date.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', paid_date: null, dispensing_date: '2023-06-01'}
+          - {claim_id: 'RX2', paid_date: '2023-06-15', dispensing_date: null}
+          - {claim_id: 'RX3', paid_date: null, dispensing_date: null}
+          - {claim_id: 'RX4', paid_date: '2023-07-01', dispensing_date: '2023-07-01'}
+    expect:
+      rows:
+        - {data_quality_check: 'missing pharmacy_claim paid_date', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing dispensing_date', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_date_checks_no_missing
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_date_checks
+    description: >
+      When all pharmacy claims have both paid_date and dispensing_date,
+      result_counts should be 0.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', paid_date: '2023-06-15', dispensing_date: '2023-06-01'}
+          - {claim_id: 'RX2', paid_date: '2023-07-01', dispensing_date: '2023-07-01'}
+    expect:
+      rows:
+        - {data_quality_check: 'missing pharmacy_claim paid_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing dispensing_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_ndc_missing_and_invalid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_ndc
+    description: >
+      Detects claims with missing NDC codes and claims with NDC codes
+      that do not join to the terminology table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', ndc_code: null}
+          - {claim_id: 'RX2', ndc_code: '12345678901'}
+          - {claim_id: 'RX3', ndc_code: 'INVALID_NDC'}
+          - {claim_id: 'RX4', ndc_code: '99999999999'}
+      - input: ref('terminology__ndc')
+        rows:
+          - {ndc: '12345678901'}
+    expect:
+      rows:
+        - {data_quality_check: 'missing ndc', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid ndc', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_prescription_details_missing
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_prescription_details
+    description: >
+      Detects claims with missing quantity, days_supply, and refills.
+      Zero values for quantity and days_supply count as missing.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', quantity: null, days_supply: 30, refills: 1}
+          - {claim_id: 'RX2', quantity: 0, days_supply: 0, refills: null}
+          - {claim_id: 'RX3', quantity: 90, days_supply: 90, refills: 0}
+    expect:
+      rows:
+        - {data_quality_check: 'missing quantity', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing days supply', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing refills', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_npi_missing_and_invalid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_npi
+    description: >
+      Detects missing and invalid prescribing/dispensing NPIs. Also
+      detects wrong entity type (organization prescribing, individual dispensing).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', prescribing_provider_npi: null, dispensing_provider_npi: 'NPI_D1'}
+          - {claim_id: 'RX2', prescribing_provider_npi: 'NPI_P1', dispensing_provider_npi: null}
+          - {claim_id: 'RX3', prescribing_provider_npi: 'INVALID', dispensing_provider_npi: 'INVALID'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: 'NPI_P1', entity_type_code: '1'}
+          - {npi: 'NPI_D1', entity_type_code: '2'}
+    expect:
+      rows:
+        - {data_quality_check: 'invalid prescribing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing prescribing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'wrong entity type prescribing_npi', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid dispensing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing dispensing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'wrong entity type dispensing_npi', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_person_id_missing_and_orphaned
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_person_id
+    description: >
+      Detects pharmacy claims with missing person_id, multiple person_ids
+      per claim, and orphaned claims without matching eligibility.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', person_id: 'P1', paid_date: '2023-06-15', dispensing_date: '2023-06-01'}
+          - {claim_id: 'RX2', person_id: null, paid_date: '2023-06-15', dispensing_date: '2023-06-01'}
+          - {claim_id: 'RX3', person_id: 'P99', paid_date: '2023-06-15', dispensing_date: '2023-06-01'}
+      - input: ref('data_quality__eligibility_dq_stage')
+        rows:
+          - {person_id: 'P1', month_start_date: '2023-06-01', month_end_date: '2023-06-30'}
+    expect:
+      rows:
+        - {data_quality_check: 'multiple pharmacy_claim person_ids', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing pharmacy_claim person_id', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'orphaned pharmacy_claim claims', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_date_checks_missing_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_date_checks
+    description: >
+      Detects medical claims with missing claim_start_date and claim_end_date.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_start_date: null, claim_end_date: '2023-06-30', claim_line_start_date: '2023-06-01', claim_line_end_date: '2023-06-30', admission_date: null, discharge_date: null, paid_date: '2023-07-01'}
+          - {claim_id: 'MC2', claim_start_date: '2023-07-01', claim_end_date: null, claim_line_start_date: null, claim_line_end_date: null, admission_date: null, discharge_date: null, paid_date: null}
+          - {claim_id: 'MC3', claim_start_date: '2023-08-01', claim_end_date: '2023-08-15', claim_line_start_date: '2023-08-01', claim_line_end_date: '2023-08-15', admission_date: null, discharge_date: null, paid_date: '2023-09-01'}
+      - input: ref('data_quality__inpatient_dq_stage')
+        rows: []
+    expect:
+      rows:
+        - {data_quality_check: 'missing claim_start_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_end_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_line_start_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_line_end_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing admission_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing discharge_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing medical_claim paid_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'claim start multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'claim end multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'admission date multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'discharge date multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_date_checks_inpatient_missing_admission
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_date_checks
+    description: >
+      Detects inpatient claims with missing admission_date and
+      discharge_date. Only inpatient claims (joined to inpatient_dq_stage)
+      are checked for admission/discharge dates.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-15', claim_line_start_date: '2023-06-01', claim_line_end_date: '2023-06-15', admission_date: null, discharge_date: null, paid_date: '2023-07-01'}
+          - {claim_id: 'MC2', claim_start_date: '2023-07-01', claim_end_date: '2023-07-10', claim_line_start_date: '2023-07-01', claim_line_end_date: '2023-07-10', admission_date: '2023-07-01', discharge_date: '2023-07-10', paid_date: '2023-08-01'}
+      - input: ref('data_quality__inpatient_dq_stage')
+        rows:
+          - {claim_id: 'MC1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {claim_id: 'MC2', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {data_quality_check: 'missing claim_start_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_end_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_line_start_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing claim_line_end_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing admission_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing discharge_date', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing medical_claim paid_date', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'claim start multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'claim end multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'admission date multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'discharge date multiple', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_claim_line_fields_missing_and_invalid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_claim_line_fields
+    description: >
+      Detects missing and invalid HCPCS, place_of_service, and
+      revenue_center codes.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_type: 'professional', hcpcs_code: '99213', place_of_service_code: '11', revenue_center_code: null}
+          - {claim_id: 'MC2', claim_type: 'professional', hcpcs_code: null, place_of_service_code: null, revenue_center_code: null}
+          - {claim_id: 'MC3', claim_type: 'institutional', hcpcs_code: 'BADCODE', place_of_service_code: null, revenue_center_code: null}
+      - input: ref('terminology__hcpcs_level_2')
+        rows:
+          - {hcpcs: '99213'}
+      - input: ref('terminology__place_of_service')
+        rows:
+          - {place_of_service_code: '11'}
+      - input: ref('terminology__revenue_center')
+        rows:
+          - {revenue_center_code: '0100'}
+    expect:
+      rows:
+        - {data_quality_check: 'invalid hcpcs_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid place_of_service_code', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid revenue_center_code', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing hcpcs_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing place_of_service_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing revenue_center_code', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_provider_npi_missing_and_invalid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__medical_claim_provider_npi
+    description: >
+      Detects missing, invalid, and wrong entity type NPI values for
+      rendering, billing, and facility NPIs.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', rendering_npi: 'NPI1', billing_npi: 'NPI2', facility_npi: 'NPI3'}
+          - {claim_id: 'MC2', rendering_npi: null, billing_npi: null, facility_npi: null}
+          - {claim_id: 'MC3', rendering_npi: 'BAD1', billing_npi: 'BAD2', facility_npi: 'BAD3'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: 'NPI1', entity_type_code: '1'}
+          - {npi: 'NPI2', entity_type_code: '1'}
+          - {npi: 'NPI3', entity_type_code: '2'}
+    expect:
+      rows:
+        - {data_quality_check: 'invalid rendering_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid billing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'invalid facility_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing rendering_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing billing_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing facility_npi', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'wrong entity type rendering_npi', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'wrong entity type facility_npi', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'multiple rendering_npi values', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'multiple billing_npi values', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'multiple facility_npi values', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_encounters_missing_groups_detects_missing
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__encounters_missing_groups
+    description: >
+      Detects encounter groups that are expected but not present in the
+      core encounter table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_group: 'inpatient'}
+          - {encounter_group: 'outpatient'}
+    expect:
+      rows:
+        - {encounter_group: 'inpatient', missing_encounter_group: 'populated', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_group: 'outpatient', missing_encounter_group: 'populated', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_group: null, missing_encounter_group: 'missing', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_group: null, missing_encounter_group: 'missing', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_encounters_missing_groups_union_counts
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__encounters_missing_groups_union
+    description: >
+      Counts the number of rows in encounters_missing_groups (which
+      includes both present and missing groups).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('data_quality__encounters_missing_groups')
+        rows:
+          - {encounter_group: 'inpatient', missing_encounter_group: 'populated', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_group: null, missing_encounter_group: 'missing', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_group: null, missing_encounter_group: 'missing', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {data_quality_check: 'number of missing encounter groups', result_count: 3, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_cms_hcc_missing_factors
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__cms_hcc
+    description: >
+      Detects when CMS-HCC patient risk factors are missing demographic
+      or disease factor types.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_factors')
+        rows:
+          - {factor_type: 'Demographic', coefficient: 0.5}
+          - {factor_type: 'Disease', coefficient: 0.3}
+    expect:
+      rows:
+        - {data_quality_check: 'missing cms-hcc demographic factor', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing cms-hcc disease factor', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_cms_hcc_missing_disease_factor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__cms_hcc
+    description: >
+      When no disease factors exist, the check flags result_count = 1.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_factors')
+        rows:
+          - {factor_type: 'Demographic', coefficient: 0.5}
+    expect:
+      rows:
+        - {data_quality_check: 'missing cms-hcc demographic factor', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'missing cms-hcc disease factor', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ed_classification_detects_missing_categories
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__ed_classification
+    description: >
+      Detects when ED classification categories are missing from the
+      ed_classification summary table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ed_classification__summary')
+        rows:
+          - {ed_classification_description: 'Emergent, ED Care Needed, Preventable/Avoidable'}
+          - {ed_classification_description: 'Emergent, Primary Care Treatable'}
+    expect:
+      rows:
+        - {data_quality_check: 'ed classification missing ed_care_needed_preventable', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'ed classification missing pc_treatable', result_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'ed classification missing ed_care_needed_not_preventable', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'ed classification missing non_emergent', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_quality_measures_zero_counts
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__quality_measures
+    description: >
+      Detects quality measures with zero numerator and denominator counts.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_counts')
+        rows:
+          - {measure_name: 'Measure A', numerator_sum: 10, denominator_sum: 100, performance_rate: 0.1}
+          - {measure_name: 'Measure B', numerator_sum: 0, denominator_sum: 50, performance_rate: 0.0}
+          - {measure_name: 'Measure C', numerator_sum: 5, denominator_sum: 0, performance_rate: null}
+    expect:
+      rows:
+        - {data_quality_check: 'quality measure numerator zero', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_quality_check: 'quality measure denominator zero', result_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_acute_inpatient_missing_prof_claim
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__acute_inpatient
+    description: >
+      Counts acute inpatient encounters missing professional claims.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_type: 'acute inpatient', prof_claim_count: 0}
+          - {encounter_type: 'acute inpatient', prof_claim_count: 3}
+          - {encounter_type: 'acute inpatient', prof_claim_count: 0}
+          - {encounter_type: 'emergency department', prof_claim_count: 0}
+    expect:
+      rows:
+        - {data_quality_check: 'inpatient encounter missing professional claim', result_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINAL MODELS
+  # =========================================================================
+
+  - name: test_core_populated_counts_records
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__core_populated
+    description: >
+      Counts records in each core table and unions them together.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1'}
+          - {claim_id: 'MC2'}
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1'}
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+          - {person_id: 'P3'}
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1'}
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+      - input: ref('core__encounter')
+        rows: []
+      - input: ref('core__condition')
+        rows:
+          - {condition_id: 'C1'}
+      - input: ref('core__procedure')
+        rows: []
+    expect:
+      rows:
+        - {table_name: 'medical_claim', record_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'pharmacy_claim', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'eligibility', record_count: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'member_months', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'patient', record_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'encounter', record_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'condition', record_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {table_name: 'procedure', record_count: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_volume_and_dollars
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_volume_and_dollars
+    description: >
+      Aggregates pharmacy claim volume and paid amounts by year_month,
+      using paid_date with dispensing_date as fallback.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', paid_date: '2023-06-15', dispensing_date: '2023-06-01', paid_amount: 100.00}
+          - {claim_id: 'RX2', paid_date: '2023-06-20', dispensing_date: '2023-06-10', paid_amount: 200.00}
+          - {claim_id: 'RX3', paid_date: null, dispensing_date: '2023-07-01', paid_amount: 50.00}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-15', year_month_int: 202306}
+          - {full_date: '2023-06-20', year_month_int: 202306}
+          - {full_date: '2023-07-01', year_month_int: 202307}
+    expect:
+      rows:
+        - {year_month: 202306, claim_volume: 2, paid_amount: 300.00, tuva_last_run: '2024-01-01 00:00:00'}
+        - {year_month: 202307, claim_volume: 1, paid_amount: 50.00, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_claim_percent_calculates_proportions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_percent
+    description: >
+      Calculates paid amount as a percentage of total for each claim type,
+      including pharmacy.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {paid_amount: 600.00, claim_type: 'institutional'}
+          - {paid_amount: 400.00, claim_type: 'professional'}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {paid_amount: 1000.00}
+    expect:
+      rows:
+        - {claim_type: 'institutional', percent_of_total_paid: 0.3}
+        - {claim_type: 'professional', percent_of_total_paid: 0.2}
+        - {claim_type: 'pharmacy', percent_of_total_paid: 0.5}

@@ -1,0 +1,763 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # HCC SUSPECTING - STAGING: stg_core__condition
+  # =========================================================================
+
+  - name: test_hcc_suspecting_stg_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__stg_core__condition
+    description: "Staging passes through condition fields with distinct and lowered code_type"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', normalized_code_type: 'ICD-10-CM', normalized_code: 'E11.65', data_source: 'src1', condition_rank: 1}
+    expect:
+      rows:
+        - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+
+  - name: test_hcc_suspecting_stg_condition_deduplicates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__stg_core__condition
+    description: "Duplicate conditions with different condition_rank collapse to one row"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', normalized_code_type: 'ICD-10-CM', normalized_code: 'E11.65', data_source: 'src1', condition_rank: 1}
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', normalized_code_type: 'ICD-10-CM', normalized_code: 'E11.65', data_source: 'src1', condition_rank: 2}
+    expect:
+      rows:
+        - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+
+  # =========================================================================
+  # HCC SUSPECTING - STAGING: stg_core__patient
+  # =========================================================================
+
+  - name: test_hcc_suspecting_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__stg_core__patient
+    description: "Staging passes through patient demographics"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', death_date: null}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', death_date: null}
+
+  - name: test_hcc_suspecting_stg_patient_includes_deceased
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__stg_core__patient
+    description: "Staging passes through deceased patients without filtering"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1950-05-20', death_date: '2023-09-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', sex: 'female', birth_date: '1950-05-20', death_date: '2023-09-01'}
+
+  # =========================================================================
+  # HCC SUSPECTING - STAGING: stg_core__pharmacy_claim
+  # =========================================================================
+
+  - name: test_hcc_suspecting_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__stg_core__pharmacy_claim
+    description: "Staging passes through pharmacy claim fields"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', dispensing_date: '2023-06-15', ndc_code: 'NDC001', paid_date: '2023-06-20', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', dispensing_date: '2023-06-15', ndc_code: 'NDC001', paid_date: '2023-06-20', data_source: 'src1'}
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_prep_conditions
+  # =========================================================================
+
+  - name: test_hcc_suspecting_prep_conditions_maps_snomed
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_prep_conditions
+    description: "SNOMED conditions are mapped to ICD-10-CM via terminology crosswalk; non-SNOMED pass through"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__condition')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+          - {claim_id: 'C2', person_id: 'P2', payer: 'MCR', recorded_date: '2023-07-01', condition_type: 'discharge_diagnosis', code_type: 'snomed-ct', code: '44054006', data_source: 'src1'}
+      - input: ref('terminology__snomed_icd_10_map')
+        rows:
+          - {referenced_component_id: '44054006', map_target: 'E11.9', map_rule: 'TRUE', map_group: '1'}
+    expect:
+      rows:
+        - {person_id: 'P1', code_type: 'icd-10-cm', code: 'E11.65', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', code_type: 'icd-10-cm', code: 'E11.9', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_prep_conditions_non_snomed_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_prep_conditions
+    description: "Non-SNOMED conditions pass through with their original code type"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__condition')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'I50.9', data_source: 'src1'}
+      - input: ref('terminology__snomed_icd_10_map')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', code_type: 'icd-10-cm', code: 'I50.9', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_prep_conditions_filters_non_default_map_rules
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_prep_conditions
+    description: "SNOMED map rules that are not TRUE or OTHERWISE TRUE are excluded"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__condition')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', payer: 'MCR', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'snomed-ct', code: '12345', data_source: 'src1'}
+      - input: ref('terminology__snomed_icd_10_map')
+        rows:
+          - {referenced_component_id: '12345', map_target: 'Z99.9', map_rule: 'IFA 123456 | Some condition', map_group: '1'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_all_conditions
+  # =========================================================================
+
+  - name: test_hcc_suspecting_all_conditions_maps_hcc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_conditions
+    description: "Conditions are joined to HCC mapping seeds to get hcc_code and hcc_description"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows:
+          - {payment_year: 2024, diagnosis_code: 'E11.65', cms_hcc_v28: '37', cms_hcc_v28_flag: 'Yes', cms_hcc_v24: '18', cms_hcc_v24_flag: 'Yes'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', hcc_code: '18', model_version: 'CMS-HCC-V24', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', payer: 'MCR', hcc_code: '37', model_version: 'CMS-HCC-V28', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_all_conditions_no_hcc_mapping
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_conditions
+    description: "Conditions without an HCC mapping still produce a row with null hcc_code"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'Z00.00', data_source: 'src1'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows: []
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', icd_10_cm_code: 'Z00.00', hcc_code: null, model_version: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_all_conditions_filters_non_icd10
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_conditions
+    description: "Non-ICD-10-CM conditions are filtered out in the joined CTE"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'cpt', code: '99213', data_source: 'src1'}
+      - input: ref('cms_hcc__icd_10_cm_mappings')
+        rows: []
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_all_medications
+  # =========================================================================
+
+  - name: test_hcc_suspecting_all_medications_unions_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_medications
+    description: "Medications are unioned from clinical medications (NDC/RXNorm) and pharmacy claims"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__medication')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-15', source_code: 'SC1', source_code_type: 'ndc', ndc_code: 'NDC1', rxnorm_code: null, data_source: 'src1'}
+      - input: ref('hcc_suspecting__stg_core__pharmacy_claim')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', dispensing_date: '2023-04-01', ndc_code: 'NDC2', paid_date: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', drug_code: 'NDC1', code_system: 'ndc', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', drug_code: 'SC1', code_system: 'ndc', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', drug_code: 'NDC2', code_system: 'ndc', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_all_medications_rxnorm_source
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_medications
+    description: "RXNorm medications from clinical source are included"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__medication')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-15', source_code: 'RX1', source_code_type: 'rxnorm', ndc_code: null, rxnorm_code: 'RXNORM1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__stg_core__pharmacy_claim')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', drug_code: 'RXNORM1', code_system: 'rxnorm', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', drug_code: 'RX1', code_system: 'rxnorm', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_all_medications_pharmacy_uses_paid_date_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_all_medications
+    description: "Pharmacy claims use paid_date when dispensing_date is null"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__medication')
+        rows: []
+      - input: ref('hcc_suspecting__stg_core__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', dispensing_date: null, ndc_code: 'NDC1', paid_date: '2023-04-01', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', drug_code: 'NDC1', code_system: 'ndc', dispensing_date: '2023-04-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_patient_hcc_history
+  # =========================================================================
+
+  - name: test_hcc_suspecting_patient_hcc_history_tracks_billed
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_patient_hcc_history
+    description: "Patient HCC history groups conditions by person/payer/hcc and tracks current year billed flag"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', icd_10_cm_code: 'E11.65', model_version: 'CMS-HCC-V28', hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', model_version: 'CMS-HCC-V28', hcc_code: '37', reason: 'Prior coding history', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_patient_hcc_history_filters_null_hcc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_patient_hcc_history
+    description: "Conditions with null hcc_code are excluded from history"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', icd_10_cm_code: 'Z00.00', model_version: null, hcc_code: null, hcc_description: null}
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_patient_hcc_history_multiple_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_patient_hcc_history
+    description: "History aggregates first and last recorded dates across multiple encounters for same HCC"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', recorded_date: '2022-01-15', condition_type: 'discharge_diagnosis', icd_10_cm_code: 'E11.65', model_version: 'CMS-HCC-V28', hcc_code: '37', hcc_description: 'Diabetes'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', icd_10_cm_code: 'E11.65', model_version: 'CMS-HCC-V28', hcc_code: '37', hcc_description: 'Diabetes'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '37', first_recorded: '2022-01-15', last_recorded: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', hcc_code: '37', first_recorded: '2022-01-15', last_recorded: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_comorbidity_suspects
+  # =========================================================================
+
+  - name: test_hcc_suspecting_comorbidity_suspects_diabetes_ckd
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_comorbidity_suspects
+    description: "HCC 37 is suspected when diabetes and CKD stage 1/2 co-occur in the same year"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C2', recorded_date: '2023-07-01', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'N18.1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Diabetes', code: 'E11.65', code_system: 'icd-10-cm'}
+          - {concept_name: 'Chronic Kidney Disease, Stage 1', code: 'N18.1', code_system: 'icd-10-cm'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '37', reason: 'Comorbidity suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_comorbidity_suspects_different_years_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_comorbidity_suspects
+    description: "Diabetes and CKD in different years do not create a comorbidity suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2022-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C2', recorded_date: '2023-07-01', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'N18.1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Diabetes', code: 'E11.65', code_system: 'icd-10-cm'}
+          - {concept_name: 'Chronic Kidney Disease, Stage 1', code: 'N18.1', code_system: 'icd-10-cm'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_comorbidity_suspects_diabetes_only_no_ckd
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_comorbidity_suspects
+    description: "Diabetes without CKD does not create a comorbidity suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-15', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Diabetes', code: 'E11.65', code_system: 'icd-10-cm'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_medication_suspects
+  # =========================================================================
+
+  - name: test_hcc_suspecting_medication_suspects_antidepressant
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_medication_suspects
+    description: "HCC 155 is suspected when antidepressant medication is dispensed within past 5 years"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_medications')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', dispensing_date: '2023-06-15', drug_code: 'DRUG1', code_system: 'ndc', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Antidepressant medication', code: 'DRUG1', code_system: 'ndc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '155', reason: 'Medication suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_medication_suspects_non_antidepressant_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_medication_suspects
+    description: "Non-antidepressant medications do not create a medication suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_medications')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', dispensing_date: '2023-06-15', drug_code: 'DRUG1', code_system: 'ndc', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Statin medication', code: 'DRUG1', code_system: 'ndc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_medication_suspects_already_billed
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_medication_suspects
+    description: "Medication suspect still generated even if billed (billed flag is informational)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_all_medications')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', dispensing_date: '2023-06-15', drug_code: 'DRUG1', code_system: 'ndc', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Antidepressant medication', code: 'DRUG1', code_system: 'ndc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', model_version: 'CMS-HCC-V28', hcc_code: '155', current_year_billed: true, reason: 'Prior coding history', contributing_factor: 'F33.1', suspect_date: '2023-01-01', hcc_description: 'Major Depression', recorded_date: '2023-01-01', condition_type: 'discharge_diagnosis', icd_10_cm_code: 'F33.1', first_recorded: '2023-01-01', last_recorded: '2023-01-01', last_billed: '2023-01-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '155', reason: 'Medication suspect', current_year_billed: true, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_lab_suspects
+  # =========================================================================
+
+  - name: test_hcc_suspecting_lab_suspects_ckd_stage
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_lab_suspects
+    description: "CKD stage is assigned based on highest eGFR result from two labs 90+ days apart"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_egfr_labs')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-01-15', result: 25, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-06-15', result: 22, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '327', hcc_description: 'CKD Stage 4'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '327', reason: 'Lab result suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_lab_suspects_single_lab_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_lab_suspects
+    description: "A single eGFR lab without a 90-day lookback does not generate a suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_egfr_labs')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-06-15', result: 22, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '327', hcc_description: 'CKD Stage 4'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_lab_suspects_ckd_stage_5
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_lab_suspects
+    description: "eGFR 0-14 maps to HCC 326 (CKD Stage 5)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_egfr_labs')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-01-15', result: 10, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-06-15', result: 8, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '326', hcc_description: 'CKD Stage 5'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '326', reason: 'Lab result suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_lab_suspects_ckd_stage_3a
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_lab_suspects
+    description: "eGFR 45-59 maps to HCC 329 (CKD Stage 3a)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_egfr_labs')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-01-15', result: 50, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-06-15', result: 48, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '329', hcc_description: 'CKD Stage 3a'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '329', reason: 'Lab result suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_lab_suspects_normal_egfr_no_suspect
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_lab_suspects
+    description: "eGFR >= 60 does not map to any CKD HCC and produces no suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_egfr_labs')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-01-15', result: 75, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'clinical source', data_source: 'src1', code_type: 'loinc', code: '33914-3', result_date: '2023-06-15', result: 80, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '326', hcc_description: 'CKD Stage 5'}
+          - {hcc_code: '327', hcc_description: 'CKD Stage 4'}
+          - {hcc_code: '328', hcc_description: 'CKD Stage 3b'}
+          - {hcc_code: '329', hcc_description: 'CKD Stage 3a'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC SUSPECTING - INTERMEDIATE: int_observation_suspects
+  # =========================================================================
+
+  - name: test_hcc_suspecting_observation_suspects_bmi_over_40
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "HCC 48 is suspected when BMI >= 40 (no comorbidity required)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows: []
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '42', code_type: 'loinc', code: 'BMI1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'BMI', code: 'BMI1', code_system: 'loinc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '48', reason: 'Observation suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_observation_suspects_bmi_under_30_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "BMI under 30 does not create any morbid obesity suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows: []
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '25', code_type: 'loinc', code: 'BMI1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'BMI', code: 'BMI1', code_system: 'loinc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_observation_suspects_bmi_35_with_diabetes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "HCC 48 is suspected when BMI >= 35 with diabetes in the same year"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-01', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'E11.65', data_source: 'src1'}
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '37', code_type: 'loinc', code: 'BMI1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'BMI', code: 'BMI1', code_system: 'loinc'}
+          - {concept_name: 'Diabetes', code: 'E11.65', code_system: 'icd-10-cm'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '48', reason: 'Observation suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_observation_suspects_bmi_30_with_osa
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "HCC 48 is suspected when BMI >= 30 with obstructive sleep apnea in the same year"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', claim_id: 'C1', recorded_date: '2023-06-01', condition_type: 'discharge_diagnosis', code_type: 'icd-10-cm', code: 'G47.33', data_source: 'src1'}
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '32', code_type: 'loinc', code: 'BMI1', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'BMI', code: 'BMI1', code_system: 'loinc'}
+          - {concept_name: 'Obstructive Sleep Apnea', code: 'G47.33', code_system: 'icd-10-cm'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '48', reason: 'Observation suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_observation_suspects_phq9_depression
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "HCC 155 is suspected when PHQ-9 score >= 15"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows: []
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '18', code_type: 'loinc', code: 'PHQ9', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Depression Assessment (PHQ-9)', code: 'PHQ9', code_system: 'loinc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '155', reason: 'Observation suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_observation_suspects_phq9_below_threshold
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__int_observation_suspects
+    description: "PHQ-9 score below 15 does not generate a depression suspect"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_prep_conditions')
+        rows: []
+      - input: ref('hcc_suspecting__stg_core__observation')
+        rows:
+          - {person_id: 'P1', payer: 'clinical source', observation_date: '2023-06-15', result: '10', code_type: 'loinc', code: 'PHQ9', data_source: 'src1'}
+      - input: ref('hcc_suspecting__clinical_concepts')
+        rows:
+          - {concept_name: 'Depression Assessment (PHQ-9)', code: 'PHQ9', code_system: 'loinc'}
+      - input: ref('hcc_suspecting__hcc_descriptions')
+        rows:
+          - {hcc_code: '48', hcc_description: 'Morbid Obesity'}
+          - {hcc_code: '155', hcc_description: 'Major Depression'}
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+    expect:
+      rows: []

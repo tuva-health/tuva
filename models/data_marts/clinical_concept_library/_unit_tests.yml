@@ -1,0 +1,114 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # clinical_concept_library__value_set_member_relevant_fields
+  # =========================================================================
+
+  - name: test_ccl_value_set_member_joins_concepts_and_coding_systems
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: clinical_concept_library__value_set_member_relevant_fields
+    description: >
+      The value_set_member_relevant_fields model should join clinical_concepts
+      with value_set_members and coding_systems to produce one row per value
+      set member with concept name, code, and coding system name.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('clinical_concept_library__clinical_concepts')
+        rows:
+          - {concept_id: 'C001', concept_name: 'Diabetes', concept_type: 'condition'}
+          - {concept_id: 'C002', concept_name: 'Hypertension', concept_type: 'condition'}
+      - input: ref('clinical_concept_library__value_set_members')
+        rows:
+          - {value_set_member_id: 'VSM001', concept_id: 'C001', code: 'E11.65', coding_system_id: 'CS001', include_descendants: 'yes'}
+          - {value_set_member_id: 'VSM002', concept_id: 'C001', code: '73211009', coding_system_id: 'CS002', include_descendants: 'no'}
+          - {value_set_member_id: 'VSM003', concept_id: 'C002', code: 'I10', coding_system_id: 'CS001', include_descendants: 'no'}
+      - input: ref('clinical_concept_library__coding_systems')
+        rows:
+          - {coding_system_id: 'CS001', coding_system_name: 'ICD-10-CM'}
+          - {coding_system_id: 'CS002', coding_system_name: 'SNOMED CT'}
+    expect:
+      rows:
+        - {concept_id: 'C001', concept_name: 'Diabetes', concept_type: 'condition', value_set_member_id: 'VSM001', code: 'E11.65', coding_system_id: 'CS001', include_descendants: 'yes', coding_system_name: 'ICD-10-CM'}
+        - {concept_id: 'C001', concept_name: 'Diabetes', concept_type: 'condition', value_set_member_id: 'VSM002', code: '73211009', coding_system_id: 'CS002', include_descendants: 'no', coding_system_name: 'SNOMED CT'}
+        - {concept_id: 'C002', concept_name: 'Hypertension', concept_type: 'condition', value_set_member_id: 'VSM003', code: 'I10', coding_system_id: 'CS001', include_descendants: 'no', coding_system_name: 'ICD-10-CM'}
+
+  - name: test_ccl_value_set_member_handles_concept_without_members
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: clinical_concept_library__value_set_member_relevant_fields
+    description: >
+      A concept with no value set members should still produce a row
+      from the left outer join, with null value_set_member fields.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('clinical_concept_library__clinical_concepts')
+        rows:
+          - {concept_id: 'C003', concept_name: 'Orphan concept', concept_type: 'lab'}
+      - input: ref('clinical_concept_library__value_set_members')
+        rows: []
+      - input: ref('clinical_concept_library__coding_systems')
+        rows:
+          - {coding_system_id: 'CS001', coding_system_name: 'ICD-10-CM'}
+    expect:
+      rows:
+        - {concept_id: 'C003', concept_name: 'Orphan concept', concept_type: 'lab', value_set_member_id: null, code: null, coding_system_id: null, include_descendants: null, coding_system_name: null}
+
+  - name: test_ccl_value_set_member_handles_missing_coding_system
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: clinical_concept_library__value_set_member_relevant_fields
+    description: >
+      A value set member referencing a coding_system_id not in the
+      coding_systems table should still appear with null coding_system_name.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('clinical_concept_library__clinical_concepts')
+        rows:
+          - {concept_id: 'C001', concept_name: 'Diabetes', concept_type: 'condition'}
+      - input: ref('clinical_concept_library__value_set_members')
+        rows:
+          - {value_set_member_id: 'VSM010', concept_id: 'C001', code: 'XYZ123', coding_system_id: 'CS999', include_descendants: 'no'}
+      - input: ref('clinical_concept_library__coding_systems')
+        rows: []
+    expect:
+      rows:
+        - {concept_id: 'C001', concept_name: 'Diabetes', concept_type: 'condition', value_set_member_id: 'VSM010', code: 'XYZ123', coding_system_id: 'CS999', include_descendants: 'no', coding_system_name: null}
+
+  - name: test_ccl_value_set_member_multiple_codes_per_concept
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: clinical_concept_library__value_set_member_relevant_fields
+    description: >
+      A single concept can have multiple value set members across different
+      coding systems. All should appear as separate rows.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('clinical_concept_library__clinical_concepts')
+        rows:
+          - {concept_id: 'C010', concept_name: 'Heart Failure', concept_type: 'condition'}
+      - input: ref('clinical_concept_library__value_set_members')
+        rows:
+          - {value_set_member_id: 'VSM020', concept_id: 'C010', code: 'I50.9', coding_system_id: 'CS001', include_descendants: 'yes'}
+          - {value_set_member_id: 'VSM021', concept_id: 'C010', code: '84114007', coding_system_id: 'CS002', include_descendants: 'no'}
+          - {value_set_member_id: 'VSM022', concept_id: 'C010', code: '428.0', coding_system_id: 'CS003', include_descendants: 'no'}
+      - input: ref('clinical_concept_library__coding_systems')
+        rows:
+          - {coding_system_id: 'CS001', coding_system_name: 'ICD-10-CM'}
+          - {coding_system_id: 'CS002', coding_system_name: 'SNOMED CT'}
+          - {coding_system_id: 'CS003', coding_system_name: 'ICD-9-CM'}
+    expect:
+      rows:
+        - {concept_id: 'C010', concept_name: 'Heart Failure', concept_type: 'condition', value_set_member_id: 'VSM020', code: 'I50.9', coding_system_id: 'CS001', include_descendants: 'yes', coding_system_name: 'ICD-10-CM'}
+        - {concept_id: 'C010', concept_name: 'Heart Failure', concept_type: 'condition', value_set_member_id: 'VSM021', code: '84114007', coding_system_id: 'CS002', include_descendants: 'no', coding_system_name: 'SNOMED CT'}
+        - {concept_id: 'C010', concept_name: 'Heart Failure', concept_type: 'condition', value_set_member_id: 'VSM022', code: '428.0', coding_system_id: 'CS003', include_descendants: 'no', coding_system_name: 'ICD-9-CM'}

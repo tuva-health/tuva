@@ -1,0 +1,154 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # normalize__all_unmapped
+  # =========================================================================
+
+  - name: test_all_unmapped_aggregates_across_domains
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__all_unmapped
+    description: >
+      The all_unmapped model unions staging models from multiple domains and
+      aggregates by source_code_type, source_code, and source_description,
+      summing item_count and concatenating domains.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 5, domain: 'condition', data_source: 'src1'}
+      - input: ref('normalize__stg_unmapped_procedure')
+        rows:
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 3, domain: 'procedure', data_source: 'src1'}
+      - input: ref('normalize__stg_unmapped_appointment')
+        rows: []
+      - input: ref('normalize__stg_unmapped_lab_result')
+        rows: []
+      - input: ref('normalize__stg_unmapped_medication')
+        rows: []
+      - input: ref('normalize__stg_unmapped_observation')
+        rows: []
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 5}
+        - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 3}
+
+  - name: test_all_unmapped_deduplicates_same_code_across_domains
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__all_unmapped
+    description: >
+      When the same source code appears in multiple domains (e.g., condition
+      and procedure), the all_unmapped model should aggregate them into one
+      row with the combined item count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'R10.9', source_description: 'Abdominal pain', item_count: 4, domain: 'condition', data_source: 'src1'}
+      - input: ref('normalize__stg_unmapped_procedure')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'R10.9', source_description: 'Abdominal pain', item_count: 2, domain: 'procedure', data_source: 'src1'}
+      - input: ref('normalize__stg_unmapped_appointment')
+        rows: []
+      - input: ref('normalize__stg_unmapped_lab_result')
+        rows: []
+      - input: ref('normalize__stg_unmapped_medication')
+        rows: []
+      - input: ref('normalize__stg_unmapped_observation')
+        rows: []
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'R10.9', source_description: 'Abdominal pain', item_count: 6}
+
+  # =========================================================================
+  # normalize__all_codes
+  # =========================================================================
+
+  - name: test_all_codes_includes_custom_mapped_entries
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__all_codes
+    description: >
+      The all_codes model should include rows from the custom_mapped seed
+      alongside unmapped codes.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+        enable_normalize_engine: true
+    given:
+      - input: ref('custom_mapped')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 10, domains: 'condition', data_sources: 'src1', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus', not_mapped: null, added_by: 'user1', added_date: '2024-01-01', reviewed_by: null, reviewed_date: null, notes: null}
+      - input: ref('normalize__all_unmapped')
+        rows:
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 5, domains: 'procedure', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null, not_mapped: null, added_by: null, added_date: null, reviewed_by: null, reviewed_date: null, notes: null}
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 10, domains: 'condition', data_sources: 'src1', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus'}
+        - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 5, domains: 'procedure', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null}
+
+  - name: test_all_codes_excludes_unmapped_already_in_custom_mapped
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__all_codes
+    description: >
+      When a code exists in both custom_mapped and all_unmapped, the
+      all_codes model should only include the custom_mapped version
+      and exclude the duplicate from all_unmapped.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+        enable_normalize_engine: true
+    given:
+      - input: ref('custom_mapped')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 10, domains: 'condition', data_sources: 'src1', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus', not_mapped: null, added_by: 'user1', added_date: '2024-01-01', reviewed_by: null, reviewed_date: null, notes: null}
+      - input: ref('normalize__all_unmapped')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 10, domains: 'condition', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null, not_mapped: null, added_by: null, added_date: null, reviewed_by: null, reviewed_date: null, notes: null}
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 5, domains: 'procedure', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null, not_mapped: null, added_by: null, added_date: null, reviewed_by: null, reviewed_date: null, notes: null}
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 10, domains: 'condition', data_sources: 'src1', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus'}
+        - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 5, domains: 'procedure', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null}
+
+  - name: test_all_codes_handles_null_source_code_type_in_join
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__all_codes
+    description: >
+      The all_codes join between custom_mapped and all_unmapped should
+      correctly handle null source_code_type values using IS NULL comparison.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+        enable_normalize_engine: true
+    given:
+      - input: ref('custom_mapped')
+        rows:
+          - {source_code_type: null, source_code: 'CUSTOM1', source_description: 'Custom code', item_count: 1, domains: 'condition', data_sources: 'src1', normalized_code_type: 'custom', normalized_code: 'C1', normalized_description: 'Custom mapped', not_mapped: null, added_by: 'user1', added_date: '2024-01-01', reviewed_by: null, reviewed_date: null, notes: null}
+      - input: ref('normalize__all_unmapped')
+        rows:
+          - {source_code_type: null, source_code: 'CUSTOM1', source_description: 'Custom code', item_count: 1, domains: 'condition', data_sources: 'src1', normalized_code_type: null, normalized_code: null, normalized_description: null, not_mapped: null, added_by: null, added_date: null, reviewed_by: null, reviewed_date: null, notes: null}
+    expect:
+      rows:
+        - {source_code_type: null, source_code: 'CUSTOM1', source_description: 'Custom code', normalized_code_type: 'custom', normalized_code: 'C1', normalized_description: 'Custom mapped'}

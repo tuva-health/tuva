@@ -1,0 +1,167 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # READMISSIONS - STAGING: stg_core__encounter
+  # =========================================================================
+
+  - name: test_readmissions_stg_encounter_filters_acute_inpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__stg_core__encounter
+    description: "Staging filters to acute inpatient encounters only"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1'}
+          - {encounter_id: 'E2', person_id: 'P2', encounter_type: 'emergency department', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: null, drg_code: null, paid_amount: 500, primary_diagnosis_code: 'J06.9', encounter_source_type: 'claims', data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_stg_encounter_filters_all_non_inpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__stg_core__encounter
+    description: "All non-acute-inpatient encounter types are filtered out"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'emergency department', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: null, drg_code: null, paid_amount: 500, primary_diagnosis_code: 'J06.9', encounter_source_type: 'claims', data_source: 'src1'}
+          - {encounter_id: 'E2', person_id: 'P2', encounter_type: 'outpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: null, drg_code: null, paid_amount: 200, primary_diagnosis_code: 'Z00.00', encounter_source_type: 'claims', data_source: 'src1'}
+          - {encounter_id: 'E3', person_id: 'P3', encounter_type: 'skilled nursing facility', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-10', discharge_disposition_code: '01', facility_npi: 'NPI3', drg_code_type: null, drg_code: null, paid_amount: 8000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1'}
+    expect:
+      rows: []
+
+  - name: test_readmissions_stg_encounter_preserves_fields
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__stg_core__encounter
+    description: "Staging preserves all relevant encounter fields including DRG and paid amount"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000.50, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - STAGING: stg_core__procedure
+  # =========================================================================
+
+  - name: test_readmissions_stg_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__stg_core__procedure
+    description: "Staging passes through procedure fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {encounter_id: 'E1', normalized_code: '0DBN0ZZ', normalized_code_type: 'icd-10-pcs'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', normalized_code: '0DBN0ZZ', normalized_code_type: 'icd-10-pcs', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_stg_procedure_multiple_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__stg_core__procedure
+    description: "Staging passes through multiple procedure records for the same encounter"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {encounter_id: 'E1', normalized_code: '0DBN0ZZ', normalized_code_type: 'icd-10-pcs'}
+          - {encounter_id: 'E1', normalized_code: '0SRA0JZ', normalized_code_type: 'icd-10-pcs'}
+          - {encounter_id: 'E2', normalized_code: '99213', normalized_code_type: 'hcpcs'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', normalized_code: '0DBN0ZZ', normalized_code_type: 'icd-10-pcs', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E1', normalized_code: '0SRA0JZ', normalized_code_type: 'icd-10-pcs', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', normalized_code: '99213', normalized_code_type: 'hcpcs', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_crude_excludes_overlapping_not_best
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_crude
+    description: "Encounters that are not the best in their overlap group are excluded from crude readmission"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-02', discharge_date: '2023-06-04', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 1, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'Selected as best among overlapping encounters'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-02', discharge_date: '2023-06-04', actual_length_of_stay: 2, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 1, encounter_rank_in_group: 2, is_best_encounter: 0, selection_reason: 'Not selected - better encounter exists'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: encounter_data_quality (APR-DRG)
+  # =========================================================================
+
+  - name: test_readmissions_data_quality_valid_apr_drg
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Encounter with valid APR-DRG code does not get invalid_drg_flag"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'apr-drg', drg_code: '302', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows:
+          - {apr_drg_code: '302'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 0, invalid_drg_flag: 0, missing_drg_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_summary_multi_person_no_cross_link
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_summary
+    description: "Readmission sequences do not cross patients"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, length_of_stay: 4, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '226', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-10', discharge_date: '2023-06-12', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, length_of_stay: 2, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '108', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P2', had_readmission_flag: 0, readmit_30_flag: 0, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}

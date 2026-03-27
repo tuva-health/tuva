@@ -1,0 +1,532 @@
+version: 2
+
+unit_tests:
+
+  ## ══════════════════════════════════════════════════════════
+  ## STAGING MODELS
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__stg_medical_claim
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_stg_medical_claim_basic_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging medical claim passes through all columns from input layer
+    model: normalized_input__stg_medical_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'CLM001', claim_line_number: 1, claim_type: 'institutional', person_id: 'P001', member_id: 'M001', payer: 'Aetna', plan: 'Gold', claim_start_date: '2024-01-15', claim_end_date: '2024-01-20', admission_date: '2024-01-15', discharge_date: '2024-01-20', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', place_of_service_code: '21', bill_type_code: '111', drg_code_type: 'ms-drg', drg_code: '470', revenue_center_code: '0100', diagnosis_code_type: 'icd-10-cm', diagnosis_code_1: 'M17.11', procedure_code_type: 'icd-10-pcs', procedure_code_1: '0SR9019', data_source: 'claims_a'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', claim_line_number: 1, claim_type: 'institutional', person_id: 'P001', member_id: 'M001', payer: 'Aetna', plan: 'Gold', claim_start_date: '2024-01-15', claim_end_date: '2024-01-20', admission_date: '2024-01-15', discharge_date: '2024-01-20', admit_source_code: '1', admit_type_code: '1', discharge_disposition_code: '01', place_of_service_code: '21', bill_type_code: '111', drg_code_type: 'ms-drg', drg_code: '470', revenue_center_code: '0100', diagnosis_code_type: 'icd-10-cm', diagnosis_code_1: 'M17.11', procedure_code_type: 'icd-10-pcs', procedure_code_1: '0SR9019', data_source: 'claims_a'}
+
+  - name: test_stg_medical_claim_null_optional_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging medical claim handles null optional code fields
+    model: normalized_input__stg_medical_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'CLM002', claim_line_number: 1, claim_type: 'professional', person_id: 'P002', admit_source_code: null, admit_type_code: null, discharge_disposition_code: null, bill_type_code: null, drg_code: null, revenue_center_code: null, data_source: 'claims_a'}
+    expect:
+      rows:
+        - {claim_id: 'CLM002', claim_line_number: 1, claim_type: 'professional', person_id: 'P002', admit_source_code: null, admit_type_code: null, discharge_disposition_code: null, bill_type_code: null, drg_code: null, revenue_center_code: null, data_source: 'claims_a'}
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__stg_eligibility
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_stg_eligibility_basic_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging eligibility passes through columns and computes person_id_key
+    model: normalized_input__stg_eligibility
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P001', member_id: 'M001', subscriber_id: 'S001', gender: 'female', race: 'white', birth_date: '1980-05-15', death_date: null, death_flag: 0, enrollment_start_date: '2024-01-01', enrollment_end_date: '2024-12-31', payer: 'Aetna', payer_type: 'commercial', plan: 'Gold', state: 'MA', data_source: 'elig_a'}
+    expect:
+      rows:
+        - {person_id: 'P001', member_id: 'M001', subscriber_id: 'S001', gender: 'female', race: 'white', birth_date: '1980-05-15', death_date: null, death_flag: 0, enrollment_start_date: '2024-01-01', enrollment_end_date: '2024-12-31', payer: 'Aetna', payer_type: 'commercial', plan: 'Gold', state: 'MA', data_source: 'elig_a'}
+
+  - name: test_stg_eligibility_null_optional_fields
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging eligibility handles null optional fields in key computation
+    model: normalized_input__stg_eligibility
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P002', member_id: null, gender: null, birth_date: null, enrollment_start_date: '2024-01-01', enrollment_end_date: '2024-06-30', payer: null, plan: null, data_source: null}
+    expect:
+      rows:
+        - {person_id: 'P002', member_id: null, gender: null, birth_date: null, enrollment_start_date: '2024-01-01', enrollment_end_date: '2024-06-30', payer: null, plan: null, data_source: null}
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__stg_pharmacy_claim
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_stg_pharmacy_claim_basic_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging pharmacy claim passes through all columns
+    model: normalized_input__stg_pharmacy_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX001', claim_line_number: 1, person_id: 'P001', member_id: 'M001', payer: 'Aetna', plan: 'Gold', prescribing_provider_npi: '1234567890', dispensing_provider_npi: '0987654321', dispensing_date: '2024-02-01', ndc_code: '00002323201', quantity: 30, days_supply: 30, refills: 2, data_source: 'pharmacy_a'}
+    expect:
+      rows:
+        - {claim_id: 'RX001', claim_line_number: 1, person_id: 'P001', member_id: 'M001', payer: 'Aetna', plan: 'Gold', prescribing_provider_npi: '1234567890', dispensing_provider_npi: '0987654321', dispensing_date: '2024-02-01', ndc_code: '00002323201', quantity: 30, days_supply: 30, refills: 2, data_source: 'pharmacy_a'}
+
+  - name: test_stg_pharmacy_claim_null_fields
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify staging pharmacy claim handles null fields
+    model: normalized_input__stg_pharmacy_claim
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX002', claim_line_number: 1, person_id: 'P002', ndc_code: null, quantity: null, days_supply: null, paid_amount: null, data_source: 'pharmacy_a'}
+    expect:
+      rows:
+        - {claim_id: 'RX002', claim_line_number: 1, person_id: 'P002', ndc_code: null, quantity: null, days_supply: null, paid_amount: null, data_source: 'pharmacy_a'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Diagnosis Code Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_diagnosis_code_intermediate
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_diagnosis_code_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_diagnosis_code_final_pivots_back_to_wide
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify diagnosis codes are pivoted back from long to wide format
+    model: normalized_input__int_diagnosis_code_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_diagnosis_code_intermediate')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'diagnosis_code_1', diagnosis_code: 'E1165'}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'diagnosis_code_2', diagnosis_code: 'I10'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', diagnosis_code_1: 'E1165', diagnosis_code_2: 'I10', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_diagnosis_code_final_null_remaining_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify unpopulated diagnosis code positions are null
+    model: normalized_input__int_diagnosis_code_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_diagnosis_code_intermediate')
+        rows:
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'diagnosis_code_1', diagnosis_code: 'J189'}
+    expect:
+      rows:
+        - {claim_id: 'CLM002', data_source: 'claims_a', diagnosis_code_1: 'J189', diagnosis_code_2: null, diagnosis_code_3: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Procedure Code Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_procedure_code_intermediate
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_procedure_code_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_procedure_code_final_pivots_back_to_wide
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify procedure codes are pivoted back from long to wide format
+    model: normalized_input__int_procedure_code_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_procedure_code_intermediate')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'procedure_code_1', procedure_code: '0SR9019'}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'procedure_code_2', procedure_code: '0SRC0J9'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', procedure_code_1: '0SR9019', procedure_code_2: '0SRC0J9', tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Admit Source Voting Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_admit_source_voting
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_admit_source_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_admit_source_final_selects_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify admit source final picks the code with highest occurrence count
+    model: normalized_input__int_admit_source_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_admit_source_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'admit_source_code', normalized_code: '1', normalized_description: 'Non-Health Care Facility', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'admit_source_code', normalized_code: '4', normalized_description: 'Transfer from Hospital', occurrence_count: 1, next_occurrence_count: 0, occurrence_row_count: 2}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'admit_source_code', normalized_code: '1', normalized_description: 'Non-Health Care Facility', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_admit_source_final_tie_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify tied admit source codes are excluded (occurrence equals next)
+    model: normalized_input__int_admit_source_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_admit_source_voting')
+        rows:
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'admit_source_code', normalized_code: '1', normalized_description: 'Non-Health Care Facility', occurrence_count: 2, next_occurrence_count: 2, occurrence_row_count: 1}
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'admit_source_code', normalized_code: '4', normalized_description: 'Transfer from Hospital', occurrence_count: 2, next_occurrence_count: 0, occurrence_row_count: 2}
+    expect:
+      rows: []
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Admit Type Voting Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_admit_type_voting
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_admit_type_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_admit_type_final_selects_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify admit type final picks the code with highest count and clear winner
+    model: normalized_input__int_admit_type_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_admit_type_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'admit_type_code', normalized_code: '1', normalized_description: 'Emergency', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'admit_type_code', normalized_code: '1', normalized_description: 'Emergency', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Bill Type Voting Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_bill_type_voting
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_bill_type_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_bill_type_final_selects_top_row
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify bill type final picks the top-ranked row
+    model: normalized_input__int_bill_type_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_bill_type_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'bill_type_code', normalized_code: '111', normalized_description: 'Hospital Inpatient', occurrence_count: 3, occurrence_row_count: 1}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'bill_type_code', normalized_code: '121', normalized_description: 'Hospital Inpatient Part B', occurrence_count: 1, occurrence_row_count: 2}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'bill_type_code', normalized_code: '111', normalized_description: 'Hospital Inpatient', occurrence_count: 3, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Discharge Disposition Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_discharge_disposition_voting
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_discharge_disposition_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_discharge_disposition_final_selects_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify discharge disposition final picks the winning code
+    model: normalized_input__int_discharge_disposition_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_discharge_disposition_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'discharge_disposition_code', normalized_code: '01', normalized_description: 'Discharged to Home', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'discharge_disposition_code', normalized_code: '01', normalized_description: 'Discharged to Home', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_discharge_disposition_final_tie_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify tied discharge disposition codes are excluded
+    model: normalized_input__int_discharge_disposition_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_discharge_disposition_voting')
+        rows:
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'discharge_disposition_code', normalized_code: '01', normalized_description: 'Home', occurrence_count: 2, next_occurrence_count: 2, occurrence_row_count: 1}
+    expect:
+      rows: []
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - DRG Voting Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_drg_voting
+  ## ──────────────────────────────────────────────────────────
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_drg_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_drg_final_selects_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify DRG final picks the code with highest count and clear winner
+    model: normalized_input__int_drg_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_drg_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'drg_code', normalized_code: '470', normalized_description: 'Major Joint Replacement', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'drg_code', normalized_code: '470', normalized_description: 'Major Joint Replacement', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Place of Service
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Revenue Center
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Medical Claim Date Normalization
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Medical Date Aggregation
+  ## ══════════════════════════════════════════════════════════
+
+  - name: test_int_medical_date_aggregation_institutional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify date aggregation for institutional claims includes admission/discharge
+    model: normalized_input__int_medical_date_aggregation
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_medical_claim_date_normalize')
+        rows:
+          - {claim_id: 'CLM001', claim_line_number: 1, claim_type: 'institutional', data_source: 'claims_a', normalized_claim_start_date: '2024-01-15', normalized_claim_end_date: '2024-01-20', normalized_admission_date: '2024-01-15', normalized_discharge_date: '2024-01-20'}
+          - {claim_id: 'CLM001', claim_line_number: 2, claim_type: 'institutional', data_source: 'claims_a', normalized_claim_start_date: '2024-01-16', normalized_claim_end_date: '2024-01-18', normalized_admission_date: '2024-01-15', normalized_discharge_date: '2024-01-20'}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', minimum_claim_start_date: '2024-01-15', maximum_claim_end_date: '2024-01-20', minimum_admission_date: '2024-01-15', maximum_discharge_date: '2024-01-20', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_medical_date_aggregation_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify date aggregation for professional claims has null admission/discharge
+    model: normalized_input__int_medical_date_aggregation
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_medical_claim_date_normalize')
+        rows:
+          - {claim_id: 'CLM002', claim_line_number: 1, claim_type: 'professional', data_source: 'claims_a', normalized_claim_start_date: '2024-02-01', normalized_claim_end_date: '2024-02-01', normalized_admission_date: null, normalized_discharge_date: null}
+    expect:
+      rows:
+        - {claim_id: 'CLM002', data_source: 'claims_a', minimum_claim_start_date: '2024-02-01', maximum_claim_end_date: '2024-02-01', minimum_admission_date: null, maximum_discharge_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - NPI Normalization
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Eligibility Date Normalization
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Eligibility State Normalization
+  ## ══════════════════════════════════════════════════════════
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Present on Admission Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_present_on_admit_voting
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_present_on_admit_voting_clear_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify POA voting selects the code with highest occurrence
+    model: normalized_input__int_present_on_admit_voting
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_present_on_admit_normalize')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', diagnosis_column: 'diagnosis_poa_1', normalized_present_on_admit_code: 'Y', present_on_admit_occurrence_count: 3}
+          - {claim_id: 'CLM001', data_source: 'claims_a', diagnosis_column: 'diagnosis_poa_1', normalized_present_on_admit_code: 'N', present_on_admit_occurrence_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'diagnosis_poa_1', normalized_code: 'Y', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'diagnosis_poa_1', normalized_code: 'N', occurrence_count: 1, next_occurrence_count: 0, occurrence_row_count: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_present_on_admit_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_present_on_admit_final_pivots_winners
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify POA final pivots winning codes back to wide format
+    model: normalized_input__int_present_on_admit_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_present_on_admit_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'DIAGNOSIS_POA_1', normalized_code: 'Y', occurrence_count: 3, next_occurrence_count: 1, occurrence_row_count: 1}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'DIAGNOSIS_POA_2', normalized_code: 'N', occurrence_count: 2, next_occurrence_count: 0, occurrence_row_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', diagnosis_poa_1: 'Y', diagnosis_poa_2: 'N', tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ══════════════════════════════════════════════════════════
+  ## INTERMEDIATE MODELS - Procedure Date Pipeline
+  ## ══════════════════════════════════════════════════════════
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_procedure_date_voting
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_procedure_date_voting_clear_winner
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify procedure date voting assigns ranks correctly
+    model: normalized_input__int_procedure_date_voting
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_procedure_date_normalize')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', procedure_column: 'procedure_date_1', procedure_date: '2024-01-15', procedure_date_occurrence_count: 3}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'procedure_date_1', normalized_code: '2024-01-15', occurrence_count: 3, next_occurrence_count: 0, occurrence_row_count: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  ## ──────────────────────────────────────────────────────────
+  ## normalized_input__int_procedure_date_final
+  ## ──────────────────────────────────────────────────────────
+
+  - name: test_int_procedure_date_final_pivots_winners
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify procedure date final pivots winning dates back to wide format
+    model: normalized_input__int_procedure_date_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_procedure_date_voting')
+        rows:
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'procedure_date_1', normalized_code: '2024-01-15', occurrence_count: 3, next_occurrence_count: 0, occurrence_row_count: 1}
+          - {claim_id: 'CLM001', data_source: 'claims_a', column_name: 'procedure_date_2', normalized_code: '2024-01-16', occurrence_count: 2, next_occurrence_count: 0, occurrence_row_count: 1}
+    expect:
+      rows:
+        - {claim_id: 'CLM001', data_source: 'claims_a', procedure_date_1: '2024-01-15', procedure_date_2: '2024-01-16', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_int_procedure_date_final_tie_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: Verify tied procedure dates are excluded from final
+    model: normalized_input__int_procedure_date_final
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__int_procedure_date_voting')
+        rows:
+          - {claim_id: 'CLM002', data_source: 'claims_a', column_name: 'procedure_date_1', normalized_code: '2024-01-15', occurrence_count: 2, next_occurrence_count: 2, occurrence_row_count: 1}
+    expect:
+      rows: []
+
+

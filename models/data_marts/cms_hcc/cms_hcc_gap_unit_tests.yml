@@ -1,0 +1,44 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # CMS HCC - INTERMEDIATE: int_eligible_conditions
+  # =========================================================================
+
+  # =========================================================================
+  # CMS HCC - FINAL: patient_risk_factors_monthly
+  # =========================================================================
+
+  - name: test_cms_hcc_patient_risk_factors_monthly_unions_factors
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: cms_hcc__patient_risk_factors_monthly
+    description: "Patient risk factors monthly unions all factor types with risk model defaults"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__int_demographic_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', gender: 'Male', age_group: '65-69', enrollment_status: 'Continuing', medicaid_status: 'No', dual_status: 'Non', orec: 'Aged', institutional_status: 'No', risk_model_code: 'CNA', enrollment_status_default: false, medicaid_dual_status_default: false, orec_default: false, institutional_status_default: false, coefficient: 0.35, factor_type: 'demographic', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_disease_factors')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', hcc_code: 'HCC19', hcc_description: 'Diabetes', coefficient: 0.302, factor_type: 'disease', model_version: 'CMS-HCC-V24', payment_year: 2024, collection_start_date: '2023-01-01', collection_end_date: '2023-12-31'}
+      - input: ref('cms_hcc__int_enrollment_interaction_factors')
+        rows: []
+      - input: ref('cms_hcc__int_disabled_interaction_factors')
+        rows: []
+      - input: ref('cms_hcc__int_disease_interaction_factors')
+        rows: []
+      - input: ref('cms_hcc__int_hcc_count_factors')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', factor_type: 'demographic', coefficient: 0.35, payment_year: 2024, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', factor_type: 'disease', coefficient: 0.302, payment_year: 2024, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CMS HCC - FINAL: patient_risk_scores_monthly_by_factor_type
+  # =========================================================================
+

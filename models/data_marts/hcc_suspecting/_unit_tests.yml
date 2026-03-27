@@ -1,0 +1,253 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # HCC SUSPECTING - FINAL: list
+  # =========================================================================
+
+  - name: test_hcc_suspecting_list_filters_not_billed_current_year
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list
+    description: "List model filters to suspects that are NOT billed in the current year (current_year_billed = false or null)"
+    given:
+      - input: ref('hcc_suspecting__list_all')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical HCC', contributing_factor: 'E11.65', suspect_date: '2023-06-15', current_year_billed: false, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC85', hcc_description: 'CHF', reason: 'Comorbidity', contributing_factor: 'I50.9', suspect_date: '2023-07-01', current_year_billed: true, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P3', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC111', hcc_description: 'COPD', reason: 'Lab suspect', contributing_factor: 'Spirometry', suspect_date: '2023-08-01', current_year_billed: null, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', reason: 'Historical HCC'}
+        - {person_id: 'P3', hcc_code: 'HCC111', reason: 'Lab suspect'}
+
+  - name: test_hcc_suspecting_list_excludes_all_billed
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list
+    description: "When all suspects are billed in the current year, the list is empty"
+    given:
+      - input: ref('hcc_suspecting__list_all')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-06-15', current_year_billed: true, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  - name: test_hcc_suspecting_list_multiple_suspects_same_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list
+    description: "A patient can have multiple un-billed suspects from different sources"
+    given:
+      - input: ref('hcc_suspecting__list_all')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '37', hcc_description: 'Diabetes with Chronic Complications', reason: 'Prior coding history', contributing_factor: 'E11.65', suspect_date: '2023-06-15', current_year_billed: false, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '155', hcc_description: 'Major Depression', reason: 'Medication suspect', contributing_factor: 'DRUG1', suspect_date: '2023-07-01', current_year_billed: false, tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '48', hcc_description: 'Morbid Obesity', reason: 'Observation suspect', contributing_factor: 'BMI 42', suspect_date: '2023-08-01', current_year_billed: null, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '37', reason: 'Prior coding history'}
+        - {person_id: 'P1', hcc_code: '155', reason: 'Medication suspect'}
+        - {person_id: 'P1', hcc_code: '48', reason: 'Observation suspect'}
+
+  # =========================================================================
+  # HCC SUSPECTING - FINAL: list_all
+  # =========================================================================
+
+  - name: test_hcc_suspecting_list_all_unions_suspect_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_all
+    description: "List all unions history, comorbidity, observation, lab, and medication suspect sources"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-06-15', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_comorbidity_suspects')
+        rows: []
+      - input: ref('hcc_suspecting__int_observation_suspects')
+        rows: []
+      - input: ref('hcc_suspecting__int_lab_suspects')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC136', hcc_description: 'CKD Stage 4', reason: 'Lab result', contributing_factor: 'eGFR < 30', suspect_date: '2023-07-01', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_medication_suspects')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', reason: 'Historical', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', hcc_code: 'HCC136', reason: 'Lab result', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_list_all_unions_all_five_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_all
+    description: "All five suspect sources are unioned correctly with one record each"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '37', hcc_description: 'Diabetes', reason: 'Prior coding history', contributing_factor: 'E11.65', suspect_date: '2023-01-01', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_comorbidity_suspects')
+        rows:
+          - {person_id: 'P2', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '37', hcc_description: 'Diabetes', reason: 'Comorbidity suspect', contributing_factor: 'Diabetes + CKD', suspect_date: '2023-02-01', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_observation_suspects')
+        rows:
+          - {person_id: 'P3', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '48', hcc_description: 'Morbid Obesity', reason: 'Observation suspect', contributing_factor: 'BMI 42', suspect_date: '2023-03-01', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_lab_suspects')
+        rows:
+          - {person_id: 'P4', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '327', hcc_description: 'CKD Stage 4', reason: 'Lab result suspect', contributing_factor: 'eGFR 22', suspect_date: '2023-04-01', current_year_billed: false}
+      - input: ref('hcc_suspecting__int_medication_suspects')
+        rows:
+          - {person_id: 'P5', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '155', hcc_description: 'Major Depression', reason: 'Medication suspect', contributing_factor: 'SSRI', suspect_date: '2023-05-01', current_year_billed: false}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: '37', reason: 'Prior coding history', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', hcc_code: '37', reason: 'Comorbidity suspect', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P3', hcc_code: '48', reason: 'Observation suspect', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P4', hcc_code: '327', reason: 'Lab result suspect', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P5', hcc_code: '155', reason: 'Medication suspect', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_list_all_empty_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_all
+    description: "When all suspect sources are empty, list_all returns no rows"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__int_patient_hcc_history')
+        rows: []
+      - input: ref('hcc_suspecting__int_comorbidity_suspects')
+        rows: []
+      - input: ref('hcc_suspecting__int_observation_suspects')
+        rows: []
+      - input: ref('hcc_suspecting__int_lab_suspects')
+        rows: []
+      - input: ref('hcc_suspecting__int_medication_suspects')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # HCC SUSPECTING - FINAL: list_rollup
+  # =========================================================================
+
+  - name: test_hcc_suspecting_list_rollup_picks_latest_suspect
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_rollup
+    description: "List rollup deduplicates by person/payer/hcc_code/model_version, keeping the most recent suspect_date"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__list')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-01-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Lab suspect', contributing_factor: 'A1C > 9', suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', model_version: 'HCC19', hcc_code: 'V24', reason: 'Lab suspect', contributing_factor: 'A1C > 9', latest_suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_list_rollup_multiple_hccs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_rollup
+    description: "List rollup keeps separate rows for different HCC codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__list')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '37', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '155', hcc_description: 'Depression', reason: 'Medication suspect', contributing_factor: 'SSRI', suspect_date: '2023-07-01', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', model_version: '37', hcc_code: 'V28', latest_suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', payer: 'MCR', model_version: '155', hcc_code: 'V28', latest_suspect_date: '2023-07-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_list_rollup_single_record
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__list_rollup
+    description: "A single suspect record passes through without deduplication"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__list')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '48', hcc_description: 'Morbid Obesity', reason: 'Observation suspect', contributing_factor: 'BMI 42', suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', model_version: '48', hcc_code: 'V28', reason: 'Observation suspect', latest_suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # HCC SUSPECTING - FINAL: summary
+  # =========================================================================
+
+  - name: test_hcc_suspecting_summary_counts_gaps
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__summary
+    description: "Summary joins patients to their suspecting list counts and computes age"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', death_date: null}
+      - input: ref('hcc_suspecting__list')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V24', hcc_code: 'HCC85', hcc_description: 'CHF', reason: 'Comorbidity', contributing_factor: 'I50.9', suspect_date: '2023-07-01', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', payer: 'MCR', patient_sex: 'male', suspecting_gaps: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_summary_excludes_deceased_patients
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__summary
+    description: "Deceased patients (death_date not null) are excluded from the summary"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', death_date: '2023-05-01'}
+          - {person_id: 'P2', sex: 'female', birth_date: '1955-03-15', death_date: null}
+      - input: ref('hcc_suspecting__list')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '37', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', suspect_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', payer: 'MCR', data_source: 'src1', model_version: 'V28', hcc_code: '155', hcc_description: 'Depression', reason: 'Medication suspect', contributing_factor: 'SSRI', suspect_date: '2023-07-01', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P2', payer: 'MCR', patient_sex: 'female', suspecting_gaps: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_hcc_suspecting_summary_no_suspects
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_suspecting__summary
+    description: "Patients with no suspects do not appear in summary (inner join)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'male', birth_date: '1960-01-01', death_date: null}
+      - input: ref('hcc_suspecting__list')
+        rows: []
+    expect:
+      rows: []

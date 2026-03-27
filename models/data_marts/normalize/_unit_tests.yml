@@ -1,0 +1,452 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_condition
+  # =========================================================================
+
+  - name: test_stg_unmapped_condition_filters_unmapped_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_condition
+    description: >
+      Staging condition model should only return rows where normalized_code
+      and normalized_description are both null, and source_code/source_description
+      are not both null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'icd-10-cm', source_code: 'A00.0', source_description: 'Cholera', normalized_code: 'A000', normalized_description: 'Cholera due to V. cholerae', data_source: 'src1'}
+          - {source_code_type: null, source_code: null, source_description: null, normalized_code: null, normalized_description: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 1, domain: 'condition', data_source: 'src1'}
+
+  - name: test_stg_unmapped_condition_counts_duplicates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_condition
+    description: >
+      Staging condition model should count multiple rows with the same
+      source_code as separate items.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', normalized_code: null, normalized_description: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 3, domain: 'condition', data_source: 'src1'}
+
+  - name: test_stg_unmapped_condition_excludes_already_mapped
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_condition
+    description: >
+      Rows that already have a normalized_code should be excluded from
+      the unmapped condition staging model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'A00.0', source_description: 'Cholera', normalized_code: 'A000', normalized_description: 'Cholera vibrio', data_source: 'src1'}
+          - {source_code_type: 'snomed', source_code: '123456', source_description: 'Some condition', normalized_code: null, normalized_description: 'Mapped description', data_source: 'src1'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_procedure
+  # =========================================================================
+
+  - name: test_stg_unmapped_procedure_filters_unmapped_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_procedure
+    description: >
+      Staging procedure model should only return rows where normalized_code
+      and normalized_description are both null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'cpt', source_code: '99214', source_description: 'Office visit level 4', normalized_code: '99214', normalized_description: 'Office visit lvl4', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 1, domain: 'procedure', data_source: 'src1'}
+
+  - name: test_stg_unmapped_procedure_excludes_null_source
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_procedure
+    description: >
+      Rows where both source_code and source_description are null should
+      be excluded.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {source_code_type: 'cpt', source_code: null, source_description: null, normalized_code: null, normalized_description: null, data_source: 'src1'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_medication
+  # =========================================================================
+
+  - name: test_stg_unmapped_medication_filters_unmapped_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_medication
+    description: >
+      Staging medication model should only return rows where ndc_code,
+      ndc_description, rxnorm_code, and rxnorm_description are all null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__medication')
+        rows:
+          - {source_code_type: 'ndc', source_code: '12345678901', source_description: 'Aspirin', ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, data_source: 'src1'}
+          - {source_code_type: 'ndc', source_code: '99999999999', source_description: 'Tylenol', ndc_code: '99999999999', ndc_description: 'Tylenol 500mg', rxnorm_code: null, rxnorm_description: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'ndc', source_code: '12345678901', source_description: 'Aspirin', item_count: 1, domain: 'medication', data_source: 'src1'}
+
+  - name: test_stg_unmapped_medication_excludes_rxnorm_mapped
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_medication
+    description: >
+      Rows with rxnorm_code populated should be excluded from unmapped
+      medication staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__medication')
+        rows:
+          - {source_code_type: 'rxnorm', source_code: '1234', source_description: 'Med A', ndc_code: null, ndc_description: null, rxnorm_code: '1234', rxnorm_description: 'Med A mapped', data_source: 'src1'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_immunization
+  # =========================================================================
+
+  - name: test_stg_unmapped_immunization_filters_unmapped_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_immunization
+    description: >
+      Staging immunization model should only return rows where normalized_code
+      and normalized_description are both null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__immunization')
+        rows:
+          - {source_code_type: 'cvx', source_code: '03', source_description: 'MMR', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'cvx', source_code: '21', source_description: 'Varicella', normalized_code: '21', normalized_description: 'Varicella vaccine', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'cvx', source_code: '03', source_description: 'MMR', item_count: 1, domain: 'immunization', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_observation
+  # =========================================================================
+
+  - name: test_stg_unmapped_observation_filters_unmapped_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_observation
+    description: >
+      Staging observation model should only return rows where normalized_code
+      and normalized_description are both null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__observation')
+        rows:
+          - {source_code_type: 'loinc', source_code: '8302-2', source_description: 'Body height', normalized_code: null, normalized_description: null, data_source: 'src1'}
+          - {source_code_type: 'loinc', source_code: '3141-9', source_description: 'Body weight', normalized_code: '3141-9', normalized_description: 'Body weight measured', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'loinc', source_code: '8302-2', source_description: 'Body height', item_count: 1, domain: 'observation', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_lab_result
+  # =========================================================================
+
+  - name: test_stg_unmapped_lab_result_filters_unmapped_orders_and_components
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_lab_result
+    description: >
+      Staging lab result model should detect unmapped rows from both orders
+      and components sub-queries and exclude rows with normalized codes.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__lab_result')
+        rows:
+          - {source_order_type: 'loinc', source_order_code: '24323-8', source_order_description: 'CMP panel', normalized_order_type: null, normalized_order_code: null, normalized_order_description: null, source_component_type: 'loinc', source_component_code: '2345-7', source_component_description: 'Glucose', normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, data_source: 'src1'}
+          - {source_order_type: 'loinc', source_order_code: '58410-2', source_order_description: 'CBC panel', normalized_order_type: 'loinc', normalized_order_code: '58410-2', normalized_order_description: 'CBC mapped', source_component_type: 'loinc', source_component_code: '6690-2', source_component_description: 'WBC', normalized_component_type: 'loinc', normalized_component_code: '6690-2', normalized_component_description: 'WBC mapped', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'loinc', source_code: '24323-8', source_description: 'CMP panel', item_count: 1, domain: 'lab_result', data_source: 'src1'}
+        - {source_code_type: 'loinc', source_code: '2345-7', source_description: 'Glucose', item_count: 1, domain: 'lab_result', data_source: 'src1'}
+
+  # =========================================================================
+  # STAGING: normalize__stg_unmapped_appointment
+  # =========================================================================
+
+  - name: test_stg_unmapped_appointment_detects_unmapped_appointment_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_appointment
+    description: >
+      Staging appointment model should detect unmapped appointment type codes
+      where normalized_code and normalized_description are both null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__appointment')
+        rows:
+          - {source_appointment_type_code: 'FOLLOWUP', source_appointment_type_description: 'Follow-up visit', normalized_appointment_type_code: null, normalized_appointment_type_description: null, source_status: 'booked', normalized_status: 'booked', source_reason_code_type: null, source_reason_code: null, source_reason_description: null, normalized_reason_code_type: null, normalized_reason_code: null, normalized_reason_description: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'appointment_type', source_code: 'FOLLOWUP', source_description: 'Follow-up visit', item_count: 1, domain: 'appointment', data_source: 'src1'}
+
+  - name: test_stg_unmapped_appointment_excludes_mapped_types
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__stg_unmapped_appointment
+    description: >
+      Appointment rows where all normalized fields are populated should
+      not appear in the unmapped output.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('core__appointment')
+        rows:
+          - {source_appointment_type_code: 'FOLLOWUP', source_appointment_type_description: 'Follow-up', normalized_appointment_type_code: 'FOLLOWUP', normalized_appointment_type_description: 'Follow-up mapped', source_status: 'booked', normalized_status: 'booked', source_reason_code_type: 'icd-10-cm', source_reason_code: 'Z00.0', source_reason_description: 'General exam', normalized_reason_code_type: 'icd-10-cm', normalized_reason_code: 'Z00.0', normalized_reason_description: 'General exam mapped', source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'src1'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # normalize__unmapped_condition (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_condition_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_condition
+    description: >
+      Unmapped condition model should aggregate items by source code type,
+      source code, source description, and domain, summing item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_condition')
+        rows:
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 5, domain: 'condition', data_source: 'src1'}
+          - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 3, domain: 'condition', data_source: 'src2'}
+    expect:
+      rows:
+        - {source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 diabetes', item_count: 8, domain: 'condition'}
+
+  # =========================================================================
+  # normalize__unmapped_procedure (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_procedure_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_procedure
+    description: >
+      Unmapped procedure model should aggregate items by source code fields,
+      summing item_count across data sources.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_procedure')
+        rows:
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 10, domain: 'procedure', data_source: 'src1'}
+          - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 7, domain: 'procedure', data_source: 'src2'}
+    expect:
+      rows:
+        - {source_code_type: 'cpt', source_code: '99213', source_description: 'Office visit', item_count: 17, domain: 'procedure'}
+
+  # =========================================================================
+  # normalize__unmapped_medication (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_medication_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_medication
+    description: >
+      Unmapped medication model should aggregate items by source code fields
+      and sum item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_medication')
+        rows:
+          - {source_code_type: 'ndc', source_code: '12345678901', source_description: 'Aspirin', item_count: 4, domain: 'medication', data_source: 'src1'}
+          - {source_code_type: 'ndc', source_code: '12345678901', source_description: 'Aspirin', item_count: 6, domain: 'medication', data_source: 'src2'}
+    expect:
+      rows:
+        - {source_code_type: 'ndc', source_code: '12345678901', source_description: 'Aspirin', item_count: 10, domain: 'medication'}
+
+  # =========================================================================
+  # normalize__unmapped_immunization (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_immunization_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_immunization
+    description: >
+      Unmapped immunization model should aggregate by source code fields
+      and sum item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_immunization')
+        rows:
+          - {source_code_type: 'cvx', source_code: '03', source_description: 'MMR', item_count: 2, domain: 'immunization', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'cvx', source_code: '03', source_description: 'MMR', item_count: 2, domain: 'immunization'}
+
+  # =========================================================================
+  # normalize__unmapped_observation (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_observation_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_observation
+    description: >
+      Unmapped observation model should aggregate by source code fields
+      and sum item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_observation')
+        rows:
+          - {source_code_type: 'loinc', source_code: '8302-2', source_description: 'Body height', item_count: 3, domain: 'observation', data_source: 'src1'}
+          - {source_code_type: 'loinc', source_code: '8302-2', source_description: 'Body height', item_count: 1, domain: 'observation', data_source: 'src2'}
+    expect:
+      rows:
+        - {source_code_type: 'loinc', source_code: '8302-2', source_description: 'Body height', item_count: 4, domain: 'observation'}
+
+  # =========================================================================
+  # normalize__unmapped_lab_result (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_lab_result_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_lab_result
+    description: >
+      Unmapped lab result model should aggregate by source code fields
+      and sum item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_lab_result')
+        rows:
+          - {source_code_type: 'loinc', source_code: '2345-7', source_description: 'Glucose', item_count: 5, domain: 'lab_result', data_source: 'src1'}
+          - {source_code_type: 'loinc', source_code: '2345-7', source_description: 'Glucose', item_count: 2, domain: 'lab_result', data_source: 'src2'}
+    expect:
+      rows:
+        - {source_code_type: 'loinc', source_code: '2345-7', source_description: 'Glucose', item_count: 7, domain: 'lab_result'}
+
+  # =========================================================================
+  # normalize__unmapped_appointment (aggregation model)
+  # =========================================================================
+
+  - name: test_unmapped_appointment_aggregates_by_source_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: normalize__unmapped_appointment
+    description: >
+      Unmapped appointment model should aggregate by source code fields
+      and sum item_count.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: "unmapped"
+    given:
+      - input: ref('normalize__stg_unmapped_appointment')
+        rows:
+          - {source_code_type: 'appointment_type', source_code: 'FOLLOWUP', source_description: 'Follow-up visit', item_count: 3, domain: 'appointment', data_source: 'src1'}
+    expect:
+      rows:
+        - {source_code_type: 'appointment_type', source_code: 'FOLLOWUP', source_description: 'Follow-up visit', item_count: 3, domain: 'appointment'}

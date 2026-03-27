@@ -1,0 +1,1322 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__condition
+  # =========================================================================
+
+  - name: test_quality_measures_stg_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__condition
+    description: "Condition staging passes through key fields from core condition"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', encounter_id: 'E1', recorded_date: '2023-06-01', source_code_type: 'icd-10-cm', source_code: 'E11.65', normalized_code_type: 'icd-10-cm', normalized_code: 'E11.65'}
+    expect:
+      rows:
+        - {person_id: 'P1', claim_id: 'C1', encounter_id: 'E1', recorded_date: '2023-06-01', source_code_type: 'icd-10-cm', source_code: 'E11.65', normalized_code_type: 'icd-10-cm', normalized_code: 'E11.65', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__encounter
+  # =========================================================================
+
+  - name: test_quality_measures_stg_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__encounter
+    description: "Encounter staging passes through key fields from core encounter"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__lab_result
+  # =========================================================================
+
+  - name: test_quality_measures_stg_lab_result_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__lab_result
+    description: "Lab result staging passes through key fields from core lab_result"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__lab_result')
+        rows:
+          - {person_id: 'P1', result: '200', result_datetime: '2023-06-01', collection_datetime: '2023-06-01', normalized_order_type: 'loinc', normalized_order_code: '13457-7', source_order_type: null, source_order_code: null, normalized_component_type: null, normalized_component_code: null, source_component_type: null, source_component_code: null}
+    expect:
+      rows:
+        - {person_id: 'P1', result: '200', result_date: '2023-06-01', collection_date: '2023-06-01', code_type: 'loinc', code: '13457-7'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__medication
+  # =========================================================================
+
+  - name: test_quality_measures_stg_medication_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__medication
+    description: "Medication staging passes through key fields from core medication"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__medication')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', prescribing_date: '2023-06-01', dispensing_date: '2023-06-02', source_code_type: 'rxnorm', source_code: '314076', ndc_code: '00378123401', rxnorm_code: '314076'}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', prescribing_date: '2023-06-01', dispensing_date: '2023-06-02', source_code_type: 'rxnorm', source_code: '314076', ndc_code: '00378123401', rxnorm_code: '314076', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__observation
+  # =========================================================================
+
+  - name: test_quality_measures_stg_observation_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__observation
+    description: "Observation staging passes through key fields from core observation"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__observation')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', observation_date: '2023-06-01', result: 'positive', source_code_type: 'snomed-ct', source_code: '12345', normalized_code_type: 'snomed-ct', normalized_code: '12345', normalized_description: 'Test observation'}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', observation_date: '2023-06-01', result: 'positive', source_code_type: 'snomed-ct', source_code: '12345', normalized_code_type: 'snomed-ct', normalized_code: '12345', normalized_description: 'Test observation', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_core__procedure
+  # =========================================================================
+
+  - name: test_quality_measures_stg_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_core__procedure
+    description: "Procedure staging passes through key fields from core procedure"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-01', source_code_type: 'hcpcs', source_code: '99213', normalized_code_type: 'hcpcs', normalized_code: '99213', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null}
+    expect:
+      rows:
+        - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-01', source_code_type: 'hcpcs', source_code: '99213', normalized_code_type: 'hcpcs', normalized_code: '99213', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_medical_claim
+  # =========================================================================
+
+  - name: test_quality_measures_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_medical_claim
+    description: "Medical claim staging passes through key fields from core medical claim"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', place_of_service_code: '11', hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null}
+    expect:
+      rows:
+        - {person_id: 'P1', claim_id: 'C1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', place_of_service_code: '11', hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - STAGING: stg_pharmacy_claim
+  # =========================================================================
+
+  - name: test_quality_measures_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__stg_pharmacy_claim
+    description: "Pharmacy claim staging passes through key fields from core pharmacy claim"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: true
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-06-01', ndc_code: '00378123401', days_supply: 30, paid_date: '2023-06-15'}
+    expect:
+      rows:
+        - {person_id: 'P1', dispensing_date: '2023-06-01', ndc_code: '00378123401', days_supply: 30, paid_date: '2023-06-15', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # QUALITY MEASURES - SHARED EXCLUSIONS: hospice_palliative
+  # =========================================================================
+
+  - name: test_quality_measures_shared_exclusions_hospice_palliative
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_shared_exclusions_hospice_palliative
+    description: "Hospice palliative exclusion identifies patients with hospice condition codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'Z51.5', code_system: 'ICD10CM', concept_name: 'hospice encounter'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', recorded_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'Z51.5', encounter_id: 'E1'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__observation')
+        rows: []
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', exclusion_date: '2023-06-01', exclusion_reason: 'hospice encounter', exclusion_type: 'hospice_palliative'}
+
+  # =========================================================================
+  # QUALITY MEASURES - SHARED EXCLUSIONS: frailty
+  # =========================================================================
+
+  - name: test_quality_measures_shared_exclusions_frailty
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_shared_exclusions_frailty
+    description: "Frailty exclusion identifies patients with frailty condition codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1940-01-01', death_date: null}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'M62.81', code_system: 'ICD10CM', concept_name: 'frailty diagnosis'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', recorded_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'M62.81', encounter_id: 'E1'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__observation')
+        rows: []
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # QUALITY MEASURES - SHARED EXCLUSIONS: institutional_snp
+  # =========================================================================
+
+  - name: test_quality_measures_shared_exclusions_institutional_snp
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_shared_exclusions_institutional_snp
+    description: "Institutional SNP exclusion identifies patients with 90+ day stays at institutional POS codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1940-01-01', death_date: null}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_start_date: '2023-01-01', claim_end_date: '2023-06-01', place_of_service_code: '32', hcpcs_code: null, hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null}
+    expect:
+      rows:
+        - {person_id: 'P1', exclusion_date: '2023-01-01', exclusion_reason: 'institutional or long term care', exclusion_type: 'institutional_snp'}
+
+  # =========================================================================
+  # QUALITY MEASURES - SHARED EXCLUSIONS: dementia
+  # =========================================================================
+
+  - name: test_quality_measures_shared_exclusions_dementia
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_shared_exclusions_dementia
+    description: "Dementia exclusion identifies frail patients with dementia medication dispensing"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_shared_exclusions_frailty')
+        rows:
+          - {person_id: 'P1', exclusion_date: '2023-06-01', exclusion_reason: 'frailty diagnosis'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00078012345', code_system: 'ndc', concept_name: 'dementia medications'}
+      - input: ref('quality_measures__stg_core__medication')
+        rows: []
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-07-01', ndc_code: '00078012345', days_supply: 30, paid_date: '2023-07-15'}
+    expect:
+      rows:
+        - {person_id: 'P1', exclusion_type: 'dementia'}
+
+  # =========================================================================
+  # QUALITY MEASURES - SHARED EXCLUSIONS: advanced_illness
+  # =========================================================================
+
+  - name: test_quality_measures_shared_exclusions_advanced_illness
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_shared_exclusions_advanced_illness
+    description: "Advanced illness exclusion identifies frail patients with advanced illness on acute inpatient claims"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_shared_exclusions_frailty')
+        rows:
+          - {person_id: 'P1', exclusion_date: '2023-06-01', exclusion_reason: 'frailty diagnosis'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'G30.9', code_system: 'ICD10CM', concept_name: 'advanced illness'}
+          - {code: '99221', code_system: 'CPT', concept_name: 'acute inpatient'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', recorded_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'G30.9', encounter_id: 'E1'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', claim_start_date: '2023-06-01', claim_end_date: '2023-06-05', hcpcs_code: '99221', place_of_service_code: '21', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM438 - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438__performance_period
+    description: "CQM438 performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'CQM438', name: 'Statin Therapy CVD', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # CQM438 - DENOMINATOR CRITERIA 1 (ASCVD)
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_denom_criteria1_ascvd
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_denominator_criteria1
+    description: "CQM438 criteria1 identifies patients with ASCVD conditions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'I25.10', code_system: 'ICD10CM', concept_name: 'ischemic heart disease or related diagnoses'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', encounter_id: 'E1', recorded_date: '2023-03-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'I25.10'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__int_cqm438__performance_period')
+        rows:
+          - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM438 - DENOMINATOR CRITERIA 2 (Cholesterol)
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_denom_criteria2_cholesterol
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_denominator_criteria2
+    description: "CQM438 criteria2 identifies patients with familial hypercholesterolemia condition"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'E78.01', code_system: 'ICD10CM', concept_name: 'familial hypercholesterolemia'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', encounter_id: 'E1', recorded_date: '2023-03-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'E78.01'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__stg_core__lab_result')
+        rows: []
+      - input: ref('quality_measures__int_cqm438__performance_period')
+        rows:
+          - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM438 - DENOMINATOR CRITERIA 3 (Diabetes)
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_denom_criteria3_diabetes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_denominator_criteria3
+    description: "CQM438 criteria3 identifies patients with diabetes condition"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'E11.65', code_system: 'ICD10CM', concept_name: 'diabetes'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', encounter_id: 'E1', recorded_date: '2023-03-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'E11.65'}
+      - input: ref('quality_measures__int_cqm438__performance_period')
+        rows:
+          - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM438 - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_denominator_unions_criteria
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_denominator
+    description: "CQM438 denominator unions criteria and filters by age with qualifying encounters"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_cqm438_denominator_criteria1')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023'}
+      - input: ref('quality_measures__int_cqm438_denominator_criteria2')
+        rows: []
+      - input: ref('quality_measures__int_cqm438_denominator_criteria3')
+        rows: []
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '99213', code_system: 'CPT', concept_name: 'office visit'}
+      - input: ref('quality_measures__stg_core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm438__performance_period')
+        rows:
+          - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, measure_id: 'CQM438'}
+
+  # =========================================================================
+  # CQM438 - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_exclusions_condition_match
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_exclusions
+    description: "CQM438 exclusions identifies denominator patients with qualifying exclusion conditions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_cqm438__performance_period')
+        rows:
+          - {measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'M62.82', code_system: 'ICD10CM', concept_name: 'rhabdomyolysis'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', recorded_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'M62.82', encounter_id: 'E1'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__observation')
+        rows: []
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__stg_core__medication')
+        rows: []
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows: []
+      - input: ref('quality_measures__int_shared_exclusions_hospice_palliative')
+        rows: []
+      - input: ref('quality_measures__int_cqm438_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {person_id: 'P1', exclusion_date: '2023-06-01', exclusion_reason: 'rhabdomyolysis', exclusion_flag: 1}
+
+  # =========================================================================
+  # CQM438 - NUMERATOR
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_numerator_statin_procedure
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_numerator
+    description: "CQM438 numerator identifies denominator patients with statin therapy procedure"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_cqm438_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '36567', code_system: 'rxnorm', concept_name: 'statin therapy'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-15', source_code_type: 'rxnorm', source_code: '36567', normalized_code_type: null, normalized_code: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__medication')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', evidence_date: '2023-06-15', numerator_flag: 1}
+
+  # =========================================================================
+  # CQM438 - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_cqm438_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm438_long
+    description: "CQM438 long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_cqm438_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm438_numerator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM438', measure_name: 'Statin Therapy CVD', measure_version: '2023', evidence_date: '2023-06-15', evidence_value: null, numerator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm438_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, measure_id: 'CQM438'}
+
+  # =========================================================================
+  # CQM130 - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_cqm130_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm130__performance_period
+    description: "CQM130 performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'CQM130', name: 'Documentation of Current Medications', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # CQM130 - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_cqm130_denominator_qualifying_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm130_denominator
+    description: "CQM130 denominator identifies patients 18+ with qualifying encounters in the performance period"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '99213', code_system: 'CPT', concept_name: 'encounter to document medications'}
+      - input: ref('quality_measures__stg_core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm130__performance_period')
+        rows:
+          - {measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, measure_id: 'CQM130'}
+
+  # =========================================================================
+  # CQM130 - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_cqm130_exclusions_medical_reason
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm130_exclusions
+    description: "CQM130 exclusions identifies denominator patients with medical reason exclusion codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_cqm130__performance_period')
+        rows:
+          - {measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'G9692', code_system: 'CPT', concept_name: 'medical reason'}
+      - input: ref('quality_measures__stg_core__condition')
+        rows: []
+      - input: ref('quality_measures__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'hcpcs', normalized_code: 'G9692', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__int_cqm130_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, procedure_encounter_date: '2023-06-01', claims_encounter_date: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM130 - NUMERATOR
+  # =========================================================================
+
+  - name: test_quality_measures_cqm130_numerator_documenting_meds
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm130_numerator
+    description: "CQM130 numerator identifies denominator patients with medication documentation procedures"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_cqm130_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, procedure_encounter_date: '2023-06-01', claims_encounter_date: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'G8427', code_system: 'CPT', concept_name: 'eligible clinician attests to documenting current medications'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'hcpcs', normalized_code: 'G8427', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # CQM130 - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_cqm130_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_cqm130_long
+    description: "CQM130 long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_cqm130_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, procedure_encounter_date: '2023-06-01', claims_encounter_date: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm130_numerator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'CQM130', measure_name: 'Documentation of Current Medications', measure_version: '2023', evidence_date: '2023-06-01', evidence_value: null, numerator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_cqm130_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, measure_id: 'CQM130'}
+
+  # =========================================================================
+  # NQF0420 - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_nqf0420_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_nqf0420__performance_period
+    description: "NQF0420 performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'NQF0420', name: 'Pain Assessment and Follow-Up', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # NQF0420 - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_nqf0420_denominator_qualifying_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_nqf0420_denominator
+    description: "NQF0420 denominator identifies patients 18+ with qualifying encounters"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '99213', code_system: 'CPT', concept_name: 'office visit'}
+      - input: ref('quality_measures__stg_core__encounter')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', encounter_type: 'office visit', encounter_group: 'office based', length_of_stay: 0, encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-01', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows: []
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_nqf0420__performance_period')
+        rows:
+          - {measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, measure_id: 'NQF0420'}
+
+  # =========================================================================
+  # NQF0420 - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_nqf0420_exclusions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_nqf0420_exclusions
+    description: "NQF0420 exclusions identifies patients not eligible for pain assessment"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_nqf0420__performance_period')
+        rows:
+          - {measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__int_nqf0420_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'G8731', code_system: 'CPT', concept_name: 'patient is not eligible for a pain assessment'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'hcpcs', normalized_code: 'G8731', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # NQF0420 - NUMERATOR
+  # =========================================================================
+
+  - name: test_quality_measures_nqf0420_numerator_pain_assessment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_nqf0420_numerator
+    description: "NQF0420 numerator identifies patients with documented pain assessment"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_nqf0420_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'G8730', code_system: 'CPT', concept_name: 'pain assessment documented'}
+      - input: ref('quality_measures__stg_core__procedure')
+        rows:
+          - {person_id: 'P1', encounter_id: 'E1', procedure_date: '2023-06-15', source_code_type: null, source_code: null, normalized_code_type: 'hcpcs', normalized_code: 'G8730', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_medical_claim')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # NQF0420 - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_nqf0420_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_nqf0420_long
+    description: "NQF0420 long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_nqf0420_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_nqf0420_numerator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0420', measure_name: 'Pain Assessment and Follow-Up', measure_version: '2023', evidence_date: '2023-06-15', evidence_value: null, numerator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_nqf0420_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, measure_id: 'NQF0420'}
+
+  # =========================================================================
+  # ADH-Diabetes - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_adh_diabetes_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_diabetes__performance_period
+    description: "ADH-Diabetes performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'ADH-Diabetes', name: 'Medication Adherence for Diabetes Medications', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # ADH-Diabetes - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_adh_diabetes_denominator_qualifying_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_diabetes_denominator
+    description: "ADH-Diabetes denominator identifies patients 18+ with 2+ diabetes medication fills and first fill 91+ days before period end"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00378123401', code_system: 'ndc', concept_name: 'pqa diabetes medications'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378123401', days_supply: 30, paid_date: '2023-03-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', dispensing_date: '2023-04-01', ndc_code: '00378123401', days_supply: 30, paid_date: '2023-04-15', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_diabetes__performance_period')
+        rows:
+          - {measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, ndc_code: '00378123401'}
+        - {person_id: 'P1', denominator_flag: 1, ndc_code: '00378123401'}
+
+  # =========================================================================
+  # ADH-Diabetes - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_adh_diabetes_exclusions_esrd
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_diabetes_exclusions
+    description: "ADH-Diabetes exclusions identifies denominator patients with ESRD or insulin"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_adh_diabetes__performance_period')
+        rows:
+          - {measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__int_adh_diabetes_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, dispensing_date: '2023-03-01', ndc_code: '00378123401', days_supply: 30, days_in_treatment_period: 306, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'N18.6', code_system: 'ICD10CM', concept_name: 'pqa esrd'}
+      - input: ref('quality_measures__int_shared_exclusions_hospice_palliative')
+        rows: []
+      - input: ref('quality_measures__stg_core__condition')
+        rows:
+          - {person_id: 'P1', claim_id: 'C1', recorded_date: '2023-06-01', source_code_type: null, source_code: null, normalized_code_type: 'icd-10-cm', normalized_code: 'N18.6', encounter_id: 'E1'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # ADH-Diabetes - NUMERATOR
+  # =========================================================================
+
+  - name: test_quality_measures_adh_diabetes_numerator_adherent
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_diabetes_numerator
+    description: "ADH-Diabetes numerator identifies patients with 80%+ medication adherence"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_adh_diabetes_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, dispensing_date: '2023-03-01', ndc_code: 'NDC1', days_supply: 306, days_in_treatment_period: 306, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_diabetes__performance_period')
+        rows:
+          - {measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', numerator_flag: 1}
+
+  # =========================================================================
+  # ADH-Diabetes - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_adh_diabetes_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_diabetes_long
+    description: "ADH-Diabetes long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_adh_diabetes_denominator')
+        rows:
+          - {person_id: 'P1', age: 65, dispensing_date: '2023-03-01', ndc_code: 'NDC1', days_supply: 30, days_in_treatment_period: 306, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Diabetes', measure_name: 'Medication Adherence for Diabetes Medications', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_diabetes_numerator')
+        rows:
+          - {person_id: 'P1', evidence_date: '2023-03-01', evidence_value: '30', adherence: 100.0, numerator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_diabetes_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, measure_id: 'ADH-Diabetes'}
+
+  # =========================================================================
+  # ADH-RAS - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_adhras_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adhras__performance_period
+    description: "ADH-RAS performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'ADH-RAS', name: 'Medication Adherence for Hypertension (RAS Antagonists)', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'ADH-RAS', measure_name: 'Medication Adherence for Hypertension (RAS Antagonists)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # ADH-RAS - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_adhras_denominator_placeholder
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adhras_denominator
+    description: "ADH-RAS denominator identifies patients with qualifying RAS antagonist fills"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00378999901', code_system: 'ndc', concept_name: 'pqa ras antagonist medications'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378999901', days_supply: 30, paid_date: '2023-03-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', dispensing_date: '2023-04-01', ndc_code: '00378999901', days_supply: 30, paid_date: '2023-04-15', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adhras__performance_period')
+        rows:
+          - {measure_id: 'ADH-RAS', measure_name: 'Medication Adherence for Hypertension (RAS Antagonists)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # ADH-RAS - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_adhras_exclusions_hospice
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adhras_exclusions
+    description: "ADH-RAS exclusions identifies denominator patients with hospice or sacubitril/valsartan"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_adhras__performance_period')
+        rows:
+          - {measure_id: 'ADH-RAS', measure_name: 'Medication Adherence for Hypertension (RAS Antagonists)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__int_adhras_denominator')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378999901', days_supply: 30, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-RAS', measure_name: 'Medication Adherence for Hypertension (RAS Antagonists)', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: 'Z51.5', code_system: 'ICD10CM', concept_name: 'pqa sacubitril valsartan medications'}
+      - input: ref('quality_measures__int_shared_exclusions_hospice_palliative')
+        rows: []
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows: []
+      - input: ref('quality_measures__stg_core__condition')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # ADH-RAS - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_adhras_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adhras_long
+    description: "ADH-RAS long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_adhras_denominator')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: 'NDC1', days_supply: 30, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-RAS', measure_name: 'Medication Adherence for Hypertension (RAS Antagonists)', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adhras_numerator')
+        rows: []
+      - input: ref('quality_measures__int_adhras_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, measure_id: 'ADH-RAS'}
+
+  # =========================================================================
+  # ADH-Statins - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_adh_statins_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_statins__performance_period
+    description: "ADH-Statins performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'ADH-Statins', name: 'Medication Adherence for Cholesterol (Statins)', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'ADH-Statins', measure_name: 'Medication Adherence for Cholesterol (Statins)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # ADH-Statins - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_adh_statins_denominator_placeholder
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_statins_denominator
+    description: "ADH-Statins denominator identifies patients with qualifying statin fills"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00378888801', code_system: 'ndc', concept_name: 'pqa statin medications'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378888801', days_supply: 30, paid_date: '2023-03-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', dispensing_date: '2023-04-01', ndc_code: '00378888801', days_supply: 30, paid_date: '2023-04-15', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_statins__performance_period')
+        rows:
+          - {measure_id: 'ADH-Statins', measure_name: 'Medication Adherence for Cholesterol (Statins)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1}
+        - {person_id: 'P1', denominator_flag: 1}
+
+  # =========================================================================
+  # ADH-Statins - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_adh_statins_exclusions_empty
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_statins_exclusions
+    description: "ADH-Statins exclusions returns empty when no exclusion conditions present"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_adh_statins__performance_period')
+        rows:
+          - {measure_id: 'ADH-Statins', measure_name: 'Medication Adherence for Cholesterol (Statins)', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__int_adh_statins_denominator')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378888801', days_supply: 30, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Statins', measure_name: 'Medication Adherence for Cholesterol (Statins)', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows: []
+      - input: ref('quality_measures__int_shared_exclusions_hospice_palliative')
+        rows: []
+      - input: ref('quality_measures__stg_core__condition')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # ADH-Statins - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_adh_statins_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_adh_statins_long
+    description: "ADH-Statins long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_adh_statins_denominator')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: 'NDC1', days_supply: 30, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'ADH-Statins', measure_name: 'Medication Adherence for Cholesterol (Statins)', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_adh_statins_numerator')
+        rows: []
+      - input: ref('quality_measures__int_adh_statins_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, measure_id: 'ADH-Statins'}
+
+  # =========================================================================
+  # SUPD - PERFORMANCE PERIOD
+  # =========================================================================
+
+  - name: test_quality_measures_supd_performance_period
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_supd__performance_period
+    description: "SUPD performance period returns measure metadata and computed date range"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'SUPD', name: 'Statin Use in Persons with Diabetes', version: '2023'}
+    expect:
+      rows:
+        - {measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+
+  # =========================================================================
+  # SUPD - DENOMINATOR
+  # =========================================================================
+
+  - name: test_quality_measures_supd_denominator_placeholder
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_supd_denominator
+    description: "SUPD denominator identifies patients 40-75 with diabetes and qualifying fills"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00378777701', code_system: 'ndc', concept_name: 'pqa diabetes medications'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-03-01', ndc_code: '00378777701', days_supply: 30, paid_date: '2023-03-15', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P1', dispensing_date: '2023-04-01', ndc_code: '00378777701', days_supply: 30, paid_date: '2023-04-15', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__stg_core__patient')
+        rows:
+          - {person_id: 'P1', sex: 'female', birth_date: '1960-01-01', death_date: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_supd__performance_period')
+        rows:
+          - {measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # SUPD - EXCLUSIONS
+  # =========================================================================
+
+  - name: test_quality_measures_supd_exclusions_empty
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_supd_exclusions
+    description: "SUPD exclusions returns empty when no exclusion conditions present"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_supd__performance_period')
+        rows:
+          - {measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31'}
+      - input: ref('quality_measures__int_supd_denominator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows: []
+      - input: ref('quality_measures__int_shared_exclusions_hospice_palliative')
+        rows: []
+      - input: ref('quality_measures__stg_core__condition')
+        rows: []
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # SUPD - NUMERATOR
+  # =========================================================================
+
+  - name: test_quality_measures_supd_numerator_statin_fill
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_supd_numerator
+    description: "SUPD numerator identifies denominator patients with statin pharmacy fill"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        quality_measures_period_end: '2023-12-31'
+    given:
+      - input: ref('quality_measures__int_supd_denominator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__value_sets')
+        rows:
+          - {code: '00378555501', code_system: 'ndc', concept_name: 'statin therapy'}
+      - input: ref('quality_measures__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P1', dispensing_date: '2023-06-15', ndc_code: '00378555501', days_supply: 30, paid_date: '2023-06-20', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # SUPD - LONG
+  # =========================================================================
+
+  - name: test_quality_measures_supd_long_combines_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: quality_measures__int_supd_long
+    description: "SUPD long combines denominator, numerator, and exclusion flags per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__int_supd_denominator')
+        rows:
+          - {person_id: 'P1', performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'SUPD', measure_name: 'Statin Use in Persons with Diabetes', measure_version: '2023', denominator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_supd_numerator')
+        rows:
+          - {person_id: 'P1', evidence_date: '2023-06-15', evidence_value: null, numerator_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('quality_measures__int_supd_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 1, exclusion_flag: 0, measure_id: 'SUPD'}
