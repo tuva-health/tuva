@@ -37,7 +37,7 @@ with cte as (
       , weights.drg_weight
     from {{ ref('core__encounter') }} as e
     left outer join cte as l
-      on e.facility_npi = l.location_id
+      on e.facility_id = l.location_id
     left outer join {{ ref('ccsr__dx_vertical_pivot') }} as p
       on e.primary_diagnosis_code = p.code
       and p.ccsr_category_rank = 1

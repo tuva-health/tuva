@@ -260,7 +260,7 @@ select * from {{ ref('data_quality__encounter_encounter_type') }}
 
 union all
 
-select * from {{ ref('data_quality__encounter_facility_npi') }}
+select * from {{ ref('data_quality__encounter_facility_id') }}
 
 union all
 

@@ -10,7 +10,7 @@ select
   , start_date
   , end_date
   , discharge_disposition_code
-  , facility_npi
+  , facility_id
   , row_number() over (partition by encounter_id
 order by start_date, end_date, claim_id) as encounter_claim_number
   , row_number() over (partition by encounter_id
