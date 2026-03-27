@@ -78,11 +78,11 @@ pre {
 }
 
 .top-controls {
-  align-items: flex-start;
+  align-items: center;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   left: 18px;
+  right: 18px;
   position: absolute;
   top: 12px;
   z-index: 5;
@@ -90,33 +90,27 @@ pre {
 
 .brand-logo {
   display: block;
-  height: 40px;
+  flex: 0 0 auto;
+  height: 42px;
   width: auto;
 }
 
 .dag-launcher {
-  backdrop-filter: blur(10px);
-  background: var(--surface);
-  border: 1.5px solid rgba(35, 35, 33, 0.9);
-  box-shadow: 0 8px 26px rgba(26, 24, 20, 0.08);
-  min-width: 332px;
-  padding: 8px 10px 10px;
+  flex: 1 1 auto;
+  min-width: 0;
   position: relative;
 }
 
-.dag-launcher.is-open {
-  background: rgba(255, 255, 255, 0.9);
-}
-
 .dag-launcher-row {
-  align-items: stretch;
-  display: grid;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 42px;
 }
 
 .dag-launcher-trigger,
-.dag-launcher-refresh {
+.dag-launcher-action {
   appearance: none;
   background: rgba(255, 255, 255, 0.95);
   border: 2px solid var(--border);
@@ -128,29 +122,23 @@ pre {
   display: flex;
   gap: 14px;
   justify-content: space-between;
+  flex: 0 1 auto;
+  max-width: 340px;
+  min-height: 42px;
   min-width: 0;
   padding: 8px 12px 9px;
   text-align: left;
 }
 
 .dag-launcher-copy {
-  display: grid;
-  gap: 3px;
+  display: block;
   min-width: 0;
-}
-
-.dag-launcher-kicker {
-  color: var(--muted);
-  font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .dag-launcher-title {
   display: block;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.94rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -163,29 +151,52 @@ pre {
   white-space: nowrap;
 }
 
-.dag-launcher-refresh {
-  font-size: 0.82rem;
-  padding: 0 12px;
-}
-
-.dag-launcher-meta {
+.dag-launcher-actions {
   align-items: center;
   display: flex;
   gap: 8px;
-  margin-top: 7px;
+  flex: 0 0 auto;
+}
+
+.dag-launcher-action {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.82rem;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.dag-status-inline {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
-.dag-launcher-meta .status-pill {
-  font-size: 0.75rem;
-  padding: 3px 7px;
+.dag-status-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.dag-launcher-meta .status-meta {
+.dag-status-label.is-ready {
+  color: var(--ready);
+}
+
+.dag-status-label.is-running {
+  color: var(--running);
+}
+
+.dag-status-label.is-error {
+  color: var(--danger);
+}
+
+.dag-status-meta {
+  color: var(--muted);
   font-size: 0.8rem;
-}
-
-.dag-launcher-meta .status-meta {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -247,35 +258,6 @@ pre {
   border-color: #4f8fbc;
 }
 
-.status-pill {
-  align-items: center;
-  border: 1.5px solid currentColor;
-  display: inline-flex;
-  font-size: 0.8rem;
-  font-weight: 600;
-  justify-self: start;
-  letter-spacing: 0.02em;
-  padding: 4px 8px;
-}
-
-.status-pill.is-ready {
-  color: var(--ready);
-}
-
-.status-pill.is-running {
-  color: var(--running);
-}
-
-.status-pill.is-error {
-  color: var(--danger);
-}
-
-.status-meta {
-  color: var(--muted);
-  font-size: 0.84rem;
-  line-height: 1.4;
-}
-
 .hud-button,
 .zoom-button,
 .modal-close,
@@ -291,7 +273,8 @@ pre {
   min-height: 1.2em;
 }
 
-.hud-button:disabled {
+.hud-button:disabled,
+.dag-launcher-action:disabled {
   cursor: default;
   opacity: 0.68;
 }
@@ -496,10 +479,39 @@ pre {
   display: none;
 }
 
+.header-legend {
+  position: relative;
+}
+
+.header-legend-trigger {
+  cursor: pointer;
+  list-style: none;
+}
+
+.header-legend-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.header-legend[open] .header-legend-trigger {
+  background: rgba(248, 246, 239, 0.98);
+}
+
+.header-legend-panel {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.97);
+  border: 1.5px solid rgba(35, 35, 33, 0.9);
+  box-shadow: 0 20px 46px rgba(26, 24, 20, 0.14);
+  min-width: 228px;
+  padding: 12px 14px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 7;
+}
+
 .legend-items {
   display: grid;
   gap: 10px;
-  margin-top: 12px;
 }
 
 .legend-item {
@@ -990,16 +1002,28 @@ pre {
   }
 
   .dag-launcher-row {
-    grid-template-columns: 1fr;
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .dag-launcher-refresh {
-    padding: 9px 12px;
+  .dag-launcher-trigger {
+    max-width: none;
+    width: 100%;
   }
 
-  .dag-launcher-meta {
+  .dag-status-inline {
     align-items: flex-start;
     flex-direction: column;
+    width: 100%;
+  }
+
+  .dag-launcher-actions {
+    width: 100%;
+  }
+
+  .dag-launcher-action {
+    flex: 1 1 0;
+    padding: 9px 12px;
   }
 
   .target-panel {
@@ -1056,10 +1080,15 @@ pre {
     width: calc(100vw - 28px);
   }
 
-  .legend-panel {
-    bottom: 90px;
-    left: 14px;
-    width: 210px;
+  .header-legend {
+    flex: 1 1 0;
+  }
+
+  .header-legend-panel {
+    left: 0;
+    min-width: 0;
+    right: auto;
+    width: min(280px, calc(100vw - 56px));
   }
 }
 

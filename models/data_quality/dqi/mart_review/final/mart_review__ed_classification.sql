@@ -12,9 +12,9 @@ with cte as
 
 select
     e.encounter_id
-    , case when s.encounter_id is null then 'Not Classified' else s.ed_classification_description end as ed_classification_description
+    , coalesce(s.ed_classification_description, 'Not Classified') as ed_classification_description
     , case
-        when s.encounter_id is null then 'Non-Avoidable'
+        when s.ed_classification_description is null then 'Non-Avoidable'
         when cast(s.ed_classification_order as int) <= 3 then s.ed_classification_description
         else 'Non-Avoidable' end as avoidable_category
     , e.paid_amount

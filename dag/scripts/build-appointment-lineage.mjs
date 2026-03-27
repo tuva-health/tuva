@@ -189,6 +189,7 @@ export async function buildLineagePayload({ targetKey = DEFAULT_TARGET_KEY } = {
       materialized: manifestNode.config?.materialized || manifestNode.resource_type || "model",
       technical: {
         alias: manifestNode.alias || manifestNode.name,
+        schemaName: manifestNode.schema || null,
         packageName: manifestNode.package_name,
         tags: manifestNode.tags || [],
         primaryKeyColumns: columns.filter((column) => column.isPrimaryKey).map((column) => column.name)
@@ -257,6 +258,7 @@ export async function buildLineagePayload({ targetKey = DEFAULT_TARGET_KEY } = {
       materialized: manifestNode.resource_type || "seed",
       technical: {
         alias: manifestNode.alias || manifestNode.name,
+        schemaName: manifestNode.schema || null,
         packageName: manifestNode.package_name,
         tags: manifestNode.tags || [],
         primaryKeyColumns: columns.filter((column) => column.isPrimaryKey).map((column) => column.name)
@@ -286,61 +288,89 @@ export async function buildLineagePayload({ targetKey = DEFAULT_TARGET_KEY } = {
     });
   }
 
-  const collapsedNodes = orderedDisplayNodeIds
-    .filter((displayNodeId) => graph.displayNodes.get(displayNodeId).kind === "collapsed")
-    .map((displayNodeId) => {
-      const displayNode = graph.displayNodes.get(displayNodeId);
-      const boundaryTarget = displayNode.target;
+  const collapsedNodes = [];
 
-      return {
-        id: displayNodeId,
-        name: boundaryTarget.label,
-        resourceType: "dag",
-        sourceStyle: false,
-        layer: boundaryTarget.categoryLabel,
-        depth: depthById.get(displayNodeId) || 0,
-        folderLabel: boundaryTarget.folderLabel,
-        description: boundaryTarget.subtitle,
-        materialized: "dag",
-        technical: {
-          alias: boundaryTarget.key,
-          packageName: "the_tuva_project",
-          tags: [],
-          primaryKeyColumns: []
-        },
-        paths: {
-          sql: null,
-          yaml: null,
-          manifestNodeId: null,
-          targetKey: boundaryTarget.key
-        },
-        mainDependencies: [],
-        supportingDependencies: [],
-        curated: {
-          nodeType: "intermediate",
-          whatItRepresents: boundaryTarget.subtitle,
-          grain: `Represents the collapsed ${boundaryTarget.label} DAG boundary in this view.`,
-          primaryKey: "",
-          transformationSteps: [
-            `This canvas has collapsed the ${boundaryTarget.label} DAG into a single node.`,
-            `Open ${boundaryTarget.label} from the selector to inspect its internal models.`
-          ]
-        },
-        baseNodeType: boundaryTarget.collapsedNodeType,
-        nodeType: "intermediate",
-        dagBoundary: {
-          targetKey: boundaryTarget.key,
-          targetLabel: boundaryTarget.label,
-          categoryLabel: boundaryTarget.categoryLabel,
-          memberCount: boundaryTarget.memberNodeIds.length,
-          outputModels: boundaryTarget.rootNodeLabels,
-          recurseWhenCollapsed: boundaryTarget.recurseWhenCollapsed
-        },
-        seedViewer: null,
-        sql: "",
-        columns: []
-      };
+  for (const displayNodeId of orderedDisplayNodeIds.filter((candidateId) => graph.displayNodes.get(candidateId).kind === "collapsed")) {
+    const displayNode = graph.displayNodes.get(displayNodeId);
+    const boundaryTarget = displayNode.target;
+    const representativeNodeId =
+      boundaryTarget.defaultSelectedNodeId ||
+      boundaryTarget.rootNodeIds[0] ||
+      displayNode.representativeNodeIds?.[0] ||
+      null;
+    const representativeNode = representativeNodeId ? nodeMap[representativeNodeId] || null : null;
+    const representativeYamlEntry = representativeNode ? await loadYamlEntry(representativeNode, yamlCache) : null;
+    const representativeColumns = representativeNode
+      ? buildColumns({
+          manifestNode: representativeNode,
+          yamlEntry: representativeYamlEntry,
+          priorNodes: []
+        })
+      : [];
+    const representativeCurated = representativeNode ? extractCuratedMetadata(representativeYamlEntry) : null;
+
+    collapsedNodes.push({
+      id: displayNodeId,
+      name: boundaryTarget.label,
+      resourceType: "dag",
+      sourceStyle: false,
+      layer: boundaryTarget.categoryLabel,
+      depth: depthById.get(displayNodeId) || 0,
+      folderLabel: boundaryTarget.folderLabel,
+      description: cleanText(
+        firstNonEmpty(representativeYamlEntry?.description, representativeNode?.description, boundaryTarget.subtitle)
+      ),
+      materialized: "dag",
+      technical: {
+        alias: representativeNode?.alias || boundaryTarget.key,
+        schemaName: representativeNode?.schema || null,
+        packageName: representativeNode?.package_name || "the_tuva_project",
+        tags: representativeNode?.tags || [],
+        primaryKeyColumns: representativeColumns.filter((column) => column.isPrimaryKey).map((column) => column.name)
+      },
+      paths: {
+        sql: null,
+        yaml: representativeNode ? loadYamlPath(representativeNode) : null,
+        yamlEntryName: representativeNode ? loadYamlEntryName(representativeNode) : null,
+        yamlCollectionKey: representativeNode ? loadYamlCollectionKey(representativeNode) : null,
+        manifestNodeId: representativeNodeId,
+        targetKey: boundaryTarget.key
+      },
+      mainDependencies: [],
+      supportingDependencies: [],
+      curated: {
+        nodeType: representativeCurated?.nodeType || "intermediate",
+        whatItRepresents: representativeCurated?.whatItRepresents || "",
+        grain: representativeCurated?.grain || "",
+        primaryKey: representativeCurated?.primaryKey || "",
+        transformationSteps: representativeCurated?.transformationSteps || [
+          `This canvas has collapsed the ${boundaryTarget.label} DAG into a single node.`,
+          `Open ${boundaryTarget.label} from the selector to inspect its internal models.`
+        ]
+      },
+      baseNodeType:
+        representativeNode && representativeNodeId
+          ? resolveBaseNodeType({
+              manifestNode: representativeNode,
+              nodeId: representativeNodeId,
+              yamlEntry: representativeYamlEntry
+            })
+          : boundaryTarget.collapsedNodeType,
+      nodeType: "intermediate",
+      dagBoundary: {
+        targetKey: boundaryTarget.key,
+        targetLabel: boundaryTarget.label,
+        categoryLabel: boundaryTarget.categoryLabel,
+        memberCount: boundaryTarget.memberNodeIds.length,
+        outputModels: boundaryTarget.rootNodeLabels,
+        recurseWhenCollapsed: boundaryTarget.recurseWhenCollapsed,
+        representativeNodeId
+      },
+      seedViewer: null,
+      sql: "",
+      columns: representativeColumns
     });
+  }
 
   const preRoleNodes = [...modelNodes, ...seedNodes, ...collapsedNodes];
   applyContextualNodeTypes({
@@ -1313,34 +1343,55 @@ function buildSeedViewer(manifestNode) {
   const baseDomain = "https://tuva-public-resources.s3.amazonaws.com";
 
   if (normalizedPath.includes("seeds/terminology/")) {
-    const datasetKey = manifestNode.name.replace(/^terminology__/, "");
-    const fileName = `${datasetKey}.csv_0_0_0.csv.gz`;
-
     return {
-      sourceType: "s3_csv_gzip",
+      sourceType: "seed_preview",
       family: "terminology",
       version: "latest",
       folder: "versioned_terminology",
-      fileName,
-      downloadUrl: `${baseDomain}/versioned_terminology/latest/${fileName}`
+      fileName: path.posix.basename(normalizedPath),
+      downloadUrl: buildTerminologySeedDownloadUrl({ manifestNode, baseDomain })
     };
   }
 
   if (normalizedPath.includes("seeds/value_sets/")) {
-    const datasetKey = path.posix.basename(normalizedPath).replace(/\.csv$/i, "");
-    const fileName = `${datasetKey}.csv_0_0_0.csv.gz`;
+    const datasetKey = buildValueSetSeedPublicKey({ manifestNode, normalizedPath });
+    const fileName = datasetKey ? `${datasetKey}.csv_0_0_0.csv.gz` : null;
 
     return {
-      sourceType: "s3_csv_gzip",
+      sourceType: "seed_preview",
       family: "value_set",
       version: "latest",
       folder: "versioned_value_sets",
-      fileName,
-      downloadUrl: `${baseDomain}/versioned_value_sets/latest/${fileName}`
+      fileName: path.posix.basename(normalizedPath),
+      downloadUrl: fileName ? `${baseDomain}/versioned_value_sets/latest/${fileName}` : null
     };
   }
 
   return null;
+}
+
+function buildTerminologySeedDownloadUrl({ manifestNode, baseDomain }) {
+  const datasetKey = (manifestNode?.name || "").replace(/^terminology__/, "");
+
+  if (!datasetKey || datasetKey === "provider") {
+    return null;
+  }
+
+  return `${baseDomain}/versioned_terminology/latest/${datasetKey}.csv_0_0_0.csv.gz`;
+}
+
+function buildValueSetSeedPublicKey({ manifestNode, normalizedPath }) {
+  const seedName = manifestNode?.name || path.posix.basename(normalizedPath).replace(/\.csv$/i, "");
+
+  if (seedName === "ed_classification__categories") {
+    return "ed_classification_categories";
+  }
+
+  if (seedName.startsWith("ed_classification__")) {
+    return seedName.replace(/^ed_classification__/, "");
+  }
+
+  return seedName || null;
 }
 
 function sortNodeType(nodeType) {

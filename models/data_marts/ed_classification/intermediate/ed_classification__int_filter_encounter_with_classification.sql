@@ -9,7 +9,18 @@ any rows that were not classified.
 }}
 
 select
-   a.*
+   a.encounter_id
+   , a.primary_diagnosis_code
+   , a.primary_diagnosis_code_type
+   , a.edcnnpa
+   , a.edcnpa
+   , a.epct
+   , a.noner
+   , a.injury
+   , a.psych
+   , a.alcohol
+   , a.drug
+   , a.ed_classification_capture
    , case greatest(edcnnpa, edcnpa, epct, noner, injury, psych, alcohol, drug)
           when edcnnpa then 'edcnnpa'
           when edcnpa then 'edcnpa'
@@ -21,5 +32,5 @@ select
           when drug then 'drug'
           else 'unclassified'
    end as classification
-from {{ ref('ed_classification__int_map_primary_dx') }} as a
+from {{ ref('ed_classification__map_primary_dx') }} as a
 where ed_classification_capture = 1

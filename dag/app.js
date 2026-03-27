@@ -257,8 +257,6 @@ function render() {
         <img class="brand-logo" src="${LOGO_URL}" alt="The Tuva Project" />
         ${renderDagLauncher()}
       </div>
-
-      ${renderLegend()}
       ${renderRefreshErrorNotice()}
 
       <div class="zoom-controls">
@@ -334,30 +332,34 @@ function renderNode(node) {
 
 function renderDagLauncher() {
   const currentTarget = getCurrentTarget();
-  const categoryLabel = currentTarget?.categoryLabel || "DAG";
+  const actionButtons = [
+    renderLegend(),
+    `
+      <button
+        class="dag-launcher-action"
+        id="refresh-button"
+        type="button"
+        ${state.refresh.status === "refreshing" ? "disabled" : ""}
+      >
+        ${state.refresh.status === "refreshing" ? "Refreshing..." : "Refresh"}
+      </button>
+    `
+  ];
 
   return `
     <div class="dag-launcher ${state.launcherOpen ? "is-open" : ""}">
       <div class="dag-launcher-row">
         <button class="dag-launcher-trigger" id="dag-launcher-trigger" type="button" aria-expanded="${String(state.launcherOpen)}">
           <span class="dag-launcher-copy">
-            <span class="dag-launcher-kicker">${escapeHtml(categoryLabel)}</span>
             <span class="dag-launcher-title">${escapeHtml(currentTarget?.label || state.payload?.target?.label || "Select DAG")}</span>
           </span>
           <span class="dag-launcher-caret" aria-hidden="true">${state.launcherOpen ? "Close" : "Browse"}</span>
         </button>
-        <button
-          class="dag-launcher-refresh"
-          id="refresh-button"
-          type="button"
-          ${state.refresh.status === "refreshing" ? "disabled" : ""}
-        >
-          ${state.refresh.status === "refreshing" ? "Refreshing..." : "Refresh"}
-        </button>
-      </div>
-      <div class="dag-launcher-meta">
-        <div class="status-pill ${renderStatusClass(state.refresh)}" id="status-pill">${escapeHtml(renderStatusLabel(state.refresh))}</div>
-        <div class="status-meta status-meta-compact" id="status-meta">${escapeHtml(renderRefreshSummary(state.refresh))}</div>
+        <div class="dag-launcher-actions">${actionButtons.join("")}</div>
+        <div class="dag-status-inline">
+          <div class="dag-status-label ${renderStatusClass(state.refresh)}" id="status-pill">${escapeHtml(renderStatusLabel(state.refresh))}</div>
+          <div class="dag-status-meta" id="status-meta">${escapeHtml(renderHeaderRefreshMeta(state.refresh))}</div>
+        </div>
       </div>
       ${state.launcherOpen ? renderTargetPanel() : ""}
     </div>
@@ -410,27 +412,7 @@ function renderModal(node) {
   const modalTabs = getModalTabs(node);
   const activeModalTab = resolveActiveModalTab(node, modalTabs);
 
-  if (isDagBoundaryNode(node)) {
-    sections.push(
-      {
-        tab: "overview",
-        html: renderModalSection(
-          "Transformation Description",
-          renderTransformationDescription(node, editor),
-          true,
-          "modal-section--transformation"
-        )
-      }
-    );
-    sections.push({
-      tab: "overview",
-      html: renderModalSection("Table Description", renderTableDescription(node, editor), false, "modal-section--description")
-    });
-    sections.push({
-      tab: "overview",
-      html: renderModalSection("Table Grain", renderGrainAndPrimaryKey(node, editor), false, "modal-section--grain")
-    });
-  } else if (isSeedNode(node)) {
+  if (isSeedNode(node)) {
     sections.push(
       {
         tab: "overview",
@@ -450,7 +432,7 @@ function renderModal(node) {
       tab: "overview",
       html: renderSeedPreviewSection(node, "modal-section--seed")
     });
-  } else if (isInputNode(node)) {
+  } else if (isInputDocumentationNode(node)) {
     sections.push(
       {
         tab: "overview",
@@ -484,6 +466,26 @@ function renderModal(node) {
     sections.push({
       tab: "dictionary",
       html: renderDictionarySection(node, editor, "modal-section--dictionary")
+    });
+  } else if (isDagBoundaryNode(node)) {
+    sections.push(
+      {
+        tab: "overview",
+        html: renderModalSection(
+          "Transformation Description",
+          renderTransformationDescription(node, editor),
+          true,
+          "modal-section--transformation"
+        )
+      }
+    );
+    sections.push({
+      tab: "overview",
+      html: renderModalSection("Table Description", renderTableDescription(node, editor), false, "modal-section--description")
+    });
+    sections.push({
+      tab: "overview",
+      html: renderModalSection("Table Grain", renderGrainAndPrimaryKey(node, editor), false, "modal-section--grain")
     });
   } else {
     sections.push(
@@ -671,7 +673,7 @@ function getModalBodyClass(node, activeTab) {
 }
 
 function getModalTabs(node) {
-  if (!node || isDagBoundaryNode(node)) {
+  if (!node) {
     return [{ key: "overview", label: "Overview" }];
   }
 
@@ -679,11 +681,15 @@ function getModalTabs(node) {
     return [{ key: "overview", label: "Overview" }];
   }
 
-  if (isInputNode(node)) {
+  if (isInputDocumentationNode(node)) {
     return [
       { key: "overview", label: "Overview" },
       { key: "dictionary", label: "Data Dictionary" }
     ];
+  }
+
+  if (isDagBoundaryNode(node)) {
+    return [{ key: "overview", label: "Overview" }];
   }
 
   return [
@@ -754,6 +760,10 @@ function getModalTabForField(node, fieldKey) {
 }
 
 function renderModalSubtitle(node) {
+  if (isCollapsedInputBoundary(node)) {
+    return `${node.layer} • input table`;
+  }
+
   if (isDagBoundaryNode(node)) {
     return `${node.layer} • collapsed DAG`;
   }
@@ -820,20 +830,12 @@ function renderTransformationDescription(node, editor = getEditorState(node)) {
 }
 
 function renderSeedPreviewSection(node, sectionClass = "") {
-  if (!node.seedViewer?.downloadUrl) {
-    return renderModalSection(
-      "Seed Data",
-      "No external seed preview source has been configured for this node.",
-      false,
-      sectionClass
-    );
-  }
-
   const preview = getSeedPreviewState(node.id);
   const totalPages = Math.max(1, Math.ceil((preview.totalMatches || 0) / preview.pageSize));
   const isLoading = preview.status === "loading";
   const canGoPrevious = preview.page > 1;
   const canGoNext = preview.page < totalPages;
+  const downloadUrl = node.seedViewer?.downloadUrl || "";
 
   return `
     <section class="modal-section ${escapeAttribute(sectionClass)}">
@@ -850,15 +852,19 @@ function renderSeedPreviewSection(node, sectionClass = "") {
                 value="${escapeAttribute(preview.query)}"
               />
             </label>
-            <a class="seed-download" href="${escapeAttribute(node.seedViewer.downloadUrl)}" target="_blank" rel="noreferrer">
-              Download CSV
-            </a>
+            ${
+              downloadUrl
+                ? `<a class="seed-download" href="${escapeAttribute(downloadUrl)}" target="_blank" rel="noreferrer">
+                    Download CSV
+                  </a>`
+                : ""
+            }
           </div>
 
           <div class="seed-meta">
             ${
               isLoading
-                ? "Loading seed rows from S3..."
+                ? "Loading seed rows..."
                 : `Showing ${preview.rows.length} of ${preview.totalMatches} matching rows (${preview.totalRows} total).`
             }
           </div>
@@ -912,7 +918,7 @@ function renderSeedPreviewTable(preview) {
 }
 
 function renderTableDescription(node, editor = getEditorState(node)) {
-  if (isDagBoundaryNode(node)) {
+  if (isDagBoundaryNode(node) && !isCollapsedInputBoundary(node)) {
     return node.description || `Collapsed DAG boundary for ${node.name}.`;
   }
 
@@ -933,7 +939,7 @@ function renderTableDescription(node, editor = getEditorState(node)) {
 }
 
 function renderGrainAndPrimaryKey(node, editor = getEditorState(node)) {
-  if (isDagBoundaryNode(node)) {
+  if (isDagBoundaryNode(node) && !isCollapsedInputBoundary(node)) {
     const outputs = node.dagBoundary?.outputModels?.length
       ? node.dagBoundary.outputModels.join(", ")
       : "No output models recorded.";
@@ -955,14 +961,14 @@ function renderGrainAndPrimaryKey(node, editor = getEditorState(node)) {
 
 function shouldRenderTransformationSection(node) {
   if (isDagBoundaryNode(node)) {
-    return true;
+    return !isCollapsedInputBoundary(node);
   }
 
-  if (isSeedNode(node)) {
+  if (isInputDocumentationNode(node)) {
     return false;
   }
 
-  if (isInputNode(node)) {
+  if (isSeedNode(node)) {
     return false;
   }
 
@@ -979,6 +985,14 @@ function isDagBoundaryNode(node) {
 
 function isInputNode(node) {
   return node?.nodeType === "input";
+}
+
+function isCollapsedInputBoundary(node) {
+  return isDagBoundaryNode(node) && isInputNode(node);
+}
+
+function isInputDocumentationNode(node) {
+  return isInputNode(node) || isCollapsedInputBoundary(node);
 }
 
 function isSourceNode(node) {
@@ -1171,13 +1185,15 @@ function renderRefreshErrorNotice() {
 
 function renderLegend() {
   return `
-    <details class="legend-panel">
-      <summary>Legend</summary>
-      <div class="legend-items">
+    <details class="header-legend">
+      <summary class="header-legend-trigger dag-launcher-action">Legend</summary>
+      <div class="header-legend-panel">
+        <div class="legend-items">
         ${renderLegendItem("Input", "input")}
         ${renderLegendItem("Intermediate", "intermediate")}
         ${renderLegendItem("Output", "output")}
         ${renderLegendItem("Terminology / value set", "terminology")}
+        </div>
       </div>
     </details>
   `;
@@ -2010,11 +2026,11 @@ function syncStatusOnly() {
   const pill = document.querySelector("#status-pill");
 
   if (meta) {
-    meta.textContent = renderRefreshSummary(state.refresh);
+    meta.textContent = renderHeaderRefreshMeta(state.refresh);
   }
 
   if (pill) {
-    pill.className = `status-pill ${renderStatusClass(state.refresh)}`;
+    pill.className = `dag-status-label ${renderStatusClass(state.refresh)}`;
     pill.textContent = renderStatusLabel(state.refresh);
   }
 }
@@ -2641,6 +2657,22 @@ function renderRefreshSummary(refresh) {
   }
 
   return "No successful refresh has completed yet.";
+}
+
+function renderHeaderRefreshMeta(refresh) {
+  if (refresh.status === "refreshing") {
+    return "Updating DAG...";
+  }
+
+  if (refresh.status === "failed") {
+    return "Last refresh failed";
+  }
+
+  if (refresh.lastSuccessAt) {
+    return `Updated ${formatTimestampCompact(refresh.lastSuccessAt)}`;
+  }
+
+  return "Not yet updated";
 }
 
 function formatCuratedPrimaryKey(primaryKey) {

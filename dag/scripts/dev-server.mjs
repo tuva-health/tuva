@@ -1,9 +1,10 @@
-import { spawn } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { createReadStream } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { gunzipSync } from "node:zlib";
 
 import Papa from "papaparse";
@@ -21,8 +22,16 @@ import {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(scriptDir, "..");
 const repoRoot = path.resolve(rootDir, "..");
+const workspaceRoot = path.dirname(repoRoot);
 const startingPort = Number(process.env.PORT || 4173);
 const dbtLocalScriptPath = process.env.DAG_DBT_LOCAL_PATH || path.join(repoRoot, "scripts", "dbt-local");
+const duckdbBinaryPath = process.env.DAG_DUCKDB_BINARY || "duckdb";
+const seedPreviewDuckDbCandidates = [
+  process.env.TUVA_DAG_DUCKDB_PATH,
+  path.join(workspaceRoot, "duckdb", "tuva_dev.duckdb"),
+  "/tmp/tuva_dev.duckdb"
+].filter(Boolean);
+const execFileAsync = promisify(execFile);
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
@@ -38,6 +47,7 @@ const contentTypes = {
 
 const sseClients = new Set();
 const seedDatasetCache = new Map();
+let seedPreviewDuckDbPathPromise = null;
 
 const serverState = {
   payload: null,
@@ -444,28 +454,20 @@ async function handleSeedPreviewRequest(requestUrl, response) {
     return;
   }
 
-  if (!node.seedViewer?.downloadUrl) {
-    writeJson(response, 404, { error: `No S3 preview source configured for ${node.name}` });
-    return;
-  }
-
-  const dataset = await loadSeedDataset(node);
-  const filteredRows = query ? dataset.rows.filter((row) => rowMatchesQuery(row, query)) : dataset.rows;
-  const startIndex = (page - 1) * pageSize;
-  const rows = filteredRows.slice(startIndex, startIndex + pageSize);
+  const preview = await loadSeedPreview(node, { query, page, pageSize });
 
   writeJson(response, 200, {
     nodeId: node.id,
-    query,
-    page,
-    pageSize,
-    totalRows: dataset.rows.length,
-    totalMatches: filteredRows.length,
-    headers: dataset.headers,
-    rows,
-    sourceUrl: node.seedViewer.downloadUrl,
-    sourceFileName: node.seedViewer.fileName,
-    family: node.seedViewer.family
+    query: preview.query,
+    page: preview.page,
+    pageSize: preview.pageSize,
+    totalRows: preview.totalRows,
+    totalMatches: preview.totalMatches,
+    headers: preview.headers,
+    rows: preview.rows,
+    sourceUrl: preview.sourceUrl,
+    sourceFileName: preview.sourceFileName,
+    family: preview.family
   });
 }
 
@@ -535,8 +537,33 @@ async function loadPayloadForTarget(targetKey = DEFAULT_TARGET_KEY) {
   return serverState.payload?.target?.key === targetKey ? serverState.payload : buildLineagePayload({ targetKey });
 }
 
+async function loadSeedPreview(node, { query = "", page = 1, pageSize = 50 } = {}) {
+  const duckDbPreview = await loadSeedPreviewFromDuckDb(node, { query, page, pageSize });
+
+  if (duckDbPreview) {
+    return duckDbPreview;
+  }
+
+  const dataset = await loadSeedDataset(node);
+  const filteredRows = query ? dataset.rows.filter((row) => rowMatchesQuery(row, query)) : dataset.rows;
+  const startIndex = (page - 1) * pageSize;
+
+  return {
+    query,
+    page,
+    pageSize,
+    totalRows: dataset.rows.length,
+    totalMatches: filteredRows.length,
+    headers: dataset.headers,
+    rows: filteredRows.slice(startIndex, startIndex + pageSize),
+    sourceUrl: node.seedViewer?.downloadUrl || null,
+    sourceFileName: node.seedViewer?.fileName || path.basename(node.paths?.sql || ""),
+    family: node.seedViewer?.family || "seed"
+  };
+}
+
 async function loadSeedDataset(node) {
-  const cacheKey = node.seedViewer?.downloadUrl;
+  const cacheKey = node.seedViewer?.downloadUrl || node.paths?.sql;
 
   if (!cacheKey) {
     throw new Error(`Seed preview source missing for ${node.name}`);
@@ -549,36 +576,21 @@ async function loadSeedDataset(node) {
   }
 
   const promise = (async () => {
-    const response = await fetch(cacheKey, {
-      headers: {
-        Accept: "application/gzip,application/x-gzip,application/octet-stream,text/csv"
+    if (node.seedViewer?.downloadUrl) {
+      try {
+        return await loadSeedDatasetFromRemote(node, node.seedViewer.downloadUrl);
+      } catch (error) {
+        if (!node.paths?.sql) {
+          throw error;
+        }
       }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch seed preview: ${response.status} ${response.statusText}`);
     }
 
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const csvText = decodeSeedBuffer(buffer);
-    const parsed = Papa.parse(csvText, {
-      header: false,
-      dynamicTyping: false,
-      skipEmptyLines: true
-    });
-
-    if (Array.isArray(parsed.errors) && parsed.errors.some((error) => error.code !== "UndetectableDelimiter")) {
-      const [firstError] = parsed.errors;
-      throw new Error(`Unable to parse seed preview: ${firstError.message}`);
+    if (node.paths?.sql) {
+      return loadSeedDatasetFromLocalFile(node, node.paths.sql);
     }
 
-    const rows = Array.isArray(parsed.data) ? parsed.data.filter(Array.isArray) : [];
-    const columnCount = rows[0]?.length || node.columns?.length || 0;
-
-    return {
-      headers: buildSeedHeaders(node, columnCount),
-      rows
-    };
+    throw new Error(`Seed preview source missing for ${node.name}`);
   })();
 
   seedDatasetCache.set(cacheKey, promise);
@@ -599,6 +611,67 @@ function decodeSeedBuffer(buffer) {
   } catch {
     return buffer.toString("utf8");
   }
+}
+
+async function loadSeedDatasetFromRemote(node, downloadUrl) {
+  const response = await fetch(downloadUrl, {
+    headers: {
+      Accept: "application/gzip,application/x-gzip,application/octet-stream,text/csv"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch seed preview: ${response.status} ${response.statusText}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return parseSeedDataset(node, decodeSeedBuffer(buffer));
+}
+
+async function loadSeedDatasetFromLocalFile(node, filePath) {
+  const buffer = await readFile(filePath);
+  return parseSeedDataset(node, buffer.toString("utf8"));
+}
+
+function parseSeedDataset(node, csvText) {
+  const parsed = Papa.parse(csvText, {
+    header: false,
+    dynamicTyping: false,
+    skipEmptyLines: true
+  });
+
+  if (Array.isArray(parsed.errors) && parsed.errors.some((error) => error.code !== "UndetectableDelimiter")) {
+    const [firstError] = parsed.errors;
+    throw new Error(`Unable to parse seed preview: ${firstError.message}`);
+  }
+
+  const rows = normalizeSeedRows(node, Array.isArray(parsed.data) ? parsed.data.filter(Array.isArray) : []);
+  const columnCount = rows[0]?.length || node.columns?.length || 0;
+
+  return {
+    headers: buildSeedHeaders(node, columnCount),
+    rows
+  };
+}
+
+function normalizeSeedRows(node, rows) {
+  if (!rows.length) {
+    return rows;
+  }
+
+  const documentedHeaders = Array.isArray(node.columns) ? node.columns.map((column) => column.name).filter(Boolean) : [];
+  const firstRow = rows[0].map((value) => String(value ?? "").trim().toLowerCase());
+  const normalizedHeaders = documentedHeaders.map((value) => String(value ?? "").trim().toLowerCase());
+
+  if (
+    documentedHeaders.length &&
+    firstRow.length === normalizedHeaders.length &&
+    firstRow.every((value, index) => value === normalizedHeaders[index])
+  ) {
+    return rows.slice(1);
+  }
+
+  return rows;
 }
 
 function buildSeedHeaders(node, columnCount) {
@@ -623,6 +696,124 @@ function rowMatchesQuery(row, query) {
   const normalizedQuery = query.toLowerCase();
 
   return row.some((value) => String(value || "").toLowerCase().includes(normalizedQuery));
+}
+
+async function loadSeedPreviewFromDuckDb(node, { query = "", page = 1, pageSize = 50 } = {}) {
+  const duckDbPath = await getSeedPreviewDuckDbPath();
+  const relation = getSeedPreviewRelation(node);
+
+  if (!duckDbPath || !relation) {
+    return null;
+  }
+
+  const documentedHeaders = Array.isArray(node.columns) ? node.columns.map((column) => column.name).filter(Boolean) : [];
+  const selectHeaders = documentedHeaders.length ? documentedHeaders : ["*"];
+  const relationSql = `${quoteIdentifier(relation.schemaName)}.${quoteIdentifier(relation.alias)}`;
+  const whereSql = buildSeedSearchWhereSql(selectHeaders, query);
+  const offset = Math.max(0, (page - 1) * pageSize);
+  const selectSql =
+    documentedHeaders.length
+      ? selectHeaders.map((header) => quoteIdentifier(header)).join(", ")
+      : "*";
+
+  try {
+    const totalRowsPromise = runDuckDbJsonQuery(
+      duckDbPath,
+      `select count(*) as total_rows from ${relationSql}`
+    );
+    const totalMatchesPromise = query
+      ? runDuckDbJsonQuery(duckDbPath, `select count(*) as total_matches from ${relationSql} ${whereSql}`)
+      : totalRowsPromise;
+    const rowsPromise = runDuckDbJsonQuery(
+      duckDbPath,
+      `select ${selectSql} from ${relationSql} ${whereSql} limit ${pageSize} offset ${offset}`
+    );
+
+    const [totalRowsResult, totalMatchesResult, rowObjects] = await Promise.all([
+      totalRowsPromise,
+      totalMatchesPromise,
+      rowsPromise
+    ]);
+    const headers = documentedHeaders.length
+      ? documentedHeaders
+      : Object.keys(rowObjects[0] || {});
+
+    return {
+      query,
+      page,
+      pageSize,
+      totalRows: Number(totalRowsResult[0]?.total_rows || 0),
+      totalMatches: Number((query ? totalMatchesResult : totalRowsResult)[0]?.[query ? "total_matches" : "total_rows"] || 0),
+      headers,
+      rows: rowObjects.map((row) => headers.map((header) => row?.[header] ?? "")),
+      sourceUrl: node.seedViewer?.downloadUrl || null,
+      sourceFileName: node.seedViewer?.fileName || path.basename(node.paths?.sql || ""),
+      family: node.seedViewer?.family || "seed"
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function getSeedPreviewDuckDbPath() {
+  if (!seedPreviewDuckDbPathPromise) {
+    seedPreviewDuckDbPathPromise = (async () => {
+      for (const candidate of seedPreviewDuckDbCandidates) {
+        try {
+          await access(candidate);
+          return candidate;
+        } catch {
+          continue;
+        }
+      }
+
+      return null;
+    })();
+  }
+
+  return seedPreviewDuckDbPathPromise;
+}
+
+function getSeedPreviewRelation(node) {
+  const schemaName = node?.technical?.schemaName;
+  const alias = node?.technical?.alias;
+
+  if (!schemaName || !alias) {
+    return null;
+  }
+
+  return { schemaName, alias };
+}
+
+function buildSeedSearchWhereSql(headers, query) {
+  if (!query || !headers.length || headers.includes("*")) {
+    return "";
+  }
+
+  const escapedQuery = escapeSqlString(query);
+  const conditions = headers.map((header) => {
+    return `cast(${quoteIdentifier(header)} as varchar) ilike '%${escapedQuery}%'`;
+  });
+
+  return conditions.length ? `where ${conditions.join(" or ")}` : "";
+}
+
+async function runDuckDbJsonQuery(databasePath, sql) {
+  const { stdout } = await execFileAsync(
+    duckdbBinaryPath,
+    ["-readonly", databasePath, "-json", "-c", sql],
+    { maxBuffer: 20 * 1024 * 1024 }
+  );
+
+  return JSON.parse(stdout || "[]");
+}
+
+function quoteIdentifier(value) {
+  return `"${String(value || "").replace(/"/g, "\"\"")}"`;
+}
+
+function escapeSqlString(value) {
+  return String(value || "").replace(/'/g, "''");
 }
 
 function clampPositiveInteger(value, fallback, max = 1000) {
