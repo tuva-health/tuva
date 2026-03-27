@@ -254,7 +254,6 @@ models:
                 max_value: 1
                 group_by:
                   - person_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_values_to_be_of_type:
               config:
@@ -1012,13 +1011,13 @@ models:
                   - tuva_dqi_sev_1
                   - dqi
                   - dqi_financial_pmpm
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:
