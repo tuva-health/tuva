@@ -333,16 +333,6 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -367,16 +357,6 @@ models:
                   - tuva_dqi_sev_3
                   - dqi
                   - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Days supply should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -490,16 +470,6 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -537,16 +507,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -619,16 +579,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -664,16 +614,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -709,16 +649,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
