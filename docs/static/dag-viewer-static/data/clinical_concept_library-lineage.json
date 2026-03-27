@@ -1,0 +1,535 @@
+{
+  "payload": {
+    "id": "clinical_concept_library-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:46.504Z",
+    "target": {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "subtitle": "Lineage for the Clinical Concept Library data mart rooted at its public output models.",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "graphTitle": "Clinical Concept Library DAG",
+      "graphSubtitle": "Lineage for the Clinical Concept Library data mart rooted at its public output models.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 3,
+      "documentedColumns": 0,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/clinical_concept_library-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields",
+        "name": "clinical_concept_library__value_set_member_relevant_fields",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 0,
+        "folderLabel": "data_marts/clinical_concept_library",
+        "description": "This model creates one record per value set member, but it includes relevant fields for each value set member taken from the clnical_concepts and coding_systems tables.",
+        "materialized": "table",
+        "technical": {
+          "alias": "value_set_member_relevant_fields",
+          "schemaName": "concept_library",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "clinical_concept_library"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/clinical_concept_library/clinical_concept_library__value_set_member_relevant_fields.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/clinical_concept_library/clinical_concept_library_models.yml",
+          "yamlEntryName": "clinical_concept_library__value_set_member_relevant_fields",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields",
+          "targetKey": "clinical_concept_library"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.concept_library__clinical_concepts",
+            "name": "concept_library__clinical_concepts",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/concept_library",
+            "nodeType": "terminology",
+            "path": "concept_library/concept_library__clinical_concepts.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.concept_library__value_set_members",
+            "name": "concept_library__value_set_members",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/concept_library",
+            "nodeType": "terminology",
+            "path": "concept_library/concept_library__value_set_members.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.concept_library__coding_systems",
+            "name": "concept_library__coding_systems",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/concept_library",
+            "nodeType": "terminology",
+            "path": "concept_library/concept_library__coding_systems.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "\n\n\nwith value_set_member_relevant_fields as (\nselect\n  aa.concept_id\n  , aa.concept_name\n  , aa.concept_type\n\n  , bb.value_set_member_id\n  , bb.code\n  , bb.coding_system_id\n  , bb.include_descendants\n\n  , cc.coding_system_name\n\nfrom {{ ref('concept_library__clinical_concepts') }} as aa\n\nleft outer join {{ ref('concept_library__value_set_members') }} as bb\non aa.concept_id = bb.concept_id\n\nleft outer join {{ ref('concept_library__coding_systems') }} as cc\non bb.coding_system_id = cc.coding_system_id\n)\n\n\nselect *\nfrom value_set_member_relevant_fields\n",
+        "columns": [
+          {
+            "name": "concept_id",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "concept_name",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "concept_type",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "value_set_member_id",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "code",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "coding_system_id",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "include_descendants",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "coding_system_name",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      }
+    ],
+    "edges": []
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "clinical_concept_library",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:46.504Z",
+    "lastSuccessAt": "2026-03-27T15:41:46.504Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}

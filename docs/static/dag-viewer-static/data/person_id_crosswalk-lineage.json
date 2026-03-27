@@ -1,0 +1,3809 @@
+{
+  "payload": {
+    "id": "person_id_crosswalk-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:43.506Z",
+    "target": {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "subtitle": "Trace core__person_id_crosswalk from its upstream sources and transformations into the final core model.",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "graphTitle": "Person ID Crosswalk DAG",
+      "graphSubtitle": "Trace core__person_id_crosswalk from its upstream sources and transformations into the final core model.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 3,
+      "documentedColumns": 202,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/person_id_crosswalk-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "model.integration_tests.eligibility",
+        "name": "eligibility",
+        "resourceType": "model",
+        "sourceStyle": true,
+        "layer": "Synthetic input",
+        "depth": 0,
+        "folderLabel": "",
+        "description": "The eligibility table includes information about a patient's health\ninsurance coverage and demographics (note: we use the word patient as a\nsynonym for member). Every claims dataset should in theory include some sort of\neligibility data because they have to know whether a patient has coverage in order to\ndetermine whether to pay a claim.  Eligibility data is used to calculate member months,\nwhich are needed to calculate measures like PMPM.",
+        "materialized": "table",
+        "technical": {
+          "alias": "eligibility",
+          "schemaName": "input_layer",
+          "packageName": "integration_tests",
+          "tags": [
+            "claims",
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "member_id",
+            "enrollment_start_date",
+            "enrollment_end_date",
+            "payer",
+            "plan",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/eligibility.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__eligibility.yml",
+          "yamlEntryName": "input_layer__eligibility",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.integration_tests.eligibility",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "seed.integration_tests.raw_data__eligibility",
+            "name": "raw_data__eligibility",
+            "resourceType": "seed",
+            "layer": "Synthetic input",
+            "folderLabel": "seeds/",
+            "nodeType": "terminology",
+            "path": "raw_data__eligibility.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "input",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n{%- set tuva_columns -%}\n      person_id\n    , member_id\n    , subscriber_id\n    , gender\n    , race\n    , birth_date\n    , death_date\n    , death_flag\n    , enrollment_start_date\n    , enrollment_end_date\n    , payer\n    , payer_type\n    , {{ the_tuva_project.quote_column('plan') }}\n    , original_reason_entitlement_code\n    , dual_status_code\n    , medicare_status_code\n    , enrollment_status\n    , hospice_flag\n    , snp_type\n    , medicaid_indicator\n    , long_term_institutional_flag\n    , part_d_raf_type\n    , low_income_subsidy_indicator\n    , metal_level\n    , csr_indicator\n    , enrollment_duration_months\n    , esrd_status\n    , transplant_duration_months\n    , group_id\n    , group_name\n    , name_suffix\n    , first_name\n    , middle_name\n    , last_name\n    , social_security_number\n    , subscriber_relation\n    , address\n    , city\n    , state\n    , zip_code\n    , phone\n    , email\n    , ethnicity\n{%- endset -%}\n\n{# Uncomment the columns below to test extension columns passthrough feature #}\n{%- set tuva_extensions -%}\n    {# , person_id as x_temp_person_id #}\n    {# , first_name as x_temp_first_name #}\n    {# , payer_type as zzz_temp_payer_type #}\n{%- endset -%}\n\n{%- set tuva_metadata -%}\n    , data_source\n    , file_date\n    , file_name\n    , ingest_datetime\n{%- endset -%}\n\nselect\n    {{ tuva_columns }}\n    {{ tuva_extensions }}\n    {{ tuva_metadata }}\nfrom {{ ref('raw_data__eligibility') }}\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical). The primary key for the eligibility table is person_id, member_id, enrollment_start_date, enrollment_end_date, and data_source. There are two commonly used data formats for eligibility (also known as enrollment) data: the eligibility span format and the member month format. The eligibility span format has one record per member eligibility span. An eligibility span is a time period when a member was enrolled with and therefore had insurance coverage by a health plan. An eligibility span has a start date and an end date. A person can have multiple eligibility spans. The member month format has one record per member per month of enrollment. For example, a person with a single eligibility span from 1/1/2020 through 3/31/2020 would have a single eligibility span record, but 3 member month records, one for each month. The eligibility table follows the eligibility span format.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "quality_measures",
+              "readmissions",
+              "semantic_layer",
+              "tuva_chronic_conditions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string; member_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "financial_pmpm",
+              "pharmacy"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. This field is a string; subscriber_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system. This ID corresponds to the policyholder for the insurance plan, and can be 1:many with person_id or member_id.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "gender",
+            "description": "The gender of the patient. This field is a string that represents the biological sex of a member. It must take one of three accepted values according to the Tuva Project: male, female, and unknown.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "The patient's race. This field is a string and corresponds to a members race.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "encounters",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "The birth date of the patient. This field is a date representing the birth date of a member.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died if there is one. This field is a date containing the day a member died. If the member is alive, this field is null.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "A flag indicating if the patient has died. death_flag contains a flag indicating if a member has died; 1 for yes 0 for no. death_flag should be 1 if a death_date is populated. death_flag can be 1 and death_date null if only an indicator is available in the source data.",
+            "dataType": "boolean",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_start_date",
+            "description": "Date the patient's insurance eligibility began.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "encounters",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_end_date",
+            "description": "Date the patient's insurance eligibility ended.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_type",
+            "description": "Type of payer (e.g. commercial, medicare, medicaid, etc.). This field is a string that contains the type of insurance provided by the payer. It must take one of the values contained in the payer_type terminology file: commercial, medicare, medicaid, and self-insured.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded (e.g. select aetna bronze 1 as plan).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "original_reason_entitlement_code",
+            "description": "Original reason for Medicare entitlement code. This field is a single-character string that contains a members original reason for Medicare entitlement. When available, mapping this field is particularly helpful for providing a more accurate risk score. If its not available, the CMS HCC mart will use medicare_status_code instead. The CMS HCC mart will default to a value of \"Aged\" when neither code is available. This field can take the values 0, 1, 2, or 3.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dual_status_code",
+            "description": "Indicates whether the patient is dually eligible for Medicare and Medicaid. This field is a string that indicates whether a member is enrolled in both Medicare and Medicaid. Knowing whether a member is enrolled in both Medicare and Medicaid can help provide a more accurate risk score. If this status is not known, the CMS HCC mart will default to \"Non\" (non-dual) in risk score calculations. This field can take the values 00, 01, 02, 03, 04, 05, 06, 08, 09, or 10",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicare_status_code",
+            "description": "Indicates how the patient became eligible for Medicare. This field is a two-character string that indicates how a member currently qualifies for Medicare, and is used in risk score calculations when original_reason_entitlement_code is not present. medicare_status_code can take the following values: 00, 10, 11, 20, 21, 31, 40.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_status",
+            "description": "Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_recapture"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hospice_flag",
+            "description": "Whether the patient is in hospice.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "snp_type",
+            "description": "Special Needs Plan type. C-SNP = Chronic condition SNP, D-SNP = Dual eligible SNP, I-SNP = Institutional SNP. Null when not enrolled in an SNP or non-Medicare. Replaces institutional_snp_flag (derivable as snp_type = 'I-SNP').",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicaid_indicator",
+            "description": "Indicates whether the patient has Medicaid coverage (1 = Yes, 0 = No). This is independent of dual-eligible status and corresponds to the CMS NEMCAID field on the Monthly Membership Report. When provided, it is used for New Enrollee risk score calculations. If not provided, Medicaid status is derived from dual_status_code.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "long_term_institutional_flag",
+            "description": "Whether the patient is in an institutional setting for longer than 30 days.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "part_d_raf_type",
+            "description": "Part D Risk Adjustment Factor type. CE = Continuing Enrollee, NE = New Enrollee, PE = PACE Continuing, NP = PACE New. Determines PACE vs non-PACE and NE vs CE scoring path for RxHCC. Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "low_income_subsidy_indicator",
+            "description": "Low Income Subsidy (Extra Help) flag. Y = receives LIS, N = no LIS. Drives the low-income coefficient selection in RxHCC scoring. Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "metal_level",
+            "description": "ACA metal tier of the health plan. P = Platinum, G = Gold, S = Silver, B = Bronze, C = Catastrophic. Determines the base coefficient set for HHS-HCC scoring. Null when non-ACA.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "csr_indicator",
+            "description": "Cost Sharing Reduction variant indicator (1-11). Adjusts Silver-level risk scores for income-based cost-sharing subsidies. Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_duration_months",
+            "description": "Number of months the enrollee was covered during the benefit year (1-12). Used as an enrollment duration adjustment factor in HHS-HCC risk score formula. Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "esrd_status",
+            "description": "ESRD clinical status: dialysis, graft, or transplant. Determines which of the ESRD scoring models applies. Null when non-ESRD.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "transplant_duration_months",
+            "description": "Months since kidney transplant at the start of the payment year. Used for transplant duration flags in ESRD scoring. Null when non-ESRD or non-transplant.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_id",
+            "description": "The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "quality_measures"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_name",
+            "description": "The group name under which multiple members are enrolled for health coverage. This field is a string that corresponds to the group name under which multiple members are enrolled for health coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "The name suffixes (e.g., Sr., Jr., III.)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "The first name of the patient. This field is a string that corresponds to the members first name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "The middle name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "The last name of the patient. This field is a string that corresponds to the members last name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "The social security number of the patient. This field is a string that corresponds to the members Social Security Number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_relation",
+            "description": "The patient's relationship to the subscriber (e.g., self, spouse, child). This field is a string that represents a members relationship to the policyholder. This field may be highly variable across data sources.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "The street address of the record (e.g., facility location, patient, etc). This field is a string that represents the members address on file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "The city of the record (e.g., facility location, patient, etc). This field is a string that represents the city where the member resides.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the record (e.g., facility location, patient, etc). This field is a string that represents the state where the member resides.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "The zip code of the record (e.g., facility location, patient, etc). This field is a string that represents the members zip code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "The phone number for the patient. This field is a string that represents the members phone number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "The email for the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "The ethnicity of the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, \"BCBS Tennessee\". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data. This field is a date, corresponding to the date associated with a particular claims file and typically representing the reporting period of the claims data. Carriers may name files according to a specific pattern (e.g. \"CarrierName_Eligibility_YYYYMMDD.csv\"). In these cases, the file_date can be retrieved from the file_name. No matter how the information is represented, including it can be helpful, especially when tracking information across different claims files over time is relevant to your use cases.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage. This field is a timestamp that corresponds to the date and time a source file landed in the data warehouse or cloud storage. If this information is available or easy to track, we recommend mapping it to ingest_datetime. A field like this is particularly useful when there may be multiple versions of the same claim line present across multiple files, but the most recent version of the claim line is the most relevant for your use case.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      },
+      {
+        "id": "model.integration_tests.patient",
+        "name": "patient",
+        "resourceType": "model",
+        "sourceStyle": true,
+        "layer": "Synthetic input",
+        "depth": 0,
+        "folderLabel": "",
+        "description": "The patient table contains demographic and geographic information on  patients.  Patients in this table may have more than 1 record,\nsince their source system ID (i.e. patient_id) may change over time.",
+        "materialized": "table",
+        "technical": {
+          "alias": "patient",
+          "schemaName": "input_layer",
+          "packageName": "integration_tests",
+          "tags": [
+            "clinical",
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "patient_id",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/patient.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__patient.yml",
+          "yamlEntryName": "input_layer__patient",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.integration_tests.patient",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "input",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False)\n | as_bool\n   )\n}}\n\n{%- set tuva_columns -%}\n      person_id\n    , patient_id\n    , name_suffix\n    , first_name\n    , middle_name\n    , last_name\n    , sex\n    , race\n    , birth_date\n    , death_date\n    , death_flag\n    , social_security_number\n    , address\n    , city\n    , state\n    , zip_code\n    , county\n    , latitude\n    , longitude\n    , phone\n    , email\n    , ethnicity\n{%- endset -%}\n\n{# Uncomment the columns below to test extension columns passthrough feature #}\n{%- set tuva_extensions -%}\n    {# , person_id as x_temp_person_id #}\n    {# , first_name as x_temp_first_name #}\n    {# , last_name as zzz_temp_last_name #}\n{%- endset -%}\n\n{%- set tuva_metadata -%}\n    , data_source\n    , file_name\n    , ingest_datetime\n{%- endset -%}\n\n{# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}\n{%- set tuva_synthetic_extensions -%}\n    {# , cast(null as {{ dbt.type_string() }}) as x_temp_person_id #}\n    {# , cast(null as {{ dbt.type_string() }}) as x_temp_first_name #}\n    {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_last_name #}\n{%- endset -%}\n\nselect {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}\ncast(null as {{ dbt.type_string() }}) as person_id\n, cast(null as {{ dbt.type_string() }}) as patient_id\n, cast(null as {{ dbt.type_string() }}) as name_suffix\n, cast(null as {{ dbt.type_string() }}) as first_name\n, cast(null as {{ dbt.type_string() }}) as middle_name\n, cast(null as {{ dbt.type_string() }}) as last_name\n, cast(null as {{ dbt.type_string() }}) as sex\n, cast(null as {{ dbt.type_string() }}) as race\n, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as birth_date\n, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as death_date\n, cast(null as {{ dbt.type_int() }}) as death_flag\n, cast(null as {{ dbt.type_string() }}) as social_security_number\n, cast(null as {{ dbt.type_string() }}) as address\n, cast(null as {{ dbt.type_string() }}) as city\n, cast(null as {{ dbt.type_string() }}) as state\n, cast(null as {{ dbt.type_string() }}) as zip_code\n, cast(null as {{ dbt.type_string() }}) as county\n, cast(null as {{ dbt.type_float() }}) as latitude\n, cast(null as {{ dbt.type_float() }}) as longitude\n, cast(null as {{ dbt.type_string() }}) as phone\n, cast(null as {{ dbt.type_string() }}) as email\n, cast(null as {{ dbt.type_string() }}) as ethnicity\n{{ tuva_synthetic_extensions }}\n, cast(null as {{ dbt.type_string() }}) as data_source\n, cast(null as {{ dbt.type_string() }}) as file_name\n, cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime\n{{ limit_zero() }}\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer",
+              "tuva_chronic_conditions",
+              "claims_enrollment",
+              "encounters",
+              "financial_pmpm",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "The name suffixes (e.g., Sr., Jr., III.)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "The first name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "The middle name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "The last name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "sex",
+            "description": "The gender of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "The patient's race.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "The birth date of the patient.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died if there is one.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "A flag indicating if the patient has died.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "The social security number of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "The street address of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "The city of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "The zip code of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "county",
+            "description": "The county for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "latitude",
+            "description": "The latitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "longitude",
+            "description": "The longitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "The phone number for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "The email for the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "The ethnicity of the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "ed_classification",
+              "hcc_recapture",
+              "semantic_layer",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "encounters",
+              "financial_pmpm",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 2
+      },
+      {
+        "id": "model.the_tuva_project.input_layer__eligibility",
+        "name": "input_layer__eligibility",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Input layer",
+        "depth": 1,
+        "folderLabel": "input_layer",
+        "description": "The eligibility table includes information about a patient's health\ninsurance coverage and demographics (note: we use the word patient as a\nsynonym for member). Every claims dataset should in theory include some sort of\neligibility data because they have to know whether a patient has coverage in order to\ndetermine whether to pay a claim.  Eligibility data is used to calculate member months,\nwhich are needed to calculate measures like PMPM.",
+        "materialized": "view",
+        "technical": {
+          "alias": "input_layer__eligibility",
+          "schemaName": "input_layer",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "member_id",
+            "enrollment_start_date",
+            "enrollment_end_date",
+            "payer",
+            "plan",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__eligibility.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__eligibility.yml",
+          "yamlEntryName": "input_layer__eligibility",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.input_layer__eligibility",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.integration_tests.eligibility",
+            "name": "eligibility",
+            "resourceType": "model",
+            "layer": "Synthetic input",
+            "folderLabel": "",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\nselect *\nfrom {{ ref('eligibility') }}\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical). The primary key for the eligibility table is person_id, member_id, enrollment_start_date, enrollment_end_date, and data_source. There are two commonly used data formats for eligibility (also known as enrollment) data: the eligibility span format and the member month format. The eligibility span format has one record per member eligibility span. An eligibility span is a time period when a member was enrolled with and therefore had insurance coverage by a health plan. An eligibility span has a start date and an end date. A person can have multiple eligibility spans. The member month format has one record per member per month of enrollment. For example, a person with a single eligibility span from 1/1/2020 through 3/31/2020 would have a single eligibility span record, but 3 member month records, one for each month. The eligibility table follows the eligibility span format.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "quality_measures",
+              "readmissions",
+              "semantic_layer",
+              "tuva_chronic_conditions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string; member_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "financial_pmpm",
+              "pharmacy"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. This field is a string; subscriber_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system. This ID corresponds to the policyholder for the insurance plan, and can be 1:many with person_id or member_id.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "gender",
+            "description": "The gender of the patient. This field is a string that represents the biological sex of a member. It must take one of three accepted values according to the Tuva Project: male, female, and unknown.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "The patient's race. This field is a string and corresponds to a members race.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "encounters",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "The birth date of the patient. This field is a date representing the birth date of a member.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died if there is one. This field is a date containing the day a member died. If the member is alive, this field is null.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "A flag indicating if the patient has died. death_flag contains a flag indicating if a member has died; 1 for yes 0 for no. death_flag should be 1 if a death_date is populated. death_flag can be 1 and death_date null if only an indicator is available in the source data.",
+            "dataType": "boolean",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_start_date",
+            "description": "Date the patient's insurance eligibility began.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "encounters",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_end_date",
+            "description": "Date the patient's insurance eligibility ended.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_type",
+            "description": "Type of payer (e.g. commercial, medicare, medicaid, etc.). This field is a string that contains the type of insurance provided by the payer. It must take one of the values contained in the payer_type terminology file: commercial, medicare, medicaid, and self-insured.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded (e.g. select aetna bronze 1 as plan).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "original_reason_entitlement_code",
+            "description": "Original reason for Medicare entitlement code. This field is a single-character string that contains a members original reason for Medicare entitlement. When available, mapping this field is particularly helpful for providing a more accurate risk score. If its not available, the CMS HCC mart will use medicare_status_code instead. The CMS HCC mart will default to a value of \"Aged\" when neither code is available. This field can take the values 0, 1, 2, or 3.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dual_status_code",
+            "description": "Indicates whether the patient is dually eligible for Medicare and Medicaid. This field is a string that indicates whether a member is enrolled in both Medicare and Medicaid. Knowing whether a member is enrolled in both Medicare and Medicaid can help provide a more accurate risk score. If this status is not known, the CMS HCC mart will default to \"Non\" (non-dual) in risk score calculations. This field can take the values 00, 01, 02, 03, 04, 05, 06, 08, 09, or 10",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicare_status_code",
+            "description": "Indicates how the patient became eligible for Medicare. This field is a two-character string that indicates how a member currently qualifies for Medicare, and is used in risk score calculations when original_reason_entitlement_code is not present. medicare_status_code can take the following values: 00, 10, 11, 20, 21, 31, 40.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_status",
+            "description": "Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_recapture"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hospice_flag",
+            "description": "Whether the patient is in hospice.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "snp_type",
+            "description": "Special Needs Plan type. C-SNP = Chronic condition SNP, D-SNP = Dual eligible SNP, I-SNP = Institutional SNP. Null when not enrolled in an SNP or non-Medicare. Replaces institutional_snp_flag (derivable as snp_type = 'I-SNP').",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicaid_indicator",
+            "description": "Indicates whether the patient has Medicaid coverage (1 = Yes, 0 = No). This is independent of dual-eligible status and corresponds to the CMS NEMCAID field on the Monthly Membership Report. When provided, it is used for New Enrollee risk score calculations. If not provided, Medicaid status is derived from dual_status_code.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "long_term_institutional_flag",
+            "description": "Whether the patient is in an institutional setting for longer than 30 days.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "part_d_raf_type",
+            "description": "Part D Risk Adjustment Factor type. CE = Continuing Enrollee, NE = New Enrollee, PE = PACE Continuing, NP = PACE New. Determines PACE vs non-PACE and NE vs CE scoring path for RxHCC. Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "low_income_subsidy_indicator",
+            "description": "Low Income Subsidy (Extra Help) flag. Y = receives LIS, N = no LIS. Drives the low-income coefficient selection in RxHCC scoring. Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "metal_level",
+            "description": "ACA metal tier of the health plan. P = Platinum, G = Gold, S = Silver, B = Bronze, C = Catastrophic. Determines the base coefficient set for HHS-HCC scoring. Null when non-ACA.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "csr_indicator",
+            "description": "Cost Sharing Reduction variant indicator (1-11). Adjusts Silver-level risk scores for income-based cost-sharing subsidies. Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_duration_months",
+            "description": "Number of months the enrollee was covered during the benefit year (1-12). Used as an enrollment duration adjustment factor in HHS-HCC risk score formula. Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "esrd_status",
+            "description": "ESRD clinical status: dialysis, graft, or transplant. Determines which of the ESRD scoring models applies. Null when non-ESRD.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "transplant_duration_months",
+            "description": "Months since kidney transplant at the start of the payment year. Used for transplant duration flags in ESRD scoring. Null when non-ESRD or non-transplant.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_id",
+            "description": "The group id which multiple members are enrolled for health coverage. This field is a string that can correspond to the particular group under which multiple members are enrolled for health coverage. This could be an identifier that is specific to an employers health plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "quality_measures"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_name",
+            "description": "The group name under which multiple members are enrolled for health coverage. This field is a string that corresponds to the group name under which multiple members are enrolled for health coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "The name suffixes (e.g., Sr., Jr., III.)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "The first name of the patient. This field is a string that corresponds to the members first name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "The middle name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "The last name of the patient. This field is a string that corresponds to the members last name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "The social security number of the patient. This field is a string that corresponds to the members Social Security Number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_relation",
+            "description": "The patient's relationship to the subscriber (e.g., self, spouse, child). This field is a string that represents a members relationship to the policyholder. This field may be highly variable across data sources.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "The street address of the record (e.g., facility location, patient, etc). This field is a string that represents the members address on file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "The city of the record (e.g., facility location, patient, etc). This field is a string that represents the city where the member resides.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the record (e.g., facility location, patient, etc). This field is a string that represents the state where the member resides.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "The zip code of the record (e.g., facility location, patient, etc). This field is a string that represents the members zip code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "The phone number for the patient. This field is a string that represents the members phone number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "The email for the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "The ethnicity of the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, \"BCBS Tennessee\". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data. This field is a date, corresponding to the date associated with a particular claims file and typically representing the reporting period of the claims data. Carriers may name files according to a specific pattern (e.g. \"CarrierName_Eligibility_YYYYMMDD.csv\"). In these cases, the file_date can be retrieved from the file_name. No matter how the information is represented, including it can be helpful, especially when tracking information across different claims files over time is relevant to your use cases.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage. This field is a timestamp that corresponds to the date and time a source file landed in the data warehouse or cloud storage. If this information is available or easy to track, we recommend mapping it to ingest_datetime. A field like this is particularly useful when there may be multiple versions of the same claim line present across multiple files, but the most recent version of the claim line is the most relevant for your use case.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 3
+      },
+      {
+        "id": "model.the_tuva_project.input_layer__patient",
+        "name": "input_layer__patient",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Input layer",
+        "depth": 1,
+        "folderLabel": "input_layer",
+        "description": "The patient table contains demographic and geographic information on  patients.  Patients in this table may have more than 1 record,\nsince their source system ID (i.e. patient_id) may change over time.",
+        "materialized": "view",
+        "technical": {
+          "alias": "input_layer__patient",
+          "schemaName": "input_layer",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "patient_id",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__patient.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__patient.yml",
+          "yamlEntryName": "input_layer__patient",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.input_layer__patient",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.integration_tests.patient",
+            "name": "patient",
+            "resourceType": "model",
+            "layer": "Synthetic input",
+            "folderLabel": "",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/patient.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False) | as_bool\n   )\n}}\nselect *\nfrom {{ ref('patient') }}\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer",
+              "tuva_chronic_conditions",
+              "claims_enrollment",
+              "encounters",
+              "financial_pmpm",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "The name suffixes (e.g., Sr., Jr., III.)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "The first name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "The middle name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "The last name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "sex",
+            "description": "The gender of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "The patient's race.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "The birth date of the patient.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died if there is one.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "A flag indicating if the patient has died.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "The social security number of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "The street address of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "The city of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "The zip code of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "county",
+            "description": "The county for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "latitude",
+            "description": "The latitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "longitude",
+            "description": "The longitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "The phone number for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "The email for the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "The ethnicity of the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "ed_classification",
+              "hcc_recapture",
+              "semantic_layer",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "encounters",
+              "financial_pmpm",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 4
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__stg_eligibility",
+        "name": "normalized_input__stg_eligibility",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Normalization staging",
+        "depth": 2,
+        "folderLabel": "normalization/staging",
+        "description": "",
+        "materialized": "ephemeral",
+        "technical": {
+          "alias": "normalized_input__stg_eligibility",
+          "schemaName": "main",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/staging/normalized_input__stg_eligibility.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__stg_eligibility",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__stg_eligibility",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__eligibility",
+            "name": "input_layer__eligibility",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect\n      person_id\n    , {{ concat_custom([\n        \"person_id\",\n        \"coalesce(cast(member_id as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(data_source,'')\",\n        \"coalesce(payer,'')\",\n        \"coalesce(\" ~ quote_column('plan') ~ \",'')\",\n        \"coalesce(cast(enrollment_start_date as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(cast(enrollment_end_date as \" ~ dbt.type_string() ~ \"),'')\"\n    ]) }} as person_id_key\n    , member_id\n    , subscriber_id\n    , gender\n    , race\n    , birth_date\n    , death_date\n    , death_flag\n    , enrollment_start_date\n    , enrollment_end_date\n    , payer\n    , payer_type\n    , {{ quote_column('plan') }}\n    , subscriber_relation\n    , original_reason_entitlement_code\n    , dual_status_code\n    , medicare_status_code\n    , enrollment_status\n    , hospice_flag\n    , snp_type\n    , medicaid_indicator\n    , long_term_institutional_flag\n    , part_d_raf_type\n    , low_income_subsidy_indicator\n    , metal_level\n    , csr_indicator\n    , enrollment_duration_months\n    , esrd_status\n    , transplant_duration_months\n    , group_id\n    , group_name\n    , name_suffix\n    , first_name\n    , middle_name\n    , last_name\n    , social_security_number\n    , address\n    , city\n    , state\n    , zip_code\n    , phone\n    , email\n    , ethnicity\n    , data_source\n    , file_name\n    , file_date\n    , ingest_datetime\n    {{ select_extension_columns(ref('input_layer__eligibility'), strip_prefix=false) }}\nfrom {{ ref('input_layer__eligibility') }}\n",
+        "columns": [],
+        "runOrder": 5
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize",
+        "name": "normalized_input__int_eligibility_dates_normalize",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Model",
+        "depth": 3,
+        "folderLabel": "normalization/intermediate",
+        "description": "",
+        "materialized": "table",
+        "technical": {
+          "alias": "_int_normalized_input_eligibility_dates_normalize",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/intermediate/normalized_input__int_eligibility_dates_normalize.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__int_eligibility_dates_normalize",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_eligibility",
+            "name": "normalized_input__stg_eligibility",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/staging/normalized_input__stg_eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.reference_data__calendar",
+            "name": "reference_data__calendar",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/reference_data",
+            "nodeType": "terminology",
+            "path": "reference_data/reference_data__calendar.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect distinct\n    elig.person_id\n  , {{ concat_custom([\n        \"elig.person_id\",\n        \"coalesce(cast(elig.member_id as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(elig.data_source,'')\",\n        \"coalesce(elig.payer,'')\",\n        \"coalesce(elig.\" ~ quote_column('plan') ~ \",'')\",\n        \"coalesce(cast(elig.enrollment_start_date as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(cast(elig.enrollment_end_date as \" ~ dbt.type_string() ~ \"),'')\"\n    ]) }} as person_id_key\n  , cal_dob.full_date as normalized_birth_date\n  , cal_death.full_date as normalized_death_date\n  , cal_enroll_start.full_date as normalized_enrollment_start_date\n  , cal_enroll_end.full_date as normalized_enrollment_end_date\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('normalized_input__stg_eligibility') }} as elig\nleft outer join {{ ref('reference_data__calendar') }} as cal_dob\n    on elig.birth_date = cal_dob.full_date\nleft outer join {{ ref('reference_data__calendar') }} as cal_death\n    on elig.death_date = cal_death.full_date\nleft outer join {{ ref('reference_data__calendar') }} as cal_enroll_start\n    on elig.enrollment_start_date = cal_enroll_start.full_date\nleft outer join {{ ref('reference_data__calendar') }} as cal_enroll_end\n    on elig.enrollment_end_date = cal_enroll_end.full_date\n",
+        "columns": [],
+        "runOrder": 6
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize",
+        "name": "normalized_input__int_eligibility_state_normalize",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Model",
+        "depth": 3,
+        "folderLabel": "normalization/intermediate",
+        "description": "",
+        "materialized": "ephemeral",
+        "technical": {
+          "alias": "normalized_input__int_eligibility_state_normalize",
+          "schemaName": "main",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/intermediate/normalized_input__int_eligibility_state_normalize.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__int_eligibility_state_normalize",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_eligibility",
+            "name": "normalized_input__stg_eligibility",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/staging/normalized_input__stg_eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.reference_data__ansi_fips_state",
+            "name": "reference_data__ansi_fips_state",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/reference_data",
+            "nodeType": "terminology",
+            "path": "reference_data/reference_data__ansi_fips_state.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect distinct\n    elig.person_id\n    , {{ concat_custom([\n        \"elig.person_id\",\n        \"coalesce(cast(elig.member_id as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(elig.data_source,'')\",\n        \"coalesce(elig.payer,'')\",\n        \"coalesce(elig.\" ~ quote_column('plan') ~ \",'')\",\n        \"coalesce(cast(elig.enrollment_start_date as \" ~ dbt.type_string() ~ \"),'')\",\n        \"coalesce(cast(elig.enrollment_end_date as \" ~ dbt.type_string() ~ \"),'')\"\n    ]) }} as person_id_key\n    , ansi.ansi_fips_state_name as normalized_state_name\n    , ansi.ansi_fips_state_code as fips_state_code\n    , ansi.ansi_fips_state_abbreviation as fips_state_abbreviation\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('normalized_input__stg_eligibility') }} as elig\nleft outer join {{ ref('reference_data__ansi_fips_state') }} as ansi\n  on (\n       trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_abbreviation))\n    or trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_code))\n    or trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_name))\n  )\n",
+        "columns": [],
+        "runOrder": 7
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__eligibility",
+        "name": "normalized_input__eligibility",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Normalization final",
+        "depth": 4,
+        "folderLabel": "normalization/final",
+        "description": "The eligibility table contains information on patient health plan and\nsupplemental insurance eligibility.",
+        "materialized": "table",
+        "technical": {
+          "alias": "normalized_input_eligibility",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "member_id",
+            "enrollment_start_date",
+            "enrollment_end_date",
+            "payer",
+            "plan",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__eligibility.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__eligibility",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__eligibility",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__eligibility",
+            "name": "input_layer__eligibility",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__eligibility.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_eligibility",
+            "name": "normalized_input__stg_eligibility",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/staging/normalized_input__stg_eligibility.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize",
+            "name": "normalized_input__int_eligibility_dates_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/intermediate/normalized_input__int_eligibility_dates_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize",
+            "name": "normalized_input__int_eligibility_state_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/intermediate/normalized_input__int_eligibility_state_normalize.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect\n  cast(elig.person_id as {{ dbt.type_string() }}) as person_id\n  , cast(elig.member_id as {{ dbt.type_string() }}) as member_id\n  , cast(elig.subscriber_id as {{ dbt.type_string() }}) as subscriber_id\n  , cast(elig.gender as {{ dbt.type_string() }}) as gender\n  , cast(elig.race as {{ dbt.type_string() }}) as race\n  , cast(date_norm.normalized_birth_date as date) as birth_date\n  , cast(date_norm.normalized_death_date as date) as death_date\n  , cast(elig.death_flag as int) as death_flag\n  , cast(date_norm.normalized_enrollment_start_date as date) as enrollment_start_date\n  , cast(date_norm.normalized_enrollment_end_date as date) as enrollment_end_date\n  , cast(elig.payer as {{ dbt.type_string() }}) as payer\n  , cast(elig.payer_type as {{ dbt.type_string() }}) as payer_type\n  , cast(elig.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n  , cast(elig.original_reason_entitlement_code as {{ dbt.type_string() }}) as original_reason_entitlement_code\n  , cast(elig.dual_status_code as {{ dbt.type_string() }}) as dual_status_code\n  , cast(elig.medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code\n  , cast(elig.enrollment_status as {{ dbt.type_string() }}) as enrollment_status\n  , cast(elig.hospice_flag as {{ dbt.type_int() }}) as hospice_flag\n  , cast(elig.snp_type as {{ dbt.type_string() }}) as snp_type\n  , cast(elig.medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator\n  , cast(elig.long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag\n  , cast(elig.part_d_raf_type as {{ dbt.type_string() }}) as part_d_raf_type\n  , cast(elig.low_income_subsidy_indicator as {{ dbt.type_string() }}) as low_income_subsidy_indicator\n  , cast(elig.metal_level as {{ dbt.type_string() }}) as metal_level\n  , cast(elig.csr_indicator as {{ dbt.type_int() }}) as csr_indicator\n  , cast(elig.enrollment_duration_months as {{ dbt.type_int() }}) as enrollment_duration_months\n  , cast(elig.esrd_status as {{ dbt.type_string() }}) as esrd_status\n  , cast(elig.transplant_duration_months as {{ dbt.type_int() }}) as transplant_duration_months\n  , cast(elig.group_id as {{ dbt.type_string() }}) as group_id\n  , cast(elig.group_name as {{ dbt.type_string() }}) as group_name\n  , cast(elig.name_suffix as {{ dbt.type_string() }}) as name_suffix\n  , cast(elig.first_name as {{ dbt.type_string() }}) as first_name\n  , cast(elig.middle_name as {{ dbt.type_string() }}) as middle_name\n  , cast(elig.last_name as {{ dbt.type_string() }}) as last_name\n  , cast(elig.social_security_number as {{ dbt.type_string() }}) as social_security_number\n  , cast(elig.subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation\n  , cast(elig.address as {{ dbt.type_string() }}) as address\n  , cast(elig.city as {{ dbt.type_string() }}) as city\n  , cast(elig.state as {{ dbt.type_string() }}) as state\n  , cast(elig.zip_code as {{ dbt.type_string() }}) as zip_code\n  , cast(ansi.fips_state_code as {{ dbt.type_string() }}) as fips_state_code\n  , cast(ansi.normalized_state_name as {{ dbt.type_string() }}) as normalized_state_name\n  , cast(ansi.fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation\n  , cast(elig.phone as {{ dbt.type_string() }}) as phone\n  , cast(elig.email as {{ dbt.type_string() }}) as email\n  , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity\n  , cast(elig.data_source as {{ dbt.type_string() }}) as data_source\n  , cast(elig.file_date as {{ dbt.type_timestamp() }}) as file_date\n  , cast(elig.file_name as {{ dbt.type_string() }}) as file_name\n  , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\n  {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig', strip_prefix=false) }}\nfrom {{ ref('normalized_input__stg_eligibility') }} as elig\nleft outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm\n  on elig.person_id_key = date_norm.person_id_key\nleft outer join {{ ref('normalized_input__int_eligibility_state_normalize') }} as ansi\n  on elig.person_id_key = ansi.person_id_key\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "quality_measures",
+              "readmissions",
+              "semantic_layer",
+              "tuva_chronic_conditions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "financial_pmpm",
+              "pharmacy"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "gender",
+            "description": "Biological sex of the patient.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/gender",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "encounters"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "Race of the patient.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/race",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "encounters",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "Date the patient was born.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_suspecting",
+              "quality_measures",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "Flag indicating if the patient is deceased",
+            "dataType": "boolean",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_start_date",
+            "description": "Date the patient's insurance eligibility began.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "encounters",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_end_date",
+            "description": "Date the patient's insurance eligibility ended.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_type",
+            "description": "Type of payer (e.g. commercial, medicare, medicaid, etc.).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/payer-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "original_reason_entitlement_code",
+            "description": "Original reason for Medicare entitlement code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-orec",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dual_status_code",
+            "description": "Indicates whether the patient is dually eligible for Medicare and  Medicaid.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-dual-eligibility",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicare_status_code",
+            "description": "Indicates how the patient became eligible for Medicare.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-status",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_status",
+            "description": "Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs",
+              "hcc_recapture"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hospice_flag",
+            "description": "Whether the patient is in hospice.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "snp_type",
+            "description": "Special Needs Plan type (C-SNP, D-SNP, I-SNP). Null when non-SNP.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicaid_indicator",
+            "description": "Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS NEMCAID field. Used for New Enrollee risk score calculations when dual_status_code is insufficient.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "long_term_institutional_flag",
+            "description": "Whether the patient is in an institutional setting for longer than 30 days.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "cms_hccs"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "part_d_raf_type",
+            "description": "Part D Risk Adjustment Factor type (CE, NE, PE, NP). Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "low_income_subsidy_indicator",
+            "description": "Low Income Subsidy (Extra Help) flag (Y/N). Null when no Part D coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "metal_level",
+            "description": "ACA metal tier (P/G/S/B/C). Null when non-ACA.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "csr_indicator",
+            "description": "Cost Sharing Reduction variant indicator (1-11). Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_duration_months",
+            "description": "Number of months covered during the benefit year (1-12). Null when non-ACA.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "esrd_status",
+            "description": "ESRD clinical status (dialysis, graft, transplant). Null when non-ESRD.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "transplant_duration_months",
+            "description": "Months since kidney transplant. Null when non-ESRD or non-transplant.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_id",
+            "description": "The group id which multiple members are enrolled for health coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "quality_measures"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_name",
+            "description": "The group name under which multiple members are enrolled for health coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "Patient's name suffix (e.g. Jr., Sr., III, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "Patient's first name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "Patient's middle name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "Patient's last name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "Patient's social security number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_relation",
+            "description": "Relationship to the policy holder (self, spouse, dependent, etc)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "Patient's street address.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "Patient's city of address.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "State the patient lives in (most recent known address)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "Zip code the patient lives in (most recent known address).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ed_classification",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "fips_state_code",
+            "description": "FIPS code for the state the patient lives in (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_state_name",
+            "description": "State for the patient (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "fips_state_abbreviation",
+            "description": "Abbreviated form of the state for the patient (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "Patient's phone number.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "Patient's email address.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "Patient's ethnicity",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source (e.g. typically  named after the payer and state \"BCBS Tennessee\").",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 8
+      },
+      {
+        "id": "model.the_tuva_project.core__person_id_crosswalk",
+        "name": "core__person_id_crosswalk",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 5,
+        "folderLabel": "core/final",
+        "description": "The person id crosswalk table contains all source patient identifiers from  the input layer eligibility (claims) and patient (clinical).",
+        "materialized": "table",
+        "technical": {
+          "alias": "person_id_crosswalk",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core"
+          ],
+          "primaryKeyColumns": [
+            "person_id",
+            "patient_id",
+            "member_id",
+            "payer",
+            "plan",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/final/core__person_id_crosswalk.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__person_id_crosswalk",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__person_id_crosswalk",
+          "targetKey": "person_id_crosswalk"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__patient",
+            "name": "input_layer__patient",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__patient.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__eligibility",
+            "name": "normalized_input__eligibility",
+            "resourceType": "model",
+            "layer": "Normalization final",
+            "folderLabel": "normalization/final",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', var('clinical_enabled', False))\n | as_bool\n   )\n}}\n\n{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}\n\nselect distinct\n      cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(null as {{ dbt.type_string() }}) as patient_id\n    , cast(member_id as {{ dbt.type_string() }}) as member_id\n    , cast(payer as {{ dbt.type_string() }}) as payer\n    , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('normalized_input__eligibility') }}\nunion all\nselect distinct\n      cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(patient_id as {{ dbt.type_string() }}) as patient_id\n    , cast(null as {{ dbt.type_string() }}) as member_id\n    , cast(null as {{ dbt.type_string() }}) as payer\n    , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('input_layer__patient') }}\n\n{% elif var('clinical_enabled', False) == true -%}\n\nselect distinct\n      cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(patient_id as {{ dbt.type_string() }}) as patient_id\n    , cast(null as {{ dbt.type_string() }}) as member_id\n    , cast(null as {{ dbt.type_string() }}) as payer\n    , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('input_layer__patient') }}\n\n{% elif var('claims_enabled', False) == true -%}\n\nselect distinct\n      cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(null as {{ dbt.type_string() }}) as patient_id\n    , cast(member_id as {{ dbt.type_string() }}) as member_id\n    , cast(payer as {{ dbt.type_string() }}) as payer\n    , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom {{ ref('normalized_input__eligibility') }}\n\n{%- endif %}\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "quality_measures",
+              "readmissions",
+              "semantic_layer",
+              "tuva_chronic_conditions"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "financial_pmpm",
+              "pharmacy"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "claims_enrollment",
+              "cms_hccs",
+              "financial_pmpm",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [
+              "ahrq_measures",
+              "claims_enrollment",
+              "cms_chronic_conditions",
+              "cms_hccs",
+              "ed_classification",
+              "encounters",
+              "financial_pmpm",
+              "hcc_recapture",
+              "hcc_suspecting",
+              "pharmacy",
+              "provider_attribution",
+              "readmissions",
+              "semantic_layer"
+            ],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 9
+      }
+    ],
+    "edges": [
+      {
+        "source": "model.integration_tests.eligibility",
+        "target": "model.the_tuva_project.input_layer__eligibility"
+      },
+      {
+        "source": "model.integration_tests.patient",
+        "target": "model.the_tuva_project.input_layer__patient"
+      },
+      {
+        "source": "model.the_tuva_project.input_layer__patient",
+        "target": "model.the_tuva_project.core__person_id_crosswalk"
+      },
+      {
+        "source": "model.the_tuva_project.input_layer__eligibility",
+        "target": "model.the_tuva_project.normalized_input__eligibility"
+      },
+      {
+        "source": "model.the_tuva_project.input_layer__eligibility",
+        "target": "model.the_tuva_project.normalized_input__stg_eligibility"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__stg_eligibility",
+        "target": "model.the_tuva_project.normalized_input__eligibility"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__stg_eligibility",
+        "target": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__stg_eligibility",
+        "target": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize",
+        "target": "model.the_tuva_project.normalized_input__eligibility"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize",
+        "target": "model.the_tuva_project.normalized_input__eligibility"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__eligibility",
+        "target": "model.the_tuva_project.core__person_id_crosswalk"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "person_id_crosswalk",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:43.506Z",
+    "lastSuccessAt": "2026-03-27T15:41:43.506Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}

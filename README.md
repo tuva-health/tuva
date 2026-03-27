@@ -84,7 +84,6 @@ Set Tuva vars under the `vars:` key in your `dbt_project.yml`. Use dbt selectors
 | `synthetic_data_size` | `small` in `integration_tests` | Selects the `small` or `large` synthetic input payload when running `integration_tests`. |
 | `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
 | `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |
-| `metric_testing_enabled` | `false` | Builds the optional metric-testing regression mart in the `data_quality` schema. |
 | `enable_normalize_engine` | `false` | Set to `unmapped` to surface unmapped code models, or `true` to also use custom mappings. |
 
 See the maintained docs reference at [thetuvaproject.com/dbt-variables](https://www.thetuvaproject.com/dbt-variables) for examples and more detail.

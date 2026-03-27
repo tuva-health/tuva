@@ -1,0 +1,3671 @@
+{
+  "payload": {
+    "id": "claims_enrollment-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:44.833Z",
+    "target": {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "subtitle": "Claims preprocessing models that derive member-month context and enrollment flags used to annotate claims data before core outputs.",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "graphTitle": "Claims Enrollment DAG",
+      "graphSubtitle": "Claims preprocessing models that derive member-month context and enrollment flags used to annotate claims data before core outputs.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 26,
+      "documentedColumns": 247,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/claims_enrollment-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "model.the_tuva_project.normalized_input__eligibility",
+        "name": "normalized_input__eligibility",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Normalization final",
+        "depth": 0,
+        "folderLabel": "normalization/final",
+        "description": "The eligibility table contains information on patient health plan and\nsupplemental insurance eligibility.",
+        "materialized": "table",
+        "technical": {
+          "alias": "normalized_input_eligibility",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__eligibility.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__eligibility",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__eligibility",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__eligibility",
+            "name": "input_layer__eligibility",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "input_layer/input_layer__eligibility.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_eligibility",
+            "name": "normalized_input__stg_eligibility",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "normalization/staging/normalized_input__stg_eligibility.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_eligibility_dates_normalize",
+            "name": "normalized_input__int_eligibility_dates_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_eligibility_dates_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_eligibility_state_normalize",
+            "name": "normalized_input__int_eligibility_state_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_eligibility_state_normalize.sql"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect\n  cast(elig.person_id as {{ dbt.type_string() }}) as person_id\n  , cast(elig.member_id as {{ dbt.type_string() }}) as member_id\n  , cast(elig.subscriber_id as {{ dbt.type_string() }}) as subscriber_id\n  , cast(elig.gender as {{ dbt.type_string() }}) as gender\n  , cast(elig.race as {{ dbt.type_string() }}) as race\n  , cast(date_norm.normalized_birth_date as date) as birth_date\n  , cast(date_norm.normalized_death_date as date) as death_date\n  , cast(elig.death_flag as int) as death_flag\n  , cast(date_norm.normalized_enrollment_start_date as date) as enrollment_start_date\n  , cast(date_norm.normalized_enrollment_end_date as date) as enrollment_end_date\n  , cast(elig.payer as {{ dbt.type_string() }}) as payer\n  , cast(elig.payer_type as {{ dbt.type_string() }}) as payer_type\n  , cast(elig.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n  , cast(elig.original_reason_entitlement_code as {{ dbt.type_string() }}) as original_reason_entitlement_code\n  , cast(elig.dual_status_code as {{ dbt.type_string() }}) as dual_status_code\n  , cast(elig.medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code\n  , cast(elig.enrollment_status as {{ dbt.type_string() }}) as enrollment_status\n  , cast(elig.hospice_flag as {{ dbt.type_int() }}) as hospice_flag\n  , cast(elig.snp_type as {{ dbt.type_string() }}) as snp_type\n  , cast(elig.medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator\n  , cast(elig.long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag\n  , cast(elig.part_d_raf_type as {{ dbt.type_string() }}) as part_d_raf_type\n  , cast(elig.low_income_subsidy_indicator as {{ dbt.type_string() }}) as low_income_subsidy_indicator\n  , cast(elig.metal_level as {{ dbt.type_string() }}) as metal_level\n  , cast(elig.csr_indicator as {{ dbt.type_int() }}) as csr_indicator\n  , cast(elig.enrollment_duration_months as {{ dbt.type_int() }}) as enrollment_duration_months\n  , cast(elig.esrd_status as {{ dbt.type_string() }}) as esrd_status\n  , cast(elig.transplant_duration_months as {{ dbt.type_int() }}) as transplant_duration_months\n  , cast(elig.group_id as {{ dbt.type_string() }}) as group_id\n  , cast(elig.group_name as {{ dbt.type_string() }}) as group_name\n  , cast(elig.name_suffix as {{ dbt.type_string() }}) as name_suffix\n  , cast(elig.first_name as {{ dbt.type_string() }}) as first_name\n  , cast(elig.middle_name as {{ dbt.type_string() }}) as middle_name\n  , cast(elig.last_name as {{ dbt.type_string() }}) as last_name\n  , cast(elig.social_security_number as {{ dbt.type_string() }}) as social_security_number\n  , cast(elig.subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation\n  , cast(elig.address as {{ dbt.type_string() }}) as address\n  , cast(elig.city as {{ dbt.type_string() }}) as city\n  , cast(elig.state as {{ dbt.type_string() }}) as state\n  , cast(elig.zip_code as {{ dbt.type_string() }}) as zip_code\n  , cast(ansi.fips_state_code as {{ dbt.type_string() }}) as fips_state_code\n  , cast(ansi.normalized_state_name as {{ dbt.type_string() }}) as normalized_state_name\n  , cast(ansi.fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation\n  , cast(elig.phone as {{ dbt.type_string() }}) as phone\n  , cast(elig.email as {{ dbt.type_string() }}) as email\n  , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity\n  , cast(elig.data_source as {{ dbt.type_string() }}) as data_source\n  , cast(elig.file_date as {{ dbt.type_timestamp() }}) as file_date\n  , cast(elig.file_name as {{ dbt.type_string() }}) as file_name\n  , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\n  {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig', strip_prefix=false) }}\nfrom {{ ref('normalized_input__stg_eligibility') }} as elig\nleft outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm\n  on elig.person_id_key = date_norm.person_id_key\nleft outer join {{ ref('normalized_input__int_eligibility_state_normalize') }} as ansi\n  on elig.person_id_key = ansi.person_id_key\n",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "gender",
+            "description": "Biological sex of the patient.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/gender",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "Race of the patient.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/race",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "Date the patient was born.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "Flag indicating if the patient is deceased",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_start_date",
+            "description": "Date the patient's insurance eligibility began.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_end_date",
+            "description": "Date the patient's insurance eligibility ended.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_type",
+            "description": "Type of payer (e.g. commercial, medicare, medicaid, etc.).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/payer-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "original_reason_entitlement_code",
+            "description": "Original reason for Medicare entitlement code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-orec",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dual_status_code",
+            "description": "Indicates whether the patient is dually eligible for Medicare and  Medicaid.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-dual-eligibility",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicare_status_code",
+            "description": "Indicates how the patient became eligible for Medicare.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/medicare-status",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_status",
+            "description": "Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hospice_flag",
+            "description": "Whether the patient is in hospice.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "snp_type",
+            "description": "Special Needs Plan type (C-SNP, D-SNP, I-SNP). Null when non-SNP.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "medicaid_indicator",
+            "description": "Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS NEMCAID field. Used for New Enrollee risk score calculations when dual_status_code is insufficient.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "long_term_institutional_flag",
+            "description": "Whether the patient is in an institutional setting for longer than 30 days.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "part_d_raf_type",
+            "description": "Part D Risk Adjustment Factor type (CE, NE, PE, NP). Null when no Part D coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "low_income_subsidy_indicator",
+            "description": "Low Income Subsidy (Extra Help) flag (Y/N). Null when no Part D coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "metal_level",
+            "description": "ACA metal tier (P/G/S/B/C). Null when non-ACA.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "csr_indicator",
+            "description": "Cost Sharing Reduction variant indicator (1-11). Null when non-ACA.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_duration_months",
+            "description": "Number of months covered during the benefit year (1-12). Null when non-ACA.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "esrd_status",
+            "description": "ESRD clinical status (dialysis, graft, transplant). Null when non-ESRD.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "transplant_duration_months",
+            "description": "Months since kidney transplant. Null when non-ESRD or non-transplant.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_id",
+            "description": "The group id which multiple members are enrolled for health coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "group_name",
+            "description": "The group name under which multiple members are enrolled for health coverage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "Patient's name suffix (e.g. Jr., Sr., III, etc).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "Patient's first name.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "Patient's middle name.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "Patient's last name.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "Patient's social security number.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "subscriber_relation",
+            "description": "Relationship to the policy holder (self, spouse, dependent, etc)",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "Patient's street address.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "Patient's city of address.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "State the patient lives in (most recent known address)",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "Zip code the patient lives in (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "fips_state_code",
+            "description": "FIPS code for the state the patient lives in (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_state_name",
+            "description": "State for the patient (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "fips_state_abbreviation",
+            "description": "Abbreviated form of the state for the patient (most recent known address).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "Patient's phone number.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "Patient's email address.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "Patient's ethnicity",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source (e.g. typically  named after the payer and state \"BCBS Tennessee\").",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__medical_claim",
+        "name": "normalized_input__medical_claim",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Normalization final",
+        "depth": 0,
+        "folderLabel": "normalization/final",
+        "description": "The medical claim table contains information on services rendered to\npatients and billed by the provider to the insurer as claims.",
+        "materialized": "table",
+        "technical": {
+          "alias": "normalized_input_medical_claim",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__medical_claim.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__medical_claim",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__medical_claim",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__medical_claim",
+            "name": "input_layer__medical_claim",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "input_layer/input_layer__medical_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_medical_claim",
+            "name": "normalized_input__stg_medical_claim",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "normalization/staging/normalized_input__stg_medical_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_admit_source_final",
+            "name": "normalized_input__int_admit_source_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_admit_source_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_admit_type_final",
+            "name": "normalized_input__int_admit_type_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_admit_type_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_bill_type_final",
+            "name": "normalized_input__int_bill_type_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_bill_type_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_medical_claim_date_normalize",
+            "name": "normalized_input__int_medical_claim_date_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_medical_claim_date_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_medical_date_aggregation",
+            "name": "normalized_input__int_medical_date_aggregation",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_medical_date_aggregation.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_medical_npi_normalize",
+            "name": "normalized_input__int_medical_npi_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_medical_npi_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_discharge_disposition_final",
+            "name": "normalized_input__int_discharge_disposition_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_discharge_disposition_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_drg_final",
+            "name": "normalized_input__int_drg_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_drg_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_place_of_service_normalize",
+            "name": "normalized_input__int_place_of_service_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_place_of_service_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_diagnosis_code_final",
+            "name": "normalized_input__int_diagnosis_code_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_diagnosis_code_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_present_on_admit_final",
+            "name": "normalized_input__int_present_on_admit_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_present_on_admit_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_procedure_code_final",
+            "name": "normalized_input__int_procedure_code_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_procedure_code_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_procedure_date_final",
+            "name": "normalized_input__int_procedure_date_final",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_procedure_date_final.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_revenue_center_normalize",
+            "name": "normalized_input__int_revenue_center_normalize",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_revenue_center_normalize.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__int_undetermined_claim_type",
+            "name": "normalized_input__int_undetermined_claim_type",
+            "resourceType": "model",
+            "layer": "Model",
+            "folderLabel": "normalization/intermediate",
+            "nodeType": "intermediate",
+            "path": "normalization/intermediate/normalized_input__int_undetermined_claim_type.sql"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n{% set index_cols = range(1, 26) %}\n\nselect\n    cast(med.claim_id as {{ dbt.type_string() }}) as claim_id\n    , cast(med.claim_line_number as int) as claim_line_number\n    , cast(med.claim_type as {{ dbt.type_string() }}) as claim_type\n    , cast(med.person_id as {{ dbt.type_string() }}) as person_id\n    , cast(med.member_id as {{ dbt.type_string() }}) as member_id\n    , cast(med.payer as {{ dbt.type_string() }}) as payer\n    , cast(med.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(coalesce(dates.minimum_claim_start_date, undetermined.claim_start_date) as date) as claim_start_date\n    , cast(coalesce(dates.maximum_claim_end_date, undetermined.claim_start_date) as date) as claim_end_date\n    , cast(coalesce(claim_line_dates.normalized_claim_line_start_date, undetermined.claim_line_start_date) as date) as claim_line_start_date\n    , cast(coalesce(claim_line_dates.normalized_claim_line_end_date, undetermined.claim_line_end_date) as date) as claim_line_end_date\n    , cast(coalesce(dates.minimum_admission_date, undetermined.admission_date) as date) as admission_date\n    , cast(coalesce(dates.maximum_discharge_date, undetermined.discharge_date) as date) as discharge_date\n    , cast(coalesce(ad_source.normalized_code, undetermined.admit_source_code) as {{ dbt.type_string() }}) as admit_source_code\n    , cast(coalesce(ad_source.normalized_description, undetermined.admit_source_description) as {{ dbt.type_string() }}) as admit_source_description\n    , cast(coalesce(ad_type.normalized_code, undetermined.admit_type_code) as {{ dbt.type_string() }}) as admit_type_code\n    , cast(coalesce(ad_type.normalized_description, undetermined.admit_type_description) as {{ dbt.type_string() }}) as admit_type_description\n    , cast(coalesce(disch_disp.normalized_code, undetermined.discharge_disposition_code) as {{ dbt.type_string() }}) as discharge_disposition_code\n    , cast(coalesce(disch_disp.normalized_description, undetermined.discharge_disposition_description) as {{ dbt.type_string() }}) as discharge_disposition_description\n    , cast(coalesce(pos.normalized_code, undetermined.place_of_service_code) as {{ dbt.type_string() }}) as place_of_service_code\n    , cast(coalesce(pos.normalized_description, undetermined.place_of_service_description) as {{ dbt.type_string() }}) as place_of_service_description\n    , cast(coalesce(bill.normalized_code, undetermined.bill_type_code) as {{ dbt.type_string() }}) as bill_type_code\n    , cast(coalesce(bill.normalized_description, undetermined.bill_type_description) as {{ dbt.type_string() }}) as bill_type_description\n    , cast(med.drg_code_type as {{ dbt.type_string() }}) as drg_code_type\n    , cast(coalesce(drg.normalized_code, undetermined.drg_code) as {{ dbt.type_string() }}) as drg_code\n    , cast(coalesce(drg.normalized_description, undetermined.drg_description) as {{ dbt.type_string() }}) as drg_description\n    , cast(coalesce(rev.normalized_code, undetermined.revenue_center_code) as {{ dbt.type_string() }}) as revenue_center_code\n    , cast(coalesce(rev.normalized_description, undetermined.revenue_center_description) as {{ dbt.type_string() }}) as revenue_center_description\n    , cast(med.service_unit_quantity as {{ dbt.type_numeric() }}) as service_unit_quantity\n    , cast(med.hcpcs_code as {{ dbt.type_string() }}) as hcpcs_code\n    , cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }}) as hcpcs_modifier_1\n    , cast(med.hcpcs_modifier_2 as {{ dbt.type_string() }}) as hcpcs_modifier_2\n    , cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }}) as hcpcs_modifier_3\n    , cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }}) as hcpcs_modifier_4\n    , cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }}) as hcpcs_modifier_5\n    , cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }}) as rendering_npi\n    , cast(med.rendering_tin as {{ dbt.type_string() }}) as rendering_tin\n    , cast(coalesce(med_npi.normalized_rendering_name, undetermined.rendering_name) as {{ dbt.type_string() }}) as rendering_name\n    , cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }}) as billing_npi\n    , cast(med.billing_tin as {{ dbt.type_string() }}) as billing_tin\n    , cast(coalesce(med_npi.normalized_billing_name, undetermined.billing_name) as {{ dbt.type_string() }}) as billing_name\n    , cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }}) as facility_npi\n    , cast(coalesce(med_npi.normalized_facility_name, undetermined.facility_name) as {{ dbt.type_string() }}) as facility_name\n    , cast(med.paid_date as date) as paid_date\n    , cast(med.paid_amount as {{ dbt.type_numeric() }}) as paid_amount\n    , cast(med.allowed_amount as {{ dbt.type_numeric() }}) as allowed_amount\n    , cast(med.charge_amount as {{ dbt.type_numeric() }}) as charge_amount\n    , cast(med.coinsurance_amount as {{ dbt.type_numeric() }}) as coinsurance_amount\n    , cast(med.copayment_amount as {{ dbt.type_numeric() }}) as copayment_amount\n    , cast(med.deductible_amount as {{ dbt.type_numeric() }}) as deductible_amount\n    , cast(med.total_cost_amount as {{ dbt.type_numeric() }}) as total_cost_amount\n    , cast(med.diagnosis_code_type as {{ dbt.type_string() }}) as diagnosis_code_type\n    {% for i in index_cols %}\n    , cast(coalesce(dx_code.diagnosis_code_{{ i }}, undetermined.diagnosis_code_{{ i }}) as {{ dbt.type_string() }}) as diagnosis_code_{{ i }}\n    {% endfor %}\n    {% for i in index_cols %}\n    , cast(coalesce(poa.diagnosis_poa_{{ i }}, undetermined.diagnosis_poa_{{ i }}) as {{ dbt.type_string() }}) as diagnosis_poa_{{ i }}\n    {% endfor %}\n    , cast(med.procedure_code_type as {{ dbt.type_string() }}) as procedure_code_type\n    {% for i in index_cols %}\n    , cast(coalesce(px_code.procedure_code_{{ i }}, undetermined.procedure_code_{{ i }}) as {{ dbt.type_string() }}) as procedure_code_{{ i }}\n    {% endfor %}\n    {% for i in index_cols %}\n    , cast(coalesce(px_date.procedure_date_{{ i }}, undetermined.procedure_date_{{ i }}) as date) as procedure_date_{{ i }}\n    {% endfor %}\n    , cast(med.data_source as {{ dbt.type_string() }}) as data_source\n    , cast(med.in_network_flag as int) as in_network_flag\n    , cast(med.file_date as {{ dbt.type_timestamp() }}) as file_date\n    , cast(med.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime\n    , cast(med.file_name as {{ dbt.type_string() }}) as file_name\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\n    {{ select_extension_columns(ref('input_layer__medical_claim'), alias='med', strip_prefix=false) }}\nfrom {{ ref('normalized_input__stg_medical_claim') }} as med\nleft outer join {{ ref('normalized_input__int_admit_source_final') }} as ad_source\n    on med.claim_id = ad_source.claim_id\n    and med.data_source = ad_source.data_source\nleft outer join {{ ref('normalized_input__int_admit_type_final') }} as ad_type\n    on med.claim_id = ad_type.claim_id\n    and med.data_source = ad_type.data_source\nleft outer join {{ ref('normalized_input__int_bill_type_final') }} as bill\n    on med.claim_id = bill.claim_id\n    and med.data_source = bill.data_source\nleft outer join {{ ref('normalized_input__int_medical_claim_date_normalize') }} as claim_line_dates\n    on med.claim_id = claim_line_dates.claim_id\n    and med.claim_line_number = claim_line_dates.claim_line_number\n    and med.data_source = claim_line_dates.data_source\nleft outer join {{ ref('normalized_input__int_medical_date_aggregation') }} as dates\n    on med.claim_id = dates.claim_id\n    and med.data_source = dates.data_source\nleft outer join {{ ref('normalized_input__int_medical_npi_normalize') }} as med_npi\n    on med.claim_id = med_npi.claim_id\n    and med.claim_line_number = med_npi.claim_line_number\n    and med.data_source = med_npi.data_source\nleft outer join {{ ref('normalized_input__int_discharge_disposition_final') }} as disch_disp\n    on med.claim_id = disch_disp.claim_id\n    and med.data_source = disch_disp.data_source\nleft outer join {{ ref('normalized_input__int_drg_final') }} as drg\n    on med.claim_id = drg.claim_id\n    and med.data_source = drg.data_source\nleft outer join {{ ref('normalized_input__int_place_of_service_normalize') }} as pos\n    on med.claim_id = pos.claim_id\n    and med.claim_line_number = pos.claim_line_number\n    and med.data_source = pos.data_source\nleft outer join {{ ref('normalized_input__int_diagnosis_code_final') }} as dx_code\n    on med.claim_id = dx_code.claim_id\n    and med.data_source = dx_code.data_source\nleft outer join {{ ref('normalized_input__int_present_on_admit_final') }} as poa\n    on med.claim_id = poa.claim_id\n    and med.data_source = poa.data_source\nleft outer join {{ ref('normalized_input__int_procedure_code_final') }} as px_code\n    on med.claim_id = px_code.claim_id\n    and med.data_source = px_code.data_source\nleft outer join {{ ref('normalized_input__int_procedure_date_final') }} as px_date\n    on med.claim_id = px_date.claim_id\n    and med.data_source = px_date.data_source\nleft outer join {{ ref('normalized_input__int_revenue_center_normalize') }} as rev\n    on med.claim_id = rev.claim_id\n    and med.claim_line_number = rev.claim_line_number\n    and med.data_source = rev.data_source\nleft outer join {{ ref('normalized_input__int_undetermined_claim_type') }} as undetermined\n    on med.claim_id = undetermined.claim_id\n    and med.claim_line_number = undetermined.claim_line_number\n    and med.data_source = undetermined.data_source\n",
+        "columns": [
+          {
+            "name": "claim_id",
+            "description": "Unique identifier for each claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_number",
+            "description": "Indicates the line number for the particular line of the claim.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_type",
+            "description": "Indicates whether the claim is professional (CMS-1500), institutional  (UB-04), dental, or vision.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/claim-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_start_date",
+            "description": "Start date for the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_end_date",
+            "description": "End date for the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_start_date",
+            "description": "Start date for the claim line.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_end_date",
+            "description": "End date for the claim line.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admission_date",
+            "description": "Admission date for the claim (inpatient claims only).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_date",
+            "description": "Discharge date for the claim (inpatient claims only).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_source_code",
+            "description": "Indicates where the patient was before the healthcare encounter  (inpatient claims only).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/admit-source",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_type_code",
+            "description": "Indicates the type of admission (inpatient claims only).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/admit-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_disposition_code",
+            "description": "Indicates the type of setting the patient was discharged to  (institutional inpatient claims only).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/discharge-disposition",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "place_of_service_code",
+            "description": "Place of service for the claim (professional claims only).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/place-of-service",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "bill_type_code",
+            "description": "Bill type code for the claim (institutional claims only).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/bill-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code_type",
+            "description": "The DRG system used for the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code",
+            "description": "The DRG code on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "revenue_center_code",
+            "description": "Revenue center code for the claim line (institutional only and  typically multiple codes per claim).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/revenue-center",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "service_unit_quantity",
+            "description": "The number of units for the particular revenue center code.",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_code",
+            "description": "HCPCS level 1 or level 2 code for the claim line.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_1",
+            "description": "1st modifier for HCPCS code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_2",
+            "description": "2nd modifier for HCPCS code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_3",
+            "description": "3rd modifier for HCPCS code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_4",
+            "description": "4th modifier for HCPCS code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_5",
+            "description": "5th modifier for HCPCS code.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "rendering_npi",
+            "description": "Rendering NPI for the claim (typically represents the physician or  entity providing services).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "billing_npi",
+            "description": "Billing NPI for the claim (typically represents organization billing  the claim).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_npi",
+            "description": "Facility NPI for the claim (typically represents the facility where  services were performed).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_date",
+            "description": "The date the claim was paid.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_amount",
+            "description": "The total amount paid on the claim by the insurer.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "allowed_amount",
+            "description": "The total amount allowed (includes amount paid by the insurer and  patient) on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "charge_amount",
+            "description": "The total amount charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "coinsurance_amount",
+            "description": "The total coinsurance charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "copayment_amount",
+            "description": "The total copayment charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "deductible_amount",
+            "description": "The total amount charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "total_cost_amount",
+            "description": "The total amount paid on the claim by different parties.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_type",
+            "description": "Indicates the type of diagnosis code (e.g. ICD-10-CM).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/code-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_1",
+            "description": "1st ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_2",
+            "description": "2nd ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_3",
+            "description": "3rd ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_4",
+            "description": "4th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_5",
+            "description": "5th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_6",
+            "description": "6th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_7",
+            "description": "7th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_8",
+            "description": "8th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_9",
+            "description": "9th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_10",
+            "description": "10th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_11",
+            "description": "11th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_12",
+            "description": "12th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_13",
+            "description": "13th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_14",
+            "description": "14th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_15",
+            "description": "15th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_16",
+            "description": "16th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_17",
+            "description": "17th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_18",
+            "description": "18th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_19",
+            "description": "19th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_20",
+            "description": "20th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_21",
+            "description": "21st ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_22",
+            "description": "22nd ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_23",
+            "description": "23rd ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_24",
+            "description": "24th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_code_25",
+            "description": "25th ICD (9 or 10) CM diagnosis code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_1",
+            "description": "Present on admission code for the 1st diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_2",
+            "description": "Present on admission code for the 2nd diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_3",
+            "description": "Present on admission code for the 3rd diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_4",
+            "description": "Present on admission code for the 4th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_5",
+            "description": "Present on admission code for the 5th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_6",
+            "description": "Present on admission code for the 6th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_7",
+            "description": "Present on admission code for the 7th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_8",
+            "description": "Present on admission code for the 8th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_9",
+            "description": "Present on admission code for the 9th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_10",
+            "description": "Present on admission code for the 10th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_11",
+            "description": "Present on admission code for the 11th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_12",
+            "description": "Present on admission code for the 12th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_13",
+            "description": "Present on admission code for the 13th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_14",
+            "description": "Present on admission code for the 14th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_15",
+            "description": "Present on admission code for the 15th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_16",
+            "description": "Present on admission code for the 16th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_17",
+            "description": "Present on admission code for the 17th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_18",
+            "description": "Present on admission code for the 18th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_19",
+            "description": "Present on admission code for the 19th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_20",
+            "description": "Present on admission code for the 20th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_21",
+            "description": "Present on admission code for the 21st diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_22",
+            "description": "Present on admission code for the 22nd diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_23",
+            "description": "Present on admission code for the 23rd diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_24",
+            "description": "Present on admission code for the 24th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "diagnosis_poa_25",
+            "description": "Present on admission code for the 25th diagnosis on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/present-on-admission",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_type",
+            "description": "Indicates the type of procedure code (e.g. ICD-10-PCS).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/code-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_1",
+            "description": "1st ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_2",
+            "description": "2nd ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_3",
+            "description": "3rd ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_4",
+            "description": "4th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_5",
+            "description": "5th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_6",
+            "description": "6th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_7",
+            "description": "7th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_8",
+            "description": "8th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_9",
+            "description": "9th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_10",
+            "description": "10th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_11",
+            "description": "11th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_12",
+            "description": "12th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_13",
+            "description": "13th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_14",
+            "description": "14th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_15",
+            "description": "15th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_16",
+            "description": "16th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_17",
+            "description": "17th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_18",
+            "description": "18th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_19",
+            "description": "19th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_20",
+            "description": "20th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_21",
+            "description": "21st ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_22",
+            "description": "22nd ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_23",
+            "description": "23rd ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_24",
+            "description": "24th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_code_25",
+            "description": "25th ICD (9 or 10) procedure code on the claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-pcs",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_1",
+            "description": "Date of the 1st procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_2",
+            "description": "Date of the 2nd procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_3",
+            "description": "Date of the 3rd procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_4",
+            "description": "Date of the 4th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_5",
+            "description": "Date of the 5th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_6",
+            "description": "Date of the 6th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_7",
+            "description": "Date of the 7th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_8",
+            "description": "Date of the 8th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_9",
+            "description": "Date of the 9th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_10",
+            "description": "Date of the 10th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_11",
+            "description": "Date of the 11th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_12",
+            "description": "Date of the 12th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_13",
+            "description": "Date of the 13th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_14",
+            "description": "Date of the 14th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_15",
+            "description": "Date of the 15th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_16",
+            "description": "Date of the 16th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_17",
+            "description": "Date of the 17th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_18",
+            "description": "Date of the 18th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_19",
+            "description": "Date of the 19th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_20",
+            "description": "Date of the 20th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_21",
+            "description": "Date of the 21st procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_22",
+            "description": "Date of the 22nd procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_23",
+            "description": "Date of the 23rd procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_24",
+            "description": "Date of the 24th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "procedure_date_25",
+            "description": "Date of the 25th procedure on the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source (e.g. typically  named after the payer and state \"BCBS Tennessee\")",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 2
+      },
+      {
+        "id": "model.the_tuva_project.normalized_input__pharmacy_claim",
+        "name": "normalized_input__pharmacy_claim",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Normalization final",
+        "depth": 0,
+        "folderLabel": "normalization/final",
+        "description": "The pharmacy claim table contains information on prescription drugs that\nwere filled and billed to the insurer.",
+        "materialized": "table",
+        "technical": {
+          "alias": "normalized_input_pharmacy_claim",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "normalized_input",
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__pharmacy_claim.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "normalized_input__pharmacy_claim",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.normalized_input__pharmacy_claim",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__pharmacy_claim",
+            "name": "input_layer__pharmacy_claim",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "input_layer/input_layer__pharmacy_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.normalized_input__stg_pharmacy_claim",
+            "name": "normalized_input__stg_pharmacy_claim",
+            "resourceType": "model",
+            "layer": "Normalization staging",
+            "folderLabel": "normalization/staging",
+            "nodeType": "intermediate",
+            "path": "normalization/staging/normalized_input__stg_pharmacy_claim.sql"
+          },
+          {
+            "id": "seed.the_tuva_project.provider_data__provider",
+            "name": "provider_data__provider",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/provider_data",
+            "nodeType": "terminology",
+            "path": "provider_data/provider_data__provider.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.terminology__ndc",
+            "name": "terminology__ndc",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "terminology/terminology__ndc.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nselect\n      cast(claim_id as {{ dbt.type_string() }}) as claim_id\n    , cast(claim_line_number as int) as claim_line_number\n    , cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(member_id as {{ dbt.type_string() }}) as member_id\n    , cast(payer as {{ dbt.type_string() }}) as payer\n    , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}\n    , cast(prescribing_provider_npi as {{ dbt.type_string() }}) as prescribing_provider_id\n    , case\n      when pres.entity_type_code = '1' then cast(\n        {{ concat_custom([\n             \"pres.provider_last_name\"\n           , \"', '\"\n           , \"pres.provider_first_name\"\n        ]) }} as {{ dbt.type_string() }})\n      when pres.entity_type_code = '2' then cast(pres.provider_organization_name as {{ dbt.type_string() }})\n      else null\n    end as prescribing_provider_name\n    , cast(dispensing_provider_npi as {{ dbt.type_string() }}) as dispensing_provider_id\n    , case\n      when disp.entity_type_code = '1' then cast(\n        {{ concat_custom([\n             \"disp.provider_last_name\"\n           , \"', '\"\n           , \"disp.provider_first_name\"\n        ]) }} as {{ dbt.type_string() }})\n      when disp.entity_type_code = '2' then cast(disp.provider_organization_name as {{ dbt.type_string() }})\n      else null\n    end as dispensing_provider_name\n    , cast(dispensing_date as date) as dispensing_date\n    , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code\n    , cast(ndc.fda_description as {{ dbt.type_string() }}) as ndc_description\n    , cast(quantity as int) as quantity\n    , cast(days_supply as int) as days_supply\n    , cast(refills as int) as refills\n    , cast(paid_date as date) as paid_date\n    , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount\n    , cast(allowed_amount as {{ dbt.type_numeric() }}) as allowed_amount\n    , cast(charge_amount as {{ dbt.type_numeric() }}) as charge_amount\n    , cast(coinsurance_amount as {{ dbt.type_numeric() }}) as coinsurance_amount\n    , cast(copayment_amount as {{ dbt.type_numeric() }}) as copayment_amount\n    , cast(deductible_amount as {{ dbt.type_numeric() }}) as deductible_amount\n    , cast(in_network_flag as int) as in_network_flag\n    , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast(pharm.file_date as {{ dbt.type_timestamp() }}) as file_date\n    , cast(pharm.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime\n    , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\n    {{ select_extension_columns(ref('input_layer__pharmacy_claim'), alias='pharm', strip_prefix=false) }}\nfrom {{ ref('normalized_input__stg_pharmacy_claim') }} as pharm\nleft outer join {{ ref('provider_data__provider') }} as pres\n      on pharm.prescribing_provider_npi = pres.npi\nleft outer join {{ ref('provider_data__provider') }} as disp\n      on pharm.dispensing_provider_npi = disp.npi\nleft outer join {{ ref('terminology__ndc') }} as ndc\n      on pharm.ndc_code = ndc.ndc\n",
+        "columns": [
+          {
+            "name": "claim_id",
+            "description": "Unique identifier for each claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_number",
+            "description": "Indicates the line number for the particular line of the claim.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "prescribing_provider_npi",
+            "description": "NPI for the provider that wrote the prescription (e.g. priamry care  physician).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dispensing_provider_npi",
+            "description": "NPI for the provider that dispensed the prescription (e.g. pharmacy).",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dispensing_date",
+            "description": "Date the prescription was filled.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ndc_code",
+            "description": "National drug code on the claim.",
+            "dataType": "",
+            "terminology": "https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "quantity",
+            "description": "Number of doses.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "days_supply",
+            "description": "Number of days supply.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "refills",
+            "description": "Number of refills for the prescription.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_date",
+            "description": "Date the claim was paid.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_amount",
+            "description": "Amount paid by the health insurer for the claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "allowed_amount",
+            "description": "Contractual amount allowed to be paid by the payer + patient.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "coinsurance_amount",
+            "description": "The total coinsurance charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "copayment_amount",
+            "description": "The total copayment charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "deductible_amount",
+            "description": "The total amount charged on the claim by the provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source (e.g. typically  named after the payer and state \"BCBS Tennessee\").",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 3
+      },
+      {
+        "id": "model.the_tuva_project.claims_enrollment__member_months",
+        "name": "claims_enrollment__member_months",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Claims preprocessing",
+        "depth": 1,
+        "folderLabel": "claims_preprocessing/claims_enrollment",
+        "description": "This table contains member months matching enrollment",
+        "materialized": "table",
+        "technical": {
+          "alias": "member_months",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_enrollment/claims_enrollment__member_months.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "claims_enrollment__member_months",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.claims_enrollment__member_months",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.normalized_input__eligibility",
+            "name": "normalized_input__eligibility",
+            "resourceType": "model",
+            "layer": "Normalization final",
+            "folderLabel": "normalization/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__eligibility.sql"
+          }
+        ],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.reference_data__calendar",
+            "name": "reference_data__calendar",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/reference_data",
+            "nodeType": "terminology",
+            "path": "reference_data/reference_data__calendar.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nwith stg_eligibility as (\n  select\n    person_id\n    , member_id\n    , payer\n    , {{ quote_column('plan') }}\n    , data_source\n    , enrollment_start_date\n    , enrollment_end_date\n    , tuva_last_run\n  from {{ ref('normalized_input__eligibility') }} as elig\n)\n\n, month_start_and_end_dates as (\n  select\n    {{ concat_custom([\"year\",\n                  dbt.right(concat_custom([\"'0'\", \"month\"]), 2)]) }} as year_month\n    , min(full_date) as month_start_date\n    , max(full_date) as month_end_date\n  from {{ ref('reference_data__calendar') }}\n  group by year, month, year_month\n)\n\n, joined as (\nselect distinct\n  a.person_id\n  , a.member_id\n  , b.year_month\n  , a.payer\n  , a.{{ quote_column('plan') }}\n  , a.data_source\n  , a.tuva_last_run\nfrom stg_eligibility as a\ninner join month_start_and_end_dates as b\n  on a.enrollment_start_date <= b.month_end_date\n  and a.enrollment_end_date >= b.month_start_date\n)\n\nselect\n  cast(\n    {{ dbt_utils.generate_surrogate_key([\n        'person_id',\n        'member_id',\n        'year_month',\n        'payer',\n        quote_column('plan'),\n        'data_source'\n    ]) }}\n    as {{ dbt.type_string() }}\n  ) as member_month_key\n, *\nfrom joined\n",
+        "columns": [
+          {
+            "name": "member_month_key",
+            "description": "Unique identifier for each member month.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "year_month",
+            "description": "The year and month of the member month.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 4
+      },
+      {
+        "id": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment",
+        "name": "claims_enrollment__flag_claims_with_enrollment",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Claims preprocessing",
+        "depth": 2,
+        "folderLabel": "claims_preprocessing/claims_enrollment",
+        "description": "This table contains claims with matching enrollment",
+        "materialized": "table",
+        "technical": {
+          "alias": "flag_claims_with_enrollment",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_enrollment/claims_enrollment__flag_claims_with_enrollment.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "claims_enrollment__flag_claims_with_enrollment",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.normalized_input__medical_claim",
+            "name": "normalized_input__medical_claim",
+            "resourceType": "model",
+            "layer": "Normalization final",
+            "folderLabel": "normalization/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__medical_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.claims_enrollment__member_months",
+            "name": "claims_enrollment__member_months",
+            "resourceType": "model",
+            "layer": "Claims preprocessing",
+            "folderLabel": "claims_preprocessing/claims_enrollment",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_enrollment/claims_enrollment__member_months.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nwith claim_dates as (\n    select\n        claim_id\n        , claim_line_number\n        , person_id\n        , member_id\n        , payer\n        , {{ quote_column('plan') }}\n        , data_source\n        , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date\n        , case\n            when claim_line_start_date is not null then 'claim_line_start_date'\n            when claim_line_start_date is null and claim_start_date is not null then 'claim_start_date'\n            when claim_line_start_date is null and claim_start_date is null and admission_date is not null then 'admission_date'\n        end as inferred_claim_start_column_used\n    from {{ ref('normalized_input__medical_claim') }}\n)\n\n, claim_year_month as (\n    select\n          claim_id\n        , claim_line_number\n        , person_id\n        , member_id\n        , payer\n        , {{ quote_column('plan') }}\n        , data_source\n        , inferred_claim_start_date\n        , inferred_claim_start_column_used\n        , {{ concat_custom([\n            date_part('year', 'inferred_claim_start_date'),\n            dbt.right(\n                concat_custom([\n                    \"'0'\",\n                    date_part('month', 'inferred_claim_start_date'),\n                ]),\n                2\n            )\n        ]) }} as inferred_claim_start_year_month\nfrom claim_dates\n)\n\nselect distinct\n     claim.claim_id\n    , claim.claim_line_number\n    , claim.person_id\n    , claim.member_id\n    , claim.payer\n    , claim.{{ quote_column('plan') }}\n    , claim.data_source\n    , mm.member_month_key\n    , claim.inferred_claim_start_year_month\n    , claim.inferred_claim_start_column_used\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom claim_year_month as claim\ninner join {{ ref('claims_enrollment__member_months') }} as mm\n    on mm.person_id = claim.person_id\n    and mm.member_id = claim.member_id\n    and mm.payer = claim.payer\n    and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}\n    and mm.year_month = claim.inferred_claim_start_year_month\n    and mm.data_source = claim.data_source\n",
+        "columns": [
+          {
+            "name": "claim_id",
+            "description": "Unique identifier for each claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_number",
+            "description": "Indicates the line number for the particular line of the claim.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_month_key",
+            "description": "The unique combination of person_id, member_id, year_month, payer, plan, and data source.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "inferred_claim_start_year_month",
+            "description": "The claim start date year and month.  If claim line start date is missing then the following column will be used,\nin the following order if also NULL:  claim start date, admission date",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "inferred_claim_end_year_month",
+            "description": "The claim end date year and month.  If claim line end date is missing then the following column will be used,\nin the following order if also NULL:  claim end date, discharge date",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "inferred_claim_start_column_used",
+            "description": "The name of the column used to populated inferred_claim_start_year_month.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "inferred_claim_end_column_used",
+            "description": "The name of the column used to populated inferred_claim_start_column_used.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 5
+      },
+      {
+        "id": "model.the_tuva_project.claims_enrollment__flag_rx_claims_with_enrollment",
+        "name": "claims_enrollment__flag_rx_claims_with_enrollment",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Claims preprocessing",
+        "depth": 2,
+        "folderLabel": "claims_preprocessing/claims_enrollment",
+        "description": "This table contains pharmacy claims with matching enrollment",
+        "materialized": "table",
+        "technical": {
+          "alias": "flag_rx_claims_with_enrollment",
+          "schemaName": "claims_preprocessing",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "claims_preprocessing"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_enrollment/claims_enrollment__flag_rx_claims_with_enrollment.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_preprocessing_models.yml",
+          "yamlEntryName": "claims_enrollment__flag_rx_claims_with_enrollment",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.claims_enrollment__flag_rx_claims_with_enrollment",
+          "targetKey": "claims_enrollment"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.normalized_input__pharmacy_claim",
+            "name": "normalized_input__pharmacy_claim",
+            "resourceType": "model",
+            "layer": "Normalization final",
+            "folderLabel": "normalization/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/normalization/final/normalized_input__pharmacy_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.claims_enrollment__member_months",
+            "name": "claims_enrollment__member_months",
+            "resourceType": "model",
+            "layer": "Claims preprocessing",
+            "folderLabel": "claims_preprocessing/claims_enrollment",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/claims_preprocessing/claims_enrollment/claims_enrollment__member_months.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\n\nwith claim_dates as (\n    select\n        claim_id\n        , claim_line_number\n        , person_id\n        , member_id\n        , payer\n        , {{ quote_column('plan') }}\n        , data_source\n        , {{ concat_custom([\n                date_part('year', 'paid_date'),\n                dbt.right(\n                    concat_custom([\n                        \"'0'\",\n                        date_part('month', 'paid_date'),\n                    ]),\n                    2\n                )\n            ]) }} as paid_year_month\n    from {{ ref('normalized_input__pharmacy_claim') }}\n)\n\nselect distinct\n     claim.claim_id\n    , claim.claim_line_number\n    , claim.person_id\n    , claim.member_id\n    , claim.payer\n    , claim.{{ quote_column('plan') }}\n    , claim.data_source\n    , mm.member_month_key\n    , claim.paid_year_month\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom claim_dates as claim\ninner join {{ ref('claims_enrollment__member_months') }} as mm\n    on mm.person_id = claim.person_id\n    and mm.member_id = claim.member_id\n    and mm.payer = claim.payer\n    and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}\n    and mm.year_month = claim.paid_year_month\n    and mm.data_source = claim.data_source\n",
+        "columns": [
+          {
+            "name": "claim_id",
+            "description": "Unique identifier for each claim.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_number",
+            "description": "Indicates the line number for the particular line of the claim.",
+            "dataType": "integer",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_month_key",
+            "description": "The unique combination of person_id, member_id, year_month, payer, plan, and data source.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_year_month",
+            "description": "the year and month of the date the pharmacy claim was paid.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 6
+      }
+    ],
+    "edges": [
+      {
+        "source": "model.the_tuva_project.normalized_input__medical_claim",
+        "target": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__pharmacy_claim",
+        "target": "model.the_tuva_project.claims_enrollment__flag_rx_claims_with_enrollment"
+      },
+      {
+        "source": "model.the_tuva_project.normalized_input__eligibility",
+        "target": "model.the_tuva_project.claims_enrollment__member_months"
+      },
+      {
+        "source": "model.the_tuva_project.claims_enrollment__member_months",
+        "target": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+      },
+      {
+        "source": "model.the_tuva_project.claims_enrollment__member_months",
+        "target": "model.the_tuva_project.claims_enrollment__flag_rx_claims_with_enrollment"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "claims_enrollment",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:44.833Z",
+    "lastSuccessAt": "2026-03-27T15:41:44.833Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}

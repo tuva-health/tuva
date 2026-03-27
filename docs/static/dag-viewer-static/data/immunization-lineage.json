@@ -1,0 +1,1846 @@
+{
+  "payload": {
+    "id": "immunization-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:40.887Z",
+    "target": {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "subtitle": "Trace core__immunization from its upstream sources and transformations into the final core model.",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "graphTitle": "Immunization DAG",
+      "graphSubtitle": "Trace core__immunization from its upstream sources and transformations into the final core model.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 1,
+      "documentedColumns": 81,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/immunization-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "model.integration_tests.immunization",
+        "name": "immunization",
+        "resourceType": "model",
+        "sourceStyle": true,
+        "layer": "Synthetic input",
+        "depth": 0,
+        "folderLabel": "",
+        "description": "The immunization table contains information about immunizations administered to patients.",
+        "materialized": "table",
+        "technical": {
+          "alias": "immunization",
+          "schemaName": "input_layer",
+          "packageName": "integration_tests",
+          "tags": [
+            "clinical",
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "immunization_id",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/immunization.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__immunization.yml",
+          "yamlEntryName": "input_layer__immunization",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.integration_tests.immunization",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "seed.integration_tests.raw_data__immunization",
+            "name": "raw_data__immunization",
+            "resourceType": "seed",
+            "layer": "Synthetic input",
+            "folderLabel": "seeds/",
+            "nodeType": "terminology",
+            "path": "raw_data__immunization.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "input",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False)\n | as_bool\n   )\n}}\n\n{%- set tuva_columns -%}\n      immunization_id\n    , person_id\n    , patient_id\n    , encounter_id\n    , source_code_type\n    , source_code\n    , source_description\n    , normalized_code_type\n    , normalized_code\n    , normalized_description\n    , status\n    , status_reason\n    , occurrence_date\n    , source_dose\n    , normalized_dose\n    , lot_number\n    , body_site\n    , route\n    , location_id\n    , practitioner_id\n{%- endset -%}\n\n{# Uncomment the columns below to test extension columns passthrough feature #}\n{%- set tuva_extensions -%}\n    {# , person_id as x_temp_person_id #}\n    {# , source_code as x_temp_source_code #}\n    {# , source_code_type as zzz_temp_source_code_type #}\n{%- endset -%}\n\n{%- set tuva_metadata -%}\n    , data_source\n    , file_name\n    , ingest_datetime\n{%- endset -%}\n\nselect\n    {{ tuva_columns }}\n    {{ tuva_extensions }}\n    {{ tuva_metadata }}\nfrom {{ ref('raw_data__immunization') }}\n",
+        "columns": [
+          {
+            "name": "immunization_id",
+            "description": "Unique identifier for each immunization.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for each encounter in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code_type",
+            "description": "The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code",
+            "description": "The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_description",
+            "description": "Description of the source code in the source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code_type",
+            "description": "The normalized type of code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code",
+            "description": "The normalized code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_description",
+            "description": "Normalized description of the code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status",
+            "description": "Status of the record (e.g., condition, test, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status_reason",
+            "description": "Indicates reason the event was not performed. (e.g., condition, test, immunization etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "occurrence_date",
+            "description": "Date the event occured or was to be occured.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_dose",
+            "description": "The quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_dose",
+            "description": "Normalized quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "lot_number",
+            "description": "Lot number of the vaccine product.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "body_site",
+            "description": "The body site where the vaccine was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "route",
+            "description": "The route used to administer the medication and/or vaccine.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "location_id",
+            "description": "Unique identifier for each location.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "practitioner_id",
+            "description": "Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      },
+      {
+        "id": "seed.the_tuva_project.terminology__act_site",
+        "name": "terminology__act_site",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/terminology",
+        "description": "This seed contains An anatomical location on a human which can be the focus of an act.",
+        "materialized": "seed",
+        "technical": {
+          "alias": "act_site",
+          "schemaName": "terminology",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "terminology"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__act_site.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology_seeds.yml",
+          "yamlEntryName": "terminology__act_site",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.terminology__act_site",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "terminology",
+          "version": "latest",
+          "folder": "versioned_terminology",
+          "fileName": "terminology__act_site.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_terminology/latest/act_site.csv_0_0_0.csv.gz"
+        },
+        "sql": "body_code,description\r\n",
+        "columns": [
+          {
+            "name": "body_code",
+            "description": "The code representing the anatomical location.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "description",
+            "description": "A description of the anatomical location.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 2
+      },
+      {
+        "id": "seed.the_tuva_project.terminology__cvx",
+        "name": "terminology__cvx",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/terminology",
+        "description": "Seed containing cvx codes and descriptions.",
+        "materialized": "seed",
+        "technical": {
+          "alias": "cvx",
+          "schemaName": "terminology",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "terminology",
+            "data_profiling"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__cvx.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology_seeds.yml",
+          "yamlEntryName": "terminology__cvx",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.terminology__cvx",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "terminology",
+          "version": "latest",
+          "folder": "versioned_terminology",
+          "fileName": "terminology__cvx.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_terminology/latest/cvx.csv_0_0_0.csv.gz"
+        },
+        "sql": "cvx,short_description,long_description\r\n",
+        "columns": [
+          {
+            "name": "cvx",
+            "description": "CVX code, which is a unique identifier for vaccines.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "short_description",
+            "description": "Short description of the vaccine.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "long_description",
+            "description": "Long description of the vaccine.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 3
+      },
+      {
+        "id": "seed.the_tuva_project.terminology__immunization_route_code",
+        "name": "terminology__immunization_route_code",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/terminology",
+        "description": "This seed contains the administrative routes used during vaccination.",
+        "materialized": "seed",
+        "technical": {
+          "alias": "immunization_route_code",
+          "schemaName": "terminology",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "terminology"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_route_code.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology_seeds.yml",
+          "yamlEntryName": "terminology__immunization_route_code",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.terminology__immunization_route_code",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "terminology",
+          "version": "latest",
+          "folder": "versioned_terminology",
+          "fileName": "terminology__immunization_route_code.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_terminology/latest/immunization_route_code.csv_0_0_0.csv.gz"
+        },
+        "sql": "route_code,description\r\n",
+        "columns": [
+          {
+            "name": "route_code",
+            "description": "The code representing the route of administration for the immunization.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "description",
+            "description": "A description of the route of administration for the immunization.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 4
+      },
+      {
+        "id": "seed.the_tuva_project.terminology__immunization_status",
+        "name": "terminology__immunization_status",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/terminology",
+        "description": "This seed contains the current status of the administered dose of vaccine.",
+        "materialized": "seed",
+        "technical": {
+          "alias": "immunization_status",
+          "schemaName": "terminology",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "terminology"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_status.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology_seeds.yml",
+          "yamlEntryName": "terminology__immunization_status",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.terminology__immunization_status",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "terminology",
+          "version": "latest",
+          "folder": "versioned_terminology",
+          "fileName": "terminology__immunization_status.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_terminology/latest/immunization_status.csv_0_0_0.csv.gz"
+        },
+        "sql": "status_code,status\r\n",
+        "columns": [
+          {
+            "name": "status_code",
+            "description": "The code representing the immunization status.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status",
+            "description": "The display of the immunization status.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 5
+      },
+      {
+        "id": "seed.the_tuva_project.terminology__immunization_status_reason",
+        "name": "terminology__immunization_status_reason",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/terminology",
+        "description": "This seed describes the reason why a dose of vaccine was not administered.",
+        "materialized": "seed",
+        "technical": {
+          "alias": "immunization_status_reason",
+          "schemaName": "terminology",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "terminology"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_status_reason.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology_seeds.yml",
+          "yamlEntryName": "terminology__immunization_status_reason",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.terminology__immunization_status_reason",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "terminology",
+          "version": "latest",
+          "folder": "versioned_terminology",
+          "fileName": "terminology__immunization_status_reason.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_terminology/latest/immunization_status_reason.csv_0_0_0.csv.gz"
+        },
+        "sql": "reason_code,code_type,description\r\n",
+        "columns": [
+          {
+            "name": "reason_code",
+            "description": "The code representing the immunization status reason.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "code_type",
+            "description": "The type of the code representing the immunization status reason.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "description",
+            "description": "A description of the immunization status reason.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 6
+      },
+      {
+        "id": "model.the_tuva_project.input_layer__immunization",
+        "name": "input_layer__immunization",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Input layer",
+        "depth": 1,
+        "folderLabel": "input_layer",
+        "description": "The immunization table contains information about immunizations administered to patients.",
+        "materialized": "view",
+        "technical": {
+          "alias": "input_layer__immunization",
+          "schemaName": "input_layer",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "input_layer"
+          ],
+          "primaryKeyColumns": [
+            "immunization_id",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__immunization.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__immunization.yml",
+          "yamlEntryName": "input_layer__immunization",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.input_layer__immunization",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.integration_tests.immunization",
+            "name": "immunization",
+            "resourceType": "model",
+            "layer": "Synthetic input",
+            "folderLabel": "",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/models/immunization.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False) | as_bool\n   )\n}}\nselect *\nfrom {{ ref('immunization') }}\n",
+        "columns": [
+          {
+            "name": "immunization_id",
+            "description": "Unique identifier for each immunization.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for each encounter in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code_type",
+            "description": "The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code",
+            "description": "The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_description",
+            "description": "Description of the source code in the source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code_type",
+            "description": "The normalized type of code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code",
+            "description": "The normalized code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_description",
+            "description": "Normalized description of the code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status",
+            "description": "Status of the record (e.g., condition, test, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status_reason",
+            "description": "Indicates reason the event was not performed. (e.g., condition, test, immunization etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "occurrence_date",
+            "description": "Date the event occured or was to be occured.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_dose",
+            "description": "The quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_dose",
+            "description": "Normalized quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "lot_number",
+            "description": "Lot number of the vaccine product.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "body_site",
+            "description": "The body site where the vaccine was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "route",
+            "description": "The route used to administer the medication and/or vaccine.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "location_id",
+            "description": "Unique identifier for each location.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "practitioner_id",
+            "description": "Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_name",
+            "description": "The file name of the source file.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 7
+      },
+      {
+        "id": "model.the_tuva_project.core__stg_clinical_immunization",
+        "name": "core__stg_clinical_immunization",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 2,
+        "folderLabel": "core/staging",
+        "description": "Staging core clinical immunization",
+        "materialized": "view",
+        "technical": {
+          "alias": "_stg_clinical_immunization",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core_stage_clinical"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/staging/core__stg_clinical_immunization.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__stg_clinical_immunization",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__stg_clinical_immunization",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.input_layer__immunization",
+            "name": "input_layer__immunization",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__immunization.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False) | as_bool\n   )\n}}\n\n{%- set tuva_core_columns -%}\n      cast(immunization_id as {{ dbt.type_string() }}) as immunization_id\n    , cast(person_id as {{ dbt.type_string() }}) as person_id\n    , cast(patient_id as {{ dbt.type_string() }}) as patient_id\n    , cast(encounter_id as {{ dbt.type_string() }}) as encounter_id\n    , cast(source_code_type as {{ dbt.type_string() }}) as source_code_type\n    , cast(source_code as {{ dbt.type_string() }}) as source_code\n    , cast(source_description as {{ dbt.type_string() }}) as source_description\n    , cast(normalized_code_type as {{ dbt.type_string() }}) as normalized_code_type\n    , cast(normalized_code as {{ dbt.type_string() }}) as normalized_code\n    , cast(normalized_description as {{ dbt.type_string() }}) as normalized_description\n    , cast(status as {{ dbt.type_string() }}) as status\n    , cast(status_reason as {{ dbt.type_string() }}) as status_reason\n    , {{ try_to_cast_date('occurrence_date', 'YYYY-MM-DD') }} as occurrence_date\n    , cast(source_dose as {{ dbt.type_string() }}) as source_dose\n    , cast(normalized_dose as {{ dbt.type_string() }}) as normalized_dose\n    , cast(lot_number as {{ dbt.type_string() }}) as lot_number\n    , cast(body_site as {{ dbt.type_string() }}) as body_site\n    , cast(route as {{ dbt.type_string() }}) as route\n    , cast(location_id as {{ dbt.type_string() }}) as location_id\n    , cast(practitioner_id as {{ dbt.type_string() }}) as practitioner_id\n{%- endset -%}\n\n{%- set tuva_metadata_columns -%}\n      , cast(data_source as {{ dbt.type_string() }}) as data_source\n    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\n{%- endset %}\n\n{%- set tuva_extension_columns -%}\n    {{ select_extension_columns(ref('input_layer__immunization'), strip_prefix=false) }}\n{%- endset %}\n\nselect\n    {{ tuva_core_columns }}\n    {{ tuva_extension_columns }}\n    {{ tuva_metadata_columns }}\nfrom {{ ref('input_layer__immunization') }}\n",
+        "columns": [],
+        "runOrder": 8
+      },
+      {
+        "id": "model.the_tuva_project.core__immunization",
+        "name": "core__immunization",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 3,
+        "folderLabel": "core/final",
+        "description": "The immunization table contains information on immunizations administered to patients, including the vaccine code, description, and administration date.",
+        "materialized": "table",
+        "technical": {
+          "alias": "immunization",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core"
+          ],
+          "primaryKeyColumns": [
+            "immunization_id",
+            "data_source"
+          ]
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/final/core__immunization.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__immunization",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__immunization",
+          "targetKey": "immunization"
+        },
+        "mainDependencies": [
+          {
+            "id": "seed.the_tuva_project.terminology__act_site",
+            "name": "terminology__act_site",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__act_site.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.terminology__cvx",
+            "name": "terminology__cvx",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__cvx.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.terminology__immunization_route_code",
+            "name": "terminology__immunization_route_code",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_route_code.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.terminology__immunization_status",
+            "name": "terminology__immunization_status",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_status.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.terminology__immunization_status_reason",
+            "name": "terminology__immunization_status_reason",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/terminology",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/terminology/terminology__immunization_status_reason.csv"
+          },
+          {
+            "id": "model.the_tuva_project.input_layer__immunization",
+            "name": "input_layer__immunization",
+            "resourceType": "model",
+            "layer": "Input layer",
+            "folderLabel": "input_layer",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/input_layer/input_layer__immunization.sql"
+          },
+          {
+            "id": "model.the_tuva_project.core__stg_clinical_immunization",
+            "name": "core__stg_clinical_immunization",
+            "resourceType": "model",
+            "layer": "Core",
+            "folderLabel": "core/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/staging/core__stg_clinical_immunization.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('clinical_enabled', False)\n | as_bool\n   )\n}}\n\n{%- set tuva_extension_columns -%}\n    {{ select_extension_columns(ref('input_layer__immunization')) }}\n{%- endset -%}\n\n{%- set tuva_metadata_columns -%}\n    , immune.data_source\n    , immune.tuva_last_run\n{%- endset -%}\n\n{% if var('enable_normalize_engine',false) != true %}\n\n\nselect\n      immune.immunization_id\n    , immune.person_id\n    , immune.patient_id\n    , immune.encounter_id\n    , immune.source_code_type\n    , immune.source_code\n    , immune.source_description\n    , case\n        when immune.normalized_code_type is not null then immune.normalized_code_type\n        when cvx.cvx is not null then 'cvx'\n        else null end as normalized_code_type\n    , coalesce(\n        immune.normalized_code\n        , cvx.cvx\n        ) as normalized_code\n    , coalesce(\n        immune.normalized_description\n        , cvx.long_description\n        ) as normalized_description\n    , case when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'\n         when cvx.cvx is not null then 'automatic'\n         end as mapping_method\n    , coalesce(immunization_status.status, immune.status) as status\n    , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason\n    , immune.occurrence_date\n    , immune.source_dose\n    , immune.normalized_dose\n    , immune.lot_number\n    , coalesce(act_site.description, immune.body_site) as body_site\n    , coalesce(immunization_route.description, immune.route) as route\n    , immune.location_id\n    , immune.practitioner_id\n    {{ tuva_extension_columns }}\n    {{ tuva_metadata_columns }}\nfrom {{ ref('core__stg_clinical_immunization') }} as immune\nleft outer join {{ ref('terminology__cvx') }} as cvx\n    on immune.source_code_type = 'cvx'\n        and immune.source_code = cvx.cvx\nleft outer join {{ ref('terminology__immunization_status') }} as immunization_status\n    on immune.status = immunization_status.status_code\nleft outer join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason\n    on immune.status_reason = immunization_status_reason.reason_code\n        and (\n        immunization_status_reason.code_type = 'actreason' or\n        immunization_status_reason.code_type = 'snomed-ct'\n        )\nleft outer join {{ ref('terminology__act_site') }} as act_site\n    on immune.body_site = act_site.body_code\nleft outer join {{ ref('terminology__immunization_route_code') }} as immunization_route\n    on immune.route = immunization_route.route_code\n\n {% else %}\n\nselect\n      immune.immunization_id\n    , immune.person_id\n    , immune.patient_id\n    , immune.encounter_id\n    , immune.source_code_type\n    , immune.source_code\n    , immune.source_description\n    , case\n        when immune.normalized_code_type is not null then immune.normalized_code_type\n        when cvx.cvx is not null then 'cvx'\n        else custom_mapped.normalized_code_type end as normalized_code_type\n    , coalesce(\n        immune.normalized_code\n        , cvx.cvx\n        , custom_mapped.normalized_code\n        ) as normalized_code\n    , coalesce(\n        immune.normalized_description\n        , cvx.long_description\n        , custom_mapped.normalized_description\n        ) as normalized_description\n  , case  when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'\n        when cvx.cvx is not null then 'automatic'\n        when custom_mapped.not_mapped is not null then custom_mapped.not_mapped\n        when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'\n        end as mapping_method\n    , coalesce(immunization_status.status, immune.status) as status\n    , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason\n    , immune.occurrence_date\n    , immune.source_dose\n    , immune.normalized_dose\n    , immune.lot_number\n    , coalesce(act_site.description, immune.body_site) as body_site\n    , coalesce(immunization_route.description, immune.route) as route\n    , immune.location_id\n    , immune.practitioner_id\n    {{ tuva_extension_columns }}\n    {{ tuva_metadata_columns }}\nfrom {{ ref('core__stg_clinical_immunization') }} as immune\nleft outer join {{ ref('terminology__cvx') }} as cvx\n    on immune.source_code_type = 'cvx'\n        and immune.source_code = cvx.cvx\nleft outer join {{ ref('terminology__immunization_status') }} as immunization_status\n    on immune.status = immunization_status.status_code\nleft outer join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason\n    on immune.status_reason = immunization_status_reason.reason_code\n        and (\n        immunization_status_reason.code_type = 'actreason' or\n        immunization_status_reason.code_type = 'snomed-ct'\n        )\nleft outer join {{ ref('terminology__act_site') }} as act_site\n    on immune.body_site = act_site.body_code\nleft outer join {{ ref('terminology__immunization_route_code') }} as immunization_route\n    on immune.route = immunization_route.route_code\nleft outer join {{ ref('custom_mapped') }} custom_mapped\n    on  ( lower(immune.source_code_type) = lower(custom_mapped.source_code_type)\n        or ( immune.source_code_type is null and custom_mapped.source_code_type is null)\n        )\n    and (immune.source_code = custom_mapped.source_code\n        or ( immune.source_code is null and custom_mapped.source_code is null)\n        )\n    and (immune.source_description = custom_mapped.source_description\n        or ( immune.source_description is null and custom_mapped.source_description is null)\n        )\n    and not (immune.source_code is null and immune.source_description is null)\n{% endif %}\n",
+        "columns": [
+          {
+            "name": "immunization_id",
+            "description": "Unique identifier for each immunization.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_id",
+            "description": "Identifier that links a patient to a particular clinical source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for each encounter in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code_type",
+            "description": "The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/code-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_code",
+            "description": "The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/cvx",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_description",
+            "description": "Description of the source code in the source system.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code_type",
+            "description": "The normalized type of code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/code-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_code",
+            "description": "The normalized code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/cvx",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_description",
+            "description": "Normalized description of the code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "mapping_method",
+            "description": "mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status",
+            "description": "Status of the record (e.g., condition, test, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "status_reason",
+            "description": "Indicates reason the event was not performed. (e.g., condition, test, immunization etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "occurrence_date",
+            "description": "Date the event occured or was to be occured.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_dose",
+            "description": "The quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "normalized_dose",
+            "description": "Normalized quantity of vaccine product that was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "lot_number",
+            "description": "Lot number of the vaccine product.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "body_site",
+            "description": "The body site where the vaccine was administered.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "route",
+            "description": "The route used to administer the medication and/or vaccine.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "location_id",
+            "description": "Unique identifier for each location.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "practitioner_id",
+            "description": "Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": true,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 9
+      }
+    ],
+    "edges": [
+      {
+        "source": "seed.the_tuva_project.terminology__act_site",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "seed.the_tuva_project.terminology__cvx",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "seed.the_tuva_project.terminology__immunization_route_code",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "seed.the_tuva_project.terminology__immunization_status",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "seed.the_tuva_project.terminology__immunization_status_reason",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "model.integration_tests.immunization",
+        "target": "model.the_tuva_project.input_layer__immunization"
+      },
+      {
+        "source": "model.the_tuva_project.input_layer__immunization",
+        "target": "model.the_tuva_project.core__immunization"
+      },
+      {
+        "source": "model.the_tuva_project.input_layer__immunization",
+        "target": "model.the_tuva_project.core__stg_clinical_immunization"
+      },
+      {
+        "source": "model.the_tuva_project.core__stg_clinical_immunization",
+        "target": "model.the_tuva_project.core__immunization"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "immunization",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:40.887Z",
+    "lastSuccessAt": "2026-03-27T15:41:40.887Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}

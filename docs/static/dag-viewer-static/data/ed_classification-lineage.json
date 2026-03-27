@@ -1,0 +1,2326 @@
+{
+  "payload": {
+    "id": "ed_classification-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:47.046Z",
+    "target": {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "subtitle": "Lineage for the ED Classification data mart rooted at its public output models.",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "graphTitle": "ED Classification DAG",
+      "graphSubtitle": "Lineage for the ED Classification data mart rooted at its public output models.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 1,
+      "documentedColumns": 121,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/ed_classification-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "dag:encounter",
+        "name": "Encounter",
+        "resourceType": "dag",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 0,
+        "folderLabel": "core/final",
+        "description": "The encounter table contains information about patients visits (i.e.  encounters).  This includes acute inpatient, emergency department, office  visits, SNF stays, etc.",
+        "materialized": "dag",
+        "technical": {
+          "alias": "encounter",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core",
+            "encounters"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": null,
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__encounter",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__encounter",
+          "targetKey": "encounter"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "intermediate",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": {
+          "targetKey": "encounter",
+          "targetLabel": "Encounter",
+          "categoryLabel": "Core",
+          "memberCount": 1,
+          "outputModels": [
+            "core__encounter"
+          ],
+          "recurseWhenCollapsed": false,
+          "representativeNodeId": "model.the_tuva_project.core__encounter"
+        },
+        "seedViewer": null,
+        "sql": "",
+        "columns": [
+          {
+            "name": "_dbt_source_relation",
+            "description": "dbt utils metadata column to indicate the source table from unioning tables together.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for each encounter in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_data_source_id",
+            "description": "Identifier for the source system from which patient data originated.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_type",
+            "description": "Indicates the type of encounter e.g. acute inpatient, emergency department, etc.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/encounter-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_group",
+            "description": "Categorization of the encounter into groups based on predefined criteria.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_start_date",
+            "description": "Date when the encounter started.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_end_date",
+            "description": "Date when the encounter ended.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "length_of_stay",
+            "description": "Length of the encounter calculated as encounter_end_date - encounter_start_date.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_source_code",
+            "description": "Indicates where the patient was before the healthcare encounter (inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/admit-source",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_source_description",
+            "description": "Description of the admit_source_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_type_code",
+            "description": "Indicates the type of admission (inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/admit-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_type_description",
+            "description": "Description of the admit_type_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_disposition_code",
+            "description": "Indicates the type of setting the patient was discharged to (institutional inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/discharge-disposition",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_disposition_description",
+            "description": "Description of the discharge_disposition_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "attending_provider_id",
+            "description": "ID for the attending provider on the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "attending_provider_name",
+            "description": "Name of the attending provider on the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_npi",
+            "description": "Facility NPI for the claim (the organizational NPI of the facility where services were performed).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_name",
+            "description": "Facility name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_type",
+            "description": "The type of facility e.g. acute care hospital.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "observation_flag",
+            "description": "Indicates whether the encounter was marked as an observation stay (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "lab_flag",
+            "description": "Indicates whether lab services were utilized during the encounter (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "dme_flag",
+            "description": "Indicates whether durable medical equipment (DME) was used during the encounter (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ambulance_flag",
+            "description": "Indicates whether ambulance services were utilized during the encounter (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "pharmacy_flag",
+            "description": "Indicates whether pharmacy services were utilized during the encounter (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ed_flag",
+            "description": "Indicates whether the encounter involved an emergency department visit (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "delivery_flag",
+            "description": "Indicates whether the encounter involved a delivery (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "delivery_type",
+            "description": "Type of delivery that occurred during the encounter, if applicable.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "newborn_flag",
+            "description": "Indicates whether the encounter was for a newborn (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "nicu_flag",
+            "description": "Indicates whether the newborn was admitted to the Neonatal Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "snf_part_b_flag",
+            "description": "Indicates whether the inpatient medical service for Medicare covers under Part B or not. (1 for yes and 0 for no)",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "primary_diagnosis_code_type",
+            "description": "The type of condition code reported in the source system e.g. ICD-10-CM.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/code-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "primary_diagnosis_code",
+            "description": "Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "primary_diagnosis_description",
+            "description": "Description of the primary diagnosis code.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code_type",
+            "description": "The DRG system used for the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code",
+            "description": "The DRG code on the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_description",
+            "description": "The description for the DRG code used on the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_amount",
+            "description": "The total amount paid by the insurer.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "allowed_amount",
+            "description": "The total amount allowed (includes amount paid by the insurer and patient).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "charge_amount",
+            "description": "The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_count",
+            "description": "The number of claims associated with the encounter or record.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "inst_claim_count",
+            "description": "Number of institutional claims generated from the encounter.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "prof_claim_count",
+            "description": "Number of professional claims generated from the encounter.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "source_model",
+            "description": "Indicates the DBT source relation name from which data is derived.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_source_type",
+            "description": "Indicates whether the encounter is from a claims or clinical data source",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "attending_provider_id",
+            "description": "ID for the attending provider on the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "attending_provider_name",
+            "description": "Name of the attending provider on the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_npi",
+            "description": "Facility NPI for the claim (the organizational NPI of the facility where services were performed).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_name",
+            "description": "Facility name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_type",
+            "description": "The type of facility e.g. acute care hospital.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      },
+      {
+        "id": "dag:patient",
+        "name": "Patient",
+        "resourceType": "dag",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 0,
+        "folderLabel": "core/final",
+        "description": "The patient table contains demographic and geographic information on patients.",
+        "materialized": "dag",
+        "technical": {
+          "alias": "patient",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": null,
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__patient",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__patient",
+          "targetKey": "patient"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "intermediate",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": {
+          "targetKey": "patient",
+          "targetLabel": "Patient",
+          "categoryLabel": "Core",
+          "memberCount": 1,
+          "outputModels": [
+            "core__patient"
+          ],
+          "recurseWhenCollapsed": false,
+          "representativeNodeId": "model.the_tuva_project.core__patient"
+        },
+        "seedViewer": null,
+        "sql": "",
+        "columns": [
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "sex",
+            "description": "The gender of the patient.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/gender",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "race",
+            "description": "The patient's race.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/race",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "birth_date",
+            "description": "The birth date of the patient.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_date",
+            "description": "Date the patient died if there is one.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "death_flag",
+            "description": "A flag indicating if the patient has died.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "name_suffix",
+            "description": "The name suffixes (e.g., Sr., Jr., III.)",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "first_name",
+            "description": "The first name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "middle_name",
+            "description": "The middle name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "last_name",
+            "description": "The last name of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "social_security_number",
+            "description": "The social security number of the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "address",
+            "description": "The street address of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "city",
+            "description": "The city of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "state",
+            "description": "The state of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "zip_code",
+            "description": "The zip code of the record (e.g., facility location, patient, etc).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "county",
+            "description": "The county for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "latitude",
+            "description": "The latitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "longitude",
+            "description": "The longitude of the record (e.g., facility location, patient, etc).",
+            "dataType": "float",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "phone",
+            "description": "The phone number for the patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "email",
+            "description": "The email for the patient",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ethnicity",
+            "description": "The ethnicity of the patient",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/ethnicity",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "age",
+            "description": "The age of the patient calculated based on their date of birth and the last time the tuva project was run.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "age_group",
+            "description": "The decade age group the patient falls into based on their calculated age.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 2
+      },
+      {
+        "id": "seed.the_tuva_project.ed_classification__categories",
+        "name": "ed_classification__categories",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/value_sets/ed_classification",
+        "description": "A mapping of ED Classifications to human-readable names",
+        "materialized": "seed",
+        "technical": {
+          "alias": "_value_set_categories",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__categories.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification_seeds.yml",
+          "yamlEntryName": "ed_classification__categories",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.ed_classification__categories",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "value_set",
+          "version": "latest",
+          "folder": "versioned_value_sets",
+          "fileName": "ed_classification__categories.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/ed_classification_categories.csv_0_0_0.csv.gz"
+        },
+        "sql": "classification,classification_name,classification_order,classification_column",
+        "columns": [
+          {
+            "name": "classification",
+            "description": "ED classification code",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "classification_name",
+            "description": "Human-readable name for the ED classification",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "classification_order",
+            "description": "Order of the ED classification",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "classification_column",
+            "description": "Column name for the ED classification",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 3
+      },
+      {
+        "id": "seed.the_tuva_project.ed_classification__johnston_icd10",
+        "name": "ed_classification__johnston_icd10",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/value_sets/ed_classification",
+        "description": "A probabilistic mapping of ICD-10 codes to ED classification categories",
+        "materialized": "seed",
+        "technical": {
+          "alias": "_value_set_johnston_icd10",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__johnston_icd10.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification_seeds.yml",
+          "yamlEntryName": "ed_classification__johnston_icd10",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.ed_classification__johnston_icd10",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "value_set",
+          "version": "latest",
+          "folder": "versioned_value_sets",
+          "fileName": "ed_classification__johnston_icd10.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/johnston_icd10.csv_0_0_0.csv.gz"
+        },
+        "sql": "icd10,edcnnpa,edcnpa,epct,noner,injury,psych,alcohol,drug",
+        "columns": [
+          {
+            "name": "icd10",
+            "description": "ICD-10 code",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "edcnnpa",
+            "description": "ED CNNPA category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "edcnpa",
+            "description": "ED CNPA category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "epct",
+            "description": "EPCT category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "noner",
+            "description": "Non-ER category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "injury",
+            "description": "Injury category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "psych",
+            "description": "Psych category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "alcohol",
+            "description": "Alcohol category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drug",
+            "description": "Drug category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 4
+      },
+      {
+        "id": "seed.the_tuva_project.ed_classification__johnston_icd9",
+        "name": "ed_classification__johnston_icd9",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/value_sets/ed_classification",
+        "description": "A probabilistic mapping of ICD-9 codes to ED classification categories",
+        "materialized": "seed",
+        "technical": {
+          "alias": "_value_set_johnston_icd9",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__johnston_icd9.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification_seeds.yml",
+          "yamlEntryName": "ed_classification__johnston_icd9",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.ed_classification__johnston_icd9",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "value_set",
+          "version": "latest",
+          "folder": "versioned_value_sets",
+          "fileName": "ed_classification__johnston_icd9.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/johnston_icd9.csv_0_0_0.csv.gz"
+        },
+        "sql": "icd9,edcnnpa,edcnpa,epct,noner,injury,psych,alcohol,drug",
+        "columns": [
+          {
+            "name": "icd9",
+            "description": "ICD-9 code",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-9-cm",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "edcnnpa",
+            "description": "ED CNNPA category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "edcnpa",
+            "description": "ED CNPA category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "epct",
+            "description": "EPCT category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "noner",
+            "description": "Non-ER category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "injury",
+            "description": "Injury category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "psych",
+            "description": "Psych category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "alcohol",
+            "description": "Alcohol category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drug",
+            "description": "Drug category",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 5
+      },
+      {
+        "id": "model.the_tuva_project.ed_classification__stg_encounter",
+        "name": "ed_classification__stg_encounter",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 1,
+        "folderLabel": "data_marts/ed_classification/staging",
+        "description": "",
+        "materialized": "ephemeral",
+        "technical": {
+          "alias": "ed_classification__stg_encounter",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/staging/ed_classification__stg_encounter.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/ed_classification_models.yml",
+          "yamlEntryName": "ed_classification__stg_encounter",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.ed_classification__stg_encounter",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [
+          {
+            "id": "dag:encounter",
+            "name": "Encounter",
+            "resourceType": "dag",
+            "layer": "Core",
+            "folderLabel": "core/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\nselect\n    encounter_id\n    , encounter_type\n    , person_id\n    , encounter_end_date\n    , facility_npi\n    , primary_diagnosis_code_type\n    , primary_diagnosis_code\n    , primary_diagnosis_description\n    , paid_amount\n    , allowed_amount\n    , charge_amount\nfrom {{ ref('core__encounter') }}\n",
+        "columns": [],
+        "runOrder": 6
+      },
+      {
+        "id": "model.the_tuva_project.ed_classification__stg_patient",
+        "name": "ed_classification__stg_patient",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 1,
+        "folderLabel": "data_marts/ed_classification/staging",
+        "description": "",
+        "materialized": "ephemeral",
+        "technical": {
+          "alias": "ed_classification__stg_patient",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/staging/ed_classification__stg_patient.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/ed_classification_models.yml",
+          "yamlEntryName": "ed_classification__stg_patient",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.ed_classification__stg_patient",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [
+          {
+            "id": "dag:patient",
+            "name": "Patient",
+            "resourceType": "dag",
+            "layer": "Core",
+            "folderLabel": "core/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False)\n | as_bool\n   )\n}}\n\nselect\n    person_id\n    , sex\n    , birth_date\n    , race\n    , state\n    , zip_code\n    , latitude\n    , longitude\n    , data_source\nfrom {{ ref('core__patient') }}\n",
+        "columns": [],
+        "runOrder": 7
+      },
+      {
+        "id": "model.the_tuva_project.ed_classification__int_map_primary_dx",
+        "name": "ed_classification__int_map_primary_dx",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 2,
+        "folderLabel": "data_marts/ed_classification/intermediate",
+        "description": "Map ED encounter primary dx to classification",
+        "materialized": "table",
+        "technical": {
+          "alias": "_int_by_provider_parent_organization",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/intermediate/ed_classification__int_map_primary_dx.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/ed_classification_models.yml",
+          "yamlEntryName": "ed_classification__int_map_primary_dx",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.ed_classification__int_map_primary_dx",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [
+          {
+            "id": "seed.the_tuva_project.ed_classification__johnston_icd10",
+            "name": "ed_classification__johnston_icd10",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/value_sets/ed_classification",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__johnston_icd10.csv"
+          },
+          {
+            "id": "seed.the_tuva_project.ed_classification__johnston_icd9",
+            "name": "ed_classification__johnston_icd9",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/value_sets/ed_classification",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__johnston_icd9.csv"
+          },
+          {
+            "id": "model.the_tuva_project.ed_classification__stg_encounter",
+            "name": "ed_classification__stg_encounter",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/ed_classification/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/staging/ed_classification__stg_encounter.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "/*\nAll condition discharge diagnosis left join with probabilistic\nindicators of ED classification terminology\n*/\n\n{{ config(\n     enabled = var('claims_enabled', False) | as_bool\n   )\n}}\n{% set colnames = [\"edcnnpa\", \"edcnpa\", \"epct\", \"noner\", \"injury\", \"psych\", \"alcohol\", \"drug\"] %}\n\nwith condition as (\n    select *\n    from {{ ref('ed_classification__stg_encounter') }}\n    where encounter_type = 'emergency department'\n)\n\n, icd9 as (\n  select\n     icd9 as code\n     {% for colname in colnames %}\n     , {{ colname }}\n     {% endfor %}\n     , 1 as ed_classification_capture\n  from {{ ref('ed_classification__johnston_icd9') }}\n)\n\n, icd10 as (\n  select\n     icd10 as code\n     {% for colname in colnames %}\n     , {{ colname }}\n     {% endfor %}\n     , 1 as ed_classification_capture\n  from {{ ref('ed_classification__johnston_icd10') }}\n)\n\nselect\n   a.*\n   {% for colname in colnames %}\n   , icd10.{{ colname }}\n   {% endfor %}\n   , coalesce(icd10.ed_classification_capture, 0) as ed_classification_capture\nfrom condition as a\nleft outer join icd10\n    on a.primary_diagnosis_code = icd10.code\n    and a.primary_diagnosis_code_type = 'icd-10-cm'\n\nunion all\n\nselect\n   a.*\n   {% for colname in colnames %}\n   , icd9.{{ colname }}\n   {% endfor %}\n   , coalesce(icd9.ed_classification_capture, 0) as ed_classification_capture\nfrom condition as a\ninner join icd9\n    on a.primary_diagnosis_code = icd9.code\n    and a.primary_diagnosis_code_type = 'icd-9-cm'\n",
+        "columns": [],
+        "runOrder": 8
+      },
+      {
+        "id": "model.the_tuva_project.ed_classification__int_filter_encounter_with_classification",
+        "name": "ed_classification__int_filter_encounter_with_classification",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 3,
+        "folderLabel": "data_marts/ed_classification/intermediate",
+        "description": "Filter out ED visits that were not classified",
+        "materialized": "table",
+        "technical": {
+          "alias": "_int_filter_encounter_with_classification",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/intermediate/ed_classification__int_filter_encounter_with_classification.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/ed_classification_models.yml",
+          "yamlEntryName": "ed_classification__int_filter_encounter_with_classification",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.ed_classification__int_filter_encounter_with_classification",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.ed_classification__int_map_primary_dx",
+            "name": "ed_classification__int_map_primary_dx",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/ed_classification/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/intermediate/ed_classification__int_map_primary_dx.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "/*\nFilter conditions to those that were classified and pick the classification\nwith the greatest probability (that's the greatest logic). This logic removes\nany rows that were not classified.\n*/\n{{ config(\n     enabled = var('claims_enabled', False) | as_bool\n   )\n}}\n\nselect\n   a.*\n   , case greatest(edcnnpa, edcnpa, epct, noner, injury, psych, alcohol, drug)\n          when edcnnpa then 'edcnnpa'\n          when edcnpa then 'edcnpa'\n          when epct then 'epct'\n          when noner then 'noner'\n          when injury then 'injury'\n          when psych then 'psych'\n          when alcohol then 'alcohol'\n          when drug then 'drug'\n          else 'unclassified'\n   end as classification\nfrom {{ ref('ed_classification__int_map_primary_dx') }} as a\nwhere ed_classification_capture = 1\n",
+        "columns": [],
+        "runOrder": 9
+      },
+      {
+        "id": "model.the_tuva_project.ed_classification__summary",
+        "name": "ed_classification__summary",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 4,
+        "folderLabel": "data_marts/ed_classification/final",
+        "description": "ED Classification as a cube that can be summarized",
+        "materialized": "table",
+        "technical": {
+          "alias": "summary",
+          "schemaName": "ed_classification",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "ed_classification"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/final/ed_classification__summary.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/ed_classification_models.yml",
+          "yamlEntryName": "ed_classification__summary",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.ed_classification__summary",
+          "targetKey": "ed_classification"
+        },
+        "mainDependencies": [
+          {
+            "id": "seed.the_tuva_project.ed_classification__categories",
+            "name": "ed_classification__categories",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/value_sets/ed_classification",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/ed_classification/ed_classification__categories.csv"
+          },
+          {
+            "id": "model.the_tuva_project.ed_classification__stg_patient",
+            "name": "ed_classification__stg_patient",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/ed_classification/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/staging/ed_classification__stg_patient.sql"
+          },
+          {
+            "id": "model.the_tuva_project.ed_classification__int_filter_encounter_with_classification",
+            "name": "ed_classification__int_filter_encounter_with_classification",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/ed_classification/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/ed_classification/intermediate/ed_classification__int_filter_encounter_with_classification.sql"
+          }
+        ],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.provider_data__provider",
+            "name": "provider_data__provider",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/provider_data",
+            "nodeType": "terminology",
+            "path": "provider_data/provider_data__provider.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = var('claims_enabled', False) | as_bool\n   )\n}}\n\n\nselect\n    class.encounter_id\n    , cat.classification_name as ed_classification_description\n    , cat.classification_order as ed_classification_order\n    , class.person_id\n    , class.encounter_end_date\n    , {{ concat_custom([date_part('year', 'class.encounter_end_date'),\n                      dbt.right(\n                      concat_custom([\"'00'\", date_part('month', 'class.encounter_end_date')])\n                      , 2)]) }} as year_month\n    , class.primary_diagnosis_code\n    , class.primary_diagnosis_description\n    , class.paid_amount\n    , class.allowed_amount\n    , class.charge_amount\n    , class.facility_npi\n    , fac_prov.provider_organization_name as facility_name\n    , practice_state as facility_state\n    , practice_city as facility_city\n    , practice_zip_code as facility_zip_code\n    , pat.sex as patient_sex\n    , floor({{ datediff('pat.birth_date', 'class.encounter_end_date', 'hour') }} / 8766.0) as patient_age\n    , zip_code as patient_zip_code\n    , latitude as patient_latitude\n    , longitude as patient_longitude\n    , race as patient_race\n    , pat.data_source\nfrom {{ ref('ed_classification__int_filter_encounter_with_classification') }} as class\ninner join {{ ref('ed_classification__categories') }} as cat\n    on class.classification = cat.classification\nleft outer join {{ ref('provider_data__provider') }} as fac_prov\n    on class.facility_npi = fac_prov.npi\nleft outer join {{ ref('ed_classification__stg_patient') }} as pat\n    on class.person_id = pat.person_id\n",
+        "columns": [
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for the emergency_department encounter.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ed_classification_description",
+            "description": "ED classification category.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/value-sets/ed-classification",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ed_classification_order",
+            "description": "The order of the classification.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/value-sets/ed-classification",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each patient in the dataset.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_end_date",
+            "description": "Date when the patient was discharged.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "year_month",
+            "description": "Year and month of the encounter end date.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "primary_diagnosis_code",
+            "description": "Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/icd-10-cm",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "primary_diagnosis_description",
+            "description": "Description of the primary diagnosis code.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_amount",
+            "description": "The total paid amount across all claims for the encounter.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "allowed_amount",
+            "description": "The total allowed amount across all claims for the encounter.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "charge_amount",
+            "description": "The total charge amount across all claims for the encounter.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_npi",
+            "description": "The ID for the facility where the encounter occurred.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_name",
+            "description": "The name of the facility.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_state",
+            "description": "The state of the facility.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_city",
+            "description": "The city of the facility.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_zip_code",
+            "description": "The zip code of the facility.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_sex",
+            "description": "The sex of the patient.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/gender",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_age",
+            "description": "The age of the patient at the time of the encounter.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_zip_code",
+            "description": "The zip code for the patient.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_latitude",
+            "description": "The latitude for the patient.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_longitude",
+            "description": "The longitude for the patient.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "patient_race",
+            "description": "The race of the patient.",
+            "dataType": "",
+            "terminology": "https://thetuvaproject.com/terminology/race",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 10
+      }
+    ],
+    "edges": [
+      {
+        "source": "seed.the_tuva_project.ed_classification__johnston_icd10",
+        "target": "model.the_tuva_project.ed_classification__int_map_primary_dx"
+      },
+      {
+        "source": "seed.the_tuva_project.ed_classification__johnston_icd9",
+        "target": "model.the_tuva_project.ed_classification__int_map_primary_dx"
+      },
+      {
+        "source": "dag:encounter",
+        "target": "model.the_tuva_project.ed_classification__stg_encounter"
+      },
+      {
+        "source": "dag:patient",
+        "target": "model.the_tuva_project.ed_classification__stg_patient"
+      },
+      {
+        "source": "seed.the_tuva_project.ed_classification__categories",
+        "target": "model.the_tuva_project.ed_classification__summary"
+      },
+      {
+        "source": "model.the_tuva_project.ed_classification__stg_encounter",
+        "target": "model.the_tuva_project.ed_classification__int_map_primary_dx"
+      },
+      {
+        "source": "model.the_tuva_project.ed_classification__stg_patient",
+        "target": "model.the_tuva_project.ed_classification__summary"
+      },
+      {
+        "source": "model.the_tuva_project.ed_classification__int_map_primary_dx",
+        "target": "model.the_tuva_project.ed_classification__int_filter_encounter_with_classification"
+      },
+      {
+        "source": "model.the_tuva_project.ed_classification__int_filter_encounter_with_classification",
+        "target": "model.the_tuva_project.ed_classification__summary"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "ed_classification",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:47.046Z",
+    "lastSuccessAt": "2026-03-27T15:41:47.046Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}

@@ -1,7 +1,7 @@
 version: 2
 
 seeds:
-  - name: appointment_seed
+  - name: raw_data__appointment
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -135,7 +135,7 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: eligibility_seed
+  - name: raw_data__eligibility
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -229,7 +229,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         transplant_duration_months: integer
 
-  - name: immunization_seed
+  - name: raw_data__immunization
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -286,7 +286,7 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         
-  - name: lab_result_seed
+  - name: raw_data__lab_result
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -367,7 +367,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
 
-  - name: medical_claim_seed
+  - name: raw_data__medical_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -639,7 +639,7 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: observation_seed
+  - name: raw_data__observation
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -696,7 +696,7 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: pharmacy_claim_seed
+  - name: raw_data__pharmacy_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
@@ -750,7 +750,7 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
-  - name: provider_attribution_seed
+  - name: raw_data__provider_attribution
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic

@@ -36,7 +36,7 @@ left outer join {{ ref('ed_classification__int_filter_encounter_with_classificat
     on encounter.encounter_id = class.encounter_id
 left outer join {{ ref('ed_classification__categories') }} as cat
     on class.classification = cat.classification
-left outer join {{ ref('terminology__provider') }} as fac_prov
+left outer join {{ ref('provider_data__provider') }} as fac_prov
     on encounter.facility_npi = fac_prov.npi
 left outer join {{ ref('core__patient') }} as pat
     on encounter.person_id = pat.person_id

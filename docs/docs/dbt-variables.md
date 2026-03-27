@@ -53,7 +53,6 @@ These vars control shared seed loading and optional feature behavior.
 | `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
 | `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |
-| `metric_testing_enabled` | `false` | Builds the optional metric-testing regression mart in the `data_quality` schema. |
 | `enable_normalize_engine` | `false` | Set to `unmapped` to surface unmapped code models, or `true` to also use custom mappings. |
 
 ## `integration_tests` Synthetic Bootstrap Vars

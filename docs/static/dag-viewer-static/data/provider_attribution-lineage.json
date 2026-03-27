@@ -1,0 +1,2329 @@
+{
+  "payload": {
+    "id": "provider_attribution-focused-lineage",
+    "generatedAt": "2026-03-27T15:41:48.421Z",
+    "target": {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "subtitle": "Lineage for the Provider Attribution data mart rooted at its public output models.",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "graphTitle": "Provider Attribution DAG",
+      "graphSubtitle": "Lineage for the Provider Attribution data mart rooted at its public output models.",
+      "heroNotes": [],
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    "summary": {
+      "hiddenSupportingDependencies": 3,
+      "documentedColumns": 81,
+      "generatedFrom": "manifest + YAML + SQL"
+    },
+    "sourceArtifacts": {
+      "manifest": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/integration_tests/target/manifest.json",
+      "persistedPayload": "/var/folders/1m/qnz50w3n5dxggrn21w1w575c0000gn/T/tuva-static-dag-chpjkhe0/provider_attribution-lineage.json"
+    },
+    "nodes": [
+      {
+        "id": "dag:medical_claim",
+        "name": "Medical Claim",
+        "resourceType": "dag",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 0,
+        "folderLabel": "core/final",
+        "description": "The medical claim table contains information on services rendered to patients and billed by the provider to the insurer as claims.",
+        "materialized": "dag",
+        "technical": {
+          "alias": "medical_claim",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core",
+            "encounters"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": null,
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__medical_claim",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__medical_claim",
+          "targetKey": "medical_claim"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "intermediate",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": {
+          "targetKey": "medical_claim",
+          "targetLabel": "Medical Claim",
+          "categoryLabel": "Core",
+          "memberCount": 1,
+          "outputModels": [
+            "core__medical_claim"
+          ],
+          "recurseWhenCollapsed": false,
+          "representativeNodeId": "model.the_tuva_project.core__medical_claim"
+        },
+        "seedViewer": null,
+        "sql": "",
+        "columns": [
+          {
+            "name": "medical_claim_id",
+            "description": "Unique identifier for each row in the table.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_id",
+            "description": "Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_number",
+            "description": "Indicates the line number for the particular line of the claim.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_id",
+            "description": "Unique identifier for each encounter in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_type",
+            "description": "Indicates the type of encounter e.g. acute inpatient, emergency department, etc.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "encounter_group",
+            "description": "Categorization of the encounter into groups based on predefined criteria.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_type",
+            "description": "Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/claim-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_start_date",
+            "description": "The date when the healthcare service was provided. Format: YYYY-MM-DD.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_end_date",
+            "description": "End date for the claim.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_start_date",
+            "description": "Start date for the claim line.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "claim_line_end_date",
+            "description": "End date for the claim line.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admission_date",
+            "description": "Admission date for the claim (inpatient claims only).",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_date",
+            "description": "Discharge date for the claim (inpatient claims only).",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "service_category_1",
+            "description": "The broader service category this claim belongs to.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/value-sets/service-categories",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "service_category_2",
+            "description": "The more specific service category this claim belongs to.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/value-sets/service-categories",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "service_category_3",
+            "description": "The most specific service category this claim belongs to.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_source_code",
+            "description": "Indicates where the patient was before the healthcare encounter (inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/admit-source",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_source_description",
+            "description": "Description of the admit_source_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_type_code",
+            "description": "Indicates the type of admission (inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/admit-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "admit_type_description",
+            "description": "Description of the admit_type_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_disposition_code",
+            "description": "Indicates the type of setting the patient was discharged to (institutional inpatient claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/discharge-disposition",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "discharge_disposition_description",
+            "description": "Description of the discharge_disposition_code for the encounter.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "place_of_service_code",
+            "description": "Place of service for the claim (professional claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/place-of-service",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "place_of_service_description",
+            "description": "Place of service description.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "bill_type_code",
+            "description": "Bill type code for the claim (institutional claims only).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/bill-type",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "bill_type_description",
+            "description": "Bill type description.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code_type",
+            "description": "The DRG system used for the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_code",
+            "description": "The DRG code on the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "drg_description",
+            "description": "The description for the DRG code used on the claim.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "revenue_center_code",
+            "description": "Revenue center code for the claim line (institutional only and typically multiple codes per claim).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/revenue-center",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "revenue_center_description",
+            "description": "Revenue center description.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "service_unit_quantity",
+            "description": "The number of units for the particular revenue center code.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_code",
+            "description": "The CPT or HCPCS code representing the procedure or service provided. These codes are used to describe medical, surgical, and diagnostic services.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_1",
+            "description": "1st modifier for HCPCS code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_2",
+            "description": "2nd modifier for HCPCS code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_3",
+            "description": "3rd modifier for HCPCS code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_4",
+            "description": "4th modifier for HCPCS code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "hcpcs_modifier_5",
+            "description": "5th modifier for HCPCS code.",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/hcpcs-level-2",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "rendering_npi",
+            "description": "Rendering NPI for the claim (typically represents the physician or entity providing services).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "rendering_tin",
+            "description": "Rendering provider tax identification number (TIN).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "rendering_name",
+            "description": "Rendering provider name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "billing_npi",
+            "description": "Billing NPI for the claim (typically represents organization billing the claim).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "billing_tin",
+            "description": "Billing provider tax identification number (TIN).",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "billing_name",
+            "description": "Billing provider name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_npi",
+            "description": "Facility NPI for the claim (the organizational NPI of the facility where services were performed).",
+            "dataType": "varchar",
+            "terminology": "https://thetuvaproject.com/terminology/provider",
+            "terminologyNote": "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "facility_name",
+            "description": "Facility name.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_date",
+            "description": "The date the claim was paid.",
+            "dataType": "date",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "paid_amount",
+            "description": "The total amount paid by the insurer.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "allowed_amount",
+            "description": "The total amount allowed (includes amount paid by the insurer and patient).",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "charge_amount",
+            "description": "The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "coinsurance_amount",
+            "description": "The total coinsurance charged on the claim by the provider.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "copayment_amount",
+            "description": "The total copayment charged on the claim by the provider.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "deductible_amount",
+            "description": "The total deductible charged on the claim by the provider.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "total_cost_amount",
+            "description": "The total amount paid on the claim by different parties.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "in_network_flag",
+            "description": "Flag indicating if the claim was in or out of network.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "enrollment_flag",
+            "description": "Flag indicating if the claim has corresponding enrollment during the same time period the service occurred.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_month_key",
+            "description": "The unique combination of person_id, year_month, payer, plan, and data source.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "file_date",
+            "description": "The date associated with the claims file, typically reflecting the reporting period of the claims data.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "ingest_datetime",
+            "description": "The date and time the source file was ingested into the data warehouse or landed in cloud storage.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "timestamp",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 1
+      },
+      {
+        "id": "dag:member_months",
+        "name": "Member Months",
+        "resourceType": "dag",
+        "sourceStyle": false,
+        "layer": "Core",
+        "depth": 0,
+        "folderLabel": "core/final",
+        "description": "The core member months tables has one record per member per month in the eligibility source data.  Members without claims are included in this data table.",
+        "materialized": "dag",
+        "technical": {
+          "alias": "member_months",
+          "schemaName": "core",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "core"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": null,
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml",
+          "yamlEntryName": "core__member_months",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.core__member_months",
+          "targetKey": "member_months"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "intermediate",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": {
+          "targetKey": "member_months",
+          "targetLabel": "Member Months",
+          "categoryLabel": "Core",
+          "memberCount": 1,
+          "outputModels": [
+            "core__member_months"
+          ],
+          "recurseWhenCollapsed": false,
+          "representativeNodeId": "model.the_tuva_project.core__member_months"
+        },
+        "seedViewer": null,
+        "sql": "",
+        "columns": [
+          {
+            "name": "member_month_key",
+            "description": "The unique combination of person_id, year_month, payer, plan, and data source.",
+            "dataType": "number",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "person_id",
+            "description": "Unique identifier for each person in the dataset.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "member_id",
+            "description": "Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "year_month",
+            "description": "Unique year-month of in the dataset computed from eligibility.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer",
+            "description": "Name of the payer (i.e. health insurer) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "plan",
+            "description": "Name of the plan (i.e. sub contract) providing coverage.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "data_source",
+            "description": "User-configured field that indicates the data source.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "tuva_last_run",
+            "description": "The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.",
+            "dataType": "varchar",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_attributed_provider",
+            "description": "Unique identifier for the provider assigned to this patient-year_month by the payer.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_attributed_provider_practice",
+            "description": "Name of the practice for the payer attributed provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_attributed_provider_organization",
+            "description": "Name of the organization for the payer attributed provider.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "payer_attributed_provider_lob",
+            "description": "Name of the line of business for the payer attributed provider (e.g. medicare, medicaid, commercial).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "custom_attributed_provider",
+            "description": "Unique identifier for the provider assigned to this patient-year_month by the user.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "custom_attributed_provider_practice",
+            "description": "Name of the practice for the attributed provider assigned by the user.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "custom_attributed_provider_organization",
+            "description": "Name of the organization for the attributed provider assigned by the user.",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "custom_attributed_provider_lob",
+            "description": "Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 2
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+        "name": "provider_attribution__stg_reference_data__calendar",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 0,
+        "folderLabel": "data_marts/provider_attribution/staging",
+        "description": "Staging view of reference calendar data supporting provider attribution date logic.",
+        "materialized": "view",
+        "technical": {
+          "alias": "_stg_reference_data__calendar",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_reference_data__calendar.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__stg_reference_data__calendar",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.reference_data__calendar",
+            "name": "reference_data__calendar",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/reference_data",
+            "nodeType": "terminology",
+            "path": "reference_data/reference_data__calendar.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nselect\n    full_date\n  , year\n  , month\n  , year_month\n  , first_day_of_month\n  , last_day_of_month\n  , year_month_int\nfrom {{ ref('reference_data__calendar') }}\n",
+        "columns": [],
+        "runOrder": 3
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+        "name": "provider_attribution__stg_terminology__provider",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 0,
+        "folderLabel": "data_marts/provider_attribution/staging",
+        "description": "Staging view of provider taxonomy detail used in provider attribution classification.",
+        "materialized": "view",
+        "technical": {
+          "alias": "_stg_terminology__provider",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_terminology__provider.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__stg_terminology__provider",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.provider_data__provider",
+            "name": "provider_data__provider",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/provider_data",
+            "nodeType": "terminology",
+            "path": "provider_data/provider_data__provider.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "input",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nselect\n    npi\n  , primary_taxonomy_code\n  , primary_specialty_description\n  , entity_type_description\nfrom {{ ref('provider_data__provider') }}\n",
+        "columns": [],
+        "runOrder": 4
+      },
+      {
+        "id": "seed.the_tuva_project.cms_provider_attribution__primary_care_hcpcs_codes",
+        "name": "cms_provider_attribution__primary_care_hcpcs_codes",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/value_sets/cms_provider_attribution",
+        "description": "Taken from p.87 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), \"APPENDIX C: PRIMARY CARE AND SPECIALTY CODES USED IN ASSIGNMENT\".\nSource can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)",
+        "materialized": "seed",
+        "technical": {
+          "alias": "_primary_care_hcpcs_codes",
+          "schemaName": "cms_provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "cms_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution__primary_care_hcpcs_codes.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution_seeds.yml",
+          "yamlEntryName": "cms_provider_attribution__primary_care_hcpcs_codes",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.cms_provider_attribution__primary_care_hcpcs_codes",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "value_set",
+          "version": "latest",
+          "folder": "versioned_value_sets",
+          "fileName": "cms_provider_attribution__primary_care_hcpcs_codes.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/cms_provider_attribution__primary_care_hcpcs_codes.csv_0_0_0.csv.gz"
+        },
+        "sql": "hcpcs_code,description",
+        "columns": [],
+        "runOrder": 5
+      },
+      {
+        "id": "seed.the_tuva_project.cms_provider_attribution__provider_specialty_assignment_codes",
+        "name": "cms_provider_attribution__provider_specialty_assignment_codes",
+        "resourceType": "seed",
+        "sourceStyle": false,
+        "layer": "Seed",
+        "depth": 0,
+        "folderLabel": "seeds/value_sets/cms_provider_attribution",
+        "description": "Taken from p.93 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), in Table 11 and 12.\nSource can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)",
+        "materialized": "seed",
+        "technical": {
+          "alias": "_provider_specialty_assignment_codes",
+          "schemaName": "cms_provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "cms_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution__provider_specialty_assignment_codes.csv",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution_seeds.yml",
+          "yamlEntryName": "cms_provider_attribution__provider_specialty_assignment_codes",
+          "yamlCollectionKey": "seeds",
+          "manifestNodeId": "seed.the_tuva_project.cms_provider_attribution__provider_specialty_assignment_codes",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "terminology",
+        "nodeType": "terminology",
+        "dagBoundary": null,
+        "seedViewer": {
+          "sourceType": "seed_preview",
+          "family": "value_set",
+          "version": "latest",
+          "folder": "versioned_value_sets",
+          "fileName": "cms_provider_attribution__provider_specialty_assignment_codes.csv",
+          "downloadUrl": "https://tuva-public-resources.s3.amazonaws.com/versioned_value_sets/latest/cms_provider_attribution__provider_specialty_assignment_codes.csv_0_0_0.csv.gz"
+        },
+        "sql": "specialty_code,description,primary_care_physician_step1,specialist_physician_step_2,physician",
+        "columns": [],
+        "runOrder": 6
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__provider_classification",
+        "name": "provider_attribution__provider_classification",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 1,
+        "folderLabel": "data_marts/provider_attribution/intermediate",
+        "description": "",
+        "materialized": "view",
+        "technical": {
+          "alias": "_int_provider_classification",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__provider_classification.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__provider_classification",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__provider_classification",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+            "name": "provider_attribution__stg_terminology__provider",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_terminology__provider.sql"
+          },
+          {
+            "id": "seed.the_tuva_project.cms_provider_attribution__provider_specialty_assignment_codes",
+            "name": "cms_provider_attribution__provider_specialty_assignment_codes",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/value_sets/cms_provider_attribution",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution__provider_specialty_assignment_codes.csv"
+          }
+        ],
+        "supportingDependencies": [
+          {
+            "id": "seed.the_tuva_project.provider_data__medicare_provider_and_supplier_taxonomy_crosswalk",
+            "name": "provider_data__medicare_provider_and_supplier_taxonomy_crosswalk",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/provider_data",
+            "nodeType": "terminology",
+            "path": "provider_data/provider_data__medicare_provider_and_supplier_taxonomy_crosswalk.csv"
+          }
+        ],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\n-- Map NPI to specialty description and CMS assignment bucket (pcp/specialist/npp)\nwith base as (\n  select\n      cast(p.npi as {{ dbt.type_string() }}) as provider_id\n    , p.primary_taxonomy_code\n    , p.primary_specialty_description as prov_specialty\n    , lower(trim(p.entity_type_description)) as entity_type\n  from {{ ref('provider_attribution__stg_terminology__provider') }} as p\n)\n\n, mapped as (\n  select\n      b.provider_id\n    , b.prov_specialty\n    , case\n        when lower(a.primary_care_physician_step1) = 'yes' and a.physician = 1 then 'pcp'\n        when lower(a.specialist_physician_step_2) = 'yes' and a.physician = 1 then 'specialist'\n        when a.physician = 0 then 'npp'\n        else 'unknown'\n      end as provider_bucket\n  from base as b\n  inner join {{ ref('provider_data__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x\n    on trim(cast(b.primary_taxonomy_code as {{ dbt.type_string() }})) = trim(cast(x.provider_taxonomy_code as {{ dbt.type_string() }}))\n  inner join {{ ref('cms_provider_attribution__provider_specialty_assignment_codes') }} as a\n  {% if target.type == 'athena' %}\n    on substr(concat('00', trim(x.medicare_specialty_code)), -2)\n     = substr(concat('00', trim(a.specialty_code)), -2)\n  {% else %}\n    on right(concat('00', trim(x.medicare_specialty_code)), 2)\n     = right(concat('00', trim(a.specialty_code)), 2)\n  {% endif %}\n  where b.entity_type = 'individual'\n)\n\n, rnk as (\n  select\n      provider_id\n    , prov_specialty\n    , provider_bucket\n    , row_number() over (partition by provider_id\norder by bucket_priority) as bucket_rank\n  from (\n    select\n        mapped.*\n      , case provider_bucket\n          when 'pcp' then 1\n          when 'npp' then 2\n          when 'specialist' then 3\n          else 4\n        end as bucket_priority\n    from mapped\n  ) as prioritized\n)\n\nselect\n    provider_id\n  , prov_specialty\n  , provider_bucket\nfrom rnk\nwhere bucket_rank = 1\n",
+        "columns": [],
+        "runOrder": 7
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+        "name": "provider_attribution__stg_core__medical_claim",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 1,
+        "folderLabel": "data_marts/provider_attribution/staging",
+        "description": "Staging view of core medical claims used for provider attribution.",
+        "materialized": "view",
+        "technical": {
+          "alias": "_stg_core__medical_claim",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__medical_claim.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__stg_core__medical_claim",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "dag:medical_claim",
+            "name": "Medical Claim",
+            "resourceType": "dag",
+            "layer": "Core",
+            "folderLabel": "core/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\n-- Staging view of core medical claims used for provider attribution.\n-- Provides the subset of fields needed by attribution, sourced only from core.\n\nselect\n    claim_id\n  , claim_line_number\n  , person_id\n  , claim_start_date\n  , claim_end_date\n  , allowed_amount\n  , paid_amount\n  , rendering_npi\n  , hcpcs_code\n  , data_source\n  , encounter_id\nfrom {{ ref('core__medical_claim') }}\n",
+        "columns": [],
+        "runOrder": 8
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+        "name": "provider_attribution__stg_core__member_months",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 1,
+        "folderLabel": "data_marts/provider_attribution/staging",
+        "description": "Staging view of member months used for provider attribution eligibility logic.",
+        "materialized": "view",
+        "technical": {
+          "alias": "_stg_core__member_months",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__member_months.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__stg_core__member_months",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "dag:member_months",
+            "name": "Member Months",
+            "resourceType": "dag",
+            "layer": "Core",
+            "folderLabel": "core/final",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/core/core_models.yml"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nselect\n    person_id\n  , year_month\nfrom {{ ref('core__member_months') }}\n",
+        "columns": [],
+        "runOrder": 9
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__int_person_years",
+        "name": "provider_attribution__int_person_years",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 2,
+        "folderLabel": "data_marts/provider_attribution/intermediate",
+        "description": "",
+        "materialized": "view",
+        "technical": {
+          "alias": "_int_person_years",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_person_years.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__int_person_years",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__int_person_years",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+            "name": "provider_attribution__stg_core__member_months",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__member_months.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nwith mm as (\n  select\n      person_id\n        {% if target.type == 'athena' %}\n        , substr(year_month, 1,4) as performance_year\n        {% else %}\n        , left(year_month, 4) as performance_year\n        {% endif %}\n  from {{ ref('provider_attribution__stg_core__member_months') }}\n  group by person_id\n        {% if target.type == 'athena' %}\n        , substr(year_month, 1,4)\n        {% else %}\n        , left(year_month, 4)\n        {% endif %}\n)\nselect\n    cast(person_id as {{ dbt.type_string() }}) as person_id\n  , cast(performance_year as {{ dbt.type_int() }}) as performance_year\nfrom mm\n",
+        "columns": [],
+        "runOrder": 10
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+        "name": "provider_attribution__int_primary_care_claims",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 2,
+        "folderLabel": "data_marts/provider_attribution/intermediate",
+        "description": "",
+        "materialized": "view",
+        "technical": {
+          "alias": "_int_primary_care_claims",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_primary_care_claims.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__int_primary_care_claims",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+            "name": "provider_attribution__stg_reference_data__calendar",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_reference_data__calendar.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+            "name": "provider_attribution__stg_terminology__provider",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_terminology__provider.sql"
+          },
+          {
+            "id": "seed.the_tuva_project.cms_provider_attribution__primary_care_hcpcs_codes",
+            "name": "cms_provider_attribution__primary_care_hcpcs_codes",
+            "resourceType": "seed",
+            "layer": "Seed",
+            "folderLabel": "seeds/value_sets/cms_provider_attribution",
+            "nodeType": "terminology",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/seeds/value_sets/cms_provider_attribution/cms_provider_attribution__primary_care_hcpcs_codes.csv"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__provider_classification",
+            "name": "provider_attribution__provider_classification",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__provider_classification.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+            "name": "provider_attribution__stg_core__medical_claim",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__medical_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+            "name": "provider_attribution__stg_core__member_months",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__member_months.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\n-- Primary care services from input_layer medical_claim, joined to member months and provider bucket\n\nwith claim_month as (\n  select\n      mc.person_id\n    , mc.claim_id\n    , mc.claim_line_number\n    , cast(mc.encounter_id as {{ dbt.type_string() }}) as encounter_id\n    , mc.claim_start_date\n    , mc.claim_end_date\n    , cal.year as claim_year\n    , cal.month as claim_month\n    , cal.year_month_int as claim_year_month_int\n    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month\n    -- Fallback to paid_amount when allowed_amount is absent; many payers omit allowed values.\n    , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount\n    , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id\n    , mc.hcpcs_code\n  from {{ ref('provider_attribution__stg_core__medical_claim') }} as mc\n  left outer join {{ ref('provider_attribution__stg_reference_data__calendar') }} as cal\n    on cast(mc.claim_start_date as date) = cal.full_date\n)\n\n, eligible_claims as (\n  select c.*\n  from claim_month as c\n  inner join {{ ref('provider_attribution__stg_core__member_months') }} as mm\n    on c.person_id = mm.person_id\n   and c.claim_year_month = mm.year_month\n)\n\n, primary_care_claims as (\n  select\n      e.person_id\n    , e.claim_id\n    , e.claim_line_number\n    , e.encounter_id\n    , e.claim_start_date\n    , e.claim_end_date\n    , e.claim_year\n    , e.claim_month\n    , e.claim_year_month\n    , e.claim_year_month_int\n    , e.allowed_amount\n    , e.provider_id\n    , e.hcpcs_code\n  from eligible_claims as e\n  inner join {{ ref('cms_provider_attribution__primary_care_hcpcs_codes') }} as pc\n    on e.hcpcs_code = pc.hcpcs_code\n)\n\n\n, with_bucket as (\n  select\n      pcc.*\n    , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket\n    , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty\n  from primary_care_claims as pcc\n  left outer join {{ ref('provider_attribution__provider_classification') }} as pc\n    on pcc.provider_id = pc.provider_id\n  inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp\n    on cast(pcc.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})\n   and lower(trim(sp.entity_type_description)) = 'individual'\n)\n\nselect * from with_bucket\n",
+        "columns": [],
+        "runOrder": 11
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__provider_ranking",
+        "name": "provider_attribution__provider_ranking",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 3,
+        "folderLabel": "data_marts/provider_attribution/final",
+        "description": "",
+        "materialized": "table",
+        "technical": {
+          "alias": "provider_ranking",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/final/provider_attribution__provider_ranking.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__provider_ranking",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__provider_ranking",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+            "name": "provider_attribution__stg_reference_data__calendar",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_reference_data__calendar.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+            "name": "provider_attribution__stg_terminology__provider",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_terminology__provider.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__provider_classification",
+            "name": "provider_attribution__provider_classification",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__provider_classification.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+            "name": "provider_attribution__stg_core__medical_claim",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__medical_claim.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+            "name": "provider_attribution__stg_core__member_months",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__member_months.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__int_person_years",
+            "name": "provider_attribution__int_person_years",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_person_years.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+            "name": "provider_attribution__int_primary_care_claims",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_primary_care_claims.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "intermediate",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\n-- Build a comprehensive provider ranking that shows all potential providers\n-- a beneficiary could be attributed to, along with the earliest step each\n-- provider qualifies for. Final assignment models can then pick rank = 1.\n\nwith calendar_months as (\n  select distinct\n      year_month_int\n    , first_day_of_month\n    , last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }}\n)\n\n, claim_bounds as (\n  select max(claim_end_date) as max_claim_end_date\n  from {{ ref('provider_attribution__int_primary_care_claims') }}\n)\n\n{% set override_as_of_date = var('provider_attribution_as_of_date', none) %}\n\n, params as (\n  select\n    {% if override_as_of_date %}\n      cast('{{ override_as_of_date }}' as date) as as_of_date\n    {% else %}\n      case\n        when max_claim_end_date is not null\n          and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)\n          then max_claim_end_date\n        else cast({{ dbt.current_timestamp() }} as date)\n      end as as_of_date\n    {% endif %}\n  from claim_bounds\n)\n\n-- Rolling \u201ccurrent\u201d window helpers\n, months_12 as (\n  select distinct\n      c.year_month_int\n    , c.first_day_of_month\n    , c.last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c\n  cross join params as p\n  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)\n    and c.full_date <= p.as_of_date\n)\n\n, months_24 as (\n  select distinct\n      c.year_month_int\n    , c.first_day_of_month\n    , c.last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c\n  cross join params as p\n  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)\n    and c.full_date <= p.as_of_date\n)\n\n, lookback_12 as (\n  select min(first_day_of_month) as lookback_start_date_12\n  from months_12\n)\n\n, lookback_24 as (\n  select min(first_day_of_month) as lookback_start_date_24\n  from months_24\n)\n\n, lookback_bounds as (\n  select\n      l12.lookback_start_date_12\n    , l24.lookback_start_date_24\n  from lookback_12 as l12\n  cross join lookback_24 as l24\n)\n\n, eligible_current as (\n  -- Current-scope eligibility: beneficiaries with at least one member month\n  -- within the 12-month window ending at as_of_date.\n  select distinct mm.person_id\n  from {{ ref('provider_attribution__stg_core__member_months') }} as mm\n  inner join months_12 as m\n    on mm.year_month = cast(m.year_month_int as {{ dbt.type_string() }})\n)\n\n, claims_12 as (\n  select\n      c.person_id\n    , c.provider_id\n    , c.provider_bucket\n    , c.prov_specialty\n    , c.encounter_id\n    , c.claim_id\n    , c.claim_year_month\n    , c.claim_year_month_int\n    , c.claim_end_date\n    , c.allowed_amount\n  from {{ ref('provider_attribution__int_primary_care_claims') }} as c\n  inner join months_12 as m\n    on c.claim_year_month_int = m.year_month_int\n  cross join params as p\n  where c.claim_end_date <= p.as_of_date\n)\n\n, claims_24 as (\n  select\n      c.person_id\n    , c.provider_id\n    , c.provider_bucket\n    , c.prov_specialty\n    , c.encounter_id\n    , c.claim_id\n    , c.claim_year_month\n    , c.claim_year_month_int\n    , c.claim_end_date\n    , c.allowed_amount\n  from {{ ref('provider_attribution__int_primary_care_claims') }} as c\n  inner join months_24 as m\n    on c.claim_year_month_int = m.year_month_int\n  cross join params as p\n  where c.claim_end_date <= p.as_of_date\n)\n\n, all_claim_month as (\n  select\n      mc.person_id\n    , mc.claim_id\n    , mc.claim_line_number\n    , cast(mc.encounter_id as {{ dbt.type_string() }}) as encounter_id\n    , mc.claim_start_date\n    , mc.claim_end_date\n    , cal.year_month_int as claim_year_month_int\n    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month\n    , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount\n    , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id\n  from {{ ref('provider_attribution__stg_core__medical_claim') }} as mc\n  left outer join {{ ref('provider_attribution__stg_reference_data__calendar') }} as cal\n    on cast(mc.claim_start_date as date) = cal.full_date\n)\n\n, eligible_all_claims as (\n  select ac.*\n  from all_claim_month as ac\n  inner join {{ ref('provider_attribution__stg_core__member_months') }} as mm\n    on ac.person_id = mm.person_id\n   and ac.claim_year_month = mm.year_month\n)\n\n, all_rendering_claims as (\n  select\n      e.person_id\n    , e.provider_id\n    , e.encounter_id\n    , e.claim_id\n    , e.claim_year_month\n    , e.claim_year_month_int\n    , e.claim_end_date\n    , e.allowed_amount\n    , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket\n    , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty\n  from eligible_all_claims as e\n  inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp\n    on cast(e.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})\n   and lower(trim(sp.entity_type_description)) = 'individual'\n  left outer join {{ ref('provider_attribution__provider_classification') }} as pc\n    on e.provider_id = pc.provider_id\n)\n\n-- Build all potential providers (no bene-level gating across steps), then\n-- collapse to the earliest qualifying step per person/provider.\n, current_all_steps as (\n  select person_id, provider_id, provider_bucket, prov_specialty, 1 as step\n         , sum(allowed_amount) as allowed_amount\n         , count(distinct encounter_id) as visits\n  from claims_12\n  where provider_id is not null and provider_bucket in ('pcp', 'npp')\n  group by person_id, provider_id, provider_bucket, prov_specialty\n\n  union all\n  select person_id, provider_id, provider_bucket, prov_specialty, 2 as step\n         , sum(allowed_amount) as allowed_amount\n         , count(distinct encounter_id) as visits\n  from claims_12\n  where provider_id is not null and provider_bucket = 'specialist'\n  group by person_id, provider_id, provider_bucket, prov_specialty\n\n  union all\n  select person_id, provider_id, provider_bucket, prov_specialty, 3 as step\n         , sum(allowed_amount) as allowed_amount\n         , count(distinct encounter_id) as visits\n  from claims_24\n  where provider_id is not null and provider_bucket in ('pcp', 'npp')\n  group by person_id, provider_id, provider_bucket, prov_specialty\n\n  union all\n  select person_id, provider_id, provider_bucket, prov_specialty, 4 as step\n         , sum(allowed_amount) as allowed_amount\n         , count(distinct encounter_id) as visits\n  from claims_24\n  where provider_id is not null\n  group by person_id, provider_id, provider_bucket, prov_specialty\n\n  union all\n  select arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown') as provider_bucket\n         , arc.prov_specialty, 5 as step\n         , sum(arc.allowed_amount) as allowed_amount\n         , count(distinct arc.encounter_id) as visits\n  from all_rendering_claims as arc\n  inner join months_24 as m on arc.claim_year_month_int = m.year_month_int\n  cross join params as p\n  where arc.provider_id is not null and arc.claim_end_date <= p.as_of_date\n  group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty\n)\n\n, current_unique as (\n  select *\n  from (\n    select\n        s.*\n      , row_number() over (partition by s.person_id, s.provider_id\norder by s.step) as step_choice_rank\n    from current_all_steps as s\n  ) as d\n  where step_choice_rank = 1\n)\n\n, yearly_all_steps as (\n  -- Yearly windows are driven by performance_year (Jan..Dec for 12-month and Jan(Y-1)..Dec(Y) for expanded)\n  select\n      py.person_id\n    , py.performance_year\n    , c.provider_id\n    , coalesce(c.provider_bucket, 'unknown') as provider_bucket\n    , c.prov_specialty\n    , 1 as step\n    , sum(c.allowed_amount) as allowed_amount\n    , count(distinct c.encounter_id) as visits\n  from {{ ref('provider_attribution__int_person_years') }} as py\n  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c\n    on py.person_id = c.person_id\n   and c.claim_year = py.performance_year\n   and c.provider_id is not null\n   and c.provider_bucket in ('pcp', 'npp')\n  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty\n\n  union all\n  select\n      py.person_id\n    , py.performance_year\n    , c.provider_id\n    , coalesce(c.provider_bucket, 'unknown') as provider_bucket\n    , c.prov_specialty\n    , 2 as step\n    , sum(c.allowed_amount) as allowed_amount\n    , count(distinct c.encounter_id) as visits\n  from {{ ref('provider_attribution__int_person_years') }} as py\n  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c\n    on py.person_id = c.person_id\n   and c.claim_year = py.performance_year\n   and c.provider_id is not null\n   and c.provider_bucket = 'specialist'\n  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty\n\n  union all\n  select\n      py.person_id\n    , py.performance_year\n    , c.provider_id\n    , coalesce(c.provider_bucket, 'unknown') as provider_bucket\n    , c.prov_specialty\n    , 3 as step\n    , sum(c.allowed_amount) as allowed_amount\n    , count(distinct c.encounter_id) as visits\n  from {{ ref('provider_attribution__int_person_years') }} as py\n  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c\n    on py.person_id = c.person_id\n   and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)\n                                  and (py.performance_year * 100 + 12)\n   and c.provider_id is not null\n   and c.provider_bucket in ('pcp', 'npp')\n  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty\n\n  union all\n  select\n      py.person_id\n    , py.performance_year\n    , c.provider_id\n    , coalesce(c.provider_bucket, 'unknown') as provider_bucket\n    , c.prov_specialty\n    , 4 as step\n    , sum(c.allowed_amount) as allowed_amount\n    , count(distinct c.encounter_id) as visits\n  from {{ ref('provider_attribution__int_person_years') }} as py\n  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c\n    on py.person_id = c.person_id\n   and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)\n                                  and (py.performance_year * 100 + 12)\n   and c.provider_id is not null\n  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty\n\n  union all\n  select\n      py.person_id\n    , py.performance_year\n    , arc.provider_id\n    , coalesce(arc.provider_bucket, 'unknown') as provider_bucket\n    , arc.prov_specialty\n    , 5 as step\n    , sum(arc.allowed_amount) as allowed_amount\n    , count(distinct arc.encounter_id) as visits\n  from {{ ref('provider_attribution__int_person_years') }} as py\n  inner join (\n    select\n        e.person_id\n      , e.provider_id\n      , e.encounter_id\n      , e.claim_year_month_int\n      , e.allowed_amount\n      , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket\n      , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty\n    from eligible_all_claims as e\n    inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp\n      on cast(e.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})\n     and lower(trim(sp.entity_type_description)) = 'individual'\n    left outer join {{ ref('provider_attribution__provider_classification') }} as pc\n      on e.provider_id = pc.provider_id\n  ) as arc\n    on py.person_id = arc.person_id\n   and arc.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)\n                                   and (py.performance_year * 100 + 12)\n  where arc.provider_id is not null\n  group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty\n)\n\n, yearly_unique as (\n  select * from (\n    select\n        s.*\n      , row_number() over (\n          partition by s.person_id, s.performance_year, s.provider_id\n          order by s.step\n        ) as step_choice_rank\n    from yearly_all_steps as s\n  ) as d\n  where step_choice_rank = 1\n)\n\n, yearly as (\n  select\n      y.person_id\n    , cast(y.performance_year as {{ dbt.type_int() }}) as performance_year\n    , cast(null as date) as as_of_date\n    , y.provider_id\n    , y.provider_bucket\n    , y.prov_specialty\n    , y.step\n    , case y.step\n        when 1 then '12-month PCP/NPP primary-care HCPCS'\n        when 2 then '12-month specialist primary-care HCPCS'\n        when 3 then '24-month PCP/NPP primary-care HCPCS'\n        when 4 then '24-month primary-care HCPCS (any classification)'\n        when 5 then '24-month any rendering NPI'\n        else 'Unknown'\n      end as step_description\n    , y.allowed_amount\n    , y.visits\n    , 'yearly' as scope\n    , case\n        when y.step in (3, 4, 5)\n          then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)\n        else start_curr.first_day_of_month\n      end as lookback_start_date\n    , end_curr.last_day_of_month as lookback_end_date\n    , {{ concat_custom([\"'yearly|'\", \"cast(y.performance_year as \" ~ dbt.type_string() ~ \")\", \"'|'\", \"y.person_id\"]) }} as attribution_key\n    , rank() over (partition by y.person_id, y.performance_year\n                   order by y.step asc, y.allowed_amount desc, y.visits desc, y.provider_id) as ranking\n  from yearly_unique as y\n  left outer join calendar_months as start_curr\n    on start_curr.year_month_int = (y.performance_year * 100) + 1\n  left outer join calendar_months as start_prev\n    on start_prev.year_month_int = ((y.performance_year - 1) * 100) + 1\n  left outer join calendar_months as end_curr\n    on end_curr.year_month_int = (y.performance_year * 100) + 12\n)\n\n, current_scope as (\n  select\n      s.person_id\n    , null as performance_year\n    , p.as_of_date\n    , s.provider_id\n    , s.provider_bucket\n    , s.prov_specialty\n    , s.step\n    , case s.step\n        when 1 then '12-month PCP/NPP primary-care HCPCS'\n        when 2 then '12-month specialist primary-care HCPCS'\n        when 3 then '24-month PCP/NPP primary-care HCPCS'\n        when 4 then '24-month primary-care HCPCS (any classification)'\n        when 5 then '24-month any rendering NPI'\n        else 'Unknown'\n      end as step_description\n    , s.allowed_amount\n    , s.visits\n    , 'current' as scope\n    , case when s.step in (1, 2) then lb.lookback_start_date_12 else lb.lookback_start_date_24 end as lookback_start_date\n    , p.as_of_date as lookback_end_date\n    , {{ concat_custom([\"'current|'\", \"replace(cast(p.as_of_date as \" ~ dbt.type_string() ~ \"),'-','')\", \"'|'\", \"s.person_id\"]) }} as attribution_key\n    , rank() over (partition by s.person_id\n                   order by s.step asc, s.allowed_amount desc, s.visits desc, s.provider_id) as ranking\n  from current_unique as s\n  inner join eligible_current as ec\n    on s.person_id = ec.person_id\n  cross join params as p\n  cross join lookback_bounds as lb\n)\n\nselect\n    person_id\n  , performance_year\n  , as_of_date\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , step\n  , step_description\n  , allowed_amount\n  , visits\n  , scope\n  , lookback_start_date\n  , lookback_end_date\n  , ranking\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom yearly\n\nunion all\n\nselect\n    person_id\n  , performance_year\n  , as_of_date\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , step\n  , step_description\n  , allowed_amount\n  , visits\n  , scope\n  , lookback_start_date\n  , lookback_end_date\n  , ranking\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom current_scope\n",
+        "columns": [
+          {
+            "name": "provider_id",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          },
+          {
+            "name": "attribution_key",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 12
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current",
+        "name": "provider_attribution__assigned_beneficiaries_current",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 4,
+        "folderLabel": "data_marts/provider_attribution/final",
+        "description": "",
+        "materialized": "table",
+        "technical": {
+          "alias": "assigned_beneficiaries_current",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/final/provider_attribution__assigned_beneficiaries_current.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__assigned_beneficiaries_current",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+            "name": "provider_attribution__stg_reference_data__calendar",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_reference_data__calendar.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+            "name": "provider_attribution__stg_core__member_months",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_core__member_months.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+            "name": "provider_attribution__int_primary_care_claims",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_primary_care_claims.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__provider_ranking",
+            "name": "provider_attribution__provider_ranking",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/final",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/final/provider_attribution__provider_ranking.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nwith claim_bounds as (\n  select max(claim_end_date) as max_claim_end_date\n  from {{ ref('provider_attribution__int_primary_care_claims') }}\n)\n\n{% set override_as_of_date = var('provider_attribution_as_of_date', none) %}\n\n, params as (\n  select\n    {% if override_as_of_date %}\n      cast('{{ override_as_of_date }}' as date) as as_of_date\n    {% else %}\n      case\n        when max_claim_end_date is not null\n          and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)\n          then max_claim_end_date\n        else cast({{ dbt.current_timestamp() }} as date)\n      end as as_of_date\n    {% endif %}\n  from claim_bounds\n)\n\n, months_12 as (\n  -- Build the last 12 calendar months (YYYYMM) ending at as_of_date\n  select distinct\n      c.year_month_int\n    , c.first_day_of_month\n    , c.last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c\n  cross join params as p\n  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)\n    and c.full_date <= p.as_of_date\n)\n\n, months_24 as (\n  -- Build the last 24 calendar months ending at as_of_date (for fallback bounds)\n  select distinct\n      c.year_month_int\n    , c.first_day_of_month\n    , c.last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c\n  cross join params as p\n  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)\n    and c.full_date <= p.as_of_date\n)\n\n, lookback_24 as (\n  select min(first_day_of_month) as lookback_start_date_24\n  from months_24\n)\n\n, lookback_bounds as (\n  select\n      l24.lookback_start_date_24\n  from lookback_24 as l24\n)\n\n, eligible as (\n  select distinct mm.person_id\n  from {{ ref('provider_attribution__stg_core__member_months') }} as mm\n  inner join months_12 as m\n    on mm.year_month = cast(m.year_month_int as {{ dbt.type_string() }})\n)\n\n, assigned as (\n  select\n      pr.person_id\n    , pr.as_of_date\n    , pr.provider_id\n    , pr.provider_bucket\n    , pr.prov_specialty\n    , pr.step as assigned_step\n    , pr.step_description\n    , pr.allowed_amount\n    , pr.visits\n    , pr.lookback_start_date\n    , pr.lookback_end_date\n    , pr.attribution_key\n  from {{ ref('provider_attribution__provider_ranking') }} as pr\n  cross join params as p\n  inner join eligible as e\n    on pr.person_id = e.person_id\n  where pr.scope = 'current'\n    and pr.as_of_date = p.as_of_date\n    and pr.ranking = 1\n)\n\n, missing as (\n  select\n      e.person_id\n  from eligible as e\n  left outer join assigned as a\n    on e.person_id = a.person_id\n  where a.person_id is null\n)\n\n, fallback as (\n  select\n      m.person_id\n    , p.as_of_date\n    , '9999999999' as provider_id\n    , 'no_eligible_history' as provider_bucket\n    , 'No assignable claims history' as prov_specialty\n    , 0 as assigned_step\n    , 'No assignable history' as step_description\n    , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount\n    , 0 as visits\n    , lb.lookback_start_date_24 as lookback_start_date\n    , p.as_of_date as lookback_end_date\n    , {{ concat_custom([\"'current|'\", \"replace(cast(p.as_of_date as \" ~ dbt.type_string() ~ \"),'-','')\", \"'|'\", \"m.person_id\"]) }} as attribution_key\n  from missing as m\n  cross join params as p\n  cross join lookback_bounds as lb\n)\n\nselect\n    person_id\n  , as_of_date\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , assigned_step\n  , step_description\n  , allowed_amount\n  , visits\n  , lookback_start_date\n  , lookback_end_date\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom assigned\n\nunion all\n\nselect\n    person_id\n  , as_of_date\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , assigned_step\n  , step_description\n  , allowed_amount\n  , visits\n  , lookback_start_date\n  , lookback_end_date\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom fallback\n",
+        "columns": [
+          {
+            "name": "attribution_key",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 13
+      },
+      {
+        "id": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_yearly",
+        "name": "provider_attribution__assigned_beneficiaries_yearly",
+        "resourceType": "model",
+        "sourceStyle": false,
+        "layer": "Data mart",
+        "depth": 4,
+        "folderLabel": "data_marts/provider_attribution/final",
+        "description": "",
+        "materialized": "table",
+        "technical": {
+          "alias": "assigned_beneficiaries_yearly",
+          "schemaName": "provider_attribution",
+          "packageName": "the_tuva_project",
+          "tags": [
+            "tuva_provider_attribution"
+          ],
+          "primaryKeyColumns": []
+        },
+        "paths": {
+          "sql": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/final/provider_attribution__assigned_beneficiaries_yearly.sql",
+          "yaml": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/provider_attribution_models.yml",
+          "yamlEntryName": "provider_attribution__assigned_beneficiaries_yearly",
+          "yamlCollectionKey": "models",
+          "manifestNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_yearly",
+          "targetKey": "provider_attribution"
+        },
+        "mainDependencies": [
+          {
+            "id": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+            "name": "provider_attribution__stg_reference_data__calendar",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/staging",
+            "nodeType": "input",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/staging/provider_attribution__stg_reference_data__calendar.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__int_person_years",
+            "name": "provider_attribution__int_person_years",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/intermediate",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/intermediate/provider_attribution__int_person_years.sql"
+          },
+          {
+            "id": "model.the_tuva_project.provider_attribution__provider_ranking",
+            "name": "provider_attribution__provider_ranking",
+            "resourceType": "model",
+            "layer": "Data mart",
+            "folderLabel": "data_marts/provider_attribution/final",
+            "nodeType": "intermediate",
+            "path": "/Users/aaronneiderhiser/code/release-candidate-0.18.0/models/data_marts/provider_attribution/final/provider_attribution__provider_ranking.sql"
+          }
+        ],
+        "supportingDependencies": [],
+        "curated": {
+          "nodeType": "",
+          "whatItRepresents": "",
+          "grain": "",
+          "primaryKey": "",
+          "transformationSteps": []
+        },
+        "baseNodeType": "intermediate",
+        "nodeType": "output",
+        "dagBoundary": null,
+        "seedViewer": null,
+        "sql": "{{ config(\n     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))\n   )\n}}\n\nwith eligible as (\n  select\n      person_id\n    , performance_year\n  from {{ ref('provider_attribution__int_person_years') }}\n)\n\n, calendar_months as (\n  select distinct\n      year_month_int\n    , first_day_of_month\n    , last_day_of_month\n  from {{ ref('provider_attribution__stg_reference_data__calendar') }}\n)\n\n, assigned as (\n  select\n      pr.person_id\n    , pr.performance_year\n    , pr.provider_id\n    , pr.provider_bucket\n    , pr.prov_specialty\n    , pr.step as assigned_step\n    , pr.step_description\n    , pr.allowed_amount\n    , pr.visits\n    , pr.lookback_start_date\n    , pr.lookback_end_date\n    , pr.attribution_key\n  from {{ ref('provider_attribution__provider_ranking') }} as pr\n  where pr.scope = 'yearly'\n    and pr.ranking = 1\n)\n\n, missing as (\n  select\n      e.person_id\n    , e.performance_year\n  from eligible as e\n  left outer join assigned as a\n    on e.person_id = a.person_id\n   and e.performance_year = a.performance_year\n  where a.person_id is null\n)\n\n, fallback as (\n  select\n      person_id\n    , performance_year\n    , '9999999999' as provider_id\n    , 'no_eligible_history' as provider_bucket\n    , 'No assignable claims history' as prov_specialty\n    , 0 as assigned_step\n    , 'No assignable history' as step_description\n    , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount\n    , 0 as visits\n    -- No prior utilization exists, so anchor placeholders to the current year's window.\n    , start_curr.first_day_of_month as lookback_start_date\n    , end_curr.last_day_of_month as lookback_end_date\n    , {{ concat_custom([\"'yearly|'\", \"cast(performance_year as \" ~ dbt.type_string() ~ \")\", \"'|'\", \"person_id\"]) }} as attribution_key\n  from missing\n  left outer join calendar_months as start_curr\n    on start_curr.year_month_int = (performance_year * 100) + 1\n  left outer join calendar_months as end_curr\n    on end_curr.year_month_int = (performance_year * 100) + 12\n)\n\nselect\n    person_id\n  , performance_year\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , assigned_step\n  , step_description\n  , allowed_amount\n  , visits\n  , lookback_start_date\n  , lookback_end_date\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom assigned\n\nunion all\n\nselect\n    person_id\n  , performance_year\n  , provider_id\n  , provider_bucket\n  , prov_specialty\n  , assigned_step\n  , step_description\n  , allowed_amount\n  , visits\n  , lookback_start_date\n  , lookback_end_date\n  , attribution_key\n  , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run\nfrom fallback\n",
+        "columns": [
+          {
+            "name": "attribution_key",
+            "description": "",
+            "dataType": "",
+            "terminology": "",
+            "terminologyNote": "",
+            "isPrimaryKey": false,
+            "mappingInstructions": "",
+            "requiredForDataMarts": [],
+            "inheritedFrom": null
+          }
+        ],
+        "runOrder": 14
+      }
+    ],
+    "edges": [
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_yearly"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "seed.the_tuva_project.cms_provider_attribution__primary_care_hcpcs_codes",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+        "target": "model.the_tuva_project.provider_attribution__provider_classification"
+      },
+      {
+        "source": "seed.the_tuva_project.cms_provider_attribution__provider_specialty_assignment_codes",
+        "target": "model.the_tuva_project.provider_attribution__provider_classification"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_reference_data__calendar",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_terminology__provider",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "dag:medical_claim",
+        "target": "model.the_tuva_project.provider_attribution__stg_core__medical_claim"
+      },
+      {
+        "source": "dag:member_months",
+        "target": "model.the_tuva_project.provider_attribution__stg_core__member_months"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+        "target": "model.the_tuva_project.provider_attribution__int_person_years"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__provider_classification",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+        "target": "model.the_tuva_project.provider_attribution__int_primary_care_claims"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__provider_classification",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__medical_claim",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__stg_core__member_months",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__int_person_years",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_yearly"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__int_person_years",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__int_primary_care_claims",
+        "target": "model.the_tuva_project.provider_attribution__provider_ranking"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__provider_ranking",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+      },
+      {
+        "source": "model.the_tuva_project.provider_attribution__provider_ranking",
+        "target": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_yearly"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "key": "appointment",
+      "label": "Appointment",
+      "title": "Appointment DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__appointment"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "title": "Condition DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__condition"
+    },
+    {
+      "key": "eligibility",
+      "label": "Eligibility",
+      "title": "Eligibility DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__eligibility"
+    },
+    {
+      "key": "encounter",
+      "label": "Encounter",
+      "title": "Encounter DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__encounter"
+    },
+    {
+      "key": "immunization",
+      "label": "Immunization",
+      "title": "Immunization DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__immunization"
+    },
+    {
+      "key": "lab_result",
+      "label": "Lab Result",
+      "title": "Lab Result DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__lab_result"
+    },
+    {
+      "key": "location",
+      "label": "Location",
+      "title": "Location DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__location"
+    },
+    {
+      "key": "medical_claim",
+      "label": "Medical Claim",
+      "title": "Medical Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medical_claim"
+    },
+    {
+      "key": "medication",
+      "label": "Medication",
+      "title": "Medication DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__medication"
+    },
+    {
+      "key": "member_months",
+      "label": "Member Months",
+      "title": "Member Months DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__member_months"
+    },
+    {
+      "key": "observation",
+      "label": "Observation",
+      "title": "Observation DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__observation"
+    },
+    {
+      "key": "patient",
+      "label": "Patient",
+      "title": "Patient DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__patient"
+    },
+    {
+      "key": "person_id_crosswalk",
+      "label": "Person ID Crosswalk",
+      "title": "Person ID Crosswalk DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__person_id_crosswalk"
+    },
+    {
+      "key": "pharmacy_claim",
+      "label": "Pharmacy Claim",
+      "title": "Pharmacy Claim DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__pharmacy_claim"
+    },
+    {
+      "key": "practitioner",
+      "label": "Practitioner",
+      "title": "Practitioner DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__practitioner"
+    },
+    {
+      "key": "procedure",
+      "label": "Procedure",
+      "title": "Procedure DAG",
+      "categoryKey": "core",
+      "categoryLabel": "Core",
+      "kind": "core_model",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.core__procedure"
+    },
+    {
+      "key": "claims_enrollment",
+      "label": "Claims Enrollment",
+      "title": "Claims Enrollment DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.claims_enrollment__flag_claims_with_enrollment"
+    },
+    {
+      "key": "encounters",
+      "label": "Encounters",
+      "title": "Encounters DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 28,
+      "defaultSelectedNodeId": "model.the_tuva_project.acute_inpatient__encounter_grain"
+    },
+    {
+      "key": "service_categories",
+      "label": "Service Categories",
+      "title": "Service Categories DAG",
+      "categoryKey": "claims_preprocessing",
+      "categoryLabel": "Claims Preprocessing",
+      "kind": "claims_preprocessing",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.service_category__service_category_grouper"
+    },
+    {
+      "key": "ahrq_measures",
+      "label": "AHRQ Measures",
+      "title": "AHRQ Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.ahrq_measures__pqi_denom_long"
+    },
+    {
+      "key": "ccsr",
+      "label": "CCSR",
+      "title": "CCSR DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.ccsr__long_condition_category"
+    },
+    {
+      "key": "chronic_conditions",
+      "label": "Chronic Conditions",
+      "title": "Chronic Conditions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.chronic_conditions__cms_chronic_conditions_long"
+    },
+    {
+      "key": "clinical_concept_library",
+      "label": "Clinical Concept Library",
+      "title": "Clinical Concept Library DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.clinical_concept_library__value_set_member_relevant_fields"
+    },
+    {
+      "key": "cms_hcc",
+      "label": "CMS HCC",
+      "title": "CMS HCC DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.cms_hcc__patient_risk_factors"
+    },
+    {
+      "key": "ed_classification",
+      "label": "ED Classification",
+      "title": "ED Classification DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 1,
+      "defaultSelectedNodeId": "model.the_tuva_project.ed_classification__summary"
+    },
+    {
+      "key": "financial_pmpm",
+      "label": "Financial PMPM",
+      "title": "Financial PMPM DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.financial_pmpm__pmpm_payer"
+    },
+    {
+      "key": "hcc_recapture",
+      "label": "HCC Recapture",
+      "title": "HCC Recapture DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 5,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_recapture__gap_status"
+    },
+    {
+      "key": "hcc_suspecting",
+      "label": "HCC Suspecting",
+      "title": "HCC Suspecting DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 4,
+      "defaultSelectedNodeId": "model.the_tuva_project.hcc_suspecting__list"
+    },
+    {
+      "key": "pharmacy",
+      "label": "Pharmacy",
+      "title": "Pharmacy DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.pharmacy__brand_generic_opportunity"
+    },
+    {
+      "key": "provider_attribution",
+      "label": "Provider Attribution",
+      "title": "Provider Attribution DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.provider_attribution__assigned_beneficiaries_current"
+    },
+    {
+      "key": "quality_measures",
+      "label": "Quality Measures",
+      "title": "Quality Measures DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 3,
+      "defaultSelectedNodeId": "model.the_tuva_project.quality_measures__summary_counts"
+    },
+    {
+      "key": "readmissions",
+      "label": "Readmissions",
+      "title": "Readmissions DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 2,
+      "defaultSelectedNodeId": "model.the_tuva_project.readmissions__encounter_augmented"
+    },
+    {
+      "key": "semantic_layer",
+      "label": "Semantic Layer",
+      "title": "Semantic Layer DAG",
+      "categoryKey": "data_marts",
+      "categoryLabel": "Data Marts",
+      "kind": "data_mart",
+      "rootCount": 22,
+      "defaultSelectedNodeId": "model.the_tuva_project.semantic_layer__dim_condition"
+    }
+  ],
+  "refresh": {
+    "status": "ready",
+    "payloadVersion": 1,
+    "activeTargetKey": "provider_attribution",
+    "activeTrigger": "static_export",
+    "lastAttemptAt": "2026-03-27T15:41:48.421Z",
+    "lastSuccessAt": "2026-03-27T15:41:48.421Z",
+    "lastError": null,
+    "hasPayload": true,
+    "mode": "static"
+  }
+}
