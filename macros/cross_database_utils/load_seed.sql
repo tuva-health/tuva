@@ -33,6 +33,17 @@ truncate table {{ this }}
 {% endmacro %}
 
 
+{% macro clickhouse__reset_seed_relation() %}
+{% set sql %}
+truncate table {{ this.schema }}.{{ this.identifier }}
+{% endset %}
+
+{% call statement('seed_reset', fetch_result=false) %}
+{{ sql }}
+{% endcall %}
+{% endmacro %}
+
+
 {% macro duckdb__reset_seed_relation() %}
 {% endmacro %}
 
@@ -405,6 +416,42 @@ WITH (
 {% set rows_loaded = results['response'].rows_affected|default(0) %}
 {{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ fabric_pattern ~ "\n  rows: " ~ rows_loaded, True) }}
 {# debugging { log(results, True)} #}
+{% endif %}
+
+{% endmacro %}
+
+
+{% macro clickhouse__load_seed(uri, pattern, compression, headers, null_marker) %}
+{% do the_tuva_project.reset_seed_relation() %}
+
+{%- set ch_table = this.schema ~ '.' ~ this.identifier -%}
+
+{% set sql %}
+INSERT INTO {{ ch_table }}
+SELECT *
+FROM s3(
+    's3://{{ uri }}/{{ pattern }}*',
+    'CSVWithNames'
+)
+{% if null_marker == true %}
+SETTINGS input_format_csv_empty_as_default = 0
+{% endif %}
+{% endset %}
+
+{% call statement('clickhousesql', fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% if execute %}
+{% set count_sql %}
+  SELECT count() AS row_count FROM {{ ch_table }}
+{% endset %}
+{% call statement('count', fetch_result=true) %}
+  {{ count_sql }}
+{% endcall %}
+{% set count_result = load_result('count') %}
+{% set row_count = count_result.table.columns[0].values()[0] if count_result.table else 0 %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ ch_table ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ row_count, True) }}
 {% endif %}
 
 {% endmacro %}

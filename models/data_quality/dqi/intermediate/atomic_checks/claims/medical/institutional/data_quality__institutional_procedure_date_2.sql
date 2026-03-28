@@ -38,7 +38,7 @@ group by
     , data_source
 	)
 select distinct -- to bring to claim_id grain
-    m.data_source
+    m.data_source as data_source
     ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     ,'MEDICAL_CLAIM' as table_name
     ,'Claim ID' as drill_down_key

@@ -75,10 +75,14 @@ clean-targets:
 
 
 dispatch:
+  - macro_namespace: 'dbt'
+    search_order: ['the_tuva_project', 'dbt']
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests', 'the_tuva_project']
   - macro_namespace: 'dbt_utils'
     search_order: ['integration_tests', 'the_tuva_project', 'dbt_utils']
+  - macro_namespace: 'dbt_expectations'
+    search_order: ['integration_tests', 'dbt_expectations']
 
 
 seeds:

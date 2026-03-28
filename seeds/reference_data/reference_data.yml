@@ -13,11 +13,11 @@ seeds:
         - reference_data
       column_types:
         ansi_fips_state_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ansi_fips_state_abbreviation : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ansi_fips_state_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ansi_fips_state_code
         description: 'The unique ANSI FIPS state code.'
@@ -42,14 +42,14 @@ seeds:
         month: integer
         day: integer
         month_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         day_of_week_number: integer
         day_of_week_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         week_of_year: integer
         day_of_year: integer
         year_month: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         first_day_of_month: date
         last_day_of_month: date
         year_month_int: integer
@@ -92,7 +92,7 @@ seeds:
         - reference_data
       column_types:
         code_type : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code_type
         description: 'The type of the code.'
@@ -108,11 +108,11 @@ seeds:
         - reference_data
       column_types:
         fips_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         county : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         state : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: fips_code
         description: 'The FIPS code for the county.'
@@ -132,9 +132,9 @@ seeds:
         - reference_data
       column_types:
         ssa_fips_state_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ssa_fips_state_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ssa_fips_state_code
         description: 'The SSA FIPS state code.'
@@ -151,323 +151,323 @@ seeds:
         - reference_data
       column_types:
         ST: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         STATE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ST_ABBR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         STCNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         COUNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         FIPS: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         LOCATION: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         AREA_SQMI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_TOTAL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_DAYPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         YEAR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ST
       - name: STATE
@@ -640,323 +640,323 @@ seeds:
         - reference_data
       column_types:
         ST: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         STATE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ST_ABBR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         STCNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         COUNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         FIPS: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         LOCATION: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         AREA_SQMI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EPL_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         SPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         RPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         F_TOTAL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_DAYPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         E_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         M_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         EP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         MP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         YEAR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
     columns:
       - name: ST
       - name: STATE

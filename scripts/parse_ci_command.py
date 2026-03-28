@@ -9,7 +9,7 @@ import uuid
 from dataclasses import dataclass
 
 
-WAREHOUSES = ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"]
+WAREHOUSES = ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb", "clickhouse"]
 WAREHOUSE_SET = set(WAREHOUSES)
 COLLABORATOR_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER"}

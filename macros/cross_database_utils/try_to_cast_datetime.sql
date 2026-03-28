@@ -7,7 +7,7 @@
 
 {%- macro try_to_cast_datetime(column_name) -%}
 
-    {{ return(adapter.dispatch('try_to_cast_datetime')(column_name)) }}
+    {{ return(adapter.dispatch('try_to_cast_datetime', 'the_tuva_project')(column_name)) }}
 
 {%- endmacro -%}
 
@@ -45,4 +45,8 @@
 
     try_cast(cast( {{ column_name }} as varchar) as timestamp)
 
+{%- endmacro -%}
+
+{%- macro clickhouse__try_to_cast_datetime(column_name) -%}
+    toDateTimeOrNull(toString({{ column_name }}))
 {%- endmacro -%}

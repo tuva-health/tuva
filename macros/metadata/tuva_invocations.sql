@@ -1,6 +1,10 @@
 {% macro create_tuva_invocations_table(schema_name) %}
     {# Creates a tuva invocations table. Returns true if the table is created or exists. Returns false if a non-supported platform is used. #}
-    {% do adapter.create_schema(api.Relation.create(database=target.database, schema=schema_name)) %}
+    {% if target.type == 'clickhouse' %}
+        {% do adapter.create_schema(api.Relation.create(database=schema_name, schema=schema_name)) %}
+    {% else %}
+        {% do adapter.create_schema(api.Relation.create(database=target.database, schema=schema_name)) %}
+    {% endif %}
 
     {%- set table_name = 'tuva_invocations' -%}
     {%- set target_type = target.type -%}
@@ -39,6 +43,20 @@
                 tuva_package_version {{ dbt.type_string() }},
                 run_started_at {{ dbt.type_timestamp() }}
             )
+        {%- endset -%}
+        {% do run_query(sql) %}
+        {{ return(true) }}
+    {%- elif target_type in ['clickhouse'] -%}
+        {%- set sql -%}
+            CREATE TABLE IF NOT EXISTS {{ schema_name }}.{{ table_name }}
+            (
+                invocation_id {{ dbt.type_string() }},
+                project_name {{ dbt.type_string() }},
+                tuva_package_version {{ dbt.type_string() }},
+                run_started_at {{ dbt.type_timestamp() }}
+            )
+            ENGINE = MergeTree()
+            ORDER BY tuple()
         {%- endset -%}
         {% do run_query(sql) %}
         {{ return(true) }}

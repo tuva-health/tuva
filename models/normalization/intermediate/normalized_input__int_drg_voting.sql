@@ -6,9 +6,9 @@
 
 with normalize_cte as (
     select
-        med.claim_id
-        , med.data_source
-        , med.drg_code_type
+        med.claim_id as claim_id
+        , med.data_source as data_source
+        , med.drg_code_type as drg_code_type
         , coalesce(msdrg.ms_drg_code, aprdrg.apr_drg_code) as drg_code
         , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
     from {{ ref('normalized_input__stg_medical_claim') }} as med
@@ -50,7 +50,7 @@ with normalize_cte as (
 order by drg_occurrence_count desc), 0) as next_occurrence_count
         , row_number() over (partition by claim_id, data_source
 order by drg_occurrence_count desc) as occurrence_row_count
-    from distinct_counts as dist
+    from distinct_counts
 )
 
 select

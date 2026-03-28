@@ -7,10 +7,10 @@
 
 with normalize_cte as (
     select
-        med.claim_id
-        , med.data_source
-        , disch.discharge_disposition_code
-        , disch.discharge_disposition_description
+        med.claim_id as claim_id
+        , med.data_source as data_source
+        , disch.discharge_disposition_code as discharge_disposition_code
+        , disch.discharge_disposition_description as discharge_disposition_description
     from {{ ref('normalized_input__stg_medical_claim') }} as med
     inner join {{ ref('terminology__discharge_disposition') }} as disch
         on med.discharge_disposition_code = disch.discharge_disposition_code
@@ -46,7 +46,7 @@ with normalize_cte as (
 order by discharge_disposition_occurrence_count desc), 0) as next_occurrence_count
         , row_number() over (partition by claim_id, data_source
 order by discharge_disposition_occurrence_count desc) as occurrence_row_count
-    from distinct_counts as dist
+    from distinct_counts
 )
 
 select

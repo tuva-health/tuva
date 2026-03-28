@@ -72,7 +72,7 @@ Outside contributor bridge helper:
   - `/ci run-<warehouse>` runs `dbt run` on one warehouse.
   - `/ci build` runs `dbt build --full-refresh` across all supported warehouses.
   - `/ci build-<warehouse>` runs `dbt build --full-refresh` on one warehouse.
-- Supported warehouses: `snowflake`, `bigquery`, `databricks`, `fabric`, `redshift`, `duckdb`.
+- Supported warehouses: `snowflake`, `bigquery`, `databricks`, `fabric`, `redshift`, `duckdb`, `clickhouse`.
 - If a PR changes seed/config files that require a full refresh, use a build command (`/ci build*`) instead of a run command (`/ci run*`).
 
 ## Git and PR Workflow
@@ -105,6 +105,7 @@ Outside contributor bridge helper:
   - Microsoft Fabric
   - Redshift
   - DuckDB
+  - ClickHouse
 
 ## Build Requirements
 

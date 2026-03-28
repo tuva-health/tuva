@@ -8,7 +8,7 @@
 
 {%- macro try_to_cast_date(column_name, date_format='YYYY-MM-DD') -%}
 
-    {{ return(adapter.dispatch('try_to_cast_date')(column_name, date_format)) }}
+    {{ return(adapter.dispatch('try_to_cast_date', 'the_tuva_project')(column_name, date_format)) }}
 
 {%- endmacro -%}
 
@@ -77,4 +77,12 @@
         when typeof({{ column_name }}) = 'date' then date({{ column_name }})
         else try_cast(substring(try_cast({{ column_name }} as varchar), 1, 10) as date)
     end)
+{%- endmacro -%}
+
+{%- macro clickhouse__try_to_cast_date(column_name, date_format) -%}
+    {%- if column_name.strip() == 'null' or column_name.strip() == 'NULL' -%}
+    CAST(NULL AS Nullable(Date))
+    {%- else -%}
+    toDateOrNull(toString({{ column_name }}))
+    {%- endif -%}
 {%- endmacro -%}

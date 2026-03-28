@@ -51,7 +51,7 @@
     {{ select_extension_columns(ref('input_layer__patient'), strip_prefix=false) }}
 {%- endset %}
 
-with tuva_last_run as (
+with tuva_last_run_ts as (
     select
        cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
      , cast(substring('{{ var('tuva_last_run') }}', 1, 10) as date) as tuva_last_run_date
@@ -62,4 +62,4 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from {{ ref('input_layer__patient') }}
-cross join tuva_last_run
+cross join tuva_last_run_ts

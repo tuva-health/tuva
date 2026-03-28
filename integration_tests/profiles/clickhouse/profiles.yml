@@ -1,0 +1,15 @@
+default:
+  target: ci
+  outputs:
+    ci:
+      type: clickhouse
+      host: "{{ env_var('DBT_CLICKHOUSE_CI_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_CLICKHOUSE_CI_PORT', '8123') | int }}"
+      user: "{{ env_var('DBT_CLICKHOUSE_CI_USER', 'default') }}"
+      password: "{{ env_var('DBT_CLICKHOUSE_CI_PASSWORD', 'dbt_clickhouse') }}"
+      schema: "{{ env_var('DBT_CLICKHOUSE_CI_SCHEMA', 'tuva_ci') }}"
+      threads: 2
+      custom_settings:
+        max_memory_usage: 0
+        allow_suspicious_variant_types: 1
+    allow_suspicious_variant_types: 1

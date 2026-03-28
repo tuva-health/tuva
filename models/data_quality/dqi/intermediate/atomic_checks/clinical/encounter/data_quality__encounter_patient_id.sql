@@ -3,7 +3,7 @@
 ) }}
 
 select
-    m.data_source
+    m.data_source as data_source
     ,coalesce(m.encounter_start_date,cast('1900-01-01' as date)) as source_date
     ,'ENCOUNTER' as table_name
     ,'Encounter ID' as drill_down_key

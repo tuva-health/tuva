@@ -71,7 +71,7 @@ select
             , snomed_ct_component.snomed_ct
         ) is not null then 'automatic'
       end as mapping_method
-    , labs.status
+    , labs.status as status
     , labs.result
     , labs.result_datetime
     , labs.collection_datetime
@@ -165,7 +165,7 @@ select
             , custom_mapped_component.normalized_code
         ) is not null then 'custom'
       end as mapping_method
-    , labs.status
+    , labs.status as status
     , labs.result
     , labs.result_datetime
     , labs.collection_datetime

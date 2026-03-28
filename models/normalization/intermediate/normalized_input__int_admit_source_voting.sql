@@ -10,9 +10,9 @@ with normalize_cte as (
     select
         med.claim_id
         , med.data_source
-        , admit.admit_source_code
+        , admit.admit_source_code as admit_source_code
 
-        , admit.admit_source_description
+        , admit.admit_source_description as admit_source_description
     from {{ ref('normalized_input__stg_medical_claim') }} as med
     inner join {{ ref('terminology__admit_source') }} as admit
         on med.admit_source_code = admit.admit_source_code
@@ -48,7 +48,7 @@ with normalize_cte as (
 order by admit_source_occurrence_count desc), 0) as next_occurrence_count
         , row_number() over (partition by claim_id, data_source
 order by admit_source_occurrence_count desc) as occurrence_row_count
-    from distinct_counts as dist
+    from distinct_counts
 )
 
 select

@@ -12,9 +12,9 @@ seeds:
       enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         encounter_group: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         encounter_group_sk: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: encounter_group
         description: Encounter group name
@@ -32,11 +32,11 @@ seeds:
       enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         encounter_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         encounter_type_sk: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         encounter_group_sk: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1000) {%- endif -%}
     columns:
       - name: encounter_type
         description: Encounter type name
@@ -56,11 +56,11 @@ seeds:
       enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         predictor_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         predictor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         encounter_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1000) {%- endif -%}
     columns:
       - name: predictor_name
         description: Name of predictor column

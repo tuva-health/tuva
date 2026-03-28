@@ -77,7 +77,7 @@ select
        , drill_down_key
        , max(drill_down_value) as drill_down_value
        , null as field_value
-       , count(drill_down_value) as frequency
+       , count(*) as frequency
        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('data_quality__data_quality_clinical_detail') }}
 where bucket_name = 'null'

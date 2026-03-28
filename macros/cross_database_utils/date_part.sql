@@ -25,3 +25,7 @@
         NULL
     {% endif %}
 {% endmacro %}
+
+{% macro clickhouse__date_part(datepart, date) -%}
+    extract({{ datepart }} from {{ date }})
+{%- endmacro %}

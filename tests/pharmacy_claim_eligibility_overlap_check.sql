@@ -51,7 +51,7 @@ with eligibility as (
 
 , final as (
     select
-        oc.data_source
+        oc.data_source as data_source
         , oc.n_rows as n_overlapping_records
         , case when (pc.n_rows = 0 or pc.n_rows is null) then 1 else 0 end as is_pc_empty
         , case when (ec.n_rows = 0 or ec.n_rows is null) then 1 else 0 end as is_elig_empty
@@ -63,8 +63,8 @@ with eligibility as (
 )
 
 select
-    data_source
-    , n_overlapping_records
+    final.data_source
+    , final.n_overlapping_records
 from final
-where not (is_pc_empty = 1 or is_elig_empty = 1)
-and n_overlapping_records = 0
+where not (final.is_pc_empty = 1 or final.is_elig_empty = 1)
+and final.n_overlapping_records = 0

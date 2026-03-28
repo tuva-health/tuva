@@ -19,22 +19,22 @@ order by generated_at desc) as row_num
 
 select
     dt.unique_id
-    , dt.database_name
-    , dt.schema_name
+    , dt.database_name as database_name
+    , dt.schema_name as schema_name
     , etr.table_name
     , dt.name as test_name
     , dt.short_name as test_short_name
     , dt.test_column_name
-    , dt.severity
+    , dt.severity as severity
     , dt.warn_if
     , dt.error_if
-    , dt.test_params
+    , dt.test_params as test_params
     , dt.test_original_name
     , dt.tags as test_tags
     , dt.description as test_description
     , dt.package_name as test_package_name
     , dt.type as test_type
-    , dt.generated_at
+    , dt.generated_at as generated_at
     , dt.metadata_hash
     , dt.quality_dimension
     , etr.detected_at

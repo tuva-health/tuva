@@ -45,7 +45,7 @@ vars:
     ## Tuva Last Run
     # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
     # Default timezone is UTC
-    tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+    tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")).strftime("%Y-%m-%d %H:%M:%S") }}'
 
     ## Tuva seed storage configuration
     custom_bucket_name: tuva-public-resources
@@ -94,6 +94,8 @@ clean-targets:
   - "dbt_packages"
 
 dispatch:
+  - macro_namespace: 'dbt'
+    search_order: ['the_tuva_project', 'dbt']
   - macro_namespace: 'dbt_utils'
     search_order: ['the_tuva_project', 'dbt_utils']
 

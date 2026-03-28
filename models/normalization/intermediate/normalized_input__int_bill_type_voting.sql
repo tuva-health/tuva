@@ -7,10 +7,10 @@
 
 with normalize_cte as (
     select
-        med.claim_id
-        , med.data_source
-        , bill.bill_type_code
-        , bill.bill_type_description
+        med.claim_id as claim_id
+        , med.data_source as data_source
+        , bill.bill_type_code as bill_type_code
+        , bill.bill_type_description as bill_type_description
     from {{ ref('normalized_input__stg_medical_claim') }} as med
     inner join {{ ref('terminology__bill_type') }} as bill
         on {{ ltrim('med.bill_type_code', '0') }} = bill.bill_type_code
@@ -43,7 +43,7 @@ with normalize_cte as (
         , bill_type_occurrence_count as occurrence_count
         , row_number() over (partition by claim_id, data_source
 order by bill_type_occurrence_count desc, bill_type_code asc) as occurrence_row_count
-    from distinct_counts as dist
+    from distinct_counts
 )
 
 select

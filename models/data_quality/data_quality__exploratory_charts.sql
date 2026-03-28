@@ -148,7 +148,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'total_paid_amount' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -205,7 +205,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'N/A' as filter_description
          , 'total_paid_amount' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -223,7 +223,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', ilmc.claim_end_date) as {{ varchar() }}) as x_axis
          {% endif %}
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as chart_filter
+         , cast(null as {{ dbt.type_string() }}) as chart_filter
          {% else %}
          , cast(null as {{ varchar() }}) as chart_filter
          {% endif %}
@@ -255,7 +255,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'count_distinct_claim_id' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -317,7 +317,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'N/A' as filter_description
          , 'count_distinct_claim_id' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -504,7 +504,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'paid_amount' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -561,7 +561,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'N/A' as filter_description
          , 'total_paid' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -579,7 +579,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', ilpc.dispensing_date) as {{ varchar() }}) as x_axis
          {% endif %}
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as chart_filter
+         , cast(null as {{ dbt.type_string() }}) as chart_filter
          {% else %}
          , cast(null as {{ varchar() }}) as chart_filter
          {% endif %}
@@ -612,7 +612,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'count_distinct_claim_id' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -674,7 +674,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'N/A' as filter_description
          , 'count_distinct_claim_id' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -771,7 +771,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_year' as filter_description
          , 'percentage_of_claims_with_eligibility' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as y_axis
+         , cast(null as {{ dbt.type_string() }}) as y_axis
          {% else %}
          , cast(null as {{ varchar() }}) as y_axis
          {% endif %}
@@ -839,7 +839,11 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }}
     where claim_start_date is not null
     group by
+        {% if target.type == 'clickhouse' %}
+        claim_type
+        {% else %}
         coalesce(claim_type, 'unknown')
+        {% endif %}
         {% if target.type == 'bigquery' %}
         , date_trunc(claim_start_date, MONTH)
         {% elif target.type in ('postgres', 'duckdb') %}
@@ -850,7 +854,7 @@ with medical_paid_amount_vs_end_date_matrix as (
         , date_trunc('MONTH', claim_start_date)
         {% elif target.type == 'athena' %}
         , date_trunc('MONTH', claim_start_date)
-        {% else %} -- snowflake and redshift
+        {% else %} -- snowflake, redshift, clickhouse
         , date_trunc('MONTH', claim_start_date)
         {% endif %}
 )
@@ -958,7 +962,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', acm.date_month) as {{ varchar() }}) as x_axis
          {% endif %}
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as chart_filter
+         , cast(null as {{ dbt.type_string() }}) as chart_filter
          {% else %}
          , cast(null as {{ varchar() }}) as chart_filter
          {% endif %}
@@ -1020,7 +1024,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', acm.date_month) as {{ varchar() }}) as x_axis
          {% endif %}
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as chart_filter
+         , cast(null as {{ dbt.type_string() }}) as chart_filter
          {% else %}
          , cast(null as {{ varchar() }}) as chart_filter
          {% endif %}
@@ -1082,7 +1086,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', acm.date_month) as {{ varchar() }}) as x_axis
          {% endif %}
          {% if target.type == 'bigquery' %}
-         , cast(null as STRING) as chart_filter
+         , cast(null as {{ dbt.type_string() }}) as chart_filter
          {% else %}
          , cast(null as {{ varchar() }}) as chart_filter
          {% endif %}

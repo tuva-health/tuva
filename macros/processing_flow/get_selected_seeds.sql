@@ -22,7 +22,11 @@
             {% else %}
                 {% set idf = node.alias %}
             {% endif %}
-            {% set fully_qualified_name = db ~ '.' ~ sch ~ '.' ~ idf %}
+            {% if node.database %}
+                {% set fully_qualified_name = db ~ '.' ~ sch ~ '.' ~ idf %}
+            {% else %}
+                {% set fully_qualified_name = sch ~ '.' ~ idf %}
+            {% endif %}
 
             {% do ns.selected_seeds.append(fully_qualified_name) %}
         {% endif %}

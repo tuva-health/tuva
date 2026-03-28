@@ -8,7 +8,7 @@
 #}
 
 {% macro year_month(date_column) -%}
-    {{ return(adapter.dispatch('year_month')(date_column)) }}
+    {{ return(adapter.dispatch('year_month', 'the_tuva_project')(date_column)) }}
 {%- endmacro %}
 
 {% macro default__year_month(date_column) -%}
@@ -45,4 +45,8 @@
 
 {% macro fabric__year_month(date_column) -%}
     FORMAT(cast({{ date_column }} as date), 'yyyyMM')
+{%- endmacro %}
+
+{% macro clickhouse__year_month(date_column) -%}
+    formatDateTime(toDate({{ date_column }}), '%Y%m')
 {%- endmacro %}

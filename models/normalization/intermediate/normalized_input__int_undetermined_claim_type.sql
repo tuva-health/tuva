@@ -19,21 +19,21 @@ select
     , claim_line_end_date
     , admission_date
     , discharge_date
-    , ad_src.admit_source_code
-    , ad_src.admit_source_description
-    , ad_type.admit_type_code
-    , ad_type.admit_type_description
-    , dis.discharge_disposition_code
-    , dis.discharge_disposition_description
-    , pos.place_of_service_code
-    , pos.place_of_service_description
-    , tob.bill_type_code
-    , tob.bill_type_description
+    , ad_src.admit_source_code as admit_source_code
+    , ad_src.admit_source_description as admit_source_description
+    , ad_type.admit_type_code as admit_type_code
+    , ad_type.admit_type_description as admit_type_description
+    , dis.discharge_disposition_code as discharge_disposition_code
+    , dis.discharge_disposition_description as discharge_disposition_description
+    , pos.place_of_service_code as place_of_service_code
+    , pos.place_of_service_description as place_of_service_description
+    , tob.bill_type_code as bill_type_code
+    , tob.bill_type_description as bill_type_description
     , med.drg_code_type
     , coalesce(msdrg.ms_drg_code, aprdrg.apr_drg_code) as drg_code
     , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
-    , rev.revenue_center_code
-    , rev.revenue_center_description
+    , rev.revenue_center_code as revenue_center_code
+    , rev.revenue_center_description as revenue_center_description
     , service_unit_quantity
     , hcpcs_code
     , hcpcs_modifier_1

@@ -11,9 +11,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs_diagnosis_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs_diagnosis_category
         description: CCS diagnosis category code
@@ -30,9 +30,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_cm: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_cm
         description: ICD-10-CM code
@@ -52,9 +52,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs_diagnosis_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs_diagnosis_category
         description: CCS diagnosis category code
@@ -71,9 +71,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs_procedure_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs_procedure_category
         description: CCS procedure category code
@@ -90,11 +90,11 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs_diagnosis_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         exclusion_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs_diagnosis_category
         description: CCS diagnosis category code
@@ -113,13 +113,13 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_cm: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ccs_diagnosis_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ccs_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_cm
         description: ICD-10-CM code
@@ -143,13 +143,13 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_pcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ccs_procedure_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ccs_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_pcs
         description: ICD-10-PCS code
@@ -173,9 +173,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs_procedure_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs_procedure_category
         description: CCS procedure category code
@@ -192,9 +192,9 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_pcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_pcs
         description: ICD-10-PCS code
@@ -214,13 +214,13 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         specialty_cohort: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         procedure_or_diagnosis: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ccs
         description: CCS code
@@ -241,13 +241,13 @@ seeds:
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_pcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ccs_code_and_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         specialty_cohort: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_pcs
         description: ICD-10-PCS code

@@ -13,7 +13,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         payment_year: |
           integer
         normalization_factor: |
@@ -43,9 +43,9 @@ seeds:
         payment_year: |
           integer
         hcpcs_cpt_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         included_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: payment_year
         description: The year for which the CPT/HCPCS codes are applicable
@@ -65,25 +65,25 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         plan_segment: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         gender: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         age_group: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicaid_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         orec: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
@@ -121,19 +121,19 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
@@ -165,23 +165,23 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicaid_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         orec: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
@@ -218,13 +218,13 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hccs_to_exclude: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -247,11 +247,11 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_hierarchy_group: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_hierarchy_group_rank: |
           integer
     columns:
@@ -282,27 +282,27 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicaid_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         orec: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_code_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcc_code_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
@@ -342,21 +342,21 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         gender: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicaid_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
@@ -392,15 +392,15 @@ seeds:
         payment_year: |
           integer
         diagnosis_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         cms_hcc_v24: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         cms_hcc_v24_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         cms_hcc_v28: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         cms_hcc_v28_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: payment_year
         description: The year for which the ICD-10 to HCC mapping is applicable
@@ -429,23 +429,23 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         model_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         factor_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicaid_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         orec: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         institutional_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         payment_hcc_count: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         coefficient: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:

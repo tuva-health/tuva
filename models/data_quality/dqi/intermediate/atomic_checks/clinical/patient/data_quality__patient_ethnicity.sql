@@ -4,7 +4,7 @@
 
 
 select
-      m.data_source
+      m.data_source as data_source
     {% if target.type == 'bigquery' %}
         , coalesce(cast({{ dbt.current_timestamp() }} as date), date('1900-01-01')) as source_date
     {% else %}

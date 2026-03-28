@@ -62,6 +62,7 @@ on:
           - fabric
           - redshift
           - duckdb
+          - clickhouse
 
 permissions:
   contents: read
@@ -200,6 +201,7 @@ jobs:
         matrix.adapter == 'fabric' && 'Fabric' ||
         matrix.adapter == 'redshift' && 'Redshift' ||
         matrix.adapter == 'duckdb' && 'DuckDB/MotherDuck' ||
+        matrix.adapter == 'clickhouse' && 'ClickHouse' ||
         matrix.adapter
       }}
     needs: resolve_request
@@ -249,6 +251,12 @@ jobs:
       DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
       DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
 
+      DBT_CLICKHOUSE_CI_HOST: ${{ secrets.DBT_CLICKHOUSE_CI_HOST }}
+      DBT_CLICKHOUSE_CI_PORT: ${{ secrets.DBT_CLICKHOUSE_CI_PORT }}
+      DBT_CLICKHOUSE_CI_USER: ${{ secrets.DBT_CLICKHOUSE_CI_USER }}
+      DBT_CLICKHOUSE_CI_PASSWORD: ${{ secrets.DBT_CLICKHOUSE_CI_PASSWORD }}
+      DBT_CLICKHOUSE_CI_SCHEMA: ${{ secrets.DBT_CLICKHOUSE_CI_SCHEMA }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -290,6 +298,9 @@ jobs:
               ;;
             duckdb)
               pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-duckdb duckdb==${{ env.DUCKDB_VERSION }}
+              ;;
+            clickhouse)
+              pip install dbt-core==${{ env.DBT_CORE_VERSION }} dbt-clickhouse
               ;;
             *)
               echo "Unsupported adapter: ${{ matrix.adapter }}" >&2

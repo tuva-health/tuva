@@ -3,16 +3,16 @@
 
 with value_set_member_relevant_fields as (
 select
-  aa.concept_id
-  , aa.concept_name
-  , aa.concept_type
+  aa.concept_id as concept_id
+  , aa.concept_name as concept_name
+  , aa.concept_type as concept_type
 
-  , bb.value_set_member_id
-  , bb.code
-  , bb.coding_system_id
-  , bb.include_descendants
+  , bb.value_set_member_id as value_set_member_id
+  , bb.code as code
+  , bb.coding_system_id as coding_system_id
+  , bb.include_descendants as include_descendants
 
-  , cc.coding_system_name
+  , cc.coding_system_name as coding_system_name
 
 from {{ ref('clinical_concept_library__clinical_concepts') }} as aa
 

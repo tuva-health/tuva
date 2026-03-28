@@ -11,9 +11,9 @@ seeds:
         - terminology
       column_types:
         body_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: body_code
         description: 'The code representing the anatomical location.'
@@ -32,11 +32,11 @@ seeds:
         - data_profiling
       column_types:
         admit_source_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         admit_source_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         newborn_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: admit_source_code
         description: 'The code representing the source of admission.'
@@ -57,9 +57,9 @@ seeds:
         - data_profiling
       column_types:
         admit_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         admit_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: admit_type_code
         description: 'The code representing the type of admission.'
@@ -76,9 +76,9 @@ seeds:
         - terminology
       column_types:
         code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code
         description: 'The code for the cancellation reason.'
@@ -95,7 +95,7 @@ seeds:
         - terminology
       column_types:
         code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code
         description: 'The code for the appointment status.'
@@ -110,9 +110,9 @@ seeds:
         - terminology
       column_types:
         code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code
         description: 'The code for the appointment type.'
@@ -130,13 +130,13 @@ seeds:
         - data_profiling
       column_types:
         apr_drg_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medical_surgical: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         mdc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         apr_drg_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: apr_drg_code
         description: 'The All Patient Refined Diagnosis Related Group (APR-DRG) code.'
@@ -158,9 +158,9 @@ seeds:
         - data_profiling
       column_types:
         bill_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         bill_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         deprecated: integer
         deprecated_date: date
     columns:
@@ -184,7 +184,7 @@ seeds:
         - data_profiling
       column_types:
         claim_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: claim_type
         description: 'The type of the claim.'
@@ -200,11 +200,11 @@ seeds:
         - data_profiling
       column_types:
         cvx: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: cvx
         description: 'CVX code, which is a unique identifier for vaccines.'
@@ -221,9 +221,9 @@ seeds:
       alias: discharge_disposition
       column_types:
         discharge_disposition_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         discharge_disposition_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1024) {%- endif -%}
     columns:
       - name: discharge_disposition_code
         description: 'The code representing the discharge disposition.'
@@ -241,9 +241,9 @@ seeds:
         - claims_preprocessing
       column_types:
         encounter_group: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         encounter_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: encounter_group
         description: 'The group of the encounter.'
@@ -259,9 +259,9 @@ seeds:
       tags: terminology
       column_types:
         code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code
         description: 'The code representing the ethnicity.'
@@ -279,7 +279,7 @@ seeds:
         - data_profiling
       column_types:
         gender: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: gender
         description: 'The gender code.'
@@ -293,15 +293,15 @@ seeds:
       tags: terminology
       column_types:
         hcpcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         seqnum: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         recid: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(2000) {%- endif -%}
         short_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: hcpcs
         description: 'The HCPCS Level II code.'
@@ -324,31 +324,31 @@ seeds:
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcpcs_cd: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_cat: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_cat_desc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_cat_subcat: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_subcat_desc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_famnumb: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
         rbcs_family_desc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rbcs_major_ind: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         hcpcs_cd_add_dt: |
-          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} date {%- else -%} date {%- endif -%}
         hcpcs_cd_end_dt: |
-          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} date {%- else -%} date {%- endif -%}
         rbcs_assignment_eff_dt: |
-          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} date {%- else -%} date {%- endif -%}
         current_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
     columns:
       - name: hcpcs_cd
         description: HCPCS or CPT code.
@@ -398,11 +398,11 @@ seeds:
         - data_profiling
       column_types:
         icd_9_cm: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_9_cm
         description: 'The ICD-9-CM code.'
@@ -424,11 +424,11 @@ seeds:
         - data_profiling
       column_types:
         icd_9_pcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_9_pcs
         description: 'The ICD-9-PCS code.'
@@ -451,13 +451,13 @@ seeds:
         - data_profiling
       column_types:
         icd_10_cm: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         header_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_cm
         description: 'Alpha-Numeric ICD-10-CM Code.'
@@ -480,9 +480,9 @@ seeds:
         - readmissions
       column_types:
         icd_10_pcs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_pcs
         description: 'The ICD-10-PCS code.'
@@ -499,9 +499,9 @@ seeds:
         - terminology
       column_types:
         route_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: route_code
         description: 'The code representing the route of administration for the immunization.'
@@ -518,11 +518,11 @@ seeds:
         - terminology
       column_types:
         reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: reason_code
         description: 'The code representing the immunization status reason.'
@@ -541,9 +541,9 @@ seeds:
         - terminology
       column_types:
         status_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: status_code
         description: 'The code representing the immunization status.'
@@ -560,45 +560,45 @@ seeds:
         - terminology
       column_types:
         loinc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         short_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         long_common_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         component: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         property: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         time_aspect: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         system: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         scale_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         method_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         class_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         class_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         class_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         class_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         paneltype: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         order_obs: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         example_units: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         external_copyright_notice: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         version_first_released: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         version_last_changed: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: loinc
         description: 'The LOINC code.'
@@ -645,17 +645,17 @@ seeds:
         - terminology
       column_types:
         loinc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_to: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         comment: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         final_map_to: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         all_comments: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         depth: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: loinc
         description: 'The deprecated term to which the replacement term(s) apply.'
@@ -679,9 +679,9 @@ seeds:
       tags: terminology
       column_types:
         mdc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         mdc_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: mdc_code
         description: 'The Major Diagnostic Category (MDC) code.'
@@ -700,9 +700,9 @@ seeds:
         - data_profiling
       column_types:
         dual_status_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         dual_status_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: dual_status_code
         description: 'The code representing dual eligibility status.'
@@ -721,9 +721,9 @@ seeds:
         - data_profiling
       column_types:
         original_reason_entitlement_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         original_reason_entitlement_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: original_reason_entitlement_code
         description: 'The code representing the original reason for Medicare entitlement.'
@@ -744,9 +744,9 @@ seeds:
         - data_profiling
       column_types:
         medicare_status_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medicare_status_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: medicare_status_code
         description: 'The code representing the Medicare status.'
@@ -765,27 +765,27 @@ seeds:
         - claims_preprocessing
       column_types:
         ms_drg: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         fiscal_year: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         final_post_acute_drg: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         final_special_pay_drg: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         mdc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ms_drg_title: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         drg_weight_raw: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         drg_weight: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         geometric_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         arithmetic_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ms_drg
         description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
@@ -823,13 +823,13 @@ seeds:
         - claims_preprocessing
       column_types:
         ms_drg_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         mdc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         medical_surgical: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ms_drg_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         deprecated: integer
         deprecated_date: date
     columns:
@@ -856,13 +856,13 @@ seeds:
         - terminology
       column_types:
         ndc: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rxcui: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rxnorm_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         fda_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
     columns:
       - name: ndc
         description: 'The National Drug Code (NDC).'
@@ -882,7 +882,7 @@ seeds:
         - terminology
       column_types:
         observation_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: observation_type
         description: The type of observation.
@@ -898,13 +898,13 @@ seeds:
       alias: other_provider_taxonomy
       column_types:
         npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(35) {%- endif -%}
         taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(35) {%- endif -%}
         medicare_specialty_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(173) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(101) {%- endif -%}
         primary_flag: integer
     columns:
       - name: npi
@@ -929,7 +929,7 @@ seeds:
         - data_profiling
       column_types:
         payer_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: payer_type
         description: 'The type of payer.'
@@ -946,9 +946,9 @@ seeds:
         - data_profiling
       column_types:
         place_of_service_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         place_of_service_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: place_of_service_code
         description: 'The code representing the place of service.'
@@ -967,9 +967,9 @@ seeds:
         - claims_preprocessing
       column_types:
         present_on_admit_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         present_on_admit_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1024) {%- endif -%}
     columns:
       - name: present_on_admit_code
         description: 'The code representing if the condition was present on admission.'
@@ -987,51 +987,51 @@ seeds:
       alias: provider
       column_types:
         npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(35) {%- endif -%}
         entity_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(26) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(26) {%- endif -%}
         entity_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(37) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(37) {%- endif -%}
         primary_taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(35) {%- endif -%}
         primary_specialty_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(173) {%- endif -%}
         provider_first_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         provider_last_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         provider_credential: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         provider_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         provider_other_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         provider_other_organization_name_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(80) {%- endif -%}
         provider_other_organization_name_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         parent_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(95) {%- endif -%}
         practice_address_line_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(80) {%- endif -%}
         practice_address_line_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(80) {%- endif -%}
         practice_city: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(65) {%- endif -%}
         practice_state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(65) {%- endif -%}
         practice_zip_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(42) {%- endif -%}
         mailing_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(42) {%- endif -%}
         location_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(42) {%- endif -%}
         official_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(42) {%- endif -%}
         last_updated: date
         deactivation_date: date
         deactivation_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(80) {%- endif -%}
     columns:
       - name: npi
         description: 'The National Provider Identifier (NPI).'
@@ -1093,9 +1093,9 @@ seeds:
         - data_profiling
       column_types:
         code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: code
         description: 'The code representing the race.'
@@ -1114,9 +1114,9 @@ seeds:
         - data_profiling
       column_types:
         revenue_center_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         revenue_center_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: revenue_center_code
         description: 'The code representing the revenue center.'
@@ -1133,25 +1133,25 @@ seeds:
         - terminology
       column_types:
         rxcui: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         rxnorm_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         atc_1_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_1_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_2_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_2_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_3_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_3_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_4_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         atc_4_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: rxcui
         description: 'The RxNorm code.'
@@ -1186,37 +1186,37 @@ seeds:
         - hcc_suspecting
       column_types:
         id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         effective_time: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         active: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         module_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ref_set_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         referenced_component_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         referenced_component_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_group: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_priority: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_rule: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(500) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(500) {%- endif -%}
         map_advice: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(500) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(500) {%- endif -%}
         map_target: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_target_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         correlation_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_category_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         map_category_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: id
         description: 'The unique identifier for the mapping.'
@@ -1261,11 +1261,11 @@ seeds:
         - terminology
       column_types:
         snomed_ct: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         is_active: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         created: date
         last_updated: date
     columns:
@@ -1291,13 +1291,13 @@ seeds:
         - terminology
       column_types:
         parent_snomed_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         parent_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         child_snomed_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         child_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: parent_snomed_code
         description: 'The SNOMED code of the parent concept.'
@@ -1318,31 +1318,31 @@ seeds:
         - terminology
       column_types:
         product_rxcui: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         product_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         product_tty: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         prescribable_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         brand_vs_generic: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         brand_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1000) {%- endif -%}
         clinical_product_rxcui: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         clinical_product_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         clinical_product_tty: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         ingredient_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         dose_form_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3000) {%- endif -%}
         active: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(10) {%- endif -%}
         prescribable: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(10) {%- endif -%}
 
   - name: terminology__ccs_services_procedures
     config:
@@ -1353,18 +1353,18 @@ seeds:
         - terminology
       column_types:
         hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%}
         ccs_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(3) {%- endif -%}
         ccs_category_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         release_year: integer
         start_valid_date: date
         end_valid_date: date
         code_range: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         source_file: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
 
   - name: terminology__nitos
     config:
@@ -1375,19 +1375,19 @@ seeds:
         - terminology
       column_types:
         hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%}
         nitos_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%}
         nitos_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(1000) {%- endif -%}
         invasive_non_invasive_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(50) {%- endif -%}
         modality: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(50) {%- endif -%}
         body_region: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(50) {%- endif -%}
         focus_area: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(50) {%- endif -%}
   - name: terminology__icd10_pcs_cms_ontology
     description: |
       A table containing the broken out elements of the ontology associated with ICD-10-PCS codes. These codes are a positional ontology, 
@@ -1401,21 +1401,21 @@ seeds:
         - terminology
       column_types:
         icd10pcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         section: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         body_system: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         operation: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         body_part: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         approach: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         device: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         qualifier: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd10pcs_code
         description: ICD-10-PCS code
@@ -1446,13 +1446,13 @@ seeds:
         - terminology
       column_types:
         medicare_specialty_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(16) {%- endif -%}
         medicare_provider_supplier_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         provider_taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(32) {%- endif -%}
         provider_taxonomy_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(512) {%- endif -%}
 
   - name: terminology__electing_teaching_hospital_list
     description: |
@@ -1465,35 +1465,35 @@ seeds:
         - terminology
       column_types:
         collection_year: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(4) {%- endif -%}
         ccn: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(6) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(6) {%- endif -%}
         tin: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(9) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(9) {%- endif -%}
         hospital_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         pecos_legal_business_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         street_address: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         po_box: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         city: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         zip_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         street_address_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         street_address_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         city_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         state_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
         zip_code_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%}
 
   - name: terminology__cms_acceptable_provider_specialty_codes
     description: |
@@ -1506,11 +1506,11 @@ seeds:
         - terminology
       column_types:
         specialty_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(8) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(8) {%- endif -%} 
         specialty_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         pecos_specialty_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
 
   - name: terminology__ssa_fips_state_county_crosswalk
     description: |
@@ -1524,21 +1524,21 @@ seeds:
         - terminology
       column_types:
         fipscounty: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%} 
         countyname_fips: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(2) {%- endif -%} 
         cbsa_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%} 
         cbsa_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         ssa_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(5) {%- endif -%} 
         state_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(64) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(64) {%- endif -%} 
         countyname_rate: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(128) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(128) {%- endif -%} 
 
   - name: terminology__provider_taxonomy_unpivot
     description: |
@@ -1551,15 +1551,15 @@ seeds:
         - terminology
       column_types:
         npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(10) {%- endif -%} 
         taxonomy_col: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         switch_col: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
         taxonomy_switch: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+          {%- if target.type in ("bigquery", "databricks", "clickhouse") -%} String {%- else -%} varchar(256) {%- endif -%} 
       meta:
         columns:
           - name: npi

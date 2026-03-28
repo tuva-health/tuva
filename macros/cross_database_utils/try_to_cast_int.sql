@@ -7,7 +7,7 @@
 
 {%- macro try_to_cast_int(column_name) -%}
 
-    {{ return(adapter.dispatch('try_to_cast_int')(column_name)) }}
+    {{ return(adapter.dispatch('try_to_cast_int', 'the_tuva_project')(column_name)) }}
 
 {%- endmacro -%}
 
@@ -45,4 +45,8 @@
 
     try_cast( {{ column_name }} as integer )
 
+{%- endmacro -%}
+
+{%- macro clickhouse__try_to_cast_int(column_name) -%}
+    toInt32OrNull(toString({{ column_name }}))
 {%- endmacro -%}

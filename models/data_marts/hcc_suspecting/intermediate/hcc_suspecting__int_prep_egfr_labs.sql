@@ -59,6 +59,8 @@ with lab_result as (
         , result_date
         {% if target.type == 'bigquery' %}
          , safe_cast(result AS {{ dbt.type_numeric() }}) AS result
+        {% elif target.type == 'clickhouse' %}
+        , toFloat64OrNull(toString(result)) as result
         {% else %}
         , try_cast(result as {{ dbt.type_numeric() }}) as result
         {% endif %}
@@ -66,6 +68,8 @@ with lab_result as (
    {% if target.type == 'fabric' %}
         WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
         AND result NOT LIKE '%[^0-9.]%'
+    {% elif target.type == 'clickhouse' %}
+        where toFloat64OrNull(toString(result)) is not null
     {% else %}
         where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
     {% endif %}
@@ -91,6 +95,15 @@ with lab_result as (
             when result like '%mL/min/1.73m2%' then trim(replace(result, 'mL/min/1.73m2', ''))
             else null
           end as {{ dbt.type_numeric() }}) as clean_result
+        {% elif target.type == 'clickhouse' %}
+        , toFloat64OrNull(toString(case
+            when lower(result) like '%unsatisfactory specimen%' then null
+            when result like '%>%' then null
+            when result like '%<%' then null
+            when result like '%@%' then trim(replace(result, '@', ''))
+            when result like '%mL/min/1.73m2%' then trim(replace(result, 'mL/min/1.73m2', ''))
+            else null
+          end)) as clean_result
         {% else %}
         , try_cast(case
             when lower(result) like '%unsatisfactory specimen%' then null

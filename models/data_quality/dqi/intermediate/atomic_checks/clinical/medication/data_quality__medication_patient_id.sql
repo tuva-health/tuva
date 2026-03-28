@@ -4,7 +4,7 @@
 
 
 select
-      m.data_source
+      m.data_source as data_source
     , coalesce(m.dispensing_date,cast('1900-01-01' as date)) as source_date
     , 'MEDICATION' as table_name
     , 'Medication ID' as drill_down_key

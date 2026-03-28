@@ -21,3 +21,7 @@
 {% macro default__yyyymm(date) -%}
     to_char({{ date }}, 'YYYYMM')
 {%- endmacro %}
+
+{% macro clickhouse__yyyymm(date) -%}
+    formatDateTime(toDate({{ date }}), '%Y%m')
+{%- endmacro %}
