@@ -58,7 +58,7 @@ truncate table {{ this }}
       *
     from
         read_csv('s3://{{ uri }}/{{ pattern }}*',
-        {% if null_marker == true %} nullstr = '\N' {% else %} nullstr = '' {% endif %},
+        {% if null_marker == true %} nullstr = ['', '\N'] {% else %} nullstr = '' {% endif %},
          quote = '"', escape = '"',
          header={{headers}},
          columns= { {{ cols }} } )

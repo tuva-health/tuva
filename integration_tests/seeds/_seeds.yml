@@ -9,8 +9,7 @@ seeds:
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         appointment_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -86,8 +85,7 @@ seeds:
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -156,8 +154,19 @@ seeds:
         enrollment_status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         hospice_flag: integer
-        institutional_snp_flag: integer
+        snp_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        medicaid_indicator: integer
         long_term_institutional_flag: integer
+        part_d_raf_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        low_income_subsidy_indicator: integer
+        metal_level: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        csr_indicator: integer
+        enrollment_duration_months: integer
+        esrd_status: integer
+        transplant_duration_months: integer
 
   - name: immunization_seed
     config:
@@ -167,8 +176,7 @@ seeds:
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         immunization_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -224,8 +232,7 @@ seeds:
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         lab_result_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -305,8 +312,7 @@ seeds:
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -577,8 +583,7 @@ seeds:
       tags:
         - clinical
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         observation_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -634,8 +639,7 @@ seeds:
       tags:
         - claims
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -688,8 +692,7 @@ seeds:
       tags:
         - attribution
         - input_layer
-      enabled: |
-        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      enabled: true
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}

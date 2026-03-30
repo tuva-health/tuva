@@ -39,20 +39,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ ref('observation_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'observation') }}
-
-{%- endif %}

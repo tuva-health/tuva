@@ -23,7 +23,7 @@
     , medicare_status_code
     , enrollment_status
     , hospice_flag
-    , institutional_snp_flag
+    , cast(case when upper(coalesce(snp_type, '')) = 'I-SNP' then 1 else 0 end as {{ dbt.type_int() }}) as institutional_snp_flag
     , long_term_institutional_flag
     , group_id
     , group_name
@@ -56,20 +56,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ ref('eligibility_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'eligibility') }}
-
-{%- endif %}

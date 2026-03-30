@@ -166,20 +166,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ ref('medical_claim_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'medical_claim') }}
-
-{%- endif %}

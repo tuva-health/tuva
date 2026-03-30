@@ -11,16 +11,9 @@ vars:
   #   prefix: 'x_'    # Prefix to identify passthrough columns (default: 'x_')
   #   strip: false    # Whether to strip prefix in final output (default: false)
 
-  error_empty_seeds: true
-  ## Use this variable to run the project with synthetic data loaded as seeds
-  # otherwise set to false and set the input vars below
-  use_synthetic_data: true
-
-
-  ## Update these vars to use your own data as input, do not comment out
-  # enabled logic has been added to the sources config
-  input_database: dev_ci_testing
-  input_schema: input_layer
+  ## Integration tests run against synthetic data only.
+  # Set to `large` to test the large synthetic release.
+  synthetic_data_size: small
 
   ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
@@ -79,23 +72,24 @@ dispatch:
 
 seeds:
   integration_tests:
+    # Local CSVs are header-only; `dbt seed` hydrates them from the published synthetic release.
     appointment_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('appointment') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('appointment') }}"
     eligibility_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('eligibility') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('eligibility') }}"
     immunization_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('immunization') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('immunization') }}"
     lab_result_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('lab_result') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('lab_result') }}"
     medical_claim_seed:
       +batch_size: 200
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('medical_claim') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('medical_claim') }}"
     observation_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('observation') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('observation') }}"
     pharmacy_claim_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('pharmacy_claim') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('pharmacy_claim') }}"
     provider_attribution_seed:
-      # +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('provider_attribution') }}"
+      +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('provider_attribution') }}"
 
 
 models:

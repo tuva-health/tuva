@@ -91,7 +91,8 @@ Each mart can be independently enabled or disabled. When not set, these inherit 
 |----------|---------|-------------|
 | `tuva_schema_prefix` | `None` | When set, all Tuva output schemas are prefixed with this value (e.g., `myprefix_core`). |
 | `custom_bucket_name` | `"tuva-public-resources"` | Default S3 bucket for versioned seed data. Used for any database without an explicit override. |
-| `tuva_seed_version` | `"0.18.0"` | Versioned S3 folder used for package seed payloads. Leading `v` is optional. |
+| `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
+| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.0.0", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `enable_input_layer_testing` | `true` | Run DQI data quality tests on the input layer. |
 | `enable_legacy_data_quality` | `false` | Build legacy (pre-DQI) data quality models. |
@@ -103,7 +104,7 @@ Each mart can be independently enabled or disabled. When not set, these inherit 
 Use `scripts/publish-dolthub-seeds` to publish the latest public DoltHub databases to versioned S3 folders.
 
 Required inputs:
-- `--version v0.18.0`
+- `--version v1.0.0`
 - AWS CLI credentials via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
 Optional inputs:
@@ -127,10 +128,14 @@ Required access:
 Example:
 
 ```bash
-scripts/mirror-seed-release --version v0.18.0
+scripts/mirror-seed-release --version v1.0.0
 ```
 
 The script mirrors:
 - `s3://tuva-public-resources/<database-folder>/<version>/...`
 - `gs://tuva-public-resources/<database-folder>/<version>/...`
 - `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`
+
+Current published defaults:
+- `concept-library` uses `1.0.1`
+- `reference-data`, `terminology`, `value-sets`, `provider-data`, and `synthetic-data` use `1.0.0`

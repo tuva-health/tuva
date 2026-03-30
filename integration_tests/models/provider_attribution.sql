@@ -14,11 +14,7 @@
     , data_source
 {%- endset -%}
 
-{%- if var('use_synthetic_data') == true -%}
-  {%- set provider_attribution_relation = ref('provider_attribution_seed') -%}
-{%- else -%}
-  {%- set provider_attribution_relation = source('source_input', 'provider_attribution') -%}
-{%- endif -%}
+{%- set provider_attribution_relation = ref('provider_attribution_seed') -%}
 
 {%- if execute -%}
   {%- set provider_attribution_columns = adapter.get_columns_in_relation(provider_attribution_relation) -%}

@@ -62,9 +62,27 @@
 {% endmacro %}
 
 
-{% macro get_seed_version(version_override=none) %}
+{% macro get_seed_version(version_override=none, database=none) %}
   {% if version_override is none %}
-    {% set version = var('tuva_seed_version', '0.18.0') %}
+    {% set version_overrides = var('tuva_seed_versions', {}) %}
+    {% set version = none %}
+
+    {% if version_overrides is mapping %}
+      {% if database is not none %}
+        {% set normalized_database = database | string | trim %}
+        {% set alternate_database = normalized_database | replace('-', '_') %}
+
+        {% if normalized_database in version_overrides %}
+          {% set version = version_overrides[normalized_database] %}
+        {% elif alternate_database in version_overrides %}
+          {% set version = version_overrides[alternate_database] %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    {% if version is none %}
+      {% set version = var('tuva_seed_version', '1.0.0') %}
+    {% endif %}
   {% else %}
     {% set version = version_override %}
   {% endif %}
@@ -81,7 +99,7 @@
 {% macro get_versioned_seed_uri(database, version_override=none) %}
   {% set bucket = the_tuva_project.get_seed_bucket(database) %}
   {% set folder = the_tuva_project.get_seed_database_folder(database) %}
-  {% set version = the_tuva_project.get_seed_version(version_override) %}
+  {% set version = the_tuva_project.get_seed_version(version_override, database=database) %}
   {{ return(bucket ~ '/' ~ folder ~ '/' ~ version) }}
 {% endmacro %}
 
@@ -166,4 +184,58 @@
       headers,
       null_marker
   )) }}
+{% endmacro %}
+
+
+{% macro load_versioned_medicare_provider_and_supplier_taxonomy_crosswalk_seed(version=none, compression=true, headers=true, null_marker=true) %}
+  {{ return(adapter.dispatch('load_versioned_medicare_provider_and_supplier_taxonomy_crosswalk_seed', 'the_tuva_project')(version, compression, headers, null_marker)) }}
+{% endmacro %}
+
+
+{% macro default__load_versioned_medicare_provider_and_supplier_taxonomy_crosswalk_seed(version, compression, headers, null_marker) %}
+  {{ return(the_tuva_project.load_versioned_seed('provider_data', 'medicare_provider_and_supplier_taxonomy_crosswalk.csv', version, compression, headers, null_marker)) }}
+{% endmacro %}
+
+
+{% macro duckdb__load_versioned_medicare_provider_and_supplier_taxonomy_crosswalk_seed(version, compression, headers, null_marker) %}
+{%- set uri = the_tuva_project.get_versioned_seed_uri('provider_data', version) -%}
+{%- set pattern = 'medicare_provider_and_supplier_taxonomy_crosswalk.csv' -%}
+
+{% set sql %}
+  create or replace table {{ this }} as
+  select
+      cast(medicare_specialty_code as varchar) as medicare_specialty_code
+    , cast(medicare_provider_supplier_type_description as varchar) as medicare_provider_supplier_type_description
+    , cast(provider_taxonomy_code as varchar) as provider_taxonomy_code
+    , cast(provider_taxonomy_description as varchar) as provider_taxonomy_description
+  from read_csv(
+      's3://{{ uri }}/{{ pattern }}*',
+      delim = ',',
+      quote = '"',
+      escape = '"',
+      header = {{ headers }},
+      parallel = false,
+      strict_mode = false,
+      null_padding = true,
+      {% if null_marker == true %} nullstr = ['', '\N'] {% else %} nullstr = '' {% endif %}
+  )
+{% endset %}
+
+{% call statement('ducksql',fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% set count_sql %}
+  SELECT COUNT(*) AS row_count FROM {{ this }}
+{% endset %}
+
+{% call statement('count',fetch_result=true) %}
+  {{ count_sql }}
+{% endcall %}
+
+{% if execute %}
+{% set count_result = load_result('count') %}
+{% set row_count = count_result.table.columns[0].values()[0] if count_result.table else 0 %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ row_count,True) }}
+{% endif %}
 {% endmacro %}
