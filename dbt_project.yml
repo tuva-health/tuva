@@ -196,7 +196,7 @@ seeds:
       terminology__medicare_orec:
         +post-hook: "{{ load_versioned_seed('terminology','medicare_orec.csv') }}"
       terminology__medicare_provider_and_supplier_taxonomy_crosswalk:
-        +post-hook: "{{ load_versioned_medicare_provider_and_supplier_taxonomy_crosswalk_seed() }}"
+        +post-hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
       terminology__medicare_status:
         +post-hook: "{{ load_versioned_seed('terminology','medicare_status.csv') }}"
       terminology__ms_drg_weights_los:
