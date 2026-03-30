@@ -1,0 +1,150 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # CCSR - STAGING: stg_core__condition (edge cases)
+  # =========================================================================
+
+  - name: test_ccsr_stg_condition_dedup_across_multiple_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Same diagnosis code on different claims is preserved as separate rows (dedup is per-claim, not global)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_stg_condition_dedup_mixed_scenario
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Mixed scenario: duplicates within a claim are removed, different codes on same claim preserved, same code on different claims preserved"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'I10', normalized_code_type: 'icd-10-cm', condition_rank: 2, data_source: 'src1'}
+          - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P2', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'I10', condition_rank: 2, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P2', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_stg_condition_null_encounter_id_preserved
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Conditions with null encounter_id are still passed through when code type is ICD-10-CM"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: null, claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: null, claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - FINAL: singular_condition_category
+  # =========================================================================
+
+  - name: test_ccsr_singular_condition_picks_default_rank_1
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__singular_condition_category
+    description: "Singular condition category filters to default IP/OP category with condition_rank=1"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        dxccsr_version: '2023.1'
+        record_type: 'ip'
+    given:
+      - input: ref('ccsr__long_condition_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END010', ccsr_category_description: 'DM complication', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END011', ccsr_category_description: 'DM general', ccsr_category_rank: 2, is_ip_default_category: 0, is_op_default_category: 0, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', normalized_code: 'E11.65', ccsr_category: 'END010', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - FINAL: procedure_summary
+  # =========================================================================
+
+  - name: test_ccsr_procedure_summary_aggregates_by_approach
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__procedure_summary
+    description: "Procedure summary counts occurrences by CCSR category/operation/approach"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ccsr__long_procedure_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: '0DBN0ZZ', code_description: 'Excision sigmoid', ccsr_parent_category: 'GIS', ccsr_category: 'GIS004', ccsr_category_description: 'Excision large intestine', clinical_domain: 'GI', procedure_section: 'Medical and Surgical', operation: 'Excision', approach: 'Open', device: 'No Device', qualifier: 'No Qualifier', data_source: 'src1', prccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P2', normalized_code: '0DBN4ZZ', code_description: 'Excision sigmoid endo', ccsr_parent_category: 'GIS', ccsr_category: 'GIS004', ccsr_category_description: 'Excision large intestine', clinical_domain: 'GI', procedure_section: 'Medical and Surgical', operation: 'Excision', approach: 'Endoscopic', device: 'No Device', qualifier: 'No Qualifier', data_source: 'src1', prccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {ccsr_category: 'GIS004', operation: 'Excision', approach: 'Open', n_occurrences_with_approach: 1, n_total_occurrences: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {ccsr_category: 'GIS004', operation: 'Excision', approach: 'Endoscopic', n_occurrences_with_approach: 1, n_total_occurrences: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - FINAL: singular_condition_category (edge cases)
+  # =========================================================================
+
+  - name: test_ccsr_singular_condition_op_record_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__singular_condition_category
+    description: "When record_type is OP, singular condition selects the OP default category instead of IP"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        dxccsr_version: '2023.1'
+        record_type: 'op'
+    given:
+      - input: ref('ccsr__long_condition_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END010', ccsr_category_description: 'DM complication', ccsr_category_rank: 1, is_ip_default_category: 0, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END011', ccsr_category_description: 'DM general', ccsr_category_rank: 2, is_ip_default_category: 1, is_op_default_category: 0, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', normalized_code: 'E11.65', ccsr_category: 'END010', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_singular_condition_multiple_encounters
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__singular_condition_category
+    description: "Multiple encounters each produce their own singular condition category row"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        dxccsr_version: '2023.1'
+        record_type: 'ip'
+    given:
+      - input: ref('ccsr__long_condition_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END010', ccsr_category_description: 'DM complication', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P2', normalized_code: 'I10', code_description: 'Hypertension', condition_rank: 1, ccsr_parent_category: 'CIR', body_system: 'Circulatory', ccsr_category: 'CIR007', ccsr_category_description: 'Hypertension', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Circulatory disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', normalized_code: 'E11.65', ccsr_category: 'END010', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P2', normalized_code: 'I10', ccsr_category: 'CIR007', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}

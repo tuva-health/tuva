@@ -1,0 +1,1698 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # ELIGIBILITY ATOMIC CHECKS (27 models)
+  # =========================================================================
+
+  - name: test_eligibility_address_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_address
+    description: >
+      Address is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', address: '123 Main St'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'eligibility', field_name: 'ADDRESS', bucket_name: 'valid'}
+
+  - name: test_eligibility_birth_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_birth_date
+    description: >
+      Birth date is a valid past date so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', birth_date: '1980-06-15'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'BIRTH_DATE', bucket_name: 'valid'}
+
+  - name: test_eligibility_city_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_city
+    description: >
+      City is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', city: 'Boston'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'CITY', bucket_name: 'valid'}
+
+  - name: test_eligibility_data_source_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_data_source
+    description: >
+      Data source is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'DATA_SOURCE', bucket_name: 'valid'}
+
+  - name: test_eligibility_death_date_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_death_date
+    description: >
+      Death date is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', birth_date: '1980-01-01', death_date: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'DEATH_DATE', bucket_name: 'null'}
+
+  - name: test_eligibility_death_flag_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_death_flag
+    description: >
+      Death flag is 0 so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', death_flag: 0}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'DEATH_FLAG', bucket_name: 'valid'}
+
+  - name: test_eligibility_dual_status_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_dual_status_code
+    description: >
+      Dual status code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', dual_status_code: '01'}
+      - input: ref('terminology__medicare_dual_eligibility')
+        rows:
+          - {dual_status_code: '01', dual_status_description: 'Qualified Medicare Beneficiary'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'DUAL_STATUS_CODE', bucket_name: 'valid'}
+
+  - name: test_eligibility_email_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_email
+    description: >
+      Email is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', email: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'EMAIL', bucket_name: 'null'}
+
+  - name: test_eligibility_end_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_end_date
+    description: >
+      End date is after start date so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', enrollment_end_date: '2023-12-31'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'ENROLLMENT_END_DATE', bucket_name: 'valid'}
+
+  - name: test_eligibility_ethnicity_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_ethnicity
+    description: >
+      Ethnicity is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', ethnicity: null}
+      - input: ref('terminology__ethnicity')
+        rows:
+          - {code: 'hispanic'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'ETHNICITY', bucket_name: 'null'}
+
+  - name: test_eligibility_first_name_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_first_name
+    description: >
+      First name is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', first_name: 'John'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'FIRST_NAME', bucket_name: 'valid'}
+
+  - name: test_eligibility_gender_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_gender
+    description: >
+      Gender joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', gender: 'male'}
+      - input: ref('terminology__gender')
+        rows:
+          - {gender: 'male'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'GENDER', bucket_name: 'valid'}
+
+  - name: test_eligibility_last_name_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_last_name
+    description: >
+      Last name is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', last_name: 'Doe'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'LAST_NAME', bucket_name: 'valid'}
+
+  - name: test_eligibility_medicare_status_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_medicare_status_code
+    description: >
+      Medicare status code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', medicare_status_code: '10'}
+      - input: ref('terminology__medicare_status')
+        rows:
+          - {medicare_status_code: '10', medicare_status_description: 'Aged without ESRD'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'MEDICARE_STATUS_CODE', bucket_name: 'valid'}
+
+  - name: test_eligibility_member_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_member_id
+    description: >
+      Member ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'MEMBER_ID', bucket_name: 'valid'}
+
+  - name: test_eligibility_middle_name_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_middle_name
+    description: >
+      Middle name is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', middle_name: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'MIDDLE_NAME', bucket_name: 'null'}
+
+  - name: test_eligibility_name_suffix_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_name_suffix
+    description: >
+      Name suffix is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', name_suffix: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'NAME_SUFFIX', bucket_name: 'null'}
+
+  - name: test_eligibility_original_reason_entitlement_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_original_reason_entitlement_code
+    description: >
+      OREC joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', original_reason_entitlement_code: '0'}
+      - input: ref('terminology__medicare_orec')
+        rows:
+          - {original_reason_entitlement_code: '0', original_reason_entitlement_description: 'Old Age'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'ORIGINAL_REASON_ENTITLEMENT_CODE', bucket_name: 'valid'}
+
+  - name: test_eligibility_payer_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_payer
+    description: >
+      Payer is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', payer: 'Medicare'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'PAYER', bucket_name: 'valid'}
+
+  - name: test_eligibility_payer_type_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_payer_type
+    description: >
+      Payer type joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', payer_type: 'medicare'}
+      - input: ref('terminology__payer_type')
+        rows:
+          - {payer_type: 'medicare'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'PAYER_TYPE', bucket_name: 'valid'}
+
+  - name: test_eligibility_person_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_person_id
+    description: >
+      Person ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', person_id: 'P1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'PERSON_ID', bucket_name: 'valid'}
+
+  - name: test_eligibility_phone_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_phone
+    description: >
+      Phone is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', phone: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'PHONE', bucket_name: 'null'}
+
+  - name: test_eligibility_plan_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_plan
+    description: >
+      Plan is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', plan: 'Plan A'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'PLAN', bucket_name: 'valid'}
+
+  - name: test_eligibility_race_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_race
+    description: >
+      Race joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', race: 'white'}
+      - input: ref('terminology__race')
+        rows:
+          - {description: 'white'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'RACE', bucket_name: 'valid'}
+
+  - name: test_eligibility_start_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_start_date
+    description: >
+      Start date is valid past date so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'ENROLLMENT_START_DATE', bucket_name: 'valid'}
+
+  - name: test_eligibility_state_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_state
+    description: >
+      State joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', state: 'Massachusetts'}
+      - input: ref('reference_data__ssa_fips_state')
+        rows:
+          - {ssa_fips_state_name: 'Massachusetts'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'STATE', bucket_name: 'valid'}
+
+  - name: test_eligibility_zip_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__eligibility_zip_code
+    description: >
+      Zip code is 5 digits so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {data_source: 'src1', enrollment_start_date: '2023-01-01', member_id: 'M1', zip_code: '02101'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'ELIGIBILITY', field_name: 'ZIP_CODE', bucket_name: 'valid'}
+
+  # =========================================================================
+  # MEDICAL CLAIM (shared/general) ATOMIC CHECKS (21 models)
+  # =========================================================================
+
+  - name: test_claim_allowed_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_allowed_amount
+    description: >
+      Allowed amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', allowed_amount: 100.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'ALLOWED_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_charge_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_charge_amount
+    description: >
+      Charge amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', charge_amount: 200.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CHARGE_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_claim_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_claim_id
+    description: >
+      Claim ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_ID', bucket_name: 'valid'}
+
+  - name: test_claim_claim_line_end_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_claim_line_end_date
+    description: >
+      Claim line end date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', claim_line_end_date: '2023-01-15', claim_end_date: '2023-01-15'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_LINE_END_DATE', bucket_name: 'valid'}
+
+  - name: test_claim_claim_line_number_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_claim_line_number
+    description: >
+      Claim line number is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', claim_line_number: 1}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_LINE_NUMBER', bucket_name: 'valid'}
+
+  - name: test_claim_claim_line_start_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_claim_line_start_date
+    description: >
+      Claim line start date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', claim_line_start_date: '2023-01-01'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_LINE_START_DATE', bucket_name: 'valid'}
+
+  - name: test_claim_claim_type_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_claim_type
+    description: >
+      Claim type joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional'}
+      - input: ref('terminology__claim_type')
+        rows:
+          - {claim_type: 'institutional'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_TYPE', bucket_name: 'valid'}
+
+  - name: test_claim_coinsurance_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_coinsurance_amount
+    description: >
+      Coinsurance amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', coinsurance_amount: 50.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'COINSURANCE_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_copayment_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_copayment_amount
+    description: >
+      Copayment amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', copayment_amount: 25.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'COPAYMENT_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_data_source_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_data_source
+    description: >
+      Data source is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DATA_SOURCE', bucket_name: 'valid'}
+
+  - name: test_claim_deductible_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_deductible_amount
+    description: >
+      Deductible amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', deductible_amount: 500.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DEDUCTIBLE_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_diagnosis_code_type_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_diagnosis_code_type
+    description: >
+      Diagnosis code type joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_code_type: 'icd-10-cm'}
+      - input: ref('reference_data__code_type')
+        rows:
+          - {code_type: 'icd-10-cm'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_TYPE', bucket_name: 'valid'}
+
+  - name: test_claim_drg_code_type_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_drg_code_type
+    description: >
+      DRG code type joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', drg_code_type: 'ms-drg'}
+      - input: ref('reference_data__code_type')
+        rows:
+          - {code_type: 'ms-drg'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DRG_CODE_TYPE', bucket_name: 'valid'}
+
+  - name: test_claim_hcpcs_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_hcpcs_code
+    description: >
+      HCPCS code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', hcpcs_code: '99213'}
+      - input: ref('terminology__hcpcs_level_2')
+        rows:
+          - {hcpcs: '99213', short_description: 'Office visit'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'HCPCS_CODE', bucket_name: 'valid'}
+
+  - name: test_claim_member_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_member_id
+    description: >
+      Member ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', member_id: 'M1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'MEMBER_ID', bucket_name: 'valid'}
+
+  - name: test_claim_paid_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_paid_amount
+    description: >
+      Paid amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', paid_amount: 75.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PAID_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_claim_paid_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_paid_date
+    description: >
+      Paid date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', paid_date: '2023-02-01'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PAID_DATE', bucket_name: 'valid'}
+
+  - name: test_claim_payer_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_payer
+    description: >
+      Payer is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', payer: 'Medicare'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PAYER', bucket_name: 'valid'}
+
+  - name: test_claim_person_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_person_id
+    description: >
+      Person ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', person_id: 'P1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PERSON_ID', bucket_name: 'valid'}
+
+  - name: test_claim_plan_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_plan
+    description: >
+      Plan is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', plan: 'Plan A'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PLAN', bucket_name: 'valid'}
+
+  - name: test_claim_total_cost_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__claim_total_cost_amount
+    description: >
+      Total cost amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', total_cost_amount: 1000.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'TOTAL_COST_AMOUNT', bucket_name: 'valid'}
+
+  # =========================================================================
+  # INSTITUTIONAL ATOMIC CHECKS (26 models)
+  # =========================================================================
+
+  - name: test_institutional_bill_type_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_bill_type_code
+    description: >
+      Bill type code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', bill_type_code: '111'}
+      - input: ref('terminology__bill_type')
+        rows:
+          - {bill_type_code: '111', bill_type_description: 'Hospital Inpatient'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'BILL_TYPE_CODE', bucket_name: 'valid'}
+
+  - name: test_institutional_billing_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_billing_npi
+    description: >
+      Billing NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', billing_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'BILLING_NPI', bucket_name: 'valid'}
+
+  - name: test_institutional_claim_end_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_claim_end_date
+    description: >
+      Claim end date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', claim_end_date: '2023-01-15'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_END_DATE', bucket_name: 'valid'}
+
+  - name: test_institutional_claim_start_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_claim_start_date
+    description: >
+      Claim start date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_START_DATE', bucket_name: 'valid'}
+
+  - name: test_institutional_diagnosis_code_1_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_diagnosis_code_1
+    description: >
+      Diagnosis code 1 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_code_1: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_1', bucket_name: 'null'}
+
+  - name: test_institutional_diagnosis_code_2_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_diagnosis_code_2
+    description: >
+      Diagnosis code 2 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_code_2: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_2', bucket_name: 'null'}
+
+  - name: test_institutional_diagnosis_code_3_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_diagnosis_code_3
+    description: >
+      Diagnosis code 3 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_code_3: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_3', bucket_name: 'null'}
+
+  - name: test_institutional_diagnosis_code_uniqueness_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_diagnosis_code_uniqueness
+    description: >
+      No duplicate diagnosis codes so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_code_1: 'E11', diagnosis_code_2: 'I10', diagnosis_code_3: null, diagnosis_code_4: null, diagnosis_code_5: null, diagnosis_code_6: null, diagnosis_code_7: null, diagnosis_code_8: null, diagnosis_code_9: null, diagnosis_code_10: null, diagnosis_code_11: null, diagnosis_code_12: null, diagnosis_code_13: null, diagnosis_code_14: null, diagnosis_code_15: null, diagnosis_code_16: null, diagnosis_code_17: null, diagnosis_code_18: null, diagnosis_code_19: null, diagnosis_code_20: null, diagnosis_code_21: null, diagnosis_code_22: null, diagnosis_code_23: null, diagnosis_code_24: null, diagnosis_code_25: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_UNIQUENESS', bucket_name: 'valid'}
+
+  - name: test_institutional_discharge_disposition_code_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_discharge_disposition_code
+    description: >
+      Discharge disposition code is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', discharge_disposition_code: null}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01', discharge_disposition_description: 'Discharged to home'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DISCHARGE_DISPOSITION_CODE', bucket_name: 'null'}
+
+  - name: test_institutional_facility_npi_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_facility_npi
+    description: >
+      Facility NPI is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', facility_npi: null}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'FACILITY_NPI', bucket_name: 'null'}
+
+  - name: test_institutional_present_on_admission_1_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_present_on_admission_1
+    description: >
+      POA 1 is 'y' so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_poa_1: 'y'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_POA_1', bucket_name: 'valid'}
+
+  - name: test_institutional_present_on_admission_2_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_present_on_admission_2
+    description: >
+      POA 2 is 'n' so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_poa_2: 'n'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_POA_2', bucket_name: 'valid'}
+
+  - name: test_institutional_present_on_admission_3_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_present_on_admission_3
+    description: >
+      POA 3 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', diagnosis_poa_3: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_POA_3', bucket_name: 'null'}
+
+  - name: test_institutional_rendering_npi_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_rendering_npi
+    description: >
+      Rendering NPI is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'institutional', rendering_npi: null}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'RENDERING_NPI', bucket_name: 'null'}
+
+  - name: test_institutional_revenue_center_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_revenue_center_code
+    description: >
+      Revenue center code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', revenue_center_code: '0120'}
+      - input: ref('terminology__revenue_center')
+        rows:
+          - {revenue_center_code: '0120', revenue_center_description: 'Room and Board'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'REVENUE_CENTER_CODE', bucket_name: 'valid'}
+
+  - name: test_institutional_service_unit_quantity_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__institutional_service_unit_quantity
+    description: >
+      Service unit quantity is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'institutional', service_unit_quantity: 5}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'service_unit_quantity', bucket_name: 'valid'}
+
+  # =========================================================================
+  # PROFESSIONAL ATOMIC CHECKS (9 models)
+  # =========================================================================
+
+  - name: test_professional_billing_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_billing_npi
+    description: >
+      Billing NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', billing_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'BILLING_NPI', bucket_name: 'valid'}
+
+  - name: test_professional_claim_end_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_claim_end_date
+    description: >
+      Professional claim end date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'professional', claim_end_date: '2023-01-15'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_END_DATE', bucket_name: 'valid'}
+
+  - name: test_professional_claim_start_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_claim_start_date
+    description: >
+      Professional claim start date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_type: 'professional'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'CLAIM_START_DATE', bucket_name: 'valid'}
+
+  - name: test_professional_diagnosis_code_1_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_diagnosis_code_1
+    description: >
+      Professional diagnosis code 1 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', diagnosis_code_1: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_1', bucket_name: 'null'}
+
+  - name: test_professional_diagnosis_code_2_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_diagnosis_code_2
+    description: >
+      Professional diagnosis code 2 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', diagnosis_code_2: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_2', bucket_name: 'null'}
+
+  - name: test_professional_diagnosis_code_3_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_diagnosis_code_3
+    description: >
+      Professional diagnosis code 3 is null so bucket should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', diagnosis_code_3: null}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 diabetes'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'DIAGNOSIS_CODE_3', bucket_name: 'null'}
+
+  - name: test_professional_facility_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_facility_npi
+    description: >
+      Facility NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', facility_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'FACILITY_NPI', bucket_name: 'valid'}
+
+  - name: test_professional_place_of_service_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_place_of_service_code
+    description: >
+      Place of service code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', place_of_service_code: '11'}
+      - input: ref('terminology__place_of_service')
+        rows:
+          - {place_of_service_code: '11', place_of_service_description: 'Office'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'PLACE_OF_SERVICE_CODE', bucket_name: 'valid'}
+
+  - name: test_professional_rendering_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__professional_rendering_npi
+    description: >
+      Rendering NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {data_source: 'src1', claim_start_date: '2023-01-01', claim_id: 'MC1', claim_line_number: 1, claim_type: 'professional', rendering_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'MEDICAL_CLAIM', field_name: 'RENDERING_NPI', bucket_name: 'valid'}
+
+  # =========================================================================
+  # PHARMACY ATOMIC CHECKS (21 models)
+  # =========================================================================
+
+  - name: test_pharmacy_allowed_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_allowed_amount
+    description: >
+      Allowed amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, allowed_amount: 100.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'ALLOWED_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_pharmacy_claim_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_id
+    description: >
+      Pharmacy claim ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'CLAIM_ID', bucket_name: 'valid'}
+
+  - name: test_pharmacy_claim_line_number_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_claim_line_number
+    description: >
+      Pharmacy claim line number is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'CLAIM_LINE_NUMBER', bucket_name: 'valid'}
+
+  - name: test_pharmacy_coinsurance_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_coinsurance_amount
+    description: >
+      Coinsurance amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, coinsurance_amount: 10.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'COINSURANCE_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_pharmacy_copayment_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_copayment_amount
+    description: >
+      Copayment amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, copayment_amount: 15.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'COPAYMENT_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_pharmacy_data_source_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_data_source
+    description: >
+      Pharmacy data source is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'DATA_SOURCE', bucket_name: 'valid'}
+
+  - name: test_pharmacy_days_supply_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_days_supply
+    description: >
+      Days supply is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, days_supply: 30}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'DAYS_SUPPLY', bucket_name: 'valid'}
+
+  - name: test_pharmacy_deductible_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_deductible_amount
+    description: >
+      Deductible amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, deductible_amount: 50.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'DEDUCTIBLE_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_pharmacy_dispensing_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_dispensing_date
+    description: >
+      Dispensing date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, dispensing_date: '2023-01-10'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'DISPENSING_DATE', bucket_name: 'valid'}
+
+  - name: test_pharmacy_dispensing_provider_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_dispensing_provider_npi
+    description: >
+      Dispensing provider NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, dispensing_provider_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'DISPENSING_PROVIDER_NPI', bucket_name: 'valid'}
+
+  - name: test_pharmacy_member_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_member_id
+    description: >
+      Pharmacy member ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, member_id: 'M1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'MEMBER_ID', bucket_name: 'valid'}
+
+  - name: test_pharmacy_ndc_code_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_ndc_code
+    description: >
+      NDC code joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, ndc_code: '12345678901'}
+      - input: ref('terminology__ndc')
+        rows:
+          - {ndc: '12345678901', rxnorm_description: 'Metformin 500mg', fda_description: null}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'NDC_CODE', bucket_name: 'valid'}
+
+  - name: test_pharmacy_paid_amount_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_paid_amount
+    description: >
+      Paid amount is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, paid_amount: 75.00}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PAID_AMOUNT', bucket_name: 'valid'}
+
+  - name: test_pharmacy_paid_date_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_paid_date
+    description: >
+      Paid date is valid so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PAID_DATE', bucket_name: 'valid'}
+
+  - name: test_pharmacy_payer_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_payer
+    description: >
+      Payer is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, payer: 'Medicare'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PAYER', bucket_name: 'valid'}
+
+  - name: test_pharmacy_person_id_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_person_id
+    description: >
+      Pharmacy person ID is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, person_id: 'P1'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PERSON_ID', bucket_name: 'valid'}
+
+  - name: test_pharmacy_plan_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_plan
+    description: >
+      Plan is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, plan: 'Plan A'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PLAN', bucket_name: 'valid'}
+
+  - name: test_pharmacy_prescribing_provider_npi_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_prescribing_provider_npi
+    description: >
+      Prescribing provider NPI joins to terminology so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, prescribing_provider_npi: '1234567890'}
+      - input: ref('terminology__provider')
+        rows:
+          - {npi: '1234567890'}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'PRESCRIBING_PROVIDER_NPI', bucket_name: 'valid'}
+
+  - name: test_pharmacy_quantity_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_quantity
+    description: >
+      Quantity is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, quantity: 60}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'QUANTITY', bucket_name: 'valid'}
+
+  - name: test_pharmacy_refills_valid
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__pharmacy_refills
+    description: >
+      Refills is non-null so bucket should be valid.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {data_source: 'src1', paid_date: '2023-01-15', claim_id: 'RX1', claim_line_number: 1, refills: 3}
+    expect:
+      rows:
+        - {data_source: 'src1', table_name: 'PHARMACY_CLAIM', field_name: 'REFILLS', bucket_name: 'valid'}
+

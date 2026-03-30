@@ -1,0 +1,110 @@
+name: Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'models/**'
+      - 'macros/**'
+      - 'integration_tests/**'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  unit_tests:
+    name: Run Unit Tests (DuckDB)
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: "3.10"
+      DBT_PROJECT_DIR: "./integration_tests"
+      DBT_PROFILES_DIR: "./integration_tests/profiles/duckdb"
+      DBT_MOTHERDUCK_CI_PATH: ${{ secrets.DBT_MOTHERDUCK_CI_PATH }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-duckdb
+        run: pip install dbt-core dbt-duckdb
+
+      - name: Install dbt dependencies
+        run: dbt deps --project-dir ${{ env.DBT_PROJECT_DIR }} --profiles-dir ${{ env.DBT_PROFILES_DIR }}
+
+      - name: Load seeds
+        run: |
+          dbt seed \
+            --project-dir ${{ env.DBT_PROJECT_DIR }} \
+            --profiles-dir ${{ env.DBT_PROFILES_DIR }}
+
+      - name: Build model schemas
+        run: |
+          dbt run --empty \
+            --project-dir ${{ env.DBT_PROJECT_DIR }} \
+            --profiles-dir ${{ env.DBT_PROFILES_DIR }} \
+            || echo "Note: some models may fail with --empty (e.g. pivot macros). This is expected."
+
+      - name: Run unit tests
+        run: |
+          dbt test \
+            --select test_type:unit \
+            --project-dir ${{ env.DBT_PROJECT_DIR }} \
+            --profiles-dir ${{ env.DBT_PROFILES_DIR }}
+
+  check_test_coverage:
+    name: Check Unit Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check new models have unit tests
+        run: |
+          # Get list of new model SQL files in this PR
+          NEW_MODELS=$(git diff --name-only --diff-filter=A origin/main...HEAD -- 'models/**/*.sql' | grep -v '__sources\|__docs' || true)
+
+          if [ -z "$NEW_MODELS" ]; then
+            echo "No new model files found. Skipping coverage check."
+            exit 0
+          fi
+
+          echo "New model files in this PR:"
+          echo "$NEW_MODELS"
+          echo ""
+
+          MISSING_TESTS=""
+          for model_file in $NEW_MODELS; do
+            model_dir=$(dirname "$model_file")
+
+            # Check for unit test files in the model directory or parent
+            has_tests=false
+            if ls "$model_dir"/*unit_tests*.yml 2>/dev/null | grep -q .; then
+              has_tests=true
+            fi
+            parent_dir=$(dirname "$model_dir")
+            if ls "$parent_dir"/*unit_tests*.yml 2>/dev/null | grep -q .; then
+              has_tests=true
+            fi
+
+            if [ "$has_tests" = false ]; then
+              MISSING_TESTS="$MISSING_TESTS\n  - $model_file"
+            fi
+          done
+
+          if [ -n "$MISSING_TESTS" ]; then
+            echo ""
+            echo "::warning::The following new models are in directories without unit test files:$MISSING_TESTS"
+            echo ""
+            echo "Consider adding unit tests in a *_unit_tests.yml file in the model directory."
+          else
+            echo "All new model directories have unit test files."
+          fi

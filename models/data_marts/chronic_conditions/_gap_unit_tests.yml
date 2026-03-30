@@ -1,0 +1,23 @@
+version: 2
+
+unit_tests:
+
+  - name: test_chronic_conditions__cms_chronic_conditions_long_empty_inputs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    description: >
+      Verify the CMS long format returns empty when all intermediate
+      models are empty.
+    model: chronic_conditions__cms_chronic_conditions_long
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('chronic_conditions__cms_chronic_conditions_all')
+        rows: []
+      - input: ref('chronic_conditions__cms_chronic_conditions_hiv_aids')
+        rows: []
+      - input: ref('chronic_conditions__cms_chronic_conditions_oud')
+        rows: []
+    expect:
+      rows: []

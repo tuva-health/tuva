@@ -1,0 +1,266 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING MODELS
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__stg_inpatient_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_stg_inpatient_institutional_bill_type
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__stg_inpatient_institutional
+    description: >
+      Institutional claims with inpatient bill type codes (e.g., '11')
+      are classified as inpatient service_type.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', bill_type_code: '111', drg_code_type: null, drg_code: null, data_source: 'src1'}
+          - {claim_id: 'C2', claim_line_number: 1, claim_type: 'institutional', bill_type_code: '131', drg_code_type: null, drg_code: null, data_source: 'src1'}
+          - {claim_id: 'C3', claim_line_number: 1, claim_type: 'professional', bill_type_code: null, drg_code_type: null, drg_code: null, data_source: 'src1'}
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__stg_medical_claim
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__stg_medical_claim
+    description: >
+      Passes through normalized medical claim data enriched with terminology
+      lookups for CCS, provider, revenue center, place of service, and bill type.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', admission_date: null, discharge_date: null, claim_start_date: '2023-01-01', claim_end_date: '2023-01-01', claim_line_start_date: '2023-01-01', claim_line_end_date: '2023-01-01', bill_type_code: null, hcpcs_code: '99213', drg_code_type: null, drg_code: null, drg_description: null, place_of_service_code: '11', revenue_center_code: null, diagnosis_code_1: 'J06.9', facility_npi: null, rendering_npi: null, data_source: 'src1'}
+      - input: ref('ccsr__dxccsr_v2023_1_cleaned_map')
+        rows: []
+      - input: ref('terminology__provider')
+        rows: []
+      - input: ref('terminology__nitos')
+        rows: []
+      - input: ref('terminology__revenue_center')
+        rows: []
+      - input: ref('terminology__place_of_service')
+        rows: []
+      - input: ref('terminology__bill_type')
+        rows: []
+      - input: ref('terminology__ccs_services_procedures')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', hcpcs_code: '99213', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Institutional Categories
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__acute_inpatient_institutional_maternity
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_acute_inpatient_institutional_maternity
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__acute_inpatient_institutional_maternity
+    description: >
+      Inpatient claims with maternity-related MS-DRG codes (MDC 14/15) are
+      classified with specific L&D service_category_3 values.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', drg_code: '768', drg_code_type: 'ms-drg', revenue_center_code: null, data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '768', mdc_code: '14', ms_drg_description: 'Vaginal delivery', medical_surgical: 'P'}
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'l/d - vaginal delivery', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # service_category__acute_inpatient_institutional_med_surg
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_acute_inpatient_institutional_med_surg
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__acute_inpatient_institutional_med_surg
+    description: >
+      Inpatient claims with valid DRG codes are classified as medical or
+      surgical based on the DRG medical_surgical flag.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', drg_code: '193', drg_code_type: 'ms-drg', data_source: 'src1'}
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '193', mdc_code: '04', ms_drg_description: 'Pneumonia', medical_surgical: 'M'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'medical', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Office-Based Categories
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__office_based_surgery_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_office_based_surgery_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__office_based_surgery_professional
+    description: >
+      Office-based professional claims with numeric HCPCS codes between
+      10021 and 69999 are classified as office-based surgery.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', claim_type: 'professional', hcpcs_code: '11102', data_source: 'src1'}
+      - input: ref('service_category__stg_office_based')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # -------------------------------------------------------------------------
+  # service_category__office_based_other_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_office_based_other_professional
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__office_based_other_professional
+    description: >
+      Office-based claims not matched by any specific office-based subcategory
+      (pharmacy, radiology, visit, surgery, PT) fall into office-based other.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_office_based')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'office based', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('service_category__pharmacy_professional')
+        rows: []
+      - input: ref('service_category__office_based_radiology')
+        rows: []
+      - input: ref('service_category__office_based_visit_professional')
+        rows: []
+      - input: ref('service_category__office_based_surgery_professional')
+        rows: []
+      - input: ref('service_category__office_based_physical_therapy_professional')
+        rows: []
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'office-based', service_category_2: 'office-based other', service_category_3: 'office-based other', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Combined
+  # =========================================================================
+
+  # =========================================================================
+  # FINAL MODEL
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # service_category__service_category_grouper
+  # -------------------------------------------------------------------------
+
+  - name: test_gap_sc_service_category_grouper
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__service_category_grouper
+    description: >
+      Combines professional, institutional header, and institutional line
+      service categories, deduplicates by priority, and produces the final
+      service category assignment per claim line.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'professional', data_source: 'src1'}
+      - input: ref('service_category__combined_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_line_id: 'C1|1', service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', source_model_name: 'service_category__emergency_department_professional', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('service_category__combined_institutional_header_level')
+        rows: []
+      - input: ref('service_category__combined_institutional_line_level')
+        rows: []
+      - input: ref('service_category__service_categories')
+        rows:
+          - {service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', priority: 2}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_type: 'professional', service_category_1: 'outpatient', service_category_2: 'emergency department', service_category_3: 'emergency department', duplicate_row_number: 1}
+
+  - name: test_gap_sc_service_category_grouper_prioritizes_institutional_line_level
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: service_category__service_category_grouper
+    description: >
+      Institutional claims can match both header and line-level service
+      categories; the lower priority_number should receive duplicate_row_number
+      1 so downstream encounter models do not fan out.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', data_source: 'src1'}
+      - input: ref('service_category__combined_professional')
+        rows: []
+      - input: ref('service_category__combined_institutional_header_level')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'acute inpatient - other', source_model_name: 'service_category__acute_inpatient_institutional_other'}
+      - input: ref('service_category__combined_institutional_line_level')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', source_model_name: 'service_category__ambulance_institutional'}
+      - input: ref('service_category__service_categories')
+        rows:
+          - {service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'acute inpatient - other', priority: 20}
+          - {service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', priority: 1}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_type: 'institutional', service_category_1: 'ancillary', service_category_2: 'ambulance', service_category_3: 'ambulance', duplicate_row_number: 1, source_model_name: 'service_category__ambulance_institutional'}
+        - {claim_id: 'C1', claim_line_number: 1, data_source: 'src1', claim_type: 'institutional', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'acute inpatient - other', duplicate_row_number: 2, source_model_name: 'service_category__acute_inpatient_institutional_other'}

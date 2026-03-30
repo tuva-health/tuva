@@ -1,0 +1,423 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING: stg_ahrq_measures__pqi_summary
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_ahrq_pqi_summary_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_ahrq_measures__pqi_summary
+    description: "PQI summary staging passes through pqi_number, pqi_name, encounter_id and appends tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_summary')
+        rows:
+          - {pqi_number: 'PQI01', pqi_name: 'Diabetes Short-Term Complications', encounter_id: 'E1'}
+    expect:
+      rows:
+        - {pqi_number: 'PQI01', pqi_name: 'Diabetes Short-Term Complications', encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_chronic_conditions__tuva_chronic_conditions_long
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_chronic_conditions_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_chronic_conditions__tuva_chronic_conditions_long
+    description: "Chronic conditions staging passes through person_id and condition with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('chronic_conditions__tuva_chronic_conditions_long')
+        rows:
+          - {person_id: 'P1', condition: 'Diabetes Mellitus'}
+    expect:
+      rows:
+        - {person_id: 'P1', condition: 'Diabetes Mellitus', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_semantic_layer_stg_chronic_conditions_multiple
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_chronic_conditions__tuva_chronic_conditions_long
+    description: "Chronic conditions staging handles multiple conditions per patient"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('chronic_conditions__tuva_chronic_conditions_long')
+        rows:
+          - {person_id: 'P1', condition: 'Diabetes Mellitus'}
+          - {person_id: 'P1', condition: 'Hypertension'}
+          - {person_id: 'P2', condition: 'COPD'}
+    expect:
+      rows:
+        - {person_id: 'P1', condition: 'Diabetes Mellitus', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', condition: 'Hypertension', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', condition: 'COPD', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_cms_hcc__patient_risk_factors
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_risk_factors_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_cms_hcc__patient_risk_factors
+    description: "Risk factors staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_factors')
+        rows:
+          - {person_id: 'P1', factor_type: 'disease', risk_factor_description: 'HCC19', coefficient: 0.302, model_version: 'V24', payment_year: 2024}
+    expect:
+      rows:
+        - {person_id: 'P1', factor_type: 'disease', risk_factor_description: 'HCC19', coefficient: 0.302, model_version: 'V24', payment_year: 2024, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_cms_hcc__patient_risk_scores
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_risk_scores_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_cms_hcc__patient_risk_scores
+    description: "Risk scores staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_scores')
+        rows:
+          - {person_id: 'P1', v24_risk_score: 1.5, v28_risk_score: 1.3, blended_risk_score: 1.4, normalized_risk_score: 1.4, payment_risk_score: 1.4, payment_risk_score_weighted_by_months: 14.0, member_months: 10, payment_year: 2024}
+    expect:
+      rows:
+        - {person_id: 'P1', v24_risk_score: 1.5, v28_risk_score: 1.3, blended_risk_score: 1.4, normalized_risk_score: 1.4, payment_risk_score: 1.4, payment_risk_score_weighted_by_months: 14.0, member_months: 10, payment_year: 2024, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_cms_hcc__patient_risk_scores_monthly
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_risk_scores_monthly_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_cms_hcc__patient_risk_scores_monthly
+    description: "Monthly risk scores staging passes through columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_scores_monthly')
+        rows:
+          - {collection_end_date: '2024-03-31', person_id: 'P1', normalized_risk_score: 1.25}
+    expect:
+      rows:
+        - {collection_end_date: '2024-03-31', person_id: 'P1', normalized_risk_score: 1.25, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__eligibility
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_eligibility_distinct_data_source
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__eligibility
+    description: "Eligibility staging selects distinct data_source values"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {data_source: 'src1', person_id: 'P1'}
+          - {data_source: 'src1', person_id: 'P2'}
+          - {data_source: 'src2', person_id: 'P3'}
+    expect:
+      rows:
+        - {data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_source: 'src2', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__member_months
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_member_months_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__member_months
+    description: "Member months staging passes through key columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+    expect:
+      rows:
+        - {person_id: 'P1', data_source: 'src1', year_month: '202301', payer: 'MCR', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__patient
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__patient
+    description: "Patient staging passes through all core patient columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {person_id: 'P1', name_suffix: null, first_name: 'John', middle_name: null, last_name: 'Doe', sex: 'male', race: 'white', birth_date: '1960-01-01', death_date: null, death_flag: 0, address: '123 Main', city: 'Town', state: 'CA', zip_code: '90210', county: 'LA', latitude: 34.0, longitude: -118.0, phone: '5551234567', email: null, ethnicity: null, data_source: 'src1', age: 64, age_group: '60-69'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__pharmacy_claim
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__pharmacy_claim
+    description: "Pharmacy claim staging passes through key columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', data_source: 'src1', ndc_code: '00000000001', paid_amount: 50.00, allowed_amount: 60.00, prescribing_provider_id: 'NPI1', prescribing_provider_name: 'Dr Smith', dispensing_provider_id: 'NPI2', dispensing_provider_name: 'Pharmacy A', paid_date: '2023-06-15', dispensing_date: '2023-06-14', days_supply: 30, quantity: 30}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', ndc_code: '00000000001', paid_amount: 50.00, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__practitioner
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_practitioner_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__practitioner
+    description: "Practitioner staging passes through npi, specialty, practitioner_id with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__practitioner')
+        rows:
+          - {npi: '1234567890', specialty: 'Internal Medicine', practitioner_id: 'PRAC1'}
+    expect:
+      rows:
+        - {npi: '1234567890', specialty: 'Internal Medicine', practitioner_id: 'PRAC1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_ed_classification__summary
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_ed_classification_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_ed_classification__summary
+    description: "ED classification staging passes through encounter_id, person_id, ed classification columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ed_classification__summary')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', ed_classification_order: 1, ed_classification_description: 'Non-Emergent'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', ed_classification_order: 1, ed_classification_description: 'Non-Emergent', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_financial_pmpm__pmpm_prep
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_pmpm_prep_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_financial_pmpm__pmpm_prep
+    description: "PMPM prep staging passes through cost columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', year_month: '202301', data_source: 'src1', inpatient_paid: 1000, outpatient_paid: 500, office_based_paid: 200, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 100, acute_inpatient_paid: 1000, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 200, outpatient_hospice_paid: 0, outpatient_hospital_or_clinic_paid: 0, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, inpatient_allowed: 1200, outpatient_allowed: 600, office_based_allowed: 250, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 120, acute_inpatient_allowed: 1200, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 250, outpatient_hospice_allowed: 0, outpatient_hospital_or_clinic_allowed: 0, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, total_paid: 1800, medical_paid: 1700, total_allowed: 2170, medical_allowed: 2050}
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', data_source: 'src1', inpatient_paid: 1000, total_paid: 1800, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_hcc_suspecting__list_rollup
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_hcc_suspecting_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_hcc_suspecting__list_rollup
+    description: "HCC suspecting staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('hcc_suspecting__list_rollup')
+        rows:
+          - {person_id: 'P1', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', latest_suspect_date: '2023-12-01'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', hcc_description: 'Diabetes', reason: 'Historical', contributing_factor: 'E11.65', latest_suspect_date: '2023-12-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_pharmacy__pharmacy_claim_expanded
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_pharmacy_expanded_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_pharmacy__pharmacy_claim_expanded
+    description: "Pharmacy claim expanded staging passes through columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy__pharmacy_claim_expanded')
+        rows:
+          - {data_source: 'src1', claim_id: 'C1', claim_line_number: 1, generic_available_total_opportunity: 100.00, generic_average_cost_per_unit: 1.50, brand_cost_per_unit: 5.00, generic_available: 'yes', generic_available_sk: 'sk1'}
+    expect:
+      rows:
+        - {data_source: 'src1', claim_id: 'C1', claim_line_number: 1, generic_available: 'yes', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_quality_measures__summary_long
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_quality_measures_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_quality_measures__summary_long
+    description: "Quality measures staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, exclusion_flag: 0, performance_flag: 0, evidence_date: '2023-06-15', evidence_value: null, exclusion_date: null, exclusion_reason: null, performance_period_begin: '2023-01-01', performance_period_end: '2023-12-31', measure_id: 'NQF0059', measure_name: 'Diabetes HbA1c', measure_version: '2023'}
+    expect:
+      rows:
+        - {person_id: 'P1', denominator_flag: 1, numerator_flag: 0, measure_id: 'NQF0059', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_readmissions__readmission_summary
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_readmission_summary_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_readmissions__readmission_summary
+    description: "Readmission summary staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__readmission_summary')
+        rows:
+          - {encounter_id: 'E1', index_admission_flag: 1, had_readmission_flag: 1, planned_flag: 0, readmit_30_flag: 1, unplanned_readmit_30_flag: 1, readmission_encounter_id: 'E2', days_to_readmit: 14, readmission_admit_date: '2023-07-01', readmission_discharge_date: '2023-07-05', readmission_discharge_disposition_code: '01', readmission_facility: 'Hospital A', readmission_drg_code_type: 'ms-drg', readmission_drg: '470', readmission_length_of_stay: 4, readmission_index_admission_flag: 0, readmission_planned_flag: 0, readmission_specialty_cohort: 'medicine', readmission_died_flag: 0, readmission_diagnosis_ccs: '108'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', index_admission_flag: 1, had_readmission_flag: 1, readmit_30_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_readmissions__encounter_augmented
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_encounter_augmented_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_readmissions__encounter_augmented
+    description: "Encounter augmented staging passes through encounter data from readmissions"
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1'}
+
+  # =========================================================================
+  # STAGING: stg_reference_data__calendar
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_calendar_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_reference_data__calendar
+    description: "Calendar staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-03-15', year: 2023, month: 3, day: 15, month_name: 'March', day_of_week_number: 4, day_of_week_name: 'Wednesday', week_of_year: 11, day_of_year: 74, year_month: '2023-03', first_day_of_month: '2023-03-01', last_day_of_month: '2023-03-31', year_month_int: 202303}
+    expect:
+      rows:
+        - {full_date: '2023-03-15', year: 2023, month: 3, day: 15, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__encounter
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__encounter
+    description: "Encounter staging passes through all core encounter columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_group: 'inpatient', encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-15', length_of_stay: 5, admit_source_code: '1', admit_source_description: 'Physician Referral', admit_type_code: '1', admit_type_description: 'Emergency', discharge_disposition_code: '01', discharge_disposition_description: 'Home', attending_provider_id: 'NPI1', attending_provider_name: 'Dr Smith', facility_npi: 'FAC1', facility_name: 'Hospital A', facility_type: 'acute care hospital', observation_flag: 0, lab_flag: 0, dme_flag: 0, ambulance_flag: 0, pharmacy_flag: 0, ed_flag: 0, delivery_flag: 0, delivery_type: null, newborn_flag: 0, nicu_flag: 0, snf_part_b_flag: 0, primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'I2510', primary_diagnosis_description: 'ASCVD', drg_code_type: 'ms-drg', drg_code: '470', drg_description: 'Major joint replacement', paid_amount: 25000, allowed_amount: 30000, charge_amount: 50000, claim_count: 2, inst_claim_count: 1, prof_claim_count: 1, source_model: 'tuva', data_source: 'src1', encounter_source_type: 'claims'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_group: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING: stg_core__medical_claim
+  # =========================================================================
+
+  - name: test_semantic_layer_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: semantic_layer__stg_core__medical_claim
+    description: "Medical claim staging passes through all columns with tuva_last_run"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', encounter_id: 'E1', person_id: 'P1', claim_id: 'C1', claim_line_number: 1, claim_type: 'institutional', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-10', claim_end_date: '2023-06-15', claim_line_start_date: '2023-06-10', claim_line_end_date: '2023-06-15', admission_date: '2023-06-10', discharge_date: '2023-06-15', admit_source_code: '1', admit_source_description: null, admit_type_code: '1', admit_type_description: null, discharge_disposition_code: '01', discharge_disposition_description: null, place_of_service_code: '21', place_of_service_description: null, bill_type_code: '111', bill_type_description: null, drg_code_type: null, drg_code: null, drg_description: null, revenue_center_code: '0100', revenue_center_description: null, service_unit_quantity: 1, hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, rendering_npi: 'NPI1', rendering_tin: null, rendering_name: null, billing_npi: 'NPI2', billing_tin: null, billing_name: null, facility_npi: 'FAC1', facility_name: null, paid_date: '2023-07-01', paid_amount: 500, allowed_amount: 600, charge_amount: 1000, coinsurance_amount: 0, copayment_amount: 0, deductible_amount: 0, total_cost_amount: 500, in_network_flag: 1, data_source: 'src1', service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: null, enrollment_flag: 1}
+    expect:
+      rows:
+        - {medical_claim_id: 'MC1', person_id: 'P1', claim_id: 'C1', claim_start_date: '2023-06-10', tuva_last_run: '2024-01-01 00:00:00'}

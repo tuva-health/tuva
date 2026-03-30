@@ -1,0 +1,632 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: stg_pqi_condition
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_condition
+    description: "PQI condition staging passes through normalized code fields from core condition"
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {normalized_code_type: 'icd-10-cm', normalized_code: 'E11.65', encounter_id: 'E1', data_source: 'src1'}
+    expect:
+      rows:
+        - {normalized_code_type: 'icd-10-cm', normalized_code: 'E11.65', encounter_id: 'E1', data_source: 'src1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: stg_pqi_patient
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_patient
+    description: "PQI patient staging passes through demographics from core patient"
+    given:
+      - input: ref('core__patient')
+        rows:
+          - {data_source: 'src1', birth_date: '1960-01-01', person_id: 'P1', sex: 'female'}
+    expect:
+      rows:
+        - {data_source: 'src1', birth_date: '1960-01-01', person_id: 'P1', sex: 'female'}
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: stg_pqi_member_months
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_member_months_joins_calendar
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_member_months
+    description: "PQI member months staging joins core member_months with calendar to get first_day_of_month"
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_month: '202306'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {year_month: '2023-06', first_day_of_month: '2023-06-01'}
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', first_day_of_month: '2023-06-01', year_month: '202306'}
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: stg_pqi_procedure
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_procedure
+    description: "PQI procedure staging passes through normalized code fields from core procedure"
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {normalized_code_type: 'icd-10-pcs', normalized_code: '0210093', encounter_id: 'E1', data_source: 'src1'}
+    expect:
+      rows:
+        - {normalized_code_type: 'icd-10-pcs', normalized_code: '0210093', encounter_id: 'E1', data_source: 'src1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - SHARED EXCLUSION: missing_dates
+  # =========================================================================
+
+  - name: test_ahrq_pqi_shared_exclusion_missing_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_shared_exclusion_missing_dates
+    description: "Missing dates exclusion identifies encounters with null start date"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: null, encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P2', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - SHARED EXCLUSION: missing_primary_dx
+  # =========================================================================
+
+  - name: test_ahrq_pqi_shared_exclusion_missing_primary_dx
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_shared_exclusion_missing_primary_dx
+    description: "Missing primary diagnosis exclusion identifies encounters with null primary_diagnosis_code"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: null, person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P2', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - SHARED EXCLUSION: transfer
+  # =========================================================================
+
+  - name: test_ahrq_pqi_shared_exclusion_transfer
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_shared_exclusion_transfer
+    description: "Transfer exclusion identifies encounters with admit_source_code 4, 5, or 6"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '4', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P2', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - SHARED EXCLUSION: ungroupable_drg
+  # =========================================================================
+
+  - name: test_ahrq_pqi_shared_exclusion_ungroupable_drg
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_shared_exclusion_ungroupable_drg
+    description: "Ungroupable DRG exclusion identifies encounters with DRG code 999"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '999', drg_description: 'Ungroupable', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P2', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - SHARED EXCLUSION: union
+  # =========================================================================
+
+  - name: test_ahrq_pqi_shared_exclusion_union_combines_reasons
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_shared_exclusion_union
+    description: "Shared exclusion union combines all exclusion reasons for encounters"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '999', drg_description: 'Ungroupable', admit_source_code: '4', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_missing_age')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_missing_gender')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_missing_dates')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_missing_primary_dx')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_transfer')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_ungroupable_drg')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer'}
+        - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'ungroupable DRG'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 01 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 01 EXCLUSIONS
+  # =========================================================================
+
+  - name: test_ahrq_pqi01_exclusions_from_shared
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_01_exclusions
+    description: "PQI 01 exclusions passes through shared exclusion union with row number"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_union')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', exclusion_number: 1}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 03 EXCLUSIONS
+  # =========================================================================
+
+  - name: test_ahrq_pqi03_exclusions_from_shared
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_03_exclusions
+    description: "PQI 03 exclusions passes through shared exclusion union with row number"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_union')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'missing age', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'missing age', exclusion_number: 1}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 03 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi03_num_matches_diabetes_long_term
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_03_num
+    description: "PQI 03 numerator identifies encounters with diabetes long-term complication diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1136', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'E1136', value_set_name: 'diabetes_with_long-term_complications_diagnosis_codes', pqi_number: '03'}
+      - input: ref('ahrq_measures__int_pqi_03_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_03_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 05 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 05 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi05_num_matches_copd_or_asthma
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_05_num
+    description: "PQI 05 numerator identifies encounters with COPD or asthma diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '190', drg_description: 'COPD', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'J44.1', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'J44.1', value_set_name: 'chronic_obstructive_pulmonary_disorder', pqi_number: '05'}
+      - input: ref('ahrq_measures__int_pqi_05_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_05_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 07 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 07 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi07_num_matches_hypertension
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_07_num
+    description: "PQI 07 numerator identifies encounters with hypertension diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '304', drg_description: 'HTN', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'I10', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'I10', value_set_name: 'hypertension_diagnosis_codes', pqi_number: '07'}
+      - input: ref('ahrq_measures__int_pqi_07_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_07_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 08 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 08 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi08_num_matches_heart_failure
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_08_num
+    description: "PQI 08 numerator identifies encounters with heart failure diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '291', drg_description: 'HF', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'I50.9', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'I50.9', value_set_name: 'heart_failure_diagnosis_codes', pqi_number: '08'}
+      - input: ref('ahrq_measures__int_pqi_08_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_08_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 11 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 11 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi11_num_matches_bacterial_pneumonia
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_11_num
+    description: "PQI 11 numerator identifies encounters with bacterial pneumonia diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '177', drg_description: 'Pneumonia', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'J15.9', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'J15.9', value_set_name: 'bacterial_pneumonia_diagnosis_codes', pqi_number: '11'}
+      - input: ref('ahrq_measures__int_pqi_11_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_11_exclusions')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 12 DENOM
+  # =========================================================================
+
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 12 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi12_num_matches_urinary_infection
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_12_num
+    description: "PQI 12 numerator identifies encounters with urinary tract infection diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '689', drg_description: 'UTI', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'N39.0', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'N39.0', value_set_name: 'urinary_tract_infection_diagnosis_codes', pqi_number: '12'}
+      - input: ref('ahrq_measures__int_pqi_12_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_12_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 14 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 14 EXCLUSIONS
+  # =========================================================================
+
+  - name: test_ahrq_pqi14_exclusions_from_shared
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_14_exclusions
+    description: "PQI 14 exclusions passes through shared exclusion union"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_shared_exclusion_union')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', exclusion_number: 1}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 14 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi14_num_matches_uncontrolled_diabetes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_14_num
+    description: "PQI 14 numerator identifies encounters with uncontrolled diabetes diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1165', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'E1165', value_set_name: 'uncontrolled_diabetes_diagnosis_codes', pqi_number: '14'}
+      - input: ref('ahrq_measures__int_pqi_14_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_14_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 15 DENOM
+  # =========================================================================
+
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 15 NUM
+  # =========================================================================
+
+  - name: test_ahrq_pqi15_num_matches_asthma_younger
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_15_num
+    description: "PQI 15 numerator identifies encounters with asthma diagnosis codes for younger adults"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '202', drg_description: 'Asthma', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'J45.41', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'J45.41', value_set_name: 'asthma_diagnosis_codes', pqi_number: '15'}
+      - input: ref('ahrq_measures__int_pqi_15_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 30, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_15_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1'}
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 16 DENOM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 16 NUM
+  # =========================================================================
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_denom_long
+  # =========================================================================
+
+  - name: test_ahrq_pqi_denom_long_unions_all_denoms
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_denom_long
+    description: "PQI denom long unions all PQI denominator models with pqi_number labels"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_01_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_03_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_05_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_07_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_08_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_11_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_12_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_14_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_15_denom')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_16_denom')
+        rows: []
+    expect:
+      rows:
+        - {year_number: 2023, person_id: 'P1', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_exclusion_long
+  # =========================================================================
+
+  - name: test_ahrq_pqi_exclusion_long_unions_all_exclusions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_exclusion_long
+    description: "PQI exclusion long unions all PQI exclusion models with pqi_number labels"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_01_exclusions')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', exclusion_number: 1, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_03_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_05_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_07_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_08_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_11_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_12_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_14_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_15_exclusions')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_16_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', encounter_id: 'E1', exclusion_reason: 'transfer', exclusion_number: 1, pqi_number: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_num_long
+  # =========================================================================
+
+  - name: test_ahrq_pqi_num_long_unions_all_numerators
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_num_long
+    description: "PQI num long unions all PQI numerator models with pqi_number labels"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__int_pqi_01_num')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_03_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_05_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_07_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_08_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_11_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_12_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_14_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_15_num')
+        rows: []
+      - input: ref('ahrq_measures__int_pqi_16_num')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}

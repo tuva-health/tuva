@@ -1,0 +1,229 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: stg_pqi_inpatient_encounter
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_inpatient_encounter_filters_acute_inpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_inpatient_encounter
+    description: "Only acute inpatient encounters are selected from core encounters"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '470', drg_description: 'Hip replacement', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 15000, encounter_type: 'acute inpatient'}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: null, drg_description: null, admit_source_code: null, encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-10', length_of_stay: 0, primary_diagnosis_code: 'J06.9', person_id: 'P2', facility_npi: 'NPI2', paid_amount: 500, encounter_type: 'emergency department'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', data_source: 'src1', person_id: 'P1', primary_diagnosis_code: 'S72.001A', year_number: 2023}
+
+  # =========================================================================
+  # AHRQ MEASURES - INTERMEDIATE: int_pqi_01_num
+  # =========================================================================
+
+  - name: test_ahrq_pqi01_num_matches_diabetes_short_term
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_01_num
+    description: "PQI 01 numerator identifies encounters with diabetes short-term complication diagnosis codes"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM w/MCC', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1010', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '470', drg_description: 'Hip', admit_source_code: '1', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-05', length_of_stay: 4, primary_diagnosis_code: 'S72.001A', person_id: 'P2', facility_npi: 'NPI1', paid_amount: 15000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'E1010', value_set_name: 'diabetes_with_short-term_complications_diagnosis_codes', pqi_number: '01'}
+      - input: ref('ahrq_measures__int_pqi_01_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_01_exclusions')
+        rows: []
+    expect:
+      rows:
+        - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_rate
+  # =========================================================================
+
+  - name: test_ahrq_pqi_rate_computes_rate_per_100k
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_rate
+    description: "PQI rate computes rate per 100,000 as (numerator count / denominator count) * 100,000"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_num_long')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {data_source: 'src1', person_id: 'P2', year_number: 2023, encounter_id: 'E2', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__pqi_denom_long')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P2', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P3', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P4', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {data_source: 'src1', year_number: 2023, pqi_number: '01', denom_count: 4, num_count: 2, rate_per_100_thousand: 50000.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_summary
+  # =========================================================================
+
+  - name: test_ahrq_pqi_summary_joins_encounter_details
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_summary
+    description: "PQI summary joins numerator encounters to encounter details and measure names"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_num_long')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM w/MCC', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1010', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023, admit_source_code: '1'}
+      - input: ref('pqi__measures')
+        rows:
+          - {pqi_number: '01', pqi_name: 'Diabetes Short-Term Complications Admission Rate'}
+    expect:
+      rows:
+        - {pqi_number: '01', pqi_name: 'Diabetes Short-Term Complications Admission Rate', encounter_id: 'E1', person_id: 'P1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - STAGING: filters non-acute-inpatient types
+  # =========================================================================
+
+  - name: test_ahrq_stg_pqi_inpatient_encounter_excludes_ed_and_outpatient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__stg_pqi_inpatient_encounter
+    description: "Outpatient and office visit encounters are excluded from PQI staging"
+    given:
+      - input: ref('core__encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: null, drg_description: null, admit_source_code: null, encounter_start_date: '2023-06-10', encounter_end_date: '2023-06-10', length_of_stay: 0, primary_diagnosis_code: 'J06.9', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 200, encounter_type: 'outpatient'}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: null, drg_description: null, admit_source_code: null, encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', length_of_stay: 0, primary_diagnosis_code: 'Z00.00', person_id: 'P2', facility_npi: 'NPI2', paid_amount: 100, encounter_type: 'office visit'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # AHRQ MEASURES - PQI 01 NUM: excluded encounters not in numerator
+  # =========================================================================
+
+  - name: test_ahrq_pqi01_num_excludes_encounters_with_shared_exclusion
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__int_pqi_01_num
+    description: "PQI 01 numerator excludes encounters that appear in the shared exclusion list"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM', admit_source_code: '1', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1010', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023}
+      - input: ref('pqi__value_sets')
+        rows:
+          - {code: 'E1010', value_set_name: 'diabetes_with_short-term_complications_diagnosis_codes', pqi_number: '01'}
+      - input: ref('ahrq_measures__int_pqi_01_denom')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', age: 55, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__int_pqi_01_exclusions')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', exclusion_reason: 'transfer', exclusion_number: 1, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_rate zero numerator
+  # =========================================================================
+
+  - name: test_ahrq_pqi_rate_zero_numerator
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_rate
+    description: "PQI rate returns zero count and zero rate when no numerator encounters exist"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_num_long')
+        rows: []
+      - input: ref('ahrq_measures__pqi_denom_long')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', pqi_number: '03', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P2', data_source: 'src1', pqi_number: '03', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {data_source: 'src1', year_number: 2023, pqi_number: '03', denom_count: 2, num_count: 0, rate_per_100_thousand: 0.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_rate multiple PQIs
+  # =========================================================================
+
+  - name: test_ahrq_pqi_rate_multiple_pqi_numbers
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_rate
+    description: "PQI rate produces separate rows for different PQI numbers"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_num_long')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {data_source: 'src1', person_id: 'P3', year_number: 2023, encounter_id: 'E3', pqi_number: '08', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__pqi_denom_long')
+        rows:
+          - {year_number: 2023, person_id: 'P1', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P2', data_source: 'src1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P3', data_source: 'src1', pqi_number: '08', tuva_last_run: '2024-01-01 00:00:00'}
+          - {year_number: 2023, person_id: 'P4', data_source: 'src1', pqi_number: '08', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {data_source: 'src1', year_number: 2023, pqi_number: '01', denom_count: 2, num_count: 1, rate_per_100_thousand: 50000.0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_source: 'src1', year_number: 2023, pqi_number: '08', denom_count: 2, num_count: 1, rate_per_100_thousand: 50000.0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # AHRQ MEASURES - FINAL: pqi_summary multiple PQIs
+  # =========================================================================
+
+  - name: test_ahrq_pqi_summary_multiple_encounters
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ahrq_measures__pqi_summary
+    description: "PQI summary returns one row per numerator encounter with measure details"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ahrq_measures__pqi_num_long')
+        rows:
+          - {data_source: 'src1', person_id: 'P1', year_number: 2023, encounter_id: 'E1', pqi_number: '01', tuva_last_run: '2024-01-01 00:00:00'}
+          - {data_source: 'src1', person_id: 'P2', year_number: 2023, encounter_id: 'E2', pqi_number: '03', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('ahrq_measures__stg_pqi_inpatient_encounter')
+        rows:
+          - {encounter_id: 'E1', data_source: 'src1', drg_code: '637', drg_description: 'DM w/MCC', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, primary_diagnosis_code: 'E1010', person_id: 'P1', facility_npi: 'NPI1', paid_amount: 10000, year_number: 2023, admit_source_code: '1'}
+          - {encounter_id: 'E2', data_source: 'src1', drg_code: '637', drg_description: 'DM LT', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-04', length_of_stay: 3, primary_diagnosis_code: 'E1136', person_id: 'P2', facility_npi: 'NPI2', paid_amount: 8000, year_number: 2023, admit_source_code: '1'}
+      - input: ref('pqi__measures')
+        rows:
+          - {pqi_number: '01', pqi_name: 'Diabetes Short-Term Complications Admission Rate'}
+          - {pqi_number: '03', pqi_name: 'Diabetes Long-Term Complications Admission Rate'}
+    expect:
+      rows:
+        - {pqi_number: '01', pqi_name: 'Diabetes Short-Term Complications Admission Rate', encounter_id: 'E1', person_id: 'P1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {pqi_number: '03', pqi_name: 'Diabetes Long-Term Complications Admission Rate', encounter_id: 'E2', person_id: 'P2', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}

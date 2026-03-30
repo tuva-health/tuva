@@ -1,0 +1,131 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # HCC RECAPTURE - INTERMEDIATE: int_gap_status
+  # =========================================================================
+
+  - name: test_hcc_recapture_int_gap_status_closed_when_recaptured
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "Gap status is closed when an HCC from prior year is recaptured in current year"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2022, recorded_date: '2022-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C0', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows:
+          - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+          - {person_id: 'P1', collection_year: 2022, payer: 'MCR'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', payment_year: 2023, gap_status: 'new'}
+        - {person_id: 'P1', hcc_code: 'HCC19', payment_year: 2024, gap_status: 'closed'}
+
+  - name: test_hcc_recapture_int_gap_status_open_when_not_recaptured
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "Gap status is open when an HCC from prior year is not coded in current year"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2022, recorded_date: '2022-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C0', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows:
+          - {person_id: 'P1', collection_year: 2022, payer: 'MCR'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', payment_year: 2023, gap_status: 'new'}
+
+  - name: test_hcc_recapture_int_gap_status_new_chronic_hcc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "A chronic HCC coded this year but not in prior year gets gap_status 'new'"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC85', hcc_description: 'CHF', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.450, model_version: 'CMS-HCC-V24', hcc_code: 'HCC85', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows:
+          - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC85', payment_year: 2024, gap_status: 'new'}
+
+  - name: test_hcc_recapture_int_gap_status_inappropriate_non_chronic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "Non-chronic HCCs get gap_status 'inappropriate for recapture'"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 0, claim_id: 'C1', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2022, recorded_date: '2022-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 0, claim_id: 'C0', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows:
+          - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+          - {person_id: 'P1', collection_year: 2022, payer: 'MCR'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC19', payment_year: 2023, gap_status: 'inappropriate for recapture'}
+        - {person_id: 'P1', hcc_code: 'HCC19', payment_year: 2024, gap_status: 'inappropriate for recapture'}
+
+  - name: test_hcc_recapture_int_gap_status_higher_hierarchy_closed
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "When a higher-coefficient HCC in the same hierarchy group is coded, lower one is closed"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes High', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2022, recorded_date: '2022-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC18', hcc_description: 'Diabetes Low', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C0', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 2, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+          - {coefficient: 0.150, model_version: 'CMS-HCC-V24', hcc_code: 'HCC18', hcc_hierarchy_group: 'DM', hcc_hierarchy_group_rank: 2, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows:
+          - {person_id: 'P1', collection_year: 2023, payer: 'MCR'}
+          - {person_id: 'P1', collection_year: 2022, payer: 'MCR'}
+    expect:
+      rows:
+        - {person_id: 'P1', hcc_code: 'HCC18', gap_status: 'closed - higher coefficient hcc in hierarchy group'}
+        - {person_id: 'P1', hcc_code: 'HCC18', gap_status: 'new'}
+        - {person_id: 'P1', hcc_code: 'HCC19', gap_status: 'closed - higher coefficient hcc in hierarchy group'}
+
+  - name: test_hcc_recapture_int_gap_status_filters_non_eligible_benes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: hcc_recapture__int_gap_status
+    description: "Only eligible beneficiaries appear in gap_status results"
+    given:
+      - input: ref('hcc_recapture__int_hccs')
+        rows:
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2023, recorded_date: '2023-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C1', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+          - {person_id: 'P1', payer: 'MCR', collection_year: 2022, recorded_date: '2022-06-15', model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_description: 'Diabetes', data_source: 'src1', hcc_chronic_flag: 1, claim_id: 'C0', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA', eligible_bene: 1, eligible_claim_indicator: 1, rendering_npi: 'NPI1', reason: 'Prior coding', condition_type: 'discharge_diagnosis', suspect_hcc_flag: 0}
+      - input: ref('hcc_recapture__stg_coef_hier')
+        rows:
+          - {coefficient: 0.302, model_version: 'CMS-HCC-V24', hcc_code: 'HCC19', hcc_hierarchy_group: 'no hierarchy', hcc_hierarchy_group_rank: 1, risk_model_code: 'CNA'}
+      - input: ref('hcc_recapture__stg_eligible_benes')
+        rows: []
+    expect:
+      rows: []

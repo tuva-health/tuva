@@ -1,0 +1,1039 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: encounter_with_ccs
+  # =========================================================================
+
+  - name: test_readmissions_encounter_with_ccs_maps_diagnosis
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_with_ccs
+    description: "Encounter with CCS maps primary diagnosis to CCS category and validates code"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'S72.001A'}
+      - input: ref('readmissions__icd_10_cm_to_ccs')
+        rows:
+          - {icd_10_cm: 'S72.001A', ccs_diagnosis_category: '226'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_with_ccs_invalid_diagnosis
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_with_ccs
+    description: "Encounter with unrecognized ICD-10-CM code gets valid_primary_diagnosis_code_flag=0 and null CCS"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'INVALID', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'S72.001A'}
+      - input: ref('readmissions__icd_10_cm_to_ccs')
+        rows:
+          - {icd_10_cm: 'S72.001A', ccs_diagnosis_category: '226'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', primary_diagnosis_code: 'INVALID', valid_primary_diagnosis_code_flag: 0, ccs_diagnosis_category: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_with_ccs_null_diagnosis
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_with_ccs
+    description: "Encounter with null primary diagnosis code gets valid flag=0 and null CCS"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: null, encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('readmissions__icd_10_cm_to_ccs')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', primary_diagnosis_code: null, valid_primary_diagnosis_code_flag: 0, ccs_diagnosis_category: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: index_discharge_requirement
+  # =========================================================================
+
+  - name: test_readmissions_index_discharge_excludes_invalid_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_discharge_requirement
+    description: "Encounters with discharge_disposition_code 02 (transfer), 07 (AMA), or 20 (died) are excluded from index admissions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-03', discharge_disposition_code: '02', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E3', person_id: 'P3', admit_date: '2023-06-01', discharge_date: '2023-06-02', discharge_disposition_code: '07', facility_npi: 'NPI3', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 5000, primary_diagnosis_code: 'J18.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E4', person_id: 'P4', admit_date: '2023-06-01', discharge_date: '2023-06-10', discharge_disposition_code: '20', facility_npi: 'NPI4', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 25000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_index_discharge_allows_other_codes
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_discharge_requirement
+    description: "Encounters with valid discharge disposition codes other than 02, 07, 20 pass through"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-03', discharge_disposition_code: '06', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E3', person_id: 'P3', admit_date: '2023-06-01', discharge_date: '2023-06-02', discharge_disposition_code: null, facility_npi: 'NPI3', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 5000, primary_diagnosis_code: 'J18.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E3', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: index_time_requirement
+  # =========================================================================
+
+  - name: test_readmissions_index_time_requirement_30_day_buffer
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_time_requirement
+    description: "Encounters discharged within 30 days of the max discharge date are excluded"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-12-15', discharge_date: '2023-12-20', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_index_time_requirement_exactly_30_days
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_time_requirement
+    description: "Encounter discharged exactly 30 days before max qualifies for index time requirement"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-11-01', discharge_date: '2023-11-20', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-12-01', discharge_date: '2023-12-20', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_index_time_requirement_29_days_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_time_requirement
+    description: "Encounter discharged only 29 days before the max is excluded from time requirement"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-11-01', discharge_date: '2023-11-22', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-12-01', discharge_date: '2023-12-21', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: index_admission
+  # =========================================================================
+
+  - name: test_readmissions_index_admission_requires_all_criteria
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_admission
+    description: "Index admissions require passing time, discharge, and not having an exclusion"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-03', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_time_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_discharge_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__exclusion')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_index_admission_excluded_by_exclusion
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_admission
+    description: "Encounter meeting time and discharge requirements is excluded when in exclusion list"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'C50.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_time_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_discharge_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__exclusion')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []
+
+  - name: test_readmissions_index_admission_fails_time_requirement
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_admission
+    description: "Encounter meeting discharge but not time requirement is excluded from index admissions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_time_requirement')
+        rows: []
+      - input: ref('readmissions__index_discharge_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__exclusion')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_readmissions_index_admission_fails_discharge_requirement
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__index_admission
+    description: "Encounter meeting time but not discharge requirement is excluded from index admissions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '02', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_time_requirement')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_discharge_requirement')
+        rows: []
+      - input: ref('readmissions__exclusion')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: exclusion
+  # =========================================================================
+
+  - name: test_readmissions_exclusion_filters_excluded_ccs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__exclusion
+    description: "Encounters with excluded CCS diagnosis categories are identified"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'C50.9', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '11', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__exclusion_ccs_diagnosis_category')
+        rows:
+          - {ccs_diagnosis_category: '11'}
+    expect:
+      rows:
+        - {encounter_id: 'E2', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_exclusion_null_ccs_not_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__exclusion
+    description: "Encounters with null CCS diagnosis category are not excluded"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'INVALID', valid_primary_diagnosis_code_flag: 0, ccs_diagnosis_category: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__exclusion_ccs_diagnosis_category')
+        rows:
+          - {ccs_diagnosis_category: '11'}
+    expect:
+      rows: []
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: encounter_overlap
+  # =========================================================================
+
+  - name: test_readmissions_encounter_overlap_identifies_best
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_overlap
+    description: "Overlap model identifies best encounter among overlapping encounters for same person"
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-07-01', discharge_date: '2023-07-03', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 5000, primary_diagnosis_code: 'J18.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', has_overlaps: 0, is_best_encounter: 1}
+        - {encounter_id: 'E2', person_id: 'P2', has_overlaps: 0, is_best_encounter: 1}
+
+  - name: test_readmissions_encounter_overlap_collapses_three_way_overlap_without_fanout
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_overlap
+    description: "Three encounters that all overlap stay in one overlap group and do not fan out"
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-02', discharge_date: '2023-06-06', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 12000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E3', person_id: 'P1', admit_date: '2023-06-03', discharge_date: '2023-06-07', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 9000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1}
+        - {encounter_id: 'E2', person_id: 'P1', overlap_group_id: 'E2', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1}
+        - {encounter_id: 'E3', person_id: 'P1', overlap_group_id: 'E3', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1}
+
+  - name: test_readmissions_encounter_overlap_multi_person_isolation
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_overlap
+    description: "Overlap groups do not cross patients; overlapping encounters for different persons are independent"
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-03', discharge_date: '2023-06-07', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 12000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E3', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E4', person_id: 'P2', admit_date: '2023-06-03', discharge_date: '2023-06-07', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 10000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', has_overlaps: 0, is_best_encounter: 1}
+        - {encounter_id: 'E2', person_id: 'P1', has_overlaps: 0, is_best_encounter: 1}
+        - {encounter_id: 'E3', person_id: 'P2', has_overlaps: 0, is_best_encounter: 1}
+        - {encounter_id: 'E4', person_id: 'P2', has_overlaps: 0, is_best_encounter: 1}
+
+  - name: test_readmissions_encounter_overlap_claims_preferred_over_non_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_overlap
+    description: "Among overlapping encounters, claim source type is preferred over non-claim"
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-03', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'other', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-03', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claim', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', has_overlaps: 1, is_best_encounter: 0}
+        - {encounter_id: 'E2', person_id: 'P1', has_overlaps: 1, is_best_encounter: 1}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: procedure_ccs
+  # =========================================================================
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: encounter_specialty_cohort
+  # =========================================================================
+
+  - name: test_readmissions_specialty_cohort_defaults_medicine
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_specialty_cohort
+    description: "Encounters without procedure/diagnosis specialty assignments default to Medicine"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__procedure_ccs')
+        rows: []
+      - input: ref('readmissions__surgery_gynecology_cohort')
+        rows: []
+      - input: ref('readmissions__specialty_cohort')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', specialty_cohort: 'Medicine', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_specialty_cohort_surgery_via_procedure
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_specialty_cohort
+    description: "Encounter with Surgery/Gynecology procedure code gets Surgery/Gynecology cohort"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__procedure_ccs')
+        rows:
+          - {encounter_id: 'E1', procedure_code: '0SRA0JZ', valid_icd_10_pcs_flag: 1, ccs_procedure_category: '152', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__surgery_gynecology_cohort')
+        rows:
+          - {icd_10_pcs: '0SRA0JZ'}
+      - input: ref('readmissions__specialty_cohort')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', specialty_cohort: 'Surgery/Gynecology', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_specialty_cohort_diagnosis_based
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_specialty_cohort
+    description: "Encounter with a diagnosis CCS mapped to a specialty cohort gets that cohort"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'I21.0', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__procedure_ccs')
+        rows: []
+      - input: ref('readmissions__surgery_gynecology_cohort')
+        rows: []
+      - input: ref('readmissions__specialty_cohort')
+        rows:
+          - {ccs: '100', specialty_cohort: 'Cardiorespiratory', procedure_or_diagnosis: 'Diagnosis'}
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'I21.0', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '100', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', specialty_cohort: 'Cardiorespiratory', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: planned_encounter
+  # =========================================================================
+
+  - name: test_readmissions_planned_encounter_always_planned
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__planned_encounter
+    description: "Encounters with always-planned CCS procedure categories are flagged as planned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__procedure_ccs')
+        rows:
+          - {encounter_id: 'E1', procedure_code: '0DBN0ZZ', valid_icd_10_pcs_flag: 1, ccs_procedure_category: '90', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__always_planned_ccs_procedure_category')
+        rows:
+          - {ccs_procedure_category: '90'}
+      - input: ref('readmissions__always_planned_ccs_diagnosis_category')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__potentially_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__potentially_planned_icd_10_pcs')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_icd_10_cm')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_ccs')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_planned_encounter_always_planned_dx
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__planned_encounter
+    description: "Encounters with always-planned CCS diagnosis categories are flagged as planned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__procedure_ccs')
+        rows: []
+      - input: ref('readmissions__always_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__always_planned_ccs_diagnosis_category')
+        rows:
+          - {ccs_diagnosis_category: '254'}
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'Z51.11', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '254', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__potentially_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__potentially_planned_icd_10_pcs')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_icd_10_cm')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_ccs')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_planned_encounter_potentially_planned_non_acute
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__planned_encounter
+    description: "Potentially planned encounter that is NOT acute is confirmed as planned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__procedure_ccs')
+        rows:
+          - {encounter_id: 'E1', procedure_code: '0SRA0JZ', valid_icd_10_pcs_flag: 1, ccs_procedure_category: '152', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__always_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__always_planned_ccs_diagnosis_category')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'M16.11', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '203', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__potentially_planned_ccs_procedure_category')
+        rows:
+          - {ccs_procedure_category: '152'}
+      - input: ref('readmissions__potentially_planned_icd_10_pcs')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_icd_10_cm')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_ccs')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_planned_encounter_potentially_planned_but_acute
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__planned_encounter
+    description: "Potentially planned encounter that IS acute is NOT flagged as planned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__procedure_ccs')
+        rows:
+          - {encounter_id: 'E1', procedure_code: '0SRA0JZ', valid_icd_10_pcs_flag: 1, ccs_procedure_category: '152', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__always_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__always_planned_ccs_diagnosis_category')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'I21.0', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '100', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__potentially_planned_ccs_procedure_category')
+        rows:
+          - {ccs_procedure_category: '152'}
+      - input: ref('readmissions__potentially_planned_icd_10_pcs')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_icd_10_cm')
+        rows:
+          - {icd_10_cm: 'I21.0'}
+      - input: ref('readmissions__acute_diagnosis_ccs')
+        rows: []
+    expect:
+      rows: []
+
+  - name: test_readmissions_planned_encounter_not_planned
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__planned_encounter
+    description: "Encounter with no planned procedure or diagnosis categories is not planned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__procedure_ccs')
+        rows:
+          - {encounter_id: 'E1', procedure_code: '0DBN0ZZ', valid_icd_10_pcs_flag: 1, ccs_procedure_category: '90', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__always_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__always_planned_ccs_diagnosis_category')
+        rows: []
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__potentially_planned_ccs_procedure_category')
+        rows: []
+      - input: ref('readmissions__potentially_planned_icd_10_pcs')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_icd_10_cm')
+        rows: []
+      - input: ref('readmissions__acute_diagnosis_ccs')
+        rows: []
+    expect:
+      rows: []
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: encounter_data_quality
+  # =========================================================================
+
+  - name: test_readmissions_data_quality_flags_missing_admit
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Data quality flags missing admit date and sets disqualified flag"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: null, discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: null, discharge_date: '2023-06-05', actual_length_of_stay: 1, source_type_priority: 1, completeness_score: 4, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 1, missing_admit_date_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_data_quality_flags_admit_after_discharge
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Data quality flags admit date after discharge date"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-10', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-10', discharge_date: '2023-06-05', actual_length_of_stay: 1, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 1, admit_after_discharge_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_data_quality_flags_invalid_discharge_disposition
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Data quality flags an invalid discharge disposition code"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: 'XX', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 1, invalid_discharge_disposition_code_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_data_quality_flags_missing_drg
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Data quality flags missing DRG code"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: null, paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 4, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows: []
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 1, missing_drg_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_data_quality_clean_encounter
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Clean encounter with all valid fields gets disqualified_encounter_flag=0"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 0, missing_admit_date_flag: 0, missing_discharge_date_flag: 0, admit_after_discharge_flag: 0, missing_discharge_disposition_code_flag: 0, invalid_discharge_disposition_code_flag: 0, missing_primary_diagnosis_flag: 0, invalid_primary_diagnosis_code_flag: 0, no_diagnosis_ccs_flag: 0, overlaps_with_another_encounter_flag: 0, missing_drg_flag: 0, invalid_drg_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_data_quality_flags_overlap
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_data_quality
+    description: "Encounter that is not best in its overlap group gets overlap flag"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_with_ccs')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', valid_primary_diagnosis_code_flag: 1, ccs_diagnosis_category: '226', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E0', has_overlaps: 1, encounter_rank_in_group: 2, is_best_encounter: 0, selection_reason: 'Not selected - better encounter exists'}
+      - input: ref('terminology__discharge_disposition')
+        rows:
+          - {discharge_disposition_code: '01'}
+      - input: ref('terminology__ms_drg')
+        rows:
+          - {ms_drg_code: '470'}
+      - input: ref('terminology__apr_drg')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', disqualified_encounter_flag: 1, overlaps_with_another_encounter_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - INTERMEDIATE: readmission_crude
+  # =========================================================================
+
+  - name: test_readmissions_crude_flags_30_day_readmit
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_crude
+    description: "Crude readmission flags encounters with a subsequent admission within 30 days"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-20', discharge_date: '2023-06-22', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-20', discharge_date: '2023-06-22', actual_length_of_stay: 2, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E2', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 1, readmit_30_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_crude_different_persons_not_linked
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_crude
+    description: "Encounters for different patients are not linked as readmissions"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-10', discharge_date: '2023-06-12', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_overlap')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', actual_length_of_stay: 4, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E1', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-10', discharge_date: '2023-06-12', actual_length_of_stay: 2, source_type_priority: 1, completeness_score: 5, overlap_group_id: 'E2', has_overlaps: 0, encounter_rank_in_group: 1, is_best_encounter: 1, selection_reason: 'No overlapping encounters'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P2', had_readmission_flag: 0, readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - FINAL: encounter_augmented
+  # =========================================================================
+
+  - name: test_readmissions_encounter_augmented_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_augmented
+    description: "Encounter augmented model joins index admission, planned, specialty cohort and data quality flags"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__index_admission')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__planned_encounter')
+        rows: []
+      - input: ref('readmissions__encounter_specialty_cohort')
+        rows:
+          - {encounter_id: 'E1', specialty_cohort: 'Surgical/Gynecology'}
+      - input: ref('readmissions__encounter_data_quality')
+        rows:
+          - {encounter_id: 'E1', diagnosis_ccs: '226', disqualified_encounter_flag: 0, missing_admit_date_flag: 0, missing_discharge_date_flag: 0, admit_after_discharge_flag: 0, missing_discharge_disposition_code_flag: 0, invalid_discharge_disposition_code_flag: 0, missing_primary_diagnosis_flag: 0, invalid_primary_diagnosis_code_flag: 0, no_diagnosis_ccs_flag: 0, overlaps_with_another_encounter_flag: 0, missing_drg_flag: 0, invalid_drg_flag: 0}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Surgical/Gynecology', died_flag: 0, disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_augmented_minimum_los_is_one
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_augmented
+    description: "Same-day admit and discharge still produce a minimum length_of_stay of 1"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E2', person_id: 'P2', admit_date: '2023-06-01', discharge_date: '2023-06-01', discharge_disposition_code: '01', facility_npi: 'NPI2', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1'}
+      - input: ref('readmissions__index_admission')
+        rows: []
+      - input: ref('readmissions__planned_encounter')
+        rows: []
+      - input: ref('readmissions__encounter_specialty_cohort')
+        rows: []
+      - input: ref('readmissions__encounter_data_quality')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E2', person_id: 'P2', length_of_stay: 1, index_admission_flag: 0, planned_flag: 0, died_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_augmented_died_flag
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_augmented
+    description: "Encounter with discharge_disposition_code 20 gets died_flag=1"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-10', discharge_disposition_code: '20', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 25000, primary_diagnosis_code: 'I50.9', encounter_source_type: 'claims', data_source: 'src1'}
+      - input: ref('readmissions__index_admission')
+        rows: []
+      - input: ref('readmissions__planned_encounter')
+        rows: []
+      - input: ref('readmissions__encounter_specialty_cohort')
+        rows: []
+      - input: ref('readmissions__encounter_data_quality')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', died_flag: 1, index_admission_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_augmented_planned_flag
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_augmented
+    description: "Encounter listed in planned_encounter table gets planned_flag=1"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'M16.11', encounter_source_type: 'claims', data_source: 'src1'}
+      - input: ref('readmissions__index_admission')
+        rows: []
+      - input: ref('readmissions__planned_encounter')
+        rows:
+          - {encounter_id: 'E1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('readmissions__encounter_specialty_cohort')
+        rows:
+          - {encounter_id: 'E1', specialty_cohort: 'Surgery/Gynecology'}
+      - input: ref('readmissions__encounter_data_quality')
+        rows:
+          - {encounter_id: 'E1', diagnosis_ccs: '203', disqualified_encounter_flag: 0, missing_admit_date_flag: 0, missing_discharge_date_flag: 0, admit_after_discharge_flag: 0, missing_discharge_disposition_code_flag: 0, invalid_discharge_disposition_code_flag: 0, missing_primary_diagnosis_flag: 0, invalid_primary_diagnosis_code_flag: 0, no_diagnosis_ccs_flag: 0, overlaps_with_another_encounter_flag: 0, missing_drg_flag: 0, invalid_drg_flag: 0}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', planned_flag: 1, index_admission_flag: 0, specialty_cohort: 'Surgery/Gynecology', died_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_encounter_augmented_multi_day_los
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__encounter_augmented
+    description: "Multi-day encounter correctly computes length_of_stay as datediff"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-10', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, primary_diagnosis_code: 'S72.001A', encounter_source_type: 'claims', data_source: 'src1'}
+      - input: ref('readmissions__index_admission')
+        rows: []
+      - input: ref('readmissions__planned_encounter')
+        rows: []
+      - input: ref('readmissions__encounter_specialty_cohort')
+        rows: []
+      - input: ref('readmissions__encounter_data_quality')
+        rows: []
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', length_of_stay: 9, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # READMISSIONS - FINAL: readmission_summary
+  # =========================================================================
+
+  - name: test_readmissions_summary_computes_readmission_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_summary
+    description: "Readmission summary sequences non-disqualified encounters and computes readmission flags"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, length_of_stay: 4, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '226', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_summary_unplanned_readmit_30
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_summary
+    description: "Readmission summary flags unplanned 30-day readmission when next encounter is within 30 days and unplanned"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, length_of_stay: 4, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '226', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-20', discharge_date: '2023-06-22', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, length_of_stay: 2, index_admission_flag: 0, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '108', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 1, readmit_30_flag: 1, unplanned_readmit_30_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_summary_planned_readmit_30
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_summary
+    description: "Planned 30-day readmission gets readmit_30_flag=1 but unplanned_readmit_30_flag=0"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, length_of_stay: 4, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '226', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E2', person_id: 'P1', admit_date: '2023-06-20', discharge_date: '2023-06-22', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 8000, length_of_stay: 2, index_admission_flag: 0, planned_flag: 1, specialty_cohort: 'Surgery/Gynecology', died_flag: 0, diagnosis_ccs: '203', disqualified_encounter_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', had_readmission_flag: 1, readmit_30_flag: 1, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E2', person_id: 'P1', had_readmission_flag: 0, readmit_30_flag: 0, unplanned_readmit_30_flag: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_readmissions_summary_disqualified_excluded
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: readmissions__readmission_summary
+    description: "Disqualified encounters are excluded from readmission summary"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__encounter_augmented')
+        rows:
+          - {encounter_id: 'E1', person_id: 'P1', admit_date: '2023-06-01', discharge_date: '2023-06-05', discharge_disposition_code: '01', facility_npi: 'NPI1', drg_code_type: 'ms-drg', drg_code: '470', paid_amount: 15000, length_of_stay: 4, index_admission_flag: 1, planned_flag: 0, specialty_cohort: 'Medicine', died_flag: 0, diagnosis_ccs: '226', disqualified_encounter_flag: 1, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows: []

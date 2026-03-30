@@ -1,0 +1,155 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGE MODELS
+  # =========================================================================
+
+  - name: test_stg_institutional_inpatient_filters_bill_type_11
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__stg_institutional_inpatient
+    description: >
+      Filters medical claims to only institutional claims with
+      bill_type_code starting with '11'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_type: 'institutional', bill_type_code: '111', claim_line_number: '1'}
+          - {claim_id: 'MC2', claim_type: 'institutional', bill_type_code: '121', claim_line_number: '1'}
+          - {claim_id: 'MC3', claim_type: 'institutional', bill_type_code: '131', claim_line_number: '1'}
+          - {claim_id: 'MC4', claim_type: 'professional', bill_type_code: null, claim_line_number: '1'}
+    expect:
+      rows:
+        - {claim_id: 'MC1', claim_type: 'institutional', bill_type_code: '111', claim_line_number: '1'}
+
+  - name: test_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__stg_medical_claim
+    description: >
+      Passes through all rows from the medical_claim source without
+      any filtering.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_type: 'institutional'}
+          - {claim_id: 'MC2', claim_type: 'professional'}
+    expect:
+      rows:
+        - {claim_id: 'MC1', claim_type: 'institutional'}
+        - {claim_id: 'MC2', claim_type: 'professional'}
+
+  - name: test_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__stg_pharmacy_claim
+    description: >
+      Passes through all rows from the pharmacy_claim source without
+      any filtering.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', ndc_code: '12345678901'}
+          - {claim_id: 'RX2', ndc_code: '99999999999'}
+    expect:
+      rows:
+        - {claim_id: 'RX1', ndc_code: '12345678901'}
+        - {claim_id: 'RX2', ndc_code: '99999999999'}
+
+  - name: test_stg_eligibility_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__stg_eligibility
+    description: >
+      Passes through all rows from the eligibility source without
+      any filtering.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31'}
+          - {person_id: 'P2', enrollment_start_date: '2023-06-01', enrollment_end_date: '2023-12-31'}
+    expect:
+      rows:
+        - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31'}
+        - {person_id: 'P2', enrollment_start_date: '2023-06-01', enrollment_end_date: '2023-12-31'}
+
+  # =========================================================================
+  # FINAL MODELS
+  # =========================================================================
+
+  - name: test_raw_summary_counts_input_layer_tables
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__raw_summary
+    description: >
+      Counts rows and unique identifiers per input layer table and
+      pairs them with raw_data placeholders.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1'}
+          - {person_id: 'P2'}
+          - {person_id: 'P1'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'MC1'}
+          - {claim_id: 'MC1'}
+          - {claim_id: 'MC2'}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1'}
+    expect:
+      rows:
+        - {source: 'input_layer', table_name: 'eligibility', row_count: 3, unique_check: 2, unique_check_desc: 'Unique Patient Count', table_order: 2, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'eligibility', row_count: null, unique_check: null, unique_check_desc: 'Unique Patient Count', table_order: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'eligibility', row_count: null, unique_check: null, unique_check_desc: 'Unique Patient Count', table_order: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'eligibility', row_count: null, unique_check: null, unique_check_desc: 'Unique Patient Count', table_order: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'input_layer', table_name: 'medical_claim', row_count: 3, unique_check: 2, unique_check_desc: 'Unique Claim Count', table_order: 4, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'medical_claim', row_count: null, unique_check: null, unique_check_desc: 'Unique Claim Count', table_order: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'medical_claim', row_count: null, unique_check: null, unique_check_desc: 'Unique Claim Count', table_order: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'medical_claim', row_count: null, unique_check: null, unique_check_desc: 'Unique Claim Count', table_order: 3, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'input_layer', table_name: 'pharmacy_claim', row_count: 1, unique_check: 1, unique_check_desc: 'Unique Claim Count', table_order: 6, tuva_last_run: '2024-01-01 00:00:00'}
+        - {source: 'raw_data', table_name: 'pharmacy_claim', row_count: null, unique_check: null, unique_check_desc: 'Unique Claim Count', table_order: 5, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_crosswalk_field_to_mart_sk_assigns_dense_rank
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: data_quality__crosswalk_field_to_mart_sk
+    description: >
+      Assigns dense_rank surrogate keys (table_claim_type_field_sk) based on
+      table_name + claim_type + field_name combinations, merging results from
+      both the detail table and the crosswalk table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('data_quality__data_quality_detail')
+        rows:
+          - {table_name: 'medical_claim', claim_type: 'institutional', field_name: 'bill_type_code', data_source: 'src1', source_date: '2023-01-01', drill_down_key: 'claim_id', drill_down_value: 'MC1', bucket_name: 'valid', invalid_reason: null, field_value: '111', summary_sk: 'SK1'}
+          - {table_name: 'medical_claim', claim_type: 'professional', field_name: 'hcpcs_code', data_source: 'src1', source_date: '2023-01-01', drill_down_key: 'claim_id', drill_down_value: 'MC2', bucket_name: 'valid', invalid_reason: null, field_value: '99213', summary_sk: 'SK2'}
+      - input: ref('data_quality__crosswalk_field_to_mart')
+        rows:
+          - {input_layer_table_name: 'medical_claim', claim_type: 'institutional', field_name: 'bill_type_code', mart_name: 'encounters'}
+    expect:
+      rows:
+        - {input_layer_table_name: 'medical_claim', claim_type: 'institutional', field_name: 'bill_type_code', mart_name: null, table_claim_type_field_sk: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {input_layer_table_name: 'medical_claim', claim_type: 'institutional', field_name: 'bill_type_code', mart_name: 'encounters', table_claim_type_field_sk: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {input_layer_table_name: 'medical_claim', claim_type: 'professional', field_name: 'hcpcs_code', mart_name: null, table_claim_type_field_sk: 2, tuva_last_run: '2024-01-01 00:00:00'}
+

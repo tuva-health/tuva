@@ -1,0 +1,172 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # FINANCIAL PMPM - STAGING: stg_eligibility
+  # =========================================================================
+
+  - name: test_financial_pmpm_stg_eligibility_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_eligibility
+    description: "Eligibility staging passes through core eligibility fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_stg_eligibility_multiple_rows
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_eligibility
+    description: "Eligibility staging handles multiple eligibility records for different payers"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__eligibility')
+        rows:
+          - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCD', plan: 'PlanB', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCD', plan: 'PlanB', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - STAGING: stg_medical_claim
+  # =========================================================================
+
+  - name: test_financial_pmpm_stg_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_medical_claim
+    description: "Medical claim staging passes through core medical claim fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', claim_id: 'C1', claim_line_number: 1, claim_start_date: '2023-03-15', claim_end_date: '2023-03-15', service_category_1: 'inpatient', service_category_2: 'acute inpatient', paid_amount: 1000, allowed_amount: 1200, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', claim_id: 'C1', service_category_1: 'inpatient', paid_amount: 1000, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_stg_medical_claim_multiple_lines
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_medical_claim
+    description: "Medical claim staging passes through multiple claim lines"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', claim_id: 'C1', claim_line_number: 1, claim_start_date: '2023-03-15', claim_end_date: '2023-03-15', service_category_1: 'inpatient', service_category_2: 'acute inpatient', paid_amount: 1000, allowed_amount: 1200, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', claim_id: 'C1', claim_line_number: 2, claim_start_date: '2023-03-15', claim_end_date: '2023-03-15', service_category_1: 'inpatient', service_category_2: 'acute inpatient', paid_amount: 500, allowed_amount: 600, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P2', member_id: 'M2', claim_id: 'C2', claim_line_number: 1, claim_start_date: '2023-04-10', claim_end_date: '2023-04-10', service_category_1: 'outpatient', service_category_2: 'emergency department', paid_amount: 800, allowed_amount: 900, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', claim_id: 'C1', claim_line_number: 1, service_category_1: 'inpatient', paid_amount: 1000, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', claim_id: 'C1', claim_line_number: 2, service_category_1: 'inpatient', paid_amount: 500, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', claim_id: 'C2', claim_line_number: 1, service_category_1: 'outpatient', paid_amount: 800, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - STAGING: stg_pharmacy_claim
+  # =========================================================================
+
+  - name: test_financial_pmpm_stg_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_pharmacy_claim
+    description: "Pharmacy claim staging passes through core pharmacy claim fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', dispensing_date: '2023-03-15', paid_date: null, paid_amount: 200, allowed_amount: 250, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', dispensing_date: '2023-03-15', paid_amount: 200, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_stg_pharmacy_claim_multiple_claims
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__stg_pharmacy_claim
+    description: "Pharmacy claim staging passes through multiple pharmacy claims"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', dispensing_date: '2023-03-15', paid_date: '2023-03-20', paid_amount: 200, allowed_amount: 250, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', dispensing_date: '2023-04-10', paid_date: '2023-04-15', paid_amount: 75, allowed_amount: 90, payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', dispensing_date: '2023-03-15', paid_amount: 200, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', dispensing_date: '2023-04-10', paid_amount: 75, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - FINAL: pmpm_prep (gap/edge case tests)
+  # =========================================================================
+
+  - name: test_financial_pmpm_pmpm_prep_multiple_member_months
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_prep
+    description: "PMPM prep correctly handles member with multiple month entries"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+          - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+      - input: ref('financial_pmpm__service_category_1_paid_pivot')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', inpatient_paid: 500, outpatient_paid: 0, office_based_paid: 0, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 0}
+      - input: ref('financial_pmpm__service_category_2_paid_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_1_allowed_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_2_allowed_pivot')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', total_paid: 500, medical_paid: 500, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', year_month: '202302', total_paid: 0, medical_paid: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - FINAL: pmpm_payer (gap/edge case tests)
+  # =========================================================================
+
+  - name: test_financial_pmpm_pmpm_payer_multiple_months_same_payer
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer
+    description: "PMPM payer aggregates multiple months separately"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 1000, medical_paid: 800, inpatient_paid: 500, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 500, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1200, medical_allowed: 1000, inpatient_allowed: 600, outpatient_allowed: 250, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 600, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+          - {person_id: 'P1', member_id: 'M1', year_month: '202302', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 300, medical_paid: 200, inpatient_paid: 0, outpatient_paid: 100, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 100, acute_inpatient_paid: 0, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 100, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 400, medical_allowed: 300, inpatient_allowed: 0, outpatient_allowed: 120, office_based_allowed: 130, ancillary_allowed: 0, other_allowed: 50, pharmacy_allowed: 100, acute_inpatient_allowed: 0, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 130, outpatient_hospital_or_clinic_allowed: 120, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', data_source: 'src1', member_months: 1, total_paid: 1000, tuva_last_run: '2024-01-01 00:00:00'}
+        - {year_month: '202302', payer: 'MCR', data_source: 'src1', member_months: 1, total_paid: 300, tuva_last_run: '2024-01-01 00:00:00'}

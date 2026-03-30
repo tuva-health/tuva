@@ -1,0 +1,176 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # FINANCIAL PMPM - FINAL: pmpm_payer
+  # =========================================================================
+
+  - name: test_financial_pmpm_pmpm_payer_computes_pmpm
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer
+    description: "PMPM payer aggregates by year_month/payer/data_source and divides by member month count"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 1000, medical_paid: 800, inpatient_paid: 500, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 500, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1200, medical_allowed: 1000, inpatient_allowed: 600, outpatient_allowed: 250, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 600, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', data_source: 'src1', member_months: 1, total_paid: 1000, inpatient_paid: 500, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_pmpm_payer_multiple_members_averages
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer
+    description: "PMPM payer with multiple members computes correct average (sum/count)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 1000, medical_paid: 800, inpatient_paid: 500, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 500, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1200, medical_allowed: 1000, inpatient_allowed: 600, outpatient_allowed: 250, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 600, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+          - {person_id: 'P2', member_id: 'M2', year_month: '202301', payer: 'MCR', plan: 'PlanB', data_source: 'src1', total_paid: 500, medical_paid: 400, inpatient_paid: 0, outpatient_paid: 200, office_based_paid: 200, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 100, acute_inpatient_paid: 0, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 200, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 600, medical_allowed: 500, inpatient_allowed: 0, outpatient_allowed: 250, office_based_allowed: 250, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 100, acute_inpatient_allowed: 0, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 250, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', data_source: 'src1', member_months: 2, total_paid: 750, inpatient_paid: 250, pharmacy_paid: 150, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_pmpm_payer_separate_payers
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer
+    description: "PMPM payer separates results by payer"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 1000, medical_paid: 800, inpatient_paid: 500, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 500, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1200, medical_allowed: 1000, inpatient_allowed: 600, outpatient_allowed: 250, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 600, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+          - {person_id: 'P2', member_id: 'M2', year_month: '202301', payer: 'MCD', plan: 'PlanB', data_source: 'src1', total_paid: 600, medical_paid: 500, inpatient_paid: 300, outpatient_paid: 100, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 100, acute_inpatient_paid: 300, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 100, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 700, medical_allowed: 600, inpatient_allowed: 350, outpatient_allowed: 120, office_based_allowed: 130, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 100, acute_inpatient_allowed: 350, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 130, outpatient_hospital_or_clinic_allowed: 120, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', data_source: 'src1', member_months: 1, total_paid: 1000, tuva_last_run: '2024-01-01 00:00:00'}
+        - {year_month: '202301', payer: 'MCD', data_source: 'src1', member_months: 1, total_paid: 600, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - FINAL: pmpm_payer_plan
+  # =========================================================================
+
+  - name: test_financial_pmpm_pmpm_payer_plan_aggregates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer_plan
+    description: "PMPM payer plan aggregates by year_month/payer/plan/data_source"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 1000, medical_paid: 800, inpatient_paid: 500, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 500, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 200, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1200, medical_allowed: 1000, inpatient_allowed: 600, outpatient_allowed: 250, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 600, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 250, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_months: 1, total_paid: 1000, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_pmpm_payer_plan_separates_by_plan
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_payer_plan
+    description: "PMPM payer plan keeps different plans separate within same payer"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', total_paid: 800, medical_paid: 600, inpatient_paid: 400, outpatient_paid: 100, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200, acute_inpatient_paid: 400, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 100, outpatient_hospital_or_clinic_paid: 100, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 1000, medical_allowed: 800, inpatient_allowed: 500, outpatient_allowed: 150, office_based_allowed: 150, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 200, acute_inpatient_allowed: 500, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 150, outpatient_hospital_or_clinic_allowed: 150, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+          - {person_id: 'P2', member_id: 'M2', year_month: '202301', payer: 'MCR', plan: 'PlanB', data_source: 'src1', total_paid: 400, medical_paid: 300, inpatient_paid: 0, outpatient_paid: 150, office_based_paid: 150, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 100, acute_inpatient_paid: 0, ambulance_paid: 0, ambulatory_surgery_center_paid: 0, dialysis_paid: 0, durable_medical_equipment_paid: 0, emergency_department_paid: 0, home_health_paid: 0, inpatient_hospice_paid: 0, inpatient_psychiatric_paid: 0, inpatient_rehabilitation_paid: 0, lab_paid: 0, observation_paid: 0, office_based_other_paid: 0, office_based_pt_ot_st_paid: 0, office_based_radiology_paid: 0, office_based_surgery_paid: 0, office_based_visit_paid: 150, outpatient_hospital_or_clinic_paid: 150, outpatient_pt_ot_st_paid: 0, outpatient_psychiatric_paid: 0, outpatient_radiology_paid: 0, outpatient_rehabilitation_paid: 0, outpatient_surgery_paid: 0, skilled_nursing_paid: 0, telehealth_visit_paid: 0, urgent_care_paid: 0, total_allowed: 500, medical_allowed: 400, inpatient_allowed: 0, outpatient_allowed: 200, office_based_allowed: 200, ancillary_allowed: 0, other_allowed: 0, pharmacy_allowed: 100, acute_inpatient_allowed: 0, ambulance_allowed: 0, ambulatory_surgery_center_allowed: 0, dialysis_allowed: 0, durable_medical_equipment_allowed: 0, emergency_department_allowed: 0, home_health_allowed: 0, inpatient_hospice_allowed: 0, inpatient_psychiatric_allowed: 0, inpatient_rehabilitation_allowed: 0, lab_allowed: 0, observation_allowed: 0, office_based_other_allowed: 0, office_based_pt_ot_st_allowed: 0, office_based_radiology_allowed: 0, office_based_surgery_allowed: 0, office_based_visit_allowed: 200, outpatient_hospital_or_clinic_allowed: 200, outpatient_pt_ot_st_allowed: 0, outpatient_psychiatric_allowed: 0, outpatient_radiology_allowed: 0, outpatient_rehabilitation_allowed: 0, outpatient_surgery_allowed: 0, skilled_nursing_allowed: 0, telehealth_visit_allowed: 0, urgent_care_allowed: 0, tuva_last_run: '2024-01-01 00:00:00', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, other_paid_2: 0, pharmacy_paid_2: 0, other_allowed_2: 0, pharmacy_allowed_2: 0, outpatient_hospice_paid: 0, outpatient_hospice_allowed: 0}
+    expect:
+      rows:
+        - {year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', member_months: 1, total_paid: 800, tuva_last_run: '2024-01-01 00:00:00'}
+        - {year_month: '202301', payer: 'MCR', plan: 'PlanB', data_source: 'src1', member_months: 1, total_paid: 400, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # FINANCIAL PMPM - FINAL: pmpm_prep
+  # =========================================================================
+
+  - name: test_financial_pmpm_pmpm_prep_joins_pivots
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_prep
+    description: "PMPM prep joins member months to paid/allowed pivots and computes totals"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+      - input: ref('financial_pmpm__service_category_1_paid_pivot')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', inpatient_paid: 500, outpatient_paid: 0, office_based_paid: 100, ancillary_paid: 0, other_paid: 0, pharmacy_paid: 200}
+      - input: ref('financial_pmpm__service_category_2_paid_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_1_allowed_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_2_allowed_pivot')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', payer: 'MCR', total_paid: 800, medical_paid: 600, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_pmpm_prep_no_claims_all_zeros
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_prep
+    description: "Member months with no matching claims get zero for all paid/allowed amounts"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+      - input: ref('financial_pmpm__service_category_1_paid_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_2_paid_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_1_allowed_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_2_allowed_pivot')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', payer: 'MCR', total_paid: 0, medical_paid: 0, total_allowed: 0, medical_allowed: 0, inpatient_paid: 0, pharmacy_paid: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_financial_pmpm_pmpm_prep_total_paid_includes_pharmacy
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: financial_pmpm__pmpm_prep
+    description: "Total_paid = medical_paid + pharmacy_paid, medical_paid excludes pharmacy"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+      - input: ref('financial_pmpm__service_category_1_paid_pivot')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', inpatient_paid: 300, outpatient_paid: 200, office_based_paid: 100, ancillary_paid: 50, other_paid: 25, pharmacy_paid: 175}
+      - input: ref('financial_pmpm__service_category_2_paid_pivot')
+        rows: []
+      - input: ref('financial_pmpm__service_category_1_allowed_pivot')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', year_month: '202301', payer: 'MCR', plan: 'PlanA', data_source: 'src1', inpatient_allowed: 400, outpatient_allowed: 250, office_based_allowed: 130, ancillary_allowed: 60, other_allowed: 30, pharmacy_allowed: 200}
+      - input: ref('financial_pmpm__service_category_2_allowed_pivot')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', total_paid: 850, medical_paid: 675, pharmacy_paid: 175, total_allowed: 1070, medical_allowed: 870, pharmacy_allowed: 200, tuva_last_run: '2024-01-01 00:00:00'}
+

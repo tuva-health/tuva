@@ -1,0 +1,1189 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGING MODELS
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # encounters__patient_data_source_id
+  # -------------------------------------------------------------------------
+
+  - name: test_patient_data_source_id_assigns_ids
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__patient_data_source_id
+    description: >
+      Assigns a dense_rank patient_data_source_id per unique
+      person_id + data_source combination from medical claims and eligibility.
+    given:
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+          - {person_id: 'P2', data_source: 'src1'}
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+          - {person_id: 'P3', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', data_source: 'src1'}
+        - {person_id: 'P2', data_source: 'src1'}
+        - {person_id: 'P3', data_source: 'src1'}
+
+  # -------------------------------------------------------------------------
+  # encounters__stg_eligibility
+  # -------------------------------------------------------------------------
+
+  - name: test_stg_eligibility_row_numbering
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_eligibility
+    description: >
+      Patient eligibility rows are numbered by enrollment_start_date desc,
+      so the most recent enrollment gets patient_row_num = 1.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', birth_date: '1960-01-01', gender: 'male', race: 'white', enrollment_start_date: '2022-01-01', data_source: 'src1'}
+          - {person_id: 'P1', birth_date: '1960-01-01', gender: 'male', race: 'white', enrollment_start_date: '2023-06-01', data_source: 'src1'}
+      - input: ref('encounters__patient_data_source_id')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', patient_data_source_id: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', birth_date: '1960-01-01', gender: 'male', race: 'white', patient_data_source_id: 1, patient_row_num: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', birth_date: '1960-01-01', gender: 'male', race: 'white', patient_data_source_id: 1, patient_row_num: 2, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # encounters__stg_inpatient_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_stg_inpatient_institutional_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_inpatient_institutional
+    description: >
+      Passes through claim_id and service_type from the upstream
+      stg_inpatient_institutional model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_inpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', service_type: 'inpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # encounters__stg_outpatient_institutional
+  # -------------------------------------------------------------------------
+
+  - name: test_stg_outpatient_institutional_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_outpatient_institutional
+    description: >
+      Passes through claim_id and service_type from the upstream
+      stg_outpatient_institutional model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_outpatient_institutional')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', service_type: 'outpatient', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # encounters__stg_professional
+  # -------------------------------------------------------------------------
+
+  - name: test_stg_professional_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__stg_professional
+    description: >
+      Passes through claim_id, claim_line_number, claim_line_id, service_type,
+      and data_source from the upstream stg_professional model.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_professional')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', data_source: 'src1', service_type: 'professional', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {claim_id: 'C1', claim_line_number: 1, claim_line_id: 'C1|1', service_type: 'professional', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # encounters__prof_and_lower_priority
+  # -------------------------------------------------------------------------
+
+  - name: test_prof_and_lower_priority_unions_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__prof_and_lower_priority
+    description: >
+      Unions professional claims with lower-priority institutional claims
+      (lab, dme, ambulance) from the service_category grouper.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_professional')
+        rows:
+          - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1'}
+      - input: ref('service_category__service_category_grouper')
+        rows:
+          - {claim_id: 'INST1', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 1, service_category_2: 'lab'}
+          - {claim_id: 'INST2', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 1, service_category_2: 'durable medical equipment'}
+          - {claim_id: 'INST3', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 1, service_category_2: 'ambulance'}
+          - {claim_id: 'INST4', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 1, service_category_2: 'acute inpatient'}
+          - {claim_id: 'INST5', claim_line_number: 1, data_source: 'src1', duplicate_row_number: 2, service_category_2: 'lab'}
+    expect:
+      rows:
+        - {claim_id: 'PROF1', claim_line_number: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'INST1', claim_line_number: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'INST2', claim_line_number: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {claim_id: 'INST3', claim_line_number: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Acute Inpatient
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # acute_inpatient__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_acute_inpatient_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: acute_inpatient__start_end_dates
+    description: >
+      Computes encounter start (min) and end (max) dates from the
+      generate_encounter_id model.
+    given:
+      - input: ref('acute_inpatient__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-05'}
+          - {encounter_id: 1, start_date: '2023-01-02', end_date: '2023-01-07'}
+          - {encounter_id: 2, start_date: '2023-02-01', end_date: '2023-02-03'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-07'}
+        - {encounter_id: 2, encounter_start_date: '2023-02-01', encounter_end_date: '2023-02-03'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Ambulance (anchor/generate/match pattern)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # ambulance__anchor_events
+  # -------------------------------------------------------------------------
+
+  - name: test_ambulance_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ambulance__anchor_events
+    description: >
+      Identifies distinct claim_ids that have service_category_2 = 'ambulance'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'AMB1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulance'}
+          - {claim_id: 'AMB1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulance'}
+          - {claim_id: 'NON1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'lab'}
+    expect:
+      rows:
+        - {claim_id: 'AMB1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # -------------------------------------------------------------------------
+  # ambulance__generate_encounter_id
+  # -------------------------------------------------------------------------
+
+  - name: test_ambulance_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ambulance__generate_encounter_id
+    description: >
+      Generates old_encounter_id using dense_rank over
+      patient_data_source_id and start_date.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'AMB1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulance'}
+          - {claim_id: 'AMB2', patient_data_source_id: 1, start_date: '2023-02-15', service_category_2: 'ambulance'}
+      - input: ref('ambulance__anchor_events')
+        rows:
+          - {claim_id: 'AMB1'}
+          - {claim_id: 'AMB2'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'AMB1', old_encounter_id: 1}
+        - {patient_data_source_id: 1, start_date: '2023-02-15', claim_id: 'AMB2', old_encounter_id: 2}
+
+  # -------------------------------------------------------------------------
+  # ambulance__match_claims_to_anchor
+  # -------------------------------------------------------------------------
+
+  - name: test_ambulance_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ambulance__match_claims_to_anchor
+    description: >
+      Matches medical claim lines to ambulance anchor encounters by
+      patient_data_source_id, start_date, and service_category_2.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'AMB1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulance'}
+          - {claim_id: 'AMB1', claim_line_number: 2, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulance'}
+      - input: ref('ambulance__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'AMB1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'AMB1', claim_line_number: 1, old_encounter_id: 1}
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'AMB1', claim_line_number: 2, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Lab (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_lab_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: lab__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'lab'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'LAB1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'lab'}
+          - {claim_id: 'NON1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'office-based visit'}
+    expect:
+      rows:
+        - {claim_id: 'LAB1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_lab_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: lab__generate_encounter_id
+    description: >
+      Generates old_encounter_id for lab claims using dense_rank over
+      patient_data_source_id and start_date.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'LAB1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'lab'}
+      - input: ref('lab__anchor_events')
+        rows:
+          - {claim_id: 'LAB1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'LAB1', old_encounter_id: 1}
+
+  - name: test_lab_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: lab__match_claims_to_anchor
+    description: >
+      Matches lab claim lines to lab anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'LAB1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'lab'}
+      - input: ref('lab__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'LAB1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'LAB1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - DME (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_dme_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dme__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'durable medical equipment'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DME1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'durable medical equipment'}
+    expect:
+      rows:
+        - {claim_id: 'DME1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_dme_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dme__generate_encounter_id
+    description: >
+      Generates old_encounter_id for DME claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DME1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'durable medical equipment'}
+      - input: ref('dme__anchor_events')
+        rows:
+          - {claim_id: 'DME1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DME1', old_encounter_id: 1}
+
+  - name: test_dme_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dme__match_claims_to_anchor
+    description: >
+      Matches DME claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DME1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'durable medical equipment'}
+      - input: ref('dme__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DME1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DME1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Dialysis (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_dialysis_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dialysis__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'dialysis'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DIA1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'dialysis'}
+    expect:
+      rows:
+        - {claim_id: 'DIA1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_dialysis_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dialysis__generate_encounter_id
+    description: >
+      Generates old_encounter_id for dialysis claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DIA1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'dialysis'}
+      - input: ref('dialysis__anchor_events')
+        rows:
+          - {claim_id: 'DIA1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DIA1', old_encounter_id: 1}
+
+  - name: test_dialysis_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: dialysis__match_claims_to_anchor
+    description: >
+      Matches dialysis claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'DIA1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'dialysis'}
+      - input: ref('dialysis__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DIA1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'DIA1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - ASC (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_asc_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: asc__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'ambulatory surgery center'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ASC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulatory surgery center'}
+    expect:
+      rows:
+        - {claim_id: 'ASC1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_asc_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: asc__generate_encounter_id
+    description: >
+      Generates old_encounter_id for ASC claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ASC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'ambulatory surgery center'}
+      - input: ref('asc__anchor_events')
+        rows:
+          - {claim_id: 'ASC1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'ASC1', old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Home Health (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_home_health_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: home_health__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'home health'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'HH1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'home health'}
+    expect:
+      rows:
+        - {claim_id: 'HH1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_home_health_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: home_health__generate_encounter_id
+    description: >
+      Generates old_encounter_id for home health claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'HH1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'home health'}
+      - input: ref('home_health__anchor_events')
+        rows:
+          - {claim_id: 'HH1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'HH1', old_encounter_id: 1}
+
+  - name: test_home_health_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: home_health__match_claims_to_anchor
+    description: >
+      Matches home health claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'HH1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'home health'}
+      - input: ref('home_health__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'HH1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'HH1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Hospice (anchor/generate/match pattern)
+  # =========================================================================
+
+  - name: test_outpatient_hospice_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospice__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient hospice'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OH1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospice'}
+    expect:
+      rows:
+        - {claim_id: 'OH1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_hospice_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospice__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient hospice claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OH1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospice'}
+      - input: ref('outpatient_hospice__anchor_events')
+        rows:
+          - {claim_id: 'OH1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OH1', old_encounter_id: 1}
+
+  - name: test_outpatient_hospice_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospice__match_claims_to_anchor
+    description: >
+      Matches outpatient hospice claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OH1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospice'}
+      - input: ref('outpatient_hospice__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OH1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OH1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Hospital or Clinic
+  # =========================================================================
+
+  - name: test_outpatient_hospital_or_clinic_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospital_or_clinic__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient hospital or clinic'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OHC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospital or clinic'}
+    expect:
+      rows:
+        - {claim_id: 'OHC1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_hospital_or_clinic_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospital_or_clinic__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient hospital or clinic claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OHC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospital or clinic'}
+      - input: ref('outpatient_hospital_or_clinic__anchor_events')
+        rows:
+          - {claim_id: 'OHC1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OHC1', old_encounter_id: 1}
+
+  - name: test_outpatient_hospital_or_clinic_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_hospital_or_clinic__match_claims_to_anchor
+    description: >
+      Matches outpatient hospital or clinic claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OHC1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient hospital or clinic'}
+      - input: ref('outpatient_hospital_or_clinic__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OHC1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OHC1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Urgent Care
+  # =========================================================================
+
+  - name: test_urgent_care_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: urgent_care__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'urgent care'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'UC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'urgent care'}
+    expect:
+      rows:
+        - {claim_id: 'UC1'}
+
+  - name: test_urgent_care_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: urgent_care__generate_encounter_id
+    description: >
+      Generates old_encounter_id for urgent care claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'UC1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'urgent care'}
+      - input: ref('urgent_care__anchor_events')
+        rows:
+          - {claim_id: 'UC1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'UC1', old_encounter_id: 1}
+
+  - name: test_urgent_care_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: urgent_care__match_claims_to_anchor
+    description: >
+      Matches urgent care claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'UC1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'urgent care'}
+      - input: ref('urgent_care__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'UC1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'UC1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Psych
+  # =========================================================================
+
+  - name: test_outpatient_psych_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_psych__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient psychiatric'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OP1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient psychiatric'}
+    expect:
+      rows:
+        - {claim_id: 'OP1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_psych_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_psych__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient psych claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OP1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient psychiatric'}
+      - input: ref('outpatient_psych__anchor_events')
+        rows:
+          - {claim_id: 'OP1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OP1', old_encounter_id: 1}
+
+  - name: test_outpatient_psych_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_psych__match_claims_to_anchor
+    description: >
+      Matches outpatient psych claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OP1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient psychiatric'}
+      - input: ref('outpatient_psych__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OP1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OP1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Rehab
+  # =========================================================================
+
+  - name: test_outpatient_rehab_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_rehab__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient rehabilitation'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OR1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient rehabilitation'}
+    expect:
+      rows:
+        - {claim_id: 'OR1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_rehab_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_rehab__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient rehabilitation claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OR1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient rehabilitation'}
+      - input: ref('outpatient_rehab__anchor_events')
+        rows:
+          - {claim_id: 'OR1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OR1', old_encounter_id: 1}
+
+  - name: test_outpatient_rehab_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_rehab__match_claims_to_anchor
+    description: >
+      Matches outpatient rehabilitation claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OR1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient rehabilitation'}
+      - input: ref('outpatient_rehab__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OR1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OR1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Surgery
+  # =========================================================================
+
+  - name: test_outpatient_surgery_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_surgery__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient surgery'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OS1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient surgery'}
+    expect:
+      rows:
+        - {claim_id: 'OS1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_surgery_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_surgery__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient surgery claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OS1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient surgery'}
+      - input: ref('outpatient_surgery__anchor_events')
+        rows:
+          - {claim_id: 'OS1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OS1', old_encounter_id: 1}
+
+  - name: test_outpatient_surgery_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_surgery__match_claims_to_anchor
+    description: >
+      Matches outpatient surgery claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'OS1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient surgery'}
+      - input: ref('outpatient_surgery__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OS1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'OS1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Injections
+  # =========================================================================
+
+  - name: test_outpatient_injections_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_injections__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient injection claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'INJ1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient injections'}
+      - input: ref('outpatient_injections__anchor_events')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', old_encounter_id: 1}
+
+  - name: test_outpatient_injections_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_injections__match_claims_to_anchor
+    description: >
+      Matches outpatient injection claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'INJ1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient injections'}
+      - input: ref('outpatient_injections__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'INJ1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient PT/OT/ST
+  # =========================================================================
+
+  - name: test_outpatient_ptotst_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_ptotst__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient pt/ot/st'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PT1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient pt/ot/st'}
+    expect:
+      rows:
+        - {claim_id: 'PT1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_ptotst_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_ptotst__generate_encounter_id
+    description: >
+      Generates old_encounter_id for PT/OT/ST claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PT1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient pt/ot/st'}
+      - input: ref('outpatient_ptotst__anchor_events')
+        rows:
+          - {claim_id: 'PT1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'PT1', old_encounter_id: 1}
+
+  - name: test_outpatient_ptotst_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_ptotst__match_claims_to_anchor
+    description: >
+      Matches PT/OT/ST claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'PT1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient pt/ot/st'}
+      - input: ref('outpatient_ptotst__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'PT1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'PT1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Radiology
+  # =========================================================================
+
+  - name: test_outpatient_radiology_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_radiology__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient radiology'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'RAD1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient radiology'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_outpatient_radiology_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_radiology__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient radiology claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'RAD1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient radiology'}
+      - input: ref('outpatient_radiology__anchor_events')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Outpatient Substance Use
+  # =========================================================================
+
+  - name: test_outpatient_substance_use_anchor_events
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_substance_use__anchor_events
+    description: >
+      Identifies distinct claim_ids with service_category_2 = 'outpatient substance use'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'SU1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient substance use'}
+    expect:
+      rows: []
+
+  - name: test_outpatient_substance_use_generate_encounter_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_substance_use__generate_encounter_id
+    description: >
+      Generates old_encounter_id for outpatient substance use claims.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'SU1', patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient substance use'}
+      - input: ref('outpatient_substance_use__anchor_events')
+        rows:
+          - {claim_id: 'SU1'}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'SU1', old_encounter_id: 1}
+
+  - name: test_outpatient_substance_use_match_claims_to_anchor
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: outpatient_substance_use__match_claims_to_anchor
+    description: >
+      Matches outpatient substance use claim lines to anchor encounters.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'SU1', claim_line_number: 1, patient_data_source_id: 1, start_date: '2023-01-01', service_category_2: 'outpatient substance use'}
+      - input: ref('outpatient_substance_use__generate_encounter_id')
+        rows:
+          - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'SU1', old_encounter_id: 1}
+    expect:
+      rows:
+        - {patient_data_source_id: 1, start_date: '2023-01-01', claim_id: 'SU1', claim_line_number: 1, old_encounter_id: 1}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - Inpatient types (start_end_dates pattern)
+  # =========================================================================
+
+  # -------------------------------------------------------------------------
+  # emergency_department__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_emergency_department_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: emergency_department__start_end_dates
+    description: >
+      Computes encounter start (min) and end (max) dates for ED encounters.
+    given:
+      - input: ref('emergency_department__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-01'}
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-02'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-02'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_hospice__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_hospice_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_hospice__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient hospice encounters.
+    given:
+      - input: ref('inpatient_hospice__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-10'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-10'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_psych__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_psych_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_psych__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient psych encounters.
+    given:
+      - input: ref('inpatient_psych__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-14'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-14'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_rehab__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_rehab_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_rehab__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient rehab encounters.
+    given:
+      - input: ref('inpatient_rehab__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-21'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-21'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_long_term__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_long_term_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_long_term__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient long term encounters.
+    given:
+      - input: ref('inpatient_long_term__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-03-01'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-03-01'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_snf__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_snf_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_snf__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient SNF encounters.
+    given:
+      - input: ref('inpatient_snf__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-30'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-30'}
+
+  # -------------------------------------------------------------------------
+  # inpatient_substance_use__start_end_dates
+  # -------------------------------------------------------------------------
+
+  - name: test_inpatient_substance_use_start_end_dates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: inpatient_substance_use__start_end_dates
+    description: >
+      Computes encounter start/end dates for inpatient substance use encounters.
+    given:
+      - input: ref('inpatient_substance_use__generate_encounter_id')
+        rows:
+          - {encounter_id: 1, start_date: '2023-01-01', end_date: '2023-01-14'}
+    expect:
+      rows:
+        - {encounter_id: 1, encounter_start_date: '2023-01-01', encounter_end_date: '2023-01-14'}
+
+  # =========================================================================
+  # INTERMEDIATE MODELS - encounters__orphaned_claims
+  # =========================================================================
+
+  - name: test_orphaned_claims_identifies_unmatched
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: encounters__orphaned_claims
+    description: >
+      Claims not found in the combined_claim_line_crosswalk are flagged as
+      orphaned and assigned a new encounter_id above the max existing id.
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - {claim_id: 'ORPH1', claim_line_number: 1, service_category_1: 'other', service_category_2: 'other', service_category_3: 'other', claim_type: 'professional', claim_start_date: '2023-01-01', claim_end_date: '2023-01-01', start_date: '2023-01-01', end_date: '2023-01-01', patient_data_source_id: 1}
+          - {claim_id: 'MATCHED1', claim_line_number: 1, service_category_1: 'inpatient', service_category_2: 'acute inpatient', service_category_3: 'medical', claim_type: 'institutional', claim_start_date: '2023-01-01', claim_end_date: '2023-01-05', start_date: '2023-01-01', end_date: '2023-01-05', patient_data_source_id: 1}
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        rows:
+          - {claim_id: 'MATCHED1', claim_line_number: 1, encounter_id: 1, old_encounter_id: 1, encounter_type: 'acute inpatient', encounter_group: 'inpatient', priority_number: 0, anchor_claim_id: null, claim_line_attribution_number: 1}
+    expect:
+      rows:
+        - {claim_id: 'ORPH1', claim_line_number: 1, encounter_type: 'orphaned claim', encounter_group: 'other'}

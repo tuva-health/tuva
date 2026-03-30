@@ -1,0 +1,353 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # STAGE MODELS
+  # =========================================================================
+
+  - name: test_stg_member_month_joins_calendar
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__stg_member_month
+    description: >
+      Joins core member_months to the calendar table to add
+      year_month_int and year_month_date columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', year_month: '202301', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_id: 'M1'}
+          - {person_id: 'P2', year_month: '202302', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_id: 'M2'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, full_date: '2023-01-01', day: 1}
+          - {year_month_int: 202301, full_date: '2023-01-15', day: 15}
+          - {year_month_int: 202302, full_date: '2023-02-01', day: 1}
+    expect:
+      rows:
+        - {person_id: 'P1', year_month: '202301', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_id: 'M1', year_month_int: 202301, year_month_date: '2023-01-01'}
+        - {person_id: 'P2', year_month: '202302', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_id: 'M2', year_month_int: 202302, year_month_date: '2023-02-01'}
+
+  - name: test_stg_medical_claim_joins_calendar_for_year_month
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__stg_medical_claim
+    description: >
+      Joins core medical_claim to calendar to derive year_month from
+      claim_line_start_date (with claim_start_date as fallback).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        rows:
+          - {claim_id: 'MC1', claim_line_start_date: '2023-06-15', claim_start_date: '2023-06-01', paid_amount: 100.00, person_id: 'P1', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_month_key: 'K1', encounter_id: 'E1'}
+          - {claim_id: 'MC2', claim_line_start_date: null, claim_start_date: '2023-07-01', paid_amount: 200.00, person_id: 'P2', data_source: 'src1', payer: 'MCR', plan: 'PlanA', member_month_key: 'K2', encounter_id: 'E2'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-15', year_month_int: 202306}
+          - {full_date: '2023-07-01', year_month_int: 202307}
+    expect:
+      rows:
+        - {claim_id: 'MC1', year_month: '202306', paid_amount: 100.00, person_id: 'P1', data_source: 'src1'}
+        - {claim_id: 'MC2', year_month: '202307', paid_amount: 200.00, person_id: 'P2', data_source: 'src1'}
+
+  - name: test_stg_pharmacy_claim_joins_calendar_with_fallback
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__stg_pharmacy_claim
+    description: >
+      Joins core pharmacy_claim to calendar using paid_date with
+      dispensing_date as fallback.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', paid_date: '2023-06-15', dispensing_date: '2023-06-01', paid_amount: 50.00, person_id: 'P1', data_source: 'src1'}
+          - {claim_id: 'RX2', paid_date: null, dispensing_date: '2023-07-01', paid_amount: 75.00, person_id: 'P2', data_source: 'src1'}
+      - input: ref('reference_data__calendar')
+        rows:
+          - {full_date: '2023-06-15', year_month_int: 202306}
+          - {full_date: '2023-07-01', year_month_int: 202307}
+    expect:
+      rows:
+        - {claim_id: 'RX1', year_month: '202306', paid_amount: 50.00, person_id: 'P1', data_source: 'src1'}
+        - {claim_id: 'RX2', year_month: '202307', paid_amount: 75.00, person_id: 'P2', data_source: 'src1'}
+
+  # =========================================================================
+  # FINAL MODELS
+  # =========================================================================
+
+  - name: test_readmissions_filters_index_admissions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__readmissions
+    description: >
+      Filters readmission_summary to only include rows where
+      index_admission_flag = 1.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('readmissions__readmission_summary')
+        rows:
+          - {encounter_id: 'E1', index_admission_flag: 1, person_id: 'P1'}
+          - {encounter_id: 'E2', index_admission_flag: 0, person_id: 'P2'}
+          - {encounter_id: 'E3', index_admission_flag: 1, person_id: 'P3'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', index_admission_flag: 1, person_id: 'P1'}
+        - {encounter_id: 'E3', index_admission_flag: 1, person_id: 'P3'}
+
+  - name: test_patient_risk_scores_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__patient_risk_scores
+    description: >
+      Passes through all CMS-HCC patient risk scores without
+      modification.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_scores')
+        rows:
+          - {person_id: 'P1', payment_year: 2024, normalized_risk_score: 1.25}
+          - {person_id: 'P2', payment_year: 2024, normalized_risk_score: 0.85}
+    expect:
+      rows:
+        - {person_id: 'P1', payment_year: 2024, normalized_risk_score: 1.25}
+        - {person_id: 'P2', payment_year: 2024, normalized_risk_score: 0.85}
+
+  - name: test_patient_risk_factors_adds_dense_rank_sk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__patient_risk_factors
+    description: >
+      Adds a patient_risk_sk column using dense_rank over
+      person_id, model_version, and payment_year.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__patient_risk_factors')
+        rows:
+          - {person_id: 'P1', model_version: 'V24', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.5}
+          - {person_id: 'P1', model_version: 'V24', payment_year: 2024, factor_type: 'Disease', coefficient: 0.3}
+          - {person_id: 'P1', model_version: 'V28', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.4}
+          - {person_id: 'P2', model_version: 'V24', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.6}
+    expect:
+      rows:
+        - {person_id: 'P1', model_version: 'V24', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.5, patient_risk_sk: 1}
+        - {person_id: 'P1', model_version: 'V24', payment_year: 2024, factor_type: 'Disease', coefficient: 0.3, patient_risk_sk: 1}
+        - {person_id: 'P1', model_version: 'V28', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.4, patient_risk_sk: 2}
+        - {person_id: 'P2', model_version: 'V24', payment_year: 2024, factor_type: 'Demographic', coefficient: 0.6, patient_risk_sk: 3}
+
+  - name: test_patient_risk_buckets_score_ranges
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__patient_risk
+    description: >
+      Buckets risk scores into predefined ranges (e.g., '.5', '1', '2', etc.)
+      and sums coefficients per person/model/payment_year.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('mart_review__patient_risk_factors')
+        rows:
+          - {person_id: 'P1', model_version: 'V24', payment_year: 2024, coefficient: 0.3, patient_risk_sk: 1}
+          - {person_id: 'P1', model_version: 'V24', payment_year: 2024, coefficient: 0.1, patient_risk_sk: 1}
+          - {person_id: 'P2', model_version: 'V24', payment_year: 2024, coefficient: 1.2, patient_risk_sk: 2}
+          - {person_id: 'P2', model_version: 'V24', payment_year: 2024, coefficient: 0.5, patient_risk_sk: 2}
+          - {person_id: 'P3', model_version: 'V24', payment_year: 2024, coefficient: 3.0, patient_risk_sk: 3}
+          - {person_id: 'P3', model_version: 'V24', payment_year: 2024, coefficient: 2.5, patient_risk_sk: 3}
+    expect:
+      rows:
+        - {risk_score_bucket: '.5', payment_year: 2024, person_id: 'P1', model_version: 'V24', patient_risk_sk: 1, risk_score: 0.4, tuva_last_run: '2024-01-01 00:00:00'}
+        - {risk_score_bucket: '2', payment_year: 2024, person_id: 'P2', model_version: 'V24', patient_risk_sk: 2, risk_score: 1.7, tuva_last_run: '2024-01-01 00:00:00'}
+        - {risk_score_bucket: '5+', payment_year: 2024, person_id: 'P3', model_version: 'V24', patient_risk_sk: 3, risk_score: 5.5, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_quality_measures_summary_long_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__quality_measures_summary_long
+    description: >
+      Passes through all quality measure summary long records.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__summary_long')
+        rows:
+          - {measure_id: 'M1', measure_name: 'Measure A', person_id: 'P1', denominator_flag: 1, numerator_flag: 1}
+          - {measure_id: 'M2', measure_name: 'Measure B', person_id: 'P2', denominator_flag: 1, numerator_flag: 0}
+    expect:
+      rows:
+        - {measure_id: 'M1', measure_name: 'Measure A', person_id: 'P1', denominator_flag: 1, numerator_flag: 1}
+        - {measure_id: 'M2', measure_name: 'Measure B', person_id: 'P2', denominator_flag: 1, numerator_flag: 0}
+
+  - name: test_quality_measures_value_set_adds_tuva_last_run
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__quality_measures_value_set
+    description: >
+      Passes through quality measures and appends tuva_last_run.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('quality_measures__measures')
+        rows:
+          - {id: 'NQF2372', name: 'Breast Cancer Screening'}
+    expect:
+      rows:
+        - {id: 'NQF2372', name: 'Breast Cancer Screening', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_members_with_claims_counts
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__members_with_claims
+    description: >
+      Counts members with medical claims, pharmacy claims, and any claims
+      by data_source and year_month.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', year_month: '202301'}
+          - {person_id: 'P2', data_source: 'src1', year_month: '202301'}
+          - {person_id: 'P3', data_source: 'src1', year_month: '202301'}
+      - input: ref('mart_review__stg_medical_claim')
+        rows:
+          - {person_id: 'P1', data_source: 'src1', year_month: '202301', paid_amount: 100.00}
+      - input: ref('mart_review__stg_pharmacy_claim')
+        rows:
+          - {person_id: 'P2', data_source: 'src1', year_month: '202301', paid_amount: 50.00}
+    expect:
+      rows:
+        - {data_source: 'src1', year_month: '202301', members_with_medical_claims: 1, members_with_pharmacy_claims: 1, members_with_claims: 2, total_member_months: 3}
+
+  - name: test_claims_with_enrollment_calculates_percentage
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__claims_with_enrollment
+    description: >
+      Calculates the percentage of medical claims that have matching
+      enrollment records in core member_months.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('mart_review__stg_medical_claim')
+        rows:
+          - {data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', member_month_key: 'K1', person_id: 'P1'}
+          - {data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', member_month_key: 'K2', person_id: 'P2'}
+          - {data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', member_month_key: 'K3', person_id: 'P3'}
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_month_key: 'K1'}
+          - {person_id: 'P2', member_month_key: 'K2'}
+    expect:
+      rows:
+        - {data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', claims_with_enrollment: 2, claims: 3, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_calendar_month_filters_first_day
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__calendar_month
+    description: >
+      Selects distinct year_month entries from the calendar where day = 1,
+      returning the first day of each month.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('reference_data__calendar')
+        rows:
+          - {year_month_int: 202301, full_date: '2023-01-01', day: 1}
+          - {year_month_int: 202301, full_date: '2023-01-15', day: 15}
+          - {year_month_int: 202302, full_date: '2023-02-01', day: 1}
+          - {year_month_int: 202302, full_date: '2023-02-28', day: 28}
+    expect:
+      rows:
+        - {year_month: '202301', full_date: '2023-01-01', tuva_last_run: '2024-01-01 00:00:00'}
+        - {year_month: '202302', full_date: '2023-02-01', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_data_source_collects_distinct_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__data_source
+    description: >
+      Collects distinct data_source values from all core tables and
+      returns a deduplicated set.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {data_source: 'src1'}
+          - {data_source: 'src2'}
+      - input: ref('core__eligibility')
+        rows:
+          - {data_source: 'src1'}
+      - input: ref('core__encounter')
+        rows:
+          - {data_source: 'src1'}
+      - input: ref('core__location')
+        rows:
+          - {data_source: 'src1'}
+      - input: ref('core__medical_claim')
+        rows:
+          - {data_source: 'src2'}
+      - input: ref('core__member_months')
+        rows:
+          - {data_source: 'src1'}
+      - input: ref('core__patient')
+        rows:
+          - {data_source: 'src1'}
+      - input: ref('core__pharmacy_claim')
+        rows:
+          - {data_source: 'src2'}
+      - input: ref('core__practitioner')
+        rows:
+          - {data_source: 'src3'}
+      - input: ref('core__procedure')
+        rows:
+          - {data_source: 'src1'}
+    expect:
+      rows:
+        - {data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_source: 'src2', tuva_last_run: '2024-01-01 00:00:00'}
+        - {data_source: 'src3', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_member_months_joins_pmpm
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: mart_review__member_months
+    description: >
+      Joins core member_months with financial_pmpm prep data and
+      coalesces null paid amounts to 0.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__member_months')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA'}
+          - {person_id: 'P2', member_id: 'M2', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA'}
+      - input: ref('financial_pmpm__pmpm_prep')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', total_paid: 500.00, medical_paid: 400.00, pharmacy_paid: 100.00}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', total_paid: 500.00, medical_paid: 400.00, pharmacy_paid: 100.00}
+        - {person_id: 'P2', member_id: 'M2', data_source: 'src1', year_month: '202301', payer: 'MCR', plan: 'PlanA', total_paid: 0, medical_paid: 0, pharmacy_paid: 0}

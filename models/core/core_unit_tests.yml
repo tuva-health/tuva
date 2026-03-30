@@ -1,0 +1,1588 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # core__condition — Normalization logic and terminology joins
+  # =========================================================================
+
+  - name: test_condition_normalizes_icd10_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__condition
+    description: >
+      When source_code_type is icd-10-cm and the code matches terminology,
+      the normalized fields should be populated via automatic mapping.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_condition')
+        rows:
+          - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 DM w hyperglycemia', long_description: 'Type 2 diabetes mellitus with hyperglycemia'}
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: null, normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 DM w hyperglycemia', mapping_method: 'automatic', condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_condition_manual_normalization_takes_priority
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__condition
+    description: >
+      When the staging model already has normalized_code populated,
+      the manual mapping takes priority over automatic terminology lookup.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_condition')
+        rows:
+          - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: null, normalized_code_type: 'icd-10-cm', normalized_code: 'E119', normalized_description: 'DM type 2 without complications', condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 DM w hyperglycemia', long_description: 'Type 2 diabetes mellitus with hyperglycemia'}
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: null, normalized_code_type: 'icd-10-cm', normalized_code: 'E119', normalized_description: 'DM type 2 without complications', mapping_method: 'manual', condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_condition_no_terminology_match_yields_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__condition
+    description: >
+      When source_code does not match any terminology table,
+      normalized fields should be null and mapping_method should be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_condition')
+        rows:
+          - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'ZZZZZ', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {condition_id: 'C1', payer: 'MCR', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'discharge_diagnosis', source_code_type: 'icd-10-cm', source_code: 'ZZZZZ', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, mapping_method: null, condition_rank: 1, present_on_admit_code: null, present_on_admit_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__eligibility — Passthrough from staging
+  # =========================================================================
+
+  - name: test_eligibility_passthrough_basic
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__eligibility
+    description: >
+      Eligibility model passes through all columns from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_eligibility')
+        rows:
+          - {eligibility_id: 'E1', person_id: 'P1', member_id: 'M1', subscriber_id: 'S1', birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: '10', enrollment_status: null, hospice_flag: 0, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 12, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {eligibility_id: 'E1', person_id: 'P1', member_id: 'M1', subscriber_id: 'S1', birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: '10', enrollment_status: null, hospice_flag: 0, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 12, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_eligibility_multiple_records_preserved
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__eligibility
+    description: >
+      Multiple eligibility records for different enrollment periods
+      are all passed through without deduplication.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_eligibility')
+        rows:
+          - {eligibility_id: 'E1', person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+          - {eligibility_id: 'E2', person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanB', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {eligibility_id: 'E1', person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {eligibility_id: 'E2', person_id: 'P1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanB', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__member_months — Passthrough from staging
+  # =========================================================================
+
+  - name: test_member_months_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__member_months
+    description: >
+      Member months passes through all fields from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_member_months')
+        rows:
+          - {member_month_key: 'MM1', person_id: 'P1', member_id: 'M1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {member_month_key: 'MM1', person_id: 'P1', member_id: 'M1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_member_months_multiple_months_preserved
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__member_months
+    description: >
+      Multiple member months for the same person are all passed through.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_member_months')
+        rows:
+          - {member_month_key: 'MM1', person_id: 'P1', member_id: 'M1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {member_month_key: 'MM2', person_id: 'P1', member_id: 'M1', year_month: '2023-02', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {member_month_key: 'MM3', person_id: 'P2', member_id: 'M2', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', payer_attributed_provider: null, payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: null, custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {member_month_key: 'MM1', person_id: 'P1', year_month: '2023-01', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {member_month_key: 'MM2', person_id: 'P1', year_month: '2023-02', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {member_month_key: 'MM3', person_id: 'P2', year_month: '2023-01', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__medical_claim — Passthrough from staging
+  # =========================================================================
+
+  - name: test_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__medical_claim
+    description: >
+      Medical claim model passes through columns from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', claim_id: 'CLM1', claim_line_number: 1, encounter_id: 'ENC1', encounter_type: 'acute inpatient', encounter_group: 'inpatient', claim_type: 'institutional', person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-01', claim_end_date: '2023-06-05', claim_line_start_date: '2023-06-01', claim_line_end_date: '2023-06-05', admission_date: '2023-06-01', discharge_date: '2023-06-05', service_category_1: 'inpatient', service_category_2: 'acute', service_category_3: null, admit_source_code: '1', admit_source_description: null, admit_type_code: '1', admit_type_description: null, discharge_disposition_code: '01', discharge_disposition_description: null, place_of_service_code: '21', place_of_service_description: null, bill_type_code: '111', bill_type_description: null, drg_code_type: 'ms-drg', drg_code: '470', drg_description: null, revenue_center_code: '0100', revenue_center_description: null, service_unit_quantity: 1, hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, rendering_npi: 'NPI1', rendering_tin: null, rendering_name: null, billing_npi: 'NPI2', billing_tin: null, billing_name: null, facility_npi: 'NPI3', facility_name: null, paid_date: '2023-07-01', paid_amount: 5000.00, allowed_amount: 4500.00, charge_amount: 6000.00, coinsurance_amount: 100.00, copayment_amount: 50.00, deductible_amount: 200.00, total_cost_amount: 5350.00, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1'}
+    expect:
+      rows:
+        - {medical_claim_id: 'MC1', claim_id: 'CLM1', claim_line_number: 1, person_id: 'P1', payer: 'MCR', paid_amount: 5000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medical_claim_multiple_lines_preserved
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__medical_claim
+    description: >
+      Multiple claim lines for the same claim are preserved as separate rows,
+      testing that the PK (medical_claim_id) remains unique.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_medical_claim')
+        rows:
+          - {medical_claim_id: 'MC1', claim_id: 'CLM1', claim_line_number: 1, encounter_id: 'ENC1', encounter_type: 'office visit', encounter_group: 'outpatient', claim_type: 'professional', person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', claim_line_start_date: '2023-06-01', claim_line_end_date: '2023-06-01', admission_date: null, discharge_date: null, service_category_1: 'office visit', service_category_2: null, service_category_3: null, admit_source_code: null, admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, place_of_service_code: '11', place_of_service_description: null, bill_type_code: null, bill_type_description: null, drg_code_type: null, drg_code: null, drg_description: null, revenue_center_code: null, revenue_center_description: null, service_unit_quantity: 1, hcpcs_code: '99213', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, rendering_npi: 'NPI1', rendering_tin: null, rendering_name: null, billing_npi: null, billing_tin: null, billing_name: null, facility_npi: null, facility_name: null, paid_date: null, paid_amount: 100.00, allowed_amount: 90.00, charge_amount: 120.00, coinsurance_amount: null, copayment_amount: null, deductible_amount: null, total_cost_amount: null, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+          - {medical_claim_id: 'MC2', claim_id: 'CLM1', claim_line_number: 2, encounter_id: 'ENC1', encounter_type: 'office visit', encounter_group: 'outpatient', claim_type: 'professional', person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-01', claim_end_date: '2023-06-01', claim_line_start_date: '2023-06-01', claim_line_end_date: '2023-06-01', admission_date: null, discharge_date: null, service_category_1: 'office visit', service_category_2: null, service_category_3: null, admit_source_code: null, admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, place_of_service_code: '11', place_of_service_description: null, bill_type_code: null, bill_type_description: null, drg_code_type: null, drg_code: null, drg_description: null, revenue_center_code: null, revenue_center_description: null, service_unit_quantity: 1, hcpcs_code: '36415', hcpcs_modifier_1: null, hcpcs_modifier_2: null, hcpcs_modifier_3: null, hcpcs_modifier_4: null, hcpcs_modifier_5: null, rendering_npi: 'NPI1', rendering_tin: null, rendering_name: null, billing_npi: null, billing_tin: null, billing_name: null, facility_npi: null, facility_name: null, paid_date: null, paid_amount: 25.00, allowed_amount: 20.00, charge_amount: 30.00, coinsurance_amount: null, copayment_amount: null, deductible_amount: null, total_cost_amount: null, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__medical_claim')
+        rows:
+          - {claim_id: 'C1', data_source: 'src1'}
+    expect:
+      rows:
+        - {medical_claim_id: 'MC1', claim_id: 'CLM1', claim_line_number: 1, person_id: 'P1', hcpcs_code: '99213', paid_amount: 100.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {medical_claim_id: 'MC2', claim_id: 'CLM1', claim_line_number: 2, person_id: 'P1', hcpcs_code: '36415', paid_amount: 25.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__pharmacy_claim — Passthrough from staging
+  # =========================================================================
+
+  - name: test_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__pharmacy_claim
+    description: >
+      Pharmacy claim model passes through columns from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_pharmacy_claim')
+        rows:
+          - {pharmacy_claim_id: 'RX1', claim_id: 'RXCLM1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', prescribing_provider_id: 'NPI1', prescribing_provider_name: 'Dr Smith', dispensing_provider_id: 'NPI2', dispensing_provider_name: 'CVS', dispensing_date: '2023-06-01', ndc_code: '00000000001', ndc_description: 'Test Drug', quantity: 30, days_supply: 30, refills: 3, paid_date: '2023-06-15', paid_amount: 50.00, allowed_amount: 45.00, charge_amount: 60.00, coinsurance_amount: 5.00, copayment_amount: 10.00, deductible_amount: 0, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {pharmacy_claim_id: 'RX1', claim_id: 'RXCLM1', claim_line_number: 1, person_id: 'P1', ndc_code: '00000000001', days_supply: 30, paid_amount: 50.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_pharmacy_claim_pk_uniqueness
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__pharmacy_claim
+    description: >
+      Each pharmacy claim line produces a unique pharmacy_claim_id,
+      even for different lines on the same claim.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('core__stg_claims_pharmacy_claim')
+        rows:
+          - {pharmacy_claim_id: 'RX1', claim_id: 'RXCLM1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', prescribing_provider_id: null, prescribing_provider_name: null, dispensing_provider_id: null, dispensing_provider_name: null, dispensing_date: '2023-06-01', ndc_code: '11111111111', ndc_description: null, quantity: 30, days_supply: 30, refills: 0, paid_date: null, paid_amount: 50.00, allowed_amount: null, charge_amount: null, coinsurance_amount: null, copayment_amount: null, deductible_amount: null, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+          - {pharmacy_claim_id: 'RX2', claim_id: 'RXCLM1', claim_line_number: 2, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', prescribing_provider_id: null, prescribing_provider_name: null, dispensing_provider_id: null, dispensing_provider_name: null, dispensing_date: '2023-06-01', ndc_code: '22222222222', ndc_description: null, quantity: 60, days_supply: 60, refills: 0, paid_date: null, paid_amount: 100.00, allowed_amount: null, charge_amount: null, coinsurance_amount: null, copayment_amount: null, deductible_amount: null, in_network_flag: 1, enrollment_flag: 1, member_month_key: 'MM1', data_source: 'src1', file_date: null, ingest_datetime: null, file_name: null, tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__pharmacy_claim')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {pharmacy_claim_id: 'RX1', claim_id: 'RXCLM1', claim_line_number: 1, ndc_code: '11111111111', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {pharmacy_claim_id: 'RX2', claim_id: 'RXCLM1', claim_line_number: 2, ndc_code: '22222222222', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__patient — Claims-only path with deduplication
+  # =========================================================================
+
+  - name: test_patient_claims_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__patient
+    description: >
+      Patient model in claims-only mode passes through from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_patient')
+        rows:
+          - {person_id: 'P1', name_suffix: null, first_name: 'John', middle_name: null, last_name: 'Doe', sex: 'male', race: 'white', birth_date: '1960-03-15', death_date: null, death_flag: 0, social_security_number: null, address: '123 Main St', city: 'Anytown', state: 'NY', zip_code: '10001', county: null, latitude: null, longitude: null, phone: null, email: null, ethnicity: null, age: 63, age_group: '60-69', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1960-03-15', age: 63, age_group: '60-69', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_patient_pk_uniqueness_one_row_per_person
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__patient
+    description: >
+      Patient model should produce exactly one row per person_id
+      when claims-only mode is active.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_patient')
+        rows:
+          - {person_id: 'P1', name_suffix: null, first_name: 'John', middle_name: null, last_name: 'Doe', sex: 'male', race: null, birth_date: '1960-03-15', death_date: null, death_flag: 0, social_security_number: null, address: null, city: null, state: null, zip_code: null, county: null, latitude: null, longitude: null, phone: null, email: null, ethnicity: null, age: 63, age_group: '60-69', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {person_id: 'P2', name_suffix: null, first_name: 'Jane', middle_name: null, last_name: 'Smith', sex: 'female', race: null, birth_date: '1955-07-20', death_date: null, death_flag: 0, social_security_number: null, address: null, city: null, state: null, zip_code: null, county: null, latitude: null, longitude: null, phone: null, email: null, ethnicity: null, age: 68, age_group: '60-69', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'John', sex: 'male', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', first_name: 'Jane', sex: 'female', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__procedure — Normalization logic and terminology joins
+  # =========================================================================
+
+  - name: test_procedure_normalizes_hcpcs
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__procedure
+    description: >
+      When source_code_type is hcpcs and the code matches terminology,
+      normalized fields are populated via automatic mapping.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_procedure')
+        rows:
+          - {procedure_id: 'PR1', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', procedure_date: '2023-06-15', source_code_type: 'hcpcs', source_code: '99213', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: 'NPI1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_pcs')
+        rows: []
+      - input: ref('terminology__icd_9_pcs')
+        rows: []
+      - input: ref('terminology__hcpcs_level_2')
+        rows:
+          - {hcpcs: '99213', short_description: 'Office visit est patient', long_description: 'Office or other outpatient visit for the evaluation and management of an established patient'}
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {procedure_id: 'PR1', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM1', procedure_date: '2023-06-15', source_code_type: 'hcpcs', source_code: '99213', source_description: null, normalized_code_type: 'hcpcs', normalized_code: '99213', normalized_description: 'Office visit est patient', mapping_method: 'automatic', modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: 'NPI1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_procedure_icd10_pcs_normalization
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__procedure
+    description: >
+      When source_code_type is icd-10-pcs, the ICD-10 PCS terminology
+      is used for normalization.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_procedure')
+        rows:
+          - {procedure_id: 'PR2', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM2', procedure_date: '2023-07-01', source_code_type: 'icd-10-pcs', source_code: '0DBN4ZX', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: 'NPI2', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_pcs')
+        rows:
+          - {icd_10_pcs: '0DBN4ZX', description: 'Excision of sigmoid colon percutaneous endoscopic diagnostic'}
+      - input: ref('terminology__icd_9_pcs')
+        rows: []
+      - input: ref('terminology__hcpcs_level_2')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {procedure_id: 'PR2', person_id: 'P1', source_code_type: 'icd-10-pcs', source_code: '0DBN4ZX', normalized_code_type: 'icd-10-pcs', normalized_code: '0DBN4ZX', normalized_description: 'Excision of sigmoid colon percutaneous endoscopic diagnostic', mapping_method: 'automatic', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_procedure_no_match_yields_null_normalization
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__procedure
+    description: >
+      When source_code does not match any terminology table,
+      normalized fields should all be null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_claims_procedure')
+        rows:
+          - {procedure_id: 'PR3', person_id: 'P1', member_id: 'M1', patient_id: null, encounter_id: null, claim_id: 'CLM3', procedure_date: '2023-08-01', source_code_type: 'hcpcs', source_code: 'XXXXX', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_pcs')
+        rows: []
+      - input: ref('terminology__icd_9_pcs')
+        rows: []
+      - input: ref('terminology__hcpcs_level_2')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+    expect:
+      rows:
+        - {procedure_id: 'PR3', person_id: 'P1', source_code_type: 'hcpcs', source_code: 'XXXXX', normalized_code_type: null, normalized_code: null, normalized_description: null, mapping_method: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__lab_result — Normalization with order and component joins
+  # =========================================================================
+
+  - name: test_lab_result_normalizes_loinc_order
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__lab_result
+    description: >
+      When source_order_type is loinc and matches terminology,
+      the normalized order fields should be populated.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', accession_number: 'ACC1', source_order_type: 'loinc', source_order_code: '2093-3', source_order_description: 'Cholesterol total', source_component_type: null, source_component_code: null, source_component_description: null, normalized_order_type: null, normalized_order_code: null, normalized_order_description: null, normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, status: 'final', result: '200', result_datetime: '2023-06-15 10:00:00', collection_datetime: '2023-06-15 09:00:00', source_units: 'mg/dL', normalized_units: null, source_reference_range_low: '100', source_reference_range_high: '240', normalized_reference_range_low: null, normalized_reference_range_high: null, source_abnormal_flag: null, normalized_abnormal_flag: null, specimen: 'blood', ordering_practitioner_id: 'NPI1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__loinc')
+        rows:
+          - {loinc: '2093-3', long_common_name: 'Cholesterol [Mass/volume] in Serum or Plasma'}
+      - input: ref('terminology__snomed_ct')
+        rows: []
+      - input: ref('input_layer__lab_result')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR1', person_id: 'P1', source_order_code: '2093-3', normalized_order_type: 'loinc', normalized_order_code: '2093-3', normalized_order_description: 'Cholesterol [Mass/volume] in Serum or Plasma', mapping_method: 'automatic', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_lab_result_manual_normalization_priority
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__lab_result
+    description: >
+      When normalized_order_code is already populated (manual mapping),
+      it takes priority over terminology lookup.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_lab_result')
+        rows:
+          - {lab_result_id: 'LR2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', accession_number: 'ACC2', source_order_type: 'loinc', source_order_code: '2093-3', source_order_description: 'Cholesterol', source_component_type: null, source_component_code: null, source_component_description: null, normalized_order_type: 'loinc', normalized_order_code: '2093-3', normalized_order_description: 'Manual cholesterol desc', normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, status: 'final', result: '210', result_datetime: '2023-06-15 10:00:00', collection_datetime: '2023-06-15 09:00:00', source_units: 'mg/dL', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, source_abnormal_flag: null, normalized_abnormal_flag: null, specimen: null, ordering_practitioner_id: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__loinc')
+        rows:
+          - {loinc: '2093-3', long_common_name: 'Cholesterol [Mass/volume] in Serum or Plasma'}
+      - input: ref('terminology__snomed_ct')
+        rows: []
+      - input: ref('input_layer__lab_result')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR2', person_id: 'P1', normalized_order_type: 'loinc', normalized_order_code: '2093-3', normalized_order_description: 'Manual cholesterol desc', mapping_method: 'manual', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__observation — Normalization with multiple code systems
+  # =========================================================================
+
+  - name: test_observation_normalizes_snomed_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__observation
+    description: >
+      When source_code_type is snomed-ct and matches terminology,
+      normalized fields should be populated.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_observation')
+        rows:
+          - {observation_id: 'OB1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', panel_id: null, observation_date: '2023-06-15', observation_type: 'vital-signs', source_code_type: 'snomed-ct', source_code: '271649006', source_description: 'Systolic BP', normalized_code_type: null, normalized_code: null, normalized_description: null, result: '120', source_units: 'mmHg', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__icd_10_pcs')
+        rows: []
+      - input: ref('terminology__icd_9_pcs')
+        rows: []
+      - input: ref('terminology__hcpcs_level_2')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows:
+          - {snomed_ct: '271649006', description: 'Systolic blood pressure'}
+      - input: ref('terminology__loinc')
+        rows: []
+      - input: ref('terminology__observation_type')
+        rows:
+          - {observation_type: 'vital-signs'}
+      - input: ref('input_layer__observation')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {observation_id: 'OB1', person_id: 'P1', source_code_type: 'snomed-ct', source_code: '271649006', normalized_code_type: 'snomed-ct', normalized_code: '271649006', normalized_description: 'Systolic blood pressure', mapping_method: 'automatic', observation_type: 'vital-signs', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_observation_observation_type_normalization
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__observation
+    description: >
+      The observation_type field is normalized against the
+      terminology__observation_type lookup table.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_observation')
+        rows:
+          - {observation_id: 'OB2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', panel_id: null, observation_date: '2023-06-15', observation_type: 'Vital-Signs', source_code_type: 'loinc', source_code: 'XXXXX', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, result: '98.6', source_units: 'F', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__icd_10_pcs')
+        rows: []
+      - input: ref('terminology__icd_9_pcs')
+        rows: []
+      - input: ref('terminology__hcpcs_level_2')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+      - input: ref('terminology__loinc')
+        rows: []
+      - input: ref('terminology__observation_type')
+        rows:
+          - {observation_type: 'vital-signs'}
+      - input: ref('input_layer__observation')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {observation_id: 'OB2', person_id: 'P1', observation_type: 'vital-signs', normalized_code_type: null, normalized_code: null, mapping_method: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__immunization — CVX normalization and status enrichment
+  # =========================================================================
+
+  - name: test_immunization_normalizes_cvx_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__immunization
+    description: >
+      When source_code_type is cvx and matches terminology,
+      normalized code fields should be populated.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_immunization')
+        rows:
+          - {immunization_id: 'IM1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '208', source_description: 'COVID-19 vaccine', normalized_code_type: null, normalized_code: null, normalized_description: null, status: 'completed', status_reason: null, occurrence_date: '2023-06-15', source_dose: '0.3 mL', normalized_dose: null, lot_number: 'LOT123', body_site: null, route: null, location_id: null, practitioner_id: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__cvx')
+        rows:
+          - {cvx: '208', long_description: 'SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose'}
+      - input: ref('terminology__immunization_status')
+        rows:
+          - {status_code: 'completed', status: 'completed'}
+      - input: ref('terminology__immunization_status_reason')
+        rows: []
+      - input: ref('terminology__act_site')
+        rows: []
+      - input: ref('terminology__immunization_route_code')
+        rows: []
+      - input: ref('input_layer__immunization')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {immunization_id: 'IM1', person_id: 'P1', source_code_type: 'cvx', source_code: '208', normalized_code_type: 'cvx', normalized_code: '208', normalized_description: 'SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose', mapping_method: 'automatic', status: 'completed', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_immunization_status_reason_enrichment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__immunization
+    description: >
+      The status_reason field is enriched from the
+      terminology__immunization_status_reason table when matching.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_immunization')
+        rows:
+          - {immunization_id: 'IM2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '999', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, status: 'not-done', status_reason: 'MEDPREC', occurrence_date: '2023-06-15', source_dose: null, normalized_dose: null, lot_number: null, body_site: null, route: null, location_id: null, practitioner_id: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__cvx')
+        rows: []
+      - input: ref('terminology__immunization_status')
+        rows:
+          - {status_code: 'not-done', status: 'not-done'}
+      - input: ref('terminology__immunization_status_reason')
+        rows:
+          - {reason_code: 'MEDPREC', description: 'medical precaution', code_type: 'actreason'}
+      - input: ref('terminology__act_site')
+        rows: []
+      - input: ref('terminology__immunization_route_code')
+        rows: []
+      - input: ref('input_layer__immunization')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {immunization_id: 'IM2', person_id: 'P1', normalized_code_type: null, normalized_code: null, mapping_method: null, status: 'not-done', status_reason: 'medical precaution', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__medication — NDC and RxNorm normalization chain
+  # =========================================================================
+
+  - name: test_medication_normalizes_ndc_code
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__medication
+    description: >
+      When source_code_type is ndc and matches terminology,
+      the ndc_code and ndc_description are populated.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', dispensing_date: '2023-06-15', prescribing_date: '2023-06-10', source_code_type: 'ndc', source_code: '00002323201', source_description: 'Metformin 500mg', ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, atc_code: null, atc_description: null, route: 'oral', strength: '500mg', quantity: 60, quantity_unit: 'tablets', days_supply: 30, practitioner_id: 'NPI1', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__ndc')
+        rows:
+          - {ndc: '00002323201', fda_description: 'Metformin HCL 500mg tablet', rxnorm_description: 'Metformin Hydrochloride 500 MG Oral Tablet', rxcui: '860974'}
+      - input: ref('terminology__rxnorm_to_atc')
+        rows:
+          - {rxcui: '860974', rxnorm_description: 'Metformin Hydrochloride 500 MG Oral Tablet', atc_3_code: 'A10BA', atc_3_name: 'Biguanides', atc_4_name: 'Metformin'}
+      - input: ref('input_layer__medication')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'ndc', source_code: '00002323201', ndc_code: '00002323201', ndc_description: 'Metformin HCL 500mg tablet', ndc_mapping_method: 'automatic', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_medication_rxnorm_atc_chain_from_ndc
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__medication
+    description: >
+      When an NDC matches, the rxnorm and ATC codes are resolved
+      through the NDC-to-RxNorm-to-ATC chain.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_medication')
+        rows:
+          - {medication_id: 'MED2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', dispensing_date: '2023-06-15', prescribing_date: null, source_code_type: 'ndc', source_code: '00002323201', source_description: null, ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, atc_code: null, atc_description: null, route: null, strength: null, quantity: null, quantity_unit: null, days_supply: null, practitioner_id: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__ndc')
+        rows:
+          - {ndc: '00002323201', fda_description: 'Metformin HCL 500mg', rxnorm_description: 'Metformin 500 MG', rxcui: '860974'}
+      - input: ref('terminology__rxnorm_to_atc')
+        rows:
+          - {rxcui: '860974', rxnorm_description: 'Metformin 500 MG', atc_3_code: 'A10BA', atc_3_name: 'Biguanides', atc_4_name: 'Metformin'}
+      - input: ref('input_layer__medication')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {medication_id: 'MED2', person_id: 'P1', ndc_code: '00002323201', rxnorm_code: '860974', atc_code: 'A10BA', atc_description: 'Biguanides', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__appointment — Normalization with multiple terminology joins
+  # =========================================================================
+
+  - name: test_appointment_no_terminology_match
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__appointment
+    description: >
+      When source codes do not match any terminology tables,
+      normalized fields should fall back to the staging values or null.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        enable_normalize_engine: false
+    given:
+      - input: ref('core__stg_clinical_appointment')
+        rows:
+          - {appointment_id: 'AP2', person_id: 'P1', patient_id: 'PT1', encounter_id: null, source_appointment_type_code: 'CUSTOM_TYPE', source_appointment_type_description: 'Custom', normalized_appointment_type_code: null, normalized_appointment_type_description: null, start_datetime: '2023-07-01 14:00:00', end_datetime: '2023-07-01 15:00:00', duration: 60, location_id: null, practitioner_id: null, source_status: 'custom_status', normalized_status: null, appointment_specialty: null, reason: null, source_reason_code_type: null, source_reason_code: null, source_reason_description: null, normalized_reason_code_type: null, normalized_reason_code: null, normalized_reason_description: null, cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('terminology__appointment_cancellation_reason')
+        rows: []
+      - input: ref('terminology__appointment_status')
+        rows: []
+      - input: ref('terminology__appointment_type')
+        rows: []
+      - input: ref('terminology__icd_10_cm')
+        rows: []
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__snomed_ct')
+        rows: []
+      - input: ref('input_layer__appointment')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {appointment_id: 'AP2', person_id: 'P1', normalized_appointment_type_code: null, normalized_appointment_type_description: null, normalized_status: null, normalized_reason_code_type: null, normalized_reason_code: null, mapping_method: null, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__location — Passthrough (claims-only path)
+  # =========================================================================
+
+  - name: test_location_claims_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__location
+    description: >
+      Location model in claims-only mode passes through from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_location')
+        rows:
+          - {location_id: 'LOC1', npi: '1234567890', name: 'General Hospital', facility_type: null, parent_organization: 'Health System', address: '100 Hospital Dr', city: 'Anytown', state: 'NY', zip_code: '10001', latitude: null, longitude: null, data_source: null, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {location_id: 'LOC1', npi: '1234567890', name: 'General Hospital', city: 'Anytown', state: 'NY', zip_code: '10001', data_source: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_location_clinical_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__location
+    description: >
+      Location model in clinical-only mode passes through from clinical staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: false
+    given:
+      - input: ref('core__stg_clinical_location')
+        rows:
+          - {location_id: 'CLOC1', npi: '9876543210', name: 'Community Clinic', facility_type: 'clinic', parent_organization: null, address: '200 Clinic Rd', city: 'Smalltown', state: 'CA', zip_code: '90001', latitude: 34.05, longitude: -118.25, data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__location')
+        rows:
+          - {location_id: 'L1', data_source: 'src1'}
+    expect:
+      rows:
+        - {location_id: 'CLOC1', npi: '9876543210', name: 'Community Clinic', facility_type: 'clinic', city: 'Smalltown', state: 'CA', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__practitioner — Passthrough (claims-only and clinical-only paths)
+  # =========================================================================
+
+  - name: test_practitioner_claims_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__practitioner
+    description: >
+      Practitioner model in claims-only mode passes through from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_practitioner')
+        rows:
+          - {practitioner_id: 'PRAC1', npi: '1111111111', first_name: 'Alice', last_name: 'Johnson', practice_affiliation: 'Big Health System', specialty: 'Internal Medicine', sub_specialty: null, data_source: null, tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {practitioner_id: 'PRAC1', npi: '1111111111', first_name: 'Alice', last_name: 'Johnson', specialty: 'Internal Medicine', data_source: null, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_practitioner_clinical_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__practitioner
+    description: >
+      Practitioner model in clinical-only mode passes through from clinical staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+        claims_enabled: false
+    given:
+      - input: ref('core__stg_clinical_practitioner')
+        rows:
+          - {practitioner_id: 'CPRAC1', npi: '2222222222', first_name: 'Bob', last_name: 'Williams', practice_affiliation: null, specialty: 'Cardiology', sub_specialty: 'Interventional', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+      - input: ref('input_layer__practitioner')
+        rows:
+          - {practitioner_id: 'PRAC1', data_source: 'src1'}
+    expect:
+      rows:
+        - {practitioner_id: 'CPRAC1', npi: '2222222222', first_name: 'Bob', last_name: 'Williams', specialty: 'Cardiology', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__encounter — Claims-only passthrough
+  # =========================================================================
+
+  - name: test_encounter_claims_only_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__encounter
+    description: >
+      Encounter model in claims-only mode passes through from staging.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_encounter')
+        rows:
+          - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_group: 'inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, admit_source_code: '1', admit_source_description: null, admit_type_code: '1', admit_type_description: null, discharge_disposition_code: '01', discharge_disposition_description: null, attending_provider_id: null, attending_provider_name: null, facility_npi: 'NPI3', facility_name: 'General Hospital', facility_type: 'acute care hospital', observation_flag: 0, lab_flag: 1, dme_flag: 0, ambulance_flag: 0, pharmacy_flag: 1, ed_flag: 0, delivery_flag: 0, delivery_type: null, newborn_flag: 0, nicu_flag: 0, snf_part_b_flag: 0, primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'J18.9', primary_diagnosis_description: 'Pneumonia', drg_code_type: 'ms-drg', drg_code: '193', drg_description: null, paid_amount: 15000.00, allowed_amount: 14000.00, charge_amount: 20000.00, claim_count: 2, inst_claim_count: 1, prof_claim_count: 1, source_model: null, encounter_source_type: 'claim', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, paid_amount: 15000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_encounter_pk_uniqueness_multiple_encounters
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__encounter
+    description: >
+      Multiple encounters for the same person should each have unique
+      encounter_ids and be preserved.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('core__stg_claims_encounter')
+        rows:
+          - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_group: 'inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, admit_source_code: null, admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, attending_provider_id: null, attending_provider_name: null, facility_npi: null, facility_name: null, facility_type: null, observation_flag: 0, lab_flag: 0, dme_flag: 0, ambulance_flag: 0, pharmacy_flag: 0, ed_flag: 0, delivery_flag: 0, delivery_type: null, newborn_flag: 0, nicu_flag: 0, snf_part_b_flag: 0, primary_diagnosis_code_type: null, primary_diagnosis_code: null, primary_diagnosis_description: null, drg_code_type: null, drg_code: null, drg_description: null, paid_amount: 10000.00, allowed_amount: null, charge_amount: null, claim_count: 1, inst_claim_count: 1, prof_claim_count: 0, source_model: null, encounter_source_type: 'claim', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'ENC2', person_id: 'P1', encounter_type: 'office visit', encounter_group: 'outpatient', encounter_start_date: '2023-07-15', encounter_end_date: '2023-07-15', length_of_stay: 0, admit_source_code: null, admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, attending_provider_id: null, attending_provider_name: null, facility_npi: null, facility_name: null, facility_type: null, observation_flag: 0, lab_flag: 0, dme_flag: 0, ambulance_flag: 0, pharmacy_flag: 0, ed_flag: 0, delivery_flag: 0, delivery_type: null, newborn_flag: 0, nicu_flag: 0, snf_part_b_flag: 0, primary_diagnosis_code_type: null, primary_diagnosis_code: null, primary_diagnosis_description: null, drg_code_type: null, drg_code: null, drg_description: null, paid_amount: 200.00, allowed_amount: null, charge_amount: null, claim_count: 1, inst_claim_count: 0, prof_claim_count: 1, source_model: null, encounter_source_type: 'claim', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', paid_amount: 10000.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'ENC2', person_id: 'P1', encounter_type: 'office visit', paid_amount: 200.00, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # core__person_id_crosswalk — Claims-only distinct crosswalk
+  # =========================================================================
+
+  - name: test_person_id_crosswalk_claims_only
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__person_id_crosswalk
+    description: >
+      In claims-only mode, produces distinct person_id / member_id / payer
+      combinations from eligibility data.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P2', member_id: 'M2', payer: 'MCR', plan: 'PlanB', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', patient_id: null, member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', patient_id: null, member_id: 'M2', payer: 'MCR', plan: 'PlanB', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_person_id_crosswalk_deduplicates
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__person_id_crosswalk
+    description: >
+      Duplicate rows in eligibility are deduplicated in the crosswalk output
+      (SELECT DISTINCT).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', patient_id: null, member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_person_id_crosswalk_claims_and_clinical_keep_both_sources
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__person_id_crosswalk
+    description: >
+      In combined mode, claims and clinical rows are deduplicated within each
+      source family, but both source families still contribute rows.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        clinical_enabled: true
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'claims_src'}
+          - {person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'claims_src'}
+      - input: ref('input_layer__patient')
+        rows:
+          - {person_id: 'P2', patient_id: 'PAT2', data_source: 'clinical_src'}
+          - {person_id: 'P2', patient_id: 'PAT2', data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {person_id: 'P1', patient_id: null, member_id: 'M1', payer: 'MCR', plan: 'PlanA', data_source: 'claims_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P2', patient_id: 'PAT2', member_id: null, payer: null, plan: null, data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_claims_condition
+  # =========================================================================
+
+  - name: test_stg_claims_condition_joins_diagnosis_and_poa
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_condition
+    description: >
+      The staging model joins diagnosis codes with medical claims
+      and produces a condition_id from the concatenated key fields.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__int_diagnosis_code_intermediate')
+        rows:
+          - {claim_id: 'CLM1', data_source: 'src1', diagnosis_code_type: 'icd-10-cm', diagnosis_code: 'E1165', column_name: 'diagnosis_code_1'}
+      - input: ref('normalized_input__int_present_on_admit_voting')
+        rows:
+          - {claim_id: 'CLM1', data_source: 'src1', column_name: 'present_on_admit_code_1', normalized_code: 'Y'}
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_line_number: 1, data_source: 'src1', payer: 'MCR', person_id: 'P1', member_id: 'M1', admission_date: '2023-06-01', claim_start_date: '2023-06-01', discharge_date: '2023-06-05', claim_end_date: '2023-06-05'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'E1165', short_description: 'Type 2 DM w hyperglycemia', long_description: 'Type 2 diabetes mellitus with hyperglycemia'}
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__present_on_admission')
+        rows:
+          - {present_on_admit_code: 'Y', present_on_admit_description: 'Yes'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', claim_id: 'CLM1', source_code_type: 'icd-10-cm', source_code: 'E1165', condition_type: 'discharge_diagnosis', condition_rank: 1, present_on_admit_code: 'Y', present_on_admit_description: 'Yes', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_claims_condition_null_diagnosis_filtered
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_condition
+    description: >
+      Rows where diagnosis_code is null should be filtered out
+      by the WHERE source_code IS NOT NULL clause.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__int_diagnosis_code_intermediate')
+        rows:
+          - {claim_id: 'CLM1', data_source: 'src1', diagnosis_code_type: 'icd-10-cm', diagnosis_code: null, column_name: 'diagnosis_code_1'}
+          - {claim_id: 'CLM2', data_source: 'src1', diagnosis_code_type: 'icd-10-cm', diagnosis_code: 'J189', column_name: 'diagnosis_code_1'}
+      - input: ref('normalized_input__int_present_on_admit_voting')
+        rows: []
+      - input: ref('normalized_input__medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_line_number: 1, data_source: 'src1', payer: 'MCR', person_id: 'P1', member_id: 'M1', admission_date: null, claim_start_date: '2023-06-01', discharge_date: null, claim_end_date: '2023-06-01'}
+          - {claim_id: 'CLM2', claim_line_number: 1, data_source: 'src1', payer: 'MCR', person_id: 'P2', member_id: 'M2', admission_date: null, claim_start_date: '2023-07-01', discharge_date: null, claim_end_date: '2023-07-01'}
+      - input: ref('terminology__icd_10_cm')
+        rows:
+          - {icd_10_cm: 'J189', short_description: 'Pneumonia unspecified organism', long_description: 'Pneumonia, unspecified organism'}
+      - input: ref('terminology__icd_9_cm')
+        rows: []
+      - input: ref('terminology__present_on_admission')
+        rows: []
+    expect:
+      rows:
+        - {person_id: 'P2', claim_id: 'CLM2', source_code: 'J189', source_code_type: 'icd-10-cm', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_claims_eligibility
+  # =========================================================================
+
+  - name: test_stg_claims_eligibility_generates_eligibility_id
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_eligibility
+    description: >
+      The eligibility_id is generated from a concatenation of key fields.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: '0', dual_status_code: null, medicare_status_code: '10', enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 12, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: null, race: null, state: null, zip_code: null, address: null, city: null, phone: null, email: null, first_name: null, middle_name: null, last_name: null, name_suffix: null, social_security_number: null, ethnicity: null, death_flag: null}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_claims_eligibility_preserves_all_enrollment_periods
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_eligibility
+    description: >
+      Multiple enrollment periods for the same person are all preserved.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: null, race: null, state: null, zip_code: null, address: null, city: null, phone: null, email: null, first_name: null, middle_name: null, last_name: null, name_suffix: null, social_security_number: null, ethnicity: null, death_flag: null}
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanB', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: null, race: null, state: null, zip_code: null, address: null, city: null, phone: null, email: null, first_name: null, middle_name: null, last_name: null, name_suffix: null, social_security_number: null, ethnicity: null, death_flag: null}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {person_id: 'P1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanB', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_claims_member_months
+  # =========================================================================
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_claims_patient
+  # =========================================================================
+
+  - name: test_stg_claims_patient_picks_latest_enrollment
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_patient
+    description: >
+      The staging model picks the row with the latest enrollment_end_date
+      per person_id (row_sequence = 1).
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: 'male', race: null, state: 'NY', zip_code: '10001', address: null, city: 'Anytown', phone: null, email: null, first_name: 'John', middle_name: null, last_name: 'Doe', name_suffix: null, social_security_number: null, ethnicity: null, death_flag: 0}
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanB', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: 6, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: 'male', race: null, state: 'NY', zip_code: '10001', address: null, city: 'Anytown', phone: null, email: null, first_name: 'John', middle_name: null, last_name: 'Doe', name_suffix: null, social_security_number: null, ethnicity: null, death_flag: 0}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1960-01-01', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_claims_patient_null_enrollment_end_date_treated_as_far_future
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_claims_patient
+    description: >
+      A null enrollment_end_date is treated as 2050-01-01 for sorting,
+      so it should be selected as the latest record.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: null, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: 'female', race: null, state: 'CA', zip_code: '90001', address: '456 Oak Ave', city: 'Los Angeles', phone: null, email: null, first_name: 'Jane', middle_name: null, last_name: 'Smith', name_suffix: null, social_security_number: null, ethnicity: null, death_flag: 0}
+          - {person_id: 'P1', member_id: 'M1', subscriber_id: null, birth_date: '1960-01-01', death_date: null, enrollment_start_date: '2024-01-01', enrollment_end_date: null, payer: 'MCR', payer_type: 'medicare', plan: 'PlanB', original_reason_entitlement_code: null, dual_status_code: null, medicare_status_code: null, enrollment_status: null, hospice_flag: null, snp_type: null, medicaid_indicator: null, long_term_institutional_flag: null, part_d_raf_type: null, low_income_subsidy_indicator: null, metal_level: null, csr_indicator: null, enrollment_duration_months: null, esrd_status: null, transplant_duration_months: null, subscriber_relation: null, group_id: null, group_name: null, normalized_state_name: null, fips_state_code: null, fips_state_abbreviation: null, data_source: 'src1', file_date: null, file_name: null, ingest_datetime: null, gender: 'female', race: null, state: 'CA', zip_code: '90002', address: '789 Pine St', city: 'LA', phone: null, email: null, first_name: 'Jane', middle_name: 'M', last_name: 'Smith', name_suffix: null, social_security_number: null, ethnicity: null, death_flag: 0}
+      - input: ref('input_layer__eligibility')
+        rows:
+          - {person_id: 'P1', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'Jane', last_name: 'Smith', sex: 'female', city: 'LA', zip_code: '90002', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_condition
+  # =========================================================================
+
+  - name: test_stg_clinical_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_condition
+    description: >
+      Clinical condition staging passes through all columns from the input layer.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__condition')
+        rows:
+          - {condition_id: 'CC1', payer: null, person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', claim_id: null, recorded_date: '2023-06-15', onset_date: '2023-06-10', resolved_date: null, status: 'active', condition_type: 'encounter-diagnosis', source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: 'Type 2 DM with hyperglycemia', normalized_code_type: null, normalized_code: null, normalized_description: null, condition_rank: null, present_on_admit_code: null, present_on_admit_description: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {condition_id: 'CC1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_code_type: 'icd-10-cm', source_code: 'E11.65', status: 'active', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_condition_multiple_conditions
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_condition
+    description: >
+      Multiple clinical conditions for same patient are all passed through
+      maintaining unique condition_ids.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__condition')
+        rows:
+          - {condition_id: 'CC1', payer: null, person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', claim_id: null, recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'problem-list-item', source_code_type: 'icd-10-cm', source_code: 'E11.65', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, condition_rank: null, present_on_admit_code: null, present_on_admit_description: null, data_source: 'clinical_src'}
+          - {condition_id: 'CC2', payer: null, person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', claim_id: null, recorded_date: '2023-06-15', onset_date: null, resolved_date: null, status: 'active', condition_type: 'problem-list-item', source_code_type: 'icd-10-cm', source_code: 'I10', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, condition_rank: null, present_on_admit_code: null, present_on_admit_description: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {condition_id: 'CC1', person_id: 'P1', source_code: 'E11.65', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {condition_id: 'CC2', person_id: 'P1', source_code: 'I10', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_patient
+  # =========================================================================
+
+  - name: test_stg_clinical_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_patient
+    description: >
+      Clinical patient staging passes through columns and computes age.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__patient')
+        rows:
+          - {person_id: 'P1', name_suffix: null, first_name: 'Alice', middle_name: null, last_name: 'Brown', sex: 'female', race: 'white', birth_date: '1990-06-15', death_date: null, death_flag: 0, social_security_number: null, address: null, city: null, state: null, zip_code: null, county: null, latitude: null, longitude: null, phone: null, email: null, ethnicity: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {person_id: 'P1', first_name: 'Alice', last_name: 'Brown', sex: 'female', birth_date: '1990-06-15', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_patient_age_group_calculation
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_patient
+    description: >
+      The age_group is correctly calculated based on birth_date relative
+      to tuva_last_run. A person born 1960-01-01 with tuva_last_run
+      2024-01-01 should be age 64, in the 60-69 group.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__patient')
+        rows:
+          - {person_id: 'P1', name_suffix: null, first_name: 'Bob', middle_name: null, last_name: 'Jones', sex: 'male', race: null, birth_date: '1960-01-01', death_date: null, death_flag: 0, social_security_number: null, address: null, city: null, state: null, zip_code: null, county: null, latitude: null, longitude: null, phone: null, email: null, ethnicity: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {person_id: 'P1', birth_date: '1960-01-01', age: 64, age_group: '60-69', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_encounter
+  # =========================================================================
+
+  - name: test_stg_clinical_encounter_sets_clinical_group
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_encounter
+    description: >
+      Clinical encounter staging sets encounter_group to 'clinical'
+      and encounter_source_type to 'clinical'.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__encounter')
+        rows:
+          - {encounter_id: 'CENC1', person_id: 'P1', encounter_type: 'office visit', encounter_start_date: '2023-06-15', encounter_end_date: '2023-06-15', length_of_stay: 0, admit_source_code: null, admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, attending_provider_id: 'NPI1', attending_provider_name: 'Dr Smith', facility_npi: null, facility_name: null, primary_diagnosis_code_type: null, primary_diagnosis_code: null, primary_diagnosis_description: null, drg_code_type: null, drg_code: null, drg_description: null, paid_amount: null, allowed_amount: null, charge_amount: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {encounter_id: 'CENC1', person_id: 'P1', encounter_type: 'office visit', encounter_group: 'clinical', encounter_source_type: 'clinical', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_encounter_nulls_claims_only_flags
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_encounter
+    description: >
+      Clinical encounters set claims-specific flags (observation_flag,
+      lab_flag, etc.) to null since they are not applicable.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__encounter')
+        rows:
+          - {encounter_id: 'CENC2', person_id: 'P1', encounter_type: 'inpatient', encounter_start_date: '2023-07-01', encounter_end_date: '2023-07-05', length_of_stay: 4, admit_source_code: '1', admit_source_description: null, admit_type_code: null, admit_type_description: null, discharge_disposition_code: null, discharge_disposition_description: null, attending_provider_id: null, attending_provider_name: null, facility_npi: 'NPI3', facility_name: 'Hospital', primary_diagnosis_code_type: null, primary_diagnosis_code: null, primary_diagnosis_description: null, drg_code_type: null, drg_code: null, drg_description: null, paid_amount: null, allowed_amount: null, charge_amount: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {encounter_id: 'CENC2', person_id: 'P1', encounter_group: 'clinical', observation_flag: null, lab_flag: null, dme_flag: null, ambulance_flag: null, pharmacy_flag: null, ed_flag: null, delivery_flag: null, newborn_flag: null, nicu_flag: null, snf_part_b_flag: null, claim_count: null, inst_claim_count: null, prof_claim_count: null, source_model: null, encounter_source_type: 'clinical', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_lab_result
+  # =========================================================================
+
+  - name: test_stg_clinical_lab_result_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_lab_result
+    description: >
+      Clinical lab result staging passes through all columns from the input layer.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', accession_number: 'ACC1', source_order_type: 'loinc', source_order_code: '2093-3', source_order_description: 'Cholesterol', source_component_type: null, source_component_code: null, source_component_description: null, normalized_order_type: null, normalized_order_code: null, normalized_order_description: null, normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, status: 'final', result: '200', result_datetime: '2023-06-15 10:00:00', collection_datetime: '2023-06-15 09:00:00', source_units: 'mg/dL', normalized_units: null, source_reference_range_low: '100', source_reference_range_high: '240', normalized_reference_range_low: null, normalized_reference_range_high: null, source_abnormal_flag: null, normalized_abnormal_flag: null, specimen: 'blood', ordering_practitioner_id: 'NPI1', data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR1', person_id: 'P1', source_order_code: '2093-3', result: '200', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_lab_result_multiple_results
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_lab_result
+    description: >
+      Multiple lab results maintain unique lab_result_ids.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__lab_result')
+        rows:
+          - {lab_result_id: 'LR1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', accession_number: 'ACC1', source_order_type: 'loinc', source_order_code: '2093-3', source_order_description: null, source_component_type: null, source_component_code: null, source_component_description: null, normalized_order_type: null, normalized_order_code: null, normalized_order_description: null, normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, status: 'final', result: '200', result_datetime: null, collection_datetime: null, source_units: 'mg/dL', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, source_abnormal_flag: null, normalized_abnormal_flag: null, specimen: null, ordering_practitioner_id: null, data_source: 'clinical_src'}
+          - {lab_result_id: 'LR2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', accession_number: 'ACC1', source_order_type: 'loinc', source_order_code: '2571-8', source_order_description: null, source_component_type: null, source_component_code: null, source_component_description: null, normalized_order_type: null, normalized_order_code: null, normalized_order_description: null, normalized_component_type: null, normalized_component_code: null, normalized_component_description: null, status: 'final', result: '90', result_datetime: null, collection_datetime: null, source_units: 'mg/dL', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, source_abnormal_flag: null, normalized_abnormal_flag: null, specimen: null, ordering_practitioner_id: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {lab_result_id: 'LR1', person_id: 'P1', source_order_code: '2093-3', result: '200', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {lab_result_id: 'LR2', person_id: 'P1', source_order_code: '2571-8', result: '90', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_medication
+  # =========================================================================
+
+  - name: test_stg_clinical_medication_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_medication
+    description: >
+      Clinical medication staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', dispensing_date: '2023-06-15', prescribing_date: '2023-06-10', source_code_type: 'ndc', source_code: '00002323201', source_description: 'Metformin', ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, atc_code: null, atc_description: null, route: 'oral', strength: '500mg', quantity: 60, quantity_unit: 'tablets', days_supply: 30, practitioner_id: 'NPI1', data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', source_code_type: 'ndc', source_code: '00002323201', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_medication_preserves_all_records
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_medication
+    description: >
+      Multiple medication records are all passed through, preserving PK uniqueness.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', dispensing_date: '2023-06-15', prescribing_date: null, source_code_type: 'ndc', source_code: '11111111111', source_description: null, ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, atc_code: null, atc_description: null, route: null, strength: null, quantity: null, quantity_unit: null, days_supply: null, practitioner_id: null, data_source: 'clinical_src'}
+          - {medication_id: 'MED2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', dispensing_date: '2023-06-15', prescribing_date: null, source_code_type: 'rxnorm', source_code: '860974', source_description: null, ndc_code: null, ndc_description: null, rxnorm_code: null, rxnorm_description: null, atc_code: null, atc_description: null, route: null, strength: null, quantity: null, quantity_unit: null, days_supply: null, practitioner_id: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', source_code: '11111111111', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {medication_id: 'MED2', person_id: 'P1', source_code: '860974', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_observation
+  # =========================================================================
+
+  - name: test_stg_clinical_observation_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_observation
+    description: >
+      Clinical observation staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__observation')
+        rows:
+          - {observation_id: 'OB1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', panel_id: null, observation_date: '2023-06-15', observation_type: 'vital-signs', source_code_type: 'loinc', source_code: '8480-6', source_description: 'Systolic BP', normalized_code_type: null, normalized_code: null, normalized_description: null, result: '120', source_units: 'mmHg', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {observation_id: 'OB1', person_id: 'P1', observation_type: 'vital-signs', source_code: '8480-6', result: '120', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_observation_multiple_obs_preserved
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_observation
+    description: >
+      Multiple observations for same encounter are all preserved.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__observation')
+        rows:
+          - {observation_id: 'OB1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', panel_id: null, observation_date: '2023-06-15', observation_type: 'vital-signs', source_code_type: 'loinc', source_code: '8480-6', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, result: '120', source_units: 'mmHg', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, data_source: 'clinical_src'}
+          - {observation_id: 'OB2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', panel_id: null, observation_date: '2023-06-15', observation_type: 'vital-signs', source_code_type: 'loinc', source_code: '8462-4', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, result: '80', source_units: 'mmHg', normalized_units: null, source_reference_range_low: null, source_reference_range_high: null, normalized_reference_range_low: null, normalized_reference_range_high: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {observation_id: 'OB1', source_code: '8480-6', result: '120', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {observation_id: 'OB2', source_code: '8462-4', result: '80', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_immunization
+  # =========================================================================
+
+  - name: test_stg_clinical_immunization_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_immunization
+    description: >
+      Clinical immunization staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__immunization')
+        rows:
+          - {immunization_id: 'IM1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '208', source_description: 'COVID-19 vaccine', normalized_code_type: null, normalized_code: null, normalized_description: null, status: 'completed', status_reason: null, occurrence_date: '2023-06-15', source_dose: '0.3 mL', normalized_dose: null, lot_number: 'LOT123', body_site: null, route: null, location_id: null, practitioner_id: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {immunization_id: 'IM1', person_id: 'P1', source_code: '208', status: 'completed', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_immunization_multiple_vaccines
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_immunization
+    description: >
+      Multiple immunizations are all preserved with unique IDs.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__immunization')
+        rows:
+          - {immunization_id: 'IM1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '208', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, status: 'completed', status_reason: null, occurrence_date: '2023-01-15', source_dose: null, normalized_dose: null, lot_number: null, body_site: null, route: null, location_id: null, practitioner_id: null, data_source: 'clinical_src'}
+          - {immunization_id: 'IM2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC2', source_code_type: 'cvx', source_code: '140', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, status: 'completed', status_reason: null, occurrence_date: '2023-09-01', source_dose: null, normalized_dose: null, lot_number: null, body_site: null, route: null, location_id: null, practitioner_id: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {immunization_id: 'IM1', source_code: '208', occurrence_date: '2023-01-15', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {immunization_id: 'IM2', source_code: '140', occurrence_date: '2023-09-01', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_procedure
+  # =========================================================================
+
+  - name: test_stg_clinical_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_procedure
+    description: >
+      Clinical procedure staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__procedure')
+        rows:
+          - {procedure_id: 'CPR1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', claim_id: null, procedure_date: '2023-06-15', source_code_type: 'hcpcs', source_code: '99213', source_description: 'Office visit', normalized_code_type: null, normalized_code: null, normalized_description: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: 'NPI1', data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {procedure_id: 'CPR1', person_id: 'P1', source_code: '99213', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_procedure_sets_member_id_null
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_procedure
+    description: >
+      Clinical procedures set member_id to null since it is claims-only.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__procedure')
+        rows:
+          - {procedure_id: 'CPR2', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', claim_id: null, procedure_date: '2023-07-01', source_code_type: 'icd-10-pcs', source_code: '0DBN4ZX', source_description: null, normalized_code_type: null, normalized_code: null, normalized_description: null, modifier_1: null, modifier_2: null, modifier_3: null, modifier_4: null, modifier_5: null, practitioner_id: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {procedure_id: 'CPR2', person_id: 'P1', member_id: null, patient_id: 'PT1', source_code: '0DBN4ZX', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_location
+  # =========================================================================
+
+  - name: test_stg_clinical_location_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_location
+    description: >
+      Clinical location staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__location')
+        rows:
+          - {location_id: 'CLOC1', npi: '9876543210', name: 'Community Clinic', facility_type: 'clinic', parent_organization: null, address: '200 Clinic Rd', city: 'Smalltown', state: 'CA', zip_code: '90001', latitude: 34.05, longitude: -118.25, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {location_id: 'CLOC1', npi: '9876543210', name: 'Community Clinic', city: 'Smalltown', state: 'CA', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_location_multiple_locations
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_location
+    description: >
+      Multiple locations are preserved with unique location_ids.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__location')
+        rows:
+          - {location_id: 'CLOC1', npi: '1111111111', name: 'Clinic A', facility_type: 'clinic', parent_organization: null, address: null, city: 'CityA', state: 'NY', zip_code: '10001', latitude: null, longitude: null, data_source: 'clinical_src'}
+          - {location_id: 'CLOC2', npi: '2222222222', name: 'Clinic B', facility_type: 'clinic', parent_organization: null, address: null, city: 'CityB', state: 'CA', zip_code: '90001', latitude: null, longitude: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {location_id: 'CLOC1', name: 'Clinic A', city: 'CityA', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {location_id: 'CLOC2', name: 'Clinic B', city: 'CityB', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_practitioner
+  # =========================================================================
+
+  - name: test_stg_clinical_practitioner_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_practitioner
+    description: >
+      Clinical practitioner staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__practitioner')
+        rows:
+          - {practitioner_id: 'CPRAC1', npi: '3333333333', first_name: 'Alice', last_name: 'Johnson', practice_affiliation: 'Big Health', specialty: 'Family Medicine', sub_specialty: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {practitioner_id: 'CPRAC1', npi: '3333333333', first_name: 'Alice', specialty: 'Family Medicine', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_practitioner_multiple_practitioners
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_practitioner
+    description: >
+      Multiple practitioners are preserved with unique IDs.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__practitioner')
+        rows:
+          - {practitioner_id: 'CPRAC1', npi: '1111111111', first_name: 'Alice', last_name: 'Johnson', practice_affiliation: null, specialty: 'Family Medicine', sub_specialty: null, data_source: 'clinical_src'}
+          - {practitioner_id: 'CPRAC2', npi: '2222222222', first_name: 'Bob', last_name: 'Williams', practice_affiliation: null, specialty: 'Cardiology', sub_specialty: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {practitioner_id: 'CPRAC1', first_name: 'Alice', specialty: 'Family Medicine', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {practitioner_id: 'CPRAC2', first_name: 'Bob', specialty: 'Cardiology', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # STAGING MODELS — core__stg_clinical_appointment
+  # =========================================================================
+
+  - name: test_stg_clinical_appointment_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_appointment
+    description: >
+      Clinical appointment staging passes through all columns.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__appointment')
+        rows:
+          - {appointment_id: 'CAP1', person_id: 'P1', patient_id: 'PT1', encounter_id: 'ENC1', source_appointment_type_code: 'ROUTINE', source_appointment_type_description: 'Routine visit', normalized_appointment_type_code: null, normalized_appointment_type_description: null, start_datetime: '2023-06-15 09:00:00', end_datetime: '2023-06-15 10:00:00', duration: 60, location_id: 'LOC1', practitioner_id: 'NPI1', source_status: 'booked', normalized_status: null, appointment_specialty: null, reason: null, source_reason_code_type: null, source_reason_code: null, source_reason_description: null, normalized_reason_code_type: null, normalized_reason_code: null, normalized_reason_description: null, cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {appointment_id: 'CAP1', person_id: 'P1', source_status: 'booked', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_stg_clinical_appointment_multiple_appointments
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: core__stg_clinical_appointment
+    description: >
+      Multiple appointments are all preserved with unique appointment_ids.
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        clinical_enabled: true
+    given:
+      - input: ref('input_layer__appointment')
+        rows:
+          - {appointment_id: 'CAP1', person_id: 'P1', patient_id: 'PT1', encounter_id: null, source_appointment_type_code: null, source_appointment_type_description: null, normalized_appointment_type_code: null, normalized_appointment_type_description: null, start_datetime: '2023-06-15 09:00:00', end_datetime: '2023-06-15 10:00:00', duration: 60, location_id: null, practitioner_id: null, source_status: 'booked', normalized_status: null, appointment_specialty: null, reason: null, source_reason_code_type: null, source_reason_code: null, source_reason_description: null, normalized_reason_code_type: null, normalized_reason_code: null, normalized_reason_description: null, cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'clinical_src'}
+          - {appointment_id: 'CAP2', person_id: 'P1', patient_id: 'PT1', encounter_id: null, source_appointment_type_code: null, source_appointment_type_description: null, normalized_appointment_type_code: null, normalized_appointment_type_description: null, start_datetime: '2023-07-15 14:00:00', end_datetime: '2023-07-15 15:00:00', duration: 60, location_id: null, practitioner_id: null, source_status: 'cancelled', normalized_status: null, appointment_specialty: null, reason: null, source_reason_code_type: null, source_reason_code: null, source_reason_description: null, normalized_reason_code_type: null, normalized_reason_code: null, normalized_reason_description: null, cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'clinical_src'}
+    expect:
+      rows:
+        - {appointment_id: 'CAP1', source_status: 'booked', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}
+        - {appointment_id: 'CAP2', source_status: 'cancelled', data_source: 'clinical_src', tuva_last_run: '2024-01-01 00:00:00'}

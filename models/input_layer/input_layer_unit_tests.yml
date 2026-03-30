@@ -1,0 +1,642 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # APPOINTMENT
+  # =========================================================================
+
+  - name: test_input_layer_appointment_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__appointment
+    description: "Verifies that appointment data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('appointment')
+        rows:
+          - {appointment_id: 'APT1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_appointment_type_code: 'OFFICE', source_appointment_type_description: 'Office Visit', normalized_appointment_type_code: 'OV', normalized_appointment_type_description: 'Office Visit', start_datetime: '2023-06-15 09:00:00', end_datetime: '2023-06-15 10:00:00', duration: 60, location_id: 'LOC1', practitioner_id: 'PRAC1', source_status: 'completed', normalized_status: 'completed', appointment_specialty: 'Internal Medicine', reason: 'Annual checkup', source_reason_code_type: 'icd-10-cm', source_reason_code: 'Z0000', source_reason_description: 'General exam', normalized_reason_code_type: 'icd-10-cm', normalized_reason_code: 'Z0000', normalized_reason_description: 'General exam', cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'clinic_a', file_name: 'appts_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+    expect:
+      rows:
+        - {appointment_id: 'APT1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_appointment_type_code: 'OFFICE', source_appointment_type_description: 'Office Visit', normalized_appointment_type_code: 'OV', normalized_appointment_type_description: 'Office Visit', start_datetime: '2023-06-15 09:00:00', end_datetime: '2023-06-15 10:00:00', duration: 60, location_id: 'LOC1', practitioner_id: 'PRAC1', source_status: 'completed', normalized_status: 'completed', appointment_specialty: 'Internal Medicine', reason: 'Annual checkup', source_reason_code_type: 'icd-10-cm', source_reason_code: 'Z0000', source_reason_description: 'General exam', normalized_reason_code_type: 'icd-10-cm', normalized_reason_code: 'Z0000', normalized_reason_description: 'General exam', cancellation_reason: null, source_cancellation_reason_code_type: null, source_cancellation_reason_code: null, source_cancellation_reason_description: null, normalized_cancellation_reason_code_type: null, normalized_cancellation_reason_code: null, normalized_cancellation_reason_description: null, data_source: 'clinic_a', file_name: 'appts_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+
+  - name: test_input_layer_appointment_multiple_rows_preserve_pk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__appointment
+    description: "Multiple appointments with unique appointment_id values pass through preserving primary key uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('appointment')
+        rows:
+          - {appointment_id: 'APT1', person_id: 'P1', patient_id: 'PAT1', data_source: 'src1'}
+          - {appointment_id: 'APT2', person_id: 'P1', patient_id: 'PAT1', data_source: 'src1'}
+          - {appointment_id: 'APT3', person_id: 'P2', patient_id: 'PAT2', data_source: 'src2'}
+    expect:
+      rows:
+        - {appointment_id: 'APT1', person_id: 'P1', patient_id: 'PAT1', data_source: 'src1'}
+        - {appointment_id: 'APT2', person_id: 'P1', patient_id: 'PAT1', data_source: 'src1'}
+        - {appointment_id: 'APT3', person_id: 'P2', patient_id: 'PAT2', data_source: 'src2'}
+
+  # =========================================================================
+  # CONDITION
+  # =========================================================================
+
+  - name: test_input_layer_condition_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__condition
+    description: "Verifies that condition data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('condition')
+        rows:
+          - {condition_id: 'COND1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: '2023-06-01', resolved_date: null, status: 'active', condition_type: 'billing', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: 'Type 2 diabetes with hyperglycemia', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus with hyperglycemia', condition_rank: 1, present_on_admit_code: 'Y', present_on_admit_description: 'Yes', payer: 'MCR', data_source: 'claims_src', file_name: 'claims_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+    expect:
+      rows:
+        - {condition_id: 'COND1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', claim_id: 'CLM1', recorded_date: '2023-06-15', onset_date: '2023-06-01', resolved_date: null, status: 'active', condition_type: 'billing', source_code_type: 'icd-10-cm', source_code: 'E1165', source_description: 'Type 2 diabetes with hyperglycemia', normalized_code_type: 'icd-10-cm', normalized_code: 'E1165', normalized_description: 'Type 2 diabetes mellitus with hyperglycemia', condition_rank: 1, present_on_admit_code: 'Y', present_on_admit_description: 'Yes', payer: 'MCR', data_source: 'claims_src', file_name: 'claims_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+
+  - name: test_input_layer_condition_multiple_conditions_same_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__condition
+    description: "Multiple conditions for the same patient pass through with unique condition_id values"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('condition')
+        rows:
+          - {condition_id: 'COND1', person_id: 'P1', normalized_code: 'E1165', condition_type: 'billing', data_source: 'src1'}
+          - {condition_id: 'COND2', person_id: 'P1', normalized_code: 'I10', condition_type: 'billing', data_source: 'src1'}
+          - {condition_id: 'COND3', person_id: 'P1', normalized_code: 'E1165', condition_type: 'problem', data_source: 'src1'}
+    expect:
+      rows:
+        - {condition_id: 'COND1', person_id: 'P1', normalized_code: 'E1165', condition_type: 'billing', data_source: 'src1'}
+        - {condition_id: 'COND2', person_id: 'P1', normalized_code: 'I10', condition_type: 'billing', data_source: 'src1'}
+        - {condition_id: 'COND3', person_id: 'P1', normalized_code: 'E1165', condition_type: 'problem', data_source: 'src1'}
+
+  # =========================================================================
+  # ELIGIBILITY
+  # =========================================================================
+
+  - name: test_input_layer_eligibility_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__eligibility
+    description: "Verifies that eligibility data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'MCR', payer_type: 'medicare', plan: 'PlanA', data_source: 'src1'}
+
+  - name: test_input_layer_eligibility_composite_pk_multiple_spans
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__eligibility
+    description: "Multiple eligibility spans for the same person pass through preserving composite PK (person_id, member_id, enrollment_start_date, enrollment_end_date, plan, payer, data_source)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('eligibility')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+          - {person_id: 'P2', member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'COM', plan: 'PlanB', data_source: 'src1'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-06-30', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P1', member_id: 'M1', enrollment_start_date: '2023-07-01', enrollment_end_date: '2023-12-31', payer: 'MCR', plan: 'PlanA', data_source: 'src1'}
+        - {person_id: 'P2', member_id: 'M2', enrollment_start_date: '2023-01-01', enrollment_end_date: '2023-12-31', payer: 'COM', plan: 'PlanB', data_source: 'src1'}
+
+  # =========================================================================
+  # ENCOUNTER
+  # =========================================================================
+
+  - name: test_input_layer_encounter_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__encounter
+    description: "Verifies that encounter data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounter')
+        rows:
+          - {encounter_id: 'ENC1', person_id: 'P1', patient_id: 'PAT1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, admit_source_code: '1', admit_source_description: 'Non-healthcare facility', admit_type_code: '1', admit_type_description: 'Emergency', discharge_disposition_code: '01', discharge_disposition_description: 'Home', attending_provider_id: 'PROV1', attending_provider_name: 'Dr. Smith', facility_npi: '1234567890', facility_name: 'General Hospital', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'I2510', primary_diagnosis_description: 'ASCVD of native coronary artery', drg_code_type: 'ms-drg', drg_code: '280', drg_description: 'Acute MI discharged alive', paid_amount: 15000.00, allowed_amount: 18000.00, charge_amount: 25000.00, data_source: 'claims_src', file_name: 'enc_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'ENC1', person_id: 'P1', patient_id: 'PAT1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', length_of_stay: 4, admit_source_code: '1', admit_source_description: 'Non-healthcare facility', admit_type_code: '1', admit_type_description: 'Emergency', discharge_disposition_code: '01', discharge_disposition_description: 'Home', attending_provider_id: 'PROV1', attending_provider_name: 'Dr. Smith', facility_npi: '1234567890', facility_name: 'General Hospital', primary_diagnosis_code_type: 'icd-10-cm', primary_diagnosis_code: 'I2510', primary_diagnosis_description: 'ASCVD of native coronary artery', drg_code_type: 'ms-drg', drg_code: '280', drg_description: 'Acute MI discharged alive', paid_amount: 15000.00, allowed_amount: 18000.00, charge_amount: 25000.00, data_source: 'claims_src', file_name: 'enc_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+
+  - name: test_input_layer_encounter_multiple_types
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__encounter
+    description: "Multiple encounter types for different patients pass through preserving encounter_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('encounter')
+        rows:
+          - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', data_source: 'src1'}
+          - {encounter_id: 'ENC2', person_id: 'P1', encounter_type: 'emergency department', encounter_start_date: '2023-08-10', encounter_end_date: '2023-08-10', data_source: 'src1'}
+          - {encounter_id: 'ENC3', person_id: 'P2', encounter_type: 'office visit', encounter_start_date: '2023-09-01', encounter_end_date: '2023-09-01', data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'ENC1', person_id: 'P1', encounter_type: 'acute inpatient', encounter_start_date: '2023-06-01', encounter_end_date: '2023-06-05', data_source: 'src1'}
+        - {encounter_id: 'ENC2', person_id: 'P1', encounter_type: 'emergency department', encounter_start_date: '2023-08-10', encounter_end_date: '2023-08-10', data_source: 'src1'}
+        - {encounter_id: 'ENC3', person_id: 'P2', encounter_type: 'office visit', encounter_start_date: '2023-09-01', encounter_end_date: '2023-09-01', data_source: 'src1'}
+
+  # =========================================================================
+  # IMMUNIZATION
+  # =========================================================================
+
+  - name: test_input_layer_immunization_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__immunization
+    description: "Verifies that immunization data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('immunization')
+        rows:
+          - {immunization_id: 'IMM1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '208', source_description: 'COVID-19 Pfizer', normalized_code_type: 'cvx', normalized_code: '208', normalized_description: 'COVID-19 Pfizer-BioNTech', status: 'completed', status_reason: null, occurrence_date: '2023-03-15', source_dose: '0.3 mL', normalized_dose: '0.3 mL', lot_number: 'EW0150', body_site: 'Left deltoid', route: 'Intramuscular', location_id: 'LOC1', practitioner_id: 'PRAC1', data_source: 'clinic_a', file_name: 'imm_2023.csv', ingest_datetime: '2023-04-01 00:00:00'}
+    expect:
+      rows:
+        - {immunization_id: 'IMM1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_code_type: 'cvx', source_code: '208', source_description: 'COVID-19 Pfizer', normalized_code_type: 'cvx', normalized_code: '208', normalized_description: 'COVID-19 Pfizer-BioNTech', status: 'completed', status_reason: null, occurrence_date: '2023-03-15', source_dose: '0.3 mL', normalized_dose: '0.3 mL', lot_number: 'EW0150', body_site: 'Left deltoid', route: 'Intramuscular', location_id: 'LOC1', practitioner_id: 'PRAC1', data_source: 'clinic_a', file_name: 'imm_2023.csv', ingest_datetime: '2023-04-01 00:00:00'}
+
+  - name: test_input_layer_immunization_multiple_doses
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__immunization
+    description: "Multiple immunization records for the same patient pass through with unique immunization_id values"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('immunization')
+        rows:
+          - {immunization_id: 'IMM1', person_id: 'P1', normalized_code: '208', occurrence_date: '2023-01-15', data_source: 'src1'}
+          - {immunization_id: 'IMM2', person_id: 'P1', normalized_code: '208', occurrence_date: '2023-02-15', data_source: 'src1'}
+          - {immunization_id: 'IMM3', person_id: 'P1', normalized_code: '213', occurrence_date: '2023-09-01', data_source: 'src1'}
+    expect:
+      rows:
+        - {immunization_id: 'IMM1', person_id: 'P1', normalized_code: '208', occurrence_date: '2023-01-15', data_source: 'src1'}
+        - {immunization_id: 'IMM2', person_id: 'P1', normalized_code: '208', occurrence_date: '2023-02-15', data_source: 'src1'}
+        - {immunization_id: 'IMM3', person_id: 'P1', normalized_code: '213', occurrence_date: '2023-09-01', data_source: 'src1'}
+
+  # =========================================================================
+  # LAB RESULT
+  # =========================================================================
+
+  - name: test_input_layer_lab_result_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__lab_result
+    description: "Verifies that lab result data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('lab_result')
+        rows:
+          - {lab_result_id: 'LAB1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', accession_number: 'ACC001', source_order_type: 'loinc', source_order_code: '4548-4', source_order_description: 'HbA1c', source_component_type: 'loinc', source_component_code: '4548-4', source_component_description: 'HbA1c', normalized_order_type: 'loinc', normalized_order_code: '4548-4', normalized_order_description: 'HbA1c', normalized_component_type: 'loinc', normalized_component_code: '4548-4', normalized_component_description: 'Hemoglobin A1c', status: 'final', result: '7.2', result_datetime: '2023-06-15 14:30:00', collection_datetime: '2023-06-15 08:00:00', source_units: '%', normalized_units: '%', source_reference_range_low: '4.0', source_reference_range_high: '5.6', normalized_reference_range_low: '4.0', normalized_reference_range_high: '5.6', source_abnormal_flag: 1, normalized_abnormal_flag: 1, specimen: 'blood', ordering_practitioner_id: 'PRAC1', data_source: 'lab_src', file_name: 'labs_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+    expect:
+      rows:
+        - {lab_result_id: 'LAB1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', accession_number: 'ACC001', source_order_type: 'loinc', source_order_code: '4548-4', source_order_description: 'HbA1c', source_component_type: 'loinc', source_component_code: '4548-4', source_component_description: 'HbA1c', normalized_order_type: 'loinc', normalized_order_code: '4548-4', normalized_order_description: 'HbA1c', normalized_component_type: 'loinc', normalized_component_code: '4548-4', normalized_component_description: 'Hemoglobin A1c', status: 'final', result: '7.2', result_datetime: '2023-06-15 14:30:00', collection_datetime: '2023-06-15 08:00:00', source_units: '%', normalized_units: '%', source_reference_range_low: '4.0', source_reference_range_high: '5.6', normalized_reference_range_low: '4.0', normalized_reference_range_high: '5.6', source_abnormal_flag: 1, normalized_abnormal_flag: 1, specimen: 'blood', ordering_practitioner_id: 'PRAC1', data_source: 'lab_src', file_name: 'labs_2023.csv', ingest_datetime: '2023-07-01 00:00:00'}
+
+  - name: test_input_layer_lab_result_multiple_results_same_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__lab_result
+    description: "Multiple lab results for the same patient pass through preserving lab_result_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('lab_result')
+        rows:
+          - {lab_result_id: 'LAB1', person_id: 'P1', normalized_order_code: '4548-4', result: '7.2', data_source: 'src1'}
+          - {lab_result_id: 'LAB2', person_id: 'P1', normalized_order_code: '2345-7', result: '120', data_source: 'src1'}
+    expect:
+      rows:
+        - {lab_result_id: 'LAB1', person_id: 'P1', normalized_order_code: '4548-4', result: '7.2', data_source: 'src1'}
+        - {lab_result_id: 'LAB2', person_id: 'P1', normalized_order_code: '2345-7', result: '120', data_source: 'src1'}
+
+  # =========================================================================
+  # LOCATION
+  # =========================================================================
+
+  - name: test_input_layer_location_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__location
+    description: "Verifies that location data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('location')
+        rows:
+          - {location_id: 'LOC1', npi: '1234567890', name: 'General Hospital', facility_type: 'acute care hospital', parent_organization: 'Health System A', address: '123 Main St', city: 'Springfield', state: 'IL', zip_code: '62701', latitude: 39.7817, longitude: -89.6501, data_source: 'clinic_a'}
+    expect:
+      rows:
+        - {location_id: 'LOC1', npi: '1234567890', name: 'General Hospital', facility_type: 'acute care hospital', parent_organization: 'Health System A', address: '123 Main St', city: 'Springfield', state: 'IL', zip_code: '62701', latitude: 39.7817, longitude: -89.6501, data_source: 'clinic_a'}
+
+  - name: test_input_layer_location_multiple_facilities
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__location
+    description: "Multiple locations pass through preserving location_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('location')
+        rows:
+          - {location_id: 'LOC1', name: 'Hospital A', facility_type: 'acute care hospital', data_source: 'src1'}
+          - {location_id: 'LOC2', name: 'Clinic B', facility_type: 'outpatient clinic', data_source: 'src1'}
+          - {location_id: 'LOC3', name: 'SNF C', facility_type: 'skilled nursing facility', data_source: 'src2'}
+    expect:
+      rows:
+        - {location_id: 'LOC1', name: 'Hospital A', facility_type: 'acute care hospital', data_source: 'src1'}
+        - {location_id: 'LOC2', name: 'Clinic B', facility_type: 'outpatient clinic', data_source: 'src1'}
+        - {location_id: 'LOC3', name: 'SNF C', facility_type: 'skilled nursing facility', data_source: 'src2'}
+
+  # =========================================================================
+  # MEDICAL CLAIM
+  # =========================================================================
+
+  - name: test_input_layer_medical_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__medical_claim
+    description: "Verifies that medical claim data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_line_number: 1, claim_type: 'institutional', person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-01', claim_end_date: '2023-06-05', bill_type_code: '111', hcpcs_code: '99213', data_source: 'claims_src'}
+    expect:
+      rows:
+        - {claim_id: 'CLM1', claim_line_number: 1, claim_type: 'institutional', person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', claim_start_date: '2023-06-01', claim_end_date: '2023-06-05', bill_type_code: '111', hcpcs_code: '99213', data_source: 'claims_src'}
+
+  - name: test_input_layer_medical_claim_composite_pk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__medical_claim
+    description: "Multiple claim lines for the same claim pass through preserving composite PK (claim_id, claim_line_number, data_source)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medical_claim')
+        rows:
+          - {claim_id: 'CLM1', claim_line_number: 1, person_id: 'P1', claim_type: 'professional', hcpcs_code: '99213', data_source: 'src1'}
+          - {claim_id: 'CLM1', claim_line_number: 2, person_id: 'P1', claim_type: 'professional', hcpcs_code: '85025', data_source: 'src1'}
+          - {claim_id: 'CLM2', claim_line_number: 1, person_id: 'P2', claim_type: 'institutional', hcpcs_code: '99223', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'CLM1', claim_line_number: 1, person_id: 'P1', claim_type: 'professional', hcpcs_code: '99213', data_source: 'src1'}
+        - {claim_id: 'CLM1', claim_line_number: 2, person_id: 'P1', claim_type: 'professional', hcpcs_code: '85025', data_source: 'src1'}
+        - {claim_id: 'CLM2', claim_line_number: 1, person_id: 'P2', claim_type: 'institutional', hcpcs_code: '99223', data_source: 'src1'}
+
+  # =========================================================================
+  # MEDICATION
+  # =========================================================================
+
+  - name: test_input_layer_medication_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__medication
+    description: "Verifies that medication data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_code_type: 'ndc', source_code: '00002771001', source_description: 'Metformin 500mg', rxnorm_code: '860975', rxnorm_description: 'Metformin hydrochloride 500 MG', data_source: 'clinic_a'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', source_code_type: 'ndc', source_code: '00002771001', source_description: 'Metformin 500mg', rxnorm_code: '860975', rxnorm_description: 'Metformin hydrochloride 500 MG', data_source: 'clinic_a'}
+
+  - name: test_input_layer_medication_multiple_meds_same_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__medication
+    description: "Multiple medications for the same patient pass through preserving medication_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('medication')
+        rows:
+          - {medication_id: 'MED1', person_id: 'P1', rxnorm_code: '860975', data_source: 'src1'}
+          - {medication_id: 'MED2', person_id: 'P1', rxnorm_code: '197361', data_source: 'src1'}
+          - {medication_id: 'MED3', person_id: 'P2', rxnorm_code: '860975', data_source: 'src1'}
+    expect:
+      rows:
+        - {medication_id: 'MED1', person_id: 'P1', rxnorm_code: '860975', data_source: 'src1'}
+        - {medication_id: 'MED2', person_id: 'P1', rxnorm_code: '197361', data_source: 'src1'}
+        - {medication_id: 'MED3', person_id: 'P2', rxnorm_code: '860975', data_source: 'src1'}
+
+  # =========================================================================
+  # OBSERVATION
+  # =========================================================================
+
+  - name: test_input_layer_observation_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__observation
+    description: "Verifies that observation data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', panel_id: null, source_code_type: 'loinc', source_code: '8480-6', source_description: 'Systolic blood pressure', normalized_code_type: 'loinc', normalized_code: '8480-6', normalized_description: 'Systolic blood pressure', result: '130', source_units: 'mmHg', normalized_units: 'mmHg', observation_date: '2023-06-15', data_source: 'clinic_a'}
+    expect:
+      rows:
+        - {observation_id: 'OBS1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', panel_id: null, source_code_type: 'loinc', source_code: '8480-6', source_description: 'Systolic blood pressure', normalized_code_type: 'loinc', normalized_code: '8480-6', normalized_description: 'Systolic blood pressure', result: '130', source_units: 'mmHg', normalized_units: 'mmHg', observation_date: '2023-06-15', data_source: 'clinic_a'}
+
+  - name: test_input_layer_observation_multiple_vitals
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__observation
+    description: "Multiple observations (vitals) for the same encounter pass through preserving observation_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('observation')
+        rows:
+          - {observation_id: 'OBS1', person_id: 'P1', normalized_code: '8480-6', result: '130', data_source: 'src1'}
+          - {observation_id: 'OBS2', person_id: 'P1', normalized_code: '8462-4', result: '85', data_source: 'src1'}
+          - {observation_id: 'OBS3', person_id: 'P1', normalized_code: '29463-7', result: '185', data_source: 'src1'}
+    expect:
+      rows:
+        - {observation_id: 'OBS1', person_id: 'P1', normalized_code: '8480-6', result: '130', data_source: 'src1'}
+        - {observation_id: 'OBS2', person_id: 'P1', normalized_code: '8462-4', result: '85', data_source: 'src1'}
+        - {observation_id: 'OBS3', person_id: 'P1', normalized_code: '29463-7', result: '185', data_source: 'src1'}
+
+  # =========================================================================
+  # PATIENT
+  # =========================================================================
+
+  - name: test_input_layer_patient_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__patient
+    description: "Verifies that patient data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('patient')
+        rows:
+          - {person_id: 'P1', patient_id: 'PAT1', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', death_date: null, race: 'white', data_source: 'clinic_a'}
+    expect:
+      rows:
+        - {person_id: 'P1', patient_id: 'PAT1', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', death_date: null, race: 'white', data_source: 'clinic_a'}
+
+  - name: test_input_layer_patient_composite_pk_person_patient
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__patient
+    description: "Multiple patient records pass through preserving composite PK (person_id, patient_id) -- same person can have multiple patient_ids across source systems"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('patient')
+        rows:
+          - {person_id: 'P1', patient_id: 'PAT1A', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', data_source: 'system_a'}
+          - {person_id: 'P1', patient_id: 'PAT1B', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', data_source: 'system_b'}
+          - {person_id: 'P2', patient_id: 'PAT2', first_name: 'Jane', last_name: 'Smith', sex: 'female', birth_date: '1980-05-20', data_source: 'system_a'}
+    expect:
+      rows:
+        - {person_id: 'P1', patient_id: 'PAT1A', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', data_source: 'system_a'}
+        - {person_id: 'P1', patient_id: 'PAT1B', first_name: 'John', last_name: 'Doe', sex: 'male', birth_date: '1954-01-01', data_source: 'system_b'}
+        - {person_id: 'P2', patient_id: 'PAT2', first_name: 'Jane', last_name: 'Smith', sex: 'female', birth_date: '1980-05-20', data_source: 'system_a'}
+
+  # =========================================================================
+  # PHARMACY CLAIM
+  # =========================================================================
+
+  - name: test_input_layer_pharmacy_claim_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__pharmacy_claim
+    description: "Verifies that pharmacy claim data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', dispensing_date: '2023-06-15', ndc_code: '00002771001', quantity: 90, days_supply: 90, data_source: 'rx_src'}
+    expect:
+      rows:
+        - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', payer: 'MCR', plan: 'PlanA', dispensing_date: '2023-06-15', ndc_code: '00002771001', quantity: 90, days_supply: 90, data_source: 'rx_src'}
+
+  - name: test_input_layer_pharmacy_claim_composite_pk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__pharmacy_claim
+    description: "Multiple pharmacy claim lines pass through preserving composite PK (claim_id, claim_line_number, data_source)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('pharmacy_claim')
+        rows:
+          - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', ndc_code: '00002771001', data_source: 'src1'}
+          - {claim_id: 'RX1', claim_line_number: 2, person_id: 'P1', ndc_code: '00006074231', data_source: 'src1'}
+          - {claim_id: 'RX2', claim_line_number: 1, person_id: 'P2', ndc_code: '00002771001', data_source: 'src1'}
+    expect:
+      rows:
+        - {claim_id: 'RX1', claim_line_number: 1, person_id: 'P1', ndc_code: '00002771001', data_source: 'src1'}
+        - {claim_id: 'RX1', claim_line_number: 2, person_id: 'P1', ndc_code: '00006074231', data_source: 'src1'}
+        - {claim_id: 'RX2', claim_line_number: 1, person_id: 'P2', ndc_code: '00002771001', data_source: 'src1'}
+
+  # =========================================================================
+  # PRACTITIONER
+  # =========================================================================
+
+  - name: test_input_layer_practitioner_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__practitioner
+    description: "Verifies that practitioner data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('practitioner')
+        rows:
+          - {practitioner_id: 'PRAC1', npi: '1234567890', first_name: 'Alice', last_name: 'Johnson', practice_affiliation: 'General Hospital', specialty: 'Internal Medicine', sub_specialty: 'Endocrinology', data_source: 'clinic_a'}
+    expect:
+      rows:
+        - {practitioner_id: 'PRAC1', npi: '1234567890', first_name: 'Alice', last_name: 'Johnson', practice_affiliation: 'General Hospital', specialty: 'Internal Medicine', sub_specialty: 'Endocrinology', data_source: 'clinic_a'}
+
+  - name: test_input_layer_practitioner_multiple_providers
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__practitioner
+    description: "Multiple practitioners pass through preserving practitioner_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('practitioner')
+        rows:
+          - {practitioner_id: 'PRAC1', npi: '1234567890', specialty: 'Internal Medicine', data_source: 'src1'}
+          - {practitioner_id: 'PRAC2', npi: '0987654321', specialty: 'Cardiology', data_source: 'src1'}
+          - {practitioner_id: 'PRAC3', npi: '5678901234', specialty: 'Orthopedics', data_source: 'src2'}
+    expect:
+      rows:
+        - {practitioner_id: 'PRAC1', npi: '1234567890', specialty: 'Internal Medicine', data_source: 'src1'}
+        - {practitioner_id: 'PRAC2', npi: '0987654321', specialty: 'Cardiology', data_source: 'src1'}
+        - {practitioner_id: 'PRAC3', npi: '5678901234', specialty: 'Orthopedics', data_source: 'src2'}
+
+  # =========================================================================
+  # PROCEDURE
+  # =========================================================================
+
+  - name: test_input_layer_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__procedure
+    description: "Verifies that procedure data passes through unchanged from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('procedure')
+        rows:
+          - {procedure_id: 'PROC1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', claim_id: 'CLM1', procedure_date: '2023-06-15', source_code_type: 'icd-10-pcs', source_code: '0210093', source_description: 'CABG', normalized_code_type: 'icd-10-pcs', normalized_code: '0210093', normalized_description: 'Bypass Coronary Artery', practitioner_id: 'PRAC1', data_source: 'claims_src'}
+    expect:
+      rows:
+        - {procedure_id: 'PROC1', person_id: 'P1', patient_id: 'PAT1', encounter_id: 'ENC1', claim_id: 'CLM1', procedure_date: '2023-06-15', source_code_type: 'icd-10-pcs', source_code: '0210093', source_description: 'CABG', normalized_code_type: 'icd-10-pcs', normalized_code: '0210093', normalized_description: 'Bypass Coronary Artery', practitioner_id: 'PRAC1', data_source: 'claims_src'}
+
+  - name: test_input_layer_procedure_multiple_procedures_same_encounter
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__procedure
+    description: "Multiple procedures for the same encounter pass through preserving procedure_id uniqueness"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('procedure')
+        rows:
+          - {procedure_id: 'PROC1', person_id: 'P1', encounter_id: 'ENC1', normalized_code: '0210093', data_source: 'src1'}
+          - {procedure_id: 'PROC2', person_id: 'P1', encounter_id: 'ENC1', normalized_code: '02100A3', data_source: 'src1'}
+          - {procedure_id: 'PROC3', person_id: 'P2', encounter_id: 'ENC2', normalized_code: '0SR9019', data_source: 'src1'}
+    expect:
+      rows:
+        - {procedure_id: 'PROC1', person_id: 'P1', encounter_id: 'ENC1', normalized_code: '0210093', data_source: 'src1'}
+        - {procedure_id: 'PROC2', person_id: 'P1', encounter_id: 'ENC1', normalized_code: '02100A3', data_source: 'src1'}
+        - {procedure_id: 'PROC3', person_id: 'P2', encounter_id: 'ENC2', normalized_code: '0SR9019', data_source: 'src1'}
+
+  # =========================================================================
+  # PROVIDER ATTRIBUTION
+  # =========================================================================
+
+  - name: test_input_layer_provider_attribution_passthrough_when_enabled
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__provider_attribution
+    description: "When provider_attribution_enabled is true, data passes through from the source ref"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_enabled: true
+    given:
+      - input: ref('provider_attribution')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1', payer_attributed_provider_practice: 'Practice A', payer_attributed_provider_organization: 'Org A', payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1', payer_attributed_provider_practice: 'Practice A', payer_attributed_provider_organization: 'Org A', payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+
+  - name: test_input_layer_provider_attribution_preserves_custom_fields_and_grain
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__provider_attribution
+    description: "Multiple attribution rows pass through unchanged, including custom attribution fields and nulls"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_enabled: true
+    given:
+      - input: ref('provider_attribution')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1', payer_attributed_provider_practice: 'Practice A', payer_attributed_provider_organization: 'Org A', payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: 'CUST1', custom_attributed_provider_practice: 'Custom Practice A', custom_attributed_provider_organization: 'Custom Org A', custom_attributed_provider_lob: 'Custom LOB'}
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-02', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV2', payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+          - {person_id: 'P2', member_id: 'M2', patient_id: 'PAT2', year_month: '2023-01', payer: 'COM', plan: 'PlanB', data_source: 'src2', payer_attributed_provider: 'PROV3', payer_attributed_provider_practice: 'Practice B', payer_attributed_provider_organization: 'Org B', payer_attributed_provider_lob: 'Commercial', custom_attributed_provider: 'CUST2', custom_attributed_provider_practice: 'Custom Practice B', custom_attributed_provider_organization: 'Custom Org B', custom_attributed_provider_lob: 'Custom LOB B'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1', payer_attributed_provider_practice: 'Practice A', payer_attributed_provider_organization: 'Org A', payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: 'CUST1', custom_attributed_provider_practice: 'Custom Practice A', custom_attributed_provider_organization: 'Custom Org A', custom_attributed_provider_lob: 'Custom LOB'}
+        - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-02', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV2', payer_attributed_provider_practice: null, payer_attributed_provider_organization: null, payer_attributed_provider_lob: 'Medicare', custom_attributed_provider: null, custom_attributed_provider_practice: null, custom_attributed_provider_organization: null, custom_attributed_provider_lob: null}
+        - {person_id: 'P2', member_id: 'M2', patient_id: 'PAT2', year_month: '2023-01', payer: 'COM', plan: 'PlanB', data_source: 'src2', payer_attributed_provider: 'PROV3', payer_attributed_provider_practice: 'Practice B', payer_attributed_provider_organization: 'Org B', payer_attributed_provider_lob: 'Commercial', custom_attributed_provider: 'CUST2', custom_attributed_provider_practice: 'Custom Practice B', custom_attributed_provider_organization: 'Custom Org B', custom_attributed_provider_lob: 'Custom LOB B'}
+
+  - name: test_input_layer_provider_attribution_composite_pk
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__provider_attribution
+    description: "Multiple attribution records pass through preserving composite PK (person_id, member_id, payer, plan, year_month, data_source)"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        provider_attribution_enabled: true
+    given:
+      - input: ref('provider_attribution')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1'}
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-02', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1'}
+          - {person_id: 'P2', member_id: 'M2', patient_id: 'PAT2', year_month: '2023-01', payer: 'COM', plan: 'PlanB', data_source: 'src1', payer_attributed_provider: 'PROV2'}
+    expect:
+      rows:
+        - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1'}
+        - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-02', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1'}
+        - {person_id: 'P2', member_id: 'M2', patient_id: 'PAT2', year_month: '2023-01', payer: 'COM', plan: 'PlanB', data_source: 'src1', payer_attributed_provider: 'PROV2'}
+
+  - name: test_input_layer_provider_attribution_returns_no_rows_when_disabled
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: input_layer__provider_attribution
+    description: "When provider_attribution_enabled is false, the model should intentionally emit no rows"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        claims_enabled: true
+        provider_attribution_enabled: false
+    given:
+      - input: ref('provider_attribution')
+        rows:
+          - {person_id: 'P1', member_id: 'M1', patient_id: 'PAT1', year_month: '2023-01', payer: 'MCR', plan: 'PlanA', data_source: 'src1', payer_attributed_provider: 'PROV1'}
+          - {person_id: 'P2', member_id: 'M2', patient_id: 'PAT2', year_month: '2023-02', payer: 'COM', plan: 'PlanB', data_source: 'src2', payer_attributed_provider: 'PROV2'}
+    expect:
+      rows: []

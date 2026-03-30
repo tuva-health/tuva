@@ -1,0 +1,185 @@
+version: 2
+
+unit_tests:
+
+  # =========================================================================
+  # CCSR - STAGING: stg_core__condition
+  # =========================================================================
+
+  - name: test_ccsr_stg_condition_filters_icd10cm
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Only ICD-10-CM condition codes are passed through; other code types are filtered out"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E2', claim_id: 'C2', person_id: 'P2', normalized_code: '250.00', normalized_code_type: 'icd-9-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E3', claim_id: 'C3', person_id: 'P3', normalized_code: 'SNOMED1', normalized_code_type: 'snomed-ct', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_stg_condition_deduplicates_same_dx_across_line_items
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Same diagnosis code on multiple line items of same claim produces only one record after deduplication"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_stg_condition_preserves_different_dx_on_same_claim
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__condition
+    description: "Different diagnosis codes on the same claim are all preserved as separate rows"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__condition')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', normalized_code_type: 'icd-10-cm', condition_rank: 1, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'I10', normalized_code_type: 'icd-10-cm', condition_rank: 2, data_source: 'src1'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'J18.9', normalized_code_type: 'icd-10-cm', condition_rank: 3, data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', condition_rank: 1, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'I10', condition_rank: 2, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'J18.9', condition_rank: 3, data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - STAGING: stg_core__procedure
+  # =========================================================================
+
+  - name: test_ccsr_stg_procedure_passthrough
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__stg_core__procedure
+    description: "Procedure staging passes through all core procedure fields"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__procedure')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: '0DBN0ZZ', data_source: 'src1'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: '0DBN0ZZ', data_source: 'src1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - INTERMEDIATE: dx_vertical_pivot
+  # =========================================================================
+
+  - name: test_ccsr_dx_vertical_pivot_unpivots_categories
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__dx_vertical_pivot
+    description: "ICD-10-CM codes are unpivoted from wide category columns (1-6) into long format rows; null categories are excluded"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ccsr__dxccsr_v2023_1_cleaned_map')
+        rows:
+          - {icd_10_cm_code: 'E11.65', icd_10_cm_code_description: 'Type 2 DM with hyperglycemia', ccsr_category_1: 'END010', ccsr_category_1_description: 'Diabetes mellitus with complication', ccsr_category_2: null, ccsr_category_2_description: null, ccsr_category_3: null, ccsr_category_3_description: null, ccsr_category_4: null, ccsr_category_4_description: null, ccsr_category_5: null, ccsr_category_5_description: null, ccsr_category_6: null, ccsr_category_6_description: null, default_ccsr_category_ip: 'END010', default_ccsr_category_op: 'END010'}
+    expect:
+      rows:
+        - {code: 'E11.65', code_description: 'Type 2 DM with hyperglycemia', ccsr_parent_category: 'END', ccsr_category: 'END010', ccsr_category_description: 'Diabetes mellitus with complication', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_dx_vertical_pivot_ccsr_category_mapping
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__dx_vertical_pivot
+    description: "Known ICD-10-CM code with multiple CCSR categories produces correct category mappings and ranks"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ccsr__dxccsr_v2023_1_cleaned_map')
+        rows:
+          - {icd_10_cm_code: 'I50.9', icd_10_cm_code_description: 'Heart failure unspecified', ccsr_category_1: 'CIR019', ccsr_category_1_description: 'Heart failure', ccsr_category_2: 'CIR020', ccsr_category_2_description: 'Cardiomyopathy', ccsr_category_3: null, ccsr_category_3_description: null, ccsr_category_4: null, ccsr_category_4_description: null, ccsr_category_5: null, ccsr_category_5_description: null, ccsr_category_6: null, ccsr_category_6_description: null, default_ccsr_category_ip: 'CIR019', default_ccsr_category_op: 'CIR019'}
+    expect:
+      rows:
+        - {code: 'I50.9', code_description: 'Heart failure unspecified', ccsr_parent_category: 'CIR', ccsr_category: 'CIR019', ccsr_category_description: 'Heart failure', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, tuva_last_run: '2024-01-01 00:00:00'}
+        - {code: 'I50.9', code_description: 'Heart failure unspecified', ccsr_parent_category: 'CIR', ccsr_category: 'CIR020', ccsr_category_description: 'Cardiomyopathy', ccsr_category_rank: 2, is_ip_default_category: 0, is_op_default_category: 0, tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - FINAL: singular_condition_category (condition_rank filtering)
+  # =========================================================================
+
+  - name: test_ccsr_singular_condition_filters_to_rank_1_only
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__singular_condition_category
+    description: "Singular condition category only includes conditions with condition_rank=1, excluding secondary diagnoses"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        dxccsr_version: '2023.1'
+        record_type: 'ip'
+    given:
+      - input: ref('ccsr__long_condition_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END010', ccsr_category_description: 'DM complication', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'I10', code_description: 'Hypertension', condition_rank: 2, ccsr_parent_category: 'CIR', body_system: 'Circulatory', ccsr_category: 'CIR007', ccsr_category_description: 'Hypertension', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Circulatory disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', normalized_code: 'E11.65', ccsr_category: 'END010', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  - name: test_ccsr_singular_condition_no_duplicates_multi_line_items
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__singular_condition_category
+    description: "Singular condition category produces exactly one record per encounter when input has no duplicates"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+        dxccsr_version: '2023.1'
+        record_type: 'ip'
+    given:
+      - input: ref('ccsr__long_condition_category')
+        rows:
+          - {encounter_id: 'E1', claim_id: 'C1', person_id: 'P1', normalized_code: 'E11.65', code_description: 'T2 DM', condition_rank: 1, ccsr_parent_category: 'END', body_system: 'Endocrine', ccsr_category: 'END010', ccsr_category_description: 'DM complication', ccsr_category_rank: 1, is_ip_default_category: 1, is_op_default_category: 1, data_source: 'src1', parent_category_description: 'Endocrine disorders', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+    expect:
+      rows:
+        - {encounter_id: 'E1', person_id: 'P1', normalized_code: 'E11.65', ccsr_category: 'END010', dxccsr_version: '2023.1', tuva_last_run: '2024-01-01 00:00:00'}
+
+  # =========================================================================
+  # CCSR - INTERMEDIATE: procedure_category_map
+  # =========================================================================
+
+  - name: test_ccsr_procedure_category_map_joins_ontology
+    config:
+      enabled: "{{ var('tuva_unit_tests_enabled', false) | as_bool }}"
+    model: ccsr__procedure_category_map
+    description: "Procedure CCSR map joins to ICD-10-PCS ontology for operation/approach/device/qualifier"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('ccsr__prccsr_v2023_1_cleaned_map')
+        rows:
+          - {icd_10_pcs: '0DBN0ZZ', icd_10_pcs_description: 'Excision sigmoid colon', prccsr: 'GIS004', prccsr_description: 'Excision of large intestine', clinical_domain: 'Gastrointestinal'}
+      - input: ref('terminology__icd10_pcs_cms_ontology')
+        rows:
+          - {icd10pcs_code: '0DBN0ZZ', section: 'Medical and Surgical', operation: 'Excision', approach: 'Open', device: 'No Device', qualifier: 'No Qualifier'}
+    expect:
+      rows:
+        - {code: '0DBN0ZZ', code_description: 'Excision sigmoid colon', ccsr_category: 'GIS004', ccsr_parent_category: 'GIS', ccsr_category_description: 'Excision of large intestine', clinical_domain: 'Gastrointestinal', procedure_section: 'Medical and Surgical', operation: 'Excision', approach: 'Open', device: 'No Device', qualifier: 'No Qualifier', tuva_last_run: '2024-01-01 00:00:00'}
+
