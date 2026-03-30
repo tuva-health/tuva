@@ -15,7 +15,7 @@
         "'_'",
         "unpivot_cte.claim_id",
         "'_'",
-        "enc.encounter_id",
+        "med.encounter_id",
         "'_'",        
         "unpivot_cte.procedure_sequence_id",
         "'_'",
