@@ -232,7 +232,7 @@ from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
-    {% if null_marker == true %} null_marker = '\\N', {% else %} {% endif %}
+    {% if null_marker == true %} null_markers = ['', '\\N'], {% else %} {% endif %}
     quote = '"',
     allow_quoted_newlines = True
     )
