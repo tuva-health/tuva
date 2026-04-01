@@ -18,7 +18,7 @@ select claim_id
       enc.claim_id
     , enc.patient_data_source_id
     , c.start_date
-    , coalesce(c.end_date, c.start_date) as end_date -- Avoids large length of stay gaps being combined
+    , c.end_date
     , enc.facility_npi
     , enc.discharge_disposition_code
   from {{ ref('encounters__stg_medical_claim') }} as enc
@@ -38,7 +38,7 @@ select claim_id
     , end_date
     , discharge_disposition_code
     , facility_npi
-    , rank() over (partition by patient_data_source_id
+    , row_number() over (partition by patient_data_source_id
 order by end_date, start_date, claim_id) as row_num
   from base
 )
