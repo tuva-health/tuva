@@ -2016,12 +2016,12 @@ models:
       materialized: table
 
 
-  - name: data_quality__encounter_facility_npi
+  - name: data_quality__encounter_facility_id
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: encounter_facility_npi
+      alias: encounter_facility_id
       tags:
         - data_quality
       materialized: table

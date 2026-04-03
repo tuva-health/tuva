@@ -23,7 +23,7 @@
     , medicare_status_code
     , enrollment_status
     , hospice_flag
-    , snp_type
+    , cast(case when upper(coalesce(snp_type, '')) = 'I-SNP' then 1 else 0 end as {{ dbt.type_int() }}) as institutional_snp_flag
     , medicaid_indicator
     , long_term_institutional_flag
     , part_d_raf_type

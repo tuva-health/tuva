@@ -40,7 +40,7 @@ select e.encounter_id
 , i.readmission_pred as expected_readmission
 , e.readmission_denominator
 , e.discharge_location as actual_discharge_location
-, ce.facility_npi
+, ce.facility_id
 , ce.facility_name
 , case when ce.drg_code_type = 'ms-drg' then concat(ce.drg_code,' ',ce.drg_description) else null end as ms_drg_code
 , ce.paid_amount

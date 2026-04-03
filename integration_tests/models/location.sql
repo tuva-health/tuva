@@ -4,33 +4,6 @@
    )
 }}
 
-{%- set tuva_columns -%}
-      location_id
-    , npi
-    , name
-    , facility_type
-    , parent_organization
-    , address
-    , city
-    , state
-    , zip_code
-    , latitude
-    , longitude
-{%- endset -%}
-
-{# Uncomment the columns below to test extension columns passthrough feature #}
-{%- set tuva_extensions -%}
-    {# , state as x_temp_state #}
-    {# , parent_organization as x_temp_parent_organization #}
-    {# , facility_type as zzz_temp_facility_type #}
-{%- endset -%}
-
-{%- set tuva_metadata -%}
-    , data_source
-    , file_name
-    , ingest_datetime
-{%- endset -%}
-
 {# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}
 {%- set tuva_synthetic_extensions -%}
     {# , cast(null as {{ dbt.type_string() }}) as x_temp_state #}

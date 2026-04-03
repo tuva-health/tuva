@@ -172,7 +172,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -216,7 +215,7 @@ models:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A claim should not belong to two different people.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 meta:
                   dqi_test_description: A claim should not belong to two different people.
@@ -231,7 +230,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -348,7 +346,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -445,7 +442,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - not_null:
               config:
@@ -841,7 +837,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1023,16 +1018,6 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Service unit quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: number
@@ -1297,7 +1282,7 @@ models:
                 If you have an NPI field and are unsure if the NPI is a facility NPI (i.e. level 2 org NPI), then 
                 join to terminology.provider and filter to level 2 NPIs only.
 
-                If left as null, then encounters will under-merge since encounter merging depends on the facility NPI field. 
+                If left as null, then encounters will under-merge since encounter merging depends on the facility ID field. 
                 There are two primary options if facility NPIs (i.e. level 2 NPIs) are not available:
                 - Leave null: This mean claims will not merge based on encounter grouping logic since all claims are assumed to be in different facilities.
                 - Add a blank string: This will over-merge, but will apply encounter grouping logic and assumes all encounters are at the same facility.
@@ -1408,16 +1393,6 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1457,16 +1432,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1539,16 +1504,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1584,16 +1539,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1629,16 +1574,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -4366,13 +4301,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:

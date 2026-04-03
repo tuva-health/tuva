@@ -8,7 +8,7 @@ select p.pqi_number
  , e.encounter_id
  , e.data_source
  , e.person_id
- , e.facility_npi
+ , e.facility_id
  , e.drg_code
  , e.drg_description
  , e.encounter_start_date

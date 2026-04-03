@@ -14,7 +14,7 @@ select
   , claim_end_date
   , allowed_amount
   , paid_amount
-  , rendering_npi
+  , rendering_id as rendering_npi
   , hcpcs_code
   , data_source
   , encounter_id

@@ -40,13 +40,13 @@ select
   , mc.hcpcs_modifier_3
   , mc.hcpcs_modifier_4
   , mc.hcpcs_modifier_5
-  , mc.rendering_npi
+  , mc.rendering_id
   , mc.rendering_tin
   , mc.rendering_name
-  , mc.billing_npi
+  , mc.billing_id
   , mc.billing_tin
   , mc.billing_name
-  , mc.facility_npi
+  , mc.facility_id
   , mc.facility_name
   , mc.paid_date
   , mc.paid_amount

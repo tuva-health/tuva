@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
    )
 }}
 
@@ -73,15 +73,15 @@ order by sum(paid_amount) desc) as paid_order
 
 , highest_paid_facility as (
   select encounter_id
-  , facility_npi
+  , facility_id
   , row_number() over (partition by encounter_id
 order by sum(paid_amount) desc) as paid_order
   , sum(paid_amount) as paid_amount
   from detail_values
-  where facility_npi is not null
+  where facility_id is not null
   group by
    encounter_id
-  , facility_npi
+  , facility_id
 )
 
 
@@ -115,7 +115,7 @@ select d.encounter_id
 , hp.diagnosis_code_type as primary_diagnosis_code_type
 , hp.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-, hf.facility_npi as facility_npi
+, hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
 , sc.lab_flag
@@ -143,7 +143,7 @@ hf.paid_order = 1
 left outer join patient as e
   on d.patient_data_source_id = e.patient_data_source_id
 left outer join {{ ref('provider_data__provider') }} as b
-  on hf.facility_npi = b.npi
+  on hf.facility_id = b.npi
 left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm
   and hp.diagnosis_code_type = 'icd-10-cm'

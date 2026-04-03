@@ -39,16 +39,8 @@
        , cast(medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code
        , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
        , cast(hospice_flag as {{ dbt.type_int() }}) as hospice_flag
-       , cast(snp_type as {{ dbt.type_string() }}) as snp_type
-       , cast(medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator
+       , cast(institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
        , cast(long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag
-       , cast(part_d_raf_type as {{ dbt.type_string() }}) as part_d_raf_type
-       , cast(low_income_subsidy_indicator as {{ dbt.type_string() }}) as low_income_subsidy_indicator
-       , cast(metal_level as {{ dbt.type_string() }}) as metal_level
-       , cast(csr_indicator as {{ dbt.type_int() }}) as csr_indicator
-       , cast(enrollment_duration_months as {{ dbt.type_int() }}) as enrollment_duration_months
-       , cast(esrd_status as {{ dbt.type_string() }}) as esrd_status
-       , cast(transplant_duration_months as {{ dbt.type_int() }}) as transplant_duration_months
        , cast(subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
        , cast(group_id as {{ dbt.type_string() }}) as group_id
        , cast(group_name as {{ dbt.type_string() }}) as group_name
