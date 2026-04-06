@@ -9,9 +9,9 @@
       "target_schema": schema_var
     , "alias": "patient_risk_factors_snapshot"
     , "tags": "cms_hcc"
-    , "strategy": "timestamp"
-    , "updated_at": "tuva_last_run"
-    , "unique_key": "person_id||payer||factor_type||risk_factor_description||model_version||payment_year||tuva_last_run"
+    , "strategy": "check"
+    , "check_cols": ["enrollment_status_default", "medicaid_dual_status_default", "orec_default", "institutional_status_default", "coefficient"]
+    , "unique_key": "person_id||payer||factor_type||risk_factor_description||model_version||payment_year"
     , "enabled": var('snapshots_enabled',False) == true and var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) == true | as_bool
     , "hard_deletes": "invalidate"
   })

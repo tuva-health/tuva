@@ -9,9 +9,9 @@
       "target_schema": schema_var
     , "alias": "patient_risk_scores_snapshot"
     , "tags": "cms_hcc"
-    , "strategy": "timestamp"
-    , "updated_at": "tuva_last_run"
-    , "unique_key": "person_id||payer||payment_risk_score||payment_risk_score_weighted_by_months||payment_year||tuva_last_run"
+    , "strategy": "check"
+    , "check_cols": ["v24_risk_score", "v28_risk_score", "blended_risk_score", "normalized_risk_score", "payment_risk_score", "payment_risk_score_weighted_by_months", "member_months"]
+    , "unique_key": "person_id||payer||payment_year"
     , "enabled": var('snapshots_enabled',False) == true and var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) == true | as_bool
     , "hard_deletes": "invalidate"
   })
