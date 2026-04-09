@@ -112,6 +112,21 @@ const sidebars = {
             "connectors/fhir-inferno",
           ],
         },
+        {
+          type: "category",
+          label: "MSSP ACOs",
+          collapsed: true,
+          items: [
+            "mssp-acos/overview",
+            "mssp-acos/getting-started",
+            "mssp-acos/mssp-pipeline",
+            "mssp-acos/cms-mssp-connector",
+            "mssp-acos/cms-alr-connector",
+            "mssp-acos/medicare-cclf-connector",
+            "mssp-acos/cms-aco-dashboards",
+            "mssp-acos/cms-benchmark-app"
+          ],
+        },
         "dashboards",
         {
           type: "category",

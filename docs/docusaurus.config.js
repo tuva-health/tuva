@@ -56,6 +56,9 @@ const config = {
     tuvaVersion: getTuvaVersion(),
   },
 
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: { mermaid: true },
+
   plugins: [
     require.resolve("docusaurus-plugin-image-zoom"),
     [
