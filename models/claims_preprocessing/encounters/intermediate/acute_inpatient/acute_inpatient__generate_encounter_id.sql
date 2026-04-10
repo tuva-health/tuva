@@ -18,7 +18,7 @@ select claim_id
       enc.claim_id
     , enc.patient_data_source_id
     , c.start_date
-    c.end_date
+    , c.end_date
     , enc.facility_npi
     , enc.discharge_disposition_code
   from {{ ref('encounters__stg_medical_claim') }} as enc
