@@ -50,11 +50,10 @@
     , ethnicity
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
+{# Extension columns for testing passthrough to core.member_months #}
 {%- set tuva_extensions -%}
-    {# , person_id as x_temp_person_id #}
-    {# , first_name as x_temp_first_name #}
-    {# , payer_type as zzz_temp_payer_type #}
+    , person_id as x_temp_person_id
+    , first_name as x_temp_first_name
 {%- endset -%}
 
 {%- set tuva_metadata -%}
