@@ -6,11 +6,11 @@ hide_title: true
 
 # CMS ALR Connector
 
-The CMS ALR Connector is a dbt project that transforms CMS Advanced ACO Assignment List Reports (AALR) into an `enrollment` table compatible with the [Medicare CCLF Connector](medicare-cclf-connector). It is designed to be run after the [MSSP Pipeline](mssp-pipeline) has loaded raw AALR files into your warehouse.
+The CMS ALR Connector is a dbt project that transforms CMS Advanced ACO Assignment List Reports (AALR) into the enrollment input expected by the [Medicare CCLF Connector](medicare-cclf-connector). It is designed to run after the [MSSP Pipeline](mssp-pipeline) has loaded the raw ALR files into your warehouse.
 
 ## What Are AALR Reports?
 
-CMS provides monthly Assignment List Reports to MSSP ACOs identifying which Medicare beneficiaries are assigned to the ACO for a given performance year. The Advanced ACO variant (AALR) includes additional detail on:
+CMS provides monthly Assignment List Reports to MSSP ACOs identifying which Medicare beneficiaries are assigned to the ACO for a given performance year. The connector expects the raw ALR data to be organized using the latest CMS ALR format and source tables defined in the repo's `_sources.yml`. The Advanced ACO variant includes:
 
 - **AALR1** — Assigned beneficiaries and enrollment flags (12 monthly flags per beneficiary)
 - **AALR2** — Assigned beneficiaries by TIN
@@ -19,7 +19,7 @@ CMS provides monthly Assignment List Reports to MSSP ACOs identifying which Medi
 - **AALR6** — Beneficiaries eligible for voluntary alignment
 - **AALR9** — Beneficiaries flagged as underserved
 
-Each AALR file name encodes the performance year and iteration number, which the connector uses to determine file precedence when multiple iterations exist for the same period.
+Each AALR file name is used to derive metadata such as performance year and reporting period. The connector relies on the `file_name` field to determine file precedence when multiple iterations exist for the same period.
 
 ## Model Layers
 
@@ -42,9 +42,9 @@ Type-casting only — no business logic. One staging model per AALR table:
 
 Two models that join and reshape the staging data:
 
-**`aalr_history`** — Joins all six AALR staging models and pivots the 12 monthly enrollment flag columns into individual rows, producing one row per beneficiary per enrollment month. Enriches each row with turnover, voluntary alignment, and underserved flags. Deduplicates by TIN and NPI using `dbt_utils.deduplicate()`.
+**`aalr_history`** — Joins all six AALR staging models and pivots the 12 monthly enrollment flag columns into individual rows, producing one row per beneficiary per enrollment month. It enriches each row with turnover, voluntary alignment, and underserved flags, then deduplicates by TIN and NPI using `dbt_utils.deduplicate()`.
 
-**`aalr_history_filtered`** — Filters `aalr_history` to the highest-priority AALR file per enrollment month and performance year. Priority is determined by the `mssp_file_parameters` seed (see below).
+**`aalr_history_filtered`** — Filters `aalr_history` to the highest-priority AALR file per enrollment month and performance year. Priority is determined by the `mssp_file_parameters` seed.
 
 ### Final (tables)
 
@@ -58,13 +58,13 @@ Two models that join and reshape the staging data:
 | `current_bene_mbi_id` | Current Medicare Beneficiary Identifier |
 | `bene_hic_num` | Health Insurance Claim number |
 
-**`provider_attribution`** (optional) — Provider assignment data by TIN and NPI.
+**`provider_attribution`** — Provider attribution output by TIN and NPI in Tuva's payer attribution format.
 
 ## File Priority Seed
 
-The `seeds/mssp_file_parameters.csv` seed maps AALR file iterations to performance periods and assigns a `priority` value. When multiple iterations of an AALR file exist for the same performance year and month (e.g., a restatement), the connector uses the highest-priority file and discards the others.
+The `seeds/mssp_file_parameters.csv` seed maps AALR file iterations to performance periods and assigns a `priority` value. When multiple iterations of an AALR file exist for the same performance year and month, the connector uses the highest-priority file and discards the others.
 
-This seed must be updated when CMS releases new AALR iterations or performance year definitions.
+The current seed covers performance years 2016 through 2026.
 
 ## Configuration
 
@@ -74,6 +74,10 @@ Set these variables in `dbt_project.yml` or via `--vars` on the command line:
 vars:
   input_database: "your_database"   # Database containing raw AALR tables
   input_schema: "your_mssp_schema"  # Schema containing raw AALR tables
+  provider_attribution_enabled: true
+  cms_alr_connector: true
+  # Optional schema prefix for multi-tenant deployments
+  tuva_schema_prefix: "optional_prefix"
 ```
 
 ## How to Run
@@ -94,6 +98,8 @@ dbt run --select enrollment
 ## Output
 
 The `enrollment` table is written to the target schema configured in your dbt profile. Point the [Medicare CCLF Connector](medicare-cclf-connector) at this table to provide member enrollment data for eligibility generation.
+
+By default, the repo writes intermediate staging/history models to schema names derived from `input_layer`, while the final `enrollment` model is configured for `raw_data`. If `tuva_schema_prefix` is supplied, those schemas are prefixed automatically.
 
 ## Supported Databases
 
@@ -119,6 +125,6 @@ cms_alr_connector/
 │   └── final/             # enrollment, provider_attribution
 ├── macros/                # extract_file_metadata, cast_numeric, try_to_cast_date
 ├── seeds/
-│   └── mssp_file_parameters.csv  # File metadata and priority mapping
+│   └── mssp_file_parameters.csv  # File metadata and priority mapping (2016-2026)
 └── tests/                 # dbt data tests
 ```
