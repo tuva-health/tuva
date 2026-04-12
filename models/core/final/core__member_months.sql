@@ -20,6 +20,10 @@
     , custom_attributed_provider_lob
 {%- endset -%}
 
+{%- set tuva_extension_columns -%}
+    {{ select_extension_columns(ref('input_layer__eligibility')) }}
+{%- endset -%}
+
 {%- set tuva_metadata_columns -%}
     , data_source
     , tuva_last_run
@@ -27,5 +31,6 @@
 
 select
     {{ tuva_core_columns }}
+    {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from {{ ref('core__stg_claims_member_months') }}
