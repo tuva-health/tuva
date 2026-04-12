@@ -17,6 +17,17 @@
           passthrough:
             prefix: 'x_'    # Prefix to identify passthrough columns
             strip: false    # Whether to strip prefix in final output
+
+    Unit-test override:
+        In dbt unit tests the macro uses adapter.get_columns_in_relation() at
+        compile time. Because dbt resolves ref() to an ephemeral CTE during unit
+        test compilation, the introspection call returns nothing. Set the project
+        var _extension_columns_override to a list of column names to bypass DB
+        introspection entirely and make tests self-contained:
+
+            overrides:
+              vars:
+                _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
 #}
     {%- if not execute -%}
         {{ return('') }}
@@ -25,64 +36,51 @@
     {%- set passthrough_config = var('passthrough', {}) -%}
     {%- set effective_prefix = prefix if prefix is not none else passthrough_config.get('prefix', 'x_') -%}
     {%- set effective_strip_prefix = strip_prefix if strip_prefix is not none else passthrough_config.get('strip', false) -%}
-
-    {#- Get columns from the relation -#}
-    {%- set source_columns = adapter.get_columns_in_relation(relation) -%}
-
-    {#- Fallback for unit-test context: when a model is included in a unit test's
-        `given` section, dbt resolves ref() to an ephemeral CTE alias such as
-        __dbt__cte__input_layer__eligibility rather than the real DB relation.
-        adapter.get_columns_in_relation() returns nothing for CTE aliases, so the
-        macro would produce an empty column list and the model compiles without
-        extension columns. The workaround is to detect the CTE name pattern, strip
-        the prefix to recover the original identifier, and query information_schema
-        to find the real schema, then fetch columns from the actual table/view. -#}
-    {%- if source_columns | length == 0 -%}
-        {%- set rel_str = relation | string -%}
-        {%- if rel_str.startswith('__dbt__cte__') -%}
-            {%- set actual_id = rel_str[12:] -%}
-            {%- set schema_res = run_query(
-                "SELECT table_schema FROM information_schema.tables "
-                ~ "WHERE table_name = '" ~ actual_id ~ "' "
-                ~ "AND table_schema NOT IN ('main', 'information_schema', 'pg_catalog') "
-                ~ "ORDER BY table_schema LIMIT 1"
-            ) -%}
-            {%- if schema_res and schema_res.rows | length > 0 -%}
-                {%- set actual_rel = adapter.get_relation(
-                    database=target.database,
-                    schema=schema_res.rows[0][0],
-                    identifier=actual_id
-                ) -%}
-                {%- if actual_rel -%}
-                    {%- set source_columns = adapter.get_columns_in_relation(actual_rel) -%}
-                {%- endif -%}
-            {%- endif -%}
-        {%- endif -%}
-    {%- endif -%}
-
-    {%- if source_columns | length == 0 -%}
-        {{ return('') }}
-    {%- endif -%}
-
     {%- set alias_prefix = alias ~ '.' if alias else '' -%}
     {%- set extension_columns = [] -%}
 
-    {#- Find extension columns -#}
-    {%- for col in source_columns -%}
-        {%- if col.name.lower().startswith(effective_prefix.lower()) -%}
-            {%- set stripped_name = col.name[effective_prefix | length:] -%}
-            {%- if effective_strip_prefix -%}
-                {%- set col_expr = alias_prefix ~ col.name ~ ' as ' ~ stripped_name -%}
-            {%- else -%}
-                {%- set col_expr = alias_prefix ~ col.name -%}
-            {%- endif -%}
-            {%- do extension_columns.append(col_expr) -%}
-        {%- endif -%}
-    {%- endfor -%}
+    {#- Allow an explicit column-name list to be supplied via project var.
+        Intended for dbt unit tests: set _extension_columns_override in the
+        test's `overrides.vars` block so the test does not rely on DB
+        introspection and is fully self-contained. -#}
+    {%- set col_override = var('_extension_columns_override', none) -%}
 
-    {%- if extension_columns | length > 0 -%}
-        {%- for col_expr in extension_columns %}
-    , {{ col_expr }}
+    {%- if col_override is not none -%}
+
+        {%- for col_name in col_override -%}
+            {%- if col_name.lower().startswith(effective_prefix.lower()) -%}
+                {%- if effective_strip_prefix -%}
+                    {%- set stripped = col_name[effective_prefix | length:] -%}
+                    {%- do extension_columns.append(alias_prefix ~ col_name ~ ' as ' ~ stripped) -%}
+                {%- else -%}
+                    {%- do extension_columns.append(alias_prefix ~ col_name) -%}
+                {%- endif -%}
+            {%- endif -%}
         {%- endfor -%}
+
+    {%- else -%}
+
+        {#- Normal path: introspect the relation at compile time. -#}
+        {%- set source_columns = adapter.get_columns_in_relation(relation) -%}
+
+        {%- if source_columns | length == 0 -%}
+            {{ return('') }}
+        {%- endif -%}
+
+        {%- for col in source_columns -%}
+            {%- if col.name.lower().startswith(effective_prefix.lower()) -%}
+                {%- set stripped_name = col.name[effective_prefix | length:] -%}
+                {%- if effective_strip_prefix -%}
+                    {%- do extension_columns.append(alias_prefix ~ col.name ~ ' as ' ~ stripped_name) -%}
+                {%- else -%}
+                    {%- do extension_columns.append(alias_prefix ~ col.name) -%}
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
+
     {%- endif -%}
+
+    {%- for col_expr in extension_columns %}
+    , {{ col_expr }}
+    {%- endfor -%}
 {% endmacro %}
