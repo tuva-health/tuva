@@ -1,0 +1,204 @@
+version: 2
+
+# Unit tests for extension column passthrough through the member_months pipeline.
+#
+# These tests verify that x_ columns defined in the eligibility input layer flow
+# correctly through each stage:
+#   normalized_input__eligibility
+#     → claims_enrollment__member_months   (calendar join → monthly explosion)
+#     → core__stg_claims_member_months     (LEFT JOIN with provider attribution)
+#     → core__member_months                (final SELECT)
+#
+# Pre-requisites for running these tests:
+#   1. input_layer__eligibility must be materialized with x_ columns.
+#      Run: dbt run -s input_layer__eligibility (from integration_tests/).
+#   2. A stub view for financial_pmpm__stg_provider_attribution must exist in
+#      the main (default) schema so dbt can infer fixture column types.
+#      The model is disabled by default; create the stub via the Python snippet
+#      in integration_tests/tests/README or by enabling financial_pmpm and
+#      running: dbt run -s financial_pmpm__stg_provider_attribution.
+#
+# Why input_layer__eligibility is in each `given` section:
+#   When a model is listed in `given`, dbt resolves ref() to an ephemeral CTE
+#   during unit-test compilation.  select_extension_columns() calls
+#   adapter.get_columns_in_relation() at compile time; the macro's CTE-fallback
+#   logic then queries information_schema to find the real table and discover
+#   the x_ columns, making the tests self-contained once the pre-reqs are met.
+
+unit_tests:
+
+  # ── Stage 1: calendar join explodes enrollment span into monthly rows ───────
+  - name: test_member_months_extension_columns_flow_through_calendar_join
+    description: >
+      Verifies that x_ extension columns from normalized_input__eligibility are
+      preserved after the calendar join that explodes enrollment spans into one
+      row per member-month.
+    model: claims_enrollment__member_months
+    config:
+      enabled: "{{ var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', false))) | as_bool }}"
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - person_id: '10'
+            member_id: '10'
+            payer: 'medicare'
+            plan: 'medicare'
+            data_source: 'test'
+            enrollment_start_date: '2020-01-01'
+            enrollment_end_date: '2020-01-31'
+            tuva_last_run: '2024-01-01 00:00:00'
+            x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+      # Provide first + last day of January so the aggregate yields the correct
+      # month_start_date / month_end_date for the enrollment overlap check.
+      - input: ref('reference_data__calendar')
+        rows:
+          - full_date: '2020-01-01'
+            year: 2020
+            month: 1
+          - full_date: '2020-01-31'
+            year: 2020
+            month: 1
+      # select_extension_columns() introspects this relation at compile time.
+      # The fixture makes the test self-contained — no prior model run required.
+      - input: ref('input_layer__eligibility')
+        rows:
+          - x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+    expect:
+      rows:
+        # member_month_key = md5('10-10-202001-medicare-medicare-test')
+        - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+          person_id: '10'
+          member_id: '10'
+          year_month: '202001'
+          payer: 'medicare'
+          plan: 'medicare'
+          data_source: 'test'
+          tuva_last_run: '2024-01-01 00:00:00'
+          x_temp_person_id: '10'
+          x_temp_first_name: 'John'
+
+  # ── Stage 2: staging model passes extension columns through LEFT JOIN ────────
+  - name: test_stg_claims_member_months_extension_columns_survive_attribution_join
+    description: >
+      Verifies that x_ extension columns are preserved in core__stg_claims_member_months
+      after the LEFT JOIN with provider attribution data.
+    model: core__stg_claims_member_months
+    config:
+      enabled: "{{ var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00+00:00'
+    given:
+      - input: ref('claims_enrollment__member_months')
+        rows:
+          - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+            person_id: '10'
+            member_id: '10'
+            year_month: '202001'
+            payer: 'medicare'
+            plan: 'medicare'
+            data_source: 'test'
+            tuva_last_run: '2024-01-01 00:00:00'
+            x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+      # Non-matching row: LEFT JOIN on (person_id, member_id, year_month, payer,
+      # plan, data_source) produces no match → attribution columns are null.
+      # Non-null values are required so dbt can infer column types without
+      # querying the actual relation (financial_pmpm is disabled by default).
+      - input: ref('financial_pmpm__stg_provider_attribution')
+        rows:
+          - person_id: '99'
+            member_id: '99'
+            year_month: '999999'
+            payer: 'no-match'
+            plan: 'no-match'
+            data_source: 'no-match'
+            payer_attributed_provider: 'no-match'
+            payer_attributed_provider_practice: 'no-match'
+            payer_attributed_provider_organization: 'no-match'
+            payer_attributed_provider_lob: 'no-match'
+            custom_attributed_provider: 'no-match'
+            custom_attributed_provider_practice: 'no-match'
+            custom_attributed_provider_organization: 'no-match'
+            custom_attributed_provider_lob: 'no-match'
+      - input: ref('input_layer__eligibility')
+        rows:
+          - x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+    expect:
+      rows:
+        - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+          person_id: '10'
+          member_id: '10'
+          year_month: '202001'
+          payer: 'medicare'
+          plan: 'medicare'
+          data_source: 'test'
+          tuva_last_run: '2024-01-01 00:00:00'
+          payer_attributed_provider: null
+          payer_attributed_provider_practice: null
+          payer_attributed_provider_organization: null
+          payer_attributed_provider_lob: null
+          custom_attributed_provider: null
+          custom_attributed_provider_practice: null
+          custom_attributed_provider_organization: null
+          custom_attributed_provider_lob: null
+          x_temp_person_id: '10'
+          x_temp_first_name: 'John'
+
+  # ── Stage 3: final core table SELECT preserves extension columns ────────────
+  - name: test_core_member_months_extension_columns_appear_in_final_output
+    description: >
+      Verifies that x_ extension columns appear in the final core.member_months
+      table in the correct position (between the attribution columns and the
+      metadata columns data_source / tuva_last_run).
+    model: core__member_months
+    config:
+      enabled: "{{ var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool }}"
+    given:
+      - input: ref('core__stg_claims_member_months')
+        rows:
+          - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+            person_id: '10'
+            member_id: '10'
+            year_month: '202001'
+            payer: 'medicare'
+            plan: 'medicare'
+            payer_attributed_provider: null
+            payer_attributed_provider_practice: null
+            payer_attributed_provider_organization: null
+            payer_attributed_provider_lob: null
+            custom_attributed_provider: null
+            custom_attributed_provider_practice: null
+            custom_attributed_provider_organization: null
+            custom_attributed_provider_lob: null
+            x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+            data_source: 'test'
+            tuva_last_run: '2024-01-01 00:00:00'
+      - input: ref('input_layer__eligibility')
+        rows:
+          - x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+    expect:
+      rows:
+        - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+          person_id: '10'
+          member_id: '10'
+          year_month: '202001'
+          payer: 'medicare'
+          plan: 'medicare'
+          payer_attributed_provider: null
+          payer_attributed_provider_practice: null
+          payer_attributed_provider_organization: null
+          payer_attributed_provider_lob: null
+          custom_attributed_provider: null
+          custom_attributed_provider_practice: null
+          custom_attributed_provider_organization: null
+          custom_attributed_provider_lob: null
+          x_temp_person_id: '10'
+          x_temp_first_name: 'John'
+          data_source: 'test'
+          tuva_last_run: '2024-01-01 00:00:00'

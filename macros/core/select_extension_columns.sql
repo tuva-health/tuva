@@ -29,6 +29,37 @@
     {#- Get columns from the relation -#}
     {%- set source_columns = adapter.get_columns_in_relation(relation) -%}
 
+    {#- Fallback for unit-test context: when a model is included in a unit test's
+        `given` section, dbt resolves ref() to an ephemeral CTE alias such as
+        __dbt__cte__input_layer__eligibility rather than the real DB relation.
+        adapter.get_columns_in_relation() returns nothing for CTE aliases, so the
+        macro would produce an empty column list and the model compiles without
+        extension columns. The workaround is to detect the CTE name pattern, strip
+        the prefix to recover the original identifier, and query information_schema
+        to find the real schema, then fetch columns from the actual table/view. -#}
+    {%- if source_columns | length == 0 -%}
+        {%- set rel_str = relation | string -%}
+        {%- if rel_str.startswith('__dbt__cte__') -%}
+            {%- set actual_id = rel_str[12:] -%}
+            {%- set schema_res = run_query(
+                "SELECT table_schema FROM information_schema.tables "
+                ~ "WHERE table_name = '" ~ actual_id ~ "' "
+                ~ "AND table_schema NOT IN ('main', 'information_schema', 'pg_catalog') "
+                ~ "ORDER BY table_schema LIMIT 1"
+            ) -%}
+            {%- if schema_res and schema_res.rows | length > 0 -%}
+                {%- set actual_rel = adapter.get_relation(
+                    database=target.database,
+                    schema=schema_res.rows[0][0],
+                    identifier=actual_id
+                ) -%}
+                {%- if actual_rel -%}
+                    {%- set source_columns = adapter.get_columns_in_relation(actual_rel) -%}
+                {%- endif -%}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}
+
     {%- if source_columns | length == 0 -%}
         {{ return('') }}
     {%- endif -%}
