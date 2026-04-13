@@ -13,10 +13,10 @@ This guide walks through setting up and running the full pipeline, from download
 Before you begin, you will need:
 
 - **CMS Datahub access** — Credentials for the ACO Management System (ACOMS) to download your ACO's data files
+- **Your ACO ID** — The CMS-assigned identifier for your ACO
 - **A supported data warehouse** — One of: Snowflake, Databricks, BigQuery, Redshift, MotherDuck, or a local DuckDB/Parquet setup
 - **Python 3.10+** and [uv](https://github.com/astral-sh/uv) for running the MSSP Pipeline
 - **dbt** installed and configured for your data warehouse
-- **Your ACO ID** — The CMS-assigned identifier for your ACO
 
 ## Step 1: Go to the CMS Portal and setup API Credentials
 
@@ -26,7 +26,7 @@ Store the API credentials is a safe location to be used in a later step.
 
 ## Step 2: Download and Load CMS Data
 
-After getting your we will need to clone the MSSP Pipeline and configure it's dependencies and credentials. The MSSP pipeline does the heavy lifting by downloading, unpacking the ACO's files from the CMS Datahub and then loads them into your data warehouse.
+Next we will need to clone the MSSP Pipeline and configure it's dependencies and credentials. The MSSP pipeline does the heavy lifting by downloading, unpacking the ACO's files from the CMS Datahub and then loads them into your data warehouse.
 
 ### Clone and configure the MSSP Pipeline
 
@@ -95,7 +95,7 @@ uv sync
 
 ### Configure
 
-In `cms_mssp_connector/dbt_project.yml`, point to the raw MSSP source data:
+In `cms_mssp_connector/dbt_project.yml`, update the config to point to the raw MSSP source data:
 
 ```yaml
 vars:
@@ -112,33 +112,9 @@ dbt build
 
 This creates staging and intermediate models for all MSSP report files. In addition, the MSSP connector will run the ALR and CCLF connectors to populate the data warehouse with all core and enriched datamarts provided by Tuva.
 
-## Step 3: Run the Tuva Project
-
-With the Tuva Input Layer populated, run the Tuva Project to generate the Core Data Model and all data marts. This can be run seamlessly from the CMS MSSP connector, but can also be triggered separately if desired.
-
-### Configure
-
-In your Tuva project's `dbt_project.yml`, point to the output schema from Step 4:
-
-```yaml
-vars:
-  input_database: "your_database"
-  input_schema: "your_cclf_output_schema"
-```
-
-### Run
-
-```bash
-cd tuva
-dbt deps
-dbt build
-```
-
-
 ## Step 4: Deploy ACO dashboards
 
-With the Tuva data models available in your data warehouse. We can now deploy the ACO dashboards, note that these are only available in Power BI.
-
+With the Tuva data models available in your data warehouse. We can now deploy the ACO dashboards, please follow the instructions in the [CMS ACO Dashboards](cms-aco-dashboards) page as this is a multi-step process, note that these are only available in Power BI.
 
 ## Pipeline Summary
 

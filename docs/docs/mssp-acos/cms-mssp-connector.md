@@ -14,25 +14,16 @@ The current project stages the following raw MSSP report tables:
 
 | File Type | Raw Tables | Description |
 |---|---|---|
-| **BEUR** | `beur_beneficiary_expenditure_utilization_report` | Per-beneficiary expenditure and utilization benchmarks |
-| **BAIP** | `baip_beneficiary_advanced_investment_payment` | Advanced investment payment amounts per beneficiary |
-| **NCBP** | `ncbp_non_claims_based_payments` | Non-claims-based payment adjustments |
-| **BNEX** | `beneficiary_exclusions` | Beneficiaries excluded from benchmark calculations |
-| **BNEX MBI XREF** | `excluded_beneficiary_mbi_xref` | MBI cross-reference for excluded beneficiaries |
-| **EXPU** | `expu_table_1`, `expu_table_2`, `expu_table_3` | Expenditure and utilization by enrollment type (used in benchmark calculations) |
-| **MCQM** | `mcqm_beneficiaries`, `mcqm_dm_001ssp`, `mcqm_bcs_112ssp`, `mcqm_dep_134ssp`, `mcqm_htn_236ssp` | Medicare quality measure results by beneficiary and measure |
-| **Participant List** | `participants_list`, `provider_and_supplier_list` | ACO participant TIN and NPI rosters |
-| **Shadow Bundles** | `shadow_bundles_dm`, `shadow_bundles_epi`, `shadow_bundles_hh`, `shadow_bundles_hs`, `shadow_bundles_ip`, `shadow_bundles_opl`, `shadow_bundles_pb`, `shadow_bundles_sn` | Episode payment shadow bundle reports by bundle type |
-| **CCLFA/B** | `claims_benefit_enhancement_and_demonstration_code_file_cclfa`, `cclfb_claims_benefit_enhancement_and_demonstration_code_file_cclfb` | Claims benefit enhancement and demonstration code files |
-
-## Dependencies
-
-The current repo declares these dbt dependencies in `packages.yml`:
-
-| Dependency | Purpose |
-|---|---|
-| `dbt_utils` | Shared dbt utility macros |
-| `cms_alr_connector` | Local dependency available for downstream integration work |
+| **BEUR** | Expenditure and utilization reports | Per-beneficiary expenditure and utilization benchmarks |
+| **BAIP** | Advanced Investment Payment reports | Advanced investment payment amounts per beneficiary |
+| **NCBP** | Non claims-based payment reports | Non-claims-based payment adjustments |
+| **BNEX** | Beneficiary exclusions | Beneficiaries excluded from data sharing |
+| **BNEX MBI XREF** | Member benficiary crosswalk | MBI cross-reference for excluded beneficiaries |
+| **EXPU** | Expenditure and utilization report | Expenditure and utilization by enrollment type (used in benchmark calculations) |
+| **MCQM** | Medicare quality measure list | Medicare quality measure results by beneficiary and measure |
+| **Participant List** | Participant lists | ACO participant TIN and NPI rosters |
+| **Shadow Bundles** | Shadow bundle reports | Episode payment shadow bundle reports by bundle type |
+| **CCLFA/B** | CCLFA & CCLF B reports | Claims benefit enhancement and demonstration code files |
 
 ## Architecture
 
