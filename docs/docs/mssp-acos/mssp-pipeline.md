@@ -30,7 +30,7 @@ The integration subsystem wraps the `acoms-cli` binary provided by CMS to authen
 
 ## Installation
 
-To get started with the MSSP Pipeline tool, clone the git repository (PLACEHOLDER) to your local machine or the machine you'll be using to manage runs. Then run the following comands to install the correct dependencies. We leverage `uv` to manage our depencies, you can follow their docs (https://docs.astral.sh/uv/getting-started/installation/) docs for installation steps.
+To get started with the MSSP Pipeline tool, clone the git repository to your local machine or the machine you'll be using to manage runs. Then run the following comands to install the correct dependencies. We leverage `uv` to manage our depencies, you can follow their docs (https://docs.astral.sh/uv/getting-started/installation/) docs for installation steps.
 
 ```bash
 cd mssp_pipeline
