@@ -6,20 +6,20 @@ hide_title: true
 
 # CMS ALR Connector
 
-The CMS ALR Connector is a dbt project that transforms CMS Advanced ACO Assignment List Reports (AALR) into the enrollment input expected by the [Medicare CCLF Connector](medicare-cclf-connector). It is designed to run after the [MSSP Pipeline](mssp-pipeline) has loaded the raw ALR files into your warehouse.
+The CMS ALR Connector is a dbt project that transforms CMS Advanced ACO Assignment List Reports (ALR) into the enrollment input expected by the [Medicare CCLF Connector](medicare-cclf-connector). It is designed to run after the [MSSP Pipeline](mssp-pipeline) has loaded the raw ALR files into your warehouse.
 
-## What Are AALR Reports?
+## What Are ALR Reports?
 
 CMS provides monthly Assignment List Reports to MSSP ACOs identifying which Medicare beneficiaries are assigned to the ACO for a given performance year. The connector expects the raw ALR data to be organized using the latest CMS ALR format and source tables defined in the repo's `_sources.yml`. The Advanced ACO variant includes:
 
-- **AALR1** — Assigned beneficiaries and enrollment flags (12 monthly flags per beneficiary)
-- **AALR2** — Assigned beneficiaries by TIN
-- **AALR4** — Assigned beneficiaries by TIN and NPI
-- **AALR5** — Beneficiary turnover (newly assigned and dropped)
-- **AALR6** — Beneficiaries eligible for voluntary alignment
-- **AALR9** — Beneficiaries flagged as underserved
+- **ALR1** — Assigned beneficiaries and enrollment flags (12 monthly flags per beneficiary)
+- **ALR2** — Assigned beneficiaries by TIN
+- **ALR4** — Assigned beneficiaries by TIN and NPI
+- **ALR5** — Beneficiary turnover (newly assigned and dropped)
+- **ALR6** — Beneficiaries eligible for voluntary alignment
+- **ALR9** — Beneficiaries flagged as underserved
 
-Each AALR file name is used to derive metadata such as performance year and reporting period. The connector relies on the `file_name` field to determine file precedence when multiple iterations exist for the same period.
+Each ALR file name is used to derive metadata such as performance year and reporting period. The connector relies on the `file_name` field to determine file precedence when multiple iterations exist for the same period.
 
 ## Model Layers
 
@@ -27,24 +27,24 @@ The connector follows a standard three-layer dbt architecture:
 
 ### Staging (views)
 
-Type-casting only — no business logic. One staging model per AALR table:
+Type-casting only — no business logic. One staging model per ALR table:
 
 | Model | Source |
 |---|---|
-| `stg_aalr1_assigned_beneficiaries` | AALR1 |
-| `stg_aalr2_assigned_beneficiaries_tin` | AALR2 |
-| `stg_aalr4_assigned_beneficiaries_tin_npi` | AALR4 |
-| `stg_aalr5_beneficiary_turnover` | AALR5 |
-| `stg_aalr6_beneficiaries_assignable_or_voluntary` | AALR6 |
-| `stg_aalr9_beneficiaries_underserved` | AALR9 |
+| `stg_ALR1_assigned_beneficiaries` | ALR1 |
+| `stg_ALR2_assigned_beneficiaries_tin` | ALR2 |
+| `stg_ALR4_assigned_beneficiaries_tin_npi` | ALR4 |
+| `stg_ALR5_beneficiary_turnover` | ALR5 |
+| `stg_ALR6_beneficiaries_assignable_or_voluntary` | ALR6 |
+| `stg_ALR9_beneficiaries_underserved` | ALR9 |
 
 ### Intermediate (tables)
 
 Two models that join and reshape the staging data:
 
-**`aalr_history`** — Joins all six AALR staging models and pivots the 12 monthly enrollment flag columns into individual rows, producing one row per beneficiary per enrollment month. It enriches each row with turnover, voluntary alignment, and underserved flags, then deduplicates by TIN and NPI using `dbt_utils.deduplicate()`.
+**`ALR_history`** — Joins all six ALR staging models and pivots the 12 monthly enrollment flag columns into individual rows, producing one row per beneficiary per enrollment month. It enriches each row with turnover, voluntary alignment, and underserved flags, then deduplicates by TIN and NPI using `dbt_utils.deduplicate()`.
 
-**`aalr_history_filtered`** — Filters `aalr_history` to the highest-priority AALR file per enrollment month and performance year. Priority is determined by the `mssp_file_parameters` seed.
+**`ALR_history_filtered`** — Filters `ALR_history` to the highest-priority ALR file per enrollment month and performance year. Priority is determined by the `mssp_file_parameters` seed.
 
 ### Final (tables)
 
@@ -62,7 +62,7 @@ Two models that join and reshape the staging data:
 
 ## File Priority Seed
 
-The `seeds/mssp_file_parameters.csv` seed maps AALR file iterations to performance periods and assigns a `priority` value. When multiple iterations of an AALR file exist for the same performance year and month, the connector uses the highest-priority file and discards the others.
+The `seeds/mssp_file_parameters.csv` seed maps ALR file iterations to performance periods and assigns a `priority` value. When multiple iterations of an ALR file exist for the same performance year and month, the connector uses the highest-priority file and discards the others.
 
 The current seed covers performance years 2016 through 2026.
 
@@ -72,8 +72,8 @@ Set these variables in `dbt_project.yml` or via `--vars` on the command line:
 
 ```yaml
 vars:
-  input_database: "your_database"   # Database containing raw AALR tables
-  input_schema: "your_mssp_schema"  # Schema containing raw AALR tables
+  input_database: "your_database"   # Database containing raw ALR tables
+  input_schema: "your_mssp_schema"  # Schema containing raw ALR tables
   provider_attribution_enabled: true
   cms_alr_connector: true
   # Optional schema prefix for multi-tenant deployments
@@ -120,8 +120,8 @@ Cross-database compatibility is implemented via dbt adapter dispatch macros (`ca
 cms_alr_connector/
 ├── dbt_project.yml
 ├── models/
-│   ├── staging/           # One view per AALR source table
-│   ├── intermediate/      # aalr_history, aalr_history_filtered
+│   ├── staging/           # One view per ALR source table
+│   ├── intermediate/      # ALR_history, ALR_history_filtered
 │   └── final/             # enrollment, provider_attribution
 ├── macros/                # extract_file_metadata, cast_numeric, try_to_cast_date
 ├── seeds/

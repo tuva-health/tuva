@@ -20,7 +20,7 @@ These components work together sequentially to load raw CMS data into the Tuva P
 |---|---|---|
 | [MSSP Pipeline](mssp-pipeline) | Python CLI | Downloads MSSP ACO files from the CMS Datahub and loads them into your data warehouse |
 | [CMS MSSP Connector](cms-mssp-connector) | dbt project | Transforms remaining MSSP report files (BEUR, BAIP, NCBP, MCQM, EXPU, Shadow Bundles, etc.) into data marts |
-| [CMS ALR Connector](cms-alr-connector) | dbt project | Transforms CMS Assignment List Reports (AALR) into the enrollment format required by the CCLF connector, and creates the attribution input format based on data in the ALRs |
+| [CMS ALR Connector](cms-alr-connector) | dbt project | Transforms CMS Assignment List Reports (ALR) into the enrollment format required by the CCLF connector, and creates the attribution input format based on data in the ALRs |
 | [Medicare CCLF Connector](medicare-cclf-connector) | dbt project | Transforms CMS Comprehensive Claims and Line Feed (CCLF) files into the Tuva Input Layer and combines with ALR data, then runs the Tuva dbt project to create enriched claims datamarts |
 | [CMS ACO Dashboards](cms-aco-dashboards) | Power BI Dashboard | Suite of dashboards that allow a MSSP ACO to understand their attributed population, cost & utilzation, and risk adjustment / quality measure performance |
 
@@ -40,11 +40,11 @@ The pipeline components run in the following order:
 flowchart TD
     A[CMS Datahub] --> B["`**mssp_pipeline**
 Downloads + loads all CMS files into warehouse
-CCLF · AALR · BEUR · BAIP · MCQM · EXPU`"]
+CCLF · ALR · BEUR · BAIP · MCQM · EXPU`"]
     B --> C["`**cms_mssp_connector**
 BEUR / BAIP / NCBP / BNEX / EXPU / MCQM / Shadow Bundles`"]
     C --> D["`**cms_alr_connector**
-AALR to enrollment`"]
+ALR to enrollment`"]
     D --> E["`**medicare_cclf_connector**
 CCLF + enrollment to Tuva Input Layer`"]
     E --> F["`**Tuva Project**

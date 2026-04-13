@@ -23,7 +23,7 @@ Reads files with DuckDB, exports to warehouse`"]
     integration --> local["`**Local files**
 FILE_STORE`"]
     processing --> warehouse["`**Warehouse tables**
-CCLF, AALR, etc.`"]
+CCLF, ALR, etc.`"]
 ```
 
 The integration subsystem wraps the `acoms-cli` binary provided by CMS to authenticate and retrieve file listings. The processing subsystem uses DuckDB to read the raw files and export them to any supported backend — no intermediate Python parsing.

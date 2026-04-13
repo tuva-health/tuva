@@ -79,7 +79,7 @@ After this step, your warehouse will contain raw CCLF tables, ALR tables, and ot
 
 ## Step 3: Run the CMS MSSP Connector
 
-The [CMS MSSP Connector](cms-mssp-connector) runs immediately after the pipeline to build source objects and intermediate models for all MSSP report files that are not AALR or CCLF (benchmark expenditures, quality measures, shadow bundles, non-claims payments, and more).
+The [CMS MSSP Connector](cms-mssp-connector) runs immediately after the pipeline to build source objects and intermediate models for all MSSP report files that are not ALR or CCLF (benchmark expenditures, quality measures, shadow bundles, non-claims payments, and more).
 
 ### Clone and configure the CMS MSSP Connector
 ```bash
@@ -122,7 +122,7 @@ With the Tuva data models available in your data warehouse. We can now deploy th
 |---|---|---|---|
 | 1 | mssp_pipeline | CMS Datahub | All raw MSSP tables in warehouse |
 | 2 | cms_mssp_connector (phase 1) | Raw MSSP tables | Staging + intermediate MSSP models |
-| 3 | cms_alr_connector | AALR tables | `enrollment` table |
+| 3 | cms_alr_connector | ALR tables | `enrollment` table |
 | 4 | medicare_cclf_connector | CCLF tables + enrollment | `eligibility`, `medical_claim`, `pharmacy_claim` |
 | 5 | Tuva Project | Tuva Input Layer | Core Data Model + data marts |
 | 6 | MSSP ACO Power BI Dashboards | Core Data Model + data marts  | Power BI dashboards |
