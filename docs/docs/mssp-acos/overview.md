@@ -22,7 +22,7 @@ These components work together sequentially to load raw CMS data into the Tuva P
 | [CMS MSSP Connector](cms-mssp-connector) | dbt project | Transforms remaining MSSP report files (BEUR, BAIP, NCBP, MCQM, EXPU, Shadow Bundles, etc.) into data marts |
 | [CMS ALR Connector](cms-alr-connector) | dbt project | Transforms CMS Assignment List Reports (AALR) into the enrollment format required by the CCLF connector, and creates the attribution input format based on data in the ALRs |
 | [Medicare CCLF Connector](medicare-cclf-connector) | dbt project | Transforms CMS Comprehensive Claims and Line Feed (CCLF) files into the Tuva Input Layer and combines with ALR data, then runs the Tuva dbt project to create enriched claims datamarts |
-| [CMS ACO Dashboards](cms-aco-dashboard) | Power BI Dashboard | Suite of dashboards that allow a MSSP ACO to understand their attributed population, cost & utilzation, and risk adjustment / quality measure performance |
+| [CMS ACO Dashboards](cms-aco-dashboards) | Power BI Dashboard | Suite of dashboards that allow a MSSP ACO to understand their attributed population, cost & utilzation, and risk adjustment / quality measure performance |
 
 ### Standalone Tools
 
