@@ -4,7 +4,8 @@ models:
   - name: hcc_recapture__recapture_rates
     description: HCC recapture rates by payment year.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates
       tags: ["hcc_recapture", "final"]
       materialized: table
@@ -32,7 +33,8 @@ models:
   - name: hcc_recapture__recapture_rates_monthly
     description: HCC recapture rates by payment year month.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates_monthly
       tags: ["hcc_recapture", "final"]
       materialized: table
@@ -65,7 +67,8 @@ models:
   - name: hcc_recapture__recapture_rates_monthly_ytd
     description: HCC recapture rates by payment month year-to-date.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates_monthly_ytd
       tags: ["hcc_recapture", "final"]
       materialized: table
@@ -106,7 +109,8 @@ models:
   - name: hcc_recapture__hcc_status
     description: Combines claims data with HCC gap status.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: hcc_status
       tags: ["hcc_recapture", "final"]
       materialized: table
@@ -189,7 +193,8 @@ models:
   - name: hcc_recapture__gap_status
     description: The gap status for each HCC.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: gap_status
       tags: ["hcc_recapture", "final"]
       materialized: table  

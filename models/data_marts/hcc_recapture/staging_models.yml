@@ -6,7 +6,8 @@ models:
       Combine HCC hierarchy rankings with coefficients and add risk model code. Long-term risk model code should be added directly to the
       Tuva seed files instead.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: stg_coef_hier
       tags: ["hcc_recapture", "staging"]
       materialized: table
@@ -44,7 +45,8 @@ models:
       Beneficiaries eligible for HCC recapture. When ESRD risk scores are available in the Tuva project, 
       the filter removing ESRD beneficiaries will need to be removed.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: stg_eligible_benes
       tags: ["hcc_recapture", "staging"]
       materialized: table

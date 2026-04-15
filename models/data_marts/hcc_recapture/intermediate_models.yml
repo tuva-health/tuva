@@ -4,7 +4,8 @@ models:
   - name: hcc_recapture__int_all_hccs
     description: Add eligible claim and eligible benes columns. This is not filtered to eligible claims only so all claims can be seen at this step.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: int_all_hccs
       tags: ["hcc_recapture", "intermediate"]
       materialized: table
@@ -75,7 +76,8 @@ models:
   - name: hcc_recapture__int_hccs
     description: Filter to just eligible claims and apply HCC hierarchies.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: int_hccs
       tags: ["hcc_recapture", "intermediate"]
       materialized: table
@@ -148,7 +150,8 @@ models:
       Determines the gap for a given HCC code. A gap is based on prior year claims which qualified as an HCC. If there was a chronic HCC in a prior year,
       it would be expected this same HCC was coded in a future year.
     config:
-      schema: hcc_recapture
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture{% else %}hcc_recapture{%- endif -%}
       alias: int_gap_status
       tags: ["hcc_recapture", "intermediate"]
       materialized: table
