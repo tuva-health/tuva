@@ -2,7 +2,7 @@
 "The expectation is that the sum of paid_amount, coinsurance_amount, copayment_amount, and deductible_amount will be equivalent to allowed_amount."
 */
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool,
      tags = ['dqi', 'tuva_dqi_sev_4', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
             'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification',

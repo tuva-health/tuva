@@ -6,7 +6,7 @@ title: "Other Provider Taxonomy"
 import { JsonDataTable } from '@site/src/components/JsonDataTable';
 import { JsonDataTableNoTerm } from '@site/src/components/JsonDataTableNoTerm';
 
-<JsonDataTableNoTerm  jsonPath="nodes.seed\.the_tuva_project\.terminology__other_provider_taxonomy.columns" />
+<JsonDataTableNoTerm  jsonPath="nodes.seed\.the_tuva_project\.provider_data__other_provider_taxonomy.columns" />
 
 <a href="https://tuva-public-resources.s3.amazonaws.com/versioned_provider_data/latest/other_provider_taxonomy_compressed.csv.gz">Download CSV</a>
 
@@ -42,5 +42,5 @@ You should have exported the seed to an S3 bucket by now
 **The below steps are only required if the headers of the file need to be changed. The Tuva Project does not store the contents of the terminology file in GitHub.**
 
 1. Create a branch in [The Tuva Project](https://github.com/tuva-health/tuva)
-2. Copy and paste the updated header into the [Other Provider Taxonomy file](https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__other_provider_taxonomy.csv)
+2. Copy and paste the updated header into the [Other Provider Taxonomy file](https://github.com/tuva-health/tuva/blob/main/seeds/provider_data/provider_data__other_provider_taxonomy.csv)
 3. Submit a pull request

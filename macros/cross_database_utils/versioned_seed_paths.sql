@@ -62,9 +62,27 @@
 {% endmacro %}
 
 
-{% macro get_seed_version(version_override=none) %}
+{% macro get_seed_version(version_override=none, database=none) %}
   {% if version_override is none %}
-    {% set version = var('tuva_seed_version', '0.18.0') %}
+    {% set version_overrides = var('tuva_seed_versions', {}) %}
+    {% set version = none %}
+
+    {% if version_overrides is mapping %}
+      {% if database is not none %}
+        {% set normalized_database = database | string | trim %}
+        {% set alternate_database = normalized_database | replace('-', '_') %}
+
+        {% if normalized_database in version_overrides %}
+          {% set version = version_overrides[normalized_database] %}
+        {% elif alternate_database in version_overrides %}
+          {% set version = version_overrides[alternate_database] %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    {% if version is none %}
+      {% set version = var('tuva_seed_version', '1.0.0') %}
+    {% endif %}
   {% else %}
     {% set version = version_override %}
   {% endif %}
@@ -81,7 +99,7 @@
 {% macro get_versioned_seed_uri(database, version_override=none) %}
   {% set bucket = the_tuva_project.get_seed_bucket(database) %}
   {% set folder = the_tuva_project.get_seed_database_folder(database) %}
-  {% set version = the_tuva_project.get_seed_version(version_override) %}
+  {% set version = the_tuva_project.get_seed_version(version_override, database=database) %}
   {{ return(bucket ~ '/' ~ folder ~ '/' ~ version) }}
 {% endmacro %}
 
@@ -167,3 +185,4 @@
       null_marker
   )) }}
 {% endmacro %}
+

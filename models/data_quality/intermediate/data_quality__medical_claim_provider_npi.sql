@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', False)) | as_bool
 )}}
 
 with medical_claim as (
@@ -21,11 +21,11 @@ with medical_claim as (
       , max(case when term3.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_facility_npi
 
     from {{ ref('input_layer__medical_claim') }} as m
-    left join {{ ref('terminology__provider') }} as term
+    left join {{ ref('provider_data__provider') }} as term
       on m.rendering_npi = term.npi
-    left join {{ ref('terminology__provider') }} as term2
+    left join {{ ref('provider_data__provider') }} as term2
       on m.billing_npi  = term2.npi
-    left join {{ ref('terminology__provider') }} as term3
+    left join {{ ref('provider_data__provider') }} as term3
       on m.facility_npi = term3.npi
     group by
         m.claim_id

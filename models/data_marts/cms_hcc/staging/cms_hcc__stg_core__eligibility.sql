@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 -- Need distinct to deduplicate and remove the plan column
@@ -12,10 +12,8 @@ select distinct
     , dual_status_code
     , medicare_status_code
     , enrollment_status
-    , medicaid_indicator
     , long_term_institutional_flag
-    , case when snp_type = 'I-SNP' then 1 else 0 end as institutional_snp_flag
-    , case when snp_type is not null then 1 else 0 end as snp_flag
+    , institutional_snp_flag
     , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__eligibility') }}

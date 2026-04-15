@@ -1,7 +1,7 @@
 -- macros/get_selected_seeds.sql
 {% macro get_selected_seeds() %}
 {% if execute %}
-    {% set nodes = graph.nodes.values() %}
+    {% set nodes = graph['nodes'].values() %}
     {% set selected_nodes = selected_resources %}
     {% set ns = namespace(selected_seeds=[]) %}
 

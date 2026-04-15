@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('tuva_provider_attribution', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))
    )
 }}
 
@@ -24,7 +24,7 @@ with base as (
         else 'unknown'
       end as provider_bucket
   from base as b
-  inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x
+  inner join {{ ref('provider_data__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x
     on trim(cast(b.primary_taxonomy_code as {{ dbt.type_string() }})) = trim(cast(x.provider_taxonomy_code as {{ dbt.type_string() }}))
   inner join {{ ref('cms_provider_attribution__provider_specialty_assignment_codes') }} as a
   {% if target.type == 'athena' %}

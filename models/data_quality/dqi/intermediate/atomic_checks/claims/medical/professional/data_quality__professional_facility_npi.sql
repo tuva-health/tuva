@@ -30,4 +30,4 @@ select
     , cast(m.facility_npi as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from base as m
-left outer join {{ ref('terminology__provider') }} as term on m.facility_npi = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.facility_npi = term.npi

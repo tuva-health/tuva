@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+     enabled = var('clinical_enabled', False)
  | as_bool
    )
 }}
@@ -52,20 +52,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('lab_result_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'lab_result') }}
-
-{%- endif %}
+from {{ ref('raw_data__lab_result') }}

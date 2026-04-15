@@ -91,8 +91,8 @@ dbt build --select tag:tuva_provider_attribution \
 ```
 
 Notes:
-- Models are enabled when `tuva_provider_attribution` (or `claims_enabled` or
-  `tuva_marts_enabled`) evaluates true.
+- Models are enabled when both `provider_attribution_enabled` and
+  `claims_enabled` evaluate true.
 - The “current” output runs for every person with at least one member month
   in the last 12 months ending at `as_of_date`. Persons without assignable
   history receive a labeled fallback row to keep the output grain of the tables at one row for every member with eligibility during the evaluation period.
