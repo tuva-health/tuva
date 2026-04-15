@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -24,16 +24,8 @@ select
   , cast(elig.medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code
   , cast(elig.enrollment_status as {{ dbt.type_string() }}) as enrollment_status
   , cast(elig.hospice_flag as {{ dbt.type_int() }}) as hospice_flag
-  , cast(elig.snp_type as {{ dbt.type_string() }}) as snp_type
-  , cast(elig.medicaid_indicator as {{ dbt.type_int() }}) as medicaid_indicator
+  , cast(elig.institutional_snp_flag as {{ dbt.type_int() }}) as institutional_snp_flag
   , cast(elig.long_term_institutional_flag as {{ dbt.type_int() }}) as long_term_institutional_flag
-  , cast(elig.part_d_raf_type as {{ dbt.type_string() }}) as part_d_raf_type
-  , cast(elig.low_income_subsidy_indicator as {{ dbt.type_string() }}) as low_income_subsidy_indicator
-  , cast(elig.metal_level as {{ dbt.type_string() }}) as metal_level
-  , cast(elig.csr_indicator as {{ dbt.type_int() }}) as csr_indicator
-  , cast(elig.enrollment_duration_months as {{ dbt.type_int() }}) as enrollment_duration_months
-  , cast(elig.esrd_status as {{ dbt.type_string() }}) as esrd_status
-  , cast(elig.transplant_duration_months as {{ dbt.type_int() }}) as transplant_duration_months
   , cast(elig.group_id as {{ dbt.type_string() }}) as group_id
   , cast(elig.group_name as {{ dbt.type_string() }}) as group_name
   , cast(elig.name_suffix as {{ dbt.type_string() }}) as name_suffix

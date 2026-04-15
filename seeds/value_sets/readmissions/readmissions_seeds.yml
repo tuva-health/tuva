@@ -8,7 +8,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_acute_diagnosis_ccs
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs_diagnosis_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -27,7 +27,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_acute_diagnosis_icd_10_cm
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         icd_10_cm: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -49,7 +49,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_always_planned_ccs_diagnosis_category
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs_diagnosis_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -68,7 +68,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_always_planned_ccs_procedure_category
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs_procedure_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -87,7 +87,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_exclusion_ccs_diagnosis_category
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs_diagnosis_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -110,7 +110,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_icd_10_cm_to_ccs
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         icd_10_cm: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -140,7 +140,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_icd_10_pcs_to_ccs
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         icd_10_pcs: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -170,7 +170,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_potentially_planned_ccs_procedure_category
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs_procedure_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -189,7 +189,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_potentially_planned_icd_10_pcs
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         icd_10_pcs: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -211,7 +211,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_specialty_cohort
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         ccs: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -238,7 +238,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_surgery_gynecology_cohort
       tags: readmissions
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         icd_10_pcs: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

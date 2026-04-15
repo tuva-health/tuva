@@ -2,7 +2,7 @@
 {% macro is_tuva_selected() %}
   {# Check if any resources from the_tuva_project or tuva packages are selected #}
   {% if execute %}
-    {% set nodes = graph.nodes.values() %}
+    {% set nodes = graph['nodes'].values() %}
     {% set selected_nodes = selected_resources %}
 
     {% for node in nodes %}

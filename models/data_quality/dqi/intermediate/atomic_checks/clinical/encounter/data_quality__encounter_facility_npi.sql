@@ -8,7 +8,7 @@ select
     , 'ENCOUNTER' as table_name
     , 'Encounter ID' as drill_down_key
     , coalesce(encounter_id, 'NULL') as drill_down_value
-    , 'FACILITY_NPI' as field_name
+    , 'FACILITY_ID' as field_name
     , case when term.npi is not null then 'valid'
           when m.facility_npi is not null then 'invalid'
           else 'null'
@@ -19,4 +19,4 @@ select
     , cast(facility_npi as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
-left outer join {{ ref('terminology__provider') }} as term on m.facility_npi = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.facility_npi = term.npi

@@ -1,7 +1,7 @@
 {{ config(
      enabled = (
          var('provider_attribution_enabled', False) == True and
-         var('claims_enabled', var('tuva_marts_enabled', False))
+         var('claims_enabled', False)
      ) | as_bool
    )
 }}
@@ -14,11 +14,7 @@
     , data_source
 {%- endset -%}
 
-{%- if var('use_synthetic_data') == true -%}
-  {%- set provider_attribution_relation = ref('provider_attribution_seed') -%}
-{%- else -%}
-  {%- set provider_attribution_relation = source('source_input', 'provider_attribution') -%}
-{%- endif -%}
+{%- set provider_attribution_relation = ref('raw_data__provider_attribution') -%}
 
 {%- if execute -%}
   {%- set provider_attribution_columns = adapter.get_columns_in_relation(provider_attribution_relation) -%}

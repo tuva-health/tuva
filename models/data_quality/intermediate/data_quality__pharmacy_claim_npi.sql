@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', False)) | as_bool
 )}}
 
 with pharmacy_claim as (
@@ -12,9 +12,9 @@ with pharmacy_claim as (
       , max(case when m.dispensing_provider_npi is null then 1 else 0 end) as missing_dispensing_npi
       , max(case when term2.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_dispensing_npi
     from {{ ref('input_layer__pharmacy_claim') }} as m
-    left join {{ ref('terminology__provider') }} as term
+    left join {{ ref('provider_data__provider') }} as term
       on m.prescribing_provider_npi = term.npi
-    left join {{ ref('terminology__provider') }} as term2
+    left join {{ ref('provider_data__provider') }} as term2
       on m.dispensing_provider_npi  = term2.npi
     group by
         m.claim_id

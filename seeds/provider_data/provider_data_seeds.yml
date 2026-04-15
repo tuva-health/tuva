@@ -1,0 +1,192 @@
+version: 2
+
+seeds:
+  - name: provider_data__other_provider_taxonomy
+    description: 'Seed containing other provider taxonomy codes and descriptions.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      tags:
+        - provider_data
+        - claims_preprocessing
+      alias: other_provider_taxonomy
+      column_types:
+        npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+        taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+        medicare_specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
+        primary_flag: integer
+    columns:
+      - name: npi
+        description: 'The National Provider Identifier (NPI).'
+      - name: taxonomy_code
+        description: 'The provider taxonomy code.'
+      - name: medicare_specialty_code
+        description: 'The Medicare specialty code.'
+      - name: description
+        description: 'Description of the provider taxonomy.'
+      - name: primary_flag
+        description: 'Indicates if this is the primary taxonomy (1) or not (0).'
+
+  - name: provider_data__provider
+    description: 'Seed containing provider information.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      tags:
+        - provider_data
+        - claims_preprocessing
+      alias: provider
+      column_types:
+        npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+        entity_type_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(26) {%- endif -%}
+        entity_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(37) {%- endif -%}
+        primary_taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+        primary_specialty_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+        provider_first_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_last_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_credential: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name_type_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        provider_other_organization_name_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        parent_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        practice_address_line_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        practice_address_line_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        practice_city: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+        practice_state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+        practice_zip_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+        mailing_telephone_number: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+        location_telephone_number: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+        official_telephone_number: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+        last_updated: date
+        deactivation_date: date
+        deactivation_flag: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+    columns:
+      - name: npi
+        description: 'The National Provider Identifier (NPI).'
+      - name: entity_type_code
+        description: 'The entity type code of the provider.'
+      - name: entity_type_description
+        description: 'The entity type description of the provider.'
+      - name: primary_taxonomy_code
+        description: 'The primary taxonomy code of the provider.'
+      - name: primary_specialty_description
+        description: 'The primary specialty description of the provider.'
+      - name: provider_first_name
+        description: 'The first name of the provider.'
+      - name: provider_last_name
+        description: 'The last name of the provider.'
+      - name: provider_credential
+        description: 'The credential of the provider.'
+      - name: provider_organization_name
+        description: 'The organization name of the provider.'
+      - name: provider_other_organization_name
+        description: 'Other organization name of the provider (for Type 2 NPI).'
+      - name: provider_other_organization_name_type_code
+        description: 'The type code for the other organization name of the provider.'
+      - name: provider_other_organization_name_type_description
+        description: 'The type description for the other organization name of the provider.'
+      - name: parent_organization_name
+        description: 'The parent organization name of the provider.'
+      - name: practice_address_line_1
+        description: 'The first line of the practice address.'
+      - name: practice_address_line_2
+        description: 'The second line of the practice address.'
+      - name: practice_city
+        description: 'The city of the practice address.'
+      - name: practice_state
+        description: 'The state of the practice address.'
+      - name: practice_zip_code
+        description: 'The ZIP code of the practice address.'
+      - name: mailing_telephone_number
+        description: 'Provider Business Mailing Address Telephone Number.'
+      - name: location_telephone_number
+        description: 'Provider Business Practice Location Address Telephone Number.'
+      - name: official_telephone_number
+        description: 'Authorized Official Telephone Number'
+      - name: last_updated
+        description: 'The date when the provider information was last updated.'
+      - name: deactivation_date
+        description: 'The date when the provider was deactivated.'
+      - name: deactivation_flag
+        description: 'Flag indicating if the provider is deactivated.'
+
+  - name: provider_data__medicare_provider_and_supplier_taxonomy_crosswalk
+    description: |
+      A source for crosswalk CMS provider specialty codes with NPPES taxonomy codes. Source can be found here: 
+      https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      alias: medicare_provider_and_supplier_taxonomy_crosswalk
+      tags:
+        - provider_data
+      column_types:
+        medicare_specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
+        medicare_provider_supplier_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        provider_taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        provider_taxonomy_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+
+  - name: provider_data__provider_taxonomy_unpivot
+    description: |
+      Provider taxonomy codes from NPPES.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      alias: provider_taxonomy_unpivot
+      tags:
+        - provider_data
+      column_types:
+        npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%} 
+        taxonomy_col: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        switch_col: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        taxonomy_switch: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+      meta:
+        columns:
+          - name: npi
+            description: 'The National Provider Identifier (NPI).'
+          - name: taxonomy_col
+            description: 'The taxonomy column identifier.'
+          - name: taxonomy_code
+            description: 'The provider taxonomy code.'
+          - name: switch_col
+            description: 'The switch column identifier.'
+          - name: taxonomy_switch
+            description: 'The taxonomy switch value.'

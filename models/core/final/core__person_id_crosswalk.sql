@@ -1,10 +1,10 @@
 {{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', var('clinical_enabled', False))
  | as_bool
    )
 }}
 
-{% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -26,7 +26,7 @@ select distinct
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('input_layer__patient') }}
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -38,7 +38,7 @@ select distinct
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('input_layer__patient') }}
 
-{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id

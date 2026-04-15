@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "parse_ci_command.py"
+MODULE_PATH = pathlib.Path(__file__).resolve().with_name("parse_ci_command.py")
 SPEC = importlib.util.spec_from_file_location("parse_ci_command", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
@@ -47,6 +47,11 @@ class ParseCiCommandTests(unittest.TestCase):
         self.assertEqual(parsed.targets, ["bigquery", "fabric"])
         self.assertEqual(validated.subcommand, "build")
         self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
+        self.assertEqual(
+            validated.command_tokens,
+            ["dbt", "build", "--select", "tag:tuva_demo"],
+        )
 
     def test_multiple_selector_values_are_allowed(self):
         validated = MODULE.validate_dbt_command(
@@ -55,8 +60,16 @@ class ParseCiCommandTests(unittest.TestCase):
 
         self.assertEqual(
             validated.command_tokens,
-            ["dbt", "build", "--select", "input_layer__eligibility", "tag:tuva_demo"],
+            [
+                "dbt",
+                "build",
+                "--select",
+                "input_layer__eligibility",
+                "tag:tuva_demo",
+            ],
         )
+        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
 
     def test_invalid_warehouse_is_rejected(self):
         with self.assertRaises(MODULE.ValidationError):
@@ -78,6 +91,13 @@ class ParseCiCommandTests(unittest.TestCase):
         validated = MODULE.validate_dbt_command(parsed.command_tokens)
 
         MODULE._authorize_request("COLLABORATOR", parsed, validated)
+
+    def test_build_full_refresh_still_refreshes_seeds(self):
+        validated = MODULE.validate_dbt_command(["dbt", "build", "--full-refresh"])
+
+        self.assertEqual(validated.command_tokens, ["dbt", "build", "--full-refresh"])
+        self.assertFalse(validated.requires_seed_baseline)
+        self.assertTrue(validated.refreshes_seeds)
 
 
 if __name__ == "__main__":
