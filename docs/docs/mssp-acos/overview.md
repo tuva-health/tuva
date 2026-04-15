@@ -24,14 +24,6 @@ These components work together sequentially to load raw CMS data into the Tuva P
 | [Medicare CCLF Connector](medicare-cclf-connector) | dbt project | Transforms CMS Comprehensive Claims and Line Feed (CCLF) files into the Tuva Input Layer and combines with ALR data, then runs the Tuva dbt project to create enriched claims datamarts |
 | [CMS ACO Dashboards](cms-aco-dashboards) | Power BI Dashboard | Suite of dashboards that allow a MSSP ACO to understand their attributed population, cost & utilzation, and risk adjustment / quality measure performance |
 
-### Standalone Tools
-
-| Component | Type | Purpose |
-|---|---|---|
-| [CMS Benchmark App](cms-benchmark-app) | Web app | Calculates projected ACO savings against the CMS Minimum Savings Rate (MSR) using CMS-provided Excel reports |
-
-The CMS Benchmark App operates independently — it takes Excel files downloaded directly from the CMS portal and requires no data warehouse or other pipeline components.
-
 ## Claims Analytics Data Flow
 
 The pipeline components run in the following order:
@@ -50,17 +42,6 @@ CCLF + enrollment to Tuva Input Layer`"]
     E --> F["`**Tuva Project**
 Core Data Model + Data Marts`"]
     F --> G["`**ACO Dashboards**`"]
-```
-
-## Benchmark Savings Calculation
-
-The CMS Benchmark App is a separate, standalone tool. It takes three CMS Excel report files (BNMRK, BY3 EXPU, latest QEXPU) uploaded directly through a web interface and calculates projected savings vs. the MSR — no data warehouse required.
-
-```mermaid
-flowchart TD
-    A["`**CMS Portal**
-Excel reports (Benchmarks + EXPUs)`"] --> B["`**cms_benchmark_app_v2**
-Upload 3 Excel files for projected savings vs. MSR`"]
 ```
 
 ## What CMS Data Is Involved
