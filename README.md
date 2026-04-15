@@ -1,109 +1,100 @@
-[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.9.x&color=orange)
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.10%2B&color=orange)
 
-![diagram](./the-tuva-project-3.jpg)
+![Tuva Project Overview](./docs/static/img/tuva_project_overview_from_downloads.jpg)
 
 ## What is the Tuva Project?
-The Tuva Project is a collection of tools for transforming raw healthcare data into analytics-ready data.  The main Tuva package (i.e. this repo) is a dbt package that includes the following components:
+
+The Tuva Project is a dbt package for transforming raw healthcare data into analytics-ready data. The package includes:
+
 - Input Layer
 - Claims Preprocessing
 - Core Data Model
 - Data Marts
-- Terminology & Value Sets
+- Terminology and Value Sets
 
-Detailed documentation of this package and related tools, including data dictionaries, can be found at www.thetuvaproject.com.
+## Docs
+
+- [Getting Started](https://www.thetuvaproject.com/getting-started)
+- [dbt Variables](https://www.thetuvaproject.com/dbt-variables)
+- [Full Documentation](https://www.thetuvaproject.com/)
+
+The docs source for the getting-started runbook lives in [docs/docs/getting-started.md](./docs/docs/getting-started.md).
+
+## Local Development
+
+Recommended local setup:
+
+- Python 3.10 or later
+- DuckDB
+- `dbt-core` and `dbt-duckdb`
+
+Use `integration_tests` as your development project. Configure a DuckDB connection in `profiles.yml`, then run from the repo root:
+
+```bash
+./scripts/dbt-local deps
+./scripts/dbt-local build --full-refresh
+```
+
+`dbt seed` and `dbt build` load synthetic data into `raw_data` from versioned S3 artifacts. `dbt run` assumes those relations already exist, so on a fresh database you should run `seed` or `build` first.
+
+Once the synthetic data is loaded, iterate with:
+
+```bash
+./scripts/dbt-local run
+```
 
 ## Agentic Workflow
 
-We are increasingly using agents to use and further develop this package. You can find context for agents in [AGENTS.md](AGENTS.md).
-
-## Contributing
-
-This is the recommended setup for development:
-- Python 3.10 or later
-- duckdb
-- dbt (dbt-core and dbt-duckdb)
-
-Connect duckdb and dbt via your profile.yml.
-
-Use tuva/integration_tests as your development project.  Configure the dbt_project.yml in this folder to connect to duckdb.
-
-Run the package from integration_tests.  This will:
-- Load package seed payloads from versioned S3 artifacts
-- Build the entire pipeline in your duckdb instance
-
-From there we recommend iterating with your preferred coding agent using [AGENTS.md](AGENTS.md).
-
-Hello and welcome! Thank you so much for taking the time to contribute to the Tuva Project. People like you are helping to build a community of healthcare data practitioners that shares knowledge and tools. Whether it’s fixing a bug, submitting an idea, updating the docs, or sharing your healthcare knowledge, you can make an impact!
-
-In this guide, you will get an overview of the contribution workflow, from how to contribute, setting up your development environment, testing, and creating a pull request.
+If you are using coding agents in this repo, the local workflow guidance lives in [AGENTS.md](AGENTS.md).
 
 ## dbt Variables
 
-Tuva uses dbt variables (`var()`) to control which parts of the pipeline are enabled and to configure runtime behavior. Set these in your `dbt_project.yml` under the `vars:` key.
+Set Tuva vars under the `vars:` key in your `dbt_project.yml`. Use dbt selectors to run individual marts; the vars below control broad data domains, shared runtime behavior, and the synthetic bootstrap flow used by `integration_tests`.
 
-### Data Source Enablement
+### Broad Enablement
 
-These variables control which input data types are active. Setting a group-level variable enables all marts in that group; individual mart variables override the group setting.
+| Variable | Root Default | `integration_tests` Default | Description |
+|----------|--------------|-----------------------------|-------------|
+| `claims_enabled` | `false` | `true` | Enable claims-based models. |
+| `clinical_enabled` | `false` | `true` | Enable clinical-based models. |
+| `provider_attribution_enabled` | `false` | `true` | Enable provider attribution models. Claims input must also be enabled. |
+| `semantic_layer_enabled` | `false` | `true` | Enable semantic-layer models. Claims-dependent semantic models also require `claims_enabled`. |
+| `fhir_preprocessing_enabled` | `false` | `false` | Enable FHIR preprocessing models. |
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `claims_enabled` | `false` | Enable all claims-based marts |
-| `clinical_enabled` | `false` | Enable all clinical-based marts |
-| `tuva_marts_enabled` | `false` | Enable all marts (claims + clinical). Overridden by the more specific variables above. |
-
-### Individual Mart Enablement
-
-Each mart can be independently enabled or disabled. When not set, these inherit from `claims_enabled`, `clinical_enabled`, or `tuva_marts_enabled`.
+### Shared Runtime Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `claims_preprocessing_enabled` | Inherits | Claims preprocessing (encounters, service categories, normalized input) |
-| `ccsr_enabled` | Inherits | Clinical Classifications Software Refined (CCSR) |
-| `cms_chronic_conditions_enabled` | Inherits | CMS Chronic Conditions |
-| `tuva_chronic_conditions_enabled` | Inherits | Tuva Chronic Conditions |
-| `cms_hcc_enabled` | Inherits | CMS-HCC Risk Adjustment |
-| `ed_classification_enabled` | Inherits | ED Classification |
-| `financial_pmpm_enabled` | Inherits | Financial PMPM |
-| `hcc_suspecting_enabled` | `false` | HCC Suspecting |
-| `hcc_recapture_enabled` | `false` | HCC Recapture |
-| `quality_measures_enabled` | Inherits | Quality Measures (HEDIS/CQM) |
-| `readmissions_enabled` | Inherits | Readmissions |
-| `fhir_preprocessing_enabled` | `false` | FHIR Preprocessing |
-| `pqi_enabled` | Inherits | AHRQ Prevention Quality Indicators |
-| `provider_attribution_enabled` | Inherits | Provider Attribution |
-| `semantic_layer_enabled` | Inherits | Semantic Layer |
-| `brand_generic_enabled` | Inherits | Brand/Generic pharmacy analysis |
+| `tuva_last_run` | Current UTC timestamp | Populates the `tuva_last_run` column in output models. |
+| `tuva_schema_prefix` | unset | Prefixes output schemas, for example `myprefix_core`. |
+| `cms_hcc_payment_year` | Current year | CMS-HCC payment year used for risk scoring. |
+| `quality_measures_period_end` | Current year-end | Optional reporting-period end date for quality measures. |
+| `record_type` | `"ip"` | CCSR record type: `"ip"` for inpatient or `"op"` for outpatient. |
+| `dxccsr_version` | `"2023.1"` | CCSR diagnosis mapping version. |
+| `prccsr_version` | `"2023.1"` | CCSR procedure mapping version. |
+| `provider_attribution_as_of_date` | unset | Optional `YYYY-MM-DD` override for provider attribution current-state calculations. |
 
-### Runtime Configuration
+### Seed And Feature Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `tuva_last_run` | Current UTC timestamp | Populates the `tuva_last_run` column in all output models. Automatically set to the dbt run start time. |
-| `cms_hcc_payment_year` | Current year | The CMS-HCC payment year for risk score calculation. |
-| `quality_measures_period_end` | Current year-end | End date of the quality measures reporting period. |
-| `record_type` | `"ip"` | CCSR record type: `"ip"` for inpatient, `"op"` for outpatient. |
-| `dxccsr_version` | `"’2023.1’"` | CCSR diagnosis mapping version. |
-| `prccsr_version` | `"’2023.1’"` | CCSR procedure mapping version. |
+| `custom_bucket_name` | `"tuva-public-resources"` | Default bucket for versioned Tuva seed artifacts. |
+| `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
+| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.0.0", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
+| `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
+| `synthetic_data_size` | `small` in `integration_tests` | Selects the `small` or `large` synthetic input payload when running `integration_tests`. |
+| `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
+| `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |
+| `enable_normalize_engine` | `false` | Set to `unmapped` to surface unmapped code models, or `true` to also use custom mappings. |
 
-### Infrastructure & Schema
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `tuva_schema_prefix` | `None` | When set, all Tuva output schemas are prefixed with this value (e.g., `myprefix_core`). |
-| `custom_bucket_name` | `"tuva-public-resources"` | Default S3 bucket for versioned seed data. Used for any database without an explicit override. |
-| `tuva_seed_version` | `"0.18.0"` | Versioned S3 folder used for package seed payloads. Leading `v` is optional. |
-| `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
-| `enable_input_layer_testing` | `true` | Run DQI data quality tests on the input layer. |
-| `enable_legacy_data_quality` | `false` | Build legacy (pre-DQI) data quality models. |
-| `enable_normalize_engine` | `false` | Enable the normalize engine for custom code mapping. Set to `"unmapped"` to list unmapped codes, or `true` to also integrate custom mappings. |
-| `provider_attribution_as_of_date` | None | Reference date for provider attribution calculations. |
+See the maintained docs reference at [thetuvaproject.com/dbt-variables](https://www.thetuvaproject.com/dbt-variables) for examples and more detail.
 
 ## Publishing Versioned Seed Artifacts
 
 Use `scripts/publish-dolthub-seeds` to publish the latest public DoltHub databases to versioned S3 folders.
 
 Required inputs:
-- `--version v0.18.0`
+- `--version v1.0.0`
 - AWS CLI credentials via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
 Optional inputs:
@@ -127,10 +118,14 @@ Required access:
 Example:
 
 ```bash
-scripts/mirror-seed-release --version v0.18.0
+scripts/mirror-seed-release --version v1.0.0
 ```
 
 The script mirrors:
 - `s3://tuva-public-resources/<database-folder>/<version>/...`
 - `gs://tuva-public-resources/<database-folder>/<version>/...`
 - `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`
+
+Current published defaults:
+- `concept-library` uses `1.0.1`
+- `reference-data`, `terminology`, `value-sets`, `provider-data`, and `synthetic-data` use `1.0.0`

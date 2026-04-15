@@ -157,9 +157,9 @@ and
 hcpc.paid_order = 1
 left outer join patient as e
   on d.patient_data_source_id = e.patient_data_source_id
-left outer join {{ ref('terminology__provider') }} as b
+left outer join {{ ref('provider_data__provider') }} as b
   on hf.facility_npi = b.npi
-left outer join {{ ref('terminology__provider') }} as b2
+left outer join {{ ref('provider_data__provider') }} as b2
   on phy.billing_npi = b2.npi
 left outer join {{ ref('terminology__icd_10_cm') }} as icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm

@@ -1,10 +1,11 @@
 version: 2
 models:
   - name: input_layer__location
-    description: |
-      The location table contains information on actual practice and facility locations 
-      where patients receive medical care.
-    mapping_instructions: ''
+    description: >-
+      The location table contains information about the practice and facility
+      locations where patients receive medical care.
+    grain: Intended to be one record per location per data source.
+    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -13,7 +14,7 @@ models:
     columns:
       - name: location_id
         description: Unique identifier for each location.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -70,7 +71,7 @@ models:
             is_primary_key: true
       - name: npi
         description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -93,7 +94,7 @@ models:
             data_type: varchar
       - name: name
         description: The name of the location.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -116,7 +117,7 @@ models:
             data_type: varchar
       - name: facility_type
         description: The type of facility e.g. acute care hospital.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -139,7 +140,7 @@ models:
             data_type: varchar
       - name: parent_organization
         description: The parent organization associated with the facility.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -162,7 +163,7 @@ models:
             data_type: varchar
       - name: address
         description: The street address of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -185,7 +186,7 @@ models:
             data_type: varchar
       - name: city
         description: The city of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -208,7 +209,7 @@ models:
             data_type: varchar
       - name: state
         description: The state of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -231,7 +232,7 @@ models:
             data_type: varchar
       - name: zip_code
         description: The zip code of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -254,7 +255,7 @@ models:
             data_type: varchar
       - name: latitude
         description: The latitude of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -277,7 +278,7 @@ models:
             data_type: float
       - name: longitude
         description: The longitude of the record (e.g., facility location, patient, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -300,7 +301,7 @@ models:
             data_type: float
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:

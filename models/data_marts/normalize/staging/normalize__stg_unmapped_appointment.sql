@@ -1,6 +1,6 @@
 {{ config(
      enabled = ( ( var('enable_normalize_engine', False) == True  or  var('enable_normalize_engine', False) == "unmapped") and
-                   var('clinical_enabled', var('tuva_marts_enabled', False))
+                   var('clinical_enabled', False)
                ) | as_bool
    )
 }}
@@ -15,11 +15,11 @@ with appointments as (
 
     select distinct
           'appointment_type' as source_code_type
-        , source_appointment_type_code as source_code
-        , source_appointment_type_description as source_description
+        , type_code as source_code
+        , type_description as source_description
         , 'appointment_type' as normalized_code_type
-        , normalized_appointment_type_code as normalized_code
-        , normalized_appointment_type_description as normalized_description
+        , type_code_norm as normalized_code
+        , type_description_norm as normalized_description
         , data_source
     from appointments
 
@@ -29,25 +29,11 @@ with appointments as (
 
     select distinct
           'appointment_status' as source_code_type
-        , source_status as source_code
-        , source_status as source_description
+        , status_code as source_code
+        , status_description as source_description
         , 'appointment_status' as normalized_code_type
-        , normalized_status as normalized_code
-        , normalized_status as normalized_description
-        , data_source
-    from appointments
-
-)
-
-, reason_code as (
-
-    select distinct
-          source_reason_code_type as source_code_type
-        , source_reason_code as source_code
-        , source_reason_description as source_description
-        , normalized_reason_code_type as normalized_code_type
-        , normalized_reason_code as normalized_code
-        , normalized_reason_description as normalized_description
+        , status_code_norm as normalized_code
+        , status_description_norm as normalized_description
         , data_source
     from appointments
 
@@ -56,12 +42,12 @@ with appointments as (
 , appointment_cancellation_reason as (
 
     select distinct
-          source_cancellation_reason_code_type as source_code_type
-        , source_cancellation_reason_code as source_code
-        , source_cancellation_reason_description as source_description
-        , normalized_cancellation_reason_code_type as normalized_code_type
-        , normalized_cancellation_reason_code as normalized_code
-        , normalized_cancellation_reason_description as normalized_description
+          'appointment_cancellation_reason' as source_code_type
+        , cancellation_reason as source_code
+        , cancellation_reason as source_description
+        , 'appointment_cancellation_reason' as normalized_code_type
+        , cancellation_reason_code_norm as normalized_code
+        , cancellation_reason_description_norm as normalized_description
         , data_source
     from appointments
 
@@ -72,8 +58,6 @@ with appointments as (
     select * from appointment_type
     union all
     select * from appointment_status
-    union all
-    select * from reason_code
     union all
     select * from appointment_cancellation_reason
 

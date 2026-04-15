@@ -6,7 +6,7 @@ title: "Provider"
 import { JsonDataTable } from '@site/src/components/JsonDataTable';
 import { JsonDataTableNoTerm } from '@site/src/components/JsonDataTableNoTerm';
 
-<JsonDataTableNoTerm  jsonPath="nodes.seed\.the_tuva_project\.terminology__provider.columns" />
+<JsonDataTableNoTerm  jsonPath="nodes.seed\.the_tuva_project\.provider_data__provider.columns" />
 
 <a href="https://tuva-public-resources.s3.amazonaws.com/versioned_provider_data/latest/provider_compressed.csv.gz">Download CSV</a>
 
@@ -42,5 +42,5 @@ You should have exported the seed to an S3 bucket by now
 **The below steps are only required if the headers of the file need to be changed. The Tuva Project does not store the contents of the terminology file in GitHub.**
 
 1. Create a branch in [The Tuva Project](https://github.com/tuva-health/tuva)
-2. Copy and paste the updated header into the [Provider file](https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__provider.csv)
+2. Copy and paste the updated header into the [Provider file](https://github.com/tuva-health/tuva/blob/main/seeds/provider_data/provider_data__provider.csv)
 3. Submit a pull request

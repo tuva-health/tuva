@@ -2,12 +2,21 @@ version: 2
 models:
   - name: core__appointment
     description: |
-      The core appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed,  or scheduled events.
+      The core appointment table contains normalized information related to appointments at a healthcare facility. This table may include canceled, completed, or scheduled appointments.
+    grain: One record per appointment per patient.
+    transformation_steps: |-
+      This model transforms the input layer by:
+      1. Casting every appointment field to its core data type
+      2. Left joining appointment type, appointment status, and appointment cancellation reason terminology tables to populate the _norm columns
+      3. Pulling through extension columns from input_layer__appointment
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: appointment
+      meta:
+        dag:
+          node_type: output
       tags: core
       materialized: table
     columns:
@@ -38,30 +47,6 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_appointment_type_code
-        description: Appointment type code from the source.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: source_appointment_type_description
-        description: Appointment type description from the source.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: normalized_appointment_type_code
-        description: Normalized appointment type code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: normalized_appointment_type_description
-        description: Normalized appointment type description.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
       - name: start_datetime
         description: The start date/time of the appointment or service.
         config:
@@ -73,75 +58,74 @@ models:
           meta:
             data_type: timestamp
       - name: duration
-        description: Number of minutes that the appointment or service is to take.
+        description: Number of minutes the appointment is expected to take.
         config:
           meta:
             data_type: number
       - name: location_id
-        description: Unique identifier for each location.
+        description: Unique identifier for the location where the appointment is scheduled.
         config:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner associated with the appointment.
         config:
           meta:
             data_type: varchar
-      - name: source_status
-        description: Status of the appointment from the source system.
+      - name: type_code
+        description: Appointment type code from the source.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_description
+        description: Appointment type description from the source.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_code_norm
+        description: Normalized appointment type code derived downstream from the source
+          appointment type.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: type_description_norm
+        description: Normalized appointment type description derived downstream from the
+          source appointment type.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-type
+            data_type: varchar
+      - name: status_code
+        description: Status code of the appointment from the source system.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
-      - name: normalized_status
-        description: The normalized status of the appointment.
+      - name: status_description
+        description: Human-readable description of the appointment status from the
+          source system.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
-      - name: appointment_specialty
-        description: Specialty of a practitioner that would be required to perform the service requested in this appointment.
+      - name: status_code_norm
+        description: Normalized status code derived downstream from the source status.
         config:
           meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-status
+            data_type: varchar
+      - name: status_description_norm
+        description: Normalized appointment status description derived downstream from
+          the source status.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
       - name: reason
         description: Free text reason for the appointment or service.
-        config:
-          meta:
-            data_type: varchar
-      - name: source_reason_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: source_reason_code
-        description: The code in the source system for the appointment reason (e.g., ICD-10 code).
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-            data_type: varchar
-      - name: source_reason_description
-        description: Description of the source code for the appointment reason in the source system (e.g., ICD-10 description).
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_reason_code_type
-        description: The normalized type of code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: normalized_reason_code
-        description: The normalized code for the appointment reason (e.g., ICD-10 code).
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-            data_type: varchar
-      - name: normalized_reason_description
-        description: Normalized description of the code for the appointment reason (e.g., ICD-10 description).
         config:
           meta:
             data_type: varchar
@@ -150,46 +134,17 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_cancellation_reason_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: source_cancellation_reason_code
-        description: The code in the source system for the cancellation reason.
+      - name: cancellation_reason_code_norm
+        description: Normalized code for the appointment cancellation reason.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
             data_type: varchar
-      - name: source_cancellation_reason_description
-        description: Description of the source code for the cancellation reason in the source system.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: normalized_cancellation_reason_code_type
-        description: The normalized type of code.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
-            data_type: varchar
-      - name: normalized_cancellation_reason_code
-        description: The normalized code for the cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: normalized_cancellation_reason_description
+      - name: cancellation_reason_description_norm
         description: Normalized description of the code for the cancellation reason.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
-        config:
-          meta:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
@@ -197,7 +152,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -229,7 +186,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -244,7 +203,8 @@ models:
           meta:
             data_type: varchar
       - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        description: Unique identifier for a claim. Each claim represents a distinct
+          healthcare service or set of services provided to a patient.
         config:
           meta:
             data_type: varchar
@@ -274,7 +234,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -284,7 +245,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
@@ -302,7 +265,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
@@ -310,12 +275,24 @@ models:
           meta:
             data_type: varchar
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
       - name: condition_rank
-        description: The numerical ranking of the condition. For conditions derived from medical claims, condition_rank is set from the diagnosis code position on the claim, so diagnosis_code_1 becomes condition_rank = 1, diagnosis_code_2 becomes condition_rank = 2, and so on through diagnosis_code_25. For conditions sourced from the input layer condition table, this field is passed through without transformation from the mapped input value. A condition_rank of 1 indicates a primary diagnosis code, and any condition_rank greater than 1 indicates a secondary diagnosis code.
+        description: The numerical ranking of the condition. For conditions derived from
+          medical claims, condition_rank is set from the diagnosis code position
+          on the claim, so diagnosis_code_1 becomes condition_rank = 1,
+          diagnosis_code_2 becomes condition_rank = 2, and so on through
+          diagnosis_code_25. For conditions sourced from the input layer
+          condition table, this field is passed through without transformation
+          from the mapped input value. A condition_rank of 1 indicates a primary
+          diagnosis code, and any condition_rank greater than 1 indicates a
+          secondary diagnosis code.
         data_type: integer
         config:
           meta:
@@ -337,7 +314,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -373,12 +352,15 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
       - name: subscriber_id
-        description: Identifier that links a patient to a particular insurance product or health plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan.
         config:
           meta:
             data_type: varchar
@@ -425,7 +407,8 @@ models:
             terminology: https://thetuvaproject.com/terminology/medicare-orec
             data_type: varchar
       - name: dual_status_code
-        description: Indicates whether the patient is dually eligible for Medicare and Medicaid.
+        description: Indicates whether the patient is dually eligible for Medicare and
+          Medicaid.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/medicare-dual-eligibility
@@ -438,7 +421,10 @@ models:
             data_type: varchar
       - name: enrollment_status
         description: >
-          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
+          Indicates the type of enrollment status for a beneficiary. Used for
+          determining risk score coefficients. If unsure of the enrollment
+          status,  leave this field null so Tuva can determine the enrollment
+          status based on the beneficiary information.
         config:
           meta:
             data_type: varchar
@@ -455,27 +441,29 @@ models:
             data_type: varchar
       - name: medicaid_indicator
         description: >
-          Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS NEMCAID field.
-          Used for New Enrollee risk score calculations when dual_status_code is insufficient.
+          Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS
+          NEMCAID field. Used for New Enrollee risk score calculations when
+          dual_status_code is insufficient.
         config:
           meta:
             data_type: integer
       - name: long_term_institutional_flag
-        description: Whether the patient is in an institutional setting for longer than 30 days.
+        description: Whether the patient is in an institutional setting for longer than
+          30 days.
         config:
           meta:
             data_type: integer
       - name: part_d_raf_type
         description: >
-          Part D Risk Adjustment Factor type (CE, NE, PE, NP).
-          Null when no Part D coverage.
+          Part D Risk Adjustment Factor type (CE, NE, PE, NP). Null when no Part
+          D coverage.
         config:
           meta:
             data_type: varchar
       - name: low_income_subsidy_indicator
         description: >
-          Low Income Subsidy (Extra Help) flag (Y/N).
-          Null when no Part D coverage.
+          Low Income Subsidy (Extra Help) flag (Y/N). Null when no Part D
+          coverage.
         config:
           meta:
             data_type: varchar
@@ -493,7 +481,8 @@ models:
             data_type: integer
       - name: enrollment_duration_months
         description: >
-          Number of months covered during the benefit year (1-12). Null when non-ACA.
+          Number of months covered during the benefit year (1-12). Null when
+          non-ACA.
         config:
           meta:
             data_type: integer
@@ -510,7 +499,8 @@ models:
           meta:
             data_type: integer
       - name: fips_state_code
-        description: FIPS code for the state the patient lives in (most recent known address).
+        description: FIPS code for the state the patient lives in (most recent known
+          address).
         config:
           meta:
             data_type: varchar
@@ -520,12 +510,14 @@ models:
           meta:
             data_type: varchar
       - name: fips_state_abbreviation
-        description: Abbreviated form of the state for the patient (most recient known address).
+        description: Abbreviated form of the state for the patient (most recient known
+          address).
         config:
           meta:
             data_type: varchar
       - name: subscriber_relation
-        description: The patient's relationship to the subscriber (e.g., self, spouse, child).
+        description: The patient's relationship to the subscriber (e.g., self, spouse,
+          child).
         config:
           meta:
             data_type: varchar
@@ -535,7 +527,8 @@ models:
           meta:
             data_type: varchar
       - name: group_name
-        description: The group name under which multiple members are enrolled for health coverage.
+        description: The group name under which multiple members are enrolled for health
+          coverage.
         config:
           meta:
             data_type: varchar
@@ -547,17 +540,21 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: The date associated with the claims file, typically reflecting the reporting period of the claims data.
+        description: The date associated with the claims file, typically reflecting the
+          reporting period of the claims data.
         config:
           meta:
             data_type: timestamp
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        description: The date and time the source file was ingested into the data
+          warehouse or landed in cloud storage.
         config:
           meta:
             data_type: timestamp
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: varchar
@@ -575,7 +572,8 @@ models:
       materialized: table
     columns:
       - name: _dbt_source_relation
-        description: dbt utils metadata column to indicate the source table from unioning tables together.
+        description: dbt utils metadata column to indicate the source table from
+          unioning tables together.
         config:
           meta:
             data_type: varchar
@@ -596,13 +594,15 @@ models:
       - name: patient_data_source_id
         description: Identifier for the source system from which patient data originated.
       - name: encounter_type
-        description: Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
+        description: Indicates the type of encounter e.g. acute inpatient, emergency
+          department, etc.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/encounter-type
             data_type: varchar
       - name: encounter_group
-        description: Categorization of the encounter into groups based on predefined criteria.
+        description: Categorization of the encounter into groups based on predefined
+          criteria.
         config:
           meta:
             data_type: varchar
@@ -617,12 +617,14 @@ models:
           meta:
             data_type: date
       - name: length_of_stay
-        description: Length of the encounter calculated as encounter_end_date - encounter_start_date.
+        description: Length of the encounter calculated as encounter_end_date -
+          encounter_start_date.
         config:
           meta:
             data_type: number
       - name: admit_source_code
-        description: Indicates where the patient was before the healthcare encounter (inpatient claims only).
+        description: Indicates where the patient was before the healthcare encounter
+          (inpatient claims only).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/admit-source
@@ -644,7 +646,8 @@ models:
           meta:
             data_type: varchar
       - name: discharge_disposition_code
-        description: Indicates the type of setting the patient was discharged to (institutional inpatient claims only).
+        description: Indicates the type of setting the patient was discharged to
+          (institutional inpatient claims only).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/discharge-disposition
@@ -665,7 +668,8 @@ models:
           meta:
             data_type: varchar
       - name: facility_npi
-        description: Facility NPI for the claim (the organizational NPI of the facility where services were performed).
+        description: Facility NPI for the claim (the organizational NPI of the facility
+          where services were performed).
         config:
           meta:
             data_type: varchar
@@ -680,37 +684,44 @@ models:
           meta:
             data_type: varchar
       - name: observation_flag
-        description: Indicates whether the encounter was marked as an observation stay (1 for yes, 0 for no).
+        description: Indicates whether the encounter was marked as an observation stay
+          (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: lab_flag
-        description: Indicates whether lab services were utilized during the encounter (1 for yes, 0 for no).
+        description: Indicates whether lab services were utilized during the encounter
+          (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: dme_flag
-        description: Indicates whether durable medical equipment (DME) was used during the encounter (1 for yes, 0 for no).
+        description: Indicates whether durable medical equipment (DME) was used during
+          the encounter (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: ambulance_flag
-        description: Indicates whether ambulance services were utilized during the encounter (1 for yes, 0 for no).
+        description: Indicates whether ambulance services were utilized during the
+          encounter (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: pharmacy_flag
-        description: Indicates whether pharmacy services were utilized during the encounter (1 for yes, 0 for no).
+        description: Indicates whether pharmacy services were utilized during the
+          encounter (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: ed_flag
-        description: Indicates whether the encounter involved an emergency department visit (1 for yes, 0 for no).
+        description: Indicates whether the encounter involved an emergency department
+          visit (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: delivery_flag
-        description: Indicates whether the encounter involved a delivery (1 for yes, 0 for no).
+        description: Indicates whether the encounter involved a delivery (1 for yes, 0
+          for no).
         config:
           meta:
             data_type: number
@@ -720,32 +731,39 @@ models:
           meta:
             data_type: varchar
       - name: newborn_flag
-        description: Indicates whether the encounter was for a newborn (1 for yes, 0 for no).
+        description: Indicates whether the encounter was for a newborn (1 for yes, 0 for
+          no).
         config:
           meta:
             data_type: number
       - name: nicu_flag
-        description: Indicates whether the newborn was admitted to the Neonatal Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).
+        description: Indicates whether the newborn was admitted to the Neonatal
+          Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).
         config:
           meta:
             data_type: number
       - name: snf_part_b_flag
-        description: Indicates whether the inpatient medical service for Medicare covers under Part B or not. (1 for yes and 0 for no)
+        description: Indicates whether the inpatient medical service for Medicare covers
+          under Part B or not. (1 for yes and 0 for no)
         config:
           meta:
             data_type: number
       - name: primary_diagnosis_code_type
-        description: The type of condition code reported in the source system e.g. ICD-10-CM.
+        description: The type of condition code reported in the source system e.g.
+          ICD-10-CM.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: primary_diagnosis_code
-        description: Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.
+        description: Primary diagnosis code for the encounter. If from claims the
+          primary diagnosis code comes from the institutional claim.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
@@ -773,12 +791,14 @@ models:
           meta:
             data_type: number
       - name: allowed_amount
-        description: The total amount allowed (includes amount paid by the insurer and patient).
+        description: The total amount allowed (includes amount paid by the insurer and
+          patient).
         config:
           meta:
             data_type: number
       - name: charge_amount
-        description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.
+        description: The total amount charged for the services provided, before any
+          adjustments or payments. This is typically in US dollars.
         config:
           meta:
             data_type: number
@@ -821,7 +841,8 @@ models:
           meta:
             data_type: varchar
       - name: encounter_source_type
-        description: Indicates whether the encounter is from a claims or clinical data source
+        description: Indicates whether the encounter is from a claims or clinical data
+          source
         config:
           meta:
             data_type: varchar
@@ -836,7 +857,8 @@ models:
           meta:
             data_type: varchar
       - name: facility_npi
-        description: Facility NPI for the claim (the organizational NPI of the facility where services were performed).
+        description: Facility NPI for the claim (the organizational NPI of the facility
+          where services were performed).
         config:
           meta:
             data_type: varchar
@@ -851,7 +873,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -894,7 +918,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -904,7 +929,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/cvx
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
@@ -922,7 +949,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/cvx
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
@@ -930,7 +959,11 @@ models:
           meta:
             data_type: varchar
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -940,7 +973,8 @@ models:
           meta:
             data_type: varchar
       - name: status_reason
-        description: Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
+        description: Indicates reason the event was not performed. (e.g., condition,
+          test, immunization etc).
         config:
           meta:
             data_type: varchar
@@ -980,7 +1014,8 @@ models:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner on record (e.g., ordered
+          medication, performed the procedure, etc).
         config:
           meta:
             data_type: varchar
@@ -990,7 +1025,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -1037,7 +1074,8 @@ models:
           meta:
             data_type: varchar
       - name: source_order_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -1047,7 +1085,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: source_order_description
         description: Description of the source code in the source system.
@@ -1055,16 +1095,20 @@ models:
           meta:
             data_type: varchar
       - name: source_component_type
-        description: The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code for the component reported in the source system
+          (e.g., ICD-10 code, NDC, lab, etc)
         config:
           meta:
             data_type: varchar
       - name: source_component_code
-        description: The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+        description: The code for the component in the source system (e.g., the ICD-10
+          code, NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: source_component_description
         description: Description of the source code for the component in the source system.
@@ -1082,7 +1126,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: normalized_order_description
         description: Normalized description of the code.
@@ -1090,7 +1136,11 @@ models:
           meta:
             data_type: varchar
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -1104,7 +1154,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: normalized_component_description
         description: Normalized description of the code for the component.
@@ -1181,7 +1233,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
@@ -1189,7 +1243,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -1214,11 +1270,14 @@ models:
           meta:
             data_type: varchar
       - name: npi
-        description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
+        description: The national provider identifier associated with the record e.g.
+          facility_npi, provider_npi
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: name
         description: The name of the location.
@@ -1236,7 +1295,8 @@ models:
           meta:
             data_type: varchar
       - name: address
-        description: The street address of the record (e.g., facility location, patient, etc).
+        description: The street address of the record (e.g., facility location, patient,
+          etc).
         config:
           meta:
             data_type: varchar
@@ -1271,7 +1331,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -1297,7 +1359,8 @@ models:
           meta:
             data_type: varchar
       - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        description: Unique identifier for a claim. Each claim represents a distinct
+          healthcare service or set of services provided to a patient.
         tests:
           - not_null
         config:
@@ -1317,17 +1380,20 @@ models:
           meta:
             data_type: varchar
       - name: encounter_type
-        description: Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
+        description: Indicates the type of encounter e.g. acute inpatient, emergency
+          department, etc.
         config:
           meta:
             data_type: varchar
       - name: encounter_group
-        description: Categorization of the encounter into groups based on predefined criteria.
+        description: Categorization of the encounter into groups based on predefined
+          criteria.
         config:
           meta:
             data_type: varchar
       - name: claim_type
-        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
+        description: Indicates whether the claim is professional (CMS-1500),
+          institutional (UB-04), dental, or vision.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/claim-type
@@ -1340,7 +1406,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -1355,7 +1423,8 @@ models:
           meta:
             data_type: varchar
       - name: claim_start_date
-        description: 'The date when the healthcare service was provided. Format: YYYY-MM-DD.'
+        description: 'The date when the healthcare service was provided. Format:
+          YYYY-MM-DD.'
         config:
           meta:
             data_type: date
@@ -1402,7 +1471,8 @@ models:
           meta:
             data_type: varchar
       - name: admit_source_code
-        description: Indicates where the patient was before the healthcare encounter (inpatient claims only).
+        description: Indicates where the patient was before the healthcare encounter
+          (inpatient claims only).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/admit-source
@@ -1424,7 +1494,8 @@ models:
           meta:
             data_type: varchar
       - name: discharge_disposition_code
-        description: Indicates the type of setting the patient was discharged to (institutional inpatient claims only).
+        description: Indicates the type of setting the patient was discharged to
+          (institutional inpatient claims only).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/discharge-disposition
@@ -1472,7 +1543,8 @@ models:
           meta:
             data_type: varchar
       - name: revenue_center_code
-        description: Revenue center code for the claim line (institutional only and typically multiple codes per claim).
+        description: Revenue center code for the claim line (institutional only and
+          typically multiple codes per claim).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/revenue-center
@@ -1488,7 +1560,9 @@ models:
           meta:
             data_type: number
       - name: hcpcs_code
-        description: The CPT or HCPCS code representing the procedure or service provided. These codes are used to describe medical, surgical, and diagnostic services.
+        description: The CPT or HCPCS code representing the procedure or service
+          provided. These codes are used to describe medical, surgical, and
+          diagnostic services.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
@@ -1524,11 +1598,14 @@ models:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: rendering_npi
-        description: Rendering NPI for the claim (typically represents the physician or entity providing services).
+        description: Rendering NPI for the claim (typically represents the physician or
+          entity providing services).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: rendering_tin
         description: Rendering provider tax identification number (TIN).
@@ -1541,11 +1618,14 @@ models:
           meta:
             data_type: varchar
       - name: billing_npi
-        description: Billing NPI for the claim (typically represents organization billing the claim).
+        description: Billing NPI for the claim (typically represents organization
+          billing the claim).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: billing_tin
         description: Billing provider tax identification number (TIN).
@@ -1558,11 +1638,14 @@ models:
           meta:
             data_type: varchar
       - name: facility_npi
-        description: Facility NPI for the claim (the organizational NPI of the facility where services were performed).
+        description: Facility NPI for the claim (the organizational NPI of the facility
+          where services were performed).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: facility_name
         description: Facility name.
@@ -1580,12 +1663,14 @@ models:
           meta:
             data_type: number
       - name: allowed_amount
-        description: The total amount allowed (includes amount paid by the insurer and patient).
+        description: The total amount allowed (includes amount paid by the insurer and
+          patient).
         config:
           meta:
             data_type: number
       - name: charge_amount
-        description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.
+        description: The total amount charged for the services provided, before any
+          adjustments or payments. This is typically in US dollars.
         config:
           meta:
             data_type: number
@@ -1615,12 +1700,14 @@ models:
           meta:
             data_type: number
       - name: enrollment_flag
-        description: Flag indicating if the claim has corresponding enrollment during the same time period the service occurred.
+        description: Flag indicating if the claim has corresponding enrollment during
+          the same time period the service occurred.
         config:
           meta:
             data_type: number
       - name: member_month_key
-        description: The unique combination of person_id, year_month, payer, plan, and data source.
+        description: The unique combination of person_id, year_month, payer, plan, and
+          data source.
         config:
           meta:
             data_type: number
@@ -1630,17 +1717,21 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: The date associated with the claims file, typically reflecting the reporting period of the claims data.
+        description: The date associated with the claims file, typically reflecting the
+          reporting period of the claims data.
         config:
           meta:
             data_type: timestamp
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        description: The date and time the source file was ingested into the data
+          warehouse or landed in cloud storage.
         config:
           meta:
             data_type: timestamp
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -1689,7 +1780,8 @@ models:
           meta:
             data_type: date
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -1717,7 +1809,11 @@ models:
           meta:
             data_type: varchar
       - name: ndc_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -1733,7 +1829,11 @@ models:
           meta:
             data_type: varchar
       - name: rxnorm_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -1749,7 +1849,11 @@ models:
           meta:
             data_type: varchar
       - name: atc_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -1779,11 +1883,14 @@ models:
           meta:
             data_type: number
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner on record (e.g., ordered
+          medication, performed the procedure, etc).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
@@ -1791,10 +1898,14 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
+        description: 'The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.'
 
   - name: core__member_months
-    description: The core member months tables has one record per member per month in the eligibility source data.  Members without claims are included in this data table.
+    description: The core member months tables has one record per member per month
+      in the eligibility source data.  Members without claims are included in
+      this data table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1810,7 +1921,8 @@ models:
               - data_source
     columns:
       - name: member_month_key
-        description: The unique combination of person_id, year_month, payer, plan, and data source.
+        description: The unique combination of person_id, year_month, payer, plan, and
+          data source.
         tests:
           - not_null
         config:
@@ -1824,7 +1936,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -1851,26 +1965,33 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: varchar
       - name: payer_attributed_provider
-        description: Unique identifier for the provider assigned to this patient-year_month by the payer.
+        description: Unique identifier for the provider assigned to this
+          patient-year_month by the payer.
       - name: payer_attributed_provider_practice
         description: Name of the practice for the payer attributed provider.
       - name: payer_attributed_provider_organization
         description: Name of the organization for the payer attributed provider.
       - name: payer_attributed_provider_lob
-        description: Name of the line of business for the payer attributed provider (e.g. medicare, medicaid, commercial).
+        description: Name of the line of business for the payer attributed provider
+          (e.g. medicare, medicaid, commercial).
       - name: custom_attributed_provider
-        description: Unique identifier for the provider assigned to this patient-year_month by the user.
+        description: Unique identifier for the provider assigned to this
+          patient-year_month by the user.
       - name: custom_attributed_provider_practice
         description: Name of the practice for the attributed provider assigned by the user.
       - name: custom_attributed_provider_organization
-        description: Name of the organization for the attributed provider assigned by the user.
+        description: Name of the organization for the attributed provider assigned by
+          the user.
       - name: custom_attributed_provider_lob
-        description: Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).
+        description: Name of the line of business for the attributed provider assigned
+          by the user (e.g. medicare, medicaid, commercial).
   - name: core__observation
     description: |
       The observation table contains information on measurements other than lab tests e.g. blood pressure, height, and weight.
@@ -1925,7 +2046,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -1956,7 +2078,11 @@ models:
           meta:
             data_type: varchar
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -2001,7 +2127,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -2013,6 +2141,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: patient
+      meta:
+        dag:
+          node_type: output
       tags: core
       materialized: table
     columns:
@@ -2080,7 +2211,8 @@ models:
           meta:
             data_type: varchar
       - name: address
-        description: The street address of the record (e.g., facility location, patient, etc).
+        description: The street address of the record (e.g., facility location, patient,
+          etc).
         config:
           meta:
             data_type: varchar
@@ -2131,12 +2263,14 @@ models:
             terminology: https://thetuvaproject.com/terminology/ethnicity
             data_type: varchar
       - name: age
-        description: The age of the patient calculated based on their date of birth and the last time the tuva project was run.
+        description: The age of the patient calculated based on their date of birth and
+          the last time the tuva project was run.
         config:
           meta:
             data_type: number
       - name: age_group
-        description: The decade age group the patient falls into based on their calculated age.
+        description: The decade age group the patient falls into based on their
+          calculated age.
         config:
           meta:
             data_type: varchar
@@ -2146,7 +2280,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -2182,7 +2318,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -2202,7 +2340,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -2226,7 +2366,8 @@ models:
           meta:
             data_type: varchar
       - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        description: Unique identifier for a claim. Each claim represents a distinct
+          healthcare service or set of services provided to a patient.
         tests:
           - not_null
         config:
@@ -2248,7 +2389,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -2263,11 +2406,14 @@ models:
           meta:
             data_type: varchar
       - name: prescribing_provider_id
-        description: ID for the provider that wrote the prescription (e.g. priamry care physician).
+        description: ID for the provider that wrote the prescription (e.g. priamry care
+          physician).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: prescribing_provider_name
         description: Prescribing provider name.
@@ -2279,7 +2425,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: dispensing_provider_name
         description: Dispensing provider name.
@@ -2331,12 +2479,14 @@ models:
           meta:
             data_type: number
       - name: allowed_amount
-        description: The total amount allowed (includes amount paid by the insurer and patient).
+        description: The total amount allowed (includes amount paid by the insurer and
+          patient).
         config:
           meta:
             data_type: number
       - name: charge_amount
-        description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.
+        description: The total amount charged for the services provided, before any
+          adjustments or payments. This is typically in US dollars.
         config:
           meta:
             data_type: number
@@ -2361,12 +2511,14 @@ models:
           meta:
             data_type: number
       - name: enrollment_flag
-        description: Flag indicating if the claim has corresponding enrollment during the same time period the service occurred.
+        description: Flag indicating if the claim has corresponding enrollment during
+          the same time period the service occurred.
         config:
           meta:
             data_type: number
       - name: member_month_key
-        description: The unique combination of person_id, year_month, payer, plan, and data source.
+        description: The unique combination of person_id, year_month, payer, plan, and
+          data source.
         config:
           meta:
             data_type: number
@@ -2376,17 +2528,21 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: The date associated with the claims file, typically reflecting the reporting period of the claims data.
+        description: The date associated with the claims file, typically reflecting the
+          reporting period of the claims data.
         config:
           meta:
             data_type: timestamp
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
+        description: The date and time the source file was ingested into the data
+          warehouse or landed in cloud storage.
         config:
           meta:
             data_type: timestamp
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: varchar
@@ -2402,7 +2558,8 @@ models:
       materialized: table
     columns:
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner on record (e.g., ordered
+          medication, performed the procedure, etc).
         tests:
           - unique:
               config:
@@ -2411,11 +2568,14 @@ models:
           meta:
             data_type: varchar
       - name: npi
-        description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
+        description: The national provider identifier associated with the record e.g.
+          facility_npi, provider_npi
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: provider_first_name
         description: The first name of the healthcare provider.
@@ -2448,7 +2608,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -2479,7 +2641,8 @@ models:
           meta:
             data_type: varchar
       - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
+        description: Unique identifier for a claim. Each claim represents a distinct
+          healthcare service or set of services provided to a patient.
         config:
           meta:
             data_type: varchar
@@ -2491,7 +2654,9 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan. A patient can have more than one member_id because
+          they can have more than one insurance product/plan.
         config:
           meta:
             data_type: varchar
@@ -2506,7 +2671,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+        description: The type of code reported in the source system (e.g., ICD-10 code,
+          NDC, lab, etc)
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
@@ -2516,7 +2682,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-pcs
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
@@ -2534,7 +2702,9 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-pcs
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
@@ -2543,7 +2713,11 @@ models:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and
+          descriptions.  Can be manual (fields were populated in input layer),
+          automatic (dictionary codes matching the source code were found and
+          was automatically populated) or custom (populated by normalization
+          engine)
         config:
           meta:
             data_type: varchar
@@ -2578,11 +2752,14 @@ models:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
+        description: Unique identifier for the practitioner on record (e.g., ordered
+          medication, performed the procedure, etc).
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
@@ -2590,7 +2767,9 @@ models:
           meta:
             data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The last time the data was refreshed. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
         config:
           meta:
             data_type: timestamp
@@ -2640,17 +2819,6 @@ models:
         - core
         - core_stage_claims
       materialized: view
-  - name: core__stg_claims_patient
-    description: Staging core claims patients
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_patient
-      tags:
-        - core
-        - core_stage_claims
-      materialized: table
   - name: core__stg_claims_condition
     description: Staging core claims conditions
     config:
@@ -2706,17 +2874,21 @@ models:
         - core
         - core_stage_claims
       materialized: table
-  - name: core__stg_clinical_appointment
-    description: Staging core clinical appointments
+  - name: core__stg_patient
+    description: Staging core patient records with claims and clinical precedence
+      resolved before final age calculations.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_clinical_appointment
+      alias: _stg_patient
+      meta:
+        dag:
+          node_type: intermediate
       tags:
         - core
-        - core_stage_clinical
-      materialized: view
+        - core_stage
+      materialized: table
   - name: core__stg_clinical_condition
     description: Staging core clinical conditions
     config:
@@ -2788,17 +2960,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_observation
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_patient
-    description: Staging core clinical patients
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_patient
       tags:
         - core
         - core_stage_clinical

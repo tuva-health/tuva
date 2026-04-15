@@ -5,62 +5,42 @@ config-version: 2
 profile: default
 
 vars:
+  ## Broad enablement vars
+  claims_enabled: true
+  clinical_enabled: true
+  provider_attribution_enabled: true
+  semantic_layer_enabled: true
+  # Use selectors to run specific marts.
+  # fhir_preprocessing_enabled: true # defaults to false
+
+  ## Synthetic data bootstrap configuration
+  use_synthetic_data: true
+  synthetic_data_size: small
+  custom_bucket_name: tuva-public-resources
+  tuva_seed_version: "1.0.0"
+  tuva_seed_versions:
+    concept_library: "1.0.1"
+    reference_data: "1.0.0"
+    terminology: "1.0.0"
+    value_sets: "1.0.0"
+    provider_data: "1.0.0"
+    synthetic_data: "1.0.0"
+  tuva_seed_buckets: {}
+
   ## Passthrough Columns Configuration
   # Allows custom columns with a prefix to flow through Tuva models to core outputs.
   # passthrough:
   #   prefix: 'x_'    # Prefix to identify passthrough columns (default: 'x_')
   #   strip: false    # Whether to strip prefix in final output (default: false)
 
-  error_empty_seeds: true
-  ## Use this variable to run the project with synthetic data loaded as seeds
-  # otherwise set to false and set the input vars below
-  use_synthetic_data: true
-  synthetic_data_size: small
-  custom_bucket_name: tuva-public-resources
-  tuva_seed_version: "0.18.0"
-  tuva_seed_buckets: {}
-
-
-  ## Update these vars to use your own data as input, do not comment out
-  # enabled logic has been added to the sources config
-  input_database: dev_ci_testing
-  input_schema: input_layer
-
-  ## The Tuva Project can support claims and clinical data.
-  # By default, all models are disabled.
-  # Use the vars below to enabled or disable sections of The Tuva Project.
-
-  ## The vars directly below enable all models related to the type of healthcare data being used
-  clinical_enabled: true
-  claims_enabled: true
-  provider_attribution_enabled: true
-  semantic_layer_enabled: true
-
-
   ## CMS HCC data mart vars
-  # The payment_year variable has a default of the current year, this can be
-  # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
+  # The payment_year variable has a default of the current year.
+  # To override it, set a numeric value such as cms_hcc_payment_year: 2019.
   # cms_hcc_payment_year: 2018
 
-
   ## Quality Measures period var
-  # to run quality measueres for a period other than current year, add the below variable uncommented to your project
+  # To run quality measures for a period other than current year, uncomment below.
   # quality_measures_period_end: "2018-12-31"
-
-  ## The vars directly below enable a single data mart.  See the Quickstart
-  # guide for instructions.
-
-  # ccsr_enabled: false
-  # cms_chronic_conditions_enabled: false
-  # tuva_chronic_conditions_enabled: false
-  # claims_preprocessing_enabled: false
-  # cms_hcc_enabled: false
-  # ed_classification_enabled: false
-  # financial_pmpm_enabled: false
-  # insights_enabled: false
-  # quality_measures_enabled: false
-  # readmissions_enabled: true
-  # fhir_preprocessing_enabled: true # defaults to false
 
 
 model-paths: ["models"]
@@ -83,22 +63,22 @@ dispatch:
 
 seeds:
   integration_tests:
-    appointment_seed:
+    raw_data__appointment:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('appointment') }}"
-    eligibility_seed:
+    raw_data__eligibility:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('eligibility') }}"
-    immunization_seed:
+    raw_data__immunization:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('immunization') }}"
-    lab_result_seed:
+    raw_data__lab_result:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('lab_result') }}"
-    medical_claim_seed:
+    raw_data__medical_claim:
       +batch_size: 200
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('medical_claim') }}"
-    observation_seed:
+    raw_data__observation:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('observation') }}"
-    pharmacy_claim_seed:
+    raw_data__pharmacy_claim:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('pharmacy_claim') }}"
-    provider_attribution_seed:
+    raw_data__provider_attribution:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('provider_attribution') }}"
 
 

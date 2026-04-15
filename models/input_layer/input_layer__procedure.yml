@@ -1,9 +1,11 @@
 version: 2
 models:
   - name: input_layer__procedure
-    description: |
-      The procedure table contains information on procedures that were performed on patients in the dataset.
-    mapping_instructions: ''
+    description: >-
+      The procedure table contains information about procedures performed on
+      patients in the dataset.
+    grain: Intended to be one record per procedure record per data source.
+    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -12,7 +14,7 @@ models:
     columns:
       - name: procedure_id
         description: The unique identifier for the performed procedure.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -69,7 +71,7 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -97,7 +99,7 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -120,7 +122,7 @@ models:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -147,7 +149,7 @@ models:
             data_type: varchar
       - name: claim_id
         description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -170,7 +172,7 @@ models:
             data_type: varchar
       - name: procedure_date
         description: Date when the procedure was performed.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -209,7 +211,7 @@ models:
             data_type: date
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -239,7 +241,7 @@ models:
             data_type: varchar
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -264,7 +266,7 @@ models:
             data_type: varchar
       - name: source_description
         description: Description of the source code in the source system.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -287,7 +289,7 @@ models:
             data_type: varchar
       - name: normalized_code_type
         description: The normalized type of code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -316,7 +318,7 @@ models:
             data_type: varchar
       - name: normalized_code
         description: The normalized code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -343,7 +345,7 @@ models:
             data_type: varchar
       - name: normalized_description
         description: Normalized description of the code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -366,7 +368,7 @@ models:
             data_type: varchar
       - name: modifier_1
         description: First modifier for the procedure code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -394,7 +396,7 @@ models:
             data_type: varchar
       - name: modifier_2
         description: Second modifier for the procedure code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -422,7 +424,7 @@ models:
             data_type: varchar
       - name: modifier_3
         description: Third modifier for the procedure code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -450,7 +452,7 @@ models:
             data_type: varchar
       - name: modifier_4
         description: Fourth modifier for the procedure code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -478,7 +480,7 @@ models:
             data_type: varchar
       - name: modifier_5
         description: Fifth modifier for the procedure code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -506,7 +508,7 @@ models:
             data_type: varchar
       - name: practitioner_id
         description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -529,7 +531,7 @@ models:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -555,7 +557,7 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -570,7 +572,7 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:

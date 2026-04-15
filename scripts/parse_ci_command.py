@@ -164,7 +164,7 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
         command_tokens=normalized,
         subcommand=subcommand,
         requires_seed_baseline=subcommand in {"run", "test"},
-        refreshes_seeds=subcommand in {"build", "seed"},
+        refreshes_seeds=subcommand in {"seed", "build"},
     )
 
 

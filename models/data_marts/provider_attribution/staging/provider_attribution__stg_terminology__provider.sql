@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('tuva_provider_attribution', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))
    )
 }}
 
@@ -8,4 +8,4 @@ select
   , primary_taxonomy_code
   , primary_specialty_description
   , entity_type_description
-from {{ ref('terminology__provider') }}
+from {{ ref('provider_data__provider') }}

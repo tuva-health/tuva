@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -21,16 +21,8 @@
     , medicare_status_code
     , enrollment_status
     , hospice_flag
-    , snp_type
-    , medicaid_indicator
+    , institutional_snp_flag
     , long_term_institutional_flag
-    , part_d_raf_type
-    , low_income_subsidy_indicator
-    , metal_level
-    , csr_indicator
-    , enrollment_duration_months
-    , esrd_status
-    , transplant_duration_months
     , subscriber_relation
     , group_id
     , group_name

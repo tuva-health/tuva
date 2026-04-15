@@ -1,11 +1,11 @@
 {{ config(
-     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
-            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
+     enabled = (var('claims_enabled', False) | as_bool)
+            or (var('clinical_enabled', False) | as_bool)
    )
 }}
 
 {%- set tuva_extension_columns -%}
-{% if var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool %}
+{% if var('clinical_enabled', False) | as_bool %}
     {{ select_extension_columns(ref('input_layer__condition')) }}
 {% endif %}
 {%- endset -%}
@@ -16,17 +16,17 @@
 {%- endset -%}
 
 with all_conditions as (
-{% if var('clinical_enabled', var('tuva_marts_enabled', False)) == true
-    and var('claims_enabled', var('tuva_marts_enabled', False)) == true -%}
+{% if var('clinical_enabled', False) == true
+    and var('claims_enabled', False) == true -%}
 
     {{ smart_union([ref('core__stg_claims_condition'), ref('core__stg_clinical_condition')]) }}
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
     select *
     from {{ ref('core__stg_clinical_condition') }}
 
-{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
     select *
     from {{ ref('core__stg_claims_condition') }}

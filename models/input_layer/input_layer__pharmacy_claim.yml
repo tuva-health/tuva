@@ -1,10 +1,13 @@
 version: 2
 models:
   - name: input_layer__pharmacy_claim
-    description: |
-      The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled for a patient, 
-      billed by a pharmacy, and paid by an insurer.  Prescriptions that are ordered but not filled should not make it into the table.  Claims
-      adjustments, denials, and reversals should be handled similar to the medical_claim table.
+    description: >-
+      The pharmacy_claim table includes information about retail and specialty
+      drug prescriptions that have been filled for a patient, billed by a
+      pharmacy, and paid by an insurer. Prescriptions that are ordered but not
+      filled should not make it into the table. Claim adjustments, denials, and
+      reversals should be handled similarly to the medical_claim table.
+    grain: Intended to be one record per claim line per data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -333,16 +336,6 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -367,16 +360,6 @@ models:
                   - tuva_dqi_sev_3
                   - dqi
                   - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Days supply should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -490,16 +473,6 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -537,16 +510,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -619,16 +582,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -664,16 +617,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -709,16 +652,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -757,13 +690,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:
