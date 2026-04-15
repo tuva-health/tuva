@@ -1,10 +1,16 @@
 version: 2
 
-##  Final
-
-
 models:
   - name: ed_classification__summary
+    description: |-
+      One record per emergency department visit, including ED classification results when the primary diagnosis code is captured by the Johnston algorithm.
+    grain: One record per emergency department encounter.
+    transformation_steps: |-
+      This model starts with all emergency department encounters from core__encounter.
+
+      It left joins the classified ED encounter subset to retain visits whose primary diagnosis code did not match the Johnston ED classification lookup.
+
+      It then joins the ED classification categories, provider terminology, and patient attributes to assemble the final summary table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -12,30 +18,34 @@ models:
       alias: summary
       tags: ed_classification
       materialized: table
-    description: |
-      ED Classification as a cube that can be summarized
     columns:
       - name: encounter_id
-        description: Unique identifier for the emergency_department encounter.
+        description: Unique identifier for the emergency department encounter.
+        tests:
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
       - name: ed_classification_description
-        description: ED classification category.
+        description: Human-readable ED classification category for the encounter. Null when the encounter was not classified.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/ed-classification
       - name: ed_classification_order
-        description: The order of the classification.
+        description: Relative sort order of the ED classification category. Null when the encounter was not classified.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/ed-classification
       - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_end_date
-        description: Date when the patient was discharged.
+        description: Date when the patient was discharged from the emergency department encounter.
       - name: year_month
-        description: Year and month of the encounter end date.
+        description: Year and month derived from the encounter end date.
       - name: primary_diagnosis_code
-        description: >
-          Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.
+        description: Primary diagnosis code for the encounter. If from claims, the primary diagnosis code comes from the institutional claim.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
@@ -62,10 +72,6 @@ models:
         description: The city of the facility.
       - name: facility_zip_code
         description: The zip code of the facility.
-#      - name: facility_latitude
-#        description: The latitude of the facility.
-#      - name: facility_longitude
-#        description: The longitude of the facility.
       - name: patient_sex
         description: The sex of the patient.
         config:
@@ -84,7 +90,19 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/race
+      - name: data_source
+        description: The data source associated with the patient record used to enrich the encounter.
+
   - name: ed_classification__int_filter_encounter_with_classification
+    description: |-
+      ED encounters that received a single resolved ED classification category.
+    grain: One record per classified emergency department encounter.
+    transformation_steps: |-
+      This model reads the diagnosis-code probability mappings from ed_classification__map_primary_dx.
+
+      It keeps only rows where ed_classification_capture = 1, meaning the primary diagnosis code matched a Johnston algorithm lookup row and has classification probabilities available.
+
+      It assigns the encounter to the category with the highest Johnston probability across the ED classification columns.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -92,34 +110,76 @@ models:
       alias: _int_filter_encounter_with_classification
       tags: ed_classification
       materialized: table
-    description: Filter out ED visits that were not classified
+    columns:
+      - name: encounter_id
+        description: Unique identifier for the emergency department encounter.
+      - name: primary_diagnosis_code
+        description: Primary diagnosis code for the encounter.
+      - name: primary_diagnosis_code_type
+        description: Coding system used for the primary diagnosis code.
+      - name: edcnnpa
+        description: Emergent, ED Care Needed, Not Preventable/Avoidable probability.
+      - name: edcnpa
+        description: Emergent, ED Care Needed, Preventable/Avoidable probability.
+      - name: epct
+        description: Emergent, Primary Care Treatable probability.
+      - name: noner
+        description: Non-Emergent probability.
+      - name: injury
+        description: Injury-related probability.
+      - name: psych
+        description: Mental health-related probability.
+      - name: alcohol
+        description: Alcohol-related probability.
+      - name: drug
+        description: Drug-related probability.
+      - name: ed_classification_capture
+        description: Indicator that the primary diagnosis code matched a Johnston lookup row and has ED classification probabilities available.
+      - name: classification
+        description: ED classification code selected from the highest available Johnston probability.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/value-sets/ed-classification
 
+  - name: ed_classification__map_primary_dx
+    description: |-
+      Emergency department encounter primary diagnosis codes mapped to the Johnston ED classification probability columns.
+    grain: One record per emergency department encounter diagnosis mapping result.
+    transformation_steps: |-
+      This model reads emergency department encounters from core__encounter and keeps only encounter_id, primary_diagnosis_code, and primary_diagnosis_code_type.
 
-  - name: ed_classification__int_map_primary_dx
+      It joins ICD-10-CM and ICD-9-CM diagnosis codes to the Johnston ED classification lookup seeds.
+
+      It outputs the Johnston probability columns together with ed_classification_capture, which flags diagnosis codes that were found in the lookup.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: _int_by_provider_parent_organization
+      alias: _map_primary_dx
       tags: ed_classification
       materialized: table
-    description: Map ED encounter primary dx to classification
-
-
-##  Staging
-
-  - name: ed_classification__stg_encounter
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      tags: ed_classification
-      materialized: ephemeral
-
-  - name: ed_classification__stg_patient
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      tags: ed_classification
-      materialized: ephemeral
+    columns:
+      - name: encounter_id
+        description: Unique identifier for the emergency department encounter.
+      - name: primary_diagnosis_code
+        description: Primary diagnosis code for the encounter.
+      - name: primary_diagnosis_code_type
+        description: Coding system used for the primary diagnosis code.
+      - name: edcnnpa
+        description: Emergent, ED Care Needed, Not Preventable/Avoidable probability.
+      - name: edcnpa
+        description: Emergent, ED Care Needed, Preventable/Avoidable probability.
+      - name: epct
+        description: Emergent, Primary Care Treatable probability.
+      - name: noner
+        description: Non-Emergent probability.
+      - name: injury
+        description: Injury-related probability.
+      - name: psych
+        description: Mental health-related probability.
+      - name: alcohol
+        description: Alcohol-related probability.
+      - name: drug
+        description: Drug-related probability.
+      - name: ed_classification_capture
+        description: Indicator that the primary diagnosis code matched a Johnston lookup row and has ED classification probabilities available.

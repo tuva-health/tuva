@@ -11,6 +11,7 @@ import io
 import json
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -18,6 +19,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 import re
@@ -31,7 +33,7 @@ except ImportError as exc:
 DEFAULT_OWNER = "tuva-health"
 DEFAULT_REF = "main"
 DEFAULT_BUCKET = "tuva-public-resources"
-HTTP_TIMEOUT_SECONDS = 60
+HTTP_TIMEOUT_SECONDS = int(os.getenv("TUVA_DOLTHUB_HTTP_TIMEOUT_SECONDS", "900"))
 
 DATABASE_FOLDERS = {
     "concept_library": "concept-library",
@@ -53,18 +55,18 @@ LOCAL_REPO_DIRS = {
 }
 
 SYNTHETIC_TABLE_TO_SEED_MODEL = {
-    "appointment": "appointment_seed",
-    "appointment_small": "appointment_seed",
-    "eligibility": "eligibility_seed",
-    "eligibility_small": "eligibility_seed",
-    "immunization": "immunization_seed",
-    "lab_result": "lab_result_seed",
-    "medical_claim": "medical_claim_seed",
-    "medical_claim_small": "medical_claim_seed",
-    "observation": "observation_seed",
-    "pharmacy_claim": "pharmacy_claim_seed",
-    "pharmacy_claim_small": "pharmacy_claim_seed",
-    "provider_attribution": "provider_attribution_seed",
+    "appointment": "raw_data__appointment",
+    "appointment_small": "raw_data__appointment",
+    "eligibility": "raw_data__eligibility",
+    "eligibility_small": "raw_data__eligibility",
+    "immunization": "raw_data__immunization",
+    "lab_result": "raw_data__lab_result",
+    "medical_claim": "raw_data__medical_claim",
+    "medical_claim_small": "raw_data__medical_claim",
+    "observation": "raw_data__observation",
+    "pharmacy_claim": "raw_data__pharmacy_claim",
+    "pharmacy_claim_small": "raw_data__pharmacy_claim",
+    "provider_attribution": "raw_data__provider_attribution",
 }
 
 HOOK_PATTERN = re.compile(
@@ -95,7 +97,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--version",
         required=True,
-        help="Release version to publish, e.g. v0.18.0 or 0.18.0.",
+        help="Release version to publish, e.g. v1.0.0 or 1.0.0.",
     )
     parser.add_argument(
         "--owner",
@@ -216,6 +218,10 @@ def local_repo_path(repo_database: str) -> Path:
     return Path(ARGS.local_repo_root).resolve() / LOCAL_REPO_DIRS[repo_database]
 
 
+def release_api_endpoint(owner: str, repo_database: str) -> str:
+    return f"https://www.dolthub.com/api/v1alpha1/{owner}/{repo_database}/releases"
+
+
 def open_url_with_retries(request: urllib.request.Request, attempts: int = 4):
     delay_seconds = 1
     last_error: Exception | None = None
@@ -227,7 +233,7 @@ def open_url_with_retries(request: urllib.request.Request, attempts: int = 4):
             last_error = exc
             if exc.code < 500 or attempt == attempts:
                 raise
-        except urllib.error.URLError as exc:
+        except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
             last_error = exc
             if attempt == attempts:
                 raise
@@ -249,6 +255,27 @@ def read_csv_rows(url: str) -> list[dict[str, str]]:
     with open_url_with_retries(request) as response:
         decoded = response.read().decode("utf-8")
     return list(csv.DictReader(decoded.splitlines()))
+
+
+@lru_cache(maxsize=None)
+def read_release_rows(owner: str, repo_database: str) -> list[dict[str, str]]:
+    request = urllib.request.Request(
+        release_api_endpoint(owner, repo_database),
+        headers={"user-agent": "tuva-dolthub-publisher/1.0"},
+    )
+    with open_url_with_retries(request) as response:
+        decoded = json.loads(response.read().decode("utf-8"))
+
+    return decoded.get("releases", [])
+
+
+@lru_cache(maxsize=None)
+def resolve_dolthub_csv_ref(owner: str, repo_database: str, ref: str) -> str:
+    releases = read_release_rows(owner, repo_database)
+    for release in releases:
+        if release.get("release_tag") == ref:
+            return release["release_commit_sha"]
+    return ref
 
 
 def read_local_sql_csv(repo_database: str, query: str) -> list[dict[str, str]]:
@@ -392,21 +419,49 @@ def normalize_row(row: list[str], header: list[str], date_columns: set[str]) -> 
     return normalized
 
 
-def write_normalized_csv_to_gzip(reader, destination: Path, date_columns: set[str]) -> int:
+def normalize_external_asset_header(asset: TableAsset, source_header: list[str]) -> list[str]:
+    return [column for column in source_header if column != "__pk"]
+
+
+def normalize_external_asset_row(
+    asset: TableAsset,
+    source_header: list[str],
+    target_header: list[str],
+    row: list[str],
+) -> list[str]:
+    row_map = dict(zip(source_header, row))
+    return [row_map.get(column, "") for column in target_header]
+
+
+def write_normalized_csv_to_gzip(reader, destination: Path, asset: TableAsset, date_columns: set[str]) -> int:
     row_count = 0
-    header: list[str] | None = None
+    source_header: list[str] | None = None
+    output_header: list[str] | None = None
 
     with gzip.open(destination, "wt", encoding="utf-8", newline="") as gzip_file:
         writer = csv.writer(gzip_file, lineterminator="\n")
         for row in reader:
-            if header is None:
-                header = row
-                writer.writerow(header)
+            if source_header is None:
+                source_header = row
+                output_header = normalize_external_asset_header(asset, source_header)
+                writer.writerow(output_header)
                 continue
 
-            writer.writerow(normalize_row(row, header, date_columns))
+            assert output_header is not None
+            normalized_row = normalize_external_asset_row(asset, source_header, output_header, row)
+            writer.writerow(normalize_row(normalized_row, output_header, date_columns))
             row_count += 1
 
+    return row_count
+
+
+def count_rows_in_gzip_csv(path: Path) -> int:
+    row_count = 0
+    with gzip.open(path, "rt", encoding="utf-8", newline="") as gzip_file:
+        reader = csv.reader(gzip_file)
+        next(reader, None)
+        for _ in reader:
+            row_count += 1
     return row_count
 
 
@@ -418,7 +473,8 @@ def get_assets_for_database(logical_database: str, owner: str, ref: str) -> list
     if ARGS.source == "local":
         catalog_rows = read_local_sql_csv(repo_database, "select * from asset_table_catalog")
     else:
-        catalog_url = csv_endpoint(owner, repo_database, ref, "asset_table_catalog")
+        catalog_ref = resolve_dolthub_csv_ref(owner, repo_database, ref)
+        catalog_url = csv_endpoint(owner, repo_database, catalog_ref, "asset_table_catalog")
         catalog_rows = read_csv_rows(catalog_url)
 
     assets = [
@@ -462,8 +518,9 @@ def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> i
     if ARGS.source == "local":
         return download_local_asset(asset, destination)
 
+    source_ref = resolve_dolthub_csv_ref(ARGS.owner, asset.repo_database, ARGS.ref)
     request = urllib.request.Request(
-        csv_endpoint(ARGS.owner, asset.repo_database, ARGS.ref, asset.table_name),
+        csv_endpoint(ARGS.owner, asset.repo_database, source_ref, asset.table_name),
         headers={"user-agent": "tuva-dolthub-publisher/1.0"},
     )
 
@@ -479,6 +536,7 @@ def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> i
                 row_count = write_normalized_csv_to_gzip(
                     csv.reader(text_response),
                     destination,
+                    asset,
                     date_columns,
                 )
 
@@ -487,6 +545,7 @@ def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> i
             csv.Error,
             http.client.IncompleteRead,
             TimeoutError,
+            socket.timeout,
             urllib.error.HTTPError,
             urllib.error.URLError,
             UnicodeDecodeError,
@@ -527,6 +586,7 @@ def download_local_asset(asset: TableAsset, destination: Path) -> int:
         row_count = write_normalized_csv_to_gzip(
             csv.reader(process.stdout),
             destination,
+            asset,
             date_columns,
         )
     finally:
@@ -614,7 +674,35 @@ def main() -> int:
                     manifest.append(build_manifest_entry(asset, bucket, asset.expected_rows, staged_path))
                     continue
 
-                actual_rows = download_asset(asset, staged_path)
+                if staged_path.exists():
+                    actual_rows = count_rows_in_gzip_csv(staged_path)
+                    if actual_rows == asset.expected_rows:
+                        print(
+                            f"reusing staged {asset.repo_database}.{asset.table_name} "
+                            f"({actual_rows} rows) from {staged_path}",
+                            flush=True,
+                        )
+                    else:
+                        print(
+                            f"discarding incomplete staged file for {asset.repo_database}.{asset.table_name}: "
+                            f"expected {asset.expected_rows} rows, found {actual_rows}",
+                            flush=True,
+                        )
+                        staged_path.unlink()
+                        print(
+                            f"downloading {asset.repo_database}.{asset.table_name} "
+                            f"from {ARGS.ref} to {staged_path}",
+                            flush=True,
+                        )
+                        actual_rows = download_asset(asset, staged_path)
+                else:
+                    print(
+                        f"downloading {asset.repo_database}.{asset.table_name} "
+                        f"from {ARGS.ref} to {staged_path}",
+                        flush=True,
+                    )
+                    actual_rows = download_asset(asset, staged_path)
+
                 if actual_rows != asset.expected_rows:
                     raise RuntimeError(
                         f"Row count mismatch for {asset.repo_database}.{asset.table_name}: "
@@ -631,7 +719,8 @@ def main() -> int:
                     f"published {asset.repo_database}.{asset.table_name} "
                     f"({actual_rows} rows) -> {entry['destination_uri']}"
                     if not ARGS.download_only
-                    else f"downloaded {asset.repo_database}.{asset.table_name} ({actual_rows} rows)"
+                    else f"downloaded {asset.repo_database}.{asset.table_name} ({actual_rows} rows)",
+                    flush=True,
                 )
 
         if stage_root_path is not None:

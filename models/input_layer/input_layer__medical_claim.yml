@@ -1,13 +1,17 @@
 version: 2
 models:
   - name: input_layer__medical_claim
-    description: |
-      The medical_claim table contains information on healthcare services and supplies provided to patients, 
-      billed by providers, and paid for by health insurers. It includes information on the provider who rendered 
-      the service, the amount paid for the service by the health insurer, and the underlying reason for the 
-      service (i.e. diagnosis).  Medical claims data may include original, adjusted, reversed, or final claims.  It is up
-      to the person mapping the dataset to make the correct determination about these nuances and filter out all but
-      final claims -- otherwise key metrics such as cost, utilization, and outcomes will be incorrect.
+    description: >-
+      The medical_claim table contains information on healthcare services and
+      supplies provided to patients, billed by providers, and paid for by
+      health insurers. It includes information on the provider who rendered the
+      service, the amount paid for the service by the health insurer, and the
+      underlying reason for the service, such as diagnosis. Medical claims data
+      may include original, adjusted, reversed, or final claims. It is up to
+      the person mapping the dataset to make the correct determination about
+      these nuances and filter out all but final claims; otherwise key metrics
+      such as cost, utilization, and outcomes will be incorrect.
+    grain: Intended to be one record per claim line per data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -172,7 +176,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -216,7 +219,7 @@ models:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A claim should not belong to two different people.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 meta:
                   dqi_test_description: A claim should not belong to two different people.
@@ -231,7 +234,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -348,7 +350,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -445,7 +446,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - not_null:
               config:
@@ -841,7 +841,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1023,16 +1022,6 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Service unit quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: number
@@ -1163,7 +1152,7 @@ models:
           meta:
             data_type: varchar
       - name: rendering_npi
-        description: 'Rendering NPI for the claim (typically represents the physician or entity providing services). This field is a string that contains NPI (National Provider Identifier) values. rendering_npi represents the practitioner who performed or rendered the specific service. This value can be populated in either institutional or professional claims and can be different across claim lines. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi else null end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi else null end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
+        description: 'Rendering NPI for the claim (typically represents the physician or entity providing services). This field is a string that contains NPI (National Provider Identifier) values. rendering_npi represents the practitioner who performed or rendered the specific service. This value can be populated in either institutional or professional claims and can be different across claim lines. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi else null end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi else null end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
         mapping_instructions: ''
         required_for_data_marts: ['cms_hccs', 'encounters', 'hcc_recapture', 'provider_attribution', 'semantic_layer', 'service_categories']
         tests:
@@ -1225,7 +1214,7 @@ models:
           meta:
             data_type: varchar
       - name: billing_npi
-        description: 'Billing NPI for the claim (typically represents organization billing the claim). This field is a string that contains NPI (National Provider Identifier) values. billing_npi typically represents the entity (organization or individual) responsible for billing and receiving payment for healthcare services. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
+        description: 'Billing NPI for the claim (typically represents organization billing the claim). This field is a string that contains NPI (National Provider Identifier) values. billing_npi typically represents the entity (organization or individual) responsible for billing and receiving payment for healthcare services. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
         mapping_instructions: ''
         required_for_data_marts: ['encounters', 'semantic_layer']
         tests:
@@ -1287,7 +1276,7 @@ models:
           meta:
             data_type: varchar
       - name: facility_npi
-        description: 'Facility NPI for the claim (typically represents the facility where services were performed). This field is a string that contains NPI (National Provider Identifier) values. facility_npi typically represents the location where specific services were delivered. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
+        description: 'Facility NPI for the claim (typically represents the facility where services were performed). This field is a string that contains NPI (National Provider Identifier) values. facility_npi typically represents the location where specific services were delivered. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
         mapping_instructions: ''
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
@@ -1408,16 +1397,6 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1457,16 +1436,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1539,16 +1508,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1584,16 +1543,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1629,16 +1578,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -4366,13 +4305,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:

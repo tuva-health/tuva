@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -55,9 +55,9 @@ select
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     {{ select_extension_columns(ref('input_layer__pharmacy_claim'), alias='pharm', strip_prefix=false) }}
 from {{ ref('normalized_input__stg_pharmacy_claim') }} as pharm
-left outer join {{ ref('terminology__provider') }} as pres
+left outer join {{ ref('provider_data__provider') }} as pres
       on pharm.prescribing_provider_npi = pres.npi
-left outer join {{ ref('terminology__provider') }} as disp
+left outer join {{ ref('provider_data__provider') }} as disp
       on pharm.dispensing_provider_npi = disp.npi
 left outer join {{ ref('terminology__ndc') }} as ndc
       on pharm.ndc_code = ndc.ndc

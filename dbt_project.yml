@@ -19,64 +19,54 @@ flags:
 
   require_generic_test_arguments_property: true
 vars:
-    ## CCSR data mart vars
-    # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
-    record_type: "ip"
+  ## Broad enablement vars
+  # clinical_enabled: true
+  # claims_enabled: true
+  # provider_attribution_enabled: true
+  # semantic_layer_enabled: true
+  # fhir_preprocessing_enabled: true # defaults to false
+  # Use selectors to run specific marts.
 
-    # CCSR Version numbers from HCUP
-    dxccsr_version: "'2023.1'"
-    prccsr_version: "'2023.1'"
+  ## Seed storage configuration
+  custom_bucket_name: tuva-public-resources
+  tuva_seed_version: "1.0.0"
+  tuva_seed_versions:
+    concept_library: "1.0.1"
+    reference_data: "1.0.0"
+    terminology: "1.0.0"
+    value_sets: "1.0.0"
+    provider_data: "1.0.0"
+    synthetic_data: "1.0.0"
+  tuva_seed_buckets: {}
 
-    ## CMS HCC data mart vars
-    # The payment_year variable has a default of the current year, this can be
-    # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
-    cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
+  ## Run metadata
+  # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
+  # Default timezone is UTC.
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
-      ## Quality Measures period var
-      # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-      #quality_measures_period_end: "2020-12-31"
+  ## Optional testing and feature flags
+  enable_input_layer_testing: true
+  enable_legacy_data_quality: false
+  # enable_normalize_engine: false
+  # set to false or leave undefined to affect no change
+  # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
+  # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
 
-    ## Enable Normalize engine var
-    # set to false or leave undefined to affect no change
-    # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
-    # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
-    # enable_normalize_engine: false
+  ## CCSR data mart vars
+  # Set to "ip" for inpatient data or "op" for outpatient data (more info in the README).
+  record_type: "ip"
+  # CCSR version numbers from HCUP.
+  dxccsr_version: "'2023.1'"
+  prccsr_version: "'2023.1'"
 
-    ## Tuva Last Run
-    # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
-    # Default timezone is UTC
-    tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  ## CMS HCC data mart vars
+  # The payment_year variable has a default of the current year.
+  # To override it, set a numeric value such as cms_hcc_payment_year: 2019.
+  cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
 
-    ## Tuva seed storage configuration
-    custom_bucket_name: tuva-public-resources
-    tuva_seed_version: "0.18.0"
-    tuva_seed_buckets: {}
-
-    ## DQI data testing on input layer
-    enable_input_layer_testing: true
-
-    ## Set this variable to true if you want legacy data quality models to build
-    enable_legacy_data_quality: false
-
-    # Enable groups of marts
-    # clinical_enabled: true
-    # claims_enabled: true
-
-    # Enable specific marts
-    # ccsr_enabled: false
-    # claims_preprocessing_enabled: false
-    # cms_chronic_conditions_enabled: false
-    # cms_hcc_enabled: false
-    # ed_classification_enabled: false
-    # fhir_preprocessing_enabled: true # defaults to false
-    # financial_pmpm_enabled: false
-    # hcc_recapture_enabled: true # defaults to false
-    # hcc_suspecting_enabled: true # defaults to false
-    # insights_enabled: false
-    # quality_measures_enabled: false
-    # readmissions_enabled: true
-    # tuva_chronic_conditions_enabled: false
-    # tuva_provider_attribution: false
+  ## Quality Measures period var
+  # To run quality measures for a period other than current year, uncomment below.
+  # quality_measures_period_end: "2020-12-31"
 
 on-run-start:
   - "{{ log_invocation_start() }}"
@@ -99,12 +89,12 @@ dispatch:
 
 seeds:
   the_tuva_project:
-    clinical_concept_library:
-      clinical_concept_library__clinical_concepts:
+    concept_library:
+      concept_library__clinical_concepts:
         +post-hook: "{{ load_versioned_seed('concept_library','clinical_concepts.csv') }}"
-      clinical_concept_library__coding_systems:
+      concept_library__coding_systems:
         +post-hook: "{{ load_versioned_seed('concept_library','coding_systems.csv') }}"
-      clinical_concept_library__value_set_members:
+      concept_library__value_set_members:
         +post-hook: "{{ load_versioned_seed('concept_library','value_set_members.csv') }}"
 
     reference_data:
@@ -188,8 +178,6 @@ seeds:
         +post-hook: "{{ load_versioned_seed('terminology','medicare_dual_eligibility.csv') }}"
       terminology__medicare_orec:
         +post-hook: "{{ load_versioned_seed('terminology','medicare_orec.csv') }}"
-      terminology__medicare_provider_and_supplier_taxonomy_crosswalk:
-        +post-hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
       terminology__medicare_status:
         +post-hook: "{{ load_versioned_seed('terminology','medicare_status.csv') }}"
       terminology__ms_drg_weights_los:
@@ -202,18 +190,12 @@ seeds:
         +post-hook: "{{ load_versioned_seed('terminology','nitos.csv') }}"
       terminology__observation_type:
         +post-hook: "{{ load_versioned_seed('terminology','terminology__observation_type.csv') }}"
-      terminology__other_provider_taxonomy:
-        +post-hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
       terminology__payer_type:
         +post-hook: "{{ load_versioned_seed('terminology','payer_type.csv') }}"
       terminology__place_of_service:
         +post-hook: "{{ load_versioned_seed('terminology','place_of_service.csv') }}"
       terminology__present_on_admission:
         +post-hook: "{{ load_versioned_seed('terminology','present_on_admission.csv') }}"
-      terminology__provider:
-        +post-hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
-      terminology__provider_taxonomy_unpivot:
-        +post-hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
       terminology__race:
         +post-hook: "{{ load_versioned_seed('terminology','race.csv') }}"
       terminology__revenue_center:
@@ -230,6 +212,16 @@ seeds:
         +post-hook: "{{ load_versioned_seed('terminology','snomed_icd_10_map.csv') }}"
       terminology__ssa_fips_state_county_crosswalk:
         +post-hook: "{{ load_versioned_seed('terminology','ssa_fips_state_county_crosswalk.csv') }}"
+
+    provider_data:
+      provider_data__medicare_provider_and_supplier_taxonomy_crosswalk:
+        +post-hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
+      provider_data__other_provider_taxonomy:
+        +post-hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
+      provider_data__provider:
+        +post-hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
+      provider_data__provider_taxonomy_unpivot:
+        +post-hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
 
     value_sets:
       ccsr:

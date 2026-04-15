@@ -8,7 +8,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _value_set_clinical_concepts
       tags: hcc_suspecting
-      enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         concept_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -36,7 +36,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _value_set_hcc_descriptions
       tags: hcc_suspecting
-      enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         hcc_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -56,7 +56,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _value_set_icd_10_cm_mappings
       tags: hcc_suspecting
-      enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:
         diagnosis_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

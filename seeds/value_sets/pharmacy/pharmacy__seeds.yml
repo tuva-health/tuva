@@ -10,7 +10,7 @@ seeds:
       tags:
         - pharmacy
 
-      enabled: "{{ var('pharmacy',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         product_tty: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}        

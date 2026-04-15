@@ -44,12 +44,12 @@ with ccs_release_year as (
     , m.data_source
   from {{ ref('normalized_input__medical_claim') }} as m
   left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as dx on m.diagnosis_code_1 = dx.icd_10_cm_code
-  left outer join {{ ref('terminology__provider') }} as p on m.facility_npi = p.npi
+  left outer join {{ ref('provider_data__provider') }} as p on m.facility_npi = p.npi
   left outer join {{ ref('terminology__nitos') }} as n on m.hcpcs_code = n.hcpcs_code
   left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
   left outer join {{ ref('terminology__place_of_service') }} as pos on m.place_of_service_code = pos.place_of_service_code
   left outer join {{ ref('terminology__bill_type') }} as bt on m.bill_type_code = bt.bill_type_code
-  left outer join {{ ref('terminology__provider') }} as rend on m.rendering_npi = rend.npi
+  left outer join {{ ref('provider_data__provider') }} as rend on m.rendering_npi = rend.npi
 )
 
 select

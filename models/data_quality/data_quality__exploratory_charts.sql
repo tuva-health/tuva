@@ -5,7 +5,7 @@
     )
     and
     (
-        var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool
+        var('claims_enabled', False) | as_bool
     )
 ) }}
 

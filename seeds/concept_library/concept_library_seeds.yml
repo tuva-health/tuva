@@ -1,12 +1,12 @@
 version: 2
 
 seeds:
-  - name: clinical_concept_library__clinical_concepts
+  - name: concept_library__clinical_concepts
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_concept_library{% else %}concept_library{%- endif -%}
       alias: clinical_concepts
-      tags: clinical_concept_library
+      tags: concept_library
       column_types:
         concept_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -70,12 +70,12 @@ seeds:
       - name: coding_system_version
         description: Version of the coding system used. For now, editorial conventions and/or business logic will be required to establish a consistent format for coding version for each coding system.
 
-  - name: clinical_concept_library__value_set_members
+  - name: concept_library__value_set_members
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_concept_library{% else %}concept_library{%- endif -%}
       alias: value_set_members
-      tags: clinical_concept_library
+      tags: concept_library
       column_types:
         value_set_member_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -122,12 +122,12 @@ seeds:
       - name: comment
         description: In some cases it may be helpful to provide some explanatory context for inclusion of a particular code, e.g., insights into the intended meaning of the code that aren’t implicit in the code description but are implied by other aspects of the coding system e.g., ICD-10-CM coding guidance.
 
-  - name: clinical_concept_library__coding_systems
+  - name: concept_library__coding_systems
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_concept_library{% else %}concept_library{%- endif -%}
       alias: coding_systems
-      tags: clinical_concept_library
+      tags: concept_library
       column_types:
         coding_system_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
