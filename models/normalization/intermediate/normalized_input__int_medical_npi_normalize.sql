@@ -56,7 +56,6 @@ where normalized_facility_npi is not null
 select 
     base.claim_id
   , base.claim_line_number
-  , base.claim_start_date
   , base.claim_type
   , base.data_source
   , base.normalized_rendering_npi
