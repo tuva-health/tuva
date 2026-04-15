@@ -43,7 +43,7 @@ where claim_type = 'institutional'
         d.encounter_id
         , f.diagnosis_code_1
         , f.diagnosis_code_type
-        , f.facility_id as facility_id
+        , f.facility_npi as facility_npi
         , f.drg_code_type
         , f.drg_code
         , f.admit_source_code as admit_source_code
@@ -126,7 +126,7 @@ select
 , c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-, c.facility_id as facility_id
+, c.facility_npi as facility_npi
 , sc.observation_flag
 , sc.ed_flag
 , sc.lab_flag
@@ -177,7 +177,7 @@ left outer join institutional_claim_details as c
 left outer join patient as e
   on c.patient_data_source_id = e.patient_data_source_id
 left outer join {{ ref('provider_data__provider') }} as b
-  on c.facility_id = b.npi
+  on c.facility_npi = b.npi
 left outer join {{ ref('terminology__discharge_disposition') }} as g
   on c.discharge_disposition_code = g.discharge_disposition_code
 left outer join {{ ref('terminology__admit_source') }} as h

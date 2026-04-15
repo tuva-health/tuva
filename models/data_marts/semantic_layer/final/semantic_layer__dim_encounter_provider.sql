@@ -6,23 +6,23 @@
 with claim_provider_data as (
     select
         c.encounter_id
-      , c.rendering_id
+      , c.rendering_npi
       , p.specialty
       , sum(c.paid_amount) as paid_amount
       , max(c.tuva_last_run) as tuva_last_run
   from {{ ref('semantic_layer__stg_core__medical_claim') }} as c
     inner join {{ ref('semantic_layer__dim_data_source') }} as ds on c.data_source = ds.data_source
     left join {{ ref('semantic_layer__stg_core__practitioner') }} as p
-        on c.rendering_id = p.npi
+        on c.rendering_npi = p.npi
     group BY
         c.encounter_id
-        , c.rendering_id
+        , c.rendering_npi
         , p.specialty
 ),
 rank_ordered as (
     select
         encounter_id
-      , rendering_id
+      , rendering_npi
       , specialty
       , paid_amount
       , tuva_last_run
@@ -32,7 +32,7 @@ rank_ordered as (
 
 SELECT
     encounter_id
-  , rendering_id as primary_provider_id
+  , rendering_npi as primary_provider_id
   , specialty
   , tuva_last_run
 from rank_ordered

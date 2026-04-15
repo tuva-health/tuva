@@ -1286,7 +1286,7 @@ models:
                 If you have an NPI field and are unsure if the NPI is a facility NPI (i.e. level 2 org NPI), then 
                 join to terminology.provider and filter to level 2 NPIs only.
 
-                If left as null, then encounters will under-merge since encounter merging depends on the facility ID field. 
+                If left as null, then encounters will under-merge since encounter merging depends on the facility NPI field. 
                 There are two primary options if facility NPIs (i.e. level 2 NPIs) are not available:
                 - Leave null: This mean claims will not merge based on encounter grouping logic since all claims are assumed to be in different facilities.
                 - Add a blank string: This will over-merge, but will apply encounter grouping logic and assumes all encounters are at the same facility.

@@ -47,13 +47,13 @@
     , hcpcs_modifier_3
     , hcpcs_modifier_4
     , hcpcs_modifier_5
-    , rendering_id
+    , rendering_npi
     , rendering_tin
     , rendering_name
-    , billing_id
+    , billing_npi
     , billing_tin
     , billing_name
-    , facility_id
+    , facility_npi
     , facility_name
     , paid_date
     , paid_amount

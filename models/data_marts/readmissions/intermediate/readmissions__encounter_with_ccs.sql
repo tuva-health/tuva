@@ -15,7 +15,7 @@ select
     , aa.admit_date
     , aa.discharge_date
     , aa.discharge_disposition_code
-    , aa.facility_id
+    , aa.facility_npi
     , aa.drg_code_type
     , aa.drg_code
     , aa.paid_amount

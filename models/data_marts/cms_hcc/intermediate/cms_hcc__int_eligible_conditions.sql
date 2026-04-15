@@ -30,7 +30,7 @@ with medical_claims as (
         , claim_type
         , payer
         , person_id
-        , rendering_id as rendering_npi
+        , rendering_npi
         , claim_start_date
         , claim_end_date
         , bill_type_code

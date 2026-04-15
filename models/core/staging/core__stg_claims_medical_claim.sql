@@ -61,13 +61,13 @@
     , cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }}) as hcpcs_modifier_3
     , cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }}) as hcpcs_modifier_4
     , cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }}) as hcpcs_modifier_5
-    , cast(med.rendering_id as {{ dbt.type_string() }}) as rendering_id
+    , cast(med.rendering_npi as {{ dbt.type_string() }}) as rendering_npi
     , cast(med.rendering_tin as {{ dbt.type_string() }}) as rendering_tin
     , cast(med.rendering_name as {{ dbt.type_string() }}) as rendering_name
-    , cast(med.billing_id as {{ dbt.type_string() }}) as billing_id
+    , cast(med.billing_npi as {{ dbt.type_string() }}) as billing_npi
     , cast(med.billing_tin as {{ dbt.type_string() }}) as billing_tin
     , cast(med.billing_name as {{ dbt.type_string() }}) as billing_name
-    , cast(med.facility_id as {{ dbt.type_string() }}) as facility_id
+    , cast(med.facility_npi as {{ dbt.type_string() }}) as facility_npi
     , cast(med.facility_name as {{ dbt.type_string() }}) as facility_name
     , {{ try_to_cast_date('med.paid_date', 'YYYY-MM-DD') }} as paid_date
     , cast(med.paid_amount as {{ dbt.type_numeric() }}) as paid_amount

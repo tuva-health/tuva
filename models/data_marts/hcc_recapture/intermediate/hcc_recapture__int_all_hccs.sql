@@ -70,7 +70,7 @@ select distinct
     person_id
   , payer
   , claim_id
-  , rendering_id as rendering_npi
+  , rendering_npi
 from {{ ref('core__medical_claim') }}
 )
 

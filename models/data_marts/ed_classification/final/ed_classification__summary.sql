@@ -19,7 +19,7 @@ select
     , encounter.paid_amount
     , encounter.allowed_amount
     , encounter.charge_amount
-    , encounter.facility_id
+    , encounter.facility_npi
     , fac_prov.provider_organization_name as facility_name
     , practice_state as facility_state
     , practice_city as facility_city
@@ -37,7 +37,7 @@ left outer join {{ ref('ed_classification__int_filter_encounter_with_classificat
 left outer join {{ ref('ed_classification__categories') }} as cat
     on class.classification = cat.classification
 left outer join {{ ref('provider_data__provider') }} as fac_prov
-    on encounter.facility_id = fac_prov.npi
+    on encounter.facility_npi = fac_prov.npi
 left outer join {{ ref('core__patient') }} as pat
     on encounter.person_id = pat.person_id
 where encounter.encounter_type = 'emergency department'

@@ -6,7 +6,7 @@
 }}
 
 with all_providers_in_claims_dataset as (
-select distinct facility_id as npi
+select distinct facility_npi as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -15,7 +15,7 @@ union
 union distinct
 {% endif %}
 
-select distinct rendering_id as npi
+select distinct rendering_npi as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -24,7 +24,7 @@ union
 union distinct
 {% endif %}
 
-select distinct billing_id as npi
+select distinct billing_npi as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
