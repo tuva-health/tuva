@@ -124,7 +124,6 @@ const sidebars = {
             "mssp-acos/cms-alr-connector",
             "mssp-acos/medicare-cclf-connector",
             "mssp-acos/cms-aco-dashboards",
-            "mssp-acos/cms-benchmark-app"
           ],
         },
         "dashboards",
