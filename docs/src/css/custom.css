@@ -240,3 +240,98 @@ a.navbar-no-ext-icon svg[aria-label="(opens in new tab)"],
 a.navbar-no-ext-icon [class*="iconExternalLink"] {
   display: none !important;
 }
+
+.tuva-maintainers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tuva-maintainers-grid--founders {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.tuva-maintainer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.tuva-maintainer-card h3 {
+  margin-bottom: 0.25rem;
+}
+
+.tuva-maintainer-card p {
+  margin-bottom: 0;
+}
+
+.tuva-maintainer-header {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+}
+
+.tuva-maintainer-photo {
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid rgba(15, 23, 42, 0.05);
+  background: #e2e8f0;
+}
+
+.tuva-maintainer-tag {
+  margin-bottom: 0.25rem;
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tuva-maintainer-role {
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.tuva-maintainer-ownership {
+  margin-top: auto;
+  padding-top: 0.2rem;
+}
+
+[data-theme='dark'] .tuva-maintainer-tag {
+  color: #5eead4;
+}
+
+[data-theme='dark'] .tuva-maintainer-card {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.94));
+  box-shadow: none;
+}
+
+[data-theme='dark'] .tuva-maintainer-role {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .tuva-maintainer-photo {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #1e293b;
+}
+
+@media (max-width: 640px) {
+  .tuva-maintainer-card {
+    padding: 1rem;
+  }
+
+  .tuva-maintainer-header {
+    align-items: flex-start;
+  }
+}
