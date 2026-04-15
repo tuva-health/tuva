@@ -5,10 +5,8 @@ models:
       The appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed, or scheduled appointments.
     grain: One record per appointment per patient.
     transformation_steps: |-
-      This model performs SELECT * from the appointment table.
-
-      Its purpose is to bring the source data into the input layer without applying any transformations.
-    mapping_instructions: ''
+      This model brings the input layer appointment table into the Tuva package -- it does not do any transformation.
+    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -19,8 +17,9 @@ models:
       materialized: view
     columns:
       - name: appointment_id
-        description: This field is the unique identifier for an appointment within a data source.
-        mapping_instructions: ''
+        description: This field is the unique identifier for an appointment within a
+          data source.
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
@@ -34,91 +33,91 @@ models:
                 severity: error
       - name: person_id
         description: Unique identifier for each person in the dataset.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: encounter_id
         description: Unique identifier for each encounter associated with the appointment.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: start_datetime
         description: The scheduled start date and time of the appointment.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: timestamp
       - name: end_datetime
         description: The scheduled end date and time of the appointment.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: timestamp
       - name: duration
         description: The scheduled duration of the appointment in minutes.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: integer
       - name: location_id
         description: Unique identifier for the location where the appointment is scheduled.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: practitioner_id
         description: Unique identifier for the practitioner associated with the appointment.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: type_code
         description: Source appointment type code, such as a walk-in or routine visit code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: type_description
         description: Human-readable description of the source appointment type.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: status_code
         description: Source appointment status code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: status_description
         description: Human-readable description of the source appointment status.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: reason
         description: Free-text reason entered for the appointment.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: cancellation_reason
         description: Free-text reason the appointment was canceled.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         config:
           meta:
             data_type: varchar

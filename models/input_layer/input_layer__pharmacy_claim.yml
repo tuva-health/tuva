@@ -1,10 +1,13 @@
 version: 2
 models:
   - name: input_layer__pharmacy_claim
-    description: |
-      The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled for a patient, 
-      billed by a pharmacy, and paid by an insurer.  Prescriptions that are ordered but not filled should not make it into the table.  Claims
-      adjustments, denials, and reversals should be handled similar to the medical_claim table.
+    description: >-
+      The pharmacy_claim table includes information about retail and specialty
+      drug prescriptions that have been filled for a patient, billed by a
+      pharmacy, and paid by an insurer. Prescriptions that are ordered but not
+      filled should not make it into the table. Claim adjustments, denials, and
+      reversals should be handled similarly to the medical_claim table.
+    grain: Intended to be one record per claim line per data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:

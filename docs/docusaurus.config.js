@@ -358,11 +358,6 @@ const config = {
             label: 'Community',
           },
           {
-            to: '/dag-viewer',
-            position: 'left',
-            label: 'DAG Viewer',
-          },
-          {
             href: 'https://thetuvaproject.substack.com/',
             label: 'Newsletter',
             position: 'left',

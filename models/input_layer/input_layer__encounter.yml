@@ -1,13 +1,14 @@
 version: 2
 models:
   - name: input_layer__encounter
-    description: |
-      The encounter table contains information about patients visits (i.e. 
-      encounters).  This includes acute inpatient, emergency department, office 
-      visits, SNF stays, and other types of visits.  It's important to map the 
-      encounter_type field correctly for clinical data--in claims data this field is determined
-      automatically.  
-    mapping_instructions: ''
+    description: >-
+      The encounter table contains information about patient visits. This
+      includes acute inpatient stays, emergency department visits, office
+      visits, SNF stays, and other encounter types. It is important to map the
+      encounter_type field correctly for clinical data; in claims data this
+      field is determined automatically.
+    grain: Intended to be one record per encounter per data source.
+    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -16,7 +17,7 @@ models:
     columns:
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -73,7 +74,7 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -97,7 +98,7 @@ models:
             data_type: varchar
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -112,7 +113,7 @@ models:
             data_type: varchar
       - name: encounter_type
         description: Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -147,7 +148,7 @@ models:
             data_type: varchar
       - name: encounter_start_date
         description: Date when the encounter started.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -181,7 +182,7 @@ models:
             data_type: date
       - name: encounter_end_date
         description: Date when the encounter ended.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -215,7 +216,7 @@ models:
             data_type: date
       - name: length_of_stay
         description: Length of the encounter calculated as encounter_end_date - encounter_start_date.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -231,7 +232,7 @@ models:
             data_type: number
       - name: admit_source_code
         description: Indicates where the patient was before the healthcare encounter (inpatient claims only).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -266,7 +267,7 @@ models:
             data_type: varchar
       - name: admit_source_description
         description: Description of the admit_source_code for the encounter.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -281,7 +282,7 @@ models:
             data_type: varchar
       - name: admit_type_code
         description: Indicates the type of admission (inpatient claims only).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -306,7 +307,7 @@ models:
             data_type: varchar
       - name: admit_type_description
         description: Description of the admit_type_code for the encounter.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -321,7 +322,7 @@ models:
             data_type: varchar
       - name: discharge_disposition_code
         description: Indicates the type of setting the patient was discharged to (institutional inpatient claims only).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -346,7 +347,7 @@ models:
             data_type: varchar
       - name: discharge_disposition_description
         description: Description of the discharge_disposition_code for the encounter.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -361,7 +362,7 @@ models:
             data_type: varchar
       - name: attending_provider_id
         description: ID for the attending provider on the encounter.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -376,7 +377,7 @@ models:
             data_type: varchar
       - name: attending_provider_name
         description: Name of the attending provider on the encounter.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -389,9 +390,9 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: facility_id
-        description: Facility ID for the claim (typically represents the facility where services were performed).
-        mapping_instructions: ''
+      - name: facility_npi
+        description: Facility NPI for the claim (the organizational NPI of the facility where services were performed).
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -406,7 +407,7 @@ models:
             data_type: varchar
       - name: facility_name
         description: Facility name.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -421,7 +422,7 @@ models:
             data_type: varchar
       - name: primary_diagnosis_code_type
         description: The type of condition code reported in the source system e.g. ICD-10-CM.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -446,7 +447,7 @@ models:
             data_type: varchar
       - name: primary_diagnosis_code
         description: Primary diagnosis code for the encounter. If from claims the primary diagnosis code comes from the institutional claim.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -461,7 +462,7 @@ models:
             data_type: varchar
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -476,7 +477,7 @@ models:
             data_type: varchar
       - name: drg_code_type
         description: The DRG system used for the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -491,7 +492,7 @@ models:
             data_type: varchar
       - name: drg_code
         description: The DRG code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -516,7 +517,7 @@ models:
             data_type: varchar
       - name: drg_description
         description: The description for the DRG code used on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -531,7 +532,7 @@ models:
             data_type: varchar
       - name: paid_amount
         description: The total amount paid by the insurer.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -554,7 +555,7 @@ models:
             data_type: number
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient).
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -569,7 +570,7 @@ models:
             data_type: number
       - name: charge_amount
         description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -584,7 +585,7 @@ models:
             data_type: number
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -608,7 +609,7 @@ models:
             is_primary_key: true
       - name: file_name
         description: The file name of the source file.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -623,7 +624,7 @@ models:
             data_type: varchar
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: ''
+        mapping_instructions: 'No explicit mapping instructions provided.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:

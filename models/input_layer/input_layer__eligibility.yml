@@ -1,13 +1,14 @@
 version: 2
 models:
   - name: input_layer__eligibility
-    description: |
-      The eligibility table includes information about a patient's health 
-      insurance coverage and demographics (note: we use the word patient as a 
-      synonym for member). Every claims dataset should in theory include some sort of 
-      eligibility data because they have to know whether a patient has coverage in order to 
-      determine whether to pay a claim.  Eligibility data is used to calculate member months, 
-      which are needed to calculate measures like PMPM.
+    description: >-
+      The eligibility table includes information about a patient's health
+      insurance coverage and demographics; we use the word patient as a synonym
+      for member. Every claims dataset should include some form of eligibility
+      data because coverage must be verified before a claim is paid.
+      Eligibility data is also used to calculate member months, which are
+      needed for measures such as PMPM.
+    grain: Intended to be one record per person, member, enrollment span, payer, plan, and data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
