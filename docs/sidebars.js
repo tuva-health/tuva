@@ -150,6 +150,7 @@ const sidebars = {
             "data-warehouse-support/tuva-databricks",
           ],
         },
+        "official-tuva-maintainers",
         "vocab-normalization",
         "dbt-variables",
         "example-sql",
