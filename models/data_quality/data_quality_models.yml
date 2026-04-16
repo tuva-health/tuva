@@ -31,6 +31,88 @@ models:
               - level_of_detail
               - y_axis
               - x_axis
+  - name: data_quality__structural
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural
+      tags:
+        - data_quality
+        - dqi
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table_name
+        description: The input-layer table being evaluated.
+      - name: table_exists
+        description: Pass or fail result indicating whether the expected input-layer relation exists.
+      - name: columns_exist
+        description: Pass or fail result indicating whether all documented input-layer columns are present.
+      - name: data_types
+        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family.
+      - name: primary_keys
+        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain.
+      - name: row_count
+        description: The number of rows present for the evaluated data_source and input-layer table. Null means the relation does not exist.
+
+  - name: data_quality__logical
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: logical
+      tags:
+        - data_quality
+        - dqi
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: test_name
+        description: The logical consistency test being evaluated.
+      - name: test_result
+        description: The count of rows that violate the logical consistency test. Healthy results are expected to be zero.
+
+  - name: data_quality__analytical_key_metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytical_key_metrics
+      tags:
+        - data_quality
+        - dqi
+      materialized: table
+    columns:
+      - name: data_source
+        description: The data source for the analytical metric.
+      - name: domain
+        description: The high-level analytical domain for the metric.
+      - name: metric
+        description: The analytical metric name, including any grouping label carried into the output.
+      - name: result
+        description: The metric result value.
+
+  - name: data_quality__analytical_data_marts
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytical_data_marts
+      tags:
+        - data_quality
+        - dqi
+      materialized: table
+    columns:
+      - name: data_source
+        description: The data source for the mart row count. The value all is used when a mart does not expose data_source or when an empty mart still needs a summary row.
+      - name: data_mart_name
+        description: The Tuva final mart model name being summarized.
+      - name: row_count
+        description: The row count for the mart. Null indicates the mart relation does not exist.
+
   - name: data_quality__chronic_conditions_prevalence
     config:
       schema: |
