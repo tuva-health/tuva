@@ -409,6 +409,8 @@ jobs:
               and child_env.get("CI_REFRESHES_SEEDS") != "true"
               else "false"
           )
+          if child_env["DBT_CI_USE_BASELINE_SEEDS"] == "true" and "--no-partial-parse" not in command:
+              command.append("--no-partial-parse")
           print(f"DBT_CI_USE_BASELINE_SEEDS={child_env['DBT_CI_USE_BASELINE_SEEDS']}")
           print(f"Running: {shlex.join(command)}")
           subprocess.run(command, check=True, env=child_env)
