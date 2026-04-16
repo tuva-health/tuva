@@ -384,7 +384,8 @@ jobs:
         env:
           DBT_COMMAND_JSON: ${{ needs.resolve_request.outputs.dbt_command_json }}
           DBT_ADAPTER: ${{ matrix.adapter }}
-          DBT_CI_USE_BASELINE_SEEDS: ${{ needs.resolve_request.outputs.requires_seed_baseline == 'true' && needs.resolve_request.outputs.refreshes_seeds != 'true' && 'true' || 'false' }}
+          CI_REQUIRES_SEED_BASELINE: ${{ needs.resolve_request.outputs.requires_seed_baseline }}
+          CI_REFRESHES_SEEDS: ${{ needs.resolve_request.outputs.refreshes_seeds }}
         run: |
           python - <<'PY'
           import json
@@ -401,6 +402,14 @@ jobs:
                   f"./integration_tests/profiles/{os.environ['DBT_ADAPTER']}",
               ]
           )
+          child_env = os.environ.copy()
+          child_env["DBT_CI_USE_BASELINE_SEEDS"] = (
+              "true"
+              if child_env.get("CI_REQUIRES_SEED_BASELINE") == "true"
+              and child_env.get("CI_REFRESHES_SEEDS") != "true"
+              else "false"
+          )
+          print(f"DBT_CI_USE_BASELINE_SEEDS={child_env['DBT_CI_USE_BASELINE_SEEDS']}")
           print(f"Running: {shlex.join(command)}")
-          subprocess.run(command, check=True)
+          subprocess.run(command, check=True, env=child_env)
           PY
