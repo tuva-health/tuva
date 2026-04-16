@@ -9,10 +9,11 @@
       "target_schema": schema_var
     , "alias": "summary_counts_snapshot"
     , "tags": "quality_measures"
-    , "strategy": "timestamp"
-    , "updated_at": "tuva_last_run"
-    , "unique_key": "measure_id||measure_name||measure_version||performance_period_begin||performance_period_end||tuva_last_run"
+    , "strategy": "check"
+    , "check_cols": ["denominator_sum", "numerator_sum", "exclusion_sum", "performance_rate"]
+    , "unique_key": "measure_id||measure_name||measure_version||performance_period_begin||performance_period_end"
     , "enabled": var('snapshots_enabled',False) == true and var('claims_enabled', var('clinical_enabled', False)) == true | as_bool
+    , "hard_deletes": "invalidate"
   })
 }}
 

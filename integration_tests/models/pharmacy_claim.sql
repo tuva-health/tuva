@@ -28,11 +28,9 @@
     , in_network_flag
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
+{# Extension columns for testing passthrough to core.pharmacy_claim #}
 {%- set tuva_extensions -%}
-    {# , prescribing_provider_npi as zzz_temp_prescribing_provider_npi #}
-    {# , ndc_code as x_temp_ndc_code #}
-    {# , plan as zzz_temp_plan #}
+    , ndc_code as x_temp_ndc_code
 {%- endset -%}
 
 {%- set tuva_metadata -%}

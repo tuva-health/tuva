@@ -1,6 +1,8 @@
 {{ config(
-    enabled = var('claims_enabled', False)
-) }}
+    enabled = (var('enable_legacy_data_quality', false) | as_bool) and 
+              (var('claims_enabled', false) | as_bool)
+    )
+}}
 with tuva_last_run as(
     select cast(substring('{{ var('tuva_last_run') }}',1,10) as date) as tuva_last_run
 )
