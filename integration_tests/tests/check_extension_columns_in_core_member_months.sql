@@ -24,14 +24,17 @@
 {%- set extension_cols = [] -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
     {%- if col.name.lower().startswith('x_') -%}
-        {%- do extension_cols.append(col.name) -%}
+        {%- do extension_cols.append(col.name.lower()) -%}
     {%- endif -%}
 {%- endfor -%}
 
 {%- if extension_cols | length == 0 -%}
 
 -- No x_ columns configured in input_layer__eligibility; test passes vacuously.
-select 1 where false
+select
+    null as member_month_key
+    , null as failure_reason
+where false
 
 {%- else -%}
 
@@ -50,7 +53,10 @@ where cast(x_temp_person_id as varchar) <> cast(person_id as varchar)
 {%- else %}
 
 -- x_temp_person_id not in extension columns; pass vacuously for this check.
-select 1 where false
+select
+    null as member_month_key
+    , null as failure_reason
+where false
 
 {%- endif %}
 

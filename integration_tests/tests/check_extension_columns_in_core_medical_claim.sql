@@ -27,13 +27,17 @@
 {%- set extension_cols = [] -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
     {%- if col.name.lower().startswith('x_') -%}
-        {%- do extension_cols.append(col.name) -%}
+        {%- do extension_cols.append(col.name.lower()) -%}
     {%- endif -%}
 {%- endfor -%}
 
 {%- if extension_cols | length == 0 -%}
 
-select 1 where false
+select
+    null as claim_id
+    , null as claim_line_number
+    , null as failure_reason
+where false
 
 {%- else -%}
 
@@ -50,7 +54,11 @@ where cast(x_temp_claim_id as varchar) <> cast(claim_id as varchar)
 
 {%- else %}
 
-select 1 where false
+select
+    null as claim_id
+    , null as claim_line_number
+    , null as failure_reason
+where false
 
 {%- endif %}
 
@@ -69,7 +77,11 @@ where cast(x_temp_payer as varchar) <> cast(payer as varchar)
 
 {%- else %}
 
-select 1 where false
+select
+    null as claim_id
+    , null as claim_line_number
+    , null as failure_reason
+where false
 
 {%- endif %}
 
