@@ -384,6 +384,7 @@ jobs:
         env:
           DBT_COMMAND_JSON: ${{ needs.resolve_request.outputs.dbt_command_json }}
           DBT_ADAPTER: ${{ matrix.adapter }}
+          DBT_CI_USE_BASELINE_SEEDS: ${{ needs.resolve_request.outputs.requires_seed_baseline == 'true' && needs.resolve_request.outputs.refreshes_seeds != 'true' && 'true' || 'false' }}
         run: |
           python - <<'PY'
           import json
