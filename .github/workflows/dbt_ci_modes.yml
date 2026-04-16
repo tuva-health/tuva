@@ -406,7 +406,7 @@ jobs:
           child_env["DBT_CI_USE_BASELINE_SEEDS"] = (
               "true"
               if child_env.get("CI_REQUIRES_SEED_BASELINE") == "true"
-              and child_env.get("CI_REFRESHES_SEEDS") != "true"
+              or child_env.get("CI_REFRESHES_SEEDS") == "true"
               else "false"
           )
           if child_env["DBT_CI_USE_BASELINE_SEEDS"] == "true" and "--no-partial-parse" not in command:
