@@ -10,23 +10,35 @@
    )
 }}
 
-{% set structural_dependency_names = [
-    'input_layer__appointment',
-    'input_layer__condition',
-    'input_layer__eligibility',
-    'input_layer__encounter',
-    'input_layer__immunization',
-    'input_layer__lab_result',
-    'input_layer__location',
-    'input_layer__medical_claim',
-    'input_layer__medication',
-    'input_layer__observation',
-    'input_layer__patient',
-    'input_layer__pharmacy_claim',
-    'input_layer__practitioner',
-    'input_layer__procedure',
-    'input_layer__provider_attribution'
-] %}
+{% set structural_dependency_names = [] %}
+
+{% if var('clinical_enabled', false) | as_bool %}
+  {% do structural_dependency_names.extend([
+      'input_layer__appointment',
+      'input_layer__condition',
+      'input_layer__encounter',
+      'input_layer__immunization',
+      'input_layer__lab_result',
+      'input_layer__location',
+      'input_layer__medication',
+      'input_layer__observation',
+      'input_layer__patient',
+      'input_layer__practitioner',
+      'input_layer__procedure'
+  ]) %}
+{% endif %}
+
+{% if var('claims_enabled', false) | as_bool %}
+  {% do structural_dependency_names.extend([
+      'input_layer__eligibility',
+      'input_layer__medical_claim',
+      'input_layer__pharmacy_claim'
+  ]) %}
+{% endif %}
+
+{% if var('provider_attribution_enabled', false) | as_bool %}
+  {% do structural_dependency_names.append('input_layer__provider_attribution') %}
+{% endif %}
 
 {% for dependency_name in structural_dependency_names %}
 -- depends_on: {{ ref(dependency_name) }}

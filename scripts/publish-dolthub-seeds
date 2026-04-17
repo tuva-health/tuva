@@ -121,6 +121,13 @@ def parse_args() -> argparse.Namespace:
         help="Root folder containing local Dolt clones when --source local is used.",
     )
     parser.add_argument(
+        "--local-ref",
+        help=(
+            "Optional Dolt ref to read from when --source local is used, "
+            "for example main, tuva_health/main, or a commit hash."
+        ),
+    )
+    parser.add_argument(
         "--database",
         action="append",
         default=[],
@@ -291,14 +298,21 @@ def read_local_sql_csv(repo_database: str, query: str) -> list[dict[str, str]]:
     return list(csv.DictReader(result.stdout.splitlines()))
 
 
+def sql_string_literal(value: str) -> str:
+    return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+
 def quote_identifier(identifier: str) -> str:
     return f"`{identifier.replace('`', '``')}`"
 
 
-def get_local_header_columns(repo_database: str, table_name: str) -> list[str]:
+def get_local_header_columns(repo_database: str, table_name: str, local_ref: str | None = None) -> list[str]:
     repo_path = local_repo_path(repo_database)
+    table_reference = quote_identifier(table_name)
+    if local_ref:
+        table_reference = f"{table_reference} AS OF {sql_string_literal(local_ref)}"
     result = subprocess.run(
-        ["dolt", "sql", "-r", "csv", "-q", f"select * from {quote_identifier(table_name)} limit 0"],
+        ["dolt", "sql", "-r", "csv", "-q", f"select * from {table_reference} limit 0"],
         cwd=str(repo_path),
         check=True,
         stdout=subprocess.PIPE,
@@ -310,12 +324,15 @@ def get_local_header_columns(repo_database: str, table_name: str) -> list[str]:
     return [column for column in header_columns if column != "__pk"]
 
 
-def build_local_export_query(table_name: str, columns: list[str]) -> str:
+def build_local_export_query(table_name: str, columns: list[str], local_ref: str | None = None) -> str:
     projected_columns = [
         f"IFNULL(CAST({quote_identifier(column)} AS CHAR), '\\\\N') AS {quote_identifier(column)}"
         for column in columns
     ]
-    return f"select {', '.join(projected_columns)} from {quote_identifier(table_name)}"
+    table_reference = quote_identifier(table_name)
+    if local_ref:
+        table_reference = f"{table_reference} AS OF {sql_string_literal(local_ref)}"
+    return f"select {', '.join(projected_columns)} from {table_reference}"
 
 
 def repo_root() -> Path:
@@ -471,7 +488,10 @@ EXTERNAL_DATE_COLUMNS = build_external_date_column_map()
 def get_assets_for_database(logical_database: str, owner: str, ref: str) -> list[TableAsset]:
     repo_database = DATABASE_FOLDERS[logical_database]
     if ARGS.source == "local":
-        catalog_rows = read_local_sql_csv(repo_database, "select * from asset_table_catalog")
+        catalog_query = "select * from asset_table_catalog"
+        if ARGS.local_ref:
+            catalog_query += f" AS OF {sql_string_literal(ARGS.local_ref)}"
+        catalog_rows = read_local_sql_csv(repo_database, catalog_query)
     else:
         catalog_ref = resolve_dolthub_csv_ref(owner, repo_database, ref)
         catalog_url = csv_endpoint(owner, repo_database, catalog_ref, "asset_table_catalog")
@@ -569,8 +589,8 @@ def download_asset(asset: TableAsset, destination: Path, attempts: int = 4) -> i
 def download_local_asset(asset: TableAsset, destination: Path) -> int:
     repo_path = local_repo_path(asset.repo_database)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    columns = get_local_header_columns(asset.repo_database, asset.table_name)
-    query = build_local_export_query(asset.table_name, columns)
+    columns = get_local_header_columns(asset.repo_database, asset.table_name, ARGS.local_ref)
+    query = build_local_export_query(asset.table_name, columns, ARGS.local_ref)
 
     process = subprocess.Popen(
         ["dolt", "sql", "-r", "csv", "-q", query],
@@ -613,6 +633,8 @@ def build_manifest_entry(asset: TableAsset, bucket: str, actual_rows: int, stage
     destination_uri = f"s3://{bucket}/{asset.relative_key}"
     if ARGS.source == "local":
         source_reference = f"{local_repo_path(asset.repo_database)}/{asset.table_name}"
+        if ARGS.local_ref:
+            source_reference = f"{source_reference}@{ARGS.local_ref}"
     else:
         source_reference = csv_endpoint(ARGS.owner, asset.repo_database, ARGS.ref, asset.table_name)
     return {
@@ -642,6 +664,8 @@ def main() -> int:
 
     if ARGS.keep_staged_files and not ARGS.stage_dir:
         raise ValueError("--keep-staged-files requires --stage-dir.")
+    if ARGS.local_ref and ARGS.source != "local":
+        raise ValueError("--local-ref can only be used with --source local.")
 
     if not ARGS.dry_run and not ARGS.download_only:
         ensure_upload_prerequisites()

@@ -49,8 +49,14 @@ These vars control shared seed loading and optional feature behavior.
 | Variable | Default | Description |
 |-----------|---------|-------------|
 | `custom_bucket_name` | `"tuva-public-resources"` | Default bucket for versioned Tuva seed artifacts. |
-| `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
-| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.0.0", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
+| `concept_library_version` | `"1.0.1"` | Primary version var for concept library assets. |
+| `reference_data_version` | `"1.1.0"` | Primary version var for reference data assets. |
+| `terminology_version` | `"1.1.0"` | Primary version var for terminology assets. |
+| `value_sets_version` | `"1.1.0"` | Primary version var for value sets assets. |
+| `provider_data_version` | `"1.1.0"` | Primary version var for provider data assets. |
+| `synthetic_data_version` | `"1.0.0"` | Primary version var for synthetic data assets. |
+| `tuva_seed_version` | `"1.0.0"` | Deprecated fallback default version when no per-asset var or legacy map override is provided. Leading `v` is optional. |
+| `tuva_seed_versions` | `{}` | Deprecated per-database fallback map keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
 | `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |
@@ -78,7 +84,12 @@ vars:
   provider_attribution_enabled: true
   cms_hcc_payment_year: 2024
   quality_measures_period_end: "2024-12-31"
-  tuva_seed_version: "1.0.0"
+  concept_library_version: "1.0.1"
+  reference_data_version: "1.1.0"
+  terminology_version: "1.1.0"
+  value_sets_version: "1.1.0"
+  provider_data_version: "1.1.0"
+  synthetic_data_version: "1.0.0"
 ```
 
 ## Example `integration_tests` Config
@@ -92,6 +103,12 @@ vars:
   provider_attribution_enabled: true
   semantic_layer_enabled: true
   synthetic_data_size: small
+  concept_library_version: "1.0.1"
+  reference_data_version: "1.1.0"
+  terminology_version: "1.1.0"
+  value_sets_version: "1.1.0"
+  provider_data_version: "1.1.0"
+  synthetic_data_version: "1.0.0"
 ```
 
 For provider attribution date overrides, see [Provider Attribution](./data-marts/tuva-provider-attribution.md). For the current local runbook, see [Getting Started](./getting-started.md).

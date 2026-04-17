@@ -10,22 +10,34 @@
    )
 }}
 
-{% set analytical_data_mart_dependency_names = [
-    'ahrq_measures__pqi_summary',
-    'ccsr__procedure_summary',
-    'chronic_conditions__cms_chronic_conditions_wide',
-    'cms_hcc__patient_risk_scores',
-    'ed_classification__summary',
-    'financial_pmpm__pmpm_payer',
-    'hcc_recapture__recapture_rates',
-    'hcc_suspecting__summary',
-    'pharmacy__brand_generic_opportunity',
-    'provider_attribution__provider_ranking',
-    'quality_measures__summary_wide',
-    'readmissions__readmission_summary',
-    'semantic_layer__fact_member_months',
-    'semantic_layer__fact_quality_measures'
-] %}
+{% set analytical_data_mart_dependency_names = [] %}
+
+{% if var('claims_enabled', false) | as_bool %}
+  {% do analytical_data_mart_dependency_names.extend([
+      'ahrq_measures__pqi_summary',
+      'ccsr__procedure_summary',
+      'chronic_conditions__cms_chronic_conditions_wide',
+      'cms_hcc__patient_risk_scores',
+      'ed_classification__summary',
+      'financial_pmpm__pmpm_payer',
+      'hcc_recapture__recapture_rates',
+      'hcc_suspecting__summary',
+      'pharmacy__brand_generic_opportunity',
+      'quality_measures__summary_wide',
+      'readmissions__readmission_summary'
+  ]) %}
+{% endif %}
+
+{% if var('provider_attribution_enabled', false) | as_bool %}
+  {% do analytical_data_mart_dependency_names.append('provider_attribution__provider_ranking') %}
+{% endif %}
+
+{% if var('semantic_layer_enabled', false) | as_bool %}
+  {% do analytical_data_mart_dependency_names.extend([
+      'semantic_layer__fact_member_months',
+      'semantic_layer__fact_quality_measures'
+  ]) %}
+{% endif %}
 
 {% for dependency_name in analytical_data_mart_dependency_names %}
 -- depends_on: {{ ref(dependency_name) }}

@@ -10,22 +10,22 @@
 {% endmacro %}
 
 
-{% macro get_seed_database_folder(database) %}
+{% macro get_seed_database_name(database) %}
   {% set folders = the_tuva_project.get_seed_database_folders() %}
   {% set normalized_database = database | string | trim %}
   {% set alternate_database = normalized_database | replace('-', '_') %}
 
   {% if normalized_database in folders %}
-    {{ return(folders[normalized_database]) }}
+    {{ return(normalized_database) }}
   {% endif %}
 
   {% if alternate_database in folders %}
-    {{ return(folders[alternate_database]) }}
+    {{ return(alternate_database) }}
   {% endif %}
 
-  {% for folder in folders.values() %}
+  {% for logical_database, folder in folders.items() %}
     {% if normalized_database == folder %}
-      {{ return(folder) }}
+      {{ return(logical_database) }}
     {% endif %}
   {% endfor %}
 
@@ -35,17 +35,30 @@
 {% endmacro %}
 
 
+{% macro get_seed_database_folder(database) %}
+  {% set folders = the_tuva_project.get_seed_database_folders() %}
+  {% set logical_database = the_tuva_project.get_seed_database_name(database) %}
+  {{ return(folders[logical_database]) }}
+{% endmacro %}
+
+
 {% macro get_seed_bucket(database) %}
   {% set bucket_overrides = var('tuva_seed_buckets', {}) %}
   {% set normalized_database = database | string | trim %}
   {% set alternate_database = normalized_database | replace('-', '_') %}
+  {% set logical_database = the_tuva_project.get_seed_database_name(database) %}
+  {% set database_folder = the_tuva_project.get_seed_database_folder(logical_database) %}
   {% set bucket = none %}
 
   {% if bucket_overrides is mapping %}
-    {% if normalized_database in bucket_overrides %}
+    {% if logical_database in bucket_overrides %}
+      {% set bucket = bucket_overrides[logical_database] %}
+    {% elif normalized_database in bucket_overrides %}
       {% set bucket = bucket_overrides[normalized_database] %}
     {% elif alternate_database in bucket_overrides %}
       {% set bucket = bucket_overrides[alternate_database] %}
+    {% elif database_folder in bucket_overrides %}
+      {% set bucket = bucket_overrides[database_folder] %}
     {% endif %}
   {% endif %}
 
@@ -67,15 +80,23 @@
     {% set version_overrides = var('tuva_seed_versions', {}) %}
     {% set version = none %}
 
-    {% if version_overrides is mapping %}
-      {% if database is not none %}
-        {% set normalized_database = database | string | trim %}
-        {% set alternate_database = normalized_database | replace('-', '_') %}
+    {% if database is not none %}
+      {% set logical_database = the_tuva_project.get_seed_database_name(database) %}
+      {% set normalized_database = database | string | trim %}
+      {% set alternate_database = normalized_database | replace('-', '_') %}
+      {% set database_folder = the_tuva_project.get_seed_database_folder(logical_database) %}
+      {% set per_asset_var_name = logical_database ~ '_version' %}
+      {% set version = var(per_asset_var_name, none) %}
 
-        {% if normalized_database in version_overrides %}
+      {% if version is none and version_overrides is mapping %}
+        {% if logical_database in version_overrides %}
+          {% set version = version_overrides[logical_database] %}
+        {% elif normalized_database in version_overrides %}
           {% set version = version_overrides[normalized_database] %}
         {% elif alternate_database in version_overrides %}
           {% set version = version_overrides[alternate_database] %}
+        {% elif database_folder in version_overrides %}
+          {% set version = version_overrides[database_folder] %}
         {% endif %}
       {% endif %}
     {% endif %}
@@ -185,4 +206,3 @@
       null_marker
   )) }}
 {% endmacro %}
-

@@ -79,8 +79,14 @@ Set Tuva vars under the `vars:` key in your `dbt_project.yml`. Use dbt selectors
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `custom_bucket_name` | `"tuva-public-resources"` | Default bucket for versioned Tuva seed artifacts. |
-| `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
-| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.0.0", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
+| `concept_library_version` | `"1.0.1"` | Primary version var for concept library assets. |
+| `reference_data_version` | `"1.1.0"` | Primary version var for reference data assets. |
+| `terminology_version` | `"1.1.0"` | Primary version var for terminology assets. |
+| `value_sets_version` | `"1.1.0"` | Primary version var for value sets assets. |
+| `provider_data_version` | `"1.1.0"` | Primary version var for provider data assets. |
+| `synthetic_data_version` | `"1.0.0"` | Primary version var for synthetic data assets. |
+| `tuva_seed_version` | `"1.0.0"` | Deprecated fallback default version when no per-asset var or legacy map override is provided. Leading `v` is optional. |
+| `tuva_seed_versions` | `{}` | Deprecated per-database fallback map keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `synthetic_data_size` | `small` in `integration_tests` | Selects the `small` or `large` synthetic input payload when running `integration_tests`. |
 | `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
@@ -93,9 +99,12 @@ See the maintained docs reference at [thetuvaproject.com/dbt-variables](https://
 
 Use `scripts/publish-dolthub-seeds` to publish the latest public DoltHub databases to versioned S3 folders.
 
+The repo-local operator runbook for this process lives at [skills/versioned-seed-release.md](/Users/aaronneiderhiser/code/tuva/skills/versioned-seed-release.md).
+
 Required inputs:
-- `--version v1.0.0`
-- AWS CLI credentials via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+- `--version v1.1.0`
+- `--ref v1.1.0` to pin the DoltHub release tag instead of publishing from `main`
+- AWS CLI credentials or AWS SSO auth
 
 Optional inputs:
 - `--bucket reference_data=my-bucket`
@@ -105,6 +114,8 @@ Optional inputs:
 
 The script publishes to the normalized layout:
 - `s3://<bucket>/<database-folder>/<version>/<table>.csv.gz`
+
+For live publishes, pass `--stage-dir` so the generated `publish-manifest.json` is retained as the audit artifact for the release.
 
 ## Mirroring Seed Releases To GCS And Azure
 
@@ -118,7 +129,7 @@ Required access:
 Example:
 
 ```bash
-scripts/mirror-seed-release --version v1.0.0
+scripts/mirror-seed-release --version v1.1.0 --target gcs --target azure
 ```
 
 The script mirrors:
@@ -126,6 +137,7 @@ The script mirrors:
 - `gs://tuva-public-resources/<database-folder>/<version>/...`
 - `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`
 
-Current published defaults:
+Current published versions:
 - `concept-library` uses `1.0.1`
-- `reference-data`, `terminology`, `value-sets`, `provider-data`, and `synthetic-data` use `1.0.0`
+- `reference-data`, `terminology`, `value-sets`, and `provider-data` use `1.1.0`
+- `synthetic-data` uses `1.0.0`

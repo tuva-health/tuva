@@ -10,19 +10,28 @@
    )
 }}
 
-{% set dependency_names = [
-    'core__patient',
-    'core__medical_claim',
-    'core__pharmacy_claim',
-    'core__member_months',
-    'core__encounter',
-    'core__eligibility',
-    'readmissions__readmission_summary',
-    'readmissions__encounter_augmented',
-    'ed_classification__summary',
-    'chronic_conditions__tuva_chronic_conditions_long',
-    'cms_hcc__patient_risk_factors'
-] %}
+{% set dependency_names = [] %}
+
+{% if var('claims_enabled', false) | as_bool or var('clinical_enabled', false) | as_bool %}
+  {% do dependency_names.extend([
+      'core__patient',
+      'core__encounter'
+  ]) %}
+{% endif %}
+
+{% if var('claims_enabled', false) | as_bool %}
+  {% do dependency_names.extend([
+      'core__medical_claim',
+      'core__pharmacy_claim',
+      'core__member_months',
+      'core__eligibility',
+      'readmissions__readmission_summary',
+      'readmissions__encounter_augmented',
+      'ed_classification__summary',
+      'chronic_conditions__tuva_chronic_conditions_long',
+      'cms_hcc__patient_risk_factors'
+  ]) %}
+{% endif %}
 
 {% for dependency_name in dependency_names %}
 -- depends_on: {{ ref(dependency_name) }}

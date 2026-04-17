@@ -11,16 +11,28 @@
 }}
 
 {% set logical_rules = dq_logical_rules() %}
-{% set dependency_names = [
-    'input_layer__appointment',
-    'input_layer__condition',
-    'input_layer__eligibility',
-    'input_layer__encounter',
-    'input_layer__lab_result',
-    'input_layer__medical_claim',
-    'input_layer__pharmacy_claim',
-    'input_layer__provider_attribution'
-] %}
+{% set dependency_names = [] %}
+
+{% if var('clinical_enabled', false) | as_bool %}
+  {% do dependency_names.extend([
+      'input_layer__appointment',
+      'input_layer__condition',
+      'input_layer__encounter',
+      'input_layer__lab_result'
+  ]) %}
+{% endif %}
+
+{% if var('claims_enabled', false) | as_bool %}
+  {% do dependency_names.extend([
+      'input_layer__eligibility',
+      'input_layer__medical_claim',
+      'input_layer__pharmacy_claim'
+  ]) %}
+{% endif %}
+
+{% if var('provider_attribution_enabled', false) | as_bool %}
+  {% do dependency_names.append('input_layer__provider_attribution') %}
+{% endif %}
 
 {% for dependency_name in dependency_names %}
 -- depends_on: {{ ref(dependency_name) }}
