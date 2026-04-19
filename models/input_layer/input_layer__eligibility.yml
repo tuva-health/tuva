@@ -431,7 +431,7 @@ models:
                   - tuva_dqi_sev_3
                   - dqi
               arguments:
-                expression: "death_flag is null or cast(death_flag as {{ dbt.type_string() }}) <> '1' or death_date is not null"
+                expression: "is null or cast(death_flag as {{ dbt.type_string() }}) <> '1' or death_date is not null"
         config:
           meta:
             data_type: boolean
