@@ -3,9 +3,7 @@ version: 2
 seeds:
   - name: raw_data__appointment
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - clinical
         - input_layer
@@ -79,9 +77,7 @@ seeds:
 
   - name: patient_seed
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
-        {% else %}_tuva_synthetic{%- endif -%}
+      schema: raw_data
       tags:
         - clinical
         - input_layer
@@ -136,9 +132,7 @@ seeds:
 
   - name: raw_data__eligibility
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - claims
         - input_layer
@@ -227,9 +221,7 @@ seeds:
 
   - name: raw_data__immunization
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - clinical
         - input_layer
@@ -283,9 +275,7 @@ seeds:
         
   - name: raw_data__lab_result
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - clinical
         - input_layer
@@ -363,9 +353,7 @@ seeds:
 
   - name: raw_data__medical_claim
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - claims
         - input_layer
@@ -634,9 +622,7 @@ seeds:
 
   - name: raw_data__observation
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - clinical
         - input_layer
@@ -690,9 +676,7 @@ seeds:
 
   - name: raw_data__pharmacy_claim
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - claims
         - input_layer
@@ -743,9 +727,7 @@ seeds:
 
   - name: raw_data__provider_attribution
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_synthethic
-        {% else %}tuva_synthethic{%- endif -%}
+      schema: raw_data
       tags:
         - attribution
         - input_layer

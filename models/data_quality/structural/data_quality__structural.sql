@@ -5,28 +5,40 @@
        else 'data_quality'
      ),
      alias = 'structural',
-     tags = ['data_quality', 'dqi'],
+     tags = ['data_quality', 'dqi', 'dq1', 'dq_structural'],
      materialized = 'table'
    )
 }}
 
-{% set structural_dependency_names = [
-    'input_layer__appointment',
-    'input_layer__condition',
-    'input_layer__eligibility',
-    'input_layer__encounter',
-    'input_layer__immunization',
-    'input_layer__lab_result',
-    'input_layer__location',
-    'input_layer__medical_claim',
-    'input_layer__medication',
-    'input_layer__observation',
-    'input_layer__patient',
-    'input_layer__pharmacy_claim',
-    'input_layer__practitioner',
-    'input_layer__procedure',
-    'input_layer__provider_attribution'
-] %}
+{% set structural_dependency_names = [] %}
+
+{% if var('clinical_enabled', false) | as_bool %}
+  {% do structural_dependency_names.extend([
+      'input_layer__appointment',
+      'input_layer__condition',
+      'input_layer__encounter',
+      'input_layer__immunization',
+      'input_layer__lab_result',
+      'input_layer__location',
+      'input_layer__medication',
+      'input_layer__observation',
+      'input_layer__patient',
+      'input_layer__practitioner',
+      'input_layer__procedure'
+  ]) %}
+{% endif %}
+
+{% if var('claims_enabled', false) | as_bool %}
+  {% do structural_dependency_names.extend([
+      'input_layer__eligibility',
+      'input_layer__medical_claim',
+      'input_layer__pharmacy_claim'
+  ]) %}
+{% endif %}
+
+{% if (var('provider_attribution_enabled', false) and var('claims_enabled', false)) | as_bool %}
+  {% do structural_dependency_names.append('input_layer__provider_attribution') %}
+{% endif %}
 
 {% for dependency_name in structural_dependency_names %}
 -- depends_on: {{ ref(dependency_name) }}
@@ -49,7 +61,7 @@
                     , 'fail' as columns_exist
                     , 'fail' as data_types
                     , 'fail' as primary_keys
-                    , cast(null as {{ dbt.type_numeric() }}) as row_count
+                    , cast(null as {{ dbt.type_int() }}) as row_count
             {% endset %}
         {% else %}
             {% set expected_columns = dq_expected_columns(model_node) %}
@@ -91,7 +103,7 @@
                         , '{{ status.columns_exist }}' as columns_exist
                         , '{{ status.data_types }}' as data_types
                         , 'fail' as primary_keys
-                        , coalesce(source_counts.row_count, 0) as row_count
+                        , cast(coalesce(source_counts.row_count, 0) as {{ dbt.type_int() }}) as row_count
                     from (
                         {{ dq_source_dimension_sql(relation) }}
                     ) as sources
@@ -114,7 +126,7 @@
                             then 'pass'
                             else 'fail'
                           end as primary_keys
-                        , coalesce(source_counts.row_count, 0) as row_count
+                        , cast(coalesce(source_counts.row_count, 0) as {{ dbt.type_int() }}) as row_count
                     from (
                         {{ dq_source_dimension_sql(relation) }}
                     ) as sources
@@ -146,6 +158,6 @@
         , cast(null as {{ dbt.type_string() }}) as columns_exist
         , cast(null as {{ dbt.type_string() }}) as data_types
         , cast(null as {{ dbt.type_string() }}) as primary_keys
-        , cast(null as {{ dbt.type_numeric() }}) as row_count
+        , cast(null as {{ dbt.type_int() }}) as row_count
     where 1 = 0
 {% endif %}

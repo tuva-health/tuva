@@ -1,5 +1,8 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = (
+       var('provider_attribution_enabled', False)
+       and var('claims_enabled', False)
+     ) | as_bool
    )
 }}
 

@@ -74,7 +74,10 @@ models:
     columns:
       - name: person_id
         description: 'Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical). The primary key for the eligibility table is person_id, member_id, enrollment_start_date, enrollment_end_date, and data_source. There are two commonly used data formats for eligibility (also known as enrollment) data: the eligibility span format and the member month format. The eligibility span format has one record per member eligibility span. An eligibility span is a time period when a member was enrolled with and therefore had insurance coverage by a health plan. An eligibility span has a start date and an end date. A person can have multiple eligibility spans. The member month format has one record per member per month of enrollment. For example, a person with a single eligibility span from 1/1/2020 through 3/31/2020 would have a single eligibility span record, but 3 member month records, one for each month. The eligibility table follows the eligibility span format.'
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to a unique person-level identifier. The same person
+          should not have multiple `person_id` values across payers, data
+          sources, or plans.
         required_for_data_marts: ['ahrq_measures', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'provider_attribution', 'quality_measures', 'readmissions', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -115,7 +118,10 @@ models:
             is_primary_key: true
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string; member_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the member identifier assigned for a specific plan.
+          A person can have more than one `member_id` because they can be
+          enrolled in multiple plans, and the `member_id` can differ by plan.
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'pharmacy']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -132,7 +138,10 @@ models:
             is_primary_key: true
       - name: subscriber_id
         description: Identifier that links a patient to a particular insurance product or health plan. This field is a string; subscriber_id is specific to a health insurer or health plan, and is assigned by the insurance company to uniquely identify a specific individual within their system. This ID corresponds to the policyholder for the insurance plan, and can be 1:many with person_id or member_id.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the subscriber or policyholder identifier for the
+          plan. A family can share the same `subscriber_id`, while each covered
+          person should still have their own `member_id`.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -147,7 +156,10 @@ models:
             data_type: varchar
       - name: gender
         description: 'The gender of the patient. This field is a string that represents the biological sex of a member. It must take one of three accepted values according to the Tuva Project: male, female, and unknown.'
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to biological gender using one of three lowercase
+          values only: `male`, `female`, or `unknown`. Every person should have
+          one and only one gender.
         required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'encounters']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -178,12 +190,34 @@ models:
                   - tuva_dqi_sev_3
                   - dqi
                   - dqi_cms_hccs
+          - the_tuva_project.expect_column_unique_value_count_to_be_between:
+              description: A person should not have multiple genders.
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                meta:
+                  dqi_test_description: A person should not have multiple genders.
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_cms_hccs
+              arguments:
+                min_value: 1
+                max_value: 1
+                group_by:
+                  - person_id
+                strictly: false
         config:
           meta:
             data_type: varchar
       - name: race
         description: The patient's race. This field is a string and corresponds to a members race.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to one of the Tuva race terminology values:
+          `american indian or alaska native`, `asian`, `asked but unknown`,
+          `black or african american`, `native hawaiian or other pacific
+          islander`, `other race`, `unknown`, or `white`. Every person should
+          have one and only one race.
         required_for_data_marts: ['ed_classification', 'encounters', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -193,6 +227,29 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+          - the_tuva_project.expect_column_unique_value_count_to_be_between:
+              description: A person should not have multiple races.
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                meta:
+                  dqi_test_description: A person should not have multiple races.
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                min_value: 1
+                max_value: 1
+                group_by:
+                  - person_id
+                strictly: false
           - relationships:
               config:
                 severity: warn
@@ -216,7 +273,11 @@ models:
             data_type: varchar
       - name: birth_date
         description: The birth date of the patient. This field is a date representing the birth date of a member.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to a full birth date for the person. If the source is
+          a string, it should represent a full month-day-year value
+          (`MM/DD/YYYY`) before it is cast to a date. Every person should have
+          one and only one birth date.
         required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'encounters', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
@@ -282,7 +343,10 @@ models:
             data_type: date
       - name: death_date
         description: Date the patient died if there is one. This field is a date containing the day a member died. If the member is alive, this field is null.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Populate this field when a death date is known. If the source is a
+          string, it should represent a full month-day-year value
+          (`MM/DD/YYYY`) before it is cast to a date.
         required_for_data_marts: ['cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
@@ -322,8 +386,10 @@ models:
           meta:
             data_type: date
       - name: death_flag
-        description: A flag indicating if the patient has died. death_flag contains a flag indicating if a member has died; 1 for yes 0 for no. death_flag should be 1 if a death_date is populated. death_flag can be 1 and death_date null if only an indicator is available in the source data.
-        mapping_instructions: ''
+        description: A flag indicating if the patient has died. Allowed values are 1 for yes, 0 for no, or null. If `death_flag` is 1, `death_date` should also be populated.
+        mapping_instructions: >-
+          Map this field to `1`, `0`, or null only. If `death_flag` is `1`,
+          `death_date` should also be populated.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -357,12 +423,24 @@ models:
                   - '0'
                   - '1'
                 quote: false
+          - dbt_utils.expression_is_true:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+              arguments:
+                expression: "death_flag is null or cast(death_flag as {{ dbt.type_string() }}) <> '1' or death_date is not null"
         config:
           meta:
             data_type: boolean
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the beginning of the enrollment span for the plan.
+          If the source is a string, it should represent a full month-day-year
+          value (`MM/DD/YYYY`) before it is cast to a date.
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
@@ -407,7 +485,11 @@ models:
             is_primary_key: true
       - name: enrollment_end_date
         description: Date the patient's insurance eligibility ended.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the end of the enrollment span for the plan. If the
+          source is a string, it should represent a full month-day-year value
+          (`MM/DD/YYYY`) before it is cast to a date. `enrollment_start_date`
+          should always be less than or equal to `enrollment_end_date`.
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm']
         tests:
           - the_tuva_project.expect_column_values_to_be_between:
@@ -460,7 +542,10 @@ models:
             is_primary_key: true
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the payer name for the enrollment, such as `Aetna`
+          or `Blue Cross Blue Shield`. If the source data is for a single
+          payer, it is acceptable to hard-code the payer name.
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -485,7 +570,9 @@ models:
             is_primary_key: true
       - name: payer_type
         description: 'Type of payer (e.g. commercial, medicare, medicaid, etc.). This field is a string that contains the type of insurance provided by the payer. It must take one of the values contained in the payer_type terminology file: commercial, medicare, medicaid, and self-insured.'
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map every value to one of the Tuva payer type terminology values:
+          `commercial`, `medicaid`, `medicare`, or `self-insured`.
         required_for_data_marts: ['cms_hccs']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -494,6 +581,13 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
+                  - dqi
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
                   - dqi
           - relationships:
               config:
@@ -518,7 +612,10 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded (e.g. select aetna bronze 1 as plan).
-        mapping_instructions: ''
+        mapping_instructions: >-
+          Map this field to the plan or product name for the enrollment, such
+          as `Humana HMO` or `Humana PPO`. If the source data is already scoped
+          to a single plan, it is acceptable to hard-code the plan name.
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
