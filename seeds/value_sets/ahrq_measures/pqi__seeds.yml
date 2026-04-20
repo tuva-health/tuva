@@ -9,7 +9,7 @@ seeds:
       alias: _value_set_pqi
       tags:
         - pqi
-      enabled: "{{ var('quality_measures_pqi',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -35,7 +35,7 @@ seeds:
       alias: _value_set_pqi_measures
       tags:
         - pqi
-      enabled: "{{ var('quality_measures_pqi',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         pqi_number: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

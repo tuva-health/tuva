@@ -56,6 +56,9 @@ const config = {
     tuvaVersion: getTuvaVersion(),
   },
 
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: { mermaid: true },
+
   plugins: [
     require.resolve("docusaurus-plugin-image-zoom"),
     [
@@ -251,6 +254,18 @@ const config = {
           },
           {
             from: '/getting-started/synthetic-data-demo',
+            to: '/getting-started',
+          },
+          {
+            from: '/archive/getting-started/contributing',
+            to: '/getting-started',
+          },
+          {
+            from: '/getting-started/contributing',
+            to: '/getting-started',
+          },
+          {
+            from: '/contributing',
             to: '/getting-started',
           },
           

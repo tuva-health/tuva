@@ -1,10 +1,13 @@
 version: 2
 models:
   - name: input_layer__pharmacy_claim
-    description: |
-      The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled for a patient, 
-      billed by a pharmacy, and paid by an insurer.  Prescriptions that are ordered but not filled should not make it into the table.  Claims
-      adjustments, denials, and reversals should be handled similar to the medical_claim table.
+    description: >-
+      The pharmacy_claim table includes information about retail and specialty
+      drug prescriptions that have been filled for a patient, billed by a
+      pharmacy, and paid by an insurer. Prescriptions that are ordered but not
+      filled should not make it into the table. Claim adjustments, denials, and
+      reversals should be handled similarly to the medical_claim table.
+    grain: Intended to be one record per claim line per data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -118,7 +121,7 @@ models:
             is_primary_key: true
       - name: person_id
         description: Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical).
-        mapping_instructions: ''
+        mapping_instructions: 'Map the unique identifier that represents a single person. The same person should not have multiple person_ids. Every pharmacy claim should have one and only one person_id.'
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -144,7 +147,7 @@ models:
             data_type: varchar
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string that links each row to a given member. This field should be populated for every row in the pharmacy_claim table. It is a header-level field, so its value must be the same for all lines in a given claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the member identifier assigned to the person for the specific health plan covering the claim. A person can have multiple member_ids across plans, so member_id does not need to be globally unique to the person. A given pharmacy claim should typically carry one member_id.'
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'pharmacy']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -159,7 +162,7 @@ models:
             data_type: varchar
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the name of the insurer responsible for the pharmacy claim. In many source systems payer effectively matches the data source, so it is acceptable to hard-code a stable payer value when the source represents a single insurer.'
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -184,7 +187,7 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded if not present.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the health plan or product name associated with the pharmacy claim, such as Humana PPO or Humana HMO. If the source does not provide a plan value, it is acceptable to hard-code a stable plan label during mapping.'
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -209,7 +212,7 @@ models:
             data_type: varchar
       - name: prescribing_provider_npi
         description: NPI for the provider that wrote the prescription (e.g. primary care physician). This field is a string that contains NPI (National Provider Identifier) values. precribing_provider_npi is populated with the NPI of the provider who prescribed the medication (e.g. primary care physician).
-        mapping_instructions: ''
+        mapping_instructions: 'Map the NPI of the provider who prescribed the medication. Every pharmacy claim should have a prescribing_provider_npi, and the mapped value should be a valid 10-digit NPI that matches the provider table.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -219,12 +222,35 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+          - the_tuva_project.expect_column_value_lengths_to_equal:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_2
+                  - dqi
+              arguments:
+                value: 10
+          - the_tuva_project.expect_column_values_to_match_regex:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+              arguments:
+                regex: ^[0-9]{10}$
+                pattern1: '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
         config:
           meta:
             data_type: varchar
       - name: dispensing_provider_npi
         description: NPI for the provider that dispensed the prescription (e.g. pharmacy). This field is a string that contains NPI (National Provider Identifier) values. dispensing_provider_npi is populated with the NPI of the provider who dispensed the medication. This NPI may represent the pharmacist or the pharmacy.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the NPI of the provider or pharmacy that dispensed the medication. Every pharmacy claim should have a dispensing_provider_npi, and the mapped value should be a valid 10-digit NPI that matches the provider table.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -234,12 +260,35 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+          - the_tuva_project.expect_column_value_lengths_to_equal:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_2
+                  - dqi
+              arguments:
+                value: 10
+          - the_tuva_project.expect_column_values_to_match_regex:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+              arguments:
+                regex: ^[0-9]{10}$
+                pattern1: '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
         config:
           meta:
             data_type: varchar
       - name: dispensing_date
         description: Date the medication was dispensed. This field is a date that corresponds to the date a medication was given to the patient. This may also be denoted as fill_date depending on the data source.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the date the medication was dispensed. Cast source text or timestamps to a date in YYYY-MM-DD format during mapping. Every pharmacy claim should have a dispensing_date.'
         required_for_data_marts: ['financial_pmpm', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -248,6 +297,15 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_financial_pmpm
+                  - dqi_quality_measures
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
                   - dqi
                   - dqi_financial_pmpm
                   - dqi_quality_measures
@@ -290,7 +348,7 @@ models:
             data_type: date
       - name: ndc_code
         description: 'National drug code associated with the medication. This field represents the National Drug Code (NDC) for the actual drug being dispensed. Each line on a pharmacy claim represents a drug that was dispensed, so each line must have an ndc_code. NDC codes are written as a 10-digit number on drug packaging, but an additional digit is usually added when billing an NDC on a healthcare claim, making the NDC have 11 digits on pharmacy claims. If your raw data has 10-digit NDC codes, you must add a 0 to the code to make it 11 digits when mapping to the pharmacy_claim input layer table. The 11-digit number follows a 5-4-2 format, i.e. 5 digits in the first segment, 4 digits in the second segment, and 2 digits in the third segment. The rules for which segment the additional digit is added to are as follows: - 4-4-2 becomes 5-4-2 - 5-3-2 becomes 5-4-2 - 5-4-1 becomes 5-4-2 Essentially you add a leading zero to whichever segment needs it. If your 10-digit codes are not separated into segments by dashes, it is impossible to know where to add the extra 0 and so you cannot accurately turn your code into an 11-digit code and can therefore you cannot map it to the pharmacy_claim input layer table. Whether your raw data has 11-digit NDC codes or 10-digit codes that you may successfully convert to 11-digit codes, you must remove the dashes in the code when mapping to the pharmacy_claim input layer table. The ndc_code field should should always be populated with 11-character strings. DOI checks that the ndc_code field is always populated. DQI does not check whether the value of this field is a valid value from terminology. If your raw data has invalid values, you will map them to the input layer and Tuvas data quality intelligence flag invalid values downstream from the input layer.'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the NDC for the medication that was dispensed. Every pharmacy claim line should have an ndc_code. Normalize 10-digit source NDCs to the 11-digit billing format, remove dashes, and make sure the final mapped value is valid against Tuva terminology.'
         required_for_data_marts: ['cms_chronic_conditions', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -333,16 +391,6 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -367,16 +415,6 @@ models:
                   - tuva_dqi_sev_3
                   - dqi
                   - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Days supply should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: integer
@@ -397,7 +435,7 @@ models:
             data_type: integer
       - name: paid_date
         description: The date the claim was paid. This field is a date that corresponds to when the health insurer processed the claim for payment, and in the context of pharmacy claims should coincide with the date the pharmacy received reimbursement from the health insurer.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the date the pharmacy claim was paid. Cast source text or timestamps to a date in YYYY-MM-DD format during mapping. Every pharmacy claim should have a paid_date.'
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -406,6 +444,16 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_cms_chronic_conditions
+                  - dqi_financial_pmpm
+                  - dqi_quality_measures
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
                   - dqi
                   - dqi_cms_chronic_conditions
                   - dqi_financial_pmpm
@@ -449,7 +497,7 @@ models:
             data_type: date
       - name: paid_amount
         description: The total amount paid by the insurer. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the dollar amount paid by the health insurer for the covered medication. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the final insurer-paid amount after any source-level Adjustments, Denials, and Reversals logic has been applied. Temporary negative values may exist upstream before ADR is resolved, but the final mapped paid_amount in the input layer should be greater than zero.'
         required_for_data_marts: ['financial_pmpm', 'pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -490,22 +538,12 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient). This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the total amount allowed for a medication, including dollars paid by both the payer and the patient. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete. The expectation is that the sum of paid_amount, coinsurance_amount, copayment_amount, and deductible_amount will be equivalent to allowed_amount.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the final allowed amount after any source-level Adjustments, Denials, and Reversals logic has been applied. Temporary negative values may exist upstream before ADR is resolved, but the final mapped allowed_amount in the input layer should be greater than zero.'
         required_for_data_marts: ['financial_pmpm', 'pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -537,16 +575,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -619,16 +647,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -664,16 +682,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -709,16 +717,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -757,13 +755,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:

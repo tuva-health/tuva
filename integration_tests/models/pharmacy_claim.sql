@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -28,11 +28,9 @@
     , in_network_flag
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
+{# Extension columns for testing passthrough to core.pharmacy_claim #}
 {%- set tuva_extensions -%}
-    {# , prescribing_provider_npi as zzz_temp_prescribing_provider_npi #}
-    {# , ndc_code as x_temp_ndc_code #}
-    {# , plan as zzz_temp_plan #}
+    , ndc_code as x_temp_ndc_code
 {%- endset -%}
 
 {%- set tuva_metadata -%}
@@ -42,20 +40,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('pharmacy_claim_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'pharmacy_claim') }}
-
-{%- endif %}
+from {{ ref('raw_data__pharmacy_claim') }}

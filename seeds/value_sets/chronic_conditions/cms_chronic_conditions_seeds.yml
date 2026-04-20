@@ -10,7 +10,7 @@ seeds:
       tags:
         - cms_chronic_conditions
         - chronic_conditions
-      enabled: "{{ var('cms_chronic_conditions_enabled',var('tuva_marts_enabled',True)) }}"
+      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         condition_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

@@ -1,6 +1,8 @@
 {{ config(
-    enabled = var('claims_enabled', False)
-) }}
+    enabled = (var('enable_legacy_data_quality', false) | as_bool) and 
+              (var('claims_enabled', false) | as_bool)
+    )
+}}
 
 select distinct -- to bring to claim_ID grain
       m.data_source
@@ -25,4 +27,4 @@ select distinct -- to bring to claim_ID grain
     , cast(m.dispensing_provider_npi as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('pharmacy_claim') }} as m
-left outer join {{ ref('terminology__provider') }} as term on m.dispensing_provider_npi = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.dispensing_provider_npi = term.npi

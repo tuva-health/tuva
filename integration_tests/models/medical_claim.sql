@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -151,12 +151,10 @@
     , in_network_flag
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
+{# Extension columns for testing passthrough to core.medical_claim #}
 {%- set tuva_extensions -%}
-    {# , claim_id as x_temp_claim_id #}
-    {# , person_id as zzz_temp_person_id #}
-    {# , payer as x_temp_payer #}
-    {# , paid_date as zzz_temp_paid_date #}
+    , claim_id as x_temp_claim_id
+    , payer as x_temp_payer
 {%- endset -%}
 
 {%- set tuva_metadata -%}
@@ -166,20 +164,8 @@
     , ingest_datetime
 {%- endset -%}
 
-{% if var('use_synthetic_data') == true -%}
-
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('medical_claim_seed') }}
-
-{%- else -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ source('source_input', 'medical_claim') }}
-
-{%- endif %}
+from {{ ref('raw_data__medical_claim') }}

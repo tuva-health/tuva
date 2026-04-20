@@ -1,0 +1,143 @@
+version: 2
+
+# Unit tests for extension column passthrough through the member_months pipeline.
+#
+# These tests verify that x_ columns defined in the eligibility input layer flow
+# correctly through each stage:
+#   normalized_input__eligibility
+#     → claims_enrollment__member_months   (calendar join → monthly explosion)
+#     → core__member_months                (final SELECT)
+#
+# How _extension_columns_override works:
+#   select_extension_columns() normally calls adapter.get_columns_in_relation()
+#   at compile time to discover x_ columns dynamically.  In dbt unit tests,
+#   ref() resolves to an ephemeral CTE, so the introspection call returns nothing
+#   and the model would compile without extension columns.
+#
+#   Setting _extension_columns_override bypasses DB introspection entirely: the
+#   macro uses the supplied list instead.  This makes each test self-contained —
+#   no prior model run or external DB state is required.
+#
+# input_layer__eligibility is listed in each `given` section so dbt can satisfy
+# the compile-time dependency that ref('input_layer__eligibility') creates inside
+# the select_extension_columns() call.  With the override active, the fixture
+# data for that node is never queried; it only needs to exist as a node.
+
+unit_tests:
+
+  # ── Stage 1: calendar join explodes enrollment span into monthly rows ───────
+  - name: test_member_months_extension_columns_flow_through_calendar_join
+    description: >
+      Verifies that x_ extension columns from normalized_input__eligibility are
+      preserved after the calendar join that explodes enrollment spans into one
+      row per member-month.
+    model: claims_enrollment__member_months
+    config:
+      enabled: "{{ var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', false))) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
+    given:
+      - input: ref('normalized_input__eligibility')
+        rows:
+          - person_id: '10'
+            member_id: '10'
+            payer: 'medicare'
+            plan: 'medicare'
+            data_source: 'test'
+            enrollment_start_date: '2020-01-01'
+            enrollment_end_date: '2020-01-31'
+            tuva_last_run: '2024-01-01 00:00:00'
+            x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+      # Provide first + last day of January so the aggregate yields the correct
+      # month_start_date / month_end_date for the enrollment overlap check.
+      - input: ref('reference_data__calendar')
+        rows:
+          - full_date: '2020-01-01'
+            year: 2020
+            month: 1
+          - full_date: '2020-01-31'
+            year: 2020
+            month: 1
+      # Listed to satisfy the compile-time ref() dependency inside
+      # select_extension_columns(). The fixture data is not used because
+      # _extension_columns_override is set.
+      - input: ref('input_layer__eligibility')
+        rows:
+          - x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+    expect:
+      rows:
+        # member_month_key = md5('10-10-202001-medicare-medicare-test')
+        - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+          person_id: '10'
+          member_id: '10'
+          year_month: '202001'
+          payer: 'medicare'
+          plan: 'medicare'
+          data_source: 'test'
+          tuva_last_run: '2024-01-01 00:00:00'
+          x_temp_person_id: '10'
+          x_temp_first_name: 'John'
+
+  # ── Stage 2: final core table SELECT preserves extension columns ────────────
+  - name: test_core_member_months_extension_columns_appear_in_final_output
+    description: >
+      Verifies that x_ extension columns appear in the final core.member_months
+      table in the correct position (after the attribution columns, before
+      data_source / tuva_last_run).
+    model: core__member_months
+    config:
+      enabled: "{{ var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
+    given:
+      - input: ref('core__stg_claims_member_months')
+        rows:
+          - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+            person_id: '10'
+            member_id: '10'
+            year_month: '202001'
+            payer: 'medicare'
+            plan: 'medicare'
+            payer_attributed_provider: null
+            payer_attributed_provider_practice: null
+            payer_attributed_provider_organization: null
+            payer_attributed_provider_lob: null
+            custom_attributed_provider: null
+            custom_attributed_provider_practice: null
+            custom_attributed_provider_organization: null
+            custom_attributed_provider_lob: null
+            x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+            data_source: 'test'
+            tuva_last_run: '2024-01-01 00:00:00'
+      # Listed to satisfy the compile-time ref() dependency inside
+      # select_extension_columns(). The fixture data is not used because
+      # _extension_columns_override is set.
+      - input: ref('input_layer__eligibility')
+        rows:
+          - x_temp_person_id: '10'
+            x_temp_first_name: 'John'
+    expect:
+      rows:
+        - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
+          person_id: '10'
+          member_id: '10'
+          year_month: '202001'
+          payer: 'medicare'
+          plan: 'medicare'
+          payer_attributed_provider: null
+          payer_attributed_provider_practice: null
+          payer_attributed_provider_organization: null
+          payer_attributed_provider_lob: null
+          custom_attributed_provider: null
+          custom_attributed_provider_practice: null
+          custom_attributed_provider_organization: null
+          custom_attributed_provider_lob: null
+          x_temp_person_id: '10'
+          x_temp_first_name: 'John'
+          data_source: 'test'
+          tuva_last_run: '2024-01-01 00:00:00'

@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--version",
         required=True,
-        help="Release version to mirror, e.g. v0.18.0 or 0.18.0.",
+        help="Release version to mirror, e.g. v1.0.0 or 1.0.0.",
     )
     parser.add_argument(
         "--database",
@@ -195,7 +195,19 @@ def sync_s3_prefix(database_folder: str, stage_root: Path, dry_run: bool) -> Pat
 
 def sync_to_gcs(local_path: Path, database_folder: str, dry_run: bool) -> None:
     destination = f"gs://{ARGS.gcs_bucket}/{database_folder}/{ARGS.version}"
-    run(["gsutil", "-m", "rsync", "-r", str(local_path), destination], dry_run=dry_run)
+    run(
+        [
+            "gsutil",
+            "-o",
+            "GSUtil:parallel_process_count=1",
+            "-m",
+            "rsync",
+            "-r",
+            str(local_path),
+            destination,
+        ],
+        dry_run=dry_run,
+    )
 
 
 def azure_blob_name(database_folder: str, local_path: Path, file_path: Path) -> str:

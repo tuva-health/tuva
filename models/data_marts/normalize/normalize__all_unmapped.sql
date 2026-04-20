@@ -1,11 +1,11 @@
 {{ config(
      enabled = ( ( var('enable_normalize_engine', False) == True  or  var('enable_normalize_engine', False) == "unmapped") and
-                   var('claims_enabled', var('clinical_enabled', var('tuva_marts_enabled', False)))
+                   var('claims_enabled', var('clinical_enabled', False))
                ) | as_bool
    )
 }}
 with agg_cte as (
-    {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
+    {% if var('clinical_enabled', False) == true -%}
     select * From {{ref('normalize__stg_unmapped_appointment')}} union all
     select * From {{ref('normalize__stg_unmapped_lab_result')}} union all
     select * From {{ref('normalize__stg_unmapped_medication')}} union all

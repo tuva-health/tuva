@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -15,6 +15,7 @@ with stg_eligibility as (
     , enrollment_start_date
     , enrollment_end_date
     , tuva_last_run
+    {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig') }}
   from {{ ref('normalized_input__eligibility') }} as elig
 )
 
@@ -37,6 +38,7 @@ select distinct
   , a.{{ quote_column('plan') }}
   , a.data_source
   , a.tuva_last_run
+  {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
 from stg_eligibility as a
 inner join month_start_and_end_dates as b
   on a.enrollment_start_date <= b.month_end_date

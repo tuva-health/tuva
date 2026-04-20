@@ -1,0 +1,91 @@
+version: 2
+
+models:
+
+  - name: normalized_input__stg_patient
+    description: |
+      Typed clinical patient records from the input layer with passthrough
+      columns and run metadata applied upstream.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: normalized_input_stg_patient
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: view
+      tags:
+        - normalized_input
+        - clinical
+    columns:
+      - name: person_id
+      - name: patient_id
+      - name: name_suffix
+      - name: first_name
+      - name: middle_name
+      - name: last_name
+      - name: sex
+      - name: race
+      - name: birth_date
+      - name: death_date
+      - name: death_flag
+      - name: social_security_number
+      - name: address
+      - name: city
+      - name: state
+      - name: zip_code
+      - name: county
+      - name: latitude
+      - name: longitude
+      - name: phone
+      - name: email
+      - name: ethnicity
+      - name: data_source
+      - name: file_name
+      - name: ingest_datetime
+      - name: tuva_last_run
+
+  - name: normalized_input__patient
+    description: |
+      Clinical patient records passed through after upstream typing and
+      metadata creation.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: normalized_input_patient
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - clinical
+    columns:
+      - name: person_id
+      - name: patient_id
+      - name: name_suffix
+      - name: first_name
+      - name: middle_name
+      - name: last_name
+      - name: sex
+      - name: race
+      - name: birth_date
+      - name: death_date
+      - name: death_flag
+      - name: social_security_number
+      - name: address
+      - name: city
+      - name: state
+      - name: zip_code
+      - name: county
+      - name: latitude
+      - name: longitude
+      - name: phone
+      - name: email
+      - name: ethnicity
+      - name: data_source
+      - name: file_name
+      - name: ingest_datetime
+      - name: tuva_last_run

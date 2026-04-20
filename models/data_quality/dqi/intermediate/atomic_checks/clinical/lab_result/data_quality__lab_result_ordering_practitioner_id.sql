@@ -1,6 +1,8 @@
 {{ config(
-    enabled = var('clinical_enabled', False)
-) }}
+    enabled = (var('enable_legacy_data_quality', false) | as_bool) and 
+              (var('clinical_enabled', false) | as_bool)
+    )
+}}
 
 
 select
@@ -20,4 +22,4 @@ select
     , cast(ordering_practitioner_id as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('lab_result') }} as m
-left outer join {{ ref('terminology__provider') }} as term on m.ordering_practitioner_id = term.npi
+left outer join {{ ref('provider_data__provider') }} as term on m.ordering_practitioner_id = term.npi

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('claims_enabled', False)
  | as_bool
    )
 }}
@@ -178,10 +178,10 @@ left outer join {{ ref('terminology__apr_drg') }} as aprdrg
     and med.drg_code = aprdrg.apr_drg_code
 left outer join {{ ref('terminology__revenue_center') }} as rev
     on med.revenue_center_code = rev.revenue_center_code
-left outer join {{ ref('terminology__provider') }} as rendnpi
+left outer join {{ ref('provider_data__provider') }} as rendnpi
     on med.rendering_npi = rendnpi.npi
-left outer join {{ ref('terminology__provider') }} as billnpi
+left outer join {{ ref('provider_data__provider') }} as billnpi
     on med.billing_npi = billnpi.npi
-left outer join {{ ref('terminology__provider') }} as facnpi
+left outer join {{ ref('provider_data__provider') }} as facnpi
     on med.facility_npi = facnpi.npi
 where claim_type in ('undetermined')

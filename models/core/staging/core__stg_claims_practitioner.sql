@@ -1,6 +1,6 @@
 
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -55,7 +55,7 @@ from {{ ref('core__stg_claims_pharmacy_claim') }}
 
 , provider as (
 select aa.*
-from {{ ref('terminology__provider') }} as aa
+from {{ ref('provider_data__provider') }} as aa
 inner join all_providers_in_claims_dataset as bb
 on aa.npi = bb.npi
 where lower(aa.entity_type_description) = 'individual'

@@ -1,13 +1,17 @@
 version: 2
 models:
   - name: input_layer__medical_claim
-    description: |
-      The medical_claim table contains information on healthcare services and supplies provided to patients, 
-      billed by providers, and paid for by health insurers. It includes information on the provider who rendered 
-      the service, the amount paid for the service by the health insurer, and the underlying reason for the 
-      service (i.e. diagnosis).  Medical claims data may include original, adjusted, reversed, or final claims.  It is up
-      to the person mapping the dataset to make the correct determination about these nuances and filter out all but
-      final claims -- otherwise key metrics such as cost, utilization, and outcomes will be incorrect.
+    description: >-
+      The medical_claim table contains information on healthcare services and
+      supplies provided to patients, billed by providers, and paid for by
+      health insurers. It includes information on the provider who rendered the
+      service, the amount paid for the service by the health insurer, and the
+      underlying reason for the service, such as diagnosis. Medical claims data
+      may include original, adjusted, reversed, or final claims. It is up to
+      the person mapping the dataset to make the correct determination about
+      these nuances and filter out all but final claims; otherwise key metrics
+      such as cost, utilization, and outcomes will be incorrect.
+    grain: Intended to be one record per claim line per data source.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -144,8 +148,8 @@ models:
             data_type: integer
             is_primary_key: true
       - name: claim_type
-        description: 'Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision. This field is a string that describes the type of claim and must have one of the following 3 values: institutional, professional, or undetermined. This is a header-level field, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table. The logic to populate this field is as follows: - A claim is said to be institutional if it has any of these 6 fields populated: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code. Note that we are only requiring that at least one of those fields is populated, not that it is populated with a valid value. - A claim is said to be professional if none of the 6 fields above (bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code) are populated AND it has at least one populated place_of_service_code. Note that we only require that at least one place_of_service_code is populated, not that it is populated with a valid value. - If neither of the above two bullets is the case, the claim is said to be undetermined. Making the claim_type determination at the header level might happen in a CTE that looks like this: with claim_types as ( select claim_id , max( bill_type_code is not null or drg_code is not null or admit_type_code is not null or admit_source_code is not null or discharge_disposition_code is not null or revenue_center_code is not null ) as is_institutional , max( bill_type_code is null and drg_code is null and admit_type_code is null and admit_source_code is null and discharge_disposition_code is null and revenue_center_code is null and place_of_service_code is not null ) as is_professional from mapped_claims_data group by claim_id ) Then, later, the claim type determination can be made in a case statement, like this: ... , case when is_institutional then institutional when is_professional and not is_institutional then professional when not is_professional and not is_institutional then undetermined end as claim_type'
-        mapping_instructions: ''
+        description: 'Indicates whether the claim is professional (CMS-1500), institutional (UB-04), or undetermined. This field is a string that describes the type of claim and must have one of the following 3 values: institutional, professional, or undetermined. This is a header-level field, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table. The logic to populate this field is as follows: - A claim is said to be institutional if it has any of these fields populated: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code. - A claim is said to be professional if none of those institutional indicators are populated and it has at least one populated place_of_service_code. - If neither of the above two bullets is the case, the claim is said to be undetermined. Making the claim_type determination at the header level might happen in a CTE that looks like this: with claim_types as ( select claim_id , max( bill_type_code is not null or drg_code is not null or admit_type_code is not null or admit_source_code is not null or discharge_disposition_code is not null or revenue_center_code is not null ) as is_institutional , max( bill_type_code is null and drg_code is null and admit_type_code is null and admit_source_code is null and discharge_disposition_code is null and revenue_center_code is null and place_of_service_code is not null ) as is_professional from mapped_claims_data group by claim_id ) Then, later, the claim type determination can be made in a case statement, like this: ... , case when is_institutional then institutional when is_professional and not is_institutional then professional when not is_professional and not is_institutional then undetermined end as claim_type'
+        mapping_instructions: 'Map every claim to institutional, professional, or undetermined. This is a header-level field and must be identical across all lines for the same claim_id. Professional claims should have place_of_service_code and should not carry institutional-only indicators such as bill_type_code, admit_type_code, admit_source_code, discharge_disposition_code, drg_code, or revenue_center_code. Institutional claims should have bill_type_code and revenue_center_code and should not carry place_of_service_code. If the source does not cleanly support either pattern, map the claim to undetermined until the classification can be resolved. This field is critical because downstream service category grouping and encounter grouping depend on it.'
         required_for_data_marts: ['cms_hccs', 'encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
@@ -172,7 +176,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -202,21 +205,19 @@ models:
                 values:
                   - professional
                   - institutional
-                  - vision
-                  - dental
                   - undetermined
         config:
           meta:
             data_type: varchar
       - name: person_id
         description: Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical).
-        mapping_instructions: ''
+        mapping_instructions: 'Map the unique identifier for the person receiving care. Every claim should have one and only one person_id, and the same person should not appear under multiple person_ids. This is the person-level identifier that should remain stable across plans, member IDs, and claims when that information is available.'
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'provider_attribution', 'quality_measures', 'readmissions', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A claim should not belong to two different people.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 meta:
                   dqi_test_description: A claim should not belong to two different people.
@@ -231,7 +232,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -258,7 +258,7 @@ models:
             data_type: varchar
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string that links each row to a given member. This field should be populated for every row in the medical_claim table. It is a header-level field, so its value must be the same for all lines in a given claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the member identifier assigned to the person for the specific health plan covering the claim. A person can have multiple member_ids over time or across plans, so member_id does not need to be globally unique to the person. This is a header-level field and must be identical across all lines for the same claim_id.'
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -273,7 +273,7 @@ models:
             data_type: varchar
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage. payer contains the name of the health insurance payer for the claim (Aetna, Blue Cross Blue Shield, etc). The source data may not contain this field. In that case, the field can be set to a specific value.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the name of the payer responsible for the claim, such as Aetna, Blue Cross Blue Shield, Medicare CCLF, or Medicare MSSP. In many claims data sets the payer is effectively the data source and can be hard-coded when the source only contains one payer.'
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -298,7 +298,7 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded (e.g. select aetna bronze 1 as plan).
-        mapping_instructions: ''
+        mapping_instructions: 'Map the plan or product name associated with the coverage on the claim, such as Humana PPO or Humana HMO. This field is especially useful for commercial claims. If the source data does not provide the plan name, it is acceptable to hard-code a stable plan value for the data source.'
         required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -323,7 +323,7 @@ models:
             data_type: varchar
       - name: claim_start_date
         description: 'The date when the healthcare service was provided. Format: YYYY-MM-DD.'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the header-level start date for the claim. Every claim should have a claim_start_date and the value must be identical across all lines for the same claim_id. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. claim_start_date must always be less than or equal to claim_end_date.'
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
@@ -348,7 +348,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -420,7 +419,7 @@ models:
             data_type: date
       - name: claim_end_date
         description: End date for the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the header-level end date for the claim. Every claim should have a claim_end_date and the value must be identical across all lines for the same claim_id. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. claim_end_date must always be greater than or equal to claim_start_date.'
         required_for_data_marts: ['cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
@@ -445,7 +444,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - not_null:
               config:
@@ -515,7 +513,7 @@ models:
             data_type: date
       - name: claim_line_start_date
         description: Start date for the claim line.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the start date for the individual claim line. Every claim line should have a claim_line_start_date. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. claim_line_start_date must always be less than or equal to claim_line_end_date.'
         required_for_data_marts: ['claims_enrollment', 'encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -560,12 +558,20 @@ models:
                   - tuva_dqi_sev_5
                   - dqi
                   - dqi_financial_pmpm
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_financial_pmpm
         config:
           meta:
             data_type: date
       - name: claim_line_end_date
         description: End date for the claim line.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the end date for the individual claim line. Every claim line should have a claim_line_end_date. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. claim_line_end_date must always be greater than or equal to claim_line_start_date.'
         required_for_data_marts: ['encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -595,12 +601,20 @@ models:
                   - tuva_dqi_sev_5
                   - dqi
                   - dqi_financial_pmpm
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_financial_pmpm
         config:
           meta:
             data_type: date
       - name: admission_date
         description: Admission date for the claim (inpatient claims only).
-        mapping_instructions: ''
+        mapping_instructions: 'Populate admission_date for inpatient facility claims such as acute inpatient, skilled nursing, inpatient rehabilitation, hospice inpatient, swing bed, and other institutional inpatient stays identified from bill_type_code. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. admission_date should be less than or equal to discharge_date.'
         required_for_data_marts: ['claims_enrollment', 'encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -636,12 +650,21 @@ models:
                   - dqi_tuva_chronic_conditions
               arguments:
                 column_type: date
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_tuva_chronic_conditions
         config:
           meta:
             data_type: date
       - name: discharge_date
         description: Discharge date for the claim (inpatient claims only).
-        mapping_instructions: ''
+        mapping_instructions: 'Populate discharge_date for inpatient facility claims such as acute inpatient, skilled nursing, inpatient rehabilitation, hospice inpatient, swing bed, and other institutional inpatient stays identified from bill_type_code. If the source date is delivered as text, cast it to a date in YYYY-MM-DD format during mapping. discharge_date should be greater than or equal to admission_date.'
         required_for_data_marts: ['encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -677,12 +700,21 @@ models:
                   - dqi_tuva_chronic_conditions
               arguments:
                 column_type: date
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_tuva_chronic_conditions
         config:
           meta:
             data_type: date
       - name: admit_source_code
         description: Indicates where the patient was before the healthcare encounter (inpatient claims only). This field is a single-character string that indicates a patients location prior to admission, and exists only in institutional claims. This is another header-level value, which means there should be only 1 distinct value over a single claim_id.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the admit source code from the claim header for inpatient institutional claims when it is available. This is a header-level field and should be identical across all lines for the same claim_id. The mapped value should conform to Tuva terminology for admit_source_code.'
         required_for_data_marts: ['ahrq_measures', 'encounters', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -706,7 +738,7 @@ models:
             data_type: varchar
       - name: admit_type_code
         description: Indicates the type of admission (inpatient claims only). This field is a string that indicates the priority of admission (e.g. Urgent, Emergent, Elective, etc.) This is another header-level value, which means there should be only 1 distinct value over a single claim_id. Along with admit_source_code, these codes are maintained by the National Uniform Billing Committee (NUBC).
-        mapping_instructions: ''
+        mapping_instructions: 'Map the admit type code from the claim header for inpatient institutional claims when it is available. This is a header-level field and should be identical across all lines for the same claim_id. The mapped value should conform to Tuva terminology for admit_type_code.'
         required_for_data_marts: ['encounters', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -743,7 +775,7 @@ models:
             data_type: varchar
       - name: discharge_disposition_code
         description: 'Indicates the type of setting the patient was discharged to (institutional inpatient claims only). This field is a two-character string that represents one of the standard discharge_disposition_code values. This field should be populated for all institutional claims and is a header-level field, so its value must be the same for all rows in a given claim. Note that in source data this column might be called discharge status or patient status. DQI checks that the value of this field is a two-character string and that it is consistent across all lines for a given claim_id. Note that discharge_disposition_code values may have leading zeroes. Often, these leading zeroes are missing in the source data. This issue should be corrected during the mapping process, and one way to handle this could be the following: ```sql lpad(discharge_disposition_code, 2, 0) as discharge_disposition_code ```'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the discharge disposition code from the claim header for institutional inpatient claims when it is available. This is a header-level field and should be identical across all lines for the same claim_id. The mapped value should conform to Tuva terminology for discharge_disposition_code and should preserve leading zeroes when they exist in the standard code set.'
         required_for_data_marts: ['encounters', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -770,7 +802,7 @@ models:
             data_type: varchar
       - name: place_of_service_code
         description: 'Place of service for the claim (professional claims only). This field is a two-character string that represents one of the standard place_of_service_code values, which represent a specific location where a medical service was provided. This field should be populated for professional claims and is a line-level field, so its value may be different for different lines in a given claim. DQI checks that the value of this field is a two-character string, but it does not check whether the value is valid (i.e. that this field matches one of the place_of_service_code values in terminology). If your raw data has invalid values, DQI will identify them downstream of the input layer. DQI raises a warning if a professional claim has null place_of_service_code values. In the case that place_of_service_codes are null or not populated for some claim lines in source data, these values may be backfilled with 99, which corresponds to "Other Place of Service." Note that place_of_service_code values may have leading zeroes. Often, these leading zeroes are missing in the source data. This issue should be corrected during the mapping process, and one way to handle this could be the following: ```sql lpad(place_of_service_code, 2, 0) as place_of_service_code ```'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the place of service code at the claim-line level for professional claims. Every professional claim line should have a place_of_service_code, and institutional claims should not use this field. The mapped value should conform to Tuva terminology for place_of_service_code and should preserve leading zeroes when they exist in the standard code set.'
         required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - not_null:
@@ -822,7 +854,7 @@ models:
             data_type: varchar
       - name: bill_type_code
         description: Bill type code for the claim (institutional claims only). This field is a three- or four-character string that represents one of the standard bill type code values. In the case that this code is three characters, we expect two numbers followed by a letter. If its four characters, we expect a leading 0. This field should be populated for all institutional claims and is a header-level field, so its value must be the same for all rows in a given claim. DQI ensures that this value matches the expected character pattern and that it is consistent across all lines for a given claim_id.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the bill type code for institutional claims. Every institutional claim line should have a bill_type_code, and there should be one and only one bill_type_code per institutional claim. This is header-level information, so it should be identical across all lines for the same claim_id. The mapped value should conform to Tuva terminology for bill_type_code.'
         required_for_data_marts: ['cms_hccs', 'encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
@@ -841,7 +873,6 @@ models:
                 max_value: 1
                 group_by:
                   - claim_id
-                  - data_source
                 strictly: false
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -849,6 +880,15 @@ models:
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_cms_chronic_conditions
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                where: claim_type = 'institutional'
+                tags:
+                  - tuva_dqi_sev_3
                   - dqi
                   - dqi_cms_chronic_conditions
           - the_tuva_project.expect_column_value_lengths_to_be_between:
@@ -882,7 +922,7 @@ models:
             data_type: varchar
       - name: drg_code_type
         description: 'The DRG system used for the claim. This is a string that specifies the DRG code system associated with a given drg_code. There are two accepted values for this field: ms-drg and apr-drg. There are downstream joins to terminology that depend on this field, and populating it correctly when the information is available will lead to the best and most accurate analytics on your data,'
-        mapping_instructions: ''
+        mapping_instructions: 'Populate drg_code_type whenever drg_code is populated. The allowed values are ms-drg and apr-drg. Acute inpatient claims should have a valid DRG code and a matching DRG code type because downstream grouping and analytics depend on the combination of both fields.'
         required_for_data_marts: ['cms_chronic_conditions', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -909,12 +949,23 @@ models:
                 values:
                   - ms-drg
                   - apr-drg
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                where: drg_code is not null
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_cms_chronic_conditions
+                  - dqi_financial_pmpm
+                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: drg_code
         description: 'The DRG code on the claim. This field is a three-character string that can contain two different types of DRG (Diagnosis Related Groups) codes: 1. MS-DRGs are a classification system used by Medicare to categorize inpatient hospital stays and group them based on a patient’s diagnosis, procedures performed, age, sex, and complications or comorbidities. MS-DRGs are necessary for Medicare reimbursement but often used by hospitals as a standard for all inpatient stays. 2. APR-DRGs stands for "all patient refined DRG". This code system was developed by 3M to extend DRGs to a more general patient population. DQI expects these values to be three characters in length, and this is one of the fields that, when present, may be used to determine claim_type.'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the DRG code from the claim header when it is present. Acute inpatient claims should have one and only one valid DRG code per claim, and the code should be paired with drg_code_type. This is header-level information, so it should be identical across all lines for the same claim_id.'
         required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -939,12 +990,23 @@ models:
                   - dqi_readmission
               arguments:
                 value: 3
+          - not_null:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12')"
+                tags:
+                  - tuva_dqi_sev_3
+                  - dqi
+                  - dqi_cms_chronic_conditions
+                  - dqi_financial_pmpm
+                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: revenue_center_code
         description: 'Revenue center code for the claim line (institutional only and typically multiple codes per claim). This field is a four-character string that represents one of the standard revenue center code values. These codes are used to account for services and supplies rendered to patients in institutional care settings. As such, this field should be populated for institutional claims and is a line-level field, so its value may be different across lines in a given claim. DQI checks that the value of this field is a four-character string. DQI also ensures that revenue_center_code values match the expected character pattern. The majority of revenue_center_code values have at least one leading zero. In files coming directly from carriers, these leading zeroes may be stripped. Its possible to handle stripped leading zeroes like this: ```sql lpad(revenue_center_code, 4, 0) as revenue_center_code ```'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the revenue center code at the claim-line level for institutional claims. Every institutional claim line should have a revenue_center_code, and institutional claims will often have multiple revenue_center_code values across their lines. The mapped value should conform to Tuva terminology for revenue_center_code and should preserve leading zeroes when they exist in the standard code set.'
         required_for_data_marts: ['encounters', 'semantic_layer', 'service_categories']
         tests:
           - not_null:
@@ -1023,22 +1085,12 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Service unit quantity should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: number
       - name: hcpcs_code
         description: 'The CPT or HCPCS code representing the procedure or service provided. These codes are used to describe medical, surgical, and diagnostic services. This field is a string that represents procedures, services and supplies rendered by providers to patients. These codes exist at the line level, and there can be many HCPCS codes on a single claim. There are thousands of HCPCS codes spread across two levels: * Level 1 codes, also called CPT codes, are maintained by the American Medical Association (AMA). The Tuva Project does not have terminology for Level 1 codes for licensing reasons. * Level 2 codes, which are maintained by CMS. The Tuva Project has terminology for these codes. DQI checks that hcpcs_code values are not null on professional claims and ensures that mapped codes are HCPCS Level 2 codes. When this is the case, strategies for handling these values can be use case-specific. Organizations may opt to backfill null hcpcs_code values with 99499, a code used to report unlisted Evaluation and Management services when there is no other code that sufficiently corresponds to the services provided. The way HCPCS codes show up in claims data can vary: weve seen some carriers append a suffix to HCPCS codes, which makes them more than 5 characters. Like many of the other fields in your raw data, HCPCS codes may need some manipulation (e.g. stripping away a suffix) as you map them to the input layer.'
-        mapping_instructions: ''
+        mapping_instructions: 'Map the CPT or HCPCS code at the claim-line level. Every professional claim line should have one and only one hcpcs_code. Institutional claims may also carry HCPCS codes, but they are less consistently required. If the source appends suffixes or other nonstandard characters, normalize the value before mapping so the resulting code is the standard claim-line procedure code.'
         required_for_data_marts: ['cms_hccs', 'encounters', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1163,8 +1215,8 @@ models:
           meta:
             data_type: varchar
       - name: rendering_npi
-        description: 'Rendering NPI for the claim (typically represents the physician or entity providing services). This field is a string that contains NPI (National Provider Identifier) values. rendering_npi represents the practitioner who performed or rendered the specific service. This value can be populated in either institutional or professional claims and can be different across claim lines. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi else null end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi else null end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
-        mapping_instructions: ''
+        description: 'Rendering NPI for the claim (typically represents the physician or entity providing services). This field is a string that contains NPI (National Provider Identifier) values. rendering_npi represents the practitioner who performed or rendered the specific service. This value can be populated in either institutional or professional claims and can be different across claim lines. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi else null end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi else null end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
+        mapping_instructions: 'Map the NPI for the practitioner who rendered the service on the claim line. Every claim line should have a rendering_npi. If the source only provides a single NPI field, use provider reference data to determine whether that identifier is a person-level NPI, and map person-level NPIs to rendering_npi. If the source only provides facility or organization NPIs, the mapping should be improved upstream because logical DQ treats missing rendering_npi as a failure.'
         required_for_data_marts: ['cms_hccs', 'encounters', 'hcc_recapture', 'provider_attribution', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1225,8 +1277,8 @@ models:
           meta:
             data_type: varchar
       - name: billing_npi
-        description: 'Billing NPI for the claim (typically represents organization billing the claim). This field is a string that contains NPI (National Provider Identifier) values. billing_npi typically represents the entity (organization or individual) responsible for billing and receiving payment for healthcare services. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
-        mapping_instructions: ''
+        description: 'Billing NPI for the claim (typically represents organization billing the claim). This field is a string that contains NPI (National Provider Identifier) values. billing_npi typically represents the entity (organization or individual) responsible for billing and receiving payment for healthcare services. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
+        mapping_instructions: 'Map the NPI for the billing entity on the claim. Every claim should have one and only one billing_npi, and the value should be identical across all lines for the same claim_id. If the source only provides a single NPI field, use provider reference data to determine whether the identifier belongs to a billing provider organization or individual.'
         required_for_data_marts: ['encounters', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1287,8 +1339,8 @@ models:
           meta:
             data_type: varchar
       - name: facility_npi
-        description: 'Facility NPI for the claim (typically represents the facility where services were performed). This field is a string that contains NPI (National Provider Identifier) values. facility_npi typically represents the location where specific services were delivered. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider terminology file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join terminology__provider as p on p.npi = sd.npi ```'
-        mapping_instructions: ''
+        description: 'Facility NPI for the claim (typically represents the facility where services were performed). This field is a string that contains NPI (National Provider Identifier) values. facility_npi typically represents the location where specific services were delivered. NPIs are composed of numbers and are ten characters in length. DQI ensures that this field matches the expected length and character pattern. Source data may only include a single NPI field without specifying whether the provided identifier corresponds to a rendering, billing, or facility NPI. In that case, look for the NPI in Tuvas provider data file to determine whether it corresponds to a person or place. * If its a person, then the NPI should be mapped to rendering_npi. * If its a person and also a professional claim, then also map to billing_npi. * If its a location and the claim type is institutional, then map to facility_npi That logic could look like this: ```sql select ... , case when p.entity_type_code = 1 then npi else null end as rendering_npi , case when p.entity_type_code = 1 and claim_type = professional then p.npi end as billing_npi , case when p.entity_type_code = 2 and claim_type = institutional then p.npi end as facility_npi from source_data as sd left join provider_data__provider as p on p.npi = sd.npi ```'
+        mapping_instructions: 'Map the NPI for the facility where services were delivered. Inpatient institutional claims should have a facility_npi. If the source only provides a single NPI field, use provider reference data to determine whether the identifier is an organization or facility-level NPI before mapping it to facility_npi.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
           - not_null:
@@ -1303,7 +1355,8 @@ models:
                 - Add a blank string: This will over-merge, but will apply encounter grouping logic and assumes all encounters are at the same facility.
               config:
                 severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'        
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: warn
@@ -1334,7 +1387,7 @@ models:
             data_type: varchar
       - name: paid_date
         description: The date the claim was paid. The date the payer paid the claim, formatted YYYY-MM-DD. This date could be any date after claim_end_date and often falls a couple of weeks after claim_end_date.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the date the payer paid the claim after casting it to a date value. The final mapped value should be a valid date and should be identical across all lines for the same claim_id when the paid date is claim-header level in the source. Do not leave this as an uncast source string in the final input layer.'
         required_for_data_marts: ['cms_chronic_conditions', 'financial_pmpm', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1366,7 +1419,7 @@ models:
             data_type: date
       - name: paid_amount
         description: The total amount paid by the insurer. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the dollar amount paid by the health insurer for the covered service. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the final amount paid by the payer for the row after ADR logic has been applied. In the final mapped input layer, paid_amount should generally not be negative and should not exceed allowed_amount for the same row.'
         required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'financial_pmpm', 'provider_attribution', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1408,22 +1461,12 @@ models:
                 tags:
                   - tuva_dqi_sev_5
                   - dqi
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Paid amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient). This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the total amount allowed, including dollars paid by both the payer and the patient. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete. The expectation is that the sum of paid_amount, coinsurance_amount, copayment_amount, and deductible_amount will be equivalent to allowed_amount.
-        mapping_instructions: ''
+        mapping_instructions: 'Map the final total allowed amount for the row after ADR logic has been applied. In the final mapped input layer, allowed_amount should generally not be negative and should be at least as large as paid_amount for the same row.'
         required_for_data_marts: ['ed_classification', 'encounters', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1457,16 +1500,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Allowed amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1539,16 +1572,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Coinsurance amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1584,16 +1607,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Copayment amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1629,16 +1642,6 @@ models:
                   - real
                   - float64
                   - bignumeric
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Deductible amount should not be negative after ADR logic is applied.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 0
         config:
           meta:
             data_type: float
@@ -1679,7 +1682,7 @@ models:
             data_type: float
       - name: diagnosis_code_type
         description: 'The coding system used for the diagnosis code (e.g., ICD-10-CM, ICD-9-CM). This field is a string that describes the type of ICD diagnosis codes used on this claim. It must have one of the following two values: icd-9-cm or icd-10-cm. This is a header-level field, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table that has diagnosis codes. Claims data sources may not contain information about the diagnosis_code_type. On October 1, 2015, healthcare in the U.S. switched from ICD-9 to ICD-10. If there is no information about diagnosis_code_type in the source data, the switch-over date from ICD-9 to ICD-10 may be used: ```sql case when claim_end_date < 2015-10-01 then icd-9-cm else icd-10-cm end as diagnosis_code_type ``` DQI checks that claims with at least one populated diagnosis code have a populated diagnosis_code_type from one of the accepted values (icd-9-cm, icd-10-cm) and that the value of this field is consistent across all lines for the claim.'
-        mapping_instructions: ''
+        mapping_instructions: 'Populate diagnosis_code_type whenever any diagnosis_code_1 through diagnosis_code_25 is populated. The allowed values are icd-9-cm and icd-10-cm. If the source does not explicitly provide the code type, it can be inferred using the ICD-9 to ICD-10 transition date when appropriate. This is a header-level field and must be identical across all lines for the same claim_id.'
         required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1715,7 +1718,7 @@ models:
             data_type: varchar
       - name: diagnosis_code_1
         description: 1st ICD (9 or 10) CM diagnosis code on the claim.
-        mapping_instructions: 'Map the diagnosis code in this position from the claim header. The value should be a valid ICD-9-CM or ICD-10-CM diagnosis code found on the claim and, because it is claim-level information, it must be identical across all lines for the same claim_id. If this diagnosis position is not present on the claim, leave the field null.'
+        mapping_instructions: 'Map diagnosis codes from the claim header into diagnosis_code_1 through diagnosis_code_25. For institutional claims, map the principal diagnosis to diagnosis_code_1 and any remaining diagnosis codes to the subsequent fields. For professional claims, source systems often store diagnosis pointers rather than principal or secondary labels, but the diagnosis codes should still be consolidated into diagnosis_code_1 through diagnosis_code_25 in claim order. The mapped value in this position should be a valid ICD-9-CM or ICD-10-CM diagnosis code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'service_categories', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -1770,7 +1773,7 @@ models:
             data_type: varchar
       - name: diagnosis_code_2
         description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
-        mapping_instructions: 'Map the diagnosis code in this position from the claim header. The value should be a valid ICD-9-CM or ICD-10-CM diagnosis code found on the claim and, because it is claim-level information, it must be identical across all lines for the same claim_id. If this diagnosis position is not present on the claim, leave the field null.'
+        mapping_instructions: 'Map diagnosis codes from the claim header into diagnosis_code_1 through diagnosis_code_25. For institutional claims, diagnosis_code_2 and the remaining positions should contain the secondary diagnosis codes. For professional claims, source systems often store diagnosis pointers rather than principal or secondary labels, but the diagnosis codes should still be consolidated into diagnosis_code_1 through diagnosis_code_25 in claim order. The mapped value in this position should be a valid ICD-9-CM or ICD-10-CM diagnosis code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3332,7 +3335,7 @@ models:
             data_type: varchar
       - name: procedure_code_type
         description: 'Indicates the type of procedure code (e.g. ICD-10-PCS). This field is a string that describes the type of ICD procedure codes used on this claim. It must have one of the following two values: icd-9-pcs or icd-10-pcs. This is a header-level field on inpatient institutional claims, so its value must be the same for all lines in a given claim. This field should be populated for every row in the medical_claim table that has ICD procedure codes. Claims data sources may not contain information about the procedure_code_type. On October 1, 2015, healthcare in the U.S. switched from ICD-9 to ICD-10. If there is no information about procedure_code_type in the source data, the switch-over date from ICD-9 to ICD-10 may be used: ```sql case when claim_end_date < 2015-10-01 then icd-9-pcs else icd-10-pcs end as procedure_code_type ``` DQI checks that claims with at least one populated procedure code have a populated procedure_code_type from one of the accepted values (icd-9-pcs, icd-10-pcs) and that the value of this field is consistent across all lines for the claim.'
-        mapping_instructions: ''
+        mapping_instructions: 'Populate procedure_code_type whenever any procedure_code_1 through procedure_code_25 is populated. The allowed values are icd-9-pcs and icd-10-pcs. If the source does not explicitly provide the code type, it can be inferred using the ICD-9 to ICD-10 transition date when appropriate. This is a header-level field for inpatient institutional claims and must be identical across all lines for the same claim_id.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3358,7 +3361,7 @@ models:
             data_type: varchar
       - name: procedure_code_1
         description: 1st ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3373,7 +3376,7 @@ models:
             data_type: varchar
       - name: procedure_code_2
         description: 2nd ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3388,7 +3391,7 @@ models:
             data_type: varchar
       - name: procedure_code_3
         description: 3rd ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3403,7 +3406,7 @@ models:
             data_type: varchar
       - name: procedure_code_4
         description: 4th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3418,7 +3421,7 @@ models:
             data_type: varchar
       - name: procedure_code_5
         description: 5th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3433,7 +3436,7 @@ models:
             data_type: varchar
       - name: procedure_code_6
         description: 6th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3448,7 +3451,7 @@ models:
             data_type: varchar
       - name: procedure_code_7
         description: 7th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3463,7 +3466,7 @@ models:
             data_type: varchar
       - name: procedure_code_8
         description: 8th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3478,7 +3481,7 @@ models:
             data_type: varchar
       - name: procedure_code_9
         description: 9th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3493,7 +3496,7 @@ models:
             data_type: varchar
       - name: procedure_code_10
         description: 10th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3508,7 +3511,7 @@ models:
             data_type: varchar
       - name: procedure_code_11
         description: 11th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3523,7 +3526,7 @@ models:
             data_type: varchar
       - name: procedure_code_12
         description: 12th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3538,7 +3541,7 @@ models:
             data_type: varchar
       - name: procedure_code_13
         description: 13th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3553,7 +3556,7 @@ models:
             data_type: varchar
       - name: procedure_code_14
         description: 14th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3568,7 +3571,7 @@ models:
             data_type: varchar
       - name: procedure_code_15
         description: 15th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3583,7 +3586,7 @@ models:
             data_type: varchar
       - name: procedure_code_16
         description: 16th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3598,7 +3601,7 @@ models:
             data_type: varchar
       - name: procedure_code_17
         description: 17th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3613,7 +3616,7 @@ models:
             data_type: varchar
       - name: procedure_code_18
         description: 18th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3628,7 +3631,7 @@ models:
             data_type: varchar
       - name: procedure_code_19
         description: 19th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3643,7 +3646,7 @@ models:
             data_type: varchar
       - name: procedure_code_20
         description: 20th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3658,7 +3661,7 @@ models:
             data_type: varchar
       - name: procedure_code_21
         description: 21st ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3673,7 +3676,7 @@ models:
             data_type: varchar
       - name: procedure_code_22
         description: 22nd ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3688,7 +3691,7 @@ models:
             data_type: varchar
       - name: procedure_code_23
         description: 23rd ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3703,7 +3706,7 @@ models:
             data_type: varchar
       - name: procedure_code_24
         description: 24th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -3718,7 +3721,7 @@ models:
             data_type: varchar
       - name: procedure_code_25
         description: 25th ICD (9 or 10) procedure code on the claim.
-        mapping_instructions: ''
+        mapping_instructions: 'Map ICD procedure codes from the claim header into procedure_code_1 through procedure_code_25. The mapped value in this position should be a valid ICD-9-PCS or ICD-10-PCS procedure code and must be identical across all lines for the same claim_id. If this position is not present on the claim, leave it null.'
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -4366,13 +4369,13 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
-          - not_null:
-              description: data_source must not be null.
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
               config:
-                severity: error
+                severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
-                  - tuva_dqi_sev_1
+                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:

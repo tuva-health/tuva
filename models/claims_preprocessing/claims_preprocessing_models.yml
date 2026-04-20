@@ -114,6 +114,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: normalized_input_eligibility
+      meta:
+        dag:
+          node_type: intermediate
       materialized: table
       tags:
         - normalized_input
@@ -174,40 +177,6 @@ models:
       - name: enrollment_status
         description: >
           Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
-      - name: hospice_flag
-        description: Whether the patient is in hospice.
-      - name: snp_type
-        description: >
-          Special Needs Plan type (C-SNP, D-SNP, I-SNP). Null when non-SNP.
-      - name: medicaid_indicator
-        description: >
-          Medicaid coverage indicator (1 = Yes, 0 = No). Corresponds to CMS NEMCAID field.
-          Used for New Enrollee risk score calculations when dual_status_code is insufficient.
-      - name: long_term_institutional_flag
-        description: Whether the patient is in an institutional setting for longer than 30 days.
-      - name: part_d_raf_type
-        description: >
-          Part D Risk Adjustment Factor type (CE, NE, PE, NP).
-          Null when no Part D coverage.
-      - name: low_income_subsidy_indicator
-        description: >
-          Low Income Subsidy (Extra Help) flag (Y/N).
-          Null when no Part D coverage.
-      - name: metal_level
-        description: >
-          ACA metal tier (P/G/S/B/C). Null when non-ACA.
-      - name: csr_indicator
-        description: >
-          Cost Sharing Reduction variant indicator (1-11). Null when non-ACA.
-      - name: enrollment_duration_months
-        description: >
-          Number of months covered during the benefit year (1-12). Null when non-ACA.
-      - name: esrd_status
-        description: >
-          ESRD clinical status (dialysis, graft, transplant). Null when non-ESRD.
-      - name: transplant_duration_months
-        description: >
-          Months since kidney transplant. Null when non-ESRD or non-transplant.
       - name: group_id
         description: 'The group id which multiple members are enrolled for health coverage.'
       - name: group_name
@@ -1165,6 +1134,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: _int_normalized_input_eligibility_dates_normalize
+      meta:
+        dag:
+          node_type: intermediate
       materialized: table
       tags:
         - normalized_input
@@ -1353,6 +1325,9 @@ models:
 ##    Staging
   - name: normalized_input__stg_eligibility
     config:
+      meta:
+        dag:
+          node_type: intermediate
       materialized: ephemeral
       tags:
         - normalized_input
@@ -1375,6 +1350,9 @@ models:
 
   - name: normalized_input__int_eligibility_state_normalize
     config:
+      meta:
+        dag:
+          node_type: intermediate
       materialized: ephemeral
       tags:
         - normalized_input
