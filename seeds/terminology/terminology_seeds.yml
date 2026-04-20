@@ -1297,6 +1297,30 @@ seeds:
       - name: qualifier
         description: Qualifier associated with the ICD-10-PCS code; corresponds to the seventh character of the code
 
+<<<<<<< Updated upstream
+=======
+  - name: terminology__medicare_provider_and_supplier_taxonomy_crosswalk
+    description: |
+      A source for crosswalk CMS provider specialty codes with NPPES taxonomy codes. Source can be found here: 
+      https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: medicare_provider_and_supplier_taxonomy_crosswalk
+      tags:
+        - terminology
+        - cms_provider_attribution
+      column_types:
+        medicare_specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
+        medicare_provider_supplier_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        provider_taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        provider_taxonomy_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+
+>>>>>>> Stashed changes
   - name: terminology__electing_teaching_hospital_list
     description: |
       CMS electing teaching hospitals. Source can be found here: https://www.cms.gov/priorities/key-initiatives/open-payments/resources/reporting-entitities
@@ -1306,6 +1330,7 @@ seeds:
       alias: electing_teaching_hospital_list
       tags:
         - terminology
+        - cms_provider_attribution
       column_types:
         collection_year: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
@@ -1347,6 +1372,7 @@ seeds:
       alias: cms_acceptable_provider_specialty_codes
       tags:
         - terminology
+        - cms_provider_attribution
       column_types:
         specialty_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(8) {%- endif -%} 
@@ -1365,6 +1391,7 @@ seeds:
       alias: ssa_fips_state_county_crosswalk
       tags:
         - terminology
+        - cms_provider_attribution
       column_types:
         fipscounty: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
@@ -1382,3 +1409,40 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(64) {%- endif -%} 
         countyname_rate: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(128) {%- endif -%} 
+<<<<<<< Updated upstream
+=======
+
+  - name: terminology__provider_taxonomy_unpivot
+    description: |
+      Provider taxonomy codes from NPPES.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: provider_taxonomy_unpivot
+      tags:
+        - terminology
+        - cms_provider_attribution
+      column_types:
+        npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%} 
+        taxonomy_col: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        switch_col: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        taxonomy_switch: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+      meta:
+        columns:
+          - name: npi
+            description: 'The National Provider Identifier (NPI).'
+          - name: taxonomy_col
+            description: 'The taxonomy column identifier.'
+          - name: taxonomy_code
+            description: 'The provider taxonomy code.'
+          - name: switch_col
+            description: 'The switch column identifier.'
+          - name: taxonomy_switch
+            description: 'The taxonomy switch value.'
+>>>>>>> Stashed changes
