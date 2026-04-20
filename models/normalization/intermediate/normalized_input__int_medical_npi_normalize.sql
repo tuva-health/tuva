@@ -45,10 +45,11 @@ left outer join {{ ref('terminology__provider') }} as fac_prov
 
 , facility_npi_ranked as (
 select
-    claim_id
+    data_source
+  , claim_id
   , normalized_facility_npi
   , normalized_facility_name
-  , row_number() over (partition by claim_id order by claim_line_number) as facility_npi_rank
+  , row_number() over (partition by data_source, claim_id order by claim_line_number) as facility_npi_rank
 from base
 where normalized_facility_npi is not null
 )
@@ -68,4 +69,5 @@ select
 from base
 left join facility_npi_ranked as fac
   on base.claim_id = fac.claim_id
+  and base.data_source = fac.data_source
   and facility_npi_rank = 1
