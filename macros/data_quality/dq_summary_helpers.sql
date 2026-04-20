@@ -348,6 +348,7 @@
 {% macro dq_logical_rules() %}
     {{ return([
         {
+            'table_name': 'medical_claim',
             'test_name': 'medical_claim__claim_start_after_claim_end',
             'model_name': 'input_layer__medical_claim',
             'rule_type': 'date_order',
@@ -355,6 +356,7 @@
             'right_column': 'claim_end_date'
         },
         {
+            'table_name': 'medical_claim',
             'test_name': 'medical_claim__admit_after_discharge',
             'model_name': 'input_layer__medical_claim',
             'rule_type': 'date_order',
@@ -362,6 +364,7 @@
             'right_column': 'discharge_date'
         },
         {
+            'table_name': 'medical_claim',
             'test_name': 'medical_claim__paid_amount_gt_allowed_amount',
             'model_name': 'input_layer__medical_claim',
             'rule_type': 'amount_lte',
@@ -369,6 +372,7 @@
             'right_column': 'allowed_amount'
         },
         {
+            'table_name': 'pharmacy_claim',
             'test_name': 'pharmacy_claim__paid_amount_gt_allowed_amount',
             'model_name': 'input_layer__pharmacy_claim',
             'rule_type': 'amount_lte',
@@ -376,6 +380,7 @@
             'right_column': 'allowed_amount'
         },
         {
+            'table_name': 'eligibility',
             'test_name': 'eligibility__enrollment_start_after_end',
             'model_name': 'input_layer__eligibility',
             'rule_type': 'date_order',
@@ -383,48 +388,28 @@
             'right_column': 'enrollment_end_date'
         },
         {
+            'table_name': 'eligibility',
             'test_name': 'eligibility__death_before_birth',
             'model_name': 'input_layer__eligibility',
             'rule_type': 'date_order',
             'left_column': 'death_date',
             'right_column': 'birth_date',
             'operator': '<'
-        },
-        {
-            'test_name': 'provider_attribution__invalid_year_month',
-            'model_name': 'input_layer__provider_attribution',
-            'rule_type': 'invalid_year_month',
-            'column': 'year_month'
-        },
-        {
-            'test_name': 'encounter__start_after_end',
-            'model_name': 'input_layer__encounter',
-            'rule_type': 'date_order',
-            'left_column': 'encounter_start_date',
-            'right_column': 'encounter_end_date'
-        },
-        {
-            'test_name': 'condition__onset_after_resolved',
-            'model_name': 'input_layer__condition',
-            'rule_type': 'date_order',
-            'left_column': 'onset_date',
-            'right_column': 'resolved_date'
-        },
-        {
-            'test_name': 'lab_result__collection_after_result',
-            'model_name': 'input_layer__lab_result',
-            'rule_type': 'date_order',
-            'left_column': 'collection_datetime',
-            'right_column': 'result_datetime'
-        },
-        {
-            'test_name': 'appointment__start_after_end',
-            'model_name': 'input_layer__appointment',
-            'rule_type': 'date_order',
-            'left_column': 'start_datetime',
-            'right_column': 'end_datetime'
         }
     ]) }}
+{% endmacro %}
+
+{% macro dq_analytical_metric_is_count_sql(metric_expression) %}
+    (
+        lower({{ metric_expression }}) like 'count %'
+        or lower({{ metric_expression }}) like 'members w/%'
+        or lower({{ metric_expression }}) in (
+            'total member months',
+            'max member months',
+            'index admissions',
+            '30-day readmissions'
+        )
+    )
 {% endmacro %}
 
 {% macro dq_logical_rule_required_columns(rule) %}
@@ -442,6 +427,7 @@
     {% set actual_columns = dq_actual_columns(relation) %}
     {% set has_data_source = dq_has_column(actual_columns, 'data_source') %}
     {% set required_columns = dq_logical_rule_required_columns(rule) %}
+    {% set logical_table_name = rule.get('table_name', rule['model_name'] | replace('input_layer__', '')) %}
 
     {% for column_name in required_columns %}
         {% if not dq_has_column(actual_columns, column_name) %}
@@ -474,15 +460,16 @@
         {% set query %}
             select
                   sources.data_source
+                , '{{ logical_table_name }}' as {{ adapter.quote('table') }}
                 , '{{ rule['test_name'] }}' as test_name
-                , cast(coalesce(invalid_counts.test_result, 0) as {{ dbt.type_numeric() }}) as test_result
+                , cast(coalesce(invalid_counts.test_result, 0) as {{ dbt.type_int() }}) as test_result
             from (
                 {{ dq_source_dimension_sql(relation) }}
             ) as sources
             left join (
                 select
                       {{ source_key_expression }} as data_source_key
-                    , cast(count(*) as {{ dbt.type_numeric() }}) as test_result
+                    , cast(count(*) as {{ dbt.type_int() }}) as test_result
                 from {{ relation }}
                 where {{ quote_column(rule['column']) }} is not null
                   and cast({{ quote_column(rule['column']) }} as {{ dbt.type_string() }}) not in (
@@ -498,15 +485,16 @@
         {% set query %}
             select
                   sources.data_source
+                , '{{ logical_table_name }}' as {{ adapter.quote('table') }}
                 , '{{ rule['test_name'] }}' as test_name
-                , cast(coalesce(violations.test_result, 0) as {{ dbt.type_numeric() }}) as test_result
+                , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
             from (
                 {{ dq_source_dimension_sql(relation) }}
             ) as sources
             left join (
                 select
                       {{ source_key_expression }} as data_source_key
-                    , cast(count(*) as {{ dbt.type_numeric() }}) as test_result
+                    , cast(count(*) as {{ dbt.type_int() }}) as test_result
                 from {{ relation }}
                 where {{ predicate }}
                 group by 1
