@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  - name: core__patient
+    description: >
+      Patient dimension table containing one record per unique patient.
+      This is the primary patient reference table used across all core models
+      and data marts.
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier (primary key)"
+        tests:
+          - not_null
+          - unique
+
+      - name: sex
+        description: "Patient sex"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['male', 'female', 'unknown']
+
+      - name: race
+        description: "Patient race"
+        tests:
+          - accepted_values:
+              values: ['white', 'black', 'asian', 'hispanic', 'other', 'unknown']
+
+      - name: birth_date
+        description: "Patient date of birth in YYYY-MM-DD format"
+        tests:
+          - not_null
+
+      - name: death_date
+        description: "Patient date of death in YYYY-MM-DD format"
+        tests:
+          - date_not_in_future
+
+      - name: death_flag
+        description: "1 if patient is deceased, 0 otherwise"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run that populated this record"
+        tests:
+          - not_null
+
+  - name: core__encounter
+    description: >
+      Encounter fact table containing one record per unique patient encounter.
+      Encounters represent discrete healthcare events such as inpatient stays,
+      outpatient visits, or emergency department visits.
+    columns:
+      - name: encounter_id
+        description: "Unique encounter identifier (primary key)"
+        tests:
+          - not_null
+          - unique
+
+      - name: patient_id
+        description: "Foreign key to the patient dimension table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('core__patient')
+              field: patient_id
+
+      - name: encounter_type
+        description: "Type of encounter"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - acute inpatient
+                - ambulatory surgery center
+                - emergency department
+                - home health
+                - hospice
+                - inpatient psychiatric
+                - inpatient rehabilitation
+                - lab
+                - office visit
+                - outpatient
+                - outpatient psychiatric
+                - outpatient rehabilitation
+                - skilled nursing facility
+                - telehealth
+                - urgent care
+
+      - name: encounter_start_date
+        description: "Date the encounter began in YYYY-MM-DD format"
+        tests:
+          - not_null
+          - date_not_in_future
+
+      - name: encounter_end_date
+        description: "Date the encounter ended in YYYY-MM-DD format"
+        tests:
+          - not_null
+
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run that populated this record"
+        tests:
+          - not_null
