@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
 with base as (
 select
     *

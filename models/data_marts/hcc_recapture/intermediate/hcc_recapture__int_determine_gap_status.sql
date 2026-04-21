@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
 -- Get recapturable HCCs within the past 1 year
 with filtered_hccs as (
     select *

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
 -- Need to do this for HCCs in more than 1 group such as HCC 409 in v28
 with add_rankings as (
     select

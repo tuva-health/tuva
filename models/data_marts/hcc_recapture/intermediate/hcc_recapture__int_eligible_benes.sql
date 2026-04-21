@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
 -- Flattening months to 1 person per year
 select distinct 
   person_id

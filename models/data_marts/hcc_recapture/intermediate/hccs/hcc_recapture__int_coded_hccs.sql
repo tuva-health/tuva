@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
 with eligible_claims as (
 -- Use distinct to remove claim line
     select distinct
