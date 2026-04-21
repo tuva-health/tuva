@@ -100,8 +100,7 @@ left join seed_hcc_hierarchy as hier
     and sus.model_version = hier.model_version
 left join chronic_hccs as chronic
     on sus.model_version = chronic.model_version
-    and sus.hcc_code = chronic.hcc_code
-    and {{ date_part('year', 'sus.recorded_date') }} = chronic.payment_year - 1        
+    and sus.hcc_code = chronic.hcc_code    
 left join get_risk_code as rcode
     on sus.person_id = rcode.person_id
     and sus.payer = rcode.payer
