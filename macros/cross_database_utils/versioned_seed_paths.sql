@@ -116,7 +116,7 @@
 
 
 {% macro get_synthetic_data_size() %}
-  {% set synthetic_data_size = var('synthetic_data_size', 'small') | string | trim | lower %}
+  {% set synthetic_data_size = var('synthetic_data_size', 'large') | string | trim | lower %}
 
   {% if synthetic_data_size not in ['small', 'large'] %}
     {% do exceptions.raise_compiler_error(
@@ -185,4 +185,3 @@
       null_marker
   )) }}
 {% endmacro %}
-

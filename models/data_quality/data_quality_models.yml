@@ -22,7 +22,7 @@ models:
       - dbt_utils.unique_combination_of_columns:
           config:
             severity: error
-            enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+            enabled: "{{ (var('enable_legacy_data_quality', false) | as_bool) and (var('enable_input_layer_testing', true) | as_bool) }}"
 
           arguments:
             combination_of_columns:
@@ -39,7 +39,7 @@ models:
       alias: structural
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_structural
       materialized: table
@@ -68,7 +68,7 @@ models:
       alias: logical
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -91,7 +91,7 @@ models:
       alias: medical_claim_line_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -119,7 +119,7 @@ models:
       alias: medical_claim_claim_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -144,7 +144,7 @@ models:
       alias: pharmacy_claim_line_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -172,7 +172,7 @@ models:
       alias: pharmacy_claim_claim_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -197,7 +197,7 @@ models:
       alias: eligibility_span_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -231,7 +231,7 @@ models:
       alias: eligibility_person_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -248,7 +248,7 @@ models:
         description: Input-layer data source associated with the person.
 
   - name: data_quality__analytical_key_metrics
-    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema.
+    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema. Results are formatted from the analytical metric manifest, which is also the source of truth for each metric model and result type.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -256,8 +256,9 @@ models:
       alias: analytical_key_metrics
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq2
+        - dq_analytics
         - dq_analytical
       materialized: table
     columns:
@@ -266,9 +267,16 @@ models:
       - name: domain
         description: The high-level analytical domain for the metric.
       - name: metric
-        description: The analytical metric name, including any grouping label carried into the output.
+        description: The analytical metric name.
       - name: result
-        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while rates, utilization metrics, percentages, and averages are rendered as text values rounded to at most two decimal places.
+        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while utilization, PMPM, prevalence, percentage, and average metrics are rendered as text values rounded to at most two decimal places.
+      - name: medicare
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: commercial
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: medicaid
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+
 
   - name: data_quality__analytical_data_marts
     config:
@@ -278,8 +286,9 @@ models:
       alias: analytical_data_marts
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq2
+        - dq_analytics
         - dq_analytical
       materialized: table
     columns:

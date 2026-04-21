@@ -7,7 +7,7 @@ seeds:
       This was manually extracted from the User Guide PDF included with the DXCCSR SAS program.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_dxccsr_v2023_1_body_systems
       tags:
         - ccsr
@@ -34,7 +34,7 @@ seeds:
       For each ICD-10-CM code, the table contains up to six CCSR category codes and a default CCSR category code.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_dxccsr_v2023_1_cleaned_map
       tags:
         - ccsr
@@ -123,7 +123,7 @@ seeds:
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_prccsr_v2023_1_cleaned_map
       tags:
         - ccsr

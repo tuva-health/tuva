@@ -1,0 +1,3 @@
+{{ dq_config_analytical_metric_model('analytical_key_metric__medication__hiv_biktarvy_bictegravir_emtricitabine_tenofovir_alafenamide') }}
+
+{{ dq_analytical_metric_model_sql('data_quality__analytical_key_metric__medication__hiv_biktarvy_bictegravir_emtricitabine_tenofovir_alafenamide') }}
