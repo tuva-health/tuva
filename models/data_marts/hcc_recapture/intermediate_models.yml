@@ -74,15 +74,6 @@ models:
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-  - name: hcc_recapture__int_hccs
-    description: Filter to just eligible claims and apply HCC hierarchies.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
-        {% else %}hcc_recapture{%- endif -%}
-      alias: int_hccs
-      tags: ["hcc_recapture", "intermediate"]
-      materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
