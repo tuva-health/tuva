@@ -118,20 +118,23 @@ models:
       alias: hcc_status
       tags: ["hcc_recapture", "final"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - payer
-            - data_source
-            - payment_year
-            - recorded_date
-            - claim_id
-            - hcc_code
-            - rendering_npi
-            - model_version
-            - hcc_hierarchy_group
-            - hcc_hierarchy_group_rank
+          arguments:
+            combination_of_columns:
+              - person_id
+              - payer
+              - data_source
+              - payment_year
+              - recorded_date
+              - claim_id
+              - hcc_code
+              - rendering_npi
+              - model_version
+              - hcc_hierarchy_group
+              - hcc_hierarchy_group_rank
+              - suspect_hcc_flag
+              - filtered_by_hierarchy_flag
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -141,8 +144,8 @@ models:
         description: The name of the data source origin. Filled in by the user in the input layer files.
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
+          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2.
+          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
           an open HCC from 2023 will have a payment year = 2025.   - name: payment_year
       - name: recorded_date
         description: The date the claim was originally recorded. Based on admission date, but if null then filled in by claim start date followed by claim end date.
@@ -152,9 +155,9 @@ models:
         description: The National Provider Identifier (NPI) of the physician who rendered services to the beneficiary.
       - name: model_version
         description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
-          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment    
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment
+          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
       - name: hcc_code
         description: The hierarchical condition category code.
       - name: hcc_description
@@ -165,21 +168,21 @@ models:
           For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
       - name: hcc_hierarchy_group_rank
         description: >
-          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are 
+          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are
           coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
       - name: risk_model_code
         description: >
           There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
           This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
-          the 2025 CMS risk adjustment software.     
-      - name: eligible_claim_indicator
+          the 2025 CMS risk adjustment software.
+      - name: eligible_claim_flag
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-      - name: eligible_bene
+      - name: eligible_bene_flag
         description: A 1 is indicated for a beneficiary who is in the eligibility files. A 0 is indicated if they are not in the eligibility files.
-      - name: reason
-        description: Free text reason for the appointment or service.
+      - name: hcc_chronic_flag
+        description: Whether the HCC is considered chronic or not. A 1 indicates the HCC is chronic.
       - name: gap_status
         description: >
           definitions for gap_status:
@@ -188,12 +191,12 @@ models:
             - 'closed using lower coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is less than the prior year HCC
             - 'new': defined as an hcc that has not been coded in the past 2 years
             - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
-            - 'inappropriate for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
-      - name: recapture_flag
-        description: > 
+            - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
+      - name: recapturable_flag
+        description: >
           Whether or not the HCC is recapturable. Includes the following values:
-            - 'Y': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
-            - 'N': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years      
+            - '1': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
+            - '0': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
   - name: hcc_recapture__gap_status
     description: The gap status for each HCC.
     config:
@@ -203,15 +206,17 @@ models:
       alias: gap_status
       tags: ["hcc_recapture", "final"]
       materialized: table  
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - hcc_code
-            - payer
-            - model_version
-            - payment_year
-            - suspect_hcc_flag
+          arguments:
+            combination_of_columns:
+              - person_id
+              - hcc_code
+              - payer
+              - model_version
+              - payment_year
+              - hcc_type
+              - hcc_source
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -226,25 +231,25 @@ models:
           the 2025 CMS risk adjustment software.
       - name: model_version
         description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the 
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the
+          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment
           website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment.
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
+          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2.
+          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
           an open HCC from 2023 will have a payment year = 2025.
-      - name: recapture_flag
-        description: > 
+      - name: recapturable_flag
+        description: >
           Whether or not the HCC is recapturable. Includes the following values:
-            - 'Y': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
-            - 'N': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years- name: recapture_flag
+            - '1': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
+            - '0': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
       - name: gap_status
-        desription: >
+        description: >
           definitions for gap_status:
             - 'closed using higher coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is greater than the prior year HCC
             - 'closed': the specific HCC in question has been observed in a risk adjustable claim during the collection year.
             - 'closed using lower coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is less than the prior year HCC
             - 'new': defined as an hcc that has not been coded in the past 2 years
             - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
-            - 'inappropriate for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
+            - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
