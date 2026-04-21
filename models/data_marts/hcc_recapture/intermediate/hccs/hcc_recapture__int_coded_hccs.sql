@@ -27,8 +27,7 @@ select
 -- TODO: Update hcc_suspecting__list_all to have claim ID as well
 from {{ ref('hcc_suspecting__int_all_conditions') }} as cond
 left join eligible_claims as elig
-    on
-        cond.person_id = elig.person_id
-        and cond.payer = elig.payer
-        and cond.claim_id = elig.claim_id
+    on cond.person_id = elig.person_id
+    and cond.payer = elig.payer
+    and cond.claim_id = elig.claim_id
 where lower(condition_type) = 'discharge_diagnosis'

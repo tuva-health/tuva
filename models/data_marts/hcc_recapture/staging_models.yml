@@ -12,9 +12,10 @@ models:
       alias: stg_coef_hier
       tags: ["hcc_recapture", "staging"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - model_version
             - hcc_code
             - hcc_hierarchy_group
@@ -41,6 +42,7 @@ models:
           There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
           This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
           the 2025 CMS risk adjustment software.
+  
   - name: hcc_recapture__stg_eligible_benes
     description: >
       Beneficiaries eligible for HCC recapture. When ESRD risk scores are available in the Tuva project, 
@@ -52,9 +54,10 @@ models:
       alias: stg_eligible_benes
       tags: ["hcc_recapture", "staging"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
               - person_id
               - collection_year
               - payer
@@ -75,7 +78,7 @@ models:
                 Members without age groups are excluded.
               config:
                 severity: warn
-                
+
   - name: hcc_recapture__stg_suspect_hccs
     description: |
       A list of suspected HCCs. This is an optional model which can be included by 

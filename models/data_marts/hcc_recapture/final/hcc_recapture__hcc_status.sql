@@ -45,15 +45,14 @@ left join {{ ref('hcc_recapture__int_recapturable_hccs') }} as recap
     and hccs.hcc_hierarchy_group = recap.hcc_hierarchy_group
     and coalesce(hccs.claim_id, '') = coalesce(recap.claim_id, '')
 left join {{ ref('hcc_recapture__int_gap_status') }} as gap
-    on
-        hccs.person_id = gap.person_id
-        and hccs.payer = gap.payer
-        and hccs.model_version = gap.model_version
-        and hccs.hcc_code = gap.hcc_code
-        -- For TUVA gaps, +2 is needed because we’re comparing collection year to payment year - we already need a +1 for that comparison, and an additional +1 to account for closure in the following year.
-        -- For suspect HCCs, we only apply +1, since it’s ok for those HCCs to close themselves within the same year (e.g., CY 2025 suspect list HCCs can be closed in CY 2025 based on claims rather than CY 2026).
-        and (case
-            when gap.gap_status = 'open' and hccs.hcc_type = 'coded' then hccs.collection_year + 2
-            else hccs.collection_year + 1
-        end) = gap.payment_year
+    on hccs.person_id = gap.person_id
+    and hccs.payer = gap.payer
+    and hccs.model_version = gap.model_version
+    and hccs.hcc_code = gap.hcc_code
+    -- For TUVA gaps, +2 is needed because we’re comparing collection year to payment year - we already need a +1 for that comparison, and an additional +1 to account for closure in the following year.
+    -- For suspect HCCs, we only apply +1, since it’s ok for those HCCs to close themselves within the same year (e.g., CY 2025 suspect list HCCs can be closed in CY 2025 based on claims rather than CY 2026).
+    and (case
+          when gap.gap_status = 'open' and hccs.hcc_type = 'coded' then hccs.collection_year + 2
+          else hccs.collection_year + 1
+    end) = gap.payment_year
 where hccs.eligible_bene_flag = 1

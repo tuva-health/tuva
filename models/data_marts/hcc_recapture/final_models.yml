@@ -10,9 +10,10 @@ models:
       alias: recapture_rates
       tags: ["hcc_recapture", "final"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - payer
             - payment_year
     columns:
@@ -31,6 +32,7 @@ models:
         description: The total number of HCCs that were open or closed in the payment year. Excludes new and inappropriate for recapture HCCs.
       - name: recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment year.
+  
   - name: hcc_recapture__recapture_rates_monthly
     description: HCC recapture rates by payment year month.
     config:
@@ -40,9 +42,10 @@ models:
       alias: recapture_rates_monthly
       tags: ["hcc_recapture", "final"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - payer
             - payment_year
             - payment_year_month
@@ -66,6 +69,7 @@ models:
         description: The total number of HCCs that were open or closed in the payment month. Excludes new and inappropriate for recapture HCCs.
       - name: recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment month.
+
   - name: hcc_recapture__recapture_rates_monthly_ytd
     description: HCC recapture rates by payment month year-to-date.
     config:
@@ -75,9 +79,10 @@ models:
       alias: recapture_rates_monthly_ytd
       tags: ["hcc_recapture", "final"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - payer
             - payment_year
             - payment_year_month
@@ -109,6 +114,7 @@ models:
         description: The number of HCCs open and closed in a payment year.
       - name: ytd_recapture_rate
         description: The running total of closed HCCs divided by total HCCs in a payment year.
+  
   - name: hcc_recapture__hcc_status
     description: Combines claims data with HCC gap status.
     config:
@@ -197,6 +203,7 @@ models:
           Whether or not the HCC is recapturable. Includes the following values:
             - '1': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
             - '0': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
+
   - name: hcc_recapture__gap_status
     description: The gap status for each HCC.
     config:

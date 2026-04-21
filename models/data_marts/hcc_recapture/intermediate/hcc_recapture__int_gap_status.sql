@@ -86,17 +86,15 @@ select distinct
     , case when bgap.hcc_hierarchy_group is not null and mhier.hcc_hierarchy_group is null then 1 else 0 end as filtered_by_hierarchy_flag
 from best_gap_status as bgap
 left join min_open_hierarchy as mhier
-    on
-        bgap.person_id = mhier.person_id
-        and bgap.payer = mhier.payer
-        and bgap.payment_year = mhier.payment_year
-        and bgap.model_version = mhier.model_version
-        and bgap.hcc_hierarchy_group = mhier.hcc_hierarchy_group
-        and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
-        -- Join eligible benes again here to capture new rows with open gaps
+    on bgap.person_id = mhier.person_id
+    and bgap.payer = mhier.payer
+    and bgap.payment_year = mhier.payment_year
+    and bgap.model_version = mhier.model_version
+    and bgap.hcc_hierarchy_group = mhier.hcc_hierarchy_group
+    and bgap.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
+    -- Join eligible benes again here to capture new rows with open gaps
 inner join {{ ref('hcc_recapture__int_eligible_benes') }} as elig
-    on
-        bgap.person_id = elig.person_id
-        and bgap.payment_year = elig.collection_year + 1
-        and bgap.payer = elig.payer
+    on bgap.person_id = elig.person_id
+    and bgap.payment_year = elig.collection_year + 1
+    and bgap.payer = elig.payer
 where 1 = (case when bgap.payment_year >= 2026 and bgap.model_version = 'CMS-HCC-V24' then 0 else 1 end)

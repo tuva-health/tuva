@@ -83,12 +83,11 @@ equiv_coef as (
         , base.risk_model_code
     from {{ ref('hcc_recapture__stg_coef_hier') }} as base
     inner join {{ ref('hcc_recapture__stg_coef_hier') }} as self
-        on
-            base.hcc_hierarchy_group = self.hcc_hierarchy_group
-            and base.risk_model_code = self.risk_model_code
-            and base.coefficient = self.coefficient
-            and base.model_version = self.model_version
-            and base.hcc_code != self.hcc_code
+        on base.hcc_hierarchy_group = self.hcc_hierarchy_group
+        and base.risk_model_code = self.risk_model_code
+        and base.coefficient = self.coefficient
+        and base.model_version = self.model_version
+        and base.hcc_code != self.hcc_code
 )
 
 -- Note: Gaps can only be closed using claims received from the payor or from Athena.
@@ -126,36 +125,32 @@ select
     end as gap_status
 from filtered_hccs as base
 full outer join risk_gaps as gap
-    on
-        base.person_id = gap.person_id
-        and base.payer = gap.payer
-        and base.collection_year = gap.collection_year
-        and base.model_version = gap.model_version
-        and base.hcc_code = gap.hcc_code
-        -- Only coded or captured HCCs can close other HCCs
-        and base.hcc_type in ('coded', 'captured')
+    on base.person_id = gap.person_id
+    and base.payer = gap.payer
+    and base.collection_year = gap.collection_year
+    and base.model_version = gap.model_version
+    and base.hcc_code = gap.hcc_code
+    -- Only coded or captured HCCs can close other HCCs
+    and base.hcc_type in ('coded', 'captured')
 left join equiv_coef as equiv
-    on
-        base.model_version = equiv.model_version
-        and base.hcc_hierarchy_group = equiv.hcc_hierarchy_group
-        and base.hcc_code = equiv.hcc_code
-        and base.risk_model_code = equiv.risk_model_code
+    on base.model_version = equiv.model_version
+    and base.hcc_hierarchy_group = equiv.hcc_hierarchy_group
+    and base.hcc_code = equiv.hcc_code
+    and base.risk_model_code = equiv.risk_model_code
 left join best_past_rank as grp
-    on
-        base.person_id = grp.person_id
-        and base.payer = grp.payer
-        and base.collection_year = grp.collection_year
-        and base.model_version = grp.model_version
-        and base.hcc_hierarchy_group = grp.hcc_hierarchy_group
-        and grp.best_past_rank = grp.hcc_hierarchy_group_rank
+    on base.person_id = grp.person_id
+    and base.payer = grp.payer
+    and base.collection_year = grp.collection_year
+    and base.model_version = grp.model_version
+    and base.hcc_hierarchy_group = grp.hcc_hierarchy_group
+    and grp.best_past_rank = grp.hcc_hierarchy_group_rank
 left join best_current_rank as current_year_hier
-    on
-        gap.person_id = current_year_hier.person_id
-        and gap.payer = current_year_hier.payer
-        and gap.collection_year = current_year_hier.collection_year
-        and gap.model_version = current_year_hier.model_version
-        and gap.hcc_hierarchy_group = current_year_hier.hcc_hierarchy_group
-        and current_year_hier.best_current_rank = current_year_hier.hcc_hierarchy_group_rank
+    on gap.person_id = current_year_hier.person_id
+    and gap.payer = current_year_hier.payer
+    and gap.collection_year = current_year_hier.collection_year
+    and gap.model_version = current_year_hier.model_version
+    and gap.hcc_hierarchy_group = current_year_hier.hcc_hierarchy_group
+    and current_year_hier.best_current_rank = current_year_hier.hcc_hierarchy_group_rank
 -- Gaps are only eligible to be closed by claims data and the base table here is closing the gap aliased table
 -- The or hcc_type is null allows open HCCs to flow through
 where base.hcc_type in ('coded', 'captured') or base.hcc_type is null
