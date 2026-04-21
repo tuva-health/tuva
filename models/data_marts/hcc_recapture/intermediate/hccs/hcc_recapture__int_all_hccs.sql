@@ -9,7 +9,7 @@ WITH seed_hcc_hierarchy AS (
         , hcc_code
         , hcc_hierarchy_group
         , hcc_hierarchy_group_rank
-    FROM {{ ref('hcc_recapture__stg_hierarchy') }}
+    FROM {{ ref('cms_hcc__disease_hierarchy_flat') }}
 ),
 
 chronic_hccs AS (
