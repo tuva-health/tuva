@@ -67,7 +67,7 @@ from eligible_hccs as sus
 left join seed_hcc_hierarchy as hier
     on sus.hcc_code = hier.hcc_code
     and sus.model_version = hier.model_version
-left join chronic_hccs as chronic
+left join {{ ref('hcc_recapture__stg_chronic_hccs') }} as chronic
     on sus.model_version = chronic.model_version
     and sus.hcc_code = chronic.hcc_code    
 left join get_risk_code as rcode
