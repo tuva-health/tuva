@@ -34,12 +34,12 @@ with seed_hcc_hierarchy as (
 , chronic_hccs as (
 select distinct
       diag.hcc_code
-    , diag.payment_year
     , diag.model_version
     , 1 as chronic_flag
 from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as hier
 inner join hcc_diagnosis as diag
   on hier.code = diag.diagnosis_code
+where diag.payment_year = (select max(payment_year) from hcc_diagnosis)
 )
 
 , get_risk_code as (
