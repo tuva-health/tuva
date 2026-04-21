@@ -8,9 +8,10 @@
 
 {% macro dq_config_analytical_metric_model(alias_name) %}
     {{ config(
+         enabled = var('enable_data_quality', false) | as_bool,
          schema = dq_data_quality_schema_name(),
          alias = alias_name,
-         tags = ['data_quality', 'dqi', 'dq2', 'dq_analytical'],
+         tags = ['data_quality', 'dq', 'dq2', 'dq_analytics', 'dq_analytical'],
          materialized = 'table'
        )
     }}
@@ -22,6 +23,18 @@
         , cast(null as {{ dbt.type_string() }}) as domain
         , cast(null as {{ dbt.type_string() }}) as metric
         , cast(null as {{ dbt.type_numeric() }}) as result
+    where 1 = 0
+{% endmacro %}
+
+{% macro dq_analytical_empty_summary_result_sql() %}
+    select
+          cast(null as {{ dbt.type_string() }}) as data_source
+        , cast(null as {{ dbt.type_string() }}) as domain
+        , cast(null as {{ dbt.type_string() }}) as metric
+        , cast(null as {{ dbt.type_string() }}) as result
+        , cast(null as {{ dbt.type_string() }}) as medicare
+        , cast(null as {{ dbt.type_string() }}) as commercial
+        , cast(null as {{ dbt.type_string() }}) as medicaid
     where 1 = 0
 {% endmacro %}
 
@@ -37,40 +50,68 @@
     ) }}
 {% endmacro %}
 
+{% macro dq_find_analytical_node(node_name) %}
+    {% if not execute %}
+        {{ return(none) }}
+    {% endif %}
+
+    {% for graph_node in graph['nodes'].values() %}
+        {% if graph_node.package_name == 'the_tuva_project'
+              and graph_node.name == node_name
+              and graph_node.resource_type in ['model', 'seed'] %}
+            {{ return(graph_node) }}
+        {% endif %}
+    {% endfor %}
+
+    {{ return(none) }}
+{% endmacro %}
+
 {% macro dq_analytical_relation(model_name) %}
-    {{ return(dq_actual_relation(dq_find_model_node(model_name))) }}
+    {{ return(dq_actual_relation(dq_find_analytical_node(model_name))) }}
+{% endmacro %}
+
+{% macro dq_analytical_string_literal(value) %}
+    {{ return("'" ~ (value | string | replace("'", "''")) ~ "'") }}
+{% endmacro %}
+
+{% macro dq_analytical_normalize_text_sql(expression) %}
+    {{ return(
+        "lower("
+        ~ "replace("
+        ~ "replace("
+        ~ "replace("
+        ~ "replace("
+        ~ "replace("
+        ~ "replace("
+        ~ "replace("
+        ~ "cast(" ~ expression ~ " as " ~ dbt.type_string() ~ ")"
+        ~ ", ' ', '')"
+        ~ ", '/', '')"
+        ~ ", '-', '')"
+        ~ ", ',', '')"
+        ~ ", '(', '')"
+        ~ ", ')', '')"
+        ~ ", '.', '')"
+        ~ ")"
+    ) }}
 {% endmacro %}
 
 {% macro dq_analytical_key_metric_model_names() %}
-    {{ return([
-        'data_quality__analytical_key_metric__count_distinct_patients',
-        'data_quality__analytical_key_metric__count_distinct_patients_by_sex',
-        'data_quality__analytical_key_metric__count_distinct_patients_by_age_group',
-        'data_quality__analytical_key_metric__count_dead',
-        'data_quality__analytical_key_metric__sum_medical_claim_paid_amount',
-        'data_quality__analytical_key_metric__sum_medical_claim_paid_amount_by_claim_type',
-        'data_quality__analytical_key_metric__sum_medical_claim_allowed_amount',
-        'data_quality__analytical_key_metric__sum_medical_claim_allowed_amount_by_claim_type',
-        'data_quality__analytical_key_metric__count_distinct_medical_claims',
-        'data_quality__analytical_key_metric__count_distinct_medical_claims_by_claim_type',
-        'data_quality__analytical_key_metric__sum_pharmacy_claim_paid_amount',
-        'data_quality__analytical_key_metric__sum_pharmacy_claim_allowed_amount',
-        'data_quality__analytical_key_metric__total_member_months',
-        'data_quality__analytical_key_metric__avg_member_months',
-        'data_quality__analytical_key_metric__max_member_months',
-        'data_quality__analytical_key_metric__members_with_claims_without_enrollment',
-        'data_quality__analytical_key_metric__members_with_claims_missing_enrollment_month',
-        'data_quality__analytical_key_metric__acute_inpatient_visits_per_1000',
-        'data_quality__analytical_key_metric__snf_visits_per_1000',
-        'data_quality__analytical_key_metric__ed_visits_per_1000',
-        'data_quality__analytical_key_metric__office_visits_per_1000',
-        'data_quality__analytical_key_metric__inpatient_alos',
-        'data_quality__analytical_key_metric__inpatient_mortality_rate',
-        'data_quality__analytical_key_metric__index_admissions',
-        'data_quality__analytical_key_metric__readmissions_30_day',
-        'data_quality__analytical_key_metric__readmission_rate_30_day',
-        'data_quality__analytical_key_metric__ed_classification_percentages',
-        'data_quality__analytical_key_metric__top_chronic_condition_prevalence',
-        'data_quality__analytical_key_metric__top_hcc_prevalence'
-    ]) }}
+    {% set model_names = [] %}
+
+    {% for spec in dq_analytical_metric_manifest() %}
+        {% do model_names.append(spec['model_name']) %}
+    {% endfor %}
+
+    {{ return(model_names) }}
+{% endmacro %}
+
+{% macro dq_analytical_metric_spec(model_name) %}
+    {% for spec in dq_analytical_metric_manifest() %}
+        {% if spec['model_name'] == model_name %}
+            {{ return(spec) }}
+        {% endif %}
+    {% endfor %}
+
+    {{ exceptions.raise_compiler_error('No analytical metric spec found for ' ~ model_name) }}
 {% endmacro %}

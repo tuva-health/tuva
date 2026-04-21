@@ -1,12 +1,12 @@
 {{ config(
-     enabled = var('claims_enabled', false) | as_bool,
+     enabled = (var('enable_data_quality', false) | as_bool) and (var('claims_enabled', false) | as_bool),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
        else 'data_quality'
      ),
      alias = 'eligibility_person_flags',
-     tags = ['data_quality', 'dqi', 'dq1', 'dq_logical'],
+     tags = ['data_quality', 'dq', 'dq1', 'dq_logical'],
      materialized = 'table'
    )
 }}
