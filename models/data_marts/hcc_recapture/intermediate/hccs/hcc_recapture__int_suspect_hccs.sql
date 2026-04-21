@@ -24,5 +24,5 @@ where lower(reason) != 'prior coding history'
 union all
 select
     *
-from {{ ref('hcc_recapture__stg_suspect_list')}}
+from {{ ref('hcc_recapture__stg_suspect_hccs')}}
 {% endif %}
