@@ -89,3 +89,15 @@ models:
         {% else %}hcc_recapture{%- endif -%}
       alias: stg_suspect_hccs
       tags: ["hcc_recapture", "staging"]
+
+  - name: hcc_recapture__stg_chronic_hccs
+    description: |
+      A list of suspected HCCs. This is an optional model which can be included by 
+      setting the hcc_recapture_suspect_list variable in your dbt_project.yml
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: stg_chronic_hccs
+      tags: ["hcc_recapture", "staging"]
+      
