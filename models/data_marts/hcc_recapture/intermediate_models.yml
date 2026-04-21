@@ -138,6 +138,7 @@ models:
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+  
   - name: hcc_recapture__int_gap_status
     description: >
       Determines the gap for a given HCC code. A gap is based on prior year claims which qualified as an HCC. If there was a chronic HCC in a prior year,
@@ -207,3 +208,56 @@ models:
         description: >
           This is a 1 if this HCC gets filtered out due to a hierarchy being applied or not. The hierarchy is re-applied in this model due to interactions between
           open HCCs and closed HCCs originating in different collection years.
+
+  - name: hcc_recapture__int_eligible_benes
+    description: >
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: int_eligible_benes
+      tags: ["hcc_recapture", "intermediate"]
+      materialized: table
+  
+  - name: hcc_recapture__int_determine_gap_status
+    description: >
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: int_determine_gap_status
+      tags: ["hcc_recapture", "intermediate"]
+      materialized: table
+
+  - name: hcc_recapture__int_coded_hccs
+    description: >
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: int_coded_hccs
+      tags: ["hcc_recapture", "intermediate"]
+      materialized: table
+
+  - name: hcc_recapture__int_recapturable_hccs
+    description: >
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: int_recapturable_hccs
+      tags: ["hcc_recapture", "intermediate"]
+      materialized: table
+
+  - name: hcc_recapture__int_suspect_hccs
+    description: >
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: int_suspect_hccs
+      tags: ["hcc_recapture", "intermediate"]
+      materialized: table
+
+
+  
