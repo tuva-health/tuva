@@ -77,7 +77,7 @@ select distinct
     , bgap.payment_year
     , bgap.recapturable_flag
     , bgap.hcc_type
-    , bgap.hcc_source,   
+    , bgap.hcc_source
     , bgap.gap_status
     , bgap.hcc_hierarchy_group
     , bgap.hcc_hierarchy_group_rank
