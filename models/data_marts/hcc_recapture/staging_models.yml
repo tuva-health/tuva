@@ -65,3 +65,14 @@ models:
         description: The year that the claims originated and were originally coded.
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+
+  - name: hcc_recapture__stg_suspect_hccs
+    description: |
+      A list of suspected HCCs. This is an optional model which can be included by 
+      setting the hcc_recapture_suspect_list variable in your dbt_project.yml
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: stg_suspect_hccs
+      tags: ["hcc_recapture", "staging"]

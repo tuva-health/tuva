@@ -1,15 +1,8 @@
-{{ config(
-     enabled = var('claims_enabled', False) | as_bool
-   )
-}}
-
 with base as (
 select
     *
-from {{ ref('hcc_recapture__int_all_hccs') }}
--- hierarchies should only be applied to eligible claims
-where eligible_claim_indicator = 1
-    and hcc_chronic_flag = 1
+from {{ ref('hcc_recapture__int_all_hccs')}}
+where recapturable_flag = 1
 )
 
 , min_hierarchy as (
@@ -21,6 +14,7 @@ select
     , data_source
     , hcc_hierarchy_group
     , suspect_hcc_flag
+    , hcc_chronic_flag
     , min(hcc_hierarchy_group_rank) as min_hcc_hier_group_rank
 from base
 group by
@@ -31,6 +25,7 @@ group by
     , data_source
     , hcc_hierarchy_group
     , suspect_hcc_flag
+    , hcc_chronic_flag
 )
 
 select
@@ -47,14 +42,15 @@ select
     , base.hcc_hierarchy_group
     , base.hcc_hierarchy_group_rank
     , base.risk_model_code
-    , base.eligible_bene
-    , base.eligible_claim_indicator
+    , base.eligible_bene_flag
     , base.rendering_npi
-    , base.reason
-    , base.condition_type
     , base.suspect_hcc_flag
+    , base.recapturable_flag
+    , base.hcc_type
+    , base.hcc_source
+    , CASE WHEN mhier.hcc_hierarchy_group IS NOT NULL THEN 0 ELSE 1 END as filtered_by_hierarchy_flag
 from base
-left outer join min_hierarchy as mhier
+left join min_hierarchy mhier
     on base.person_id = mhier.person_id
     and base.payer = mhier.payer
     and base.collection_year = mhier.collection_year
@@ -63,5 +59,4 @@ left outer join min_hierarchy as mhier
     and base.hcc_hierarchy_group = mhier.hcc_hierarchy_group
     and base.hcc_hierarchy_group_rank = mhier.min_hcc_hier_group_rank
     and base.suspect_hcc_flag = mhier.suspect_hcc_flag
--- Apply hierarchies
-where mhier.hcc_hierarchy_group is not null
+    and base.hcc_chronic_flag = mhier.hcc_chronic_flag
