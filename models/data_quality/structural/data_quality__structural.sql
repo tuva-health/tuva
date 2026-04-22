@@ -1,11 +1,12 @@
 {{ config(
+     enabled = var('enable_data_quality', false) | as_bool,
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
        else 'data_quality'
      ),
      alias = 'structural',
-     tags = ['data_quality', 'dqi', 'dq1', 'dq_structural'],
+     tags = ['data_quality', 'dq', 'dq1', 'dq_structural'],
      materialized = 'table'
    )
 }}

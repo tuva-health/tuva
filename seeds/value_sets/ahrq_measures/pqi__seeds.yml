@@ -5,7 +5,7 @@ seeds:
     description: Value sets from AHRQ for each of the published PQI measures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_pqi
       tags:
         - pqi
@@ -31,7 +31,7 @@ seeds:
     description: Names and descriptions of each of the PQI measures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_pqi_measures
       tags:
         - pqi
