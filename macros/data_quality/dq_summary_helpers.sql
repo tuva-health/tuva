@@ -15,6 +15,14 @@
     {{ return(models) }}
 {% endmacro %}
 
+{% macro dq_claims_structural_model_names() %}
+    {{ return([
+        'input_layer__eligibility',
+        'input_layer__medical_claim',
+        'input_layer__pharmacy_claim'
+    ]) }}
+{% endmacro %}
+
 {% macro dq_expected_final_marts() %}
     {% if not execute %}
         {{ return([]) }}
@@ -165,6 +173,22 @@
         select
               '{{ dq_source_key_sentinel() }}' as data_source_key
             , cast(null as {{ dbt.type_string() }}) as data_source
+    {% endif %}
+{% endmacro %}
+
+{% macro dq_missing_source_dimension_sql() %}
+    select
+          '{{ dq_source_key_sentinel() }}' as data_source_key
+        , cast(null as {{ dbt.type_string() }}) as data_source
+{% endmacro %}
+
+{% macro dq_source_key_expression_sql(relation, relation_alias='source_rows') %}
+    {% set actual_columns = dq_actual_columns(relation) %}
+
+    {% if dq_has_column(actual_columns, 'data_source') %}
+        {{ return("coalesce(cast(" ~ relation_alias ~ ".data_source as " ~ dbt.type_string() ~ "), '" ~ dq_source_key_sentinel() ~ "')") }}
+    {% else %}
+        {{ return("'" ~ dq_source_key_sentinel() ~ "'") }}
     {% endif %}
 {% endmacro %}
 
