@@ -51,13 +51,61 @@ models:
       - name: table_exists
         description: Pass or fail result indicating whether the expected input-layer relation exists.
       - name: columns_exist
-        description: Pass or fail result indicating whether all documented input-layer columns are present.
+        description: Pass or fail result indicating whether all documented input-layer columns are present. For the three claims input tables, this is derived from the structural column detail table.
       - name: data_types
-        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family.
+        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family. For the three claims input tables, this is derived from the structural column detail table.
       - name: primary_keys
-        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain.
+        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain. For the three claims input tables, this is derived from the structural column detail and structural primary-key test tables.
       - name: row_count
         description: The integer number of rows present for the evaluated data_source and input-layer table. Null means the relation does not exist.
+
+  - name: data_quality__structural_column_details
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_column_details
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The documented input-layer column being evaluated.
+      - name: column_exists
+        description: Yes or no indicator for whether the documented column exists on the input-layer relation.
+      - name: data_type_correct
+        description: Yes or no indicator for whether the documented column matches the expected data-type family.
+
+  - name: data_quality__structural_primary_key_tests
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_primary_key_tests
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The primary-key column under test, or the comma-separated set of documented primary-key columns for the duplicate value test.
+      - name: test
+        description: The primary-key test being evaluated. Current values are not null and duplicate value.
+      - name: test_result
+        description: Integer test result where healthy values are expected to be zero. Not-null tests count null values, and duplicate value tests return total rows minus distinct primary-key combinations.
 
   - name: data_quality__logical
     description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.

@@ -34,7 +34,7 @@
         {% do exceptions.raise_compiler_error(
             "CI baseline seed schemas are not ready for run-only mode. Missing required objects: "
             ~ (missing | join(', '))
-            ~ ". Run `/ci large` on this PR to refresh `raw_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
+            ~ ". Run a seed-refreshing CI command such as `/ci snowflake dbt seed` or `/ci snowflake dbt build --full-refresh` to refresh `raw_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
         ) %}
     {% endif %}
 
