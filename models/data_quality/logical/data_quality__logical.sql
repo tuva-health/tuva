@@ -30,7 +30,7 @@
             , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('table') }}
             , cast(null as {{ dbt.type_string() }}) as test_name
             , cast(null as {{ dbt.type_int() }}) as test_result
-        where 1 = 0
+        {{ dq_empty_result_guard_sql() }}
     {% endif %}
 {% else %}
     select
@@ -38,5 +38,5 @@
         , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('table') }}
         , cast(null as {{ dbt.type_string() }}) as test_name
         , cast(null as {{ dbt.type_int() }}) as test_result
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

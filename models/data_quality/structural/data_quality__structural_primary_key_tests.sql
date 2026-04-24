@@ -202,5 +202,5 @@
         , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('column') }}
         , cast(null as {{ dbt.type_string() }}) as test
         , cast(null as {{ dbt.type_int() }}) as test_result
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

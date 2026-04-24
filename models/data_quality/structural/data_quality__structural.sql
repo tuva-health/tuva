@@ -247,5 +247,5 @@
         , cast(null as {{ dbt.type_string() }}) as data_types
         , cast(null as {{ dbt.type_string() }}) as primary_keys
         , cast(null as {{ dbt.type_int() }}) as row_count
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

@@ -120,6 +120,17 @@
     {{ return('__dq_null__') }}
 {% endmacro %}
 
+{% macro dq_empty_row_sql() %}
+    select 1 as _dq_empty_row
+{% endmacro %}
+
+{% macro dq_empty_result_guard_sql() %}
+    from (
+        {{ dq_empty_row_sql() }}
+    ) as dq_empty_row
+    where 1 = 0
+{% endmacro %}
+
 {% macro dq_grouped_rowcount_sql(relation, group_cols=[]) %}
     select
         {% for column_name in group_cols %}
@@ -165,6 +176,9 @@
         select
               '{{ dq_source_key_sentinel() }}' as data_source_key
             , cast(null as {{ dbt.type_string() }}) as data_source
+        from (
+            {{ dq_empty_row_sql() }}
+        ) as dq_empty_source
         where not exists (
             select 1
             from {{ relation }}

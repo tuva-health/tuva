@@ -81,5 +81,5 @@
         , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('column') }}
         , cast(null as {{ dbt.type_string() }}) as column_exists
         , cast(null as {{ dbt.type_string() }}) as data_type_correct
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}
