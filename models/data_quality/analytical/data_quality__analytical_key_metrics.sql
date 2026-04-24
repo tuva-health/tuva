@@ -61,7 +61,6 @@
     from unioned_metrics
     inner join metric_manifest
         on unioned_metrics.model_name = metric_manifest.model_name
-    order by 1, metric_manifest.sort_order
 {% else %}
     {{ dq_analytical_empty_summary_result_sql() }}
 {% endif %}

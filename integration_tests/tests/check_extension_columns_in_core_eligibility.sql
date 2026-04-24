@@ -19,6 +19,7 @@
 
 {%- set source_relation = ref('input_layer__eligibility') -%}
 {%- set extension_cols = [] -%}
+{%- set string_type = dbt.type_string() -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
     {%- if col.name.lower().startswith('x_') -%}
         {%- do extension_cols.append(col.name.lower()) -%}

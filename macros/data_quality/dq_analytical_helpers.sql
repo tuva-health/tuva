@@ -23,7 +23,7 @@
         , cast(null as {{ dbt.type_string() }}) as domain
         , cast(null as {{ dbt.type_string() }}) as metric
         , cast(null as {{ dbt.type_numeric() }}) as result
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endmacro %}
 
 {% macro dq_analytical_empty_summary_result_sql() %}
@@ -35,7 +35,7 @@
         , cast(null as {{ dbt.type_string() }}) as medicare
         , cast(null as {{ dbt.type_string() }}) as commercial
         , cast(null as {{ dbt.type_string() }}) as medicaid
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endmacro %}
 
 {% macro dq_analytical_count_result_sql(result_expression) %}
