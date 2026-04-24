@@ -46,7 +46,7 @@ select
     , claim_line_number
     , 'x_temp_ndc_code does not match ndc_code' as failure_reason
 from {{ ref('core__pharmacy_claim') }}
-where cast(x_temp_ndc_code as varchar) <> cast(ndc_code as varchar)
+where cast(x_temp_ndc_code as {{ dbt.type_string() }}) <> cast(ndc_code as {{ dbt.type_string() }})
    or (x_temp_ndc_code is null     and ndc_code is not null)
    or (x_temp_ndc_code is not null and ndc_code is null)
 

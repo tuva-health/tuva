@@ -46,7 +46,7 @@ select
     member_month_key
     , 'x_temp_person_id does not match person_id' as failure_reason
 from {{ ref('core__member_months') }}
-where cast(x_temp_person_id as varchar) <> cast(person_id as varchar)
+where cast(x_temp_person_id as {{ dbt.type_string() }}) <> cast(person_id as {{ dbt.type_string() }})
    or (x_temp_person_id is null     and person_id is not null)
    or (x_temp_person_id is not null and person_id is null)
 

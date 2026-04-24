@@ -48,7 +48,7 @@ select
     , claim_line_number
     , 'x_temp_claim_id does not match claim_id' as failure_reason
 from {{ ref('core__medical_claim') }}
-where cast(x_temp_claim_id as varchar) <> cast(claim_id as varchar)
+where cast(x_temp_claim_id as {{ dbt.type_string() }}) <> cast(claim_id as {{ dbt.type_string() }})
    or (x_temp_claim_id is null     and claim_id is not null)
    or (x_temp_claim_id is not null and claim_id is null)
 
@@ -71,7 +71,7 @@ select
     , claim_line_number
     , 'x_temp_payer does not match payer' as failure_reason
 from {{ ref('core__medical_claim') }}
-where cast(x_temp_payer as varchar) <> cast(payer as varchar)
+where cast(x_temp_payer as {{ dbt.type_string() }}) <> cast(payer as {{ dbt.type_string() }})
    or (x_temp_payer is null     and payer is not null)
    or (x_temp_payer is not null and payer is null)
 
