@@ -1,6 +1,7 @@
 import importlib.util
 import io
 import pathlib
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -82,6 +83,33 @@ class CheckMetadataDescriptionLengthTests(unittest.TestCase):
             self.assertIn("seed=example_seed", output)
             self.assertIn("column=long_column", output)
             self.assertIn("overflow=", output)
+
+    def test_script_exits_with_message_when_pyyaml_is_missing(self):
+        harness = textwrap.dedent(
+            f"""
+            import builtins
+            import runpy
+
+            original_import = builtins.__import__
+
+            def fake_import(name, *args, **kwargs):
+                if name == "yaml":
+                    raise ImportError("missing yaml")
+                return original_import(name, *args, **kwargs)
+
+            builtins.__import__ = fake_import
+            runpy.run_path({str(MODULE_PATH)!r}, run_name="__main__")
+            """
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", harness],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PyYAML is required", result.stderr)
 
 
 if __name__ == "__main__":

@@ -37,6 +37,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install PyYAML
+        run: python3 -m pip install pyyaml
+
       - name: Run scanner unit tests
         run: python3 -m unittest scripts/test_check_metadata_description_length.py
 
