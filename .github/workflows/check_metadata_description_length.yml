@@ -9,7 +9,7 @@ on:
       - "seeds/**/*.yaml"
       - "snapshots/**/*.yml"
       - "snapshots/**/*.yaml"
-      - "scripts/check_metadata_description_length.sh"
+      - "scripts/check_metadata_description_length.py"
       - "scripts/test_check_metadata_description_length.py"
       - ".github/workflows/check_metadata_description_length.yml"
   push:
@@ -22,7 +22,7 @@ on:
       - "seeds/**/*.yaml"
       - "snapshots/**/*.yml"
       - "snapshots/**/*.yaml"
-      - "scripts/check_metadata_description_length.sh"
+      - "scripts/check_metadata_description_length.py"
       - "scripts/test_check_metadata_description_length.py"
       - ".github/workflows/check_metadata_description_length.yml"
 
@@ -37,18 +37,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install yq
-        run: |
-          curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.48.1/yq_linux_amd64 -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
-
       - name: Run scanner unit tests
         run: python3 -m unittest scripts/test_check_metadata_description_length.py
 
       - name: Check column description length limit
         id: scan
         continue-on-error: true
-        run: scripts/check_metadata_description_length.sh --limit 1024
+        run: python3 scripts/check_metadata_description_length.py --limit 1024
 
       - name: Note warning-only status
         if: ${{ steps.scan.outcome == 'failure' }}
