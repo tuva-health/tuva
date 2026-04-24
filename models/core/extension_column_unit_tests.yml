@@ -41,7 +41,7 @@ unit_tests:
       - input: ref('normalized_input__eligibility')
         format: sql
         rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           select
             '10' as person_id,
             '10' as member_id,
@@ -67,7 +67,7 @@ unit_tests:
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           select
             '10' as person_id,
             '10' as member_id,
@@ -106,7 +106,7 @@ unit_tests:
       - input: ref('core__stg_claims_member_months')
         format: sql
         rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           select
             'b8cc2c5022647c213f23a44b819d61a0' as member_month_key,
             '10' as person_id,
