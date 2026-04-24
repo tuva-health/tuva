@@ -1,0 +1,57 @@
+name: Check Metadata Description Length
+
+on:
+  pull_request:
+    paths:
+      - "models/**/*.yml"
+      - "models/**/*.yaml"
+      - "seeds/**/*.yml"
+      - "seeds/**/*.yaml"
+      - "snapshots/**/*.yml"
+      - "snapshots/**/*.yaml"
+      - "scripts/check_metadata_description_length.sh"
+      - "scripts/test_check_metadata_description_length.py"
+      - ".github/workflows/check_metadata_description_length.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "models/**/*.yml"
+      - "models/**/*.yaml"
+      - "seeds/**/*.yml"
+      - "seeds/**/*.yaml"
+      - "snapshots/**/*.yml"
+      - "snapshots/**/*.yaml"
+      - "scripts/check_metadata_description_length.sh"
+      - "scripts/test_check_metadata_description_length.py"
+      - ".github/workflows/check_metadata_description_length.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-description-length:
+    name: Check YAML metadata descriptions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.48.1/yq_linux_amd64 -o /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Run scanner unit tests
+        run: python3 -m unittest scripts/test_check_metadata_description_length.py
+
+      - name: Check column description length limit
+        id: scan
+        continue-on-error: true
+        run: scripts/check_metadata_description_length.sh --limit 1024
+
+      - name: Note warning-only status
+        if: ${{ steps.scan.outcome == 'failure' }}
+        run: |
+          echo "Existing repo metadata still contains descriptions longer than 1024 characters."
+          echo "This workflow is warning-only until those descriptions are cleaned up, then continue-on-error can be removed."
