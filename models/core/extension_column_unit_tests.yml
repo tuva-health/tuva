@@ -134,7 +134,7 @@ unit_tests:
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           select
             '10' as person_id,
             '10' as member_id,
