@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: source_input
+    database: "{{ var('input_database', target.database) }}"
+    schema: |
+      {%- if var('use_synthetic_data') == true -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_raw_data
+        {%- else -%}raw_data{%- endif -%}
+      {%- else -%}
+        {{ var('input_schema', target.schema) }}
+      {%- endif -%}
+    tables:
+      - name: appointment
+      - name: condition
+      - name: eligibility
+      - name: encounter
+      - name: immunization
+      - name: lab_result
+      - name: location
+      - name: medical_claim
+      - name: medication
+      - name: observation
+      - name: patient
+      - name: pharmacy_claim
+      - name: practitioner
+      - name: procedure
+      - name: provider_attribution

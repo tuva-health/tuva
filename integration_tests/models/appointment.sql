@@ -4,9 +4,7 @@
    )
 }}
 
-{% if var('use_synthetic_data') == true -%}
-
-select
+{%- set tuva_columns -%}
       appointment_id
     , person_id
     , patient_id
@@ -41,47 +39,23 @@ select
     , normalized_cancellation_reason_code_type
     , normalized_cancellation_reason_code
     , normalized_cancellation_reason_description
-    , data_source
-from {{ ref('raw_data__appointment') }}
+{%- endset -%}
 
-{%- else -%}
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , source_appointment_type_code as x_temp_source_appointment_type_code #}
+    {# , start_datetime as x_temp_start_datetime #}
+    {# , reason as zzz_temp_reason #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
+    , data_source
+    , file_name
+    , ingest_datetime
+{%- endset -%}
 
 select
-      appointment_id
-    , person_id
-    , patient_id
-    , encounter_id
-    , type_code as source_appointment_type_code
-    , type_description as source_appointment_type_description
-    , cast(null as {{ dbt.type_string() }}) as normalized_appointment_type_code
-    , cast(null as {{ dbt.type_string() }}) as normalized_appointment_type_description
-    , start_datetime
-    , end_datetime
-    , duration
-    , location_id
-    , practitioner_id
-    , type_code
-    , type_description
-    , status_code
-    , status_description
-    , status_code as source_status
-    , cast(null as {{ dbt.type_string() }}) as normalized_status
-    , cast(null as {{ dbt.type_string() }}) as appointment_specialty
-    , reason
-    , cast(null as {{ dbt.type_string() }}) as source_reason_code_type
-    , cast(null as {{ dbt.type_string() }}) as source_reason_code
-    , cast(null as {{ dbt.type_string() }}) as source_reason_description
-    , cast(null as {{ dbt.type_string() }}) as normalized_reason_code_type
-    , cast(null as {{ dbt.type_string() }}) as normalized_reason_code
-    , cast(null as {{ dbt.type_string() }}) as normalized_reason_description
-    , cancellation_reason
-    , cast(null as {{ dbt.type_string() }}) as source_cancellation_reason_code_type
-    , cast(null as {{ dbt.type_string() }}) as source_cancellation_reason_code
-    , cast(null as {{ dbt.type_string() }}) as source_cancellation_reason_description
-    , cast(null as {{ dbt.type_string() }}) as normalized_cancellation_reason_code_type
-    , cast(null as {{ dbt.type_string() }}) as normalized_cancellation_reason_code
-    , cast(null as {{ dbt.type_string() }}) as normalized_cancellation_reason_description
-    , data_source
-from {{ source('source_input', 'appointment') }}
-
-{%- endif %}
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ tuva_source('appointment') }}
