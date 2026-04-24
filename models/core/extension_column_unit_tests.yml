@@ -41,11 +41,12 @@ unit_tests:
       - input: ref('normalized_input__eligibility')
         format: sql
         rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
           select
             '10' as person_id,
             '10' as member_id,
             'medicare' as payer,
-            'medicare' as plan,
+            'medicare' as {{ plan_identifier }},
             'test' as data_source,
             cast('2020-01-01' as date) as enrollment_start_date,
             cast('2020-01-31' as date) as enrollment_end_date,
@@ -66,11 +67,12 @@ unit_tests:
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
           select
             '10' as person_id,
             '10' as member_id,
             'medicare' as payer,
-            'medicare' as plan,
+            'medicare' as {{ plan_identifier }},
             'test' as data_source,
             cast('2020-01-01' as date) as enrollment_start_date,
             cast('2020-01-31' as date) as enrollment_end_date
@@ -104,13 +106,14 @@ unit_tests:
       - input: ref('core__stg_claims_member_months')
         format: sql
         rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
           select
             'b8cc2c5022647c213f23a44b819d61a0' as member_month_key,
             '10' as person_id,
             '10' as member_id,
             '202001' as year_month,
             'medicare' as payer,
-            'medicare' as plan,
+            'medicare' as {{ plan_identifier }},
             null as payer_attributed_provider,
             null as payer_attributed_provider_practice,
             null as payer_attributed_provider_organization,
@@ -129,11 +132,12 @@ unit_tests:
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else '"plan"' %}
           select
             '10' as person_id,
             '10' as member_id,
             'medicare' as payer,
-            'medicare' as plan,
+            'medicare' as {{ plan_identifier }},
             'test' as data_source,
             cast('2020-01-01' as date) as enrollment_start_date,
             cast('2020-01-31' as date) as enrollment_end_date

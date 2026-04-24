@@ -73,7 +73,6 @@
     from (
         {{ detail_queries | join('\nunion all\n') }}
     ) as structural_column_details
-    order by 1, 2, 3
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source

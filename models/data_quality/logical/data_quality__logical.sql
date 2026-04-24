@@ -23,7 +23,6 @@
         from (
             {{ logical_queries | join('\nunion all\n') }}
         ) as logical_results
-        order by 1, 2, 3
     {% else %}
         select
               cast(null as {{ dbt.type_string() }}) as data_source

@@ -109,7 +109,8 @@
                         , cast(sum(case when data_type_correct = 'no' then 1 else 0 end) as {{ dbt.type_int() }}) as bad_data_type_count
                     from {{ ref('data_quality__structural_column_details') }}
                     where {{ adapter.quote('table') }} = '{{ table_name }}'
-                    group by 1
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
                 ) as column_status
                     on sources.data_source_key = column_status.data_source_key
                 left join (
@@ -123,7 +124,8 @@
                           '{{ pk_column }}'{% if not loop.last %}, {% endif %}
                           {% endfor %}
                       )
-                    group by 1
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
                 ) as pk_column_status
                     on sources.data_source_key = pk_column_status.data_source_key
                 left join (
@@ -132,7 +134,8 @@
                         , cast(sum(case when test_result is null or test_result <> 0 then 1 else 0 end) as {{ dbt.type_int() }}) as failing_test_count
                     from {{ ref('data_quality__structural_primary_key_tests') }}
                     where {{ adapter.quote('table') }} = '{{ table_name }}'
-                    group by 1
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
                 ) as pk_test_status
                     on sources.data_source_key = pk_test_status.data_source_key
             {% endset %}
@@ -237,7 +240,6 @@
     from (
         {{ structural_queries | join('\nunion all\n') }}
     ) as structural_results
-    order by 1, 2
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source

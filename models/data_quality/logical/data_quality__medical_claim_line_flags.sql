@@ -125,7 +125,10 @@ diagnosis_code_flags as (
     left join {{ ref('terminology__icd_9_cm') }} as icd_9_diagnosis_lookup
         on diagnosis_codes.diagnosis_code_type = 'icd-9-cm'
        and diagnosis_codes.diagnosis_code = replace(cast(icd_9_diagnosis_lookup.icd_9_cm as {{ string_type }}), '.', '')
-    group by 1, 2, 3
+    group by
+          diagnosis_codes._dq_claim_id_key
+        , diagnosis_codes._dq_claim_line_number_key
+        , diagnosis_codes._dq_data_source_key
 ),
 
 procedure_codes as (
@@ -155,7 +158,10 @@ procedure_code_flags as (
     left join {{ ref('terminology__icd_9_pcs') }} as icd_9_procedure_lookup
         on procedure_codes.procedure_code_type = 'icd-9-pcs'
        and procedure_codes.procedure_code = replace(cast(icd_9_procedure_lookup.icd_9_pcs as {{ string_type }}), '.', '')
-    group by 1, 2, 3
+    group by
+          procedure_codes._dq_claim_id_key
+        , procedure_codes._dq_claim_line_number_key
+        , procedure_codes._dq_data_source_key
 ),
 
 final as (
