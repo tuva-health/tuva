@@ -74,10 +74,9 @@
     from (
         {{ mart_queries | join('\nunion all\n') }}
     ) as mart_counts
-    order by 1
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_mart
         , cast(null as {{ dbt.type_int() }}) as row_count
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

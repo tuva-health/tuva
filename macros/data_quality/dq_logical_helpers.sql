@@ -160,7 +160,7 @@
             , cast({{ count_expression }} as {{ dbt.type_int() }}) as test_result
         from {{ relation }} as source_rows
         where {{ where_sql }}
-        group by 1
+        group by {{ source_key_expression }}
     ) as violations
         on sources.data_source_key = violations.data_source_key
 {% endmacro %}
@@ -189,10 +189,12 @@
             {% if where_sql is not none %}
             where {{ where_sql }}
             {% endif %}
-            group by 1, 2
+            group by
+                  {{ source_key_expression }}
+                , {{ group_expression }}
             having {{ having_sql }}
         ) as grouped_rows
-        group by 1
+        group by grouped_rows.data_source_key
     ) as violations
         on sources.data_source_key = violations.data_source_key
 {% endmacro %}
@@ -236,7 +238,7 @@
           {% if where_sql is not none %}
           and {{ where_sql }}
           {% endif %}
-        group by 1
+        group by {{ source_key_expression }}
     ) as violations
         on sources.data_source_key = violations.data_source_key
 {% endmacro %}
@@ -279,7 +281,7 @@
                     and {{ match_sql }}
               )
         ) as missing_claims
-        group by 1
+        group by missing_claims.data_source_key
     ) as violations
         on sources.data_source_key = violations.data_source_key
 {% endmacro %}
@@ -341,7 +343,7 @@
             {% if not loop.last %} or {% endif %}
             {% endfor %}
         )
-        group by 1
+        group by claim_codes.data_source_key
     ) as violations
         on sources.data_source_key = violations.data_source_key
 {% endmacro %}

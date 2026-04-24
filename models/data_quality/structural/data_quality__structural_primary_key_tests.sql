@@ -99,7 +99,7 @@
                                 , cast(count(*) as {{ dbt.type_int() }}) as test_result
                             from {{ relation }} as source_rows
                             where source_rows.{{ quote_column(pk_column) }} is null
-                            group by 1
+                            group by {{ source_key_expression }}
                         ) as null_counts
                             on sources.data_source_key = null_counts.data_source_key
                     {% endset %}
@@ -175,12 +175,12 @@
                                 {% endfor %}
                             from {{ relation }} as source_rows
                             group by
-                                  1
+                                  {{ source_key_expression }}
                                 {% for pk_column in duplicate_pk_columns %}
-                                , {{ loop.index + 1 }}
+                                , source_rows.{{ quote_column(pk_column) }}
                                 {% endfor %}
                         ) as distinct_rows
-                        group by 1
+                        group by distinct_rows.data_source_key
                     ) as distinct_counts
                         on sources.data_source_key = distinct_counts.data_source_key
                 {% endset %}
@@ -194,7 +194,6 @@
     from (
         {{ pk_queries | join('\nunion all\n') }}
     ) as structural_primary_key_tests
-    order by 1, 2, 3, 4
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source
@@ -202,5 +201,5 @@
         , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('column') }}
         , cast(null as {{ dbt.type_string() }}) as test
         , cast(null as {{ dbt.type_int() }}) as test_result
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}
