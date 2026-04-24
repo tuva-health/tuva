@@ -14,12 +14,13 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - model_version
-            - hcc_code
-            - hcc_hierarchy_group
-            - hcc_hierarchy_group_rank
-            - risk_model_code
+          arguments:
+            combination_of_columns:
+              - model_version
+              - hcc_code
+              - hcc_hierarchy_group
+              - hcc_hierarchy_group_rank
+              - risk_model_code
     columns:
       - name: model_version
         description: >
@@ -54,10 +55,11 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - collection_year
-            - payer
+          arguments:
+            combination_of_columns:
+              - person_id
+              - collection_year
+              - payer
     columns:
       - name: person_id
         description: A unique identifier for a person.
