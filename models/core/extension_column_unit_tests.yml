@@ -42,7 +42,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set timestamp_type = 'datetime2' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
             '10' as person_id,
             '10' as member_id,
@@ -108,7 +108,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set timestamp_type = 'datetime2' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
             'b8cc2c5022647c213f23a44b819d61a0' as member_month_key,
             '10' as person_id,
