@@ -1,219 +1,148 @@
 version: 2
 
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- else -%} varchar(255)
+    {%- endif -%}
+  - &datetime |
+    {%- if target.type == "fabric" -%} datetime2(0)
+    {%- elif target.type in ("athena", "databricks") -%} timestamp
+    {%- else -%} datetime
+    {%- endif -%}
+  - &float |
+    {%- if target.type in ("athena", "databricks") -%} real
+    {%- else -%} float
+    {%- endif -%}
+
 seeds:
   - name: raw_data__appointment
     config:
       schema: raw_data
-      tags:
-        - clinical
-        - input_layer
-      enabled: true
-      column_types:
-        appointment_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        encounter_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_appointment_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_appointment_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_appointment_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_appointment_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        start_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        end_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        duration: integer
-        location_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        practitioner_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        appointment_specialty: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        reason: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        cancellation_reason: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-
-  - name: patient_seed
-    config:
-      schema: raw_data
-      tags:
-        - clinical
-        - input_layer
+      alias: appointment
+      tags: [clinical, input_layer]
       enabled: |
         {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        name_suffix: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        first_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        middle_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        last_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        sex: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        race: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        appointment_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        source_appointment_type_code: *string
+        source_appointment_type_description: *string
+        normalized_appointment_type_code: *string
+        normalized_appointment_type_description: *string
+        start_datetime: *datetime
+        end_datetime: *datetime
+        duration: integer
+        location_id: *string
+        practitioner_id: *string
+        source_status: *string
+        normalized_status: *string
+        appointment_specialty: *string
+        reason: *string
+        source_reason_code_type: *string
+        source_reason_code: *string
+        source_reason_description: *string
+        normalized_reason_code_type: *string
+        normalized_reason_code: *string
+        normalized_reason_description: *string
+        cancellation_reason: *string
+        source_cancellation_reason_code_type: *string
+        source_cancellation_reason_code: *string
+        source_cancellation_reason_description: *string
+        normalized_cancellation_reason_code_type: *string
+        normalized_cancellation_reason_code: *string
+        normalized_cancellation_reason_description: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__patient
+    config:
+      schema: raw_data
+      alias: patient
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        person_id: *string
+        patient_id: *string
+        name_suffix: *string
+        first_name: *string
+        middle_name: *string
+        last_name: *string
+        sex: *string
+        race: *string
         birth_date: date
         death_date: date
         death_flag: integer
-        social_security_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        address: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        city: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        zip_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        county: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        social_security_number: *string
+        address: *string
+        city: *string
+        state: *string
+        zip_code: *string
+        county: *string
         latitude: float
         longitude: float
-        phone: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        email: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ethnicity: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        phone: *string
+        email: *string
+        ethnicity: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
 
   - name: raw_data__eligibility
     config:
       schema: raw_data
-      tags:
-        - claims
-        - input_layer
-      enabled: true
+      alias: eligibility
+      tags: [claims, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        member_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        subscriber_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        gender: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        race: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: *string
+        member_id: *string
+        subscriber_id: *string
+        gender: *string
+        race: *string
         birth_date: date
         death_date: date
         death_flag: integer
         enrollment_start_date: date
         enrollment_end_date: date
-        payer: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        plan: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        original_reason_entitlement_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        dual_status_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        medicare_status_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        group_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        group_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        name_suffix: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        first_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        middle_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        last_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        social_security_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        subscriber_relation: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        address: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        city: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        zip_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        phone: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        email: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ethnicity: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        payer: *string
+        payer_type: *string
+        plan: *string
+        original_reason_entitlement_code: *string
+        dual_status_code: *string
+        medicare_status_code: *string
+        group_id: *string
+        group_name: *string
+        name_suffix: *string
+        first_name: *string
+        middle_name: *string
+        last_name: *string
+        social_security_number: *string
+        subscriber_relation: *string
+        address: *string
+        city: *string
+        state: *string
+        zip_code: *string
+        phone: *string
+        email: *string
+        ethnicity: *string
+        data_source: *string
+        file_name: *string
         file_date: date
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        enrollment_status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        ingest_datetime: *datetime
+        enrollment_status: *string
         hospice_flag: integer
-        snp_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        snp_type: *string
         medicaid_indicator: integer
         long_term_institutional_flag: integer
-        part_d_raf_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        part_d_raf_type: *string
         low_income_subsidy_indicator: integer
-        metal_level: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        metal_level: *string
         csr_indicator: integer
         enrollment_duration_months: integer
         esrd_status: integer
@@ -222,370 +151,204 @@ seeds:
   - name: raw_data__immunization
     config:
       schema: raw_data
-      tags:
-        - clinical
-        - input_layer
-      enabled: true
+      alias: immunization
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        immunization_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        encounter_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        status_reason: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        immunization_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        status: *string
+        status_reason: *string
         occurrence_date: date
-        source_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_dose: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_dose: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        lot_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        body_site: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        route: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        location_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        practitioner_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        
+        source_code_type: *string
+        source_code: *string
+        source_description: *string
+        normalized_code_type: *string
+        normalized_code: *string
+        normalized_description: *string
+        source_dose: *string
+        normalized_dose: *string
+        lot_number: *string
+        body_site: *string
+        route: *string
+        location_id: *string
+        practitioner_id: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
   - name: raw_data__lab_result
     config:
       schema: raw_data
-      tags:
-        - clinical
-        - input_layer
-      enabled: true
+      alias: lab_result
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        lab_result_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        encounter_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        accession_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_order_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_order_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_order_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_component_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_component_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_component_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_order_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_order_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_order_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_component_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_component_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_component_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        result: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        result_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        collection_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        source_units: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_units: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reference_range_low: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reference_range_high: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reference_range_low: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reference_range_high: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        lab_result_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        accession_number: *string
+        source_order_type: *string
+        source_order_code: *string
+        source_order_description: *string
+        source_component_type: *string
+        source_component_code: *string
+        source_component_description: *string
+        normalized_order_type: *string
+        normalized_order_code: *string
+        normalized_order_description: *string
+        normalized_component_type: *string
+        normalized_component_code: *string
+        normalized_component_description: *string
+        status: *string
+        result: *string
+        result_datetime: *datetime
+        collection_datetime: *datetime
+        source_units: *string
+        normalized_units: *string
+        source_reference_range_low: *string
+        source_reference_range_high: *string
+        normalized_reference_range_low: *string
+        normalized_reference_range_high: *string
         source_abnormal_flag: integer
         normalized_abnormal_flag: integer
-        specimen: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ordering_practitioner_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-        tuva_last_run: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-
+        specimen: *string
+        ordering_practitioner_id: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
 
   - name: raw_data__medical_claim
     config:
       schema: raw_data
-      tags:
-        - claims
-        - input_layer
-      enabled: true
+      alias: medical_claim
+      tags: [claims, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        claim_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        claim_id: *string
         claim_line_number: integer
-        claim_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        member_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        plan: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        claim_type: *string
+        person_id: *string
+        member_id: *string
+        payer: *string
+        plan: *string
         claim_start_date: date
         claim_end_date: date
         claim_line_start_date: date
         claim_line_end_date: date
         admission_date: date
         discharge_date: date
-        admit_source_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        admit_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        discharge_disposition_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        place_of_service_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        bill_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        drg_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        drg_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        revenue_center_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        admit_source_code: *string
+        admit_type_code: *string
+        discharge_disposition_code: *string
+        place_of_service_code: *string
+        bill_type_code: *string
+        drg_code_type: *string
+        drg_code: *string
+        revenue_center_code: *string
         service_unit_quantity: integer
-        hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        hcpcs_modifier_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        hcpcs_modifier_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        hcpcs_modifier_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        hcpcs_modifier_4: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        hcpcs_modifier_5: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        rendering_npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        rendering_tin: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        billing_npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        billing_tin: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        facility_npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        hcpcs_code: *string
+        hcpcs_modifier_1: *string
+        hcpcs_modifier_2: *string
+        hcpcs_modifier_3: *string
+        hcpcs_modifier_4: *string
+        hcpcs_modifier_5: *string
+        rendering_npi: *string
+        rendering_tin: *string
+        billing_npi: *string
+        billing_tin: *string
+        facility_npi: *string
         paid_date: date
-        paid_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        allowed_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        charge_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        coinsurance_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        copayment_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        deductible_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        total_cost_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        diagnosis_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_4: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_5: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_6: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_7: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_8: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_9: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_10: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_11: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_12: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_13: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_14: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_15: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_16: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_17: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_18: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_19: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_20: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_21: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_22: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_23: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_24: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_code_25: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_4: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_5: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_6: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_7: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_8: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_9: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_10: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_11: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_12: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_13: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_14: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_15: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_16: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_17: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_18: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_19: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_20: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_21: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_22: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_23: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_24: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        diagnosis_poa_25: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_4: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_5: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_6: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_7: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_8: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_9: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_10: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_11: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_12: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_13: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_14: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_15: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_16: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_17: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_18: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_19: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_20: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_21: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_22: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_23: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_24: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        procedure_code_25: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        paid_amount: *float
+        allowed_amount: *float
+        charge_amount: *float
+        coinsurance_amount: *float
+        copayment_amount: *float
+        deductible_amount: *float
+        total_cost_amount: *float
+        diagnosis_code_type: *string
+        diagnosis_code_1: *string
+        diagnosis_code_2: *string
+        diagnosis_code_3: *string
+        diagnosis_code_4: *string
+        diagnosis_code_5: *string
+        diagnosis_code_6: *string
+        diagnosis_code_7: *string
+        diagnosis_code_8: *string
+        diagnosis_code_9: *string
+        diagnosis_code_10: *string
+        diagnosis_code_11: *string
+        diagnosis_code_12: *string
+        diagnosis_code_13: *string
+        diagnosis_code_14: *string
+        diagnosis_code_15: *string
+        diagnosis_code_16: *string
+        diagnosis_code_17: *string
+        diagnosis_code_18: *string
+        diagnosis_code_19: *string
+        diagnosis_code_20: *string
+        diagnosis_code_21: *string
+        diagnosis_code_22: *string
+        diagnosis_code_23: *string
+        diagnosis_code_24: *string
+        diagnosis_code_25: *string
+        diagnosis_poa_1: *string
+        diagnosis_poa_2: *string
+        diagnosis_poa_3: *string
+        diagnosis_poa_4: *string
+        diagnosis_poa_5: *string
+        diagnosis_poa_6: *string
+        diagnosis_poa_7: *string
+        diagnosis_poa_8: *string
+        diagnosis_poa_9: *string
+        diagnosis_poa_10: *string
+        diagnosis_poa_11: *string
+        diagnosis_poa_12: *string
+        diagnosis_poa_13: *string
+        diagnosis_poa_14: *string
+        diagnosis_poa_15: *string
+        diagnosis_poa_16: *string
+        diagnosis_poa_17: *string
+        diagnosis_poa_18: *string
+        diagnosis_poa_19: *string
+        diagnosis_poa_20: *string
+        diagnosis_poa_21: *string
+        diagnosis_poa_22: *string
+        diagnosis_poa_23: *string
+        diagnosis_poa_24: *string
+        diagnosis_poa_25: *string
+        procedure_code_type: *string
+        procedure_code_1: *string
+        procedure_code_2: *string
+        procedure_code_3: *string
+        procedure_code_4: *string
+        procedure_code_5: *string
+        procedure_code_6: *string
+        procedure_code_7: *string
+        procedure_code_8: *string
+        procedure_code_9: *string
+        procedure_code_10: *string
+        procedure_code_11: *string
+        procedure_code_12: *string
+        procedure_code_13: *string
+        procedure_code_14: *string
+        procedure_code_15: *string
+        procedure_code_16: *string
+        procedure_code_17: *string
+        procedure_code_18: *string
+        procedure_code_19: *string
+        procedure_code_20: *string
+        procedure_code_21: *string
+        procedure_code_22: *string
+        procedure_code_23: *string
+        procedure_code_24: *string
+        procedure_code_25: *string
         procedure_date_1: date
         procedure_date_2: date
         procedure_date_3: date
@@ -612,152 +375,277 @@ seeds:
         procedure_date_24: date
         procedure_date_25: date
         in_network_flag: integer
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        data_source: *string
+        file_name: *string
         file_date: date
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        ingest_datetime: *datetime
 
   - name: raw_data__observation
     config:
       schema: raw_data
-      tags:
-        - clinical
-        - input_layer
-      enabled: true
+      alias: observation
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        observation_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        encounter_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        panel_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        observation_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        panel_id: *string
         observation_date: date
-        observation_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        result: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_units: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_units: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reference_range_low: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reference_range_high: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reference_range_low: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reference_range_high: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        observation_type: *string
+        source_code_type: *string
+        source_code: *string
+        source_description: *string
+        normalized_code_type: *string
+        normalized_code: *string
+        normalized_description: *string
+        result: *string
+        source_units: *string
+        normalized_units: *string
+        source_reference_range_low: *string
+        source_reference_range_high: *string
+        normalized_reference_range_low: *string
+        normalized_reference_range_high: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
 
   - name: raw_data__pharmacy_claim
     config:
       schema: raw_data
-      tags:
-        - claims
-        - input_layer
-      enabled: true
+      alias: pharmacy_claim
+      tags: [claims, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        claim_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        claim_id: *string
         claim_line_number: integer
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        member_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        plan: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        prescribing_provider_npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        dispensing_provider_npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: *string
+        member_id: *string
+        payer: *string
+        plan: *string
+        prescribing_provider_npi: *string
+        dispensing_provider_npi: *string
         dispensing_date: date
-        ndc_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        ndc_code: *string
         quantity: integer
         days_supply: integer
         refills: integer
         paid_date: date
-        paid_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        allowed_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        charge_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        coinsurance_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        copayment_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
-        deductible_amount: |
-          {%- if target.type in ("athena", "databricks") -%} real {%- else -%} float {%- endif -%}
+        paid_amount: *float
+        allowed_amount: *float
+        charge_amount: *float
+        coinsurance_amount: *float
+        copayment_amount: *float
+        deductible_amount: *float
         in_network_flag: integer
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        data_source: *string
+        file_name: *string
         file_date: date
-        ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        ingest_datetime: *datetime
 
   - name: raw_data__provider_attribution
     config:
       schema: raw_data
-      tags:
-        - attribution
-        - input_layer
-      enabled: true
+      alias: provider_attribution
+      tags: [attribution, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        person_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        year_month: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        plan: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        data_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer_attributed_provider: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer_attributed_provider_practice: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer_attributed_provider_organization: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        payer_attributed_provider_lob: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        custom_attributed_provider: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        custom_attributed_provider_practice: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        custom_attributed_provider_organization: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        custom_attributed_provider_lob: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: *string
+        patient_id: *string
+        year_month: *string
+        payer: *string
+        plan: *string
+        data_source: *string
+        payer_attributed_provider: *string
+        payer_attributed_provider_practice: *string
+        payer_attributed_provider_organization: *string
+        payer_attributed_provider_lob: *string
+        custom_attributed_provider: *string
+        custom_attributed_provider_practice: *string
+        custom_attributed_provider_organization: *string
+        custom_attributed_provider_lob: *string
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Placeholder synthetic seeds — header-only CSVs that materialize as empty
+  # tables when use_synthetic_data=true. Tuva does not ship synthetic data for
+  # these tables, so they remain empty. Users providing their own data should
+  # set use_synthetic_data=false and point input_schema at their tables.
+  # ────────────────────────────────────────────────────────────────────────────
+  - name: raw_data__condition
+    config:
+      schema: raw_data
+      alias: condition
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        condition_id: *string
+        payer: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        claim_id: *string
+        recorded_date: date
+        onset_date: date
+        resolved_date: date
+        status: *string
+        condition_type: *string
+        source_code_type: *string
+        source_code: *string
+        source_description: *string
+        normalized_code_type: *string
+        normalized_code: *string
+        normalized_description: *string
+        condition_rank: integer
+        present_on_admit_code: *string
+        present_on_admit_description: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__encounter
+    config:
+      schema: raw_data
+      alias: encounter
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        encounter_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_type: *string
+        encounter_start_date: date
+        encounter_end_date: date
+        length_of_stay: integer
+        admit_source_code: *string
+        admit_source_description: *string
+        admit_type_code: *string
+        admit_type_description: *string
+        discharge_disposition_code: *string
+        discharge_disposition_description: *string
+        attending_provider_id: *string
+        attending_provider_name: *string
+        facility_npi: *string
+        facility_name: *string
+        primary_diagnosis_code_type: *string
+        primary_diagnosis_code: *string
+        primary_diagnosis_description: *string
+        drg_code_type: *string
+        drg_code: *string
+        drg_description: *string
+        paid_amount: *float
+        allowed_amount: *float
+        charge_amount: *float
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__location
+    config:
+      schema: raw_data
+      alias: location
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        location_id: *string
+        npi: *string
+        name: *string
+        facility_type: *string
+        parent_organization: *string
+        address: *string
+        city: *string
+        state: *string
+        zip_code: *string
+        latitude: float
+        longitude: float
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__medication
+    config:
+      schema: raw_data
+      alias: medication
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        medication_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        dispensing_date: date
+        prescribing_date: date
+        source_code_type: *string
+        source_code: *string
+        source_description: *string
+        ndc_code: *string
+        ndc_description: *string
+        rxnorm_code: *string
+        rxnorm_description: *string
+        atc_code: *string
+        atc_description: *string
+        route: *string
+        strength: *string
+        quantity: integer
+        quantity_unit: *string
+        days_supply: integer
+        practitioner_id: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__practitioner
+    config:
+      schema: raw_data
+      alias: practitioner
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        practitioner_id: *string
+        npi: *string
+        first_name: *string
+        last_name: *string
+        practice_affiliation: *string
+        specialty: *string
+        sub_specialty: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
+
+  - name: raw_data__procedure
+    config:
+      schema: raw_data
+      alias: procedure
+      tags: [clinical, input_layer]
+      enabled: |
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        procedure_id: *string
+        person_id: *string
+        patient_id: *string
+        encounter_id: *string
+        claim_id: *string
+        procedure_date: date
+        source_code_type: *string
+        source_code: *string
+        source_description: *string
+        normalized_code_type: *string
+        normalized_code: *string
+        normalized_description: *string
+        modifier_1: *string
+        modifier_2: *string
+        modifier_3: *string
+        modifier_4: *string
+        modifier_5: *string
+        practitioner_id: *string
+        data_source: *string
+        file_name: *string
+        ingest_datetime: *datetime
