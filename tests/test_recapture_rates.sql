@@ -2,8 +2,8 @@
 select
       ytd.payer
     , ytd.payment_year
-from {{ref('ra_ops__recapture_rates_monthly_ytd')}} ytd
-left join {{ref('ra_ops__recapture_rates')}} recap
+from {{ref('hcc_recapture__recapture_rates_monthly_ytd')}} ytd
+left join {{ref('hcc_recapture__recapture_rates')}} recap
     on  ytd.payer = recap.payer
     and ytd.payment_year = recap.payment_year
     and ytd.ytd_recapture_rate = recap.recapture_rate

@@ -8,15 +8,15 @@ If this test fails, that means that the logic needs to be reviewed to find what 
 are causing ineligible recaptures and, if needed, adjust this test accordingly.
 */
 select stat.*
-from {{ ref('ra_ops__hcc_status') }} as stat
-left join {{ ref('ra_ops__int_gap_status') }} gaps
+from {{ ref('hcc_recapture__hcc_status') }} as stat
+left join {{ ref('hcc_recapture__int_gap_status') }} gaps
     on stat.person_id = gaps.person_id
     and stat.hcc_code = gaps.hcc_code
     and stat.payer = gaps.payer
     and stat.model_version = gaps.model_version
     and stat.payment_year = gaps.payment_year
     and stat.suspect_hcc_flag = gaps.suspect_hcc_flag
-left join {{ ref('ra_ops__int_recapturable_hccs')}} ext
+left join {{ ref('hcc_recapture__int_recapturable_hccs')}} ext
     on stat.person_id = ext.person_id
     and stat.payer = ext.payer
     and stat.data_source = ext.data_source

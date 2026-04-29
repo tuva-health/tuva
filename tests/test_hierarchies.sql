@@ -6,7 +6,7 @@ select distinct
     model_version,
     hcc_hierarchy_group,
     hcc_hierarchy_group_rank
-from {{ ref('ra_ops__int_gap_status') }}
+from {{ ref('hcc_recapture__int_gap_status') }}
 where hcc_hierarchy_group != 'no hierarchy'
     and filtered_by_hierarchy_flag = 0
 )
