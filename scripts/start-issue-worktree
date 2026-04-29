@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/start-issue-worktree [--dry-run] [--worktree-root PATH] <issue-number> [slug]
+
+Purpose:
+  Start Tuva issue work from a GitHub-linked branch and an isolated git worktree.
+
+Default behavior:
+  - Creates or reuses branch codex/issue-<issue-number>-<slug> from origin/main
+  - Links the branch to the GitHub issue with `gh issue develop`
+  - Creates or reuses worktree /Users/aaronneiderhiser/code/tuva-worktrees/issue-<issue-number>-<slug>
+
+Examples:
+  scripts/start-issue-worktree 123 add-claim-status
+  scripts/start-issue-worktree --dry-run 123 add-claim-status
+EOF
+}
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
+
+normalize_slug() {
+  local raw="$1"
+  echo "${raw}" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/--+/-/g'
+}
+
+run_cmd() {
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    printf '+'
+    printf ' %q' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
+}
+
+find_worktree_for_branch() {
+  local branch_ref="refs/heads/$1"
+  git worktree list --porcelain | awk -v branch_ref="${branch_ref}" '
+    $1 == "worktree" { path = $2 }
+    $1 == "branch" && $2 == branch_ref { print path; exit }
+  '
+}
+
+extract_linked_branch() {
+  local issue_number="$1"
+  grep -Eo "codex/issue-${issue_number}-[A-Za-z0-9._/-]+" | head -n 1 || true
+}
+
+DRY_RUN=0
+WORKTREE_ROOT="${TUVA_WORKTREE_ROOT:-/Users/aaronneiderhiser/code/tuva-worktrees}"
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -n|--dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    --worktree-root)
+      [[ $# -ge 2 ]] || die "--worktree-root requires a path"
+      WORKTREE_ROOT="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      while [[ $# -gt 0 ]]; do
+        POSITIONAL+=("$1")
+        shift
+      done
+      ;;
+    -*)
+      die "Unexpected option: $1"
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+
+[[ ${#POSITIONAL[@]} -ge 1 && ${#POSITIONAL[@]} -le 2 ]] || {
+  usage >&2
+  exit 1
+}
+
+ISSUE_NUMBER="${POSITIONAL[0]}"
+[[ "${ISSUE_NUMBER}" =~ ^[0-9]+$ ]] || die "Issue number must be numeric."
+
+SLUG_RAW="${POSITIONAL[1]:-}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+for cmd in git gh; do
+  command -v "${cmd}" >/dev/null 2>&1 || die "Missing required command: ${cmd}"
+done
+
+if [[ "${DRY_RUN}" -eq 0 ]]; then
+  gh auth status >/dev/null
+fi
+
+if [[ -z "${SLUG_RAW}" ]]; then
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    SLUG_RAW="issue-${ISSUE_NUMBER}"
+  else
+    SLUG_RAW="$(gh issue view "${ISSUE_NUMBER}" --json title --jq '.title')"
+  fi
+fi
+
+SLUG="$(normalize_slug "${SLUG_RAW}")"
+[[ -n "${SLUG}" ]] || die "Slug is empty after normalization."
+
+DESIRED_BRANCH="codex/issue-${ISSUE_NUMBER}-${SLUG}"
+BRANCH="${DESIRED_BRANCH}"
+
+if [[ "${DRY_RUN}" -eq 0 ]]; then
+  LINKED_OUTPUT="$(gh issue develop --list "${ISSUE_NUMBER}" 2>/dev/null || true)"
+  LINKED_BRANCH="$(printf '%s\n' "${LINKED_OUTPUT}" | extract_linked_branch "${ISSUE_NUMBER}")"
+  if [[ -n "${LINKED_BRANCH}" ]]; then
+    BRANCH="${LINKED_BRANCH}"
+  fi
+fi
+
+WORKTREE_NAME="${BRANCH#codex/}"
+WORKTREE_PATH="${WORKTREE_ROOT}/${WORKTREE_NAME}"
+
+echo "Issue: #${ISSUE_NUMBER}"
+echo "Branch: ${BRANCH}"
+echo "Worktree: ${WORKTREE_PATH}"
+
+if [[ "${DRY_RUN}" -eq 1 ]]; then
+  run_cmd git fetch origin main
+  run_cmd gh issue develop --list "${ISSUE_NUMBER}"
+  run_cmd gh issue develop "${ISSUE_NUMBER}" --base main --name "${BRANCH}"
+  run_cmd git fetch origin "+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}"
+  run_cmd mkdir -p "${WORKTREE_ROOT}"
+  run_cmd git worktree add -b "${BRANCH}" "${WORKTREE_PATH}" "origin/${BRANCH}"
+  exit 0
+fi
+
+git fetch origin main
+
+EXISTING_WORKTREE="$(find_worktree_for_branch "${BRANCH}")"
+if [[ -n "${EXISTING_WORKTREE}" ]]; then
+  echo "Ready: ${BRANCH} already has worktree ${EXISTING_WORKTREE}"
+  gh issue develop --list "${ISSUE_NUMBER}"
+  exit 0
+fi
+
+if [[ -e "${WORKTREE_PATH}" ]]; then
+  die "Worktree path already exists but is not attached to ${BRANCH}: ${WORKTREE_PATH}"
+fi
+
+if ! git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+  gh issue develop "${ISSUE_NUMBER}" --base main --name "${BRANCH}"
+fi
+
+git fetch origin "+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}"
+mkdir -p "${WORKTREE_ROOT}"
+
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+  git worktree add "${WORKTREE_PATH}" "${BRANCH}"
+else
+  git worktree add -b "${BRANCH}" "${WORKTREE_PATH}" "origin/${BRANCH}"
+fi
+
+LINKED_AFTER="$(gh issue develop --list "${ISSUE_NUMBER}")"
+printf '%s\n' "${LINKED_AFTER}"
+
+if ! printf '%s\n' "${LINKED_AFTER}" | grep -F "${BRANCH}" >/dev/null; then
+  die "Created worktree, but could not confirm ${BRANCH} is linked to issue #${ISSUE_NUMBER}."
+fi
+
+echo "Ready: ${BRANCH} in ${WORKTREE_PATH}"
