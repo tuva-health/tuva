@@ -27,6 +27,7 @@ where 1=1
   and gap_status not in ('ineligible for recapture', 'new')
   and hcc_type in ('captured', 'coded')
   and recapturable_flag = 1
+  and filtered_by_hierarchy_flag = 0
 )
 
 , monthly_hcc_counts as (
