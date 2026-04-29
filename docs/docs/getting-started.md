@@ -133,7 +133,7 @@ This is the normal path for running Tuva on your own data in your existing wareh
 - A warehouse connection already configured in `profiles.yml`
 - Your raw claims data already loaded into the warehouse
 
-The current release of Tuva is <TuvaCurrentRelease />.
+The most recent stable release of Tuva is <TuvaCurrentRelease />.
 
 ### Step 1: Create Or Use A dbt Project
 
@@ -141,7 +141,7 @@ Create a new dbt project if you do not already have one, or use an existing proj
 
 ### Step 2: Add The Tuva Package
 
-Add the Tuva package to your `packages.yml`. Replace `<current-release>` with the release shown above.
+Add the Tuva package to your `packages.yml`. Replace `<current-release>` with the stable release shown above.
 
 ```yaml
 packages:
