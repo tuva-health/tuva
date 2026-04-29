@@ -199,7 +199,7 @@ models:
             - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
             - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
         tests:
-          accepted_values:
+          - accepted_values:
             values: ['closed using higher coefficient hcc in hierarchy group', 'closed', 'closed using lower coefficient hcc in hierarchy group', 'new', 'open', 'ineligible for recapture']
       - name: recapturable_flag
         description: >
@@ -213,7 +213,7 @@ models:
             - 'captured': condition is considered captured according to a different source besides claims, such as a clinical source
             - 'suspect': condition is suspected to be present based on some other criteria besides claims diagnoses
         tests:
-          accepted_values:
+          - accepted_values:
             values: ['coded', 'captured', 'suspect']
       - name: hcc_source
         description: >
@@ -221,7 +221,7 @@ models:
             - 'payer': HCC was identified in data received from the payer such as claims or suspect lists
             - 'clinical': HCC was identified in clinical data such as the EHR 
         tests:
-          accepted_values:
+          - accepted_values:
             values: ['payer', 'clinical']
 
   - name: hcc_recapture__gap_status
