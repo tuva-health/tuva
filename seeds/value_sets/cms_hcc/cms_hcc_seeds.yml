@@ -161,7 +161,7 @@ seeds:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_disease_factors
-      tags: cms_hcc
+      tags: ["cms_hcc", "hcc_recapture"]
       enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         model_version: |
@@ -243,7 +243,7 @@ seeds:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_disease_hierarchy_flat
-      tags: cms_hcc
+      tags: ["cms_hcc", "hcc_recapture"]
       enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         hcc_code: |
@@ -386,7 +386,7 @@ seeds:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_cms_hcc_icd_10_cm_mappings
-      tags: cms_hcc
+      tags: ["cms_hcc", "hcc_recapture"]
       enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         payment_year: |
