@@ -192,15 +192,15 @@ models:
       - name: gap_status
         description: >
           definitions for gap_status:
-            - 'closed using higher coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is greater than the prior year HCC
+            - 'closed - higher coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is greater than the prior year HCC
             - 'closed': the specific HCC in question has been observed in a risk adjustable claim during the collection year.
-            - 'closed using lower coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is less than the prior year HCC
+            - 'closed - lower coefficient hcc in hierarchy group': An HCC in the same group was closed, but its coefficient is less than the prior year HCC
             - 'new': defined as an hcc that has not been coded in the past 2 years
             - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
             - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
         tests:
           - accepted_values:
-              values: ['closed using higher coefficient hcc in hierarchy group', 'closed', 'closed using lower coefficient hcc in hierarchy group', 'new', 'open', 'ineligible for recapture']
+              values: ['closed - higher coefficient hcc in hierarchy group', 'closed', 'closed - lower coefficient hcc in hierarchy group', 'new', 'open', 'ineligible for recapture']
       - name: recapturable_flag
         description: >
           Whether or not the HCC is recapturable. Includes the following values:
