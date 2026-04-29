@@ -25,9 +25,9 @@ The type of gap closure if provided using the `gap_status` field. Here are the g
 
 | Gap Status | Definition |
 |------------|------------|
-| closed using higher coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is greater than the prior year HCC |
+| closed - higher coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is greater than the prior year HCC |
 | closed | The specific HCC in question has been observed in a risk adjustable claim during the collection year |
-| closed using lower coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is less than the prior year HCC |
+| closed - lower coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is less than the prior year HCC |
 | new | Defined as an HCC that has not been coded in the past 2 years |
 | open | For gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year |
 | ineligible for recapture | The specific HCC in question is "Open" and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it's not a chronic diagnosis |
@@ -48,4 +48,4 @@ The `hcc_recapture_suspect_list` variable can be set to `true` in the `dbt_proje
 
 ### Chronic HCCs
 
-The `hcc_recapture_chronic_hccs` variable can be set to `true` in the `dbt_project.yml` in order ot provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.
+The `hcc_recapture_chronic_hccs` variable can be set to `true` in the `dbt_project.yml` in order to provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.
