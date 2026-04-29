@@ -9,7 +9,13 @@ select distinct
       person_id
     , payer
     , payment_year
-    , date_from_parts(payment_year, month(recorded_date),1) as payment_year_month
+    , cast({{ concat_custom([
+            "payment_year"
+          , "'-'"
+          , date_part('month', 'recorded_date')
+          , "'-'"
+          , "'1'"
+        ]) }} as date) as payment_year_month
     , recorded_date
     , model_version
     , hcc_code
@@ -24,7 +30,7 @@ where 1=1
 )
 
 , monthly_hcc_counts as (
-select 
+select
       payer
     , payment_year
     , payment_year_month

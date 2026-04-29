@@ -55,7 +55,7 @@ select
     , base.hcc_source
     , CASE WHEN mhier.hcc_hierarchy_group IS NOT NULL THEN 0 ELSE 1 END as filtered_by_hierarchy_flag
 from base
-left join min_hierarchy mhier
+left join min_hierarchy as mhier
     on base.person_id = mhier.person_id
     and base.payer = mhier.payer
     and base.collection_year = mhier.collection_year
