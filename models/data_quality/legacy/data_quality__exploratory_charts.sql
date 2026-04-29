@@ -1,6 +1,10 @@
 {{ config(
     materialized='table',
     enabled = (
+        var('enable_legacy_data_quality', false) | as_bool
+    )
+    and
+    (
         var('enable_input_layer_testing', true) | as_bool
     )
     and

@@ -22,6 +22,7 @@
 
 {%- set source_relation = ref('input_layer__eligibility') -%}
 {%- set extension_cols = [] -%}
+{%- set string_type = dbt.type_string() -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
     {%- if col.name.lower().startswith('x_') -%}
         {%- do extension_cols.append(col.name.lower()) -%}
@@ -46,7 +47,7 @@ select
     member_month_key
     , 'x_temp_person_id does not match person_id' as failure_reason
 from {{ ref('core__member_months') }}
-where cast(x_temp_person_id as varchar) <> cast(person_id as varchar)
+where cast(x_temp_person_id as {{ string_type }}) <> cast(person_id as {{ string_type }})
    or (x_temp_person_id is null     and person_id is not null)
    or (x_temp_person_id is not null and person_id is null)
 

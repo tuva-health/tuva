@@ -6,8 +6,7 @@ seeds:
       Target thresholds at the field level determining red, yellow, and green values in the Data Quality dashboard.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_crosswalk_field_info
       column_types:
         input_layer_table_name: |
@@ -30,8 +29,7 @@ seeds:
       Crosswalk table that defines which fields impact the ability for marts to run.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_crosswalk_field_to_mart
       column_types:
         input_layer_table_name: |
@@ -50,8 +48,7 @@ seeds:
       Crosswalk table that defines which marts impact which outcome measures.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_crosswalk_mart_to_outcome_measure
       column_types:
         mart_name: |
@@ -64,8 +61,7 @@ seeds:
       Crosswalk table that sets reasonable ranges for outcome measures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_crosswalk_measure_reasonable_ranges
       column_types:
         measure_name: |
@@ -82,8 +78,7 @@ seeds:
       reference values for analytics checks from various benchmark sources
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_reference_mart_analytics
       column_types:
         analytics_concept: |

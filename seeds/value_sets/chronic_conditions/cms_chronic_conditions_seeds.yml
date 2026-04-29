@@ -5,7 +5,7 @@ seeds:
     description: CMS generated grouping of ICD 10 codes into chronic conditions groups
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_cms_chronic_conditions_hierarchy
       tags:
         - cms_chronic_conditions

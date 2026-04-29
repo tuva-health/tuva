@@ -1,6 +1,6 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = (var('enable_legacy_data_quality', false) | as_bool)
+     and (var('clinical_enabled', False) | as_bool)
    )
 }}
 

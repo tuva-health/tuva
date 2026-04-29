@@ -39,34 +39,44 @@ unit_tests:
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
     given:
       - input: ref('normalized_input__eligibility')
-        rows:
-          - person_id: '10'
-            member_id: '10'
-            payer: 'medicare'
-            plan: 'medicare'
-            data_source: 'test'
-            enrollment_start_date: '2020-01-01'
-            enrollment_end_date: '2020-01-31'
-            tuva_last_run: '2024-01-01 00:00:00'
-            x_temp_person_id: '10'
-            x_temp_first_name: 'John'
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+            '10' as person_id,
+            '10' as member_id,
+            'medicare' as payer,
+            'medicare' as {{ plan_identifier }},
+            'test' as data_source,
+            cast('2020-01-01' as date) as enrollment_start_date,
+            cast('2020-01-31' as date) as enrollment_end_date,
+            cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run,
+            '10' as x_temp_person_id,
+            'John' as x_temp_first_name
       # Provide first + last day of January so the aggregate yields the correct
       # month_start_date / month_end_date for the enrollment overlap check.
       - input: ref('reference_data__calendar')
-        rows:
-          - full_date: '2020-01-01'
-            year: 2020
-            month: 1
-          - full_date: '2020-01-31'
-            year: 2020
-            month: 1
+        format: sql
+        rows: |
+          select cast('2020-01-01' as date) as full_date, 2020 as year, 1 as month
+          union all
+          select cast('2020-01-31' as date) as full_date, 2020 as year, 1 as month
       # Listed to satisfy the compile-time ref() dependency inside
       # select_extension_columns(). The fixture data is not used because
       # _extension_columns_override is set.
       - input: ref('input_layer__eligibility')
-        rows:
-          - x_temp_person_id: '10'
-            x_temp_first_name: 'John'
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+            '10' as person_id,
+            '10' as member_id,
+            'medicare' as payer,
+            'medicare' as {{ plan_identifier }},
+            'test' as data_source,
+            cast('2020-01-01' as date) as enrollment_start_date,
+            cast('2020-01-31' as date) as enrollment_end_date
     expect:
       rows:
         # member_month_key = md5('10-10-202001-medicare-medicare-test')
@@ -95,32 +105,44 @@ unit_tests:
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
     given:
       - input: ref('core__stg_claims_member_months')
-        rows:
-          - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'
-            person_id: '10'
-            member_id: '10'
-            year_month: '202001'
-            payer: 'medicare'
-            plan: 'medicare'
-            payer_attributed_provider: null
-            payer_attributed_provider_practice: null
-            payer_attributed_provider_organization: null
-            payer_attributed_provider_lob: null
-            custom_attributed_provider: null
-            custom_attributed_provider_practice: null
-            custom_attributed_provider_organization: null
-            custom_attributed_provider_lob: null
-            x_temp_person_id: '10'
-            x_temp_first_name: 'John'
-            data_source: 'test'
-            tuva_last_run: '2024-01-01 00:00:00'
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+            'b8cc2c5022647c213f23a44b819d61a0' as member_month_key,
+            '10' as person_id,
+            '10' as member_id,
+            '202001' as year_month,
+            'medicare' as payer,
+            'medicare' as {{ plan_identifier }},
+            null as payer_attributed_provider,
+            null as payer_attributed_provider_practice,
+            null as payer_attributed_provider_organization,
+            null as payer_attributed_provider_lob,
+            null as custom_attributed_provider,
+            null as custom_attributed_provider_practice,
+            null as custom_attributed_provider_organization,
+            null as custom_attributed_provider_lob,
+            '10' as x_temp_person_id,
+            'John' as x_temp_first_name,
+            'test' as data_source,
+            cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
       # Listed to satisfy the compile-time ref() dependency inside
       # select_extension_columns(). The fixture data is not used because
       # _extension_columns_override is set.
       - input: ref('input_layer__eligibility')
-        rows:
-          - x_temp_person_id: '10'
-            x_temp_first_name: 'John'
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+            '10' as person_id,
+            '10' as member_id,
+            'medicare' as payer,
+            'medicare' as {{ plan_identifier }},
+            'test' as data_source,
+            cast('2020-01-01' as date) as enrollment_start_date,
+            cast('2020-01-31' as date) as enrollment_end_date
     expect:
       rows:
         - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'

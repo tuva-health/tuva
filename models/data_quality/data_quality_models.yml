@@ -22,7 +22,7 @@ models:
       - dbt_utils.unique_combination_of_columns:
           config:
             severity: error
-            enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+            enabled: "{{ (var('enable_legacy_data_quality', false) | as_bool) and (var('enable_input_layer_testing', true) | as_bool) }}"
 
           arguments:
             combination_of_columns:
@@ -39,7 +39,7 @@ models:
       alias: structural
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_structural
       materialized: table
@@ -51,13 +51,61 @@ models:
       - name: table_exists
         description: Pass or fail result indicating whether the expected input-layer relation exists.
       - name: columns_exist
-        description: Pass or fail result indicating whether all documented input-layer columns are present.
+        description: Pass or fail result indicating whether all documented input-layer columns are present. For the three claims input tables, this is derived from the structural column detail table.
       - name: data_types
-        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family.
+        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family. For the three claims input tables, this is derived from the structural column detail table.
       - name: primary_keys
-        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain.
+        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain. For the three claims input tables, this is derived from the structural column detail and structural primary-key test tables.
       - name: row_count
         description: The integer number of rows present for the evaluated data_source and input-layer table. Null means the relation does not exist.
+
+  - name: data_quality__structural_column_details
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_column_details
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The documented input-layer column being evaluated.
+      - name: column_exists
+        description: Yes or no indicator for whether the documented column exists on the input-layer relation.
+      - name: data_type_correct
+        description: Yes or no indicator for whether the documented column matches the expected data-type family.
+
+  - name: data_quality__structural_primary_key_tests
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_primary_key_tests
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The primary-key column under test, or the comma-separated set of documented primary-key columns for the duplicate value test.
+      - name: test
+        description: The primary-key test being evaluated. Current values are not null and duplicate value.
+      - name: test_result
+        description: Integer test result where healthy values are expected to be zero. Not-null tests count null values, and duplicate value tests return total rows minus distinct primary-key combinations.
 
   - name: data_quality__logical
     description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.
@@ -68,7 +116,7 @@ models:
       alias: logical
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -91,7 +139,7 @@ models:
       alias: medical_claim_line_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -119,7 +167,7 @@ models:
       alias: medical_claim_claim_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -144,7 +192,7 @@ models:
       alias: pharmacy_claim_line_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -172,7 +220,7 @@ models:
       alias: pharmacy_claim_claim_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -197,7 +245,7 @@ models:
       alias: eligibility_span_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -231,7 +279,7 @@ models:
       alias: eligibility_person_flags
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq1
         - dq_logical
       materialized: table
@@ -248,7 +296,7 @@ models:
         description: Input-layer data source associated with the person.
 
   - name: data_quality__analytical_key_metrics
-    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema.
+    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema. Results are formatted from the analytical metric manifest, which is also the source of truth for each metric model and result type.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -256,8 +304,9 @@ models:
       alias: analytical_key_metrics
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq2
+        - dq_analytics
         - dq_analytical
       materialized: table
     columns:
@@ -266,9 +315,16 @@ models:
       - name: domain
         description: The high-level analytical domain for the metric.
       - name: metric
-        description: The analytical metric name, including any grouping label carried into the output.
+        description: The analytical metric name.
       - name: result
-        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while rates, utilization metrics, percentages, and averages are rendered as text values rounded to at most two decimal places.
+        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while utilization, PMPM, prevalence, percentage, and average metrics are rendered as text values rounded to at most two decimal places.
+      - name: medicare
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: commercial
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: medicaid
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+
 
   - name: data_quality__analytical_data_marts
     config:
@@ -278,8 +334,9 @@ models:
       alias: analytical_data_marts
       tags:
         - data_quality
-        - dqi
+        - dq
         - dq2
+        - dq_analytics
         - dq_analytical
       materialized: table
     columns:
