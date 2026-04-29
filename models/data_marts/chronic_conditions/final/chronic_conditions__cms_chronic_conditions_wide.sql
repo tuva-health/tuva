@@ -3,6 +3,13 @@
    )
 }}
 
+{% set cms_condition_columns = dbt_utils.get_column_values(
+     ref('chronic_conditions__cms_chronic_conditions_hierarchy'),
+     'condition_column_name',
+     order_by='condition_column_name',
+     default=[]
+) %}
+
 with chronic_conditions as (
 
     select distinct
@@ -26,18 +33,16 @@ with chronic_conditions as (
 
 select
       p.person_id
+    {% if cms_condition_columns | length > 0 %}
     , {{ dbt_utils.pivot(
           column='condition_column_name'
-        , values=dbt_utils.get_column_values(
-              ref ('chronic_conditions__cms_chronic_conditions_hierarchy')
-            , 'condition_column_name'
-            , order_by= 'condition_column_name'
-          )
+        , values=cms_condition_columns
         , agg='max'
         , then_value= 1
         , else_value= 0
         , quote_identifiers = False
       ) }}
+    {% endif %}
       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('cms_chronic_conditions__stg_core__patient') }} as p
      left outer join conditions

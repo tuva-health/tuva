@@ -27,7 +27,7 @@ on:
         required: true
         type: string
       dbt_command:
-        description: Full dbt command to execute, for example `dbt seed --select tag:tuva_demo`
+        description: Full dbt command or ordered command sequence, for example `dbt seed --select tag:tuva_demo dbt run --select tag:tuva_demo`
         required: false
         type: string
         default: ""
@@ -75,7 +75,7 @@ jobs:
       pr_number: ${{ steps.resolve.outputs.pr_number }}
       adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
       checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
-      dbt_command_json: ${{ steps.validate.outputs.dbt_command_json }}
+      dbt_commands_json: ${{ steps.validate.outputs.dbt_commands_json }}
       dbt_command_display: ${{ steps.validate.outputs.dbt_command }}
       subcommand: ${{ steps.validate.outputs.subcommand }}
       requires_seed_baseline: ${{ steps.validate.outputs.requires_seed_baseline }}
@@ -104,7 +104,7 @@ jobs:
             const inputs = context.payload.inputs || {};
             const requestedCommand = `${{ steps.validate.outputs.dbt_command }}`;
             const requestedTargets = JSON.parse(String.raw`${{ steps.validate.outputs.targets_json }}`);
-            const subcommand = `${{ steps.validate.outputs.subcommand }}`;
+            const requestedTargetsCsv = `${{ steps.validate.outputs.targets_csv }}`;
             const refreshesSeeds = `${{ steps.validate.outputs.refreshes_seeds }}` === "true";
             const requiresSeedBaseline = `${{ steps.validate.outputs.requires_seed_baseline }}` === "true";
 
@@ -171,14 +171,44 @@ jobs:
                   runGuardPrefixes.some((prefix) => path.startsWith(prefix))
               );
 
-            async function hasReusableSeedRefresh(targetName) {
-              const titleNeedles = [
-                `PR #${prNumber} / ${targetName}: dbt seed`,
-                `PR #${prNumber} / ${targetName}: dbt build --full-refresh`,
-                `PR #${prNumber} / all: dbt seed`,
-                `PR #${prNumber} / all: dbt build --full-refresh`,
-              ];
+            function parseDisplayTitle(run) {
+              const prefix = `Tuva CI / PR #${prNumber} / `;
+              const displayTitle = String(run.display_title || "");
+              if (!displayTitle.startsWith(prefix)) {
+                return null;
+              }
 
+              const label = displayTitle.slice(prefix.length);
+              const separator = label.indexOf(": ");
+              if (separator === -1) {
+                return null;
+              }
+
+              return {
+                targetLabel: label.slice(0, separator).trim().toLowerCase(),
+                commandLabel: label.slice(separator + 2).trim().toLowerCase(),
+              };
+            }
+
+            function labelIncludesTarget(targetLabel, targetName) {
+              if (targetLabel === "all") {
+                return true;
+              }
+              return targetLabel
+                .split(",")
+                .map((part) => part.trim())
+                .filter(Boolean)
+                .includes(targetName);
+            }
+
+            function labelRefreshesSeeds(commandLabel) {
+              return commandLabel
+                .split(" -> ")
+                .map((part) => part.trim())
+                .some((part) => part.startsWith("dbt seed") || part.startsWith("dbt build"));
+            }
+
+            async function hasReusableSeedRefresh(targetName) {
               const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
                 owner,
                 repo,
@@ -192,8 +222,16 @@ jobs:
                   continue;
                 }
 
-                const displayTitle = String(run.display_title || "");
-                if (!titleNeedles.some((needle) => displayTitle.includes(needle))) {
+                const parsedTitle = parseDisplayTitle(run);
+                if (!parsedTitle) {
+                  continue;
+                }
+
+                if (!labelIncludesTarget(parsedTitle.targetLabel, targetName)) {
+                  continue;
+                }
+
+                if (!labelRefreshesSeeds(parsedTitle.commandLabel)) {
                   continue;
                 }
 
@@ -223,7 +261,7 @@ jobs:
               return false;
             }
 
-            if (isDispatch && requiresBuild && requiresSeedBaseline && !refreshesSeeds) {
+            if (isDispatch && requiresBuild && requiresSeedBaseline) {
               const reusableTargets = [];
               for (const targetName of requestedTargets) {
                 if (await hasReusableSeedRefresh(targetName)) {
@@ -236,9 +274,10 @@ jobs:
                   .filter((path) => touchesSeedState([path]))
                   .slice(0, 8)
                   .join(", ");
+                const ciTargetPrefix = requestedTargetsCsv === "all" ? "all" : requestedTargets.join(" ");
 
                 core.setFailed(
-                  `This PR changes seed/config files (${sample}). Run a seed-refreshing command such as /ci dbt seed --select ... or /ci snowflake dbt build --full-refresh --select ... before running ${requestedCommand}.`
+                  `This PR changes seed/config files (${sample}). The requested sequence \`${requestedCommand}\` reaches dbt run/test before refreshing seeds. Run a seed-refreshing command such as \`/ci ${ciTargetPrefix} dbt seed\` or \`/ci ${ciTargetPrefix} dbt build --full-refresh\` before running this sequence.`
                 );
                 return;
               }
@@ -250,14 +289,7 @@ jobs:
 
   run_dbt:
     name: >-
-      ${{
-        needs.resolve_request.outputs.subcommand == 'build' && 'Build' ||
-        needs.resolve_request.outputs.subcommand == 'seed' && 'Seed' ||
-        needs.resolve_request.outputs.subcommand == 'test' && 'Test' ||
-        needs.resolve_request.outputs.subcommand == 'compile' && 'Compile' ||
-        needs.resolve_request.outputs.subcommand == 'debug' && 'Debug' ||
-        'Run'
-      }} / DW: ${{
+      Commands / DW: ${{
         matrix.adapter == 'snowflake' && 'Snowflake' ||
         matrix.adapter == 'bigquery' && 'BigQuery' ||
         matrix.adapter == 'databricks' && 'Databricks' ||
@@ -382,8 +414,9 @@ jobs:
 
       - name: Execute dbt
         env:
-          DBT_COMMAND_JSON: ${{ needs.resolve_request.outputs.dbt_command_json }}
+          DBT_COMMANDS_JSON: ${{ needs.resolve_request.outputs.dbt_commands_json }}
           DBT_ADAPTER: ${{ matrix.adapter }}
+          CI_REQUIRES_SEED_BASELINE: ${{ needs.resolve_request.outputs.requires_seed_baseline }}
         run: |
           python - <<'PY'
           import json
@@ -391,15 +424,38 @@ jobs:
           import shlex
           import subprocess
 
-          command = json.loads(os.environ["DBT_COMMAND_JSON"])
-          command.extend(
-              [
-                  "--project-dir",
-                  "./integration_tests",
-                  "--profiles-dir",
-                  f"./integration_tests/profiles/{os.environ['DBT_ADAPTER']}",
-              ]
-          )
-          print(f"Running: {shlex.join(command)}")
-          subprocess.run(command, check=True)
+          commands = json.loads(os.environ["DBT_COMMANDS_JSON"])
+          child_env = os.environ.copy()
+          seed_refreshing_subcommands = {"seed", "build"}
+          baseline_required = child_env.get("CI_REQUIRES_SEED_BASELINE") == "true"
+          seed_refreshed_in_sequence = False
+
+          for index, raw_command in enumerate(commands, start=1):
+              command = list(raw_command)
+              subcommand = command[1].lower()
+              use_baseline_seeds = (
+                  subcommand in seed_refreshing_subcommands
+                  or seed_refreshed_in_sequence
+                  or (baseline_required and subcommand in {"run", "test"})
+              )
+
+              command.extend(
+                  [
+                      "--project-dir",
+                      "./integration_tests",
+                      "--profiles-dir",
+                      f"./integration_tests/profiles/{os.environ['DBT_ADAPTER']}",
+                  ]
+              )
+
+              child_env["DBT_CI_USE_BASELINE_SEEDS"] = "true" if use_baseline_seeds else "false"
+              if child_env["DBT_CI_USE_BASELINE_SEEDS"] == "true" and "--no-partial-parse" not in command:
+                  command.append("--no-partial-parse")
+
+              print(f"Step {index}: DBT_CI_USE_BASELINE_SEEDS={child_env['DBT_CI_USE_BASELINE_SEEDS']}")
+              print(f"Running: {shlex.join(command)}")
+              subprocess.run(command, check=True, env=child_env)
+
+              if subcommand in seed_refreshing_subcommands:
+                  seed_refreshed_in_sequence = True
           PY

@@ -5,7 +5,7 @@ seeds:
     description: Value sets for clinical concepts.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_clinical_concepts
       tags: hcc_suspecting
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -33,7 +33,7 @@ seeds:
       Disease factors by model version and risk segment. Extracted from rate  announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_hcc_descriptions
       tags: hcc_suspecting
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -53,8 +53,8 @@ seeds:
       ICD-10 to HCC mapping by payment year and model version. Combined and  cleaned version of code files on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _value_set_icd_10_cm_mappings
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      alias: _value_set_hcc_suspecting_icd_10_cm_mappings
       tags: hcc_suspecting
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
       column_types:

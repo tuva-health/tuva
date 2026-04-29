@@ -15,6 +15,7 @@ with stg_eligibility as (
     , enrollment_start_date
     , enrollment_end_date
     , tuva_last_run
+    {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig') }}
   from {{ ref('normalized_input__eligibility') }} as elig
 )
 
@@ -25,7 +26,7 @@ with stg_eligibility as (
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
   from {{ ref('reference_data__calendar') }}
-  group by year, month, year_month
+  group by year, month
 )
 
 , joined as (
@@ -37,6 +38,7 @@ select distinct
   , a.{{ quote_column('plan') }}
   , a.data_source
   , a.tuva_last_run
+  {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
 from stg_eligibility as a
 inner join month_start_and_end_dates as b
   on a.enrollment_start_date <= b.month_end_date

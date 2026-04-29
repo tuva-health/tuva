@@ -23,18 +23,24 @@ frameborder="0"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
+## Prerequisite: Source Data Is Already Loaded
+
+Before you create a connector, your claims data, clinical data, or both should already be loaded into your cloud data warehouse. We typically load source data into a raw schema named `raw_<data_source>`.
+
+Your connector will read from those raw source tables and transform them into the Tuva Input Layer.
+
 ## Step 1: Create a New Repo from the Connector Template
 
-First, you need to perform some basic steps to get the connector template on your local machine.
+First, get the connector template onto your local machine.
 
-1. Visit the [Connector](https://github.com/tuva-health/connector_template) repository on GitHub.
-2. Click **"Use this template"** (see screenshot below).
+1. Visit the [Connector Template](https://github.com/tuva-health/connector_template) repository on GitHub.
+2. Click **Use this template**.
 
 ![Connectors](/img/connector-template.png)
 
-3. Name your new repository (e.g., `my-connector`).  We recommend choosing a name that aligns with your data source e.g. UHC_claims.
-4. Click **"Create repository"**.  Your new repo will contain all template files with their Git history.
-5. Clone the new repository and open it in a code editor of your choice
+3. Name your new repository. We recommend choosing a name that aligns with your data source, for example `uhc_claims`.
+4. Click **Create repository**.
+5. Clone the new repository and open it in your editor.
 
 ```bash
 git clone https://github.com/your-username/my-connector.git
@@ -43,7 +49,7 @@ cd my-connector
 
 ## Step 2: Update `dbt_project.yml`
 
-The `dbt_project.yml` is one of the most important files in a dbt project because it controls many aspects about how the project runs (e.g. what models run, where tables are built in the database, etc.).  
+The `dbt_project.yml` controls the core behavior of the connector, including the project name and which parts of Tuva should run.
 
 1. Rename the project:
 
@@ -51,88 +57,146 @@ The `dbt_project.yml` is one of the most important files in a dbt project becaus
 name: my_connector
 ```
 
-2. Set model-level configs to use your project name:
+2. Rename the top-level key under `models:` so it matches your new project name:
 
 ```yaml
 models:
   my_connector:
-    ...
+    +schema: input_layer
 ```
 
-3. Enable the appropriate connector type depending on the type of data source you're working with.  In the example below we're working with a claims data source.  
+3. Keep the dbt ref behavior flag enabled. The current connector template already includes this flag.
+
+```yaml
+flags:
+  require_ref_searches_node_package_before_root: true
+```
+
+This prevents dbt 1.11 ref warnings when Tuva refs the connector's root-project Input Layer models.
+
+4. Set the minimal connector variables based on the type of source you are mapping.
+
+For a claims connector:
 
 ```yaml
 vars:
   claims_enabled: true
   clinical_enabled: false
+  provider_attribution_enabled: false
+  semantic_layer_enabled: false
 ```
 
-4. (Optional) Set Tuva Variables.  Tuva ships with a number of Data Marts that use dbt variables to control their behavior.  You may need to set these variables.  For information on these variables see [dbt Variables](../dbt-variables.md).
-
-## Step 3: Clean Up the Models
-
-Inside `models/`, you’ll find:
-- `staging/`
-- `intermediate/`
-- `final/`
-
-The `staging/` and `intermediate/` directories are initially empty (aside from `.gitkeep` files). Inside these folders is where you'll create custom SQL files to trasform your raw data into the Input Layer.
-
-In `models/sources.yml`, remove any models you don't intend to use. For example, if you are building a claims connector, you would keep only:
+For a clinical connector:
 
 ```yaml
-- name: elibility
-- name: medical_claim
-- name: pharmacy_claim
+vars:
+  claims_enabled: false
+  clinical_enabled: true
+  provider_attribution_enabled: false
+  semantic_layer_enabled: false
 ```
 
-Also clean up the corresponding `models/models.yml` file, removing unnecessary models, etc.
+If your source includes provider attribution data, set `provider_attribution_enabled: true`. If you need the semantic layer outputs, set `semantic_layer_enabled: true`.
 
-## Step 4: Create a Virtual Environment
+## Step 3: Configure and Test Your dbt Profile
 
-Technically this step is optional, but it's a very good practice.  Create and activate a Python virtual environment:
+Make sure your `profiles.yml` in `~/.dbt/` is configured so dbt can connect to your warehouse.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
-```
-
-Next, install required Python packages (including dbt-core and Snowflake adapter):
-
-```bash
-pip install -r requirements.txt
-```
-
-If needed, update `requirements.txt` to match your environment.
-
-## Step 5: Configure and Test Your dbt Profile
-
-Ensure your `profiles.yml` (in `~/.dbt/`) is correctly configured for Snowflake.
-
-Test the connection:
+Validate the connection with:
 
 ```bash
 dbt debug
 ```
 
-## Step 6: Install dbt Dependencies
+Do not move forward until `dbt debug` succeeds.
+
+## Step 4: Install dbt Dependencies
+
+Install the packages defined in `packages.yml`:
 
 ```bash
 dbt deps
 ```
 
-This installs any packages defined in `packages.yml` (such as `tuva`).
+This pulls in Tuva and any other dbt packages required by the connector.
 
-## Step 7: Begin Building Your Models
+## Step 5: Begin Building Your Models
 
-You now have a fully set-up connector repository, ready to convert raw claims data into Tuva’s Input Layer format. 
-  - Your environment is set up
-  - The connector template is configured for claims data
+The connector template is designed around two model layers:
 
-You’re ready to begin writing transformation logic in `staging/` and `intermediate/` folders.  For examples of how to structure the actual models you will use to standardize your data take a look at our Pre-Built Connectors.  
+- `models/staging/`
+- `models/final/`
 
-Mapping a data source to the Input Layer means creating dbt models in your dbt project for each of the Input Layer tables. That means that if you have a claims data source you will create dbt models for each of the claims tables, and if you have a clinical data source you will create dbt models for each of the clinical tables in the [Input Layer](../input-layer).
+Use `models/_sources.yml` to define the raw source tables your connector reads from. Update the schema and table names there so they match the tables that already exist in your warehouse.
 
-## Step 8: `dbt build`
+The template defaults to source names that already look like Tuva input-layer tables. In practice, most users will need to update both `models/_sources.yml` and the staging models so they point to the actual raw claims or clinical tables in the warehouse.
 
-Once you're satisified with your models you can execute `dbt build` to run the project.  This will attempt to build not only the models you created, but also run all Data Quality Tests, Core Data Model, Data Marts, and load all Terminology.
+The intended pattern is:
+
+- `staging/` is where casting and light source alignment happen
+- `final/` exposes the Tuva Input Layer tables
+
+Keep the `input_layer` tag on your connector models, or add it if you create new models. This makes it easy to build only the connector output before running the rest of Tuva.
+
+## Step 6: Build and Validate Only the Input Layer
+
+Once you have a first pass of your staging and final models, build only the input layer:
+
+```bash
+dbt build --select tag:input_layer
+```
+
+Then run structural data quality:
+
+```bash
+dbt build --select tag:dq_structural
+```
+
+`dq_structural` checks whether:
+
+- the expected input-layer tables exist
+- the expected columns are present
+- the data types match the Input Layer contract
+- the documented primary keys are valid
+
+You should not move on until structural data quality is passing.
+
+Next, run logical data quality:
+
+```bash
+dbt build --select tag:dq_logical
+```
+
+`dq_logical` checks things that should generally be true about claims and clinical data. These results do not all need to be zero in order to continue, but nonzero results often indicate issues that will cause downstream problems.
+
+The recommended workflow is iterative:
+
+1. Build the input layer.
+2. Run structural data quality.
+3. Run logical data quality.
+4. Review the results.
+5. Update your staging and final models.
+6. Rerun until structural is clean and logical is as good as it can reasonably be.
+
+## Step 7: Build the Full Project and Review Analytical Data Quality
+
+Once your connector and input layer look sound, build the rest of Tuva:
+
+```bash
+dbt build
+```
+
+Then run analytical data quality:
+
+```bash
+dbt build --select tag:dq_analytical
+```
+
+This is the point where you validate the full project, not before structural and logical review.
+
+The main analytical data quality outputs are:
+
+- `analytical_key_metrics`, which provides a sanity check against commonly used metrics
+- `analytical_data_marts`, which helps confirm that the major marts built successfully
+
+Review those outputs and confirm the results make sense for your source data. If they do not, go back to your connector models, correct the mapping, and rerun the validation workflow.

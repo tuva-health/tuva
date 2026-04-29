@@ -13,6 +13,7 @@ with final_before_attribution_fields as (
     , a.payer
     , a.{{ quote_column('plan') }}
     , data_source
+    {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
   from {{ ref('claims_enrollment__member_months') }} as a
 )
 
@@ -33,6 +34,7 @@ select
   , b.custom_attributed_provider_practice
   , b.custom_attributed_provider_organization
   , b.custom_attributed_provider_lob
+  {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
 
 from final_before_attribution_fields as a
 left outer join {{ ref('financial_pmpm__stg_provider_attribution') }} as b

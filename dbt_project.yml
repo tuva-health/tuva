@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.17.1'
+version: '0.18.0'
 config-version: 2
 require-dbt-version: ">=1.10.0"
 
@@ -13,6 +13,18 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
     ## To disable elementary for dev, uncomment this:
     # enabled: "{{ target.name in ['prod','analytics'] }}"
+  the_tuva_project:
+    data_quality:
+      structural:
+        +enabled: "{{ var('enable_data_quality', false) | as_bool }}"
+      logical:
+        +enabled: "{{ var('enable_data_quality', false) | as_bool }}"
+      analytical:
+        +enabled: "{{ var('enable_data_quality', false) | as_bool }}"
+      dqi:
+        +enabled: "{{ var('enable_legacy_data_quality', false) | as_bool }}"
+      legacy:
+        +enabled: "{{ var('enable_legacy_data_quality', false) | as_bool }}"
 
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
@@ -33,7 +45,7 @@ vars:
   tuva_seed_versions:
     concept_library: "1.0.1"
     reference_data: "1.0.0"
-    terminology: "1.0.0"
+    terminology: "1.1.1"
     value_sets: "1.0.0"
     provider_data: "1.0.0"
     synthetic_data: "1.0.0"
@@ -45,6 +57,7 @@ vars:
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
   ## Optional testing and feature flags
+  enable_data_quality: false
   enable_input_layer_testing: true
   enable_legacy_data_quality: false
   # enable_normalize_engine: false
@@ -222,6 +235,24 @@ seeds:
         +post-hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
       provider_data__provider_taxonomy_unpivot:
         +post-hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
+
+    synthetic_data:
+      synthetic_data__appointment:
+        +post-hook: "{{ load_versioned_synthetic_seed('appointment') }}"
+      synthetic_data__eligibility:
+        +post-hook: "{{ load_versioned_synthetic_seed('eligibility') }}"
+      synthetic_data__immunization:
+        +post-hook: "{{ load_versioned_synthetic_seed('immunization') }}"
+      synthetic_data__lab_result:
+        +post-hook: "{{ load_versioned_synthetic_seed('lab_result') }}"
+      synthetic_data__medical_claim:
+        +post-hook: "{{ load_versioned_synthetic_seed('medical_claim') }}"
+      synthetic_data__observation:
+        +post-hook: "{{ load_versioned_synthetic_seed('observation') }}"
+      synthetic_data__pharmacy_claim:
+        +post-hook: "{{ load_versioned_synthetic_seed('pharmacy_claim') }}"
+      synthetic_data__provider_attribution:
+        +post-hook: "{{ load_versioned_synthetic_seed('provider_attribution') }}"
 
     value_sets:
       ccsr:

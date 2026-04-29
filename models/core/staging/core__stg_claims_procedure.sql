@@ -15,6 +15,8 @@
         "'_'",
         "unpivot_cte.claim_id",
         "'_'",
+        "med.encounter_id",
+        "'_'",        
         "unpivot_cte.procedure_sequence_id",
         "'_'",
         "CAST(COALESCE(unpivot_cte.source_code_type, 'unknown') AS " ~ dbt.type_string() ~ ")",
@@ -31,7 +33,7 @@
     , cast(unpivot_cte.person_id as {{ dbt.type_string() }}) as person_id
     , cast(unpivot_cte.member_id as {{ dbt.type_string() }}) as member_id
     , cast(null as {{ dbt.type_string() }}) as patient_id
-    , cast(null as {{ dbt.type_string() }}) as encounter_id --one claim can be on multiple encounters, so nulling out for now
+    , cast(med.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }}) as claim_id
     , {{ try_to_cast_date('unpivot_cte.procedure_date', 'YYYY-MM-DD') }} as procedure_date
     , cast(unpivot_cte.source_code_type as {{ dbt.type_string() }}) as source_code_type
@@ -64,7 +66,7 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-      , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
+    , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 {%- endset %}
 
@@ -122,6 +124,13 @@ where procedure_code_{{ i }} is not null
 
 )
 
+, distinct_claim_encounters as (
+select distinct
+  claim_id
+  , encounter_id
+from {{ ref('core__stg_claims_medical_claim')}}
+)
+
 select distinct
     {{ tuva_core_columns }}
     {{ tuva_metadata_columns }}
@@ -130,3 +139,5 @@ left outer join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.source_code = icd.icd_10_pcs
 left outer join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on unpivot_cte.source_code = hcpcs.hcpcs
+left outer join distinct_claim_encounters as med
+  on unpivot_cte.claim_id = med.claim_id

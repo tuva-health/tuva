@@ -22,7 +22,7 @@ models:
       - dbt_utils.unique_combination_of_columns:
           config:
             severity: error
-            enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+            enabled: "{{ (var('enable_legacy_data_quality', false) | as_bool) and (var('enable_input_layer_testing', true) | as_bool) }}"
 
           arguments:
             combination_of_columns:
@@ -31,6 +31,320 @@ models:
               - level_of_detail
               - y_axis
               - x_axis
+  - name: data_quality__structural
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table_name
+        description: The input-layer table being evaluated.
+      - name: table_exists
+        description: Pass or fail result indicating whether the expected input-layer relation exists.
+      - name: columns_exist
+        description: Pass or fail result indicating whether all documented input-layer columns are present. For the three claims input tables, this is derived from the structural column detail table.
+      - name: data_types
+        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family. For the three claims input tables, this is derived from the structural column detail table.
+      - name: primary_keys
+        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain. For the three claims input tables, this is derived from the structural column detail and structural primary-key test tables.
+      - name: row_count
+        description: The integer number of rows present for the evaluated data_source and input-layer table. Null means the relation does not exist.
+
+  - name: data_quality__structural_column_details
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_column_details
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The documented input-layer column being evaluated.
+      - name: column_exists
+        description: Yes or no indicator for whether the documented column exists on the input-layer relation.
+      - name: data_type_correct
+        description: Yes or no indicator for whether the documented column matches the expected data-type family.
+
+  - name: data_quality__structural_primary_key_tests
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_primary_key_tests
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The claims input-layer table being evaluated.
+      - name: column
+        description: The primary-key column under test, or the comma-separated set of documented primary-key columns for the duplicate value test.
+      - name: test
+        description: The primary-key test being evaluated. Current values are not null and duplicate value.
+      - name: test_result
+        description: Integer test result where healthy values are expected to be zero. Not-null tests count null values, and duplicate value tests return total rows minus distinct primary-key combinations.
+
+  - name: data_quality__logical
+    description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: logical
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    columns:
+      - name: data_source
+        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
+      - name: table
+        description: The primary input-layer table being evaluated by the logical test.
+      - name: test_name
+        description: The plain-language logical consistency test being evaluated.
+      - name: test_result
+        description: The integer sum of the persisted native-grain flag column for the logical test. Healthy results are expected to be zero.
+
+  - name: data_quality__medical_claim_line_flags
+    description: One row per medical claim line per data source. Stores only the native-grain keys plus 0/1 logical test flags that can be evaluated directly at the claim-line grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_line_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - claim_line_number
+              - data_source
+    columns:
+      - name: claim_id
+        description: Medical claim identifier at the claim-line grain.
+      - name: claim_line_number
+        description: Claim-line number within the claim.
+      - name: data_source
+        description: Input-layer data source associated with the claim line.
+
+  - name: data_quality__medical_claim_claim_flags
+    description: One row per medical claim per data source. Stores only the claim-grain keys plus 0/1 logical test flags that must be evaluated at the claim header grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_claim_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - data_source
+    columns:
+      - name: claim_id
+        description: Medical claim identifier at the claim grain.
+      - name: data_source
+        description: Input-layer data source associated with the claim.
+
+  - name: data_quality__pharmacy_claim_line_flags
+    description: One row per pharmacy claim line per data source. Stores only the native-grain keys plus 0/1 logical test flags that can be evaluated directly at the claim-line grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_line_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - claim_line_number
+              - data_source
+    columns:
+      - name: claim_id
+        description: Pharmacy claim identifier at the claim-line grain.
+      - name: claim_line_number
+        description: Claim-line number within the claim.
+      - name: data_source
+        description: Input-layer data source associated with the claim line.
+
+  - name: data_quality__pharmacy_claim_claim_flags
+    description: One row per pharmacy claim per data source. Stores only the claim-grain keys plus 0/1 logical test flags that must be evaluated at the claim header grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_claim_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - data_source
+    columns:
+      - name: claim_id
+        description: Pharmacy claim identifier at the claim grain.
+      - name: data_source
+        description: Input-layer data source associated with the claim.
+
+  - name: data_quality__eligibility_span_flags
+    description: One row per eligibility span per data source. Stores only the span-grain keys plus 0/1 logical test flags that can be evaluated directly from a single eligibility span row.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_span_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - person_id
+              - member_id
+              - enrollment_start_date
+              - enrollment_end_date
+              - data_source
+    columns:
+      - name: person_id
+        description: Person identifier for the eligibility span.
+      - name: member_id
+        description: Member identifier for the eligibility span.
+      - name: enrollment_start_date
+        description: Start date of the eligibility span.
+      - name: enrollment_end_date
+        description: End date of the eligibility span.
+      - name: data_source
+        description: Input-layer data source associated with the eligibility span.
+
+  - name: data_quality__eligibility_person_flags
+    description: One row per person per data source. Stores only the person-grain keys plus 0/1 logical test flags that must be evaluated across multiple eligibility rows for the same person.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_person_flags
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_logical
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - person_id
+              - data_source
+    columns:
+      - name: person_id
+        description: Person identifier at the person-grain logical flag level.
+      - name: data_source
+        description: Input-layer data source associated with the person.
+
+  - name: data_quality__analytical_key_metrics
+    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema. Results are formatted from the analytical metric manifest, which is also the source of truth for each metric model and result type.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytical_key_metrics
+      tags:
+        - data_quality
+        - dq
+        - dq2
+        - dq_analytics
+        - dq_analytical
+      materialized: table
+    columns:
+      - name: data_source
+        description: The data source for the analytical metric.
+      - name: domain
+        description: The high-level analytical domain for the metric.
+      - name: metric
+        description: The analytical metric name.
+      - name: result
+        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while utilization, PMPM, prevalence, percentage, and average metrics are rendered as text values rounded to at most two decimal places.
+      - name: medicare
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: commercial
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+      - name: medicaid
+        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
+
+
+  - name: data_quality__analytical_data_marts
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytical_data_marts
+      tags:
+        - data_quality
+        - dq
+        - dq2
+        - dq_analytics
+        - dq_analytical
+      materialized: table
+    columns:
+      - name: data_mart
+        description: The Tuva data mart being summarized.
+      - name: row_count
+        description: The integer row count for the representative output table of the mart. Null indicates the mart relation does not exist.
+
   - name: data_quality__chronic_conditions_prevalence
     config:
       schema: |
