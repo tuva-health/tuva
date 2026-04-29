@@ -50,7 +50,7 @@ These vars control shared seed loading and optional feature behavior.
 |-----------|---------|-------------|
 | `custom_bucket_name` | `"tuva-public-resources"` | Default bucket for versioned Tuva seed artifacts. |
 | `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
-| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.0.0", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
+| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.1.1", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.0.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
 | `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
 | `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |

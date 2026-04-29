@@ -4,6 +4,7 @@
    )
 }}
 
+with base as (
 select distinct
     med.claim_id
   , med.claim_line_number

@@ -35,7 +35,9 @@ models:
           Indicates the input data was missing and a default status was used.
       - name: orec_default
         description: >
-          Indicates the input data was missing and a default status was used.
+          Indicates the OREC risk segment was defaulted because source OREC or
+          Medicare Status was missing or indicated ESRD. When both source values
+          are missing, the default follows the CMS age rule.
       - name: institutional_status_default
         description: >
           Indicates the input data was missing and a default status was used.
@@ -76,7 +78,9 @@ models:
           Indicates the input data was missing and a default status was used.
       - name: orec_default
         description: >
-          Indicates the input data was missing and a default status was used.
+          Indicates the OREC risk segment was defaulted because source OREC or
+          Medicare Status was missing or indicated ESRD. When both source values
+          are missing, the default follows the CMS age rule.
       - name: institutional_status_default
         description: >
           Indicates the input data was missing and a default status was used.
@@ -287,7 +291,11 @@ models:
           Indicates whether the patient has "Full", "Partial", or "Non"  dual status.
       - name: orec
         description: >
-          Indicates the Original Reason for Entitlement Code (OREC)  "Aged", "Disabled", or "ESRD".
+          Indicates the Original Reason for Entitlement Code (OREC) risk
+          segment: "Aged", "Disabled", or "ESRD". When OREC is missing,
+          current Medicare Status is used as a proxy; when both source values
+          are missing, CMS age logic assigns "Disabled" for members under 65
+          and "Aged" for members 65 or older.
       - name: institutional_status
         description: >
           Indicates whether the patient resided in an institution for at  least 90 days.
@@ -299,7 +307,9 @@ models:
           Indicates the input data was missing and a default status was used.
       - name: orec_default
         description: >
-          Indicates the input data was missing and a default status was used.
+          Indicates the OREC risk segment was defaulted because source OREC or
+          Medicare Status was missing or indicated ESRD. When both source values
+          are missing, the default follows the CMS age rule.
       - name: institutional_status_default
         description: >
           Indicates the input data was missing and a default status was used.
@@ -585,7 +595,11 @@ models:
           Indicates whether the patient has "Full", "Partial", or "Non"  dual status.
       - name: orec
         description: >
-          Indicates the Original Reason for Entitlement Code (OREC)  "Aged", "Disabled", or "ESRD". If available, current Medicare Status  is used when OREC is missing.
+          Indicates the Original Reason for Entitlement Code (OREC) risk
+          segment: "Aged", "Disabled", or "ESRD". When OREC is missing,
+          current Medicare Status is used as a proxy; when both source values
+          are missing, CMS age logic assigns "Disabled" for members under 65
+          and "Aged" for members 65 or older.
       - name: institutional_status
         description: >
           Indicates whether the patient resided in an institution for at  least 90 days.
@@ -597,7 +611,9 @@ models:
           Indicates the input data was missing and a default status was used.
       - name: orec_default
         description: >
-          Indicates the input data was missing and a default status was used.
+          Indicates the OREC risk segment was defaulted because source OREC or
+          Medicare Status was missing or indicated ESRD. When both source values
+          are missing, the default follows the CMS age rule.
       - name: institutional_status_default
         description: >
           Indicates the input data was missing and a default status was used.
