@@ -5,7 +5,7 @@ where eligible_bene_flag = 1
     and hcc_type = 'coded'
     and filtered_by_hierarchy_flag = 0
 
-MINUS 
+{{ dbt.except() }}
 
 select distinct person_id, payer, payment_year - 1, model_version, hcc_code 
 -- Using the int gap status since hierarchies aren't applied yet
