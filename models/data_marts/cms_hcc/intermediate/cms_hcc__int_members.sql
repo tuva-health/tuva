@@ -262,6 +262,8 @@ with stg_eligibility as (
            model (CNA/CFA/CPA), regardless of OREC.
 
            When OREC is missing, latest Medicare status is used as a proxy.
+           If both values are missing, apply the same age-based disabled logic
+           CMS uses for blank OREC.
         */
         , case
             when original_reason_entitlement_code = '0' then 'Aged'
@@ -270,7 +272,8 @@ with stg_eligibility as (
             when original_reason_entitlement_code is null and medicare_status_code in ('10', '11', '31') then 'Aged'
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') and payment_year_age >= 65 then 'Aged'
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') then 'Disabled'
-            when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
+            when coalesce(original_reason_entitlement_code, medicare_status_code) is null and payment_year_age >= 65 then 'Aged'
+            when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Disabled'
           end as orec
         /*
            CMS SAS: ORIGDS = (OREC = '1') * (DISABL = 0)
