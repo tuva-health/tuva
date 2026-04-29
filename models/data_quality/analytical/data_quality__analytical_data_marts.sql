@@ -1,11 +1,12 @@
 {{ config(
+     enabled = var('enable_data_quality', false) | as_bool,
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
        else 'data_quality'
      ),
      alias = 'analytical_data_marts',
-     tags = ['data_quality', 'dqi', 'dq2', 'dq_analytical'],
+     tags = ['data_quality', 'dq', 'dq2', 'dq_analytics', 'dq_analytical'],
      materialized = 'table'
    )
 }}
@@ -73,10 +74,9 @@
     from (
         {{ mart_queries | join('\nunion all\n') }}
     ) as mart_counts
-    order by 1
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_mart
         , cast(null as {{ dbt.type_int() }}) as row_count
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

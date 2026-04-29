@@ -1,11 +1,12 @@
 {{ config(
+     enabled = var('enable_data_quality', false) | as_bool,
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
        else 'data_quality'
      ),
      alias = 'structural',
-     tags = ['data_quality', 'dqi', 'dq1', 'dq_structural'],
+     tags = ['data_quality', 'dq', 'dq1', 'dq_structural'],
      materialized = 'table'
    )
 }}
@@ -44,15 +45,101 @@
 -- depends_on: {{ ref(dependency_name) }}
 {% endfor %}
 
+-- depends_on: {{ ref('data_quality__structural_column_details') }}
+-- depends_on: {{ ref('data_quality__structural_primary_key_tests') }}
+
 {% if execute %}
     {% set expected_models = dq_expected_input_layer_models() %}
+    {% set detailed_claim_model_names = dq_claims_structural_model_names() %}
     {% set structural_queries = [] %}
 
     {% for model_node in expected_models %}
         {% set table_name = model_node.name | replace('input_layer__', '') %}
         {% set relation = dq_actual_relation(model_node) %}
 
-        {% if relation is none %}
+        {% if model_node.name in detailed_claim_model_names %}
+            {% set pk_columns = dq_expected_pk_columns(model_node) %}
+
+            {% if relation is none %}
+                {% set source_dimension_sql = dq_missing_source_dimension_sql() %}
+                {% set source_count_sql %}
+                    select
+                          '{{ dq_source_key_sentinel() }}' as data_source_key
+                        , cast(null as {{ dbt.type_int() }}) as row_count
+                {% endset %}
+            {% else %}
+                {% set source_dimension_sql = dq_source_dimension_sql(relation) %}
+                {% set source_count_sql = dq_source_row_count_sql(relation) %}
+            {% endif %}
+
+            {% set query %}
+                select
+                      sources.data_source
+                    , '{{ table_name }}' as table_name
+                    , '{% if relation is not none %}pass{% else %}fail{% endif %}' as table_exists
+                    , case
+                        when coalesce(column_status.missing_column_count, 0) = 0
+                        then 'pass'
+                        else 'fail'
+                      end as columns_exist
+                    , case
+                        when coalesce(column_status.bad_data_type_count, 0) = 0
+                        then 'pass'
+                        else 'fail'
+                      end as data_types
+                    , case
+                        when {% if relation is not none %}1 = 1{% else %}1 = 0{% endif %}
+                         and coalesce(pk_column_status.missing_pk_column_count, 0) = 0
+                         and coalesce(pk_test_status.failing_test_count, 0) = 0
+                        then 'pass'
+                        else 'fail'
+                      end as primary_keys
+                    , cast(source_counts.row_count as {{ dbt.type_int() }}) as row_count
+                from (
+                    {{ source_dimension_sql }}
+                ) as sources
+                left join (
+                    {{ source_count_sql }}
+                ) as source_counts
+                    on sources.data_source_key = source_counts.data_source_key
+                left join (
+                    select
+                          coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}') as data_source_key
+                        , cast(sum(case when column_exists = 'no' then 1 else 0 end) as {{ dbt.type_int() }}) as missing_column_count
+                        , cast(sum(case when data_type_correct = 'no' then 1 else 0 end) as {{ dbt.type_int() }}) as bad_data_type_count
+                    from {{ ref('data_quality__structural_column_details') }}
+                    where {{ adapter.quote('table') }} = '{{ table_name }}'
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
+                ) as column_status
+                    on sources.data_source_key = column_status.data_source_key
+                left join (
+                    select
+                          coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}') as data_source_key
+                        , cast(sum(case when column_exists = 'no' then 1 else 0 end) as {{ dbt.type_int() }}) as missing_pk_column_count
+                    from {{ ref('data_quality__structural_column_details') }}
+                    where {{ adapter.quote('table') }} = '{{ table_name }}'
+                      and {{ adapter.quote('column') }} in (
+                          {% for pk_column in pk_columns %}
+                          '{{ pk_column }}'{% if not loop.last %}, {% endif %}
+                          {% endfor %}
+                      )
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
+                ) as pk_column_status
+                    on sources.data_source_key = pk_column_status.data_source_key
+                left join (
+                    select
+                          coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}') as data_source_key
+                        , cast(sum(case when test_result is null or test_result <> 0 then 1 else 0 end) as {{ dbt.type_int() }}) as failing_test_count
+                    from {{ ref('data_quality__structural_primary_key_tests') }}
+                    where {{ adapter.quote('table') }} = '{{ table_name }}'
+                    group by
+                        coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
+                ) as pk_test_status
+                    on sources.data_source_key = pk_test_status.data_source_key
+            {% endset %}
+        {% elif relation is none %}
             {% set query %}
                 select
                       cast(null as {{ dbt.type_string() }}) as data_source
@@ -149,7 +236,10 @@
         {% do structural_queries.append(query) %}
     {% endfor %}
 
-    {{ structural_queries | join('\nunion all\n') }}
+    select *
+    from (
+        {{ structural_queries | join('\nunion all\n') }}
+    ) as structural_results
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source
@@ -159,5 +249,5 @@
         , cast(null as {{ dbt.type_string() }}) as data_types
         , cast(null as {{ dbt.type_string() }}) as primary_keys
         , cast(null as {{ dbt.type_int() }}) as row_count
-    where 1 = 0
+    {{ dq_empty_result_guard_sql() }}
 {% endif %}

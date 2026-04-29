@@ -26,7 +26,7 @@ with stg_eligibility as (
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
   from {{ ref('reference_data__calendar') }}
-  group by year, month, year_month
+  group by year, month
 )
 
 , joined as (

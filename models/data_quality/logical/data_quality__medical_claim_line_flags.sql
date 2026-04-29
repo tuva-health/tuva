@@ -1,12 +1,12 @@
 {{ config(
-     enabled = var('claims_enabled', false) | as_bool,
+     enabled = (var('enable_data_quality', false) | as_bool) and (var('claims_enabled', false) | as_bool),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
        else 'data_quality'
      ),
      alias = 'medical_claim_line_flags',
-     tags = ['data_quality', 'dqi', 'dq1', 'dq_logical'],
+     tags = ['data_quality', 'dq', 'dq1', 'dq_logical'],
      materialized = 'table'
    )
 }}
@@ -14,15 +14,11 @@
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_recent_claim_date_sql = dq_date_literal_sql('2020-01-01') %}
+{% set source_sentinel = dq_source_key_sentinel() %}
 
 {% set diagnosis_code_columns = [] %}
 {% for index in range(1, 26) %}
     {% do diagnosis_code_columns.append('diagnosis_code_' ~ index) %}
-{% endfor %}
-
-{% set secondary_diagnosis_code_columns = [] %}
-{% for index in range(2, 26) %}
-    {% do secondary_diagnosis_code_columns.append('diagnosis_code_' ~ index) %}
 {% endfor %}
 
 {% set procedure_code_columns = [] %}
@@ -44,67 +40,128 @@
 {% set drg_code_type_valid_where = "lower(cast(source_rows.drg_code_type as " ~ string_type ~ ")) in ('ms-drg', 'apr-drg')" %}
 {% set drg_code_type_invalid_where = "source_rows.drg_code_type is not null and lower(cast(source_rows.drg_code_type as " ~ string_type ~ ")) not in ('ms-drg', 'apr-drg')" %}
 
-{% set secondary_diagnosis_invalid_clauses = [] %}
-{% for column_name in secondary_diagnosis_code_columns %}
-    {% set clause %}
-        (
-            source_rows.{{ quote_column(column_name) }} is not null
-            and (
-                (
-                    lower(cast(source_rows.diagnosis_code_type as {{ string_type }})) = 'icd-10-cm'
-                    and not exists (
-                        select 1
-                        from {{ ref('terminology__icd_10_cm') }} as diagnosis_lookup
-                        where replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') = replace(cast(diagnosis_lookup.icd_10_cm as {{ string_type }}), '.', '')
-                    )
-                )
-                or
-                (
-                    lower(cast(source_rows.diagnosis_code_type as {{ string_type }})) = 'icd-9-cm'
-                    and not exists (
-                        select 1
-                        from {{ ref('terminology__icd_9_cm') }} as diagnosis_lookup
-                        where replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') = replace(cast(diagnosis_lookup.icd_9_cm as {{ string_type }}), '.', '')
-                    )
-                )
-            )
-        )
+{% set diagnosis_code_union_queries = [] %}
+{% for column_name in diagnosis_code_columns %}
+    {% set query %}
+        select
+              source_rows._dq_claim_id_key
+            , source_rows._dq_claim_line_number_key
+            , source_rows._dq_data_source_key
+            , {{ loop.index }} as diagnosis_position
+            , lower(cast(source_rows.diagnosis_code_type as {{ string_type }})) as diagnosis_code_type
+            , replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') as diagnosis_code
+        from source_rows
+        where source_rows.{{ quote_column(column_name) }} is not null
+          and lower(cast(source_rows.diagnosis_code_type as {{ string_type }})) in ('icd-10-cm', 'icd-9-cm')
     {% endset %}
-    {% do secondary_diagnosis_invalid_clauses.append(clause | trim) %}
+    {% do diagnosis_code_union_queries.append(query | trim) %}
 {% endfor %}
 
-{% set procedure_invalid_clauses = [] %}
+{% set procedure_code_union_queries = [] %}
 {% for column_name in procedure_code_columns %}
-    {% set clause %}
-        (
-            source_rows.{{ quote_column(column_name) }} is not null
-            and (
-                (
-                    lower(cast(source_rows.procedure_code_type as {{ string_type }})) = 'icd-10-pcs'
-                    and not exists (
-                        select 1
-                        from {{ ref('terminology__icd_10_pcs') }} as procedure_lookup
-                        where replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') = replace(cast(procedure_lookup.icd_10_pcs as {{ string_type }}), '.', '')
-                    )
-                )
-                or
-                (
-                    lower(cast(source_rows.procedure_code_type as {{ string_type }})) = 'icd-9-pcs'
-                    and not exists (
-                        select 1
-                        from {{ ref('terminology__icd_9_pcs') }} as procedure_lookup
-                        where replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') = replace(cast(procedure_lookup.icd_9_pcs as {{ string_type }}), '.', '')
-                    )
-                )
-            )
-        )
+    {% set query %}
+        select
+              source_rows._dq_claim_id_key
+            , source_rows._dq_claim_line_number_key
+            , source_rows._dq_data_source_key
+            , {{ loop.index }} as procedure_position
+            , lower(cast(source_rows.procedure_code_type as {{ string_type }})) as procedure_code_type
+            , replace(cast(source_rows.{{ quote_column(column_name) }} as {{ string_type }}), '.', '') as procedure_code
+        from source_rows
+        where source_rows.{{ quote_column(column_name) }} is not null
+          and lower(cast(source_rows.procedure_code_type as {{ string_type }})) in ('icd-10-pcs', 'icd-9-pcs')
     {% endset %}
-    {% do procedure_invalid_clauses.append(clause | trim) %}
+    {% do procedure_code_union_queries.append(query | trim) %}
 {% endfor %}
 
 with source_rows as (
-    select *
-    from {{ ref('input_layer__medical_claim') }}
+    select
+          medical_claim_rows.*
+        , coalesce(cast(medical_claim_rows.claim_id as {{ string_type }}), '{{ source_sentinel }}') as _dq_claim_id_key
+        , coalesce(cast(medical_claim_rows.claim_line_number as {{ string_type }}), '{{ source_sentinel }}') as _dq_claim_line_number_key
+        , coalesce(cast(medical_claim_rows.data_source as {{ string_type }}), '{{ source_sentinel }}') as _dq_data_source_key
+    from {{ ref('input_layer__medical_claim') }} as medical_claim_rows
+),
+
+diagnosis_codes as (
+    {{ diagnosis_code_union_queries | join('\nunion all\n') }}
+),
+
+diagnosis_code_flags as (
+    select
+          diagnosis_codes._dq_claim_id_key
+        , diagnosis_codes._dq_claim_line_number_key
+        , diagnosis_codes._dq_data_source_key
+        , cast(max(
+            case
+                when diagnosis_codes.diagnosis_position = 1
+                 and diagnosis_codes.diagnosis_code_type = 'icd-10-cm'
+                 and icd_10_diagnosis_lookup.icd_10_cm is null
+                    then 1
+                when diagnosis_codes.diagnosis_position = 1
+                 and diagnosis_codes.diagnosis_code_type = 'icd-9-cm'
+                 and icd_9_diagnosis_lookup.icd_9_cm is null
+                    then 1
+                else 0
+            end
+          ) as {{ dbt.type_int() }}) as diagnosis_code_1_invalid
+        , cast(max(
+            case
+                when diagnosis_codes.diagnosis_position > 1
+                 and diagnosis_codes.diagnosis_code_type = 'icd-10-cm'
+                 and icd_10_diagnosis_lookup.icd_10_cm is null
+                    then 1
+                when diagnosis_codes.diagnosis_position > 1
+                 and diagnosis_codes.diagnosis_code_type = 'icd-9-cm'
+                 and icd_9_diagnosis_lookup.icd_9_cm is null
+                    then 1
+                else 0
+            end
+          ) as {{ dbt.type_int() }}) as diagnosis_code_2_to_25_invalid
+    from diagnosis_codes
+    left join {{ ref('terminology__icd_10_cm') }} as icd_10_diagnosis_lookup
+        on diagnosis_codes.diagnosis_code_type = 'icd-10-cm'
+       and diagnosis_codes.diagnosis_code = replace(cast(icd_10_diagnosis_lookup.icd_10_cm as {{ string_type }}), '.', '')
+    left join {{ ref('terminology__icd_9_cm') }} as icd_9_diagnosis_lookup
+        on diagnosis_codes.diagnosis_code_type = 'icd-9-cm'
+       and diagnosis_codes.diagnosis_code = replace(cast(icd_9_diagnosis_lookup.icd_9_cm as {{ string_type }}), '.', '')
+    group by
+          diagnosis_codes._dq_claim_id_key
+        , diagnosis_codes._dq_claim_line_number_key
+        , diagnosis_codes._dq_data_source_key
+),
+
+procedure_codes as (
+    {{ procedure_code_union_queries | join('\nunion all\n') }}
+),
+
+procedure_code_flags as (
+    select
+          procedure_codes._dq_claim_id_key
+        , procedure_codes._dq_claim_line_number_key
+        , procedure_codes._dq_data_source_key
+        , cast(max(
+            case
+                when procedure_codes.procedure_code_type = 'icd-10-pcs'
+                 and icd_10_procedure_lookup.icd_10_pcs is null
+                    then 1
+                when procedure_codes.procedure_code_type = 'icd-9-pcs'
+                 and icd_9_procedure_lookup.icd_9_pcs is null
+                    then 1
+                else 0
+            end
+          ) as {{ dbt.type_int() }}) as procedure_code_1_to_25_invalid
+    from procedure_codes
+    left join {{ ref('terminology__icd_10_pcs') }} as icd_10_procedure_lookup
+        on procedure_codes.procedure_code_type = 'icd-10-pcs'
+       and procedure_codes.procedure_code = replace(cast(icd_10_procedure_lookup.icd_10_pcs as {{ string_type }}), '.', '')
+    left join {{ ref('terminology__icd_9_pcs') }} as icd_9_procedure_lookup
+        on procedure_codes.procedure_code_type = 'icd-9-pcs'
+       and procedure_codes.procedure_code = replace(cast(icd_9_procedure_lookup.icd_9_pcs as {{ string_type }}), '.', '')
+    group by
+          procedure_codes._dq_claim_id_key
+        , procedure_codes._dq_claim_line_number_key
+        , procedure_codes._dq_data_source_key
 ),
 
 final as (
@@ -156,12 +213,20 @@ final as (
         , {{ dq_logical_int_flag_sql("source_rows.diagnosis_code_1 is null") }} as diagnosis_code_1_null
         , {{ dq_logical_int_flag_sql(diagnosis_code_populated_where_sql ~ " and source_rows.diagnosis_code_type is null") }} as diagnosis_code_type_null_when_diagnosis_code_present
         , {{ dq_logical_int_flag_sql(diagnosis_code_type_invalid_where) }} as diagnosis_code_type_invalid
-        , {{ dq_logical_int_flag_sql("source_rows.diagnosis_code_1 is not null and " ~ diagnosis_code_type_valid_where ~ " and ((lower(cast(source_rows.diagnosis_code_type as " ~ string_type ~ ")) = 'icd-10-cm' and not exists (select 1 from " ~ ref('terminology__icd_10_cm') ~ " as diagnosis_lookup where replace(cast(source_rows.diagnosis_code_1 as " ~ string_type ~ "), '.', '') = replace(cast(diagnosis_lookup.icd_10_cm as " ~ string_type ~ "), '.', ''))) or (lower(cast(source_rows.diagnosis_code_type as " ~ string_type ~ ")) = 'icd-9-cm' and not exists (select 1 from " ~ ref('terminology__icd_9_cm') ~ " as diagnosis_lookup where replace(cast(source_rows.diagnosis_code_1 as " ~ string_type ~ "), '.', '') = replace(cast(diagnosis_lookup.icd_9_cm as " ~ string_type ~ "), '.', ''))))") }} as diagnosis_code_1_invalid
-        , {{ dq_logical_int_flag_sql(diagnosis_code_type_valid_where ~ " and (" ~ secondary_diagnosis_invalid_clauses | join(" or ") ~ ")") }} as diagnosis_code_2_to_25_invalid
+        , cast(coalesce(diagnosis_code_flags.diagnosis_code_1_invalid, 0) as {{ dbt.type_int() }}) as diagnosis_code_1_invalid
+        , cast(coalesce(diagnosis_code_flags.diagnosis_code_2_to_25_invalid, 0) as {{ dbt.type_int() }}) as diagnosis_code_2_to_25_invalid
         , {{ dq_logical_int_flag_sql(procedure_code_populated_where_sql ~ " and source_rows.procedure_code_type is null") }} as procedure_code_type_null_when_procedure_code_present
         , {{ dq_logical_int_flag_sql(procedure_code_type_invalid_where) }} as procedure_code_type_invalid
-        , {{ dq_logical_int_flag_sql(procedure_code_type_valid_where ~ " and (" ~ procedure_invalid_clauses | join(" or ") ~ ")") }} as procedure_code_1_to_25_invalid
+        , cast(coalesce(procedure_code_flags.procedure_code_1_to_25_invalid, 0) as {{ dbt.type_int() }}) as procedure_code_1_to_25_invalid
     from source_rows
+    left join diagnosis_code_flags
+        on source_rows._dq_claim_id_key = diagnosis_code_flags._dq_claim_id_key
+       and source_rows._dq_claim_line_number_key = diagnosis_code_flags._dq_claim_line_number_key
+       and source_rows._dq_data_source_key = diagnosis_code_flags._dq_data_source_key
+    left join procedure_code_flags
+        on source_rows._dq_claim_id_key = procedure_code_flags._dq_claim_id_key
+       and source_rows._dq_claim_line_number_key = procedure_code_flags._dq_claim_line_number_key
+       and source_rows._dq_data_source_key = procedure_code_flags._dq_data_source_key
     left join {{ ref('terminology__admit_source') }} as admit_source_lookup
         on cast(source_rows.admit_source_code as {{ string_type }}) = cast(admit_source_lookup.admit_source_code as {{ string_type }})
     left join {{ ref('terminology__admit_type') }} as admit_type_lookup

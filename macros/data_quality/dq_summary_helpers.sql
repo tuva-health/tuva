@@ -15,6 +15,14 @@
     {{ return(models) }}
 {% endmacro %}
 
+{% macro dq_claims_structural_model_names() %}
+    {{ return([
+        'input_layer__eligibility',
+        'input_layer__medical_claim',
+        'input_layer__pharmacy_claim'
+    ]) }}
+{% endmacro %}
+
 {% macro dq_expected_final_marts() %}
     {% if not execute %}
         {{ return([]) }}
@@ -112,6 +120,17 @@
     {{ return('__dq_null__') }}
 {% endmacro %}
 
+{% macro dq_empty_row_sql() %}
+    select 1 as _dq_empty_row
+{% endmacro %}
+
+{% macro dq_empty_result_guard_sql() %}
+    from (
+        {{ dq_empty_row_sql() }}
+    ) as dq_empty_row
+    where 1 = 0
+{% endmacro %}
+
 {% macro dq_grouped_rowcount_sql(relation, group_cols=[]) %}
     select
         {% for column_name in group_cols %}
@@ -139,7 +158,7 @@
         , cast(count(*) as {{ dbt.type_numeric() }}) as row_count
     from {{ relation }}
     {% if dq_has_column(actual_columns, 'data_source') %}
-    group by 1
+    group by coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
     {% endif %}
 {% endmacro %}
 
@@ -157,6 +176,9 @@
         select
               '{{ dq_source_key_sentinel() }}' as data_source_key
             , cast(null as {{ dbt.type_string() }}) as data_source
+        from (
+            {{ dq_empty_row_sql() }}
+        ) as dq_empty_source
         where not exists (
             select 1
             from {{ relation }}
@@ -165,6 +187,22 @@
         select
               '{{ dq_source_key_sentinel() }}' as data_source_key
             , cast(null as {{ dbt.type_string() }}) as data_source
+    {% endif %}
+{% endmacro %}
+
+{% macro dq_missing_source_dimension_sql() %}
+    select
+          '{{ dq_source_key_sentinel() }}' as data_source_key
+        , cast(null as {{ dbt.type_string() }}) as data_source
+{% endmacro %}
+
+{% macro dq_source_key_expression_sql(relation, relation_alias='source_rows') %}
+    {% set actual_columns = dq_actual_columns(relation) %}
+
+    {% if dq_has_column(actual_columns, 'data_source') %}
+        {{ return("coalesce(cast(" ~ relation_alias ~ ".data_source as " ~ dbt.type_string() ~ "), '" ~ dq_source_key_sentinel() ~ "')") }}
+    {% else %}
+        {{ return("'" ~ dq_source_key_sentinel() ~ "'") }}
     {% endif %}
 {% endmacro %}
 
@@ -190,7 +228,7 @@
             {% endfor %}
         group by
             {% if has_data_source %}
-                1,
+                coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}'),
             {% endif %}
             {% for pk_col in pk_cols %}
                 {{ quote_column(pk_col) }}{% if not loop.last %}, {% endif %}
@@ -222,7 +260,7 @@
           ) as {{ dbt.type_numeric() }}) as null_pk_count
     from {{ relation }}
     {% if has_data_source %}
-    group by 1
+    group by coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
     {% endif %}
 {% endmacro %}
 
@@ -477,7 +515,7 @@
                           cast(replace(year_month, '-', '') as {{ dbt.type_string() }})
                       from {{ ref('reference_data__calendar') }}
                   )
-                group by 1
+                group by {{ source_key_expression }}
             ) as invalid_counts
                 on sources.data_source_key = invalid_counts.data_source_key
         {% endset %}
@@ -497,7 +535,7 @@
                     , cast(count(*) as {{ dbt.type_int() }}) as test_result
                 from {{ relation }}
                 where {{ predicate }}
-                group by 1
+                group by {{ source_key_expression }}
             ) as violations
                 on sources.data_source_key = violations.data_source_key
         {% endset %}

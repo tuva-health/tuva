@@ -5,7 +5,7 @@ seeds:
     description: Measures to concepts crosswalk. List of concepts used in each reporting measure.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_concepts
       tags: quality_measures
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -32,7 +32,7 @@ seeds:
     description: Overview of reporting measures.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_measures
       tags: quality_measures
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -63,7 +63,7 @@ seeds:
     description: Concepts to value sets crosswalk. List of codes in each concept.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _value_set_codes
       tags: quality_measures
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
