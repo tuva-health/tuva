@@ -65,7 +65,16 @@ models:
     +schema: input_layer
 ```
 
-3. Set the minimal connector variables based on the type of source you are mapping.
+3. Keep the dbt ref behavior flag enabled. The current connector template already includes this flag.
+
+```yaml
+flags:
+  require_ref_searches_node_package_before_root: true
+```
+
+This prevents dbt 1.11 ref warnings when Tuva refs the connector's root-project Input Layer models.
+
+4. Set the minimal connector variables based on the type of source you are mapping.
 
 For a claims connector:
 
