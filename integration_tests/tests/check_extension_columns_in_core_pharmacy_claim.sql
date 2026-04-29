@@ -23,6 +23,7 @@
 
 {%- set source_relation = ref('input_layer__pharmacy_claim') -%}
 {%- set extension_cols = [] -%}
+{%- set string_type = dbt.type_string() -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
     {%- if col.name.lower().startswith('x_') -%}
         {%- do extension_cols.append(col.name.lower()) -%}
@@ -46,7 +47,7 @@ select
     , claim_line_number
     , 'x_temp_ndc_code does not match ndc_code' as failure_reason
 from {{ ref('core__pharmacy_claim') }}
-where cast(x_temp_ndc_code as varchar) <> cast(ndc_code as varchar)
+where cast(x_temp_ndc_code as {{ string_type }}) <> cast(ndc_code as {{ string_type }})
    or (x_temp_ndc_code is null     and ndc_code is not null)
    or (x_temp_ndc_code is not null and ndc_code is null)
 
