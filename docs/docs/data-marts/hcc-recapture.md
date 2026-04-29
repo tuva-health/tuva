@@ -30,7 +30,7 @@ The type of gap closure if provided using the `gap_status` field. Here are the g
 | closed using lower coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is less than the prior year HCC |
 | new | Defined as an HCC that has not been coded in the past 2 years |
 | open | For gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year |
-| inappropriate for recapture | The specific HCC in question is "Open" and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it's not a chronic diagnosis |
+| ineligible for recapture | The specific HCC in question is "Open" and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it's not a chronic diagnosis |
 
 Instead of just listing an HCC as closed, more detail is provided which presents an opportunity to improve future HCC recapture initiatives.
 
