@@ -2,9 +2,9 @@
 {% if var('hcc_recapture_chronic_hccs') %}
 
 select
-    hcc_code
-    , model_version
-    , chronic_flag
+    cast(hcc_code as {{dbt.type_string()}}) as hcc_code
+    , cast(model_version as {{dbt.type_string()}}) as model_version
+    , cast(chronic_flag as {{dbt.type_int()}}) as chronic_flag
 from {{ ref('chronic_hccs') }}
 
 {% else %}

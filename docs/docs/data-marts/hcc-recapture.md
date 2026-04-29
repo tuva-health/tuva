@@ -39,3 +39,13 @@ When calculating HCC gap closure, YTD recapture curves are often used. Recapture
 
 All of the models below are the final models output from the HCC recapture data mart.
 
+## Customizations
+The following options are customizable in the HCC recapture mart to provide greater flexibility.
+
+### HCC Suspect Lists
+
+The `hcc_recapture_suspect_list` variable can be set to `true` in the `dbt_project.yml` in order to provide your own HCC suspect list from a payer or clinical source. The data needs to be input into a model called `suspect_hccs`. The required fields can be found in the `hcc_recapture__stg_suspect_hccs` model.
+
+### Chronic HCCs
+
+The `hcc_recapture_chronic_hccs` variable can be set to `true` in the `dbt_project.yml` in order ot provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.
