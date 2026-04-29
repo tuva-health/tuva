@@ -167,14 +167,19 @@ If you later want to run clinical models or provider attribution, map those Inpu
 
 ### Step 4: Configure Tuva Vars
 
-Set the broad enablement vars in your `dbt_project.yml`.
+Set the dbt ref behavior flag and broad enablement vars in your `dbt_project.yml`.
 
 ```yaml
+flags:
+  require_ref_searches_node_package_before_root: true
+
 vars:
   claims_enabled: true
   # clinical_enabled: true
   # provider_attribution_enabled: true
 ```
+
+The `require_ref_searches_node_package_before_root` flag aligns dbt's ref resolution with dbt 1.11 behavior and prevents warnings when Tuva refs your root-project Input Layer models.
 
 Start with `claims_enabled: true` for a claims-only implementation. Enable `clinical_enabled` or `provider_attribution_enabled` only after those corresponding Input Layer tables are mapped.
 
