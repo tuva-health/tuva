@@ -43,7 +43,7 @@ with add_rankings as (
         order by 
             hcc_type_rank asc,
             suspect_hcc_flag asc   -- 0 preferred over 1
-    ) as hcc_type_rank
+    ) as best_rank
     from add_rankings
 )
 
@@ -56,7 +56,7 @@ with add_rankings as (
       *
       , min(gap_status_rank) over (partition by person_id, payer, hcc_code, model_version, payment_year) as min_gap_status_rank 
       from best_hcc_type
-      where hcc_type_rank = 1
+      where best_rank = 1
     )
     where min_gap_status_rank = gap_status_rank
 )
