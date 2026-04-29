@@ -38,20 +38,27 @@ with add_rankings as (
     -- 2. If tie → prefer recapture (suspect_hcc_flag = 0)
 , best_hcc_type as (
     select *
-    from add_rankings
-    qualify row_number() over (
+    , row_number() over (
         partition by person_id, payer, hcc_code, model_version, payment_year
         order by 
             hcc_type_rank asc,
             suspect_hcc_flag asc   -- 0 preferred over 1
-    ) = 1
+    ) as hcc_type_rank
+    from add_rankings
 )
 
 -- Pick the best gap status
 , best_gap_status as (
-    select *
-    from best_hcc_type
-    qualify min(gap_status_rank) over (partition by person_id, payer, hcc_code, model_version, payment_year) = gap_status_rank
+    select 
+      * 
+    from (
+      select 
+      *
+      , min(gap_status_rank) over (partition by person_id, payer, hcc_code, model_version, payment_year) as min_gap_status_rank 
+      from best_hcc_type
+      where hcc_type_rank = 1
+    )
+    where min_gap_status_rank = gap_status_rank
 )
 
 -- Find the minimum hierarchy for open hccs
