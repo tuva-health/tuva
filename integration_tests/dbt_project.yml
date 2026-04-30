@@ -74,7 +74,8 @@ seeds:
     raw_data__lab_result:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('lab_result') }}"
     raw_data__medical_claim:
-      +batch_size: 200
+      +meta:
+        batch_size: 200
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('medical_claim') }}"
     raw_data__observation:
       +post-hook: "{{ the_tuva_project.load_versioned_synthetic_seed('observation') }}"

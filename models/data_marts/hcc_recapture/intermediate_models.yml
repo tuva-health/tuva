@@ -12,19 +12,20 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - hcc_code
-            - data_source
-            - payer
-            - model_version
-            - collection_year
-            - hcc_hierarchy_group
-            - recorded_date
-            - rendering_npi
-            - claim_id
-            - condition_type
-            - reason
+          arguments:
+            combination_of_columns:
+              - person_id
+              - hcc_code
+              - data_source
+              - payer
+              - model_version
+              - collection_year
+              - hcc_hierarchy_group
+              - recorded_date
+              - rendering_npi
+              - claim_id
+              - condition_type
+              - reason
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -85,19 +86,20 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - hcc_code
-            - data_source
-            - payer
-            - model_version
-            - collection_year
-            - hcc_hierarchy_group
-            - recorded_date
-            - rendering_npi
-            - claim_id
-            - condition_type
-            - suspect_hcc_flag
+          arguments:
+            combination_of_columns:
+              - person_id
+              - hcc_code
+              - data_source
+              - payer
+              - model_version
+              - collection_year
+              - hcc_hierarchy_group
+              - recorded_date
+              - rendering_npi
+              - claim_id
+              - condition_type
+              - suspect_hcc_flag
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -160,14 +162,15 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - hcc_code
-            - payer
-            - model_version
-            - payment_year
-            - hcc_hierarchy_group
-            - suspect_hcc_flag
+          arguments:
+            combination_of_columns:
+              - person_id
+              - hcc_code
+              - payer
+              - model_version
+              - payment_year
+              - hcc_hierarchy_group
+              - suspect_hcc_flag
     columns:
       - name: person_id
         description: A unique identifier for a person.

@@ -43,4 +43,4 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('raw_data__observation') }}
+from {{ tuva_source('observation') }}
