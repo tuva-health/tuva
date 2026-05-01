@@ -20,12 +20,14 @@ select distinct
     , model_version
     , hcc_code
     , gap_status
-    , recapture_flag
+    , recapturable_flag
     , row_number() over (partition by person_id, payer, payment_year, model_version, hcc_code order by recorded_date asc) as earliest_hcc_code
-from {{ ref('hcc_recapture__hcc_status') }}
-where gap_status not in ('inappropriate for recapture', 'new')
-  and gap_status is not null
-  and suspect_hcc_flag = 0
+from {{ ref('hcc_recapture__hcc_status')}}
+where 1=1
+  and gap_status not in ('ineligible for recapture', 'new')
+  and hcc_type in ('captured', 'coded')
+  and recapturable_flag = 1
+  and filtered_by_hierarchy_flag = 0
 )
 
 , monthly_hcc_counts as (
