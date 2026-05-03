@@ -1,0 +1,209 @@
+version: 2
+
+models:
+  - name: core__patient
+    description: >
+      Patient dimension table containing one record per unique patient.
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier"
+        tests:
+          - not_null
+          - unique
+      - name: sex
+        description: "Patient sex"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['male', 'female', 'unknown']
+      - name: birth_date
+        description: "Patient date of birth"
+        tests:
+          - not_null
+      - name: death_flag
+        description: "1 if patient is deceased 0 otherwise"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__encounter
+    description: >
+      Encounter fact table containing one record per unique patient encounter.
+    columns:
+      - name: encounter_id
+        description: "Unique encounter identifier"
+        tests:
+          - not_null
+          - unique
+      - name: encounter_type
+        description: "Type of encounter"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - acute inpatient
+                - ambulatory surgery center
+                - emergency department
+                - home health
+                - hospice
+                - inpatient psychiatric
+                - inpatient rehabilitation
+                - lab
+                - office visit
+                - outpatient
+                - outpatient psychiatric
+                - outpatient rehabilitation
+                - skilled nursing facility
+                - telehealth
+                - urgent care
+      - name: encounter_start_date
+        description: "Date the encounter began"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__condition
+    description: >
+      Condition fact table containing one record per unique patient condition.
+    columns:
+      - name: condition_id
+        description: "Unique condition identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: condition_type
+        description: "Type of condition claim based or clinical"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['claims', 'clinical']
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__procedure
+    description: >
+      Procedure fact table containing one record per unique patient procedure.
+    columns:
+      - name: procedure_id
+        description: "Unique procedure identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: procedure_type
+        description: "Type of procedure claim based or clinical"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['claims', 'clinical']
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__medication
+    description: >
+      Medication fact table containing one record per unique patient medication.
+    columns:
+      - name: medication_id
+        description: "Unique medication identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__lab_result
+    description: >
+      Lab result fact table containing one record per unique patient lab result.
+    columns:
+      - name: lab_result_id
+        description: "Unique lab result identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__observation
+    description: >
+      Observation fact table containing one record per unique patient observation.
+    columns:
+      - name: observation_id
+        description: "Unique observation identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__immunization
+    description: >
+      Immunization fact table containing one record per unique patient immunization.
+    columns:
+      - name: immunization_id
+        description: "Unique immunization identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
+
+  - name: core__appointment
+    description: >
+      Appointment fact table containing one record per unique patient appointment.
+    columns:
+      - name: appointment_id
+        description: "Unique appointment identifier"
+        tests:
+          - not_null
+          - unique
+      - name: patient_id
+        description: "Foreign key to patient"
+        tests:
+          - not_null
+      - name: tuva_last_run
+        description: "Timestamp of last dbt run"
+        tests:
+          - not_null
