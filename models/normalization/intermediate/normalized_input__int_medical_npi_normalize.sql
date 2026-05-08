@@ -4,6 +4,7 @@
    )
 }}
 
+with base as (
 select distinct
     med.claim_id
   , med.claim_line_number
@@ -40,3 +41,33 @@ left outer join {{ ref('provider_data__provider') }} as fac_prov
   on med.facility_npi = fac_prov.npi
   and fac_prov.entity_type_description = 'Organization'
   and med.claim_type = 'institutional'
+)
+
+, facility_npi_ranked as (
+select
+    data_source
+  , claim_id
+  , normalized_facility_npi
+  , normalized_facility_name
+  , row_number() over (partition by data_source, claim_id order by claim_line_number) as facility_npi_rank
+from base
+where normalized_facility_npi is not null
+)
+
+select 
+    base.claim_id
+  , base.claim_line_number
+  , base.claim_type
+  , base.data_source
+  , base.normalized_rendering_npi
+  , base.normalized_rendering_name
+  , base.normalized_billing_npi
+  , base.normalized_billing_name
+  , fac.normalized_facility_npi
+  , fac.normalized_facility_name
+  , base.tuva_last_run
+from base
+left join facility_npi_ranked as fac
+  on base.claim_id = fac.claim_id
+  and base.data_source = fac.data_source
+  and facility_npi_rank = 1

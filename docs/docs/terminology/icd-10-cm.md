@@ -76,9 +76,9 @@ Each ICD-10-CM code falls into one of two high-level categories:
 - **Non-billable headers**  
   These are category headers used to group related billable codes (e.g., `E11`, `C50`, `I50`). They cannot be used alone for billing or reporting.
 
-### The `header_flag` Field
+### The `billable_code_flag` Field
 
-To distinguish billable diagnosis codes from non-billable headers, CMS’s official ICD-10-CM order files include a column Tuva has named "header_flag" indicating whether that code is a header or not:
+To distinguish billable diagnosis codes from non-billable headers, CMS's official ICD-10-CM order files include a flag Tuva has named `billable_code_flag`:
 
 - `1` = **Billable code**  
   A specific, valid code that may be submitted on claims and used in clinical systems
@@ -147,11 +147,11 @@ Note: This is the maintenance process used by Tuva to maintain the current codes
         #Slices the single column dataframe into dataframe with required columns
         df['SN'] = df['Text'].str.slice(0,6)
         df['icd_10_cm'] = df['Text'].str.slice(6,14)
-        df['header_flag'] = df['Text'].str.slice(14,16)
+        df['billable_code_flag'] = df['Text'].str.slice(14,16)
         df['short_description'] = df['Text'].str.slice(16, 77)
         df['long_description'] = df['Text'].str.slice(77, )
 
-        df2 = df[['icd_10_cm', 'header_flag', 'short_description',    'long_description']]
+        df2 = df[['icd_10_cm', 'billable_code_flag', 'short_description',    'long_description']]
         # Remove leading/trailing whitespace from all string columns
         df2 = df2.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         

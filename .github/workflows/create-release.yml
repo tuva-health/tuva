@@ -1,6 +1,7 @@
 name: Create Release
 # creates a draft release if there is a push to main/ that changes "version" in /dbt_project.yml
 # user must manually publish the release and check the latest release option
+# versions ending in -rc or -RC are marked as prereleases
 
 on:
   push:
@@ -36,6 +37,12 @@ jobs:
           if [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            NEW_VERSION_LOWER=$(echo "$NEW_VERSION" | tr '[:upper:]' '[:lower:]')
+            if [[ "$NEW_VERSION_LOWER" == *-rc ]]; then
+              echo "prerelease=true" >> $GITHUB_OUTPUT
+            else
+              echo "prerelease=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
@@ -53,5 +60,5 @@ jobs:
           tag_name: v${{ steps.check_version.outputs.version }}
           name: the_tuva_project v${{ steps.check_version.outputs.version }}
           draft: true
-          prerelease: false
+          prerelease: ${{ steps.check_version.outputs.prerelease }}
           generate_release_notes: true

@@ -1,11 +1,15 @@
 import React from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-const TUVA_REPO_URL = 'https://github.com/tuva-health/tuva';
+const TUVA_RELEASES_URL = 'https://github.com/tuva-health/tuva/releases';
 
 export default function TuvaCurrentRelease() {
   const {siteConfig} = useDocusaurusContext();
-  const version = siteConfig?.customFields?.tuvaVersion || 'latest';
+  const releaseChannels = siteConfig?.customFields?.tuvaReleaseChannels;
+  const stableRelease = releaseChannels?.stable;
+  const version =
+    stableRelease?.version || siteConfig?.customFields?.tuvaVersion || 'latest';
+  const url = stableRelease?.url || TUVA_RELEASES_URL;
 
-  return <a href={TUVA_REPO_URL}>{version}</a>;
+  return <a href={url}>{version}</a>;
 }
