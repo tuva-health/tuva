@@ -1,5 +1,5 @@
 
-{% if var('hcc_recapture_chronic_hccs') %}
+{% if var('hcc_recapture_chronic_hccs', false) | as_bool %}
 
 select
     cast(hcc_code as {{dbt.type_string()}}) as hcc_code

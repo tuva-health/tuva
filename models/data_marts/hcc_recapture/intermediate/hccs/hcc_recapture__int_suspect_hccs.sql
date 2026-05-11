@@ -20,7 +20,7 @@ from {{ ref('hcc_suspecting__list_all') }}
 -- Exclude since already included in int_all_conditions
 where lower(reason) != 'prior coding history'
 
-{% if var('hcc_recapture_suspect_list') %}
+{% if var('hcc_recapture_suspect_list', false) | as_bool %}
 union all
 select
     *

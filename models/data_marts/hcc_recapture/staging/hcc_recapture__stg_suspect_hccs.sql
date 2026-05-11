@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('hcc_recapture_suspect_list') | as_bool
+     enabled = var('hcc_recapture_suspect_list', false) | as_bool
    )
 }}
 
