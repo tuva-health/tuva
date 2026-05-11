@@ -34,6 +34,7 @@
     {%- endif -%}
 
     {%- set passthrough_config = var('passthrough', {}) -%}
+    {#- Use .get (not config.meta_get): passthrough_config is a plain dict from var('passthrough'); Fusion maps lack meta_get. #}
     {%- set effective_prefix = prefix if prefix is not none else passthrough_config.get('prefix', 'x_') -%}
     {%- set effective_strip_prefix = strip_prefix if strip_prefix is not none else passthrough_config.get('strip', false) -%}
     {%- set alias_prefix = alias ~ '.' if alias else '' -%}

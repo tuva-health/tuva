@@ -4,18 +4,17 @@ models:
     description: >-
       The observation table contains information about measurements other than
       lab tests, such as blood pressure, height, and weight.
-    grain: Intended to be one record per observation record per data source.
-    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
       tags: input_layer
       materialized: view
+      meta:
+        grain: Intended to be one record per observation record per data source.
+        mapping_instructions: 'No explicit mapping instructions provided.'
     columns:
       - name: observation_id
         description: Unique identifier for each observation in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -69,10 +68,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: person_id
         description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -90,10 +89,12 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_quality_measures
+        config:
+          meta:
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -102,10 +103,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -125,10 +126,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -150,10 +151,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['quality_measures']
       - name: panel_id
         description: Unique identifier for the panel.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -173,10 +174,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: observation_date
         description: Date the observation was recorded.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -220,10 +221,10 @@ models:
         config:
           meta:
             data_type: date
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: observation_type
         description: Type of observation.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -261,10 +262,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -305,10 +306,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -330,10 +331,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_description
         description: Description of the source code in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -353,10 +354,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: normalized_code_type
         description: The normalized type of code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -378,10 +379,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: normalized_code
         description: The normalized code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -403,10 +404,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: normalized_description
         description: Normalized description of the code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -428,10 +429,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['quality_measures']
       - name: result
         description: The result of the record (e.g., lab test, observation, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -453,10 +454,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_units
         description: Source units of the lab test.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -476,10 +477,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: normalized_units
         description: Normalized units of the lab test.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -499,10 +500,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: source_reference_range_low
         description: The low end of the reference range from the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -522,10 +523,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: source_reference_range_high
         description: The high end of the reference range from the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -545,10 +546,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: normalized_reference_range_low
         description: The normalized low end of the reference range.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -568,10 +569,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: normalized_reference_range_high
         description: The normalized high end of the reference range.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -591,10 +592,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -615,10 +616,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
       - name: file_name
         description: The file name of the source file.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -630,10 +631,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -668,3 +669,5 @@ models:
         config:
           meta:
             data_type: timestamp
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []

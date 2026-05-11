@@ -4,13 +4,6 @@ models:
   - name: ed_classification__summary
     description: |-
       One record per emergency department visit, including ED classification results when the primary diagnosis code is captured by the Johnston algorithm.
-    grain: One record per emergency department encounter.
-    transformation_steps: |-
-      This model starts with all emergency department encounters from core__encounter.
-
-      It left joins the classified ED encounter subset to retain visits whose primary diagnosis code did not match the Johnston ED classification lookup.
-
-      It then joins the ED classification categories, provider terminology, and patient attributes to assemble the final summary table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -18,6 +11,14 @@ models:
       alias: summary
       tags: ed_classification
       materialized: table
+      meta:
+        grain: One record per emergency department encounter.
+        transformation_steps: |-
+          This model starts with all emergency department encounters from core__encounter.
+
+          It left joins the classified ED encounter subset to retain visits whose primary diagnosis code did not match the Johnston ED classification lookup.
+
+          It then joins the ED classification categories, provider terminology, and patient attributes to assemble the final summary table.
     columns:
       - name: encounter_id
         description: Unique identifier for the emergency department encounter.
@@ -96,13 +97,6 @@ models:
   - name: ed_classification__int_filter_encounter_with_classification
     description: |-
       ED encounters that received a single resolved ED classification category.
-    grain: One record per classified emergency department encounter.
-    transformation_steps: |-
-      This model reads the diagnosis-code probability mappings from ed_classification__map_primary_dx.
-
-      It keeps only rows where ed_classification_capture = 1, meaning the primary diagnosis code matched a Johnston algorithm lookup row and has classification probabilities available.
-
-      It assigns the encounter to the category with the highest Johnston probability across the ED classification columns.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -110,6 +104,14 @@ models:
       alias: _int_filter_encounter_with_classification
       tags: ed_classification
       materialized: table
+      meta:
+        grain: One record per classified emergency department encounter.
+        transformation_steps: |-
+          This model reads the diagnosis-code probability mappings from ed_classification__map_primary_dx.
+
+          It keeps only rows where ed_classification_capture = 1, meaning the primary diagnosis code matched a Johnston algorithm lookup row and has classification probabilities available.
+
+          It assigns the encounter to the category with the highest Johnston probability across the ED classification columns.
     columns:
       - name: encounter_id
         description: Unique identifier for the emergency department encounter.
@@ -144,13 +146,6 @@ models:
   - name: ed_classification__map_primary_dx
     description: |-
       Emergency department encounter primary diagnosis codes mapped to the Johnston ED classification probability columns.
-    grain: One record per emergency department encounter diagnosis mapping result.
-    transformation_steps: |-
-      This model reads emergency department encounters from core__encounter and keeps only encounter_id, primary_diagnosis_code, and primary_diagnosis_code_type.
-
-      It joins ICD-10-CM and ICD-9-CM diagnosis codes to the Johnston ED classification lookup seeds.
-
-      It outputs the Johnston probability columns together with ed_classification_capture, which flags diagnosis codes that were found in the lookup.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -158,6 +153,14 @@ models:
       alias: _map_primary_dx
       tags: ed_classification
       materialized: table
+      meta:
+        grain: One record per emergency department encounter diagnosis mapping result.
+        transformation_steps: |-
+          This model reads emergency department encounters from core__encounter and keeps only encounter_id, primary_diagnosis_code, and primary_diagnosis_code_type.
+
+          It joins ICD-10-CM and ICD-9-CM diagnosis codes to the Johnston ED classification lookup seeds.
+
+          It outputs the Johnston probability columns together with ed_classification_capture, which flags diagnosis codes that were found in the lookup.
     columns:
       - name: encounter_id
         description: Unique identifier for the emergency department encounter.

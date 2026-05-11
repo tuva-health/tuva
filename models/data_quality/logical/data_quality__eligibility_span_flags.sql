@@ -35,8 +35,8 @@ final as (
         , {{ dq_logical_int_flag_sql("source_rows.birth_date is not null and source_rows.death_date is not null and source_rows.birth_date > source_rows.death_date") }} as birth_date_after_death_date
         , {{ dq_logical_int_flag_sql("source_rows.birth_date is not null and (source_rows.birth_date < " ~ min_reasonable_date_sql ~ " or source_rows.birth_date > " ~ current_date_sql ~ ")") }} as birth_date_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.death_date is not null and (source_rows.death_date < " ~ min_reasonable_date_sql ~ " or source_rows.death_date > " ~ current_date_sql ~ ")") }} as death_date_out_of_reasonable_range
-        , {{ dq_logical_int_flag_sql("source_rows.death_flag is not null and lower(cast(source_rows.death_flag as " ~ string_type ~ ")) not in ('0', '1')") }} as death_flag_invalid
-        , {{ dq_logical_int_flag_sql("source_rows.death_flag is not null and lower(cast(source_rows.death_flag as " ~ string_type ~ ")) = '1' and source_rows.death_date is null") }} as death_flag_without_death_date
+        , {{ dq_logical_int_flag_sql("source_rows.death_flag is not null and source_rows.death_flag not in (0, 1)") }} as death_flag_invalid
+        , {{ dq_logical_int_flag_sql("source_rows.death_flag = 1 and source_rows.death_date is null") }} as death_flag_without_death_date
         , {{ dq_logical_int_flag_sql("source_rows.enrollment_start_date is not null and source_rows.enrollment_end_date is not null and source_rows.enrollment_start_date > source_rows.enrollment_end_date") }} as enrollment_start_after_end
         , {{ dq_logical_int_flag_sql("source_rows.payer_type is null") }} as payer_type_null
         , {{ dq_logical_int_flag_sql("source_rows.payer_type is not null and payer_type_lookup.payer_type is null") }} as payer_type_invalid
