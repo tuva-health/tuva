@@ -32,7 +32,7 @@ These vars affect runtime behavior across the package.
 
 | Variable | Default | Description |
 |-----------|---------|-------------|
-| `tuva_last_run` | Current UTC timestamp | Populates the `tuva_last_run` column in output models. |
+| `tuva_last_run` | `run_started_at` formatted `YYYY-MM-DD HH:MM:SS` (UTC) | Populates the `tuva_last_run` column in output models. Uses `strftime` only so it works under dbt Fusion (no `modules.pytz`). Override if you need another timezone or format. |
 | `tuva_schema_prefix` | unset | Prefixes output schemas, for example `myprefix_core`. |
 | `cms_hcc_payment_year` | Current year | CMS-HCC payment year used for risk scoring. |
 | `quality_measures_period_end` | Current year-end | Optional reporting-period end date for quality measures. |
