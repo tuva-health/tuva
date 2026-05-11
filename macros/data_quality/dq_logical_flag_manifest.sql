@@ -175,5 +175,5 @@
         , '{{ definition['display_name'] }}' as test_name
         , cast(sum(cast(coalesce({{ quote_column(definition['flag_column_name']) }}, 0) as {{ dbt.type_int() }})) as {{ dbt.type_int() }}) as test_result
     from {{ ref(definition['source_model_name']) }}
-    group by 1
+    group by cast(data_source as {{ dbt.type_string() }})
 {% endmacro %}

@@ -7,13 +7,13 @@ image: /img/tuva_project_overview_from_downloads.jpg
 slug: /
 ---
 
-import TuvaCurrentRelease from '@site/src/components/TuvaCurrentRelease';
+import TuvaReleaseChannels from '@site/src/components/TuvaReleaseChannels';
 
 # 👋 Welcome
 
 Welcome to the Tuva Project! Our goal is to **democratize access to high-quality healthcare analytics** by open-sourcing the tools and knowledge needed to transform raw healthcare data into analytics-ready data. To learn more about why we started the Tuva Project read our **manifesto [here](/community/manifesto)**.
 
-**The current release of Tuva is: <TuvaCurrentRelease />**
+<TuvaReleaseChannels />
 
 ![Tuva Project Overview](/img/tuva_project_overview_from_downloads.jpg)
 

@@ -36,7 +36,9 @@ aggregated_claims as (
         , cast(sum(case when {{ acute_inpatient_claim_where_sql }} then 1 else 0 end) as {{ dbt.type_int() }}) as acute_inpatient_claim_line_count
         , count(distinct case when {{ acute_inpatient_claim_where_sql }} then source_rows.drg_code end) as acute_inpatient_drg_distinct_count
     from source_rows
-    group by 1, 2
+    group by
+          source_rows.claim_id
+        , source_rows.data_source
 ),
 
 missing_eligibility_claims as (

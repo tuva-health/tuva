@@ -25,7 +25,9 @@ aggregated_claims as (
         , source_rows.data_source
         , count(distinct case when source_rows.person_id is not null then source_rows.person_id end) as person_id_distinct_count
     from source_rows
-    group by 1, 2
+    group by
+          source_rows.claim_id
+        , source_rows.data_source
 ),
 
 missing_eligibility_claims as (
