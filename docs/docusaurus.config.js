@@ -7,17 +7,95 @@
 const lightCodeTheme = require('prism-react-renderer/dist/index').github;
 const darkCodeTheme = require('prism-react-renderer/dist/index').dracula;
 const fs = require('fs');
+const https = require('https');
 const path = require('path');
+const {
+  DEFAULT_BLEEDING_EDGE,
+  addBleedingEdgePublishedAt,
+  buildTuvaReleaseChannels,
+} = require('./src/lib/tuvaReleaseChannels');
 const enableGtag = process.env.ENABLE_DOCS_GTAG === 'true';
-const tuvaDbtProjectPath = path.resolve(__dirname, '..', 'dbt_project.yml');
+const githubReleasesUrl = 'https://api.github.com/repos/tuva-health/tuva/releases?per_page=100';
+const githubMergedPullsUrl = 'https://api.github.com/repos/tuva-health/tuva/pulls?state=closed&base=main&sort=updated&direction=desc&per_page=100';
+const releaseChannelsFallbackPath = path.resolve(
+  __dirname,
+  'src/data/tuvaReleaseChannelsFallback.json'
+);
 
-function getTuvaVersion() {
+function readReleaseChannelsFallback() {
+  const fallback = JSON.parse(
+    fs.readFileSync(releaseChannelsFallbackPath, 'utf8')
+  );
+
+  return {
+    ...fallback,
+    bleedingEdge: fallback.bleedingEdge || DEFAULT_BLEEDING_EDGE,
+  };
+}
+
+function requestJson(url) {
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'tuva-docs-release-channel-build',
+  };
+  const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`;
+  }
+
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, {headers}, (response) => {
+      let body = '';
+
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => {
+        body += chunk;
+      });
+      response.on('end', () => {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          reject(
+            new Error(`GitHub API returned HTTP ${response.statusCode}`)
+          );
+          return;
+        }
+
+        try {
+          resolve(JSON.parse(body));
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+    request.setTimeout(10000, () => {
+      request.destroy(new Error('GitHub release lookup timed out'));
+    });
+    request.on('error', reject);
+  });
+}
+
+async function getTuvaReleaseChannels() {
   try {
-    const yamlText = fs.readFileSync(tuvaDbtProjectPath, 'utf8');
-    const match = yamlText.match(/^\s*version:\s*["']?([^"'\n#]+)["']?\s*$/m);
-    return match?.[1]?.trim() || 'latest';
-  } catch {
-    return 'latest';
+    const [releases, pullRequests] = await Promise.all([
+      requestJson(githubReleasesUrl),
+      requestJson(githubMergedPullsUrl),
+    ]);
+    const releaseChannels = addBleedingEdgePublishedAt(
+      buildTuvaReleaseChannels(releases),
+      pullRequests
+    );
+
+    if (!releaseChannels.stable) {
+      throw new Error('GitHub releases response did not include a stable release');
+    }
+
+    return releaseChannels;
+  } catch (error) {
+    console.warn(
+      `[docs] Unable to fetch Tuva GitHub releases. Using fallback release channels. ${error.message}`
+    );
+    return readReleaseChannelsFallback();
   }
 }
 
@@ -53,7 +131,6 @@ const config = {
     locales: ['en'],
   },
   customFields: {
-    tuvaVersion: getTuvaVersion(),
   },
 
   themes: ['@docusaurus/theme-mermaid'],
@@ -497,4 +574,15 @@ const config = {
     }),
 };
 
-module.exports = config
+module.exports = async function createConfig() {
+  const tuvaReleaseChannels = await getTuvaReleaseChannels();
+
+  return {
+    ...config,
+    customFields: {
+      ...config.customFields,
+      tuvaVersion: tuvaReleaseChannels.stable?.version || 'latest',
+      tuvaReleaseChannels,
+    },
+  };
+};

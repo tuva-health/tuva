@@ -1,0 +1,104 @@
+version: 2
+
+unit_tests:
+  - name: test_cms_hcc_int_members_defaults_missing_orec_by_age
+    description: >
+      Verifies that members with missing OREC and Medicare Status default to the
+      CMS age-based disabled logic: under 65 as Disabled and 65 or older as Aged.
+    model: cms_hcc__int_members
+    config:
+      enabled: "{{ var('claims_enabled', False) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('cms_hcc__stg_core__eligibility')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'integer' %}
+          select
+              'under_65' as person_id
+            , 'medicare' as payer
+            , cast('2023-01-01' as date) as enrollment_start_date
+            , cast('2024-12-31' as date) as enrollment_end_date
+            , cast(null as {{ string_type }}) as original_reason_entitlement_code
+            , cast(null as {{ string_type }}) as dual_status_code
+            , cast(null as {{ string_type }}) as medicare_status_code
+            , 'Continuing' as enrollment_status
+            , cast(null as {{ integer_type }}) as long_term_institutional_flag
+            , cast(null as {{ integer_type }}) as institutional_snp_flag
+          union all
+          select
+              'sixty_five' as person_id
+            , 'medicare' as payer
+            , cast('2023-01-01' as date) as enrollment_start_date
+            , cast('2024-12-31' as date) as enrollment_end_date
+            , cast(null as {{ string_type }}) as original_reason_entitlement_code
+            , cast(null as {{ string_type }}) as dual_status_code
+            , cast(null as {{ string_type }}) as medicare_status_code
+            , 'Continuing' as enrollment_status
+            , cast(null as {{ integer_type }}) as long_term_institutional_flag
+            , cast(null as {{ integer_type }}) as institutional_snp_flag
+      - input: ref('cms_hcc__stg_core__patient')
+        format: sql
+        rows: |
+          select
+              'under_65' as person_id
+            , 'female' as sex
+            , cast('1959-02-02' as date) as birth_date
+            , cast(null as date) as death_date
+          union all
+          select
+              'sixty_five' as person_id
+            , 'male' as sex
+            , cast('1958-02-02' as date) as birth_date
+            , cast(null as date) as death_date
+      - input: ref('cms_hcc__int_monthly_collection_dates')
+        format: sql
+        rows: |
+          select
+              cast('2023-01-01' as date) as collection_start_date
+            , cast('2023-12-31' as date) as collection_end_date
+            , 2023 as collection_year
+            , 2024 as payment_year
+    expect:
+      rows:
+        - person_id: 'under_65'
+          payer: 'medicare'
+          enrollment_status: 'Continuing'
+          gender: 'Female'
+          age_group: '60-64'
+          medicaid_status: 'No'
+          dual_status: 'Non'
+          orec: 'Disabled'
+          institutional_status: 'No'
+          originally_disabled_flag: 'No'
+          institutional_snp_flag: null
+          enrollment_status_default: false
+          medicaid_dual_status_default: true
+          orec_default: true
+          institutional_status_default: true
+          payment_year: 2024
+          collection_start_date: '2023-01-01'
+          collection_end_date: '2023-12-31'
+          tuva_last_run: '2024-01-01 00:00:00'
+        - person_id: 'sixty_five'
+          payer: 'medicare'
+          enrollment_status: 'Continuing'
+          gender: 'Male'
+          age_group: '65-69'
+          medicaid_status: 'No'
+          dual_status: 'Non'
+          orec: 'Aged'
+          institutional_status: 'No'
+          originally_disabled_flag: 'No'
+          institutional_snp_flag: null
+          enrollment_status_default: false
+          medicaid_dual_status_default: true
+          orec_default: true
+          institutional_status_default: true
+          payment_year: 2024
+          collection_start_date: '2023-01-01'
+          collection_end_date: '2023-12-31'
+          tuva_last_run: '2024-01-01 00:00:00'
