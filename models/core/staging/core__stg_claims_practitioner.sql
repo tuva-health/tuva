@@ -71,6 +71,6 @@ select
     , cast(parent_organization_name as {{ dbt.type_string() }}) as practice_affiliation
     , cast(primary_specialty_description as {{ dbt.type_string() }}) as specialty
     , cast(null as {{ dbt.type_string() }}) as sub_specialty
-    , cast(null as {{ dbt.type_string() }}) as data_source
+    , cast('NPPES' as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from provider
