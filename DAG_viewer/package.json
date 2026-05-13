@@ -1,0 +1,15 @@
+{
+  "name": "@tuva-project/dag-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-static-data.mjs",
+    "build:local": "TUVA_DAG_SOURCE_ROOT=.. node scripts/build-static-data.mjs",
+    "serve": "python3 -m http.server 4174 --bind 127.0.0.1 --directory dist"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0"
+  }
+}
+
