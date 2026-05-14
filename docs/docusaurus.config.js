@@ -465,9 +465,9 @@ const config = {
           // { to: 'journal-club', label: 'Journal Club', position: 'left' },
           // { to: 'manifesto', label: 'Manifesto', position: 'left' },
           {
-            href: 'https://terminology.thetuvaproject.com',
+            href: 'https://dagviewer.thetuvaproject.com',
             position: 'right',
-            label: 'Terminology Viewer',
+            label: 'DAG Viewer',
             className: 'navbar-no-ext-icon',
             hideExternalLinkIcon: true,
           },
