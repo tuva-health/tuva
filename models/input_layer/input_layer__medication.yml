@@ -5,6 +5,8 @@ models:
       The medication table contains information about medications ordered and/or
       administered during a patient encounter.
     grain: Intended to be one record per medication record per data source.
+    transformation_steps: |-
+      This model brings the input layer medication table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |

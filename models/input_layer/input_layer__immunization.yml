@@ -5,6 +5,8 @@ models:
       The immunization table contains information about immunizations
       administered to patients.
     grain: Intended to be one record per immunization event per data source.
+    transformation_steps: |-
+      This model brings the input layer immunization table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |

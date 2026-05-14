@@ -1741,8 +1741,7 @@ function buildSeedViewer(manifestNode) {
   }
 
   if (normalizedPath.includes("seeds/value_sets/")) {
-    const datasetKey = buildValueSetSeedPublicKey({ manifestNode, normalizedPath });
-    const fileName = datasetKey ? `${datasetKey}.csv_0_0_0.csv.gz` : null;
+    const fileName = buildValueSetSeedObjectFileName({ manifestNode, normalizedPath });
 
     return {
       sourceType: "seed_preview",
@@ -1758,7 +1757,10 @@ function buildSeedViewer(manifestNode) {
 }
 
 function buildTerminologySeedDownloadUrl({ manifestNode, baseDomain }) {
-  const datasetKey = (manifestNode?.name || "").replace(/^terminology__/, "");
+  const seedName = manifestNode?.name || "";
+  const datasetKey = seedName === "terminology__icd10_pcs_cms_ontology"
+    ? "icd_10_pcs_cms_ontology"
+    : seedName.replace(/^terminology__/, "");
 
   if (!datasetKey || datasetKey === "provider") {
     return null;
@@ -1767,18 +1769,74 @@ function buildTerminologySeedDownloadUrl({ manifestNode, baseDomain }) {
   return `${baseDomain}/versioned_terminology/latest/${datasetKey}.csv_0_0_0.csv.gz`;
 }
 
-function buildValueSetSeedPublicKey({ manifestNode, normalizedPath }) {
+function buildValueSetSeedObjectFileName({ manifestNode, normalizedPath }) {
   const seedName = manifestNode?.name || path.posix.basename(normalizedPath).replace(/\.csv$/i, "");
 
+  if (!seedName) {
+    return null;
+  }
+
+  if (seedName === "encounter_group_sk" || seedName === "encounter_type_sk" || seedName === "predictor_encounter_xwalk") {
+    return `${seedName}.csv.gz`;
+  }
+
+  if (seedName.startsWith("pqi__")) {
+    return null;
+  }
+
   if (seedName === "ed_classification__categories") {
-    return "ed_classification_categories";
+    return "ed_classification_categories.csv_0_0_0.csv.gz";
   }
 
   if (seedName.startsWith("ed_classification__")) {
-    return seedName.replace(/^ed_classification__/, "");
+    return `${seedName.replace(/^ed_classification__/, "")}.csv_0_0_0.csv.gz`;
   }
 
-  return seedName || null;
+  if (seedName.startsWith("ccsr__")) {
+    return `${seedName.replace(/^ccsr__/, "")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName.startsWith("chronic_conditions__")) {
+    return `${seedName.replace(/^chronic_conditions__/, "")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName === "cms_hcc__disease_hierarchy_flat") {
+    return null;
+  }
+
+  if (seedName.startsWith("cms_hcc__")) {
+    return `${seedName.replace(/^cms_hcc__/, "cms_hcc_")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName.startsWith("data_quality__")) {
+    return `${seedName.replace(/^data_quality__/, "data_quality_")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName === "hcc_suspecting__hcc_descriptions") {
+    return "hcc_suspecting_descriptions.csv_0_0_0.csv.gz";
+  }
+
+  if (seedName.startsWith("hcc_suspecting__")) {
+    return `${seedName.replace(/^hcc_suspecting__/, "hcc_suspecting_")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName.startsWith("pharmacy__")) {
+    return `${seedName.replace(/^pharmacy__/, "")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName === "quality_measures__value_sets") {
+    return "quality_measures_value_set_codes.csv_0_0_0.csv.gz";
+  }
+
+  if (seedName.startsWith("quality_measures__")) {
+    return `${seedName.replace(/^quality_measures__/, "quality_measures_")}.csv_0_0_0.csv.gz`;
+  }
+
+  if (seedName.startsWith("readmissions__")) {
+    return `${seedName.replace(/^readmissions__/, "")}.csv_0_0_0.csv.gz`;
+  }
+
+  return `${seedName}.csv_0_0_0.csv.gz`;
 }
 
 function sortNodeType(nodeType) {
