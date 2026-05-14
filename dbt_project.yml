@@ -1,7 +1,9 @@
 name: 'the_tuva_project'
 version: '0.18.0'
 config-version: 2
-require-dbt-version: ">=1.10.0"
+## Hub / Fusion: range must include 2.0.0 (<3.0.0) per https://docs.getdbt.com/guides/fusion-package-compat
+## Use separate bounds: Core 1.10.x rejects a single ">=a,<b" string in the array (invalid semantic version).
+require-dbt-version: [">=1.10.0", "<3.0.0"]
 
 profile: default
 
@@ -52,9 +54,9 @@ vars:
   tuva_seed_buckets: {}
 
   ## Run metadata
-  # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
-  # Default timezone is UTC.
-  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  # Clock time of the dbt run for the tuva_last_run column. Uses strftime only (no modules.pytz)
+  # so Jinja works under dbt Fusion; dbt invocations provide run_started_at (UTC in dbt Core 1.x).
+  tuva_last_run: "{{ run_started_at.strftime('%Y-%m-%d %H:%M:%S') }}"
 
   ## Optional testing and feature flags
   enable_data_quality: false

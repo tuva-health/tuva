@@ -10,10 +10,6 @@ models:
       business, are also present. This table allows you to input a custom
       attribution assignment from another system, or you can use the Provider
       Attribution data mart to do this assignment from claims data.
-    grain: Intended to be one record per person, member, year month, payer, plan, and data source.
-    transformation_steps: |-
-      This model brings the input layer provider_attribution table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
     tests:
       - dbt_utils.unique_combination_of_columns:
           config:
@@ -44,11 +40,12 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
       tags: input_layer
       materialized: view
+      meta:
+        grain: Intended to be one record per person, member, year month, payer, plan, and data source.
+        mapping_instructions: 'No explicit mapping instructions provided.'
     columns:
       - name: person_id
         description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -86,10 +83,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -102,10 +99,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: member_id
         description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -127,10 +124,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm']
       - name: year_month
         description: Unique year-month in the dataset computed from eligibility.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -168,10 +165,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
       - name: payer
         description: Name of the payer (i.e. health insurer) providing coverage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -185,10 +182,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
       - name: plan
         description: Name of the plan (i.e. sub contract) providing coverage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -202,10 +199,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -243,10 +240,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
       - name: payer_attributed_provider
         description: Unique identifier for the provider assigned to this patient-year_month by the payer.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -259,10 +256,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: payer_attributed_provider_practice
         description: Name of the practice for the payer attributed provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -275,10 +272,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: payer_attributed_provider_organization
         description: Name of the organization for the payer attributed provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -291,10 +288,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: payer_attributed_provider_lob
         description: Name of the line of business for the payer attributed provider (e.g. medicare, medicaid, commercial).
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -307,10 +304,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: custom_attributed_provider
         description: Unique identifier for the provider assigned to this patient-year_month by the user.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -323,10 +320,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: custom_attributed_provider_practice
         description: Name of the practice for the attributed provider assigned by the user.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -339,10 +336,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: custom_attributed_provider_organization
         description: Name of the organization for the attributed provider assigned by the user.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -355,10 +352,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
       - name: custom_attributed_provider_lob
         description: Name of the line of business for the attributed provider assigned by the user (e.g. medicare, medicaid, commercial).
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -371,3 +368,5 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']

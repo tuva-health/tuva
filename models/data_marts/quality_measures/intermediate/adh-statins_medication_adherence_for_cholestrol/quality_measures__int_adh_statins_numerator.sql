@@ -146,7 +146,7 @@ or use the current rx_fill_date
                   dispensing_date
                 , {{ dbt.dateadd (
                       datepart = "day"
-                    , interval = +1
+                    , interval = 1
                     , from_date_or_timestamp = "previous_fill_end_date"
                   ) }}
                 )

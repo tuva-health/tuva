@@ -236,10 +236,22 @@
         {% do structural_queries.append(query) %}
     {% endfor %}
 
+    {% if structural_queries | length > 0 %}
     select *
     from (
         {{ structural_queries | join('\nunion all\n') }}
     ) as structural_results
+    {% else %}
+    select
+          cast(null as {{ dbt.type_string() }}) as data_source
+        , cast(null as {{ dbt.type_string() }}) as table_name
+        , cast(null as {{ dbt.type_string() }}) as table_exists
+        , cast(null as {{ dbt.type_string() }}) as columns_exist
+        , cast(null as {{ dbt.type_string() }}) as data_types
+        , cast(null as {{ dbt.type_string() }}) as primary_keys
+        , cast(null as {{ dbt.type_int() }}) as row_count
+    {{ dq_empty_result_guard_sql() }}
+    {% endif %}
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source

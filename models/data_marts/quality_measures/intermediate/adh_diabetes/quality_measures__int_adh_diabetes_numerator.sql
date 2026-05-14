@@ -143,7 +143,7 @@ order by dispensing_date) as previous_ndc
                   dispensing_date
                 , {{ dbt.dateadd (
                       datepart = "day"
-                    , interval = +1
+                    , interval = 1
                     , from_date_or_timestamp = "previous_end_date"
                   ) }}
                 )

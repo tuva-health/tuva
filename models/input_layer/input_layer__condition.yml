@@ -5,19 +5,16 @@ models:
       The condition table contains information about medical conditions that
       patients have been officially diagnosed with or are suspected of having.
       This includes problems, admitting diagnosis codes, and billable diagnoses.
-    grain: Intended to be one record per condition record per data source.
-    transformation_steps: |-
-      This model brings the input layer condition table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: "{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}\n"
       tags: input_layer
       materialized: view
+      meta:
+        grain: Intended to be one record per condition record per data source.
+        mapping_instructions: 'No explicit mapping instructions provided.'
     columns:
       - name: condition_id
         description: Unique identifier for each condition in the table.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -67,10 +64,12 @@ models:
                   - dqi_financial_pmpm
                   - dqi_quality_measures
                   - dqi_readmission
+        config:
+          meta:
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: payer
         description: 'Name of the payer (i.e. health insurer) providing coverage.'
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['cms_hccs', 'hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -79,10 +78,12 @@ models:
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
+        config:
+          meta:
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['cms_hccs', 'hcc_recapture', 'hcc_suspecting']
       - name: person_id
         description: 'Unique identifier for each person in the dataset.'
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -95,10 +96,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
       - name: patient_id
         description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -112,10 +113,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: encounter_id
         description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -128,10 +129,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'semantic_layer']
       - name: claim_id
         description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -144,10 +145,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures']
       - name: recorded_date
         description: Date when the condition was recorded.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -195,10 +196,10 @@ models:
         config:
           meta:
             data_type: date
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'tuva_chronic_conditions']
       - name: onset_date
         description: Date when the condition first occurred.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -238,10 +239,10 @@ models:
         config:
           meta:
             data_type: date
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: resolved_date
         description: Date when the condition was resolved.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -285,10 +286,10 @@ models:
         config:
           meta:
             data_type: date
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: status
         description: Status of the record (e.g., condition, test, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_recapture']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -308,10 +309,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['hcc_recapture']
       - name: condition_type
         description: The type of condition i.e. problem, admitting, or billing.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['cms_hccs', 'hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -331,10 +332,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['cms_hccs', 'hcc_recapture', 'hcc_suspecting']
       - name: source_code_type
         description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -368,10 +369,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['quality_measures']
       - name: source_code
         description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -393,10 +394,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['quality_measures']
       - name: source_description
         description: Description of the source code in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -408,10 +409,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: normalized_code_type
         description: The normalized type of code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -425,10 +426,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_suspecting', 'quality_measures']
       - name: normalized_code
         description: The normalized code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_suspecting', 'quality_measures', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -442,10 +443,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_suspecting', 'quality_measures', 'tuva_chronic_conditions']
       - name: normalized_description
         description: Normalized description of the code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -457,10 +458,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: condition_rank
         description: The numerical ranking of a diagnosis code in a claim.  Principle  diagnosis code is given a ranking of 1. Claims data typically has a  strict ranking of conditions whereas medical records will often not  have this information or the information won't be accurate.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ccsr', 'cms_hccs', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -480,10 +481,10 @@ models:
         config:
           meta:
             data_type: number
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ccsr', 'cms_hccs', 'hcc_suspecting']
       - name: present_on_admit_code
         description: The present_on_admit_code related to the condition.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -495,10 +496,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: present_on_admit_description
         description: The description of the present_on_admit_code for the condition.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -510,10 +511,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: data_source
         description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -534,10 +535,10 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'cms_hccs', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
       - name: file_name
         description: The file name of the source file.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -549,10 +550,10 @@ models:
         config:
           meta:
             data_type: varchar
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []
       - name: ingest_datetime
         description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -587,3 +588,5 @@ models:
         config:
           meta:
             data_type: timestamp
+            mapping_instructions: 'No explicit mapping instructions provided.'
+            required_for_data_marts: []

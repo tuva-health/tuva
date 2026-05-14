@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# - Works with dbt Core (typical local setup) or dbt Fusion when `dbt` on PATH is Fusion.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -6,44 +7,128 @@ PROJECT_DIR="${REPO_ROOT}/integration_tests"
 PROFILES_DIR="${DBT_PROFILES_DIR:-$HOME/.dbt}"
 PROFILE="${TUVA_DBT_PROFILE:-${DBT_PROFILE:-}}"
 
-if [[ ! -d "${PROJECT_DIR}" ]]; then
-  echo "integration_tests project not found at ${PROJECT_DIR}" >&2
-  exit 1
-fi
-
-if [[ ! -f "${PROFILES_DIR}/profiles.yml" ]]; then
-  echo "No dbt profiles.yml found at ${PROFILES_DIR}/profiles.yml" >&2
-  echo "Set DBT_PROFILES_DIR or create ~/.dbt/profiles.yml for local development." >&2
-  exit 1
-fi
-
-if [[ -z "${PROFILE}" ]]; then
-  if grep -qE '^[[:space:]]*default:' "${PROFILES_DIR}/profiles.yml"; then
-    PROFILE="default"
-  elif grep -qE '^[[:space:]]*tuva_dev:' "${PROFILES_DIR}/profiles.yml"; then
-    PROFILE="tuva_dev"
-  else
-    echo "Could not determine dbt profile for local Tuva development." >&2
-    echo "Set TUVA_DBT_PROFILE (or DBT_PROFILE) to one of your local profile names." >&2
-    echo "Available profiles:" >&2
-    awk '/^[^[:space:]][^:]*:/{name=$1; sub(/:$/,"",name); print "  - " name}' "${PROFILES_DIR}/profiles.yml" >&2
+require_integration_tests_dir() {
+  if [[ ! -d "${PROJECT_DIR}" ]]; then
+    echo "integration_tests project not found at ${PROJECT_DIR}" >&2
     exit 1
   fi
-fi
+}
 
-if [[ $# -eq 0 ]]; then
-  exec dbt
-fi
+require_profiles_yml() {
+  if [[ ! -f "${PROFILES_DIR}/profiles.yml" ]]; then
+    echo "No dbt profiles.yml found at ${PROFILES_DIR}/profiles.yml" >&2
+    echo "Set DBT_PROFILES_DIR or create ~/.dbt/profiles.yml for local development." >&2
+    exit 1
+  fi
+}
 
-if [[ "${1}" == -* ]]; then
+# Return 0 when the active `dbt` is Fusion (binary path contains dbt-fusion, or first line of
+# `dbt --version` says dbt-fusion — needed for pyenv/asdf shims).
+dbt_is_fusion() {
+  local binpath
+  binpath="$(command -v dbt 2>/dev/null || true)"
+  if [[ "${binpath}" == *dbt-fusion* ]]; then
+    return 0
+  fi
+  if dbt --version 2>/dev/null | head -1 | grep -q 'dbt-fusion'; then
+    return 0
+  fi
+  return 1
+}
+
+# Fusion resolves seeds under dbt_packages/the_tuva_project/..., which does not exist when the
+# package is the parent checkout. Symlink the repo root there so CSV seeds resolve (dbt1308).
+ensure_fusion_seed_path_shim() {
+  mkdir -p "${REPO_ROOT}/dbt_packages"
+  ln -sfn .. "${REPO_ROOT}/dbt_packages/the_tuva_project"
+}
+
+# Single-thread runs reduce DuckDB internal errors when seed post-hooks read from S3 in parallel.
+# Skip for bare --version / --help invocations.
+fusion_wants_threads_one() {
+  [[ $# -gt 0 ]] || return 1
+  case "${1}" in
+    --version | -v | --help | -h) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+resolve_profile() {
+  if [[ -n "${PROFILE}" ]]; then
+    return 0
+  fi
+
+  if grep -qE '^[[:space:]]*default:' "${PROFILES_DIR}/profiles.yml"; then
+    PROFILE="default"
+    return 0
+  fi
+
+  if grep -qE '^[[:space:]]*tuva_dev:' "${PROFILES_DIR}/profiles.yml"; then
+    PROFILE="tuva_dev"
+    return 0
+  fi
+
+  local count=0
+  local single=""
+  local name
+  while IFS= read -r name; do
+    [[ -z "${name}" ]] && continue
+    single="${name}"
+    count=$((count + 1))
+  done < <(awk '/^[^[:space:]#][^:]*:$/{name=$1; sub(/:$/,"",name); print name}' "${PROFILES_DIR}/profiles.yml")
+
+  if [[ "${count}" -eq 1 ]]; then
+    PROFILE="${single}"
+    return 0
+  fi
+
+  echo "Could not determine dbt profile for local dbt development." >&2
+  echo "Set TUVA_DBT_PROFILE (or DBT_PROFILE) to one of your local profile names." >&2
+  echo "Available profiles:" >&2
+  awk '/^[^[:space:]#][^:]*:/{name=$1; sub(/:$/,"",name); print "  - " name}' "${PROFILES_DIR}/profiles.yml" >&2
+  exit 1
+}
+
+run_dbt() {
   exec dbt "$@"
-fi
+}
 
-CMD="$1"
-shift
+main() {
+  require_integration_tests_dir
+  require_profiles_yml
 
-exec dbt "${CMD}" \
-  --project-dir "${PROJECT_DIR}" \
-  --profiles-dir "${PROFILES_DIR}" \
-  --profile "${PROFILE}" \
-  "$@"
+  local use_fusion=false
+  if dbt_is_fusion; then
+    use_fusion=true
+    ensure_fusion_seed_path_shim
+    export TUVA_DBT_FUSION=1
+  fi
+
+  resolve_profile
+
+  local -a fusion_extra=()
+  if [[ "${use_fusion}" == true ]] && fusion_wants_threads_one "$@"; then
+    fusion_extra=(--threads 1)
+  fi
+
+  if [[ $# -eq 0 ]]; then
+    run_dbt "${fusion_extra[@]}"
+  fi
+
+  if [[ "${1}" == -* ]]; then
+    run_dbt "${fusion_extra[@]}" "$@"
+  fi
+
+  local cmd="$1"
+  shift
+
+  # Match dbt flag ordering from Core/Fusion: subcommand, project/profile flags, then threads.
+  run_dbt "${cmd}" \
+    --project-dir "${PROJECT_DIR}" \
+    --profiles-dir "${PROFILES_DIR}" \
+    --profile "${PROFILE}" \
+    "${fusion_extra[@]}" \
+    "$@"
+}
+
+main "$@"
