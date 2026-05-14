@@ -188,6 +188,8 @@ const state = {
 const app = document.querySelector("#app");
 const persistViewportDebounced = debounce(storeViewport, 160);
 const persistPositionsDebounced = debounce(storePositions, 160);
+let sceneSyncFrame = null;
+let viewportSyncFrame = null;
 const requestSeedPreviewDebounced = debounce((nodeId, query) => {
   requestSeedPreview(nodeId, { query, page: 1 });
 }, 220);
@@ -447,9 +449,16 @@ function render() {
   app.innerHTML = `
     <div class="app-shell">
       ${state.launcherOpen ? '<button class="launcher-backdrop" id="launcher-backdrop" type="button" aria-label="Close DAG picker"></button>' : ""}
-      <div class="top-controls">
+      <header class="top-controls app-header">
+        <a class="site-brand" href="https://www.thetuvaproject.com" target="_blank" rel="noreferrer" aria-label="The Tuva Project docs">
+          <img class="site-brand-logo" src="./assets/the_tuva_project_logo_new.png" alt="The Tuva Project" />
+        </a>
+        <div class="app-header-title">DAG Viewer</div>
         ${renderDagLauncher()}
-      </div>
+        <div class="app-header-actions">
+          ${renderHeaderActions()}
+        </div>
+      </header>
       ${renderRefreshErrorNotice()}
 
       <div class="zoom-controls">
@@ -755,12 +764,27 @@ function formatSystemOverviewLabel(targetKey) {
 
 function renderDagLauncher() {
   const currentTarget = getCurrentTarget();
-  const actionButtons = [renderLegend()];
+
+  return `
+    <div class="dag-launcher ${state.launcherOpen ? "is-open" : ""}">
+      <button class="dag-launcher-trigger" id="dag-launcher-trigger" type="button" aria-expanded="${String(state.launcherOpen)}">
+        <span class="dag-launcher-copy">
+          <span class="dag-launcher-title">${escapeHtml(currentTarget?.label || state.payload?.target?.label || "Select DAG")}</span>
+        </span>
+        <span class="dag-launcher-caret" aria-hidden="true">${state.launcherOpen ? "Close" : "Browse"}</span>
+      </button>
+      ${state.launcherOpen ? renderTargetPanel() : ""}
+    </div>
+  `;
+}
+
+function renderHeaderActions() {
+  const actions = [];
 
   if (!IS_STATIC_MODE) {
-    actionButtons.push(`
+    actions.push(`
       <button
-        class="dag-launcher-action"
+        class="dag-header-action"
         id="refresh-button"
         type="button"
         ${state.refresh.status === "refreshing" ? "disabled" : ""}
@@ -770,28 +794,10 @@ function renderDagLauncher() {
     `);
   }
 
-  return `
-    <div class="dag-launcher ${state.launcherOpen ? "is-open" : ""}">
-      <div class="dag-launcher-row">
-        <div class="dag-launcher-row-left">
-          <button class="dag-launcher-trigger" id="dag-launcher-trigger" type="button" aria-expanded="${String(state.launcherOpen)}">
-            <span class="dag-launcher-copy">
-              <span class="dag-launcher-title">${escapeHtml(currentTarget?.label || state.payload?.target?.label || "Select DAG")}</span>
-            </span>
-            <span class="dag-launcher-caret" aria-hidden="true">${state.launcherOpen ? "Close" : "Browse"}</span>
-          </button>
-          <div class="dag-launcher-actions">${actionButtons.join("")}</div>
-        </div>
-        <div class="dag-launcher-row-right">
-          <div class="dag-status-inline">
-            <div class="dag-status-label ${renderStatusClass(state.refresh)}" id="status-pill">${escapeHtml(renderStatusLabel(state.refresh))}</div>
-            <div class="dag-status-meta" id="status-meta">${escapeHtml(renderHeaderRefreshMeta(state.refresh))}</div>
-          </div>
-        </div>
-      </div>
-      ${state.launcherOpen ? renderTargetPanel() : ""}
-    </div>
-  `;
+  actions.push(renderLegend());
+  actions.push('<button class="dag-header-action" id="clear-button" type="button">Reset</button>');
+
+  return actions.join("");
 }
 
 function renderTargetPanel() {
@@ -1689,7 +1695,7 @@ function renderRefreshErrorNotice() {
 function renderLegend() {
   return `
     <details class="header-legend">
-      <summary class="header-legend-trigger dag-launcher-action">Legend</summary>
+      <summary class="header-legend-trigger dag-header-action">Legend</summary>
       <div class="header-legend-panel">
         <div class="legend-items">
         ${renderLegendItem("Input Table", "input")}
@@ -1762,6 +1768,7 @@ function renderFatalError(error) {
 
 function bindHudEvents() {
   document.querySelector("#refresh-button")?.addEventListener("click", handleRefreshClick);
+  document.querySelector("#clear-button")?.addEventListener("click", handleClearClick);
   document.querySelector("#fit-button")?.addEventListener("click", handleFitClick);
   document.querySelector("#zoom-in-button")?.addEventListener("click", () => zoomCanvas(1.12));
   document.querySelector("#zoom-out-button")?.addEventListener("click", () => zoomCanvas(1 / 1.12));
@@ -2200,6 +2207,31 @@ async function handleTargetItemClick(event) {
   await changeTarget(nextTargetKey);
 }
 
+async function handleClearClick() {
+  if (!confirmDiscardEditorChanges()) {
+    return;
+  }
+
+  clearStoredLayoutState(SYSTEM_OVERVIEW_TARGET_KEY);
+  state.launcherOpen = false;
+  state.activeNodeId = null;
+  state.openNodeId = null;
+  state.modalTabNodeId = null;
+  state.modalTab = null;
+  state.editor = createEmptyEditorState();
+  updateTargetQuery(SYSTEM_OVERVIEW_TARGET_KEY);
+
+  if (state.payload?.target?.key !== SYSTEM_OVERVIEW_TARGET_KEY) {
+    await fetchLineage({
+      preserveSelection: false,
+      targetKey: SYSTEM_OVERVIEW_TARGET_KEY
+    });
+    return;
+  }
+
+  handleFitClick({ persist: false });
+}
+
 function toggleLauncher() {
   state.launcherOpen = !state.launcherOpen;
   render();
@@ -2328,6 +2360,8 @@ function handlePointerMove(event) {
     return;
   }
 
+  event.preventDefault();
+
   const dx = event.clientX - state.drag.startClientX;
   const dy = event.clientY - state.drag.startClientY;
 
@@ -2338,7 +2372,7 @@ function handlePointerMove(event) {
   if (state.drag.type === "pan") {
     state.viewport.x = state.drag.originX + dx;
     state.viewport.y = state.drag.originY + dy;
-    syncScene();
+    scheduleViewportSync();
     persistViewportDebounced();
     return;
   }
@@ -2357,7 +2391,7 @@ function handlePointerMove(event) {
       });
     });
 
-    syncScene();
+    scheduleSceneSync();
     persistPositionsDebounced();
     return;
   }
@@ -2371,7 +2405,7 @@ function handlePointerMove(event) {
       y: nextY
     });
 
-    syncScene();
+    scheduleSceneSync();
     persistPositionsDebounced();
   }
 }
@@ -2436,7 +2470,12 @@ function handleStageWheel(event) {
   const rect = stage.getBoundingClientRect();
   const pointX = event.clientX - rect.left;
   const pointY = event.clientY - rect.top;
-  const zoomFactor = event.deltaY < 0 ? 1.08 : 1 / 1.08;
+  const normalizedDelta = event.deltaMode === 1
+    ? event.deltaY * 16
+    : event.deltaMode === 2
+      ? event.deltaY * rect.height
+      : event.deltaY;
+  const zoomFactor = Math.exp(-normalizedDelta * 0.001);
   const nextScale = clamp(state.viewport.scale * zoomFactor, MIN_SCALE, MAX_SCALE);
 
   zoomToPoint({
@@ -2475,7 +2514,7 @@ function zoomToPoint({ pointX, pointY, nextScale }) {
     viewportAdjusted: true
   };
 
-  syncScene();
+  scheduleViewportSync();
   persistViewportDebounced();
 }
 
@@ -2573,13 +2612,15 @@ function getTopInsetFromBottomWithinStage(stageRect, element) {
 }
 
 function syncScene() {
+  sceneSyncFrame = null;
+  syncViewportTransform();
+
   const scene = document.querySelector("#canvas-scene");
 
   if (!scene || !state.payload) {
     return;
   }
 
-  scene.style.transform = `translate(${state.viewport.x}px, ${state.viewport.y}px) scale(${state.viewport.scale})`;
   if (isSystemOverviewActive()) {
     syncSystemOverviewScene();
   } else {
@@ -2588,6 +2629,34 @@ function syncScene() {
     drawEdges();
   }
   syncZoomOnly();
+}
+
+function syncViewportTransform() {
+  viewportSyncFrame = null;
+  const scene = document.querySelector("#canvas-scene");
+
+  if (!scene) {
+    return;
+  }
+
+  scene.style.transform = `translate3d(${state.viewport.x}px, ${state.viewport.y}px, 0) scale(${state.viewport.scale})`;
+  syncZoomOnly();
+}
+
+function scheduleSceneSync() {
+  if (sceneSyncFrame !== null) {
+    return;
+  }
+
+  sceneSyncFrame = window.requestAnimationFrame(syncScene);
+}
+
+function scheduleViewportSync() {
+  if (viewportSyncFrame !== null) {
+    return;
+  }
+
+  viewportSyncFrame = window.requestAnimationFrame(syncViewportTransform);
 }
 
 function syncSystemOverviewScene() {
@@ -2873,7 +2942,7 @@ function handleGlobalKeydown(event) {
   }
 }
 
-function handleFitClick() {
+function handleFitClick({ persist = false } = {}) {
   if (!state.payload) {
     return;
   }
@@ -2888,6 +2957,10 @@ function handleFitClick() {
   state.viewport = { ...DEFAULT_VIEWPORT };
   state.needsInitialFit = true;
   render();
+
+  if (persist) {
+    persistLayoutState();
+  }
 }
 
 function closeModal() {
@@ -3729,6 +3802,16 @@ function persistLayoutState(options = {}) {
   writeStorageJson(getViewportStorageKey(targetKey), state.viewport);
   writeStorageJson(getPositionsStorageKey(targetKey), state.positions);
   writeStorageJson(getLayoutMetaKey(targetKey), state.layoutMeta);
+}
+
+function clearStoredLayoutState(targetKey) {
+  try {
+    window.localStorage.removeItem(getViewportStorageKey(targetKey));
+    window.localStorage.removeItem(getPositionsStorageKey(targetKey));
+    window.localStorage.removeItem(getLayoutMetaKey(targetKey));
+  } catch (error) {
+    return;
+  }
 }
 
 function readStorageJson(key) {
