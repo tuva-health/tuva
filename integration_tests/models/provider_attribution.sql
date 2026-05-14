@@ -6,15 +6,7 @@
    )
 }}
 
-{# Extension columns not supported for provider_attribution #}
-{%- set tuva_extensions -%}
-{%- endset -%}
-
-{%- set tuva_metadata -%}
-    , data_source
-{%- endset -%}
-
-{%- set provider_attribution_relation = ref('raw_data__provider_attribution') -%}
+{%- set provider_attribution_relation = tuva_source('provider_attribution') -%}
 
 {%- if execute -%}
   {%- set provider_attribution_columns = adapter.get_columns_in_relation(provider_attribution_relation) -%}
@@ -31,7 +23,7 @@
   {%- endif -%}
 {%- endset -%}
 
-select
+{%- set tuva_columns -%}
       person_id
     , {{ member_id_expr }} as member_id
     , patient_id
@@ -46,6 +38,18 @@ select
     , custom_attributed_provider_practice
     , custom_attributed_provider_organization
     , custom_attributed_provider_lob
+{%- endset -%}
+
+{# Extension columns not supported for provider_attribution #}
+{%- set tuva_extensions -%}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
+    , data_source
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ provider_attribution_relation }}

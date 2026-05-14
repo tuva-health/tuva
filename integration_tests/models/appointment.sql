@@ -4,7 +4,7 @@
    )
 }}
 
-select
+{%- set tuva_columns -%}
       appointment_id
     , person_id
     , patient_id
@@ -39,5 +39,23 @@ select
     , normalized_cancellation_reason_code_type
     , normalized_cancellation_reason_code
     , normalized_cancellation_reason_description
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , source_appointment_type_code as x_temp_source_appointment_type_code #}
+    {# , start_datetime as x_temp_start_datetime #}
+    {# , reason as zzz_temp_reason #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
     , data_source
-from {{ ref('raw_data__appointment') }}
+    , file_name
+    , ingest_datetime
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+from {{ tuva_source('appointment') }}

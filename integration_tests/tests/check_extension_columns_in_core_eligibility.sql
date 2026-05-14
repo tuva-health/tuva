@@ -41,7 +41,7 @@ select
     eligibility_id
     , 'x_temp_person_id does not match person_id' as failure_reason
 from {{ ref('core__eligibility') }}
-where cast(x_temp_person_id as {{ string_type }}) <> cast(person_id as {{ string_type }})
+where cast(x_temp_person_id as {{ dbt.type_string() }}) <> cast(person_id as {{ dbt.type_string() }})
    or (x_temp_person_id is null     and person_id is not null)
    or (x_temp_person_id is not null and person_id is null)
 

@@ -12,9 +12,10 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - payer
-            - payment_year
+          arguments:
+            combination_of_columns:
+              - payer
+              - payment_year
     columns:
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.  
@@ -42,10 +43,11 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - payer
-            - payment_year
-            - payment_year_month
+          arguments:
+            combination_of_columns:
+              - payer
+              - payment_year
+              - payment_year_month
     columns:
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
@@ -77,10 +79,11 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - payer
-            - payment_year
-            - payment_year_month
+          arguments:
+            combination_of_columns:
+              - payer
+              - payment_year
+              - payment_year_month
     columns:
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
@@ -120,18 +123,19 @@ models:
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - payer
-            - data_source
-            - payment_year
-            - recorded_date
-            - claim_id
-            - hcc_code
-            - rendering_npi
-            - model_version
-            - hcc_hierarchy_group
-            - hcc_hierarchy_group_rank
+          arguments:
+            combination_of_columns:
+              - person_id
+              - payer
+              - data_source
+              - payment_year
+              - recorded_date
+              - claim_id
+              - hcc_code
+              - rendering_npi
+              - model_version
+              - hcc_hierarchy_group
+              - hcc_hierarchy_group_rank
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -205,13 +209,14 @@ models:
       materialized: table  
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - hcc_code
-            - payer
-            - model_version
-            - payment_year
-            - suspect_hcc_flag
+          arguments:
+            combination_of_columns:
+              - person_id
+              - hcc_code
+              - payer
+              - model_version
+              - payment_year
+              - suspect_hcc_flag
     columns:
       - name: person_id
         description: A unique identifier for a person.
