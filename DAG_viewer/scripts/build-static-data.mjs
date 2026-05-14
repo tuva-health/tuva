@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { gunzipSync } from "node:zlib";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { parse as parseYaml } from "yaml";
@@ -15,6 +16,7 @@ const manifestPath = path.join(cacheRoot, "manifest.json");
 const lineageCacheRoot = path.join(cacheRoot, "lineage");
 const defaultRepoUrl = "https://github.com/tuva-health/tuva.git";
 const defaultGithubRef = "main";
+const staticSeedPreviewRowLimit = Number(process.env.TUVA_DAG_SEED_PREVIEW_ROW_LIMIT || 1000) || 1000;
 
 async function main() {
   const sourceRoot = await resolveSourceRoot();
@@ -281,6 +283,7 @@ async function exportLineage(sourceRoot) {
 
   const lineageModule = await import(pathToFileURL(path.join(scriptDir, "build-lineage.mjs")).href);
   const targets = await lineageModule.listTargetConfigs();
+  const seedPreviewNodes = new Map();
 
   for (const target of targets) {
     const payload = await lineageModule.buildLineagePayload({ targetKey: target.key });
@@ -288,7 +291,10 @@ async function exportLineage(sourceRoot) {
     const outputPath = path.join(distRoot, "data", `${target.key}-lineage.json`);
 
     await writeFile(outputPath, `${JSON.stringify(staticResponse, null, 2)}\n`, "utf8");
+    collectSeedPreviewNodes(seedPreviewNodes, payload);
   }
+
+  await exportStaticSeedPreviews(seedPreviewNodes);
 }
 
 function buildStaticResponse({ payload, targets }) {
@@ -312,6 +318,151 @@ function buildStaticResponse({ payload, targets }) {
       mode: "static"
     }
   };
+}
+
+function collectSeedPreviewNodes(seedPreviewNodes, payload) {
+  for (const node of payload.nodes || []) {
+    if (node?.resourceType !== "seed" || seedPreviewNodes.has(node.id)) {
+      continue;
+    }
+
+    seedPreviewNodes.set(node.id, {
+      nodeId: node.id,
+      name: node.name,
+      csvPath: node.paths?.sql || null,
+      seedViewer: node.seedViewer || null,
+      columns: node.columns || []
+    });
+  }
+}
+
+async function exportStaticSeedPreviews(seedPreviewNodes) {
+  const outputRoot = path.join(distRoot, "data", "seed-previews");
+  await mkdir(outputRoot, { recursive: true });
+
+  for (const seedNode of seedPreviewNodes.values()) {
+    const snapshot = await buildStaticSeedPreviewSnapshot(seedNode);
+    const outputPath = path.join(outputRoot, `${seedNode.nodeId}.json`);
+    await writeFile(outputPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+  }
+}
+
+async function buildStaticSeedPreviewSnapshot(seedNode) {
+  const fallbackHeaders = seedNode.columns.map((column) => column.name).filter(Boolean);
+  let preview = null;
+  let sourceError = null;
+
+  if (seedNode.seedViewer?.downloadUrl) {
+    try {
+      preview = await readCsvPreviewFromUrl(seedNode.seedViewer.downloadUrl, staticSeedPreviewRowLimit, fallbackHeaders);
+    } catch (error) {
+      sourceError = error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  if (!preview && seedNode.csvPath && existsSync(seedNode.csvPath)) {
+    try {
+      preview = await readCsvPreviewFromFile(seedNode.csvPath, staticSeedPreviewRowLimit, fallbackHeaders);
+    } catch (error) {
+      sourceError = sourceError || (error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  return {
+    nodeId: seedNode.nodeId,
+    name: seedNode.name,
+    generatedAt: new Date().toISOString(),
+    sourceUrl: seedNode.seedViewer?.downloadUrl || null,
+    sourceError,
+    headers: preview?.headers?.length ? preview.headers : fallbackHeaders,
+    rows: preview?.rows || [],
+    cachedRows: preview?.rows?.length || 0,
+    totalRows: preview?.totalRows ?? null,
+    rowLimit: staticSeedPreviewRowLimit,
+    truncated: Boolean(preview?.truncated)
+  };
+}
+
+async function readCsvPreviewFromUrl(url, rowLimit, preferredHeaders = []) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`CSV source returned ${response.status}`);
+  }
+
+  const sourceBuffer = Buffer.from(await response.arrayBuffer());
+  const csvBuffer = isGzipBuffer(sourceBuffer) ? gunzipSync(sourceBuffer) : sourceBuffer;
+  return readCsvPreviewFromText(csvBuffer.toString("utf8"), rowLimit, preferredHeaders);
+}
+
+async function readCsvPreviewFromFile(filePath, rowLimit, preferredHeaders = []) {
+  return readCsvPreviewFromText(await readFile(filePath, "utf8"), rowLimit, preferredHeaders);
+}
+
+function readCsvPreviewFromText(csvText, rowLimit, preferredHeaders = []) {
+  const lines = csvText.split(/\r?\n/);
+  const firstLine = lines.length ? parseCsvLine(lines[0].replace(/^\uFEFF/, "")) : [];
+  const hasPreferredHeaders = preferredHeaders.length > 0;
+  const headers = hasPreferredHeaders ? preferredHeaders : firstLine;
+  const firstLineIsHeader = hasPreferredHeaders
+    ? doCsvHeadersMatch(firstLine, preferredHeaders)
+    : firstLine.length > 0;
+  const dataLines = lines.slice(firstLineIsHeader ? 1 : 0).filter((line) => line.length);
+  const rows = dataLines.slice(0, rowLimit).map(parseCsvLine);
+
+  return {
+    headers,
+    rows,
+    totalRows: dataLines.length,
+    truncated: dataLines.length > rowLimit
+  };
+}
+
+function doCsvHeadersMatch(csvHeaders, preferredHeaders) {
+  if (csvHeaders.length !== preferredHeaders.length) {
+    return false;
+  }
+
+  return csvHeaders.every((header, index) => normalizeCsvHeader(header) === normalizeCsvHeader(preferredHeaders[index]));
+}
+
+function normalizeCsvHeader(header) {
+  return String(header || "").trim().toLowerCase();
+}
+
+function isGzipBuffer(buffer) {
+  return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
+}
+
+function parseCsvLine(line) {
+  const cells = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+
+    if (character === "\"") {
+      if (inQuotes && line[index + 1] === "\"") {
+        cell += "\"";
+        index += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (character === "," && !inQuotes) {
+      cells.push(cell);
+      cell = "";
+      continue;
+    }
+
+    cell += character;
+  }
+
+  cells.push(cell);
+  return cells;
 }
 
 async function walkSelectedSourceFiles(sourceRoot) {

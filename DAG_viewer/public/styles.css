@@ -120,7 +120,8 @@ pre {
 }
 
 .dag-launcher {
-  flex: 0 1 360px;
+  flex: 1 1 680px;
+  max-width: 820px;
   min-width: 0;
   position: relative;
 }
@@ -559,6 +560,30 @@ body.is-panning {
   z-index: 0;
 }
 
+.system-overview-group-frame {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px dashed rgba(39, 38, 35, 0.46);
+  border-radius: 28px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.system-overview-group-label {
+  color: rgba(36, 35, 32, 0.78);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  width: 240px;
+  z-index: 1;
+}
+
 .system-overview-entry {
   align-items: center;
   appearance: none;
@@ -843,6 +868,7 @@ body.is-panning {
   display: grid;
   gap: 12px;
   grid-auto-flow: row;
+  min-height: 0;
   overflow: auto;
   padding: 8px 12px 12px;
 }
@@ -1076,7 +1102,7 @@ body.is-panning {
 }
 
 .seed-table-wrap {
-  max-height: 420px;
+  max-height: none;
 }
 
 .seed-preview-table th,

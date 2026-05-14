@@ -5,6 +5,8 @@ models:
       The procedure table contains information about procedures performed on
       patients in the dataset.
     grain: Intended to be one record per procedure record per data source.
+    transformation_steps: |-
+      This model brings the input layer procedure table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |

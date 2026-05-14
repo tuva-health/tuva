@@ -5,6 +5,8 @@ models:
       The location table contains information about the practice and facility
       locations where patients receive medical care.
     grain: Intended to be one record per location per data source.
+    transformation_steps: |-
+      This model brings the input layer location table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
