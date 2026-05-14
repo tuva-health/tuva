@@ -74,11 +74,6 @@ models:
     columns:
       - name: person_id
         description: 'Unique identifier for each person in the dataset. This required string should ideally be a person-level UUID, whether from the Tuva EMPI Engine or your own master patient index. If no UUID is available, map the source patient identifier to person_id, such as member_id in claims or patient_id in clinical data. The eligibility table follows the eligibility span format, so a person may appear on multiple rows because the table key also includes member_id, enrollment dates, and data_source, but person_id itself should remain stable across coverage periods, plans, payers, and source files for the same individual.'
-        mapping_instructions: >-
-          Map this field to a unique person-level identifier. The same person
-          should not have multiple `person_id` values across payers, data
-          sources, or plans.
-        required_for_data_marts: ['ahrq_measures', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'provider_attribution', 'quality_measures', 'readmissions', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

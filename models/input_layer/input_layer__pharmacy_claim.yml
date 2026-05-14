@@ -349,8 +349,6 @@ models:
             required_for_data_marts: ['financial_pmpm', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
       - name: ndc_code
         description: 'National Drug Code (NDC) for the medication dispensed on the pharmacy claim line. Each pharmacy claim line should have an ndc_code. NDCs are often shown on packaging as 10-digit codes, but pharmacy claims typically require the 11-digit billing format. If your source data contains 10-digit NDCs, convert them to 11 digits before mapping. The 11-digit format follows a 5-4-2 pattern; when converting from a dashed 10-digit format, add a leading zero to the segment that is short. If the source stores a 10-digit NDC without dashes or segment boundaries, you generally cannot determine where the extra zero belongs reliably. Remove dashes before mapping. Tuva expects this field to be populated with an 11-character string, but downstream validation determines whether the mapped value is a valid terminology code.'
-        mapping_instructions: 'Map the NDC for the medication that was dispensed. Every pharmacy claim line should have an ndc_code. Normalize 10-digit source NDCs to the 11-digit billing format, remove dashes, and make sure the final mapped value is valid against Tuva terminology.'
-        required_for_data_marts: ['cms_chronic_conditions', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:

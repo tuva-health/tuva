@@ -150,8 +150,6 @@ models:
             required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'semantic_layer', 'service_categories']
       - name: claim_type
         description: 'Header-level classification of the medical claim as institutional, professional, or undetermined. The value should be consistent across all lines for the same claim_id and should be populated for every row in the medical_claim table. A claim is institutional if one or more institutional indicators are populated, including bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, or revenue_center_code. A claim is professional if none of those institutional indicators are populated and at least one place_of_service_code is populated. If neither condition is met, map the claim as undetermined. This field is used downstream in Tuva logic, so the classification should reflect the claim at the header level rather than vary by line.'
-        mapping_instructions: 'Map every claim to institutional, professional, or undetermined. This is a header-level field and must be identical across all lines for the same claim_id. Professional claims should have place_of_service_code and should not carry institutional-only indicators such as bill_type_code, admit_type_code, admit_source_code, discharge_disposition_code, drg_code, or revenue_center_code. Institutional claims should have bill_type_code and revenue_center_code and should not carry place_of_service_code. If the source does not cleanly support either pattern, map the claim to undetermined until the classification can be resolved. This field is critical because downstream service category grouping and encounter grouping depend on it.'
-        required_for_data_marts: ['cms_hccs', 'encounters', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A claim cannot be both professional and institutional within the same claim id.
@@ -805,8 +803,6 @@ models:
             required_for_data_marts: ['encounters', 'readmissions', 'semantic_layer']
       - name: place_of_service_code
         description: 'Place of service code for professional claims. This is a line-level, two-character code that identifies the location where the medical service was provided, so values may differ across lines within the same claim. Professional claim lines should have a place_of_service_code; institutional claims should not use this field. Tuva checks that the value is two characters long, but downstream terminology validation determines whether it is a valid standard place_of_service_code. If source data omits this value for some professional claim lines, some organizations backfill 99 for Other Place of Service. Preserve leading zeroes when they exist in the standard code set and normalize missing leading zeroes during mapping.'
-        mapping_instructions: 'Map the place of service code at the claim-line level for professional claims. Every professional claim line should have a place_of_service_code, and institutional claims should not use this field. The mapped value should conform to Tuva terminology for place_of_service_code and should preserve leading zeroes when they exist in the standard code set.'
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - not_null:
               description: If a claim is professional, it should have a place of service code via CMS-1500.
@@ -1095,8 +1091,6 @@ models:
             required_for_data_marts: ['semantic_layer']
       - name: hcpcs_code
         description: 'HCPCS or CPT code for the procedure, service, or supply provided on the claim line. This line-level field may vary across lines within the same claim. Level 1 HCPCS codes are CPT codes maintained by the American Medical Association, while Level 2 HCPCS codes are maintained by CMS; Tuva terminology covers Level 2 only. Professional claims are generally expected to have hcpcs_code values, and Tuva validates Level 2 mappings when applicable. Source values sometimes include suffixes or formatting differences, so normalization such as trimming suffixes may be needed during mapping. If no specific code is available, some organizations backfill 99499 for unlisted evaluation and management services, but that choice is use-case dependent.'
-        mapping_instructions: 'Map the CPT or HCPCS code at the claim-line level. Every professional claim line should have one and only one hcpcs_code. Institutional claims may also carry HCPCS codes, but they are less consistently required. If the source appends suffixes or other nonstandard characters, normalize the value before mapping so the resulting code is the standard claim-line procedure code.'
-        required_for_data_marts: ['cms_hccs', 'encounters', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1223,8 +1217,6 @@ models:
             required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
       - name: rendering_npi
         description: 'Rendering NPI for the claim, typically representing the practitioner or entity that performed the service. This line-level field may be populated on either institutional or professional claims and may vary across claim lines. An NPI is a 10-digit numeric identifier, and Tuva validates the expected length and character pattern. Some source systems provide only a single NPI field without distinguishing rendering, billing, and facility roles. In that case, use provider data to determine whether the identifier belongs to a person or a place: if it belongs to a person, map it to rendering_npi; if it belongs to a place on an institutional claim, map it to facility_npi instead.'
-        mapping_instructions: 'Map the NPI for the practitioner who rendered the service on the claim line. Every claim line should have a rendering_npi. If the source only provides a single NPI field, use provider reference data to determine whether that identifier is a person-level NPI, and map person-level NPIs to rendering_npi. If the source only provides facility or organization NPIs, the mapping should be improved upstream because logical DQ treats missing rendering_npi as a failure.'
-        required_for_data_marts: ['cms_hccs', 'encounters', 'hcc_recapture', 'provider_attribution', 'semantic_layer', 'service_categories']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1287,8 +1279,6 @@ models:
             required_for_data_marts: ['semantic_layer']
       - name: billing_npi
         description: 'Billing NPI for the claim, typically representing the organization or individual responsible for billing and receiving payment for the service. An NPI is a 10-digit numeric identifier, and Tuva validates the expected length and character pattern. Some source systems provide only a single NPI field without distinguishing rendering, billing, and facility roles. In that case, use provider data to determine whether the identifier belongs to a person or a place: if it belongs to a person, map it to rendering_npi and, on professional claims, also consider mapping it to billing_npi; if it belongs to a place on an institutional claim, map it to facility_npi instead.'
-        mapping_instructions: 'Map the NPI for the billing entity on the claim. Every claim should have one and only one billing_npi, and the value should be identical across all lines for the same claim_id. If the source only provides a single NPI field, use provider reference data to determine whether the identifier belongs to a billing provider organization or individual.'
-        required_for_data_marts: ['encounters', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -1351,8 +1341,6 @@ models:
             required_for_data_marts: ['semantic_layer']
       - name: facility_npi
         description: 'Facility NPI for the claim, typically representing the location where services were delivered. An NPI is a 10-digit numeric identifier, and Tuva validates the expected length and character pattern. Some source systems provide only a single NPI field without distinguishing rendering, billing, and facility roles. In that case, use provider data to determine whether the identifier belongs to a person or a place: if it belongs to a place on an institutional claim, map it to facility_npi; if it belongs to a person, map it to rendering_npi instead and, on professional claims, consider whether it also belongs in billing_npi.'
-        mapping_instructions: 'Map the NPI for the facility where services were delivered. Inpatient institutional claims should have a facility_npi. If the source only provides a single NPI field, use provider reference data to determine whether the identifier is an organization or facility-level NPI before mapping it to facility_npi.'
-        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
         tests:
           - not_null:
               description: >
@@ -1693,8 +1681,6 @@ models:
             required_for_data_marts: ['semantic_layer']
       - name: diagnosis_code_type
         description: 'Coding system used for diagnosis codes on the claim. This header-level field must be consistent across all lines for the same claim and should be populated whenever diagnosis codes are present. Allowed values are icd-9-cm and icd-10-cm. If the source does not explicitly provide diagnosis_code_type, a common approach is to infer it from service date: use icd-9-cm for dates before 2015-10-01 and icd-10-cm for dates after 2015-10-01. If the source spans the transition period and omits the code type, infer the value using both the date of service and the diagnosis code pattern.'
-        mapping_instructions: 'Populate diagnosis_code_type whenever any diagnosis_code_1 through diagnosis_code_25 is populated. The allowed values are icd-9-cm and icd-10-cm. If the source does not explicitly provide the code type, it can be inferred using the ICD-9 to ICD-10 transition date when appropriate. This is a header-level field and must be identical across all lines for the same claim_id.'
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -3348,8 +3334,6 @@ models:
             required_for_data_marts: []
       - name: procedure_code_type
         description: 'Coding system used for ICD procedure codes on the claim. This header-level field on inpatient institutional claims must be consistent across all lines for the same claim and should be populated whenever ICD procedure codes are present. Allowed values are icd-9-pcs and icd-10-pcs. If the source does not explicitly provide procedure_code_type, a common approach is to infer it from service date: use icd-9-pcs for dates before 2015-10-01 and icd-10-pcs for dates after 2015-10-01. If the source spans the transition period and omits the code type, infer the value using both the date of service and the procedure code pattern.'
-        mapping_instructions: 'Populate procedure_code_type whenever any procedure_code_1 through procedure_code_25 is populated. The allowed values are icd-9-pcs and icd-10-pcs. If the source does not explicitly provide the code type, it can be inferred using the ICD-9 to ICD-10 transition date when appropriate. This is a header-level field for inpatient institutional claims and must be identical across all lines for the same claim_id.'
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
