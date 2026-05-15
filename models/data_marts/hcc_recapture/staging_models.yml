@@ -12,9 +12,10 @@ models:
       alias: stg_coef_hier
       tags: ["hcc_recapture", "staging"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
+          arguments:
+            combination_of_columns:
             - model_version
             - hcc_code
             - hcc_hierarchy_group
@@ -27,7 +28,7 @@ models:
           yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment 
           website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
       - name: hcc_code
-        description: The hierarchical condition category code.      
+        description: The hierarchical condition category code.
       - name: hcc_hierarchy_group
         description: >
           The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
@@ -41,6 +42,7 @@ models:
           There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
           This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
           the 2025 CMS risk adjustment software.
+  
   - name: hcc_recapture__stg_eligible_benes
     description: >
       Beneficiaries eligible for HCC recapture. When ESRD risk scores are available in the Tuva project, 
@@ -52,12 +54,14 @@ models:
       alias: stg_eligible_benes
       tags: ["hcc_recapture", "staging"]
       materialized: table
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - person_id
-            - collection_year
-            - payer
+          arguments:
+            combination_of_columns:
+              - person_id
+              - collection_year
+              - payer
+              - age_group
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -65,3 +69,34 @@ models:
         description: The year that the claims originated and were originally coded.
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+      - name: age_group
+        tests:
+          - not_null:
+              description: >
+                If there is no age, it is likely because they are missing a birth date in the input layer.
+                Risk model codes needs not to be null since it's used as a join argument to get equivalent coefficients.
+                Members without age groups are excluded.
+              config:
+                severity: warn
+
+  - name: hcc_recapture__stg_suspect_hccs
+    description: |
+      A list of suspected HCCs. This is an optional model which can be included by 
+      setting the hcc_recapture_suspect_list variable in your dbt_project.yml
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: stg_suspect_hccs
+      tags: ["hcc_recapture", "staging"]
+
+  - name: hcc_recapture__stg_chronic_hccs
+    description: |
+      A list of chronic HCCs. This is an optional model which can be included by
+      setting the hcc_recapture_chronic_hccs variable in your dbt_project.yml
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
+        {% else %}hcc_recapture{%- endif -%}
+      alias: stg_chronic_hccs
+      tags: ["hcc_recapture", "staging"]
