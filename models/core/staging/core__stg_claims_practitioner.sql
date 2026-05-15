@@ -16,7 +16,6 @@ select distinct
     facility_npi as npi
     , data_source
 from {{ ref('core__stg_claims_medical_claim') }}
-where facility_npi is not null
 
 {% if target.type == 'fabric' %}
 union
@@ -28,7 +27,6 @@ select distinct
     rendering_npi as npi
     , data_source
 from {{ ref('core__stg_claims_medical_claim') }}
-where rendering_npi is not null
 
 {% if target.type == 'fabric' %}
 union
@@ -40,7 +38,6 @@ select distinct
     billing_npi as npi
     , data_source
 from {{ ref('core__stg_claims_medical_claim') }}
-where billing_npi is not null
 
 {% if target.type == 'fabric' %}
 union
@@ -52,7 +49,6 @@ select distinct
     prescribing_provider_id as npi
     , data_source
 from {{ ref('core__stg_claims_pharmacy_claim') }}
-where prescribing_provider_id is not null
 
 {% if target.type == 'fabric' %}
 union
@@ -64,7 +60,6 @@ select distinct
     dispensing_provider_id as npi
     , data_source
 from {{ ref('core__stg_claims_pharmacy_claim') }}
-where dispensing_provider_id is not null
 )
 
 , provider_sources as (
