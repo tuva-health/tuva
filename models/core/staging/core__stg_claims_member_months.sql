@@ -12,9 +12,9 @@ with final_before_attribution_fields as (
     , a.year_month
     , a.payer
     , a.{{ quote_column('plan') }}
-    , data_source
-    {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
-  from {{ ref('claims_enrollment__member_months') }} as a
+    {{ select_extension_columns(ref('core__int_member_months'), alias='a') }}
+    , a.data_source
+  from {{ ref('core__int_member_months') }} as a
 )
 
 select
@@ -24,7 +24,6 @@ select
   , a.year_month
   , a.payer
   , a.{{ quote_column('plan') }}
-  , a.data_source
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
   , b.payer_attributed_provider
   , b.payer_attributed_provider_practice
@@ -34,10 +33,11 @@ select
   , b.custom_attributed_provider_practice
   , b.custom_attributed_provider_organization
   , b.custom_attributed_provider_lob
-  {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
+  {{ select_extension_columns(ref('core__int_member_months'), alias='a') }}
+  , a.data_source
 
 from final_before_attribution_fields as a
-left outer join {{ ref('financial_pmpm__stg_provider_attribution') }} as b
+left outer join {{ ref('core__stg_provider_attribution') }} as b
 on a.person_id = b.person_id
 and a.member_id = b.member_id
 and a.year_month = b.year_month

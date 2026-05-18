@@ -308,7 +308,7 @@ models:
         - data_quality
       materialized: table
 
-  
+
   - name: data_quality__eligibility_middle_name
     config:
       schema: |
@@ -417,7 +417,7 @@ models:
       tags:
         - data_quality
       materialized: table
-    
+
 
   - name: data_quality__eligibility_email
     config:
@@ -439,7 +439,7 @@ models:
       tags:
         - data_quality
       materialized: table
-      
+
 
   - name: data_quality__eligibility_plan
     config:
@@ -2181,50 +2181,6 @@ models:
         - dqi_immunization
       materialized: table
 
-  - name: data_quality__immunization_normalized_code
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: immunization_normalized_code
-      tags:
-        - data_quality
-        - dqi_immunization
-      materialized: table
-
-  - name: data_quality__immunization_normalized_code_type
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: immunization_normalized_code_type
-      tags:
-        - data_quality
-        - dqi_immunization
-      materialized: table
-
-  - name: data_quality__immunization_normalized_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: immunization_normalized_description
-      tags:
-        - data_quality
-        - dqi_immunization
-      materialized: table
-
-  - name: data_quality__immunization_normalized_dose
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: immunization_normalized_dose
-      tags:
-        - data_quality
-        - dqi_immunization
-      materialized: table
-
   - name: data_quality__immunization_occurrence_date
     config:
       schema: |
@@ -2380,37 +2336,6 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_component_code
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_component_code
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__lab_result_normalized_component_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_component_description
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__lab_result_normalized_component_type
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_component_type
-      tags:
-        - data_quality
-      materialized: table
-
-
   - name: data_quality__lab_result_ordering_practitioner_id
     config:
       schema: |
@@ -2444,17 +2369,6 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_order_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_order_description
-      tags:
-        - data_quality
-      materialized: table
-
-
   - name: data_quality__lab_result_normalized_reference_range_low
     config:
       schema: |
@@ -2472,17 +2386,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: lab_result_normalized_reference_range_high
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__lab_result_normalized_order_code
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_order_code
       tags:
         - data_quality
       materialized: table
@@ -2560,17 +2463,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: lab_result_normalized_units
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__lab_result_normalized_order_type
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_order_type
       tags:
         - data_quality
       materialized: table
@@ -2873,17 +2765,6 @@ models:
       materialized: table
 
 
-  - name: data_quality__medication_rxnorm_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medication_rxnorm_description
-      tags:
-        - data_quality
-      materialized: table
-
-
   - name: data_quality__medication_encounter_id
     config:
       schema: |
@@ -2901,17 +2782,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: medication_data_source
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__medication_atc_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medication_atc_description
       tags:
         - data_quality
       materialized: table
@@ -2967,17 +2837,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: medication_source_code_type
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__medication_ndc_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medication_ndc_description
       tags:
         - data_quality
       materialized: table
@@ -3055,28 +2914,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: observation_observation_type
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__observation_normalized_code
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: observation_normalized_code
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__observation_normalized_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: observation_normalized_description
       tags:
         - data_quality
       materialized: table
@@ -3209,17 +3046,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: observation_normalized_units
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__observation_normalized_code_type
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: observation_normalized_code_type
       tags:
         - data_quality
       materialized: table
@@ -3537,45 +3363,12 @@ models:
       materialized: table
 
 ## Clinical procedure
-  - name: data_quality__procedure_normalized_code_type
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: procedure_normalized_code_type
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__procedure_normalized_description
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: procedure_normalized_description
-      tags:
-        - data_quality
-      materialized: table
-
-
   - name: data_quality__procedure_procedure_id
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: procedure_procedure_id
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__procedure_claim_id
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: procedure_claim_id
       tags:
         - data_quality
       materialized: table
@@ -3691,17 +3484,6 @@ models:
       materialized: table
 
 
-  - name: data_quality__procedure_normalized_code
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: procedure_normalized_code
-      tags:
-        - data_quality
-      materialized: table
-
-
   - name: data_quality__procedure_modifier_1
     config:
       schema: |
@@ -3776,7 +3558,7 @@ models:
       tags:
         - data_quality
       materialized: table
-  
+
   - name: data_quality__primary_keys_immunization_immunization_id
     config:
       schema: |

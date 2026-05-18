@@ -1,9 +1,12 @@
 const initialSearchParams = new URLSearchParams(window.location.search);
 const runtimeConfig = window.TUVA_DAG_VIEWER_CONFIG || {};
-const VIEWER_MODE = runtimeConfig.mode || initialSearchParams.get("mode") || "live";
+const LOCAL_DEVELOPMENT_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
+const IS_LOCAL_DEVELOPMENT_HOST = LOCAL_DEVELOPMENT_HOSTS.has(window.location.hostname);
+const getLocalQueryParam = (key) => (IS_LOCAL_DEVELOPMENT_HOST ? initialSearchParams.get(key) : null);
+const VIEWER_MODE = runtimeConfig.mode || getLocalQueryParam("mode") || "static";
 const IS_STATIC_MODE = VIEWER_MODE === "static";
-const API_BASE_URL = runtimeConfig.apiBase || initialSearchParams.get("apiBase") || "http://127.0.0.1:8000";
-const STATIC_DATA_BASE_URL = runtimeConfig.dataBaseUrl || initialSearchParams.get("dataBase") || "./data";
+const API_BASE_URL = runtimeConfig.apiBase || getLocalQueryParam("apiBase") || "http://127.0.0.1:8000";
+const STATIC_DATA_BASE_URL = runtimeConfig.dataBaseUrl || getLocalQueryParam("dataBase") || "./data";
 const LINEAGE_API_URL = `${API_BASE_URL}/api/dag/lineage`;
 const REFRESH_API_URL = `${API_BASE_URL}/api/dag/refresh`;
 const EVENTS_API_URL = `${API_BASE_URL}/api/dag/events`;
@@ -31,6 +34,8 @@ const SEED_BAND_PADDING = 48;
 const MIN_BAND_GAP = 116;
 const MAX_BAND_GAP = 180;
 const DRAG_THRESHOLD = 6;
+const NODE_HOLD_THRESHOLD_MS = 450;
+const MODAL_BACKDROP_CLICK_GUARD_MS = 350;
 const MIN_SCALE = 0.18;
 const MAX_SCALE = 1.8;
 const FIT_SIDE_INSET = 36;
@@ -47,15 +52,15 @@ const INITIAL_OPEN_NODE_ID = initialSearchParams.get("openNode");
 const INITIAL_EDIT_FIELD = initialSearchParams.get("edit");
 const INITIAL_MODAL_TAB = initialSearchParams.get("tab");
 const SYSTEM_OVERVIEW_TARGET_KEY = "system_overview";
-const SYSTEM_OVERVIEW_LAYOUT_VERSION = "10";
+const SYSTEM_OVERVIEW_LAYOUT_VERSION = "19";
 const SYSTEM_OVERVIEW_ENTRY_WIDTH = 212;
 const SYSTEM_OVERVIEW_ENTRY_HEIGHT = 52;
 const SYSTEM_OVERVIEW_STAGE_PADDING_X = 24;
 const SYSTEM_OVERVIEW_STAGE_PADDING_Y = 18;
-const SYSTEM_OVERVIEW_NORMALIZATION_STAGE_PADDING_Y = 10;
 const SYSTEM_OVERVIEW_GROUP_PADDING_X = 14;
 const SYSTEM_OVERVIEW_GROUP_PADDING_TOP = 38;
 const SYSTEM_OVERVIEW_GROUP_PADDING_BOTTOM = 12;
+const WHEEL_ZOOM_SPEED = 0.00145;
 const SYSTEM_OVERVIEW_HIDDEN_POSITION = Object.freeze({
   x: 2240,
   y: 2060
@@ -63,7 +68,6 @@ const SYSTEM_OVERVIEW_HIDDEN_POSITION = Object.freeze({
 
 const SYSTEM_OVERVIEW_STAGE_TITLES = Object.freeze({
   inputLayer: "Input Layer",
-  claimsNormalization: "Claims Normalization",
   claimsPreprocessing: "Claims Preprocessing",
   coreDataModel: "Core Data Model",
   dataMarts: "Data Marts"
@@ -86,75 +90,118 @@ const SYSTEM_OVERVIEW_ENTRY_LAYOUT = Object.freeze([
   { id: "input-practitioner", targetKey: "input_layer__practitioner", label: "practitioner", stage: "inputLayer", group: "inputClinical", groupLabel: "Clinical", x: 138, y: 1172 },
   { id: "input-procedure", targetKey: "input_layer__procedure", label: "procedure", stage: "inputLayer", group: "inputClinical", groupLabel: "Clinical", x: 138, y: 1248 },
 
-  { id: "input-provider-attribution", targetKey: "input_layer__provider_attribution", label: "provider_attribution", stage: "inputLayer", group: "inputProviderAttribution", groupLabel: "Provider Attribution", x: 138, y: 1370 },
+  { id: "input-provider-attribution", targetKey: "input_layer__provider_attribution", label: "provider_attribution", stage: "inputLayer", group: "inputOther", groupLabel: "Other", x: 138, y: 1370 },
 
-  { id: "overview-normalized-eligibility", targetKey: "claims_normalization__eligibility", label: "eligibility", stage: "claimsNormalization", group: "claimsNormalization", x: 536, y: 454 },
-  { id: "overview-normalized-medical-claim", targetKey: "claims_normalization__medical_claim", label: "medical_claim", stage: "claimsNormalization", group: "claimsNormalization", x: 536, y: 530 },
-  { id: "overview-normalized-pharmacy-claim", targetKey: "claims_normalization__pharmacy_claim", label: "pharmacy_claim", stage: "claimsNormalization", group: "claimsNormalization", x: 536, y: 606 },
+  { id: "claims-claims-enrollment", targetKey: "claims_enrollment", label: "claims_enrollment", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 536, y: 214 },
+  { id: "claims-encounters", targetKey: "encounters", label: "encounters", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 536, y: 290 },
+  { id: "claims-service-categories", targetKey: "service_categories", label: "service_categories", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 536, y: 366 },
 
-  { id: "claims-claims-enrollment", targetKey: "claims_enrollment", label: "claims_enrollment", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 874, y: 214 },
-  { id: "claims-encounters", targetKey: "encounters", label: "encounters", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 874, y: 290 },
-  { id: "claims-service-categories", targetKey: "service_categories", label: "service_categories", stage: "claimsPreprocessing", group: "claimsPreprocessing", x: 874, y: 366 },
+  { id: "core-eligibility", targetKey: "eligibility", label: "eligibility", stage: "coreDataModel", group: "coreClaims", groupLabel: "Claims", x: 980, y: 214 },
+  { id: "core-medical-claim", targetKey: "medical_claim", label: "medical_claim", stage: "coreDataModel", group: "coreClaims", x: 980, y: 290 },
+  { id: "core-member-months", targetKey: "member_months", label: "member_months", stage: "coreDataModel", group: "coreClaims", x: 980, y: 366 },
+  { id: "core-pharmacy-claim", targetKey: "pharmacy_claim", label: "pharmacy_claim", stage: "coreDataModel", group: "coreClaims", x: 980, y: 442 },
 
-  { id: "core-appointment", targetKey: "appointment", label: "appointment", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 214 },
-  { id: "core-condition", targetKey: "condition", label: "condition", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 290 },
-  { id: "core-eligibility", targetKey: "eligibility", label: "eligibility", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 366 },
-  { id: "core-encounter", targetKey: "encounter", label: "encounter", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 442 },
-  { id: "core-immunization", targetKey: "immunization", label: "immunization", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 518 },
-  { id: "core-lab-result", targetKey: "lab_result", label: "lab_result", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 594 },
-  { id: "core-location", targetKey: "location", label: "location", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 670 },
-  { id: "core-medical-claim", targetKey: "medical_claim", label: "medical_claim", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 746 },
-  { id: "core-medication", targetKey: "medication", label: "medication", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 822 },
-  { id: "core-member-months", targetKey: "member_months", label: "member_months", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 898 },
-  { id: "core-observation", targetKey: "observation", label: "observation", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 974 },
-  { id: "core-patient", targetKey: "patient", label: "patient", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 1050 },
-  { id: "core-person-id-crosswalk", targetKey: "person_id_crosswalk", label: "person_id_crosswalk", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 1126 },
-  { id: "core-pharmacy-claim", targetKey: "pharmacy_claim", label: "pharmacy_claim", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 1202 },
-  { id: "core-practitioner", targetKey: "practitioner", label: "practitioner", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 1278 },
-  { id: "core-procedure", targetKey: "procedure", label: "procedure", stage: "coreDataModel", group: "coreDataModelAll", x: 1318, y: 1354 },
+  { id: "core-appointment", targetKey: "appointment", label: "appointment", stage: "coreDataModel", group: "coreClinical", groupLabel: "Clinical", x: 980, y: 564 },
+  { id: "core-immunization", targetKey: "immunization", label: "immunization", stage: "coreDataModel", group: "coreClinical", x: 980, y: 640 },
+  { id: "core-lab-result", targetKey: "lab_result", label: "lab_result", stage: "coreDataModel", group: "coreClinical", x: 980, y: 716 },
+  { id: "core-medication", targetKey: "medication", label: "medication", stage: "coreDataModel", group: "coreClinical", x: 980, y: 792 },
+  { id: "core-observation", targetKey: "observation", label: "observation", stage: "coreDataModel", group: "coreClinical", x: 980, y: 868 },
 
-  { id: "mart-ahrq-measures", targetKey: "ahrq_measures", label: "ahrq_measures", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 214 },
-  { id: "mart-ccsr", targetKey: "ccsr", label: "ccsr", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 290 },
-  { id: "mart-chronic-conditions", targetKey: "chronic_conditions", label: "chronic_conditions", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 366 },
-  { id: "mart-clinical-concept-library", targetKey: "clinical_concept_library", label: "clinical_concept_library", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 442 },
-  { id: "mart-cms-hcc", targetKey: "cms_hcc", label: "cms_hcc", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 518 },
-  { id: "mart-ed-classification", targetKey: "ed_classification", label: "ed_classification", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 594 },
-  { id: "mart-financial-pmpm", targetKey: "financial_pmpm", label: "financial_pmpm", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 670 },
-  { id: "mart-hcc-recapture", targetKey: "hcc_recapture", label: "hcc_recapture", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 746 },
-  { id: "mart-hcc-suspecting", targetKey: "hcc_suspecting", label: "hcc_suspecting", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 822 },
-  { id: "mart-pharmacy", targetKey: "pharmacy", label: "pharmacy", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 898 },
-  { id: "mart-provider-attribution", targetKey: "provider_attribution", label: "provider_attribution", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 974 },
-  { id: "mart-quality-measures", targetKey: "quality_measures", label: "quality_measures", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 1050 },
-  { id: "mart-readmissions", targetKey: "readmissions", label: "readmissions", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 1126 },
-  { id: "mart-semantic-layer", targetKey: "semantic_layer", label: "semantic_layer", stage: "dataMarts", group: "dataMartsAll", x: 1740, y: 1202 }
+  { id: "core-condition", targetKey: "condition", label: "condition", stage: "coreDataModel", group: "coreShared", groupLabel: "Shared", x: 980, y: 990 },
+  { id: "core-encounter", targetKey: "encounter", label: "encounter", stage: "coreDataModel", group: "coreShared", x: 980, y: 1066 },
+  { id: "core-location", targetKey: "location", label: "location", stage: "coreDataModel", group: "coreShared", x: 980, y: 1142 },
+  { id: "core-patient", targetKey: "patient", label: "patient", stage: "coreDataModel", group: "coreShared", x: 980, y: 1218 },
+  { id: "core-practitioner", targetKey: "practitioner", label: "practitioner", stage: "coreDataModel", group: "coreShared", x: 980, y: 1294 },
+  { id: "core-procedure", targetKey: "procedure", label: "procedure", stage: "coreDataModel", group: "coreShared", x: 980, y: 1370 },
+
+  { id: "core-person-id-crosswalk", targetKey: "person_id_crosswalk", label: "person_id_crosswalk", stage: "coreDataModel", group: "coreOther", groupLabel: "Other", x: 980, y: 1512 },
+
+  { id: "mart-ahrq-measures", targetKey: "ahrq_measures", label: "ahrq_measures", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 214 },
+  { id: "mart-ccsr", targetKey: "ccsr", label: "ccsr", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 290 },
+  { id: "mart-chronic-conditions", targetKey: "chronic_conditions", label: "chronic_conditions", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 366 },
+  { id: "mart-cms-hcc", targetKey: "cms_hcc", label: "cms_hcc", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 442 },
+  { id: "mart-ed-classification", targetKey: "ed_classification", label: "ed_classification", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 518 },
+  { id: "mart-financial-pmpm", targetKey: "financial_pmpm", label: "financial_pmpm", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 594 },
+  { id: "mart-hcc-recapture", targetKey: "hcc_recapture", label: "hcc_recapture", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 670 },
+  { id: "mart-hcc-suspecting", targetKey: "hcc_suspecting", label: "hcc_suspecting", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 746 },
+  { id: "mart-pharmacy", targetKey: "pharmacy", label: "pharmacy", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 822 },
+  { id: "mart-provider-attribution", targetKey: "provider_attribution", label: "provider_attribution", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 898 },
+  { id: "mart-quality-measures", targetKey: "quality_measures", label: "quality_measures", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 974 },
+  { id: "mart-readmissions", targetKey: "readmissions", label: "readmissions", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 1050 },
+  { id: "mart-semantic-layer", targetKey: "semantic_layer", label: "semantic_layer", stage: "dataMarts", group: "dataMartsAll", x: 1402, y: 1126 }
 ]);
 
 const SYSTEM_OVERVIEW_CONNECTOR_SPECS = Object.freeze([
   {
-    from: { type: "stage", key: "inputLayer", side: "right", alignEntryId: "input-eligibility" },
-    to: { type: "stage", key: "claimsNormalization", side: "left", alignEntryId: "overview-normalized-eligibility" }
+    from: { type: "stage", key: "inputLayer", side: "right" },
+    to: { type: "stage", key: "claimsPreprocessing", side: "left" }
   },
   {
-    from: { type: "stage", key: "inputLayer", side: "right", alignEntryId: "input-patient" },
-    to: { type: "stage", key: "coreDataModel", side: "left", alignEntryId: "core-patient" }
+    from: { type: "stage", key: "inputLayer", side: "right" },
+    to: { type: "stage", key: "coreDataModel", side: "left" }
   },
   {
-    from: { type: "stage", key: "claimsNormalization", side: "right", alignEntryId: "overview-normalized-medical-claim" },
-    to: { type: "stage", key: "claimsPreprocessing", side: "left", alignEntryId: "claims-encounters" }
+    from: { type: "stage", key: "claimsPreprocessing", side: "right" },
+    to: { type: "stage", key: "coreDataModel", side: "left" }
   },
   {
-    from: { type: "stage", key: "claimsNormalization", side: "right", alignEntryId: "overview-normalized-eligibility" },
-    to: { type: "stage", key: "coreDataModel", side: "left", alignEntryId: "core-eligibility" }
-  },
-  {
-    from: { type: "stage", key: "claimsPreprocessing", side: "right", alignEntryId: "claims-encounters" },
-    to: { type: "stage", key: "coreDataModel", side: "left", alignEntryId: "core-patient" }
-  },
-  {
-    from: { type: "stage", key: "coreDataModel", side: "right", alignEntryId: "core-patient" },
-    to: { type: "stage", key: "dataMarts", side: "left", alignEntryId: "mart-ccsr" }
+    from: { type: "stage", key: "coreDataModel", side: "right" },
+    to: { type: "stage", key: "dataMarts", side: "left" }
   }
 ]);
+
+const TARGET_PANEL_GROUP_DEFINITIONS = Object.freeze({
+  "Input Layer": [
+    {
+      label: "Claims",
+      keys: ["input_layer__eligibility", "input_layer__medical_claim", "input_layer__pharmacy_claim"]
+    },
+    {
+      label: "Clinical",
+      keys: [
+        "input_layer__appointment",
+        "input_layer__condition",
+        "input_layer__encounter",
+        "input_layer__immunization",
+        "input_layer__lab_result",
+        "input_layer__location",
+        "input_layer__medication",
+        "input_layer__observation",
+        "input_layer__patient",
+        "input_layer__practitioner",
+        "input_layer__procedure"
+      ]
+    },
+    {
+      label: "Other",
+      keys: ["input_layer__provider_attribution"]
+    }
+  ],
+  "Claims Preprocessing": [
+    {
+      label: "Claims",
+      keys: ["claims_enrollment", "encounters", "service_categories"]
+    }
+  ],
+  Core: [
+    {
+      label: "Claims",
+      keys: ["eligibility", "medical_claim", "member_months", "pharmacy_claim"]
+    },
+    {
+      label: "Clinical",
+      keys: ["appointment", "immunization", "lab_result", "medication", "observation"]
+    },
+    {
+      label: "Shared",
+      keys: ["condition", "encounter", "location", "patient", "practitioner", "procedure"]
+    },
+    {
+      label: "Other",
+      keys: ["person_id_crosswalk"]
+    }
+  ]
+});
 
 const nodeTypeColors = {
   input: "#d86b63",
@@ -183,6 +230,7 @@ const state = {
   sceneSize: { ...DEFAULT_SCENE_SIZE },
   viewport: { ...DEFAULT_VIEWPORT },
   layoutMeta: null,
+  ignoreBackdropClickUntil: 0,
   drag: null,
   needsInitialFit: false
 };
@@ -559,7 +607,7 @@ function renderSystemOverviewScene(payload, sceneWidth, sceneHeight) {
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#3a3936"></path>
         </marker>
       </defs>
-      ${model.connectors.map((path) => `<path class="system-overview-connector" d="${path}"></path>`).join("")}
+      ${model.connectors.map(renderSystemOverviewConnectorPath).join("")}
     </svg>
     ${model.stages
       .map(
@@ -573,7 +621,7 @@ function renderSystemOverviewScene(payload, sceneWidth, sceneHeight) {
             class="system-overview-stage-label"
             data-stage-key="${escapeAttribute(stage.key)}"
             style="left:${stage.labelX}px;top:${stage.labelY}px;"
-          >${escapeHtml(stage.title)}</div>
+          >${renderSystemOverviewStageTitle(stage)}</div>
         `
       )
       .join("")}
@@ -613,6 +661,24 @@ function renderSystemOverviewEntry(entry) {
       <span class="system-overview-entry-label">${escapeHtml(entry.label)}</span>
     </button>
   `;
+}
+
+function renderSystemOverviewConnectorPath(path) {
+  return `
+    <path class="system-overview-connector-underlay" d="${path}"></path>
+    <path class="system-overview-connector" d="${path}"></path>
+  `;
+}
+
+function renderSystemOverviewStageTitle(stage) {
+  if (stage.key === "claimsPreprocessing") {
+    return escapeHtml(stage.title)
+      .split(" ")
+      .map((word) => `<span>${word}</span>`)
+      .join("");
+  }
+
+  return escapeHtml(stage.title);
 }
 
 function buildSystemOverviewVisualModel(nodes, { positions = state.positions } = {}) {
@@ -701,7 +767,7 @@ function buildSystemOverviewVisualModel(nodes, { positions = state.positions } =
           height: Math.round(bounds.maxY - bounds.minY + getSystemOverviewStagePaddingY(key) * 2)
         },
         labelX: Math.round((bounds.minX + bounds.maxX) / 2),
-        labelY: Math.round(bounds.minY - 88)
+        labelY: Math.round(bounds.minY - getSystemOverviewStageLabelOffset(key))
       };
     })
     .filter(Boolean);
@@ -782,11 +848,15 @@ function computeEntryBounds(entries) {
 }
 
 function getSystemOverviewStagePaddingY(stageKey) {
-  if (stageKey === "claimsNormalization") {
-    return SYSTEM_OVERVIEW_NORMALIZATION_STAGE_PADDING_Y;
+  return SYSTEM_OVERVIEW_STAGE_PADDING_Y;
+}
+
+function getSystemOverviewStageLabelOffset(stageKey) {
+  if (stageKey === "claimsPreprocessing") {
+    return 122;
   }
 
-  return SYSTEM_OVERVIEW_STAGE_PADDING_Y;
+  return 88;
 }
 
 function isSystemOverviewVisibleNode(node) {
@@ -864,11 +934,15 @@ function renderTargetPanel() {
   const featuredTarget = state.targets.find((target) => target.key === SYSTEM_OVERVIEW_TARGET_KEY) || null;
   const categories = [
     { label: "Input Layer", targets: getTargetsForCategory("Input Layer") },
-    { label: "Claims Normalization", targets: getTargetsForCategory("Claims Normalization") },
     { label: "Claims Preprocessing", targets: getTargetsForCategory("Claims Preprocessing") },
     { label: "Core", targets: getTargetsForCategory("Core") },
     { label: "Data Marts", targets: getTargetsForCategory("Data Marts") }
-  ].filter((category) => category.targets.length);
+  ]
+    .filter((category) => category.targets.length)
+    .map((category) => ({
+      ...category,
+      groups: buildTargetPanelGroups(category.label, category.targets)
+    }));
 
   return `
     <div class="target-panel" id="target-panel">
@@ -890,14 +964,71 @@ function renderTargetPanel() {
           return `
             <section class="target-panel-column">
               <h2>${escapeHtml(category.label)}</h2>
-              <div class="target-panel-list">
-                ${category.targets.map(renderTargetButton).join("")}
-              </div>
+              ${renderTargetPanelGroups(category.groups)}
             </section>
           `;
         })
         .join("")}
       </div>
+    </div>
+  `;
+}
+
+function buildTargetPanelGroups(categoryLabel, targets) {
+  const definitions = TARGET_PANEL_GROUP_DEFINITIONS[categoryLabel] || null;
+
+  if (!definitions) {
+    return [{ label: "", targets }];
+  }
+
+  const targetsByKey = new Map(targets.map((target) => [target.key, target]));
+  const usedKeys = new Set();
+  const groups = definitions
+    .map((definition) => {
+      const groupedTargets = definition.keys
+        .map((key) => targetsByKey.get(key))
+        .filter(Boolean);
+
+      for (const target of groupedTargets) {
+        usedKeys.add(target.key);
+      }
+
+      return {
+        label: definition.label,
+        targets: groupedTargets
+      };
+    })
+    .filter((group) => group.targets.length);
+  const remainingTargets = targets.filter((target) => !usedKeys.has(target.key));
+
+  if (remainingTargets.length) {
+    const otherGroup = groups.find((group) => group.label === "Other");
+
+    if (otherGroup) {
+      otherGroup.targets.push(...remainingTargets);
+    } else {
+      groups.push({ label: "Other", targets: remainingTargets });
+    }
+  }
+
+  return groups;
+}
+
+function renderTargetPanelGroups(groups) {
+  return `
+    <div class="target-panel-subgroups">
+      ${groups
+        .map((group) => {
+          return `
+            <section class="target-panel-subgroup">
+              ${group.label ? `<h3>${escapeHtml(group.label)}</h3>` : ""}
+              <div class="target-panel-list">
+                ${group.targets.map(renderTargetButton).join("")}
+              </div>
+            </section>
+          `;
+        })
+        .join("")}
     </div>
   `;
 }
@@ -924,135 +1055,44 @@ function renderModal(node) {
   const activeModalTab = resolveActiveModalTab(node, modalTabs);
 
   if (isSeedNode(node)) {
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Table Description",
-          value: renderTableDescription(node, editor),
-          editorValue: editor.draft.description,
-          fieldKey: "description",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          sectionClass: "modal-section--description"
-        })
-      }
-    );
+    sections.push({
+      tab: "overview",
+      html: renderModelDescriptionSection(node, editor, { editable })
+    });
+    sections.push({
+      tab: "overview",
+      html: renderDictionarySection(node, editor, "modal-section--dictionary")
+    });
     sections.push({
       tab: "overview",
       html: renderSeedPreviewSection(node, "modal-section--seed")
     });
-  } else if (isInputDocumentationNode(node)) {
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Table Description",
-          value: renderTableDescription(node, editor),
-          editorValue: editor.draft.description,
-          fieldKey: "description",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          sectionClass: "modal-section--description"
-        })
-      }
-    );
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Table Grain",
-          value: renderGrainAndPrimaryKey(node, editor),
-          editorValue: editor.draft.grain,
-          fieldKey: "grain",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          sectionClass: "modal-section--grain"
-        })
-      }
-    );
-    sections.push({
-      tab: "overview",
-      html: renderDictionarySection(node, editor, "modal-section--dictionary")
-    });
   } else if (isDagBoundaryNode(node)) {
-    sections.push(
-      {
+    sections.push({
+      tab: "overview",
+      html: renderModelDescriptionSection(node, editor, { editable: false })
+    });
+    if (node.columns?.length) {
+      sections.push({
         tab: "overview",
-        html: renderModalSection(
-          "Transformation Description",
-          renderTransformationDescription(node, editor),
-          true,
-          "modal-section--transformation"
-        )
-      }
-    );
-    sections.push({
-      tab: "overview",
-      html: renderModalSection("Table Description", renderTableDescription(node, editor), false, "modal-section--description")
-    });
-    sections.push({
-      tab: "overview",
-      html: renderModalSection("Table Grain", renderGrainAndPrimaryKey(node, editor), false, "modal-section--grain")
-    });
+        html: renderDictionarySection(node, editor, "modal-section--dictionary")
+      });
+    }
   } else {
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Transformation Description",
-          valueHtml: renderTransformationDescription(node, editor),
-          editorValue: editor.draft.transformationStepsText,
-          fieldKey: "transformationStepsText",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          isHtml: true,
-          sectionClass: "modal-section--transformation"
-        })
-      }
-    );
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Table Description",
-          value: renderTableDescription(node, editor),
-          editorValue: editor.draft.description,
-          fieldKey: "description",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          sectionClass: "modal-section--description"
-        })
-      }
-    );
-    sections.push(
-      {
-        tab: "overview",
-        html: renderEditableTextSection({
-          title: "Table Grain",
-          value: renderGrainAndPrimaryKey(node, editor),
-          editorValue: editor.draft.grain,
-          fieldKey: "grain",
-          editable,
-          isEditing: editor.isEditing,
-          multiline: true,
-          sectionClass: "modal-section--grain"
-        })
-      }
-    );
+    sections.push({
+      tab: "overview",
+      html: renderModelDescriptionSection(node, editor, { editable })
+    });
     sections.push({
       tab: "overview",
       html: renderDictionarySection(node, editor, "modal-section--dictionary")
     });
-    sections.push({
-      tab: "sql",
-      html: renderSqlSection(node, editor, "modal-section--sql")
-    });
+    if (shouldRenderSqlSection(node)) {
+      sections.push({
+        tab: "sql",
+        html: renderSqlSection(node, editor, "modal-section--sql")
+      });
+    }
   }
 
   const visibleSections = sections.filter((section) => section.tab === activeModalTab).map((section) => section.html);
@@ -1097,13 +1137,17 @@ function renderModal(node) {
   `;
 }
 
-function renderModalSection(title, content, isHtml = false, sectionClass = "") {
-  return `
-    <section class="modal-section ${escapeAttribute(sectionClass)}">
-      <h3>${escapeHtml(title)}</h3>
-      <div class="modal-section-body">${isHtml ? content : `<p>${escapeHtml(content)}</p>`}</div>
-    </section>
-  `;
+function renderModelDescriptionSection(node, editor = getEditorState(node), { editable = false, sectionClass = "" } = {}) {
+  return renderEditableTextSection({
+    title: "Model Description",
+    value: renderModelDescriptionText(node, editor),
+    editorValue: editor.draft.modelDescription,
+    fieldKey: "modelDescription",
+    editable,
+    isEditing: editor.isEditing,
+    multiline: true,
+    sectionClass: sectionClass || "modal-section--model-description"
+  });
 }
 
 function renderEditableTextSection({
@@ -1198,11 +1242,11 @@ function getModalTabs(node) {
     return [{ key: "overview", label: "Overview" }];
   }
 
-  if (isInputDocumentationNode(node)) {
+  if (isDagBoundaryNode(node)) {
     return [{ key: "overview", label: "Overview" }];
   }
 
-  if (isDagBoundaryNode(node)) {
+  if (!shouldRenderSqlSection(node)) {
     return [{ key: "overview", label: "Overview" }];
   }
 
@@ -1261,7 +1305,7 @@ function getModalTabForField(node, fieldKey) {
     return "sql";
   }
 
-  if (fieldKey === "description" || fieldKey === "grain" || fieldKey === "transformationStepsText") {
+  if (fieldKey === "modelDescription" || fieldKey === "description" || fieldKey === "grain" || fieldKey === "transformationStepsText") {
     return "overview";
   }
 
@@ -1340,54 +1384,72 @@ function getPreviewDraft(node, editor = getEditorState(node)) {
   return editor.draft;
 }
 
-function renderTransformationDescription(node, editor = getEditorState(node)) {
+function renderModelDescriptionText(node, editor = getEditorState(node)) {
+  const draft = getPreviewDraft(node, editor);
+
+  if (draft) {
+    return draft.modelDescription || "No model description has been added yet.";
+  }
+
+  if (isDagBoundaryNode(node)) {
+    return getTableDescriptionText(node, editor) || getTransformationDescriptionText(node);
+  }
+
+  return node.description || "No model description has been added yet.";
+}
+
+function getTransformationDescriptionText(node, { includeGeneratedFallback = true } = {}) {
   if (isDagBoundaryNode(node)) {
     const outputModels = node.dagBoundary?.outputModels?.length
       ? `Outputs in this collapsed DAG: ${node.dagBoundary.outputModels.join(", ")}.`
       : "";
 
-    return `<p>${escapeHtml(
-      `This node stands in for the ${node.name} DAG so the current canvas stays readable. ${outputModels}`.trim()
-    )}</p>`;
+    return `This node stands in for the ${node.name} DAG so the current canvas stays readable. ${outputModels}`.trim();
   }
 
-  const draft = getPreviewDraft(node, editor);
+  const transformationSteps = formatTransformationStepsText(node.curated?.transformationSteps);
 
-  if (draft) {
-    if (draft.transformationStepsText.trim()) {
-      return `<p>${escapeHtml(draft.transformationStepsText.trimEnd())}</p>`;
-    }
-
-    return "<p>No curated transformation description has been added yet.</p>";
+  if (transformationSteps) {
+    return transformationSteps;
   }
 
-  if (Array.isArray(node.curated.transformationSteps) && node.curated.transformationSteps.length) {
-    return `
-      <ol class="simple-list">
-        ${node.curated.transformationSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
-      </ol>
-    `;
+  if (!includeGeneratedFallback) {
+    return "";
   }
 
-  if (typeof node.curated.transformationSteps === "string" && node.curated.transformationSteps.trim()) {
-    return `<p>${escapeHtml(node.curated.transformationSteps.trimEnd())}</p>`;
+  return formatGeneratedDependencyDescription(node);
+}
+
+function formatTransformationStepsText(transformationSteps) {
+  if (Array.isArray(transformationSteps) && transformationSteps.length) {
+    return transformationSteps
+      .map((step, index) => `${index + 1}. ${step}`)
+      .join("\n");
   }
 
+  if (typeof transformationSteps === "string" && transformationSteps.trim()) {
+    return transformationSteps.trimEnd();
+  }
+
+  return "";
+}
+
+function formatGeneratedDependencyDescription(node) {
   const sentences = [];
 
-  if (node.mainDependencies.length) {
+  if (node.mainDependencies?.length) {
     sentences.push(`Reads from ${node.mainDependencies.map((dependency) => dependency.name).join(", ")}.`);
   }
 
-  if (node.supportingDependencies.length) {
+  if (node.supportingDependencies?.length) {
     sentences.push(`Also references ${node.supportingDependencies.map((dependency) => dependency.name).join(", ")}.`);
   }
 
   if (!sentences.length) {
-    sentences.push("No curated transformation description has been added yet.");
+    return "";
   }
 
-  return `<p>${escapeHtml(sentences.join(" "))}</p>`;
+  return sentences.join(" ");
 }
 
 function renderSeedPreviewSection(node, sectionClass = "") {
@@ -1494,7 +1556,7 @@ function renderSeedPreviewTable(preview) {
   `;
 }
 
-function renderTableDescription(node, editor = getEditorState(node)) {
+function getTableDescriptionText(node, editor = getEditorState(node)) {
   if (isDagBoundaryNode(node) && !isCollapsedInputBoundary(node)) {
     return node.description || `Collapsed DAG boundary for ${node.name}.`;
   }
@@ -1502,7 +1564,7 @@ function renderTableDescription(node, editor = getEditorState(node)) {
   const draft = getPreviewDraft(node, editor);
   const parts = [];
 
-  if (node.curated.whatItRepresents) {
+  if (node.curated?.whatItRepresents) {
     parts.push(node.curated.whatItRepresents);
   }
 
@@ -1512,10 +1574,10 @@ function renderTableDescription(node, editor = getEditorState(node)) {
     parts.push(description);
   }
 
-  return parts.join("\n\n") || "No table description has been added yet.";
+  return parts.join("\n\n");
 }
 
-function renderGrainAndPrimaryKey(node, editor = getEditorState(node)) {
+function getGrainAndPrimaryKeyText(node, editor = getEditorState(node)) {
   if (isDagBoundaryNode(node) && !isCollapsedInputBoundary(node)) {
     const outputs = node.dagBoundary?.outputModels?.length
       ? node.dagBoundary.outputModels.join(", ")
@@ -1526,30 +1588,55 @@ function renderGrainAndPrimaryKey(node, editor = getEditorState(node)) {
   }
 
   const draft = getPreviewDraft(node, editor);
-  const grain = draft ? draft.grain || "Not yet authored." : node.curated.grain || "Not yet authored.";
+  const grain = draft ? draft.grain || "Not yet authored." : node.curated?.grain || "Not yet authored.";
   const draftPrimaryKeys = draft ? draft.columns.filter((column) => column.isPrimaryKey).map((column) => column.name) : [];
-  const primaryKey = draftPrimaryKeys.length
-    ? draftPrimaryKeys.join(", ")
-    : formatCuratedPrimaryKey(node.curated.primaryKey) ||
-      (node.technical.primaryKeyColumns.length ? node.technical.primaryKeyColumns.join(", ") : "Not declared.");
+  const primaryKey = node.curated?.hidePrimaryKeyInModelDescription
+    ? ""
+    : draftPrimaryKeys.length
+      ? draftPrimaryKeys.join(", ")
+      : formatCuratedPrimaryKey(node.curated?.primaryKey) ||
+        (node.technical?.primaryKeyColumns?.length ? node.technical.primaryKeyColumns.join(", ") : "Not declared.");
 
-  return `Table grain: ${grain}\n\nPrimary key: ${primaryKey}`;
+  const parts = [];
+
+  if (grain && grain !== "Not yet authored.") {
+    parts.push(`Table grain: ${grain}`);
+  }
+
+  if (primaryKey && primaryKey !== "Not declared.") {
+    parts.push(`Primary key: ${primaryKey}`);
+  }
+
+  return parts.join("\n\n");
 }
 
-function shouldRenderTransformationSection(node) {
-  if (isDagBoundaryNode(node)) {
-    return !isCollapsedInputBoundary(node);
+function filterDuplicateGrainAndPrimaryKey(grainAndPrimaryKeyText, authoredText) {
+  if (!grainAndPrimaryKeyText) {
+    return "";
   }
 
-  if (isInputDocumentationNode(node)) {
-    return false;
-  }
+  const authoredLower = authoredText.toLowerCase();
 
-  if (isSeedNode(node)) {
-    return false;
-  }
+  return grainAndPrimaryKeyText
+    .split(/\n{2,}/)
+    .filter((part) => {
+      const normalizedPart = part.trim().toLowerCase();
 
-  return true;
+      if (normalizedPart.startsWith("table grain:")) {
+        return !authoredLower.includes("table grain:");
+      }
+
+      if (normalizedPart.startsWith("primary key:")) {
+        return !authoredLower.includes("primary key:");
+      }
+
+      return true;
+    })
+    .join("\n\n");
+}
+
+function shouldRenderSqlSection(node) {
+  return Boolean(node?.sql) && node?.resourceType === "model";
 }
 
 function isSeedNode(node) {
@@ -1600,7 +1687,6 @@ function getSeedPreviewState(nodeId) {
 }
 
 function renderDictionarySection(node, editor = getEditorState(node), sectionClass = "") {
-  const includeMappingInstructions = isSourceNode(node);
   const isEditing = canEditNode(node) && editor.isEditing;
   const previewColumns = getPreviewDraft(node, editor)?.columns || node.columns;
 
@@ -1615,13 +1701,12 @@ function renderDictionarySection(node, editor = getEditorState(node), sectionCla
                 <th>Column</th>
                 <th>Type</th>
                 <th>Description</th>
-                ${includeMappingInstructions ? "<th>Mapping Instructions</th>" : ""}
                 <th>PK</th>
               </tr>
             </thead>
             <tbody>
               ${editor.draft.columns
-                .map((column, index) => renderEditableDictionaryRow(column, index, { includeMappingInstructions }))
+                .map((column, index) => renderEditableDictionaryRow(column, index))
                 .join("")}
             </tbody>
           </table>
@@ -1643,11 +1728,10 @@ function renderDictionarySection(node, editor = getEditorState(node), sectionCla
               <th>Column</th>
               <th>Type</th>
               <th>Description</th>
-              ${includeMappingInstructions ? "<th>Mapping Instructions</th>" : ""}
             </tr>
           </thead>
           <tbody>
-            ${previewColumns.map((column) => renderDictionaryRow(column, { includeMappingInstructions })).join("")}
+            ${previewColumns.map((column) => renderDictionaryRow(column)).join("")}
           </tbody>
         </table>
       </div>
@@ -1655,7 +1739,7 @@ function renderDictionarySection(node, editor = getEditorState(node), sectionCla
   });
 }
 
-function renderDictionaryRow(column, { includeMappingInstructions = false } = {}) {
+function renderDictionaryRow(column) {
   return `
     <tr>
       <td>
@@ -1664,12 +1748,11 @@ function renderDictionaryRow(column, { includeMappingInstructions = false } = {}
       </td>
       <td>${escapeHtml(column.dataType || "Unknown")}</td>
       <td>${escapeHtml(column.description || "No description yet.")}</td>
-      ${includeMappingInstructions ? `<td>${escapeHtml(column.mappingInstructions || "")}</td>` : ""}
     </tr>
   `;
 }
 
-function renderEditableDictionaryRow(column, index, { includeMappingInstructions = false } = {}) {
+function renderEditableDictionaryRow(column, index) {
   return `
     <tr>
       <td>
@@ -1690,17 +1773,6 @@ function renderEditableDictionaryRow(column, index, { includeMappingInstructions
           data-editor-column-prop="description"
         >${escapeHtml(column.description || "")}</textarea>
       </td>
-      ${
-        includeMappingInstructions
-          ? `<td>
-              <textarea
-                class="editor-textarea editor-textarea-table"
-                data-editor-column-index="${index}"
-                data-editor-column-prop="mappingInstructions"
-              >${escapeHtml(column.mappingInstructions || "")}</textarea>
-            </td>`
-          : ""
-      }
       <td>
         <label class="editor-checkbox">
           <input
@@ -1889,6 +1961,10 @@ function bindModalEvents() {
 
   backdrop?.addEventListener("click", (event) => {
     if (event.target === backdrop) {
+      if (shouldIgnoreBackdropClick()) {
+        return;
+      }
+
       closeModal();
     }
   });
@@ -1930,7 +2006,8 @@ function bindSeedPreviewEvents(openNode) {
       ...preview,
       query,
       page: 1,
-      error: null
+      error: null,
+      requestToken: preview.requestToken + 1
     };
 
     requestSeedPreviewDebounced(openNode.id, query);
@@ -2115,7 +2192,9 @@ function buildSaveChanges(node, editor) {
   const initial = editor.initialDraft;
   const draft = editor.draft;
 
-  if (draft.description !== initial.description) {
+  if (draft.modelDescription !== initial.modelDescription) {
+    changes.description = draft.modelDescription;
+  } else if (draft.description !== initial.description) {
     changes.description = draft.description;
   }
 
@@ -2123,11 +2202,11 @@ function buildSaveChanges(node, editor) {
     changes.grain = draft.grain;
   }
 
-  if (!isInputNode(node) && !isSeedNode(node) && draft.transformationStepsText !== initial.transformationStepsText) {
+  if (!isSeedNode(node) && draft.transformationStepsText !== initial.transformationStepsText) {
     changes.transformationStepsText = draft.transformationStepsText;
   }
 
-  if (!isInputNode(node) && !isSeedNode(node) && draft.sql !== initial.sql) {
+  if (!isSeedNode(node) && draft.sql !== initial.sql) {
     changes.sql = draft.sql;
   }
 
@@ -2142,7 +2221,6 @@ function buildSaveChanges(node, editor) {
       if (
         column.description !== previous.description ||
         column.dataType !== previous.dataType ||
-        column.mappingInstructions !== previous.mappingInstructions ||
         column.isPrimaryKey !== previous.isPrimaryKey
       ) {
         return column;
@@ -2179,6 +2257,7 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
     return;
   }
 
+  const focusSnapshot = captureSeedSearchFocus(nodeId);
   const previous = getSeedPreviewState(nodeId);
   const requestToken = previous.requestToken + 1;
 
@@ -2191,7 +2270,7 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
     requestToken
   };
 
-  render();
+  renderWithSeedSearchFocus(focusSnapshot);
 
   if (IS_STATIC_MODE) {
     try {
@@ -2212,7 +2291,7 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
         status: "ready",
         error: null
       };
-      render();
+      renderWithSeedSearchFocus(focusSnapshot);
     } catch (error) {
       const current = getSeedPreviewState(nodeId);
 
@@ -2227,7 +2306,7 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
         rows: [],
         totalMatches: 0
       };
-      render();
+      renderWithSeedSearchFocus(focusSnapshot);
     }
     return;
   }
@@ -2265,7 +2344,7 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
       headers: Array.isArray(body.headers) ? body.headers : [],
       rows: Array.isArray(body.rows) ? body.rows : []
     };
-    render();
+    renderWithSeedSearchFocus(focusSnapshot);
   } catch (error) {
     const current = getSeedPreviewState(nodeId);
 
@@ -2280,8 +2359,54 @@ async function requestSeedPreview(nodeId, { query = "", page = 1 } = {}) {
       rows: [],
       totalMatches: 0
     };
-    render();
+    renderWithSeedSearchFocus(focusSnapshot);
   }
+}
+
+function captureSeedSearchFocus(nodeId) {
+  const input = document.querySelector("#seed-search-input");
+
+  if (!input || document.activeElement !== input || state.openNodeId !== nodeId) {
+    return null;
+  }
+
+  return {
+    nodeId,
+    selectionStart: input.selectionStart,
+    selectionEnd: input.selectionEnd
+  };
+}
+
+function renderWithSeedSearchFocus(focusSnapshot) {
+  render();
+  restoreSeedSearchFocus(focusSnapshot);
+}
+
+function restoreSeedSearchFocus(focusSnapshot) {
+  if (!focusSnapshot) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    if (state.openNodeId !== focusSnapshot.nodeId) {
+      return;
+    }
+
+    const input = document.querySelector("#seed-search-input");
+
+    if (!input) {
+      return;
+    }
+
+    input.focus({ preventScroll: true });
+
+    if (typeof input.setSelectionRange === "function") {
+      const valueLength = input.value.length;
+      const start = Math.min(focusSnapshot.selectionStart ?? valueLength, valueLength);
+      const end = Math.min(focusSnapshot.selectionEnd ?? start, valueLength);
+      input.setSelectionRange(start, end);
+    }
+  });
 }
 
 async function changeTarget(nextTargetKey) {
@@ -2422,10 +2547,15 @@ function handleNodePointerDown(event) {
     return;
   }
 
+  event.preventDefault();
   event.stopPropagation();
 
   const nodeId = event.currentTarget.dataset.nodeId;
   const position = state.positions[nodeId];
+
+  if (typeof event.currentTarget.setPointerCapture === "function") {
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
 
   state.activeNodeId = nodeId;
   syncNodeState();
@@ -2433,6 +2563,8 @@ function handleNodePointerDown(event) {
   state.drag = {
     type: "node",
     nodeId,
+    pointerId: event.pointerId,
+    startTime: performance.now(),
     startClientX: event.clientX,
     startClientY: event.clientY,
     originX: position.x,
@@ -2511,7 +2643,7 @@ function handlePointerMove(event) {
   }
 }
 
-function handlePointerUp() {
+function handlePointerUp(event) {
   if (!state.drag) {
     return;
   }
@@ -2537,11 +2669,19 @@ function handlePointerUp() {
   }
 
   if (!drag.moved) {
+    event?.preventDefault();
+
     const draggedNode = state.payload?.nodes.find((node) => node.id === drag.nodeId) || null;
     const targetKey = draggedNode?.paths?.targetKey || null;
+    const elapsedMs = performance.now() - (drag.startTime || performance.now());
 
     if (isSystemOverviewActive() && isDagBoundaryNode(draggedNode) && targetKey && targetKey !== SYSTEM_OVERVIEW_TARGET_KEY) {
       void changeTarget(targetKey);
+      return;
+    }
+
+    if (elapsedMs > NODE_HOLD_THRESHOLD_MS) {
+      syncScene();
       return;
     }
 
@@ -2550,8 +2690,7 @@ function handlePointerUp() {
       return;
     }
 
-    state.openNodeId = drag.nodeId;
-    render();
+    openNodeModal(drag.nodeId);
     return;
   }
 
@@ -2576,7 +2715,7 @@ function handleStageWheel(event) {
     : event.deltaMode === 2
       ? event.deltaY * rect.height
       : event.deltaY;
-  const zoomFactor = Math.exp(-normalizedDelta * 0.001);
+  const zoomFactor = Math.exp(-normalizedDelta * WHEEL_ZOOM_SPEED);
   const nextScale = clamp(state.viewport.scale * zoomFactor, MIN_SCALE, MAX_SCALE);
 
   zoomToPoint({
@@ -2830,7 +2969,7 @@ function syncSystemOverviewScene() {
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#3a3936"></path>
         </marker>
       </defs>
-      ${model.connectors.map((path) => `<path class="system-overview-connector" d="${path}"></path>`).join("")}
+      ${model.connectors.map(renderSystemOverviewConnectorPath).join("")}
     `;
   }
 }
@@ -3143,6 +3282,22 @@ function closeModal() {
   render();
 }
 
+function openNodeModal(nodeId) {
+  state.openNodeId = nodeId;
+  state.ignoreBackdropClickUntil = performance.now() + MODAL_BACKDROP_CLICK_GUARD_MS;
+  render();
+}
+
+function shouldIgnoreBackdropClick() {
+  if (!state.ignoreBackdropClickUntil) {
+    return false;
+  }
+
+  const shouldIgnore = performance.now() < state.ignoreBackdropClickUntil;
+  state.ignoreBackdropClickUntil = 0;
+  return shouldIgnore;
+}
+
 function confirmDiscardEditorChanges() {
   if (!state.editor.dirty || state.editor.isSaving) {
     return !state.editor.isSaving;
@@ -3209,15 +3364,15 @@ function createEditorStateForNode(node, { isEditing = false, focusField = null }
 
 function createEditorDraftFromNode(node) {
   return {
+    modelDescription: renderModelDescriptionText(node, null),
     description: node.description || "",
-    grain: node.curated.grain || "",
+    grain: node.curated?.grain || "",
     transformationStepsText: getEditableTransformationText(node),
     sql: node.sql || "",
     columns: node.columns.map((column) => ({
       name: column.name,
       description: column.description || "",
       dataType: column.dataType || "",
-      mappingInstructions: column.mappingInstructions || "",
       isPrimaryKey: Boolean(column.isPrimaryKey)
     }))
   };
@@ -3240,7 +3395,13 @@ function getEditableTransformationText(node) {
 }
 
 function canEditNode(node) {
-  return !IS_STATIC_MODE && Boolean(node) && Boolean(state.capabilities?.canEdit) && !isDagBoundaryNode(node);
+  return (
+    IS_LOCAL_DEVELOPMENT_HOST &&
+    !IS_STATIC_MODE &&
+    Boolean(node) &&
+    Boolean(state.capabilities?.canEdit) &&
+    !isDagBoundaryNode(node)
+  );
 }
 
 function getEditorState(node) {

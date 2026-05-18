@@ -129,10 +129,6 @@ select * from {{ ref('data_quality__appointment_start_datetime') }}
 
 union all
 
-select * from {{ ref('data_quality__condition_claim_id') }}
-
-union all
-
 select * from {{ ref('data_quality__condition_condition_id') }}
 
 union all
@@ -153,18 +149,6 @@ select * from {{ ref('data_quality__condition_encounter_id') }}
 
 union all
 
-select * from {{ ref('data_quality__condition_normalized_code_type') }}
-
-union all
-
-select * from {{ ref('data_quality__condition_normalized_code') }}
-
-union all
-
-select * from {{ ref('data_quality__condition_normalized_description') }}
-
-union all
-
 select * from {{ ref('data_quality__condition_onset_date') }}
 
 union all
@@ -174,10 +158,6 @@ select * from {{ ref('data_quality__condition_patient_id') }}
 union all
 
 select * from {{ ref('data_quality__condition_present_on_admit_code') }}
-
-union all
-
-select * from {{ ref('data_quality__condition_present_on_admit_description') }}
 
 union all
 
@@ -209,15 +189,7 @@ select * from {{ ref('data_quality__encounter_admit_source_code') }}
 
 union all
 
-select * from {{ ref('data_quality__encounter_admit_source_description') }}
-
-union all
-
 select * from {{ ref('data_quality__encounter_admit_type_code') }}
-
-union all
-
-select * from {{ ref('data_quality__encounter_admit_type_description') }}
 
 union all
 
@@ -241,10 +213,6 @@ select * from {{ ref('data_quality__encounter_discharge_disposition_code') }}
 
 union all
 
-select * from {{ ref('data_quality__encounter_discharge_disposition_description') }}
-
-union all
-
 select * from {{ ref('data_quality__encounter_encounter_end_date') }}
 
 union all
@@ -265,15 +233,7 @@ select * from {{ ref('data_quality__encounter_facility_npi') }}
 
 union all
 
-select * from {{ ref('data_quality__encounter_length_of_stay') }}
-
-union all
-
 select * from {{ ref('data_quality__encounter_drg_code') }}
-
-union all
-
-select * from {{ ref('data_quality__encounter_drg_description') }}
 
 union all
 
@@ -290,10 +250,6 @@ select * from {{ ref('data_quality__encounter_primary_diagnosis_code') }}
 union all
 
 select * from {{ ref('data_quality__encounter_primary_diagnosis_code_type') }}
-
-union all
-
-select * from {{ ref('data_quality__encounter_primary_diagnosis_description') }}
 
 union all
 
@@ -318,22 +274,6 @@ select * from {{ ref('data_quality__immunization_location_id') }}
 union all
 
 select * from {{ ref('data_quality__immunization_lot_number') }}
-
-union all
-
-select * from {{ ref('data_quality__immunization_normalized_code') }}
-
-union all
-
-select * from {{ ref('data_quality__immunization_normalized_code_type') }}
-
-union all
-
-select * from {{ ref('data_quality__immunization_normalized_description') }}
-
-union all
-
-select * from {{ ref('data_quality__immunization_normalized_dose') }}
 
 union all
 
@@ -449,19 +389,7 @@ select * from {{ ref('data_quality__location_name') }}
 
 union all
 
-select * from {{ ref('data_quality__procedure_normalized_code_type') }}
-
-union all
-
-select * from {{ ref('data_quality__procedure_normalized_description') }}
-
-union all
-
 select * from {{ ref('data_quality__procedure_procedure_id') }}
-
-union all
-
-select * from {{ ref('data_quality__procedure_claim_id') }}
 
 union all
 
@@ -505,10 +433,6 @@ select * from {{ ref('data_quality__procedure_modifier_4') }}
 
 union all
 
-select * from {{ ref('data_quality__procedure_normalized_code') }}
-
-union all
-
 select * from {{ ref('data_quality__procedure_modifier_1') }}
 
 union all
@@ -545,14 +469,6 @@ select * from {{ ref('data_quality__lab_result_collection_datetime') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_component_code') }}
-
-union all
-
-select * from {{ ref('data_quality__lab_result_normalized_component_type') }}
-
-union all
-
 select * from {{ ref('data_quality__lab_result_ordering_practitioner_id') }}
 
 union all
@@ -565,19 +481,11 @@ select * from {{ ref('data_quality__lab_result_source_order_type') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_order_description') }}
-
-union all
-
 select * from {{ ref('data_quality__lab_result_normalized_reference_range_low') }}
 
 union all
 
 select * from {{ ref('data_quality__lab_result_normalized_reference_range_high') }}
-
-union all
-
-select * from {{ ref('data_quality__lab_result_normalized_order_code') }}
 
 union all
 
@@ -606,10 +514,6 @@ select * from {{ ref('data_quality__lab_result_data_source') }}
 union all
 
 select * from {{ ref('data_quality__lab_result_normalized_units') }}
-
-union all
-
-select * from {{ ref('data_quality__lab_result_normalized_order_type') }}
 
 union all
 
@@ -753,19 +657,11 @@ select * from {{ ref('data_quality__medication_patient_id') }}
 
 union all
 
-select * from {{ ref('data_quality__medication_rxnorm_description') }}
-
-union all
-
 select * from {{ ref('data_quality__medication_encounter_id') }}
 
 union all
 
 select * from {{ ref('data_quality__medication_data_source') }}
-
-union all
-
-select * from {{ ref('data_quality__medication_atc_description') }}
 
 union all
 
@@ -786,10 +682,6 @@ select * from {{ ref('data_quality__medication_medication_id') }}
 union all
 
 select * from {{ ref('data_quality__medication_source_code_type') }}
-
-union all
-
-select * from {{ ref('data_quality__medication_ndc_description') }}
 
 union all
 
@@ -818,14 +710,6 @@ select * from {{ ref('data_quality__observation_source_units') }}
 union all
 
 select * from {{ ref('data_quality__observation_observation_type') }}
-
-union all
-
-select * from {{ ref('data_quality__observation_normalized_code') }}
-
-union all
-
-select * from {{ ref('data_quality__observation_normalized_description') }}
 
 union all
 
@@ -874,10 +758,6 @@ select * from {{ ref('data_quality__observation_source_reference_range_high') }}
 union all
 
 select * from {{ ref('data_quality__observation_normalized_units') }}
-
-union all
-
-select * from {{ ref('data_quality__observation_normalized_code_type') }}
 
 union all
 

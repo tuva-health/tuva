@@ -1,9 +1,7 @@
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
-
 
 with stg_eligibility as (
   select
@@ -11,12 +9,12 @@ with stg_eligibility as (
     , member_id
     , payer
     , {{ quote_column('plan') }}
-    , data_source
     , enrollment_start_date
     , enrollment_end_date
     , tuva_last_run
-    {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig') }}
-  from {{ ref('normalized_input__eligibility') }} as elig
+    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig') }}
+    , data_source
+  from {{ ref('normalized__eligibility') }} as elig
 )
 
 , month_start_and_end_dates as (
@@ -36,9 +34,9 @@ select distinct
   , b.year_month
   , a.payer
   , a.{{ quote_column('plan') }}
-  , a.data_source
   , a.tuva_last_run
-  {{ select_extension_columns(ref('input_layer__eligibility'), alias='a') }}
+  {{ select_extension_columns(ref('normalized__eligibility'), alias='a') }}
+  , a.data_source
 from stg_eligibility as a
 inner join month_start_and_end_dates as b
   on a.enrollment_start_date <= b.month_end_date

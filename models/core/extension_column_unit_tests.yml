@@ -4,8 +4,8 @@ version: 2
 #
 # These tests verify that x_ columns defined in the eligibility input layer flow
 # correctly through each stage:
-#   normalized_input__eligibility
-#     → claims_enrollment__member_months   (calendar join → monthly explosion)
+#   normalized__eligibility
+#     → core__int_member_months            (calendar join → monthly explosion)
 #     → core__member_months                (final SELECT)
 #
 # How _extension_columns_override works:
@@ -18,27 +18,22 @@ version: 2
 #   macro uses the supplied list instead.  This makes each test self-contained —
 #   no prior model run or external DB state is required.
 #
-# input_layer__eligibility is listed in each `given` section so dbt can satisfy
-# the compile-time dependency that ref('input_layer__eligibility') creates inside
-# the select_extension_columns() call.  With the override active, the fixture
-# data for that node is never queried; it only needs to exist as a node.
-
 unit_tests:
 
   # ── Stage 1: calendar join explodes enrollment span into monthly rows ───────
-  - name: test_member_months_extension_columns_flow_through_calendar_join
+  - name: test_core_int_member_months_extension_columns_flow_through_calendar_join
     description: >
-      Verifies that x_ extension columns from normalized_input__eligibility are
+      Verifies that x_ extension columns from normalized__eligibility are
       preserved after the calendar join that explodes enrollment spans into one
       row per member-month.
-    model: claims_enrollment__member_months
+    model: core__int_member_months
     config:
       enabled: "{{ var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', false))) | as_bool }}"
     overrides:
       vars:
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']
     given:
-      - input: ref('normalized_input__eligibility')
+      - input: ref('normalized__eligibility')
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
@@ -62,21 +57,6 @@ unit_tests:
           select cast('2020-01-01' as date) as full_date, 2020 as year, 1 as month
           union all
           select cast('2020-01-31' as date) as full_date, 2020 as year, 1 as month
-      # Listed to satisfy the compile-time ref() dependency inside
-      # select_extension_columns(). The fixture data is not used because
-      # _extension_columns_override is set.
-      - input: ref('input_layer__eligibility')
-        format: sql
-        rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          select
-            '10' as person_id,
-            '10' as member_id,
-            'medicare' as payer,
-            'medicare' as {{ plan_identifier }},
-            'test' as data_source,
-            cast('2020-01-01' as date) as enrollment_start_date,
-            cast('2020-01-31' as date) as enrollment_end_date
     expect:
       rows:
         # member_month_key = md5('10-10-202001-medicare-medicare-test')
@@ -128,21 +108,6 @@ unit_tests:
             'John' as x_temp_first_name,
             'test' as data_source,
             cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
-      # Listed to satisfy the compile-time ref() dependency inside
-      # select_extension_columns(). The fixture data is not used because
-      # _extension_columns_override is set.
-      - input: ref('input_layer__eligibility')
-        format: sql
-        rows: |
-          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          select
-            '10' as person_id,
-            '10' as member_id,
-            'medicare' as payer,
-            'medicare' as {{ plan_identifier }},
-            'test' as data_source,
-            cast('2020-01-01' as date) as enrollment_start_date,
-            cast('2020-01-31' as date) as enrollment_end_date
     expect:
       rows:
         - member_month_key: 'b8cc2c5022647c213f23a44b819d61a0'

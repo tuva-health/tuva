@@ -7,5 +7,6 @@ select
     , sex
     , birth_date
     , death_date
+    , data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('core__patient') }}

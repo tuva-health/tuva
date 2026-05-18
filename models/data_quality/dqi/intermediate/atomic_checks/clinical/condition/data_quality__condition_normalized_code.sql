@@ -11,14 +11,9 @@ select
     , 'Condition ID' as drill_down_key
     , coalesce(condition_id, 'NULL') as drill_down_value
     , 'NORMALIZED_CODE' as field_name
-    , case when term.icd_10_cm is not null then 'valid'
-          when m.normalized_code is not null then 'invalid'
-          else 'null'
-    end as bucket_name
-    , case when m.normalized_code is not null and term.icd_10_cm is null
-           then 'Normalized code does not join to Terminology icd_10_cm table'
-           else null end as invalid_reason
-    , cast(normalized_code as {{ dbt.type_string() }}) as field_value
+    , cast(null as {{ dbt.type_string() }}) as bucket_name
+    , cast(null as {{ dbt.type_string() }}) as invalid_reason
+    , cast(null as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('condition') }} as m
-left outer join {{ ref('terminology__icd_10_cm') }} as term on replace(m.normalized_code, '.', '') = term.icd_10_cm
+where 1 = 0

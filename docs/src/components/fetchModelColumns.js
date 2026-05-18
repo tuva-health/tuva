@@ -6,22 +6,6 @@ const RAW_BASE_URLS = [
 ];
 export const DEFAULT_BRANCH = 'main';
 const YAML_LOAD_OPTIONS = { json: true };
-const MAPPING_HINTS = [
-  'map ',
-  'mapping',
-  'mapped',
-  'source',
-  'raw data',
-  'we recommend',
-  'should be populated',
-  'mapping process',
-  'cast',
-  'convert',
-  'lpad(',
-  'remove the dashes',
-  'backfilled',
-  'if your',
-];
 
 function normalizeYamlPath(relativePath) {
   if (!relativePath) {
@@ -91,50 +75,6 @@ function normalizeDescription(text) {
     .join(' ');
 }
 
-function splitDescriptionAndMapping(rawDescription = '', explicitMappingInstructions = '') {
-  const normalizedDescription = normalizeDescription(rawDescription);
-  const normalizedMapping = normalizeDescription(explicitMappingInstructions);
-
-  if (!normalizedDescription && !normalizedMapping) {
-    return {
-      description: '',
-      fullDescription: '',
-      mappingInstructions: 'No explicit mapping instructions provided.',
-    };
-  }
-
-  if (normalizedMapping) {
-    return {
-      description: normalizedDescription,
-      fullDescription: normalizedDescription,
-      mappingInstructions: normalizedMapping,
-    };
-  }
-
-  const sentences = normalizedDescription.split(/(?<=[.!?])\s+/).filter(Boolean);
-  const mappingSentences = [];
-  const descriptionSentences = [];
-
-  sentences.forEach((sentence) => {
-    const lowerSentence = sentence.toLowerCase();
-    const isMappingSentence = MAPPING_HINTS.some((hint) => lowerSentence.includes(hint));
-    if (isMappingSentence) {
-      mappingSentences.push(sentence);
-    } else {
-      descriptionSentences.push(sentence);
-    }
-  });
-
-  const description = normalizeDescription(descriptionSentences.join(' ')) || normalizedDescription;
-  const mappingInstructions = normalizeDescription(mappingSentences.join(' '));
-
-  return {
-    description,
-    fullDescription: normalizedDescription,
-    mappingInstructions: mappingInstructions || 'No explicit mapping instructions provided.',
-  };
-}
-
 function normalizeRequiredForDataMarts(rawValue) {
   if (!rawValue) {
     return [];
@@ -164,17 +104,12 @@ function normalizeRequiredForDataMarts(rawValue) {
 
 function mapColumns(columns = []) {
   return columns.map((column) => {
-    const explicitMappingInstructions =
-      column.config?.meta?.mapping_instructions ||
-      column.meta?.mapping_instructions ||
-      column.mapping_instructions ||
-      '';
+    const normalizedDescription = normalizeDescription(column.description);
     const requiredForDataMarts = normalizeRequiredForDataMarts(
       column.config?.meta?.required_for_data_marts ||
         column.meta?.required_for_data_marts ||
         column.required_for_data_marts
     );
-    const parsed = splitDescriptionAndMapping(column.description, explicitMappingInstructions);
 
     return {
       name: column.name,
@@ -184,9 +119,8 @@ function mapColumns(columns = []) {
         column.config?.data_type ||
         column.data_type ||
         '',
-      description: parsed.description,
-      full_description: parsed.fullDescription,
-      mapping_instructions: parsed.mappingInstructions,
+      description: normalizedDescription,
+      full_description: normalizedDescription,
       required_for_data_marts: requiredForDataMarts,
       is_primary_key:
         column.config?.meta?.is_primary_key === true || column.meta?.is_primary_key === true

@@ -7,12 +7,79 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_yearly
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
     columns:
+      - name: person_id
+        description: Unique identifier for the person assigned to a provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: performance_year
+        description: Calendar year used to calculate the yearly attribution assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: provider_id
+        description: Identifier for the assigned provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: assigned_step
+        description: Attribution step that produced the final provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that produced the final
+          provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank providers.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          providers.
+        config:
+          meta:
+            data_type: integer
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
       - name: attribution_key
+        description: Synthetic key for the yearly attribution assignment record.
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: provider_attribution__assigned_beneficiaries_current
     config:
@@ -20,12 +87,79 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_current
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
     columns:
+      - name: person_id
+        description: Unique identifier for the person assigned to a provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: as_of_date
+        description: Anchor date used to calculate the current attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: provider_id
+        description: Identifier for the assigned provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: assigned_step
+        description: Attribution step that produced the final provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that produced the final
+          provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank providers.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          providers.
+        config:
+          meta:
+            data_type: integer
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
       - name: attribution_key
+        description: Synthetic key for the current attribution assignment record.
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: provider_attribution__provider_ranking
     config:
@@ -33,16 +167,101 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: provider_ranking
       materialized: table
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
     columns:
+      - name: person_id
+        description: Unique identifier for the person included in provider attribution
+          ranking.
+        config:
+          meta:
+            data_type: varchar
+      - name: performance_year
+        description: Calendar year for yearly attribution rows. Null for current
+          attribution rows.
+        config:
+          meta:
+            data_type: integer
+      - name: as_of_date
+        description: Anchor date for current attribution rows. Null for yearly
+          attribution rows.
+        config:
+          meta:
+            data_type: date
       - name: provider_id
+        description: Identifier for the ranked provider.
         tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: step
+        description: Attribution step that qualified the provider for ranking.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that qualified the provider for
+          ranking.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank the provider.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          the provider.
+        config:
+          meta:
+            data_type: integer
+      - name: scope
+        description: Attribution scope for the ranked row, either current or yearly.
+        config:
+          meta:
+            data_type: varchar
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution ranking.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution ranking.
+        config:
+          meta:
+            data_type: date
+      - name: ranking
+        description: Provider rank within the attribution scope and person.
+        config:
+          meta:
+            data_type: integer
       - name: attribution_key
+        description: Synthetic key for the attribution scope and person.
         tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [attribution_key, provider_id]
+            combination_of_columns: [ attribution_key, provider_id ]
 
   - name: provider_attribution__int_person_years
     config:
@@ -50,7 +269,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_person_years
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__provider_classification
     config:
@@ -58,7 +277,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_provider_classification
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__int_primary_care_claims
     config:
@@ -66,7 +285,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_primary_care_claims
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__int_yearly_steps
     config:
@@ -74,7 +293,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_yearly_steps
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__int_current_steps
     config:
@@ -82,7 +301,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_current_steps
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__stg_core__medical_claim
     description: Staging view of core medical claims used for provider attribution.
@@ -91,40 +310,44 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__medical_claim
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__stg_core__claims_medical_claim
-    description: Staging view of normalized medical claim encounter references used for provider attribution.
+    description: Staging view of normalized medical claim encounter references used
+      for provider attribution.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__claims_medical_claim
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__stg_core__member_months
-    description: Staging view of member months used for provider attribution eligibility logic.
+    description: Staging view of member months used for provider attribution
+      eligibility logic.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_core__member_months
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__stg_reference_data__calendar
-    description: Staging view of reference calendar data supporting provider attribution date logic.
+    description: Staging view of reference calendar data supporting provider
+      attribution date logic.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_reference_data__calendar
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]
 
   - name: provider_attribution__stg_terminology__provider
-    description: Staging view of provider taxonomy detail used in provider attribution classification.
+    description: Staging view of provider taxonomy detail used in provider
+      attribution classification.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _stg_terminology__provider
       materialized: view
-      tags: ["tuva_provider_attribution"]
+      tags: [ "tuva_provider_attribution" ]

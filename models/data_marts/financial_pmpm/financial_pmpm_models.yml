@@ -2,7 +2,7 @@ version: 2
 
 models:
 
-#### Final
+  #### Final
   - name: financial_pmpm__pmpm_prep
     config:
       schema: |
@@ -23,152 +23,474 @@ models:
               - data_source
               - "{{ quote_column('plan') }}"
     description: >
-      Computes all the paid and allowed statistics for every person_id and year_month combination.
+      Computes all the paid and allowed statistics for every person_id and
+      year_month combination.
     columns:
       - name: person_id
-        description: Unique identifier for each patient in the dataset.
+        description: Unique identifier for the person represented by the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: member_id
-        description: 'Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.'
+        description: Identifier that links the person to a particular insurance product
+          or health plan for the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: year_month
-        description: Unique year-month of in the dataset computed from eligibility.
+        description: Year and month for the member-month or aggregation period.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: Name of the payer associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: Name of the health plan associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+        description: Source dataset associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer_attributed_provider
-        description: >
-          Unique identifier for the provider assigned to this patient-year_month
-          by the payer.
+        description: Provider assigned to the member month by the payer.
+        config:
+          meta:
+            data_type: varchar
       - name: payer_attributed_provider_practice
-        description: >
-          Name of the practice for the payer attributed provider.
+        description: Practice associated with the payer-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: payer_attributed_provider_organization
-        description: >
-          Name of the organization for the payer attributed provider.
+        description: Organization associated with the payer-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: payer_attributed_provider_lob
-        description: >
-          Name of the line of business for the payer attributed provider
-          (e.g. medicare, medicaid, commercial).
+        description: Line of business associated with the payer-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: custom_attributed_provider
-        description: >
-          Unique identifier for the provider assigned to this patient-year_month
-          by the user.
+        description: Provider assigned to the member month by custom attribution logic.
+        config:
+          meta:
+            data_type: varchar
       - name: custom_attributed_provider_practice
-        description: >
-          Name of the practice for the attributed provider assigned by the user.
+        description: Practice associated with the custom-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: custom_attributed_provider_organization
-        description: >
-          Name of the organization for the attributed provider assigned by the user.
+        description: Organization associated with the custom-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: custom_attributed_provider_lob
-        description: >
-          Name of the line of business for the attributed provider assigned by the user
-          (e.g. medicare, medicaid, commercial).
+        description: Line of business associated with the custom-attributed provider.
+        config:
+          meta:
+            data_type: varchar
       - name: inpatient_paid
-        description: Total inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_paid
-        description: Total outpatient paid amount per member per month (PMPM).
-      - name: office_visit_paid
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_paid
+        description: Per member per month paid amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_paid
-        description: Total ancillary paid amount per member per month (PMPM).
-      - name: pharmacy_paid
-        description: Total pharmacy paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_paid
-        description: Total other paid amount per member per month (PMPM).
+        description: Per member per month paid amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_paid
+        description: Per member per month paid amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_paid
-        description: Total acute inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_paid
-        description: Total ambulance paid amount per member per month (PMPM).
-      - name: ambulatory_surgery_paid
-        description: Total ambulatory surgery paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_paid
+        description: Per member per month paid amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_paid
-        description: Total dialysis paid amount per member per month (PMPM).
+        description: Per member per month paid amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Per member per month paid amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_paid
-        description: Total emergency department paid amount per member per month (PMPM).
+        description: Per member per month paid amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_paid
-        description: Total home health paid amount per member per month (PMPM).
-      - name: hospice_paid
-        description: Total hospice paid amount per member per month (PMPM).
+        description: Per member per month paid amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_paid
+        description: Per member per month paid amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient rehabilitation services.
+        config:
+          meta:
+            data_type: number
       - name: lab_paid
-        description: Total lab paid amount per member per month (PMPM).
-      - name: office_visit_paid_2
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_paid
+        description: Per member per month paid amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_paid
+        description: Per member per month paid amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_paid
+        description: Per member per month paid amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_paid
+        description: Per member per month paid amount for office based radiology services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_paid
+        description: Per member per month paid amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_paid
+        description: Per member per month paid amount for office based visit services.
+        config:
+          meta:
+            data_type: number
+      - name: other_paid_2
+        description: Other paid 2.
+        config:
+          meta:
+            data_type: varchar
+      - name: outpatient_hospice_paid
+        description: Per member per month paid amount for outpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient hospital or clinic
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_paid
+        description: Per member per month paid amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_paid
+        description: Per member per month paid amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_paid
+        description: Per member per month paid amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_paid_2
+        description: Pharmacy paid 2.
+        config:
+          meta:
+            data_type: varchar
       - name: skilled_nursing_paid
-        description: Total skilled nursing paid amount per member per month (PMPM).
+        description: Per member per month paid amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_paid
+        description: Per member per month paid amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_paid
-        description: Total urgent care paid amount per member per month (PMPM).
+        description: Per member per month paid amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_allowed
-        description: Total inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_allowed
-        description: Total outpatient allowed amount per member per month (PMPM).
-      - name: office_visit_allowed
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_allowed
+        description: Per member per month allowed amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_allowed
-        description: Total ancillary allowed amount per member per month (PMPM).
-      - name: pharmacy_allowed
-        description: Total pharmacy allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_allowed
-        description: Total other allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_allowed
+        description: Per member per month allowed amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_allowed
-        description: Total acute inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_allowed
-        description: Total ambulance allowed amount per member per month (PMPM).
-      - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_allowed
+        description: Per member per month allowed amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_allowed
-        description: Total dialysis allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_allowed
-        description: Total home health allowed amount per member per month (PMPM).
-      - name: hospice_allowed
-        description: Total hospice allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_allowed
+        description: Per member per month allowed amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
       - name: lab_allowed
-        description: Total lab allowed amount per member per month (PMPM).
-      - name: office_visit_allowed_2
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_allowed
+        description: Per member per month allowed amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_allowed
+        description: Per member per month allowed amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_allowed
+        description: Per member per month allowed amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_allowed
+        description: Per member per month allowed amount for office based radiology
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_allowed
+        description: Per member per month allowed amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_allowed
+        description: Per member per month allowed amount for office based visit services.
+        config:
+          meta:
+            data_type: number
+      - name: other_allowed_2
+        description: Other allowed 2.
+        config:
+          meta:
+            data_type: varchar
+      - name: outpatient_hospice_allowed
+        description: Per member per month allowed amount for outpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient hospital or
+          clinic services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_allowed
+        description: Per member per month allowed amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient psychiatric
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_allowed
+        description: Per member per month allowed amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_allowed
+        description: Per member per month allowed amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_allowed_2
+        description: Pharmacy allowed 2.
+        config:
+          meta:
+            data_type: varchar
       - name: skilled_nursing_allowed
-        description: Total skilled nursing allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_allowed
+        description: Per member per month allowed amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_allowed
-        description: Total urgent care allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: total_paid
-        description: Total paid amount per member per month (PMPM).
+        description: Total paid amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_paid
-        description: Total medical paid amount per member per month (PMPM).
+        description: Medical paid amount per member per month, excluding pharmacy paid
+          amount.
+        config:
+          meta:
+            data_type: number
       - name: total_allowed
-        description: Total allowed amount per member per month (PMPM).
+        description: Total allowed amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_allowed
-        description: Total medical allowed amount per member per month (PMPM).
+        description: Medical allowed amount per member per month, excluding pharmacy
+          allowed amount.
+        config:
+          meta:
+            data_type: number
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: financial_pmpm__pmpm_payer_plan
     config:
@@ -180,123 +502,397 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
-      This version of the table computes at the payer and plan grain.
+      Computes per member per month statistics for every service category by
+      aggregating across patients from pmpm_prep. This version of the table
+      computes at the payer and plan grain.
     columns:
       - name: year_month
-        description: Unique year-month of in the dataset computed from eligibility.
+        description: Year and month for the member-month or aggregation period.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: Name of the payer associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: Name of the health plan associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+        description: Source dataset associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: member_months
-        description: The sum of member months.
+        description: Count of member months included in the aggregation.
+        config:
+          meta:
+            data_type: integer
       - name: total_paid
-        description: Total paid amount per member per month (PMPM).
+        description: Total paid amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_paid
-        description: Total medical paid amount per member per month (PMPM).
+        description: Medical paid amount per member per month, excluding pharmacy paid
+          amount.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_paid
-        description: Total inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_paid
-        description: Total outpatient paid amount per member per month (PMPM).
-      - name: office_visit_paid
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_paid
+        description: Per member per month paid amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_paid
-        description: Total ancillary paid amount per member per month (PMPM).
-      - name: pharmacy_paid
-        description: Total pharmacy paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_paid
-        description: Total other paid amount per member per month (PMPM).
+        description: Per member per month paid amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_paid
+        description: Per member per month paid amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_paid
-        description: Total acute inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_paid
-        description: Total ambulance paid amount per member per month (PMPM).
-      - name: ambulatory_surgery_paid
-        description: Total ambulatory surgery paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_paid
+        description: Per member per month paid amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_paid
-        description: Total dialysis paid amount per member per month (PMPM).
+        description: Per member per month paid amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Per member per month paid amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_paid
-        description: Total emergency department paid amount per member per month (PMPM).
+        description: Per member per month paid amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_paid
-        description: Total home health paid amount per member per month (PMPM).
-      - name: hospice_paid
-        description: Total hospice paid amount per member per month (PMPM).
+        description: Per member per month paid amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_paid
+        description: Per member per month paid amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient rehabilitation services.
+        config:
+          meta:
+            data_type: number
       - name: lab_paid
-        description: Total lab paid amount per member per month (PMPM).
-      - name: office_visit_paid_2
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_paid
+        description: Per member per month paid amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_paid
+        description: Per member per month paid amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_paid
+        description: Per member per month paid amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_paid
+        description: Per member per month paid amount for office based radiology services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_paid
+        description: Per member per month paid amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_paid
+        description: Per member per month paid amount for office based visit services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient hospital or clinic
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_paid
+        description: Per member per month paid amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_paid
+        description: Per member per month paid amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_paid
+        description: Per member per month paid amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
       - name: skilled_nursing_paid
-        description: Total skilled nursing paid amount per member per month (PMPM).
+        description: Per member per month paid amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_paid
+        description: Per member per month paid amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_paid
-        description: Total urgent care paid amount per member per month (PMPM).
+        description: Per member per month paid amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: total_allowed
-        description: Total allowed amount per member per month (PMPM).
+        description: Total allowed amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_allowed
-        description: Total medical allowed amount per member per month (PMPM).
+        description: Medical allowed amount per member per month, excluding pharmacy
+          allowed amount.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_allowed
-        description: Total inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_allowed
-        description: Total outpatient allowed amount per member per month (PMPM).
-      - name: office_visit_allowed
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_allowed
+        description: Per member per month allowed amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_allowed
-        description: Total ancillary allowed amount per member per month (PMPM).
-      - name: pharmacy_allowed
-        description: Total pharmacy allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_allowed
-        description: Total other allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_allowed
+        description: Per member per month allowed amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_allowed
-        description: Total acute inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_allowed
-        description: Total ambulance allowed amount per member per month (PMPM).
-      - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_allowed
+        description: Per member per month allowed amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_allowed
-        description: Total dialysis allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_allowed
-        description: Total home health allowed amount per member per month (PMPM).
-      - name: hospice_allowed
-        description: Total hospice allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_allowed
+        description: Per member per month allowed amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
       - name: lab_allowed
-        description: Total lab allowed amount per member per month (PMPM).
-      - name: office_visit_allowed_2
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_allowed
+        description: Per member per month allowed amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_allowed
+        description: Per member per month allowed amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_allowed
+        description: Per member per month allowed amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_allowed
+        description: Per member per month allowed amount for office based radiology
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_allowed
+        description: Per member per month allowed amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_allowed
+        description: Per member per month allowed amount for office based visit services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient hospital or
+          clinic services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_allowed
+        description: Per member per month allowed amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient psychiatric
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_allowed
+        description: Per member per month allowed amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_allowed
+        description: Per member per month allowed amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
       - name: skilled_nursing_allowed
-        description: Total skilled nursing allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_allowed
+        description: Per member per month allowed amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_allowed
-        description: Total urgent care allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: financial_pmpm__pmpm_payer
     config:
@@ -308,135 +904,410 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
-      This version of the table computes at the payer grain.
+      Computes per member per month statistics for every service category by
+      aggregating across patients from pmpm_prep. This version of the table
+      computes at the payer grain.
     tests:
       - the_tuva_project.expect_table_row_count_to_be_between:
-          description: This is a check in one of the final downstream marts to see if financial_pmpm__pmpm_payer is populated. If this is flagging, please check other areas further upstream on the input layer.
+          description: This is a check in one of the final downstream marts to see if
+            financial_pmpm__pmpm_payer is populated. If this is flagging, please
+            check other areas further upstream on the input layer.
           config:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
             meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to see if financial_pmpm__pmpm_payer is populated. If this is flagging, please check other areas further upstream on the input layer."
-            tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_financial_pmpm', 'dqi_usability']
+              dqi_test_description: "This is a check in one of the final downstream marts to
+                see if financial_pmpm__pmpm_payer is populated. If this is
+                flagging, please check other areas further upstream on the input
+                layer."
+            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_financial_pmpm', 'dqi_usability' ]
           arguments:
             min_value: 1
             strictly: false
     columns:
       - name: year_month
-        description: Unique year-month of in the dataset computed from eligibility.
+        description: Year and month for the member-month or aggregation period.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: Name of the payer associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+        description: Source dataset associated with the record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: member_months
-        description: The sum of member months.
+        description: Count of member months included in the aggregation.
+        config:
+          meta:
+            data_type: integer
       - name: total_paid
-        description: Total paid amount per member per month (PMPM).
+        description: Total paid amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_paid
-        description: Total medical paid amount per member per month (PMPM).
+        description: Medical paid amount per member per month, excluding pharmacy paid
+          amount.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_paid
-        description: Total inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_paid
-        description: Total outpatient paid amount per member per month (PMPM).
-      - name: office_visit_paid
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_paid
+        description: Per member per month paid amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_paid
-        description: Total ancillary paid amount per member per month (PMPM).
-      - name: pharmacy_paid
-        description: Total pharmacy paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_paid
-        description: Total other paid amount per member per month (PMPM).
+        description: Per member per month paid amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_paid
+        description: Per member per month paid amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_paid
-        description: Total acute inpatient paid amount per member per month (PMPM).
+        description: Per member per month paid amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_paid
-        description: Total ambulance paid amount per member per month (PMPM).
-      - name: ambulatory_surgery_paid
-        description: Total ambulatory surgery paid amount per member per month (PMPM).
+        description: Per member per month paid amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_paid
+        description: Per member per month paid amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_paid
-        description: Total dialysis paid amount per member per month (PMPM).
+        description: Per member per month paid amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Per member per month paid amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_paid
-        description: Total emergency department paid amount per member per month (PMPM).
+        description: Per member per month paid amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_paid
-        description: Total home health paid amount per member per month (PMPM).
-      - name: hospice_paid
-        description: Total hospice paid amount per member per month (PMPM).
+        description: Per member per month paid amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_paid
+        description: Per member per month paid amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for inpatient rehabilitation services.
+        config:
+          meta:
+            data_type: number
       - name: lab_paid
-        description: Total lab paid amount per member per month (PMPM).
-      - name: office_visit_paid_2
-        description: Total office visit paid amount per member per month (PMPM).
+        description: Per member per month paid amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_paid
+        description: Per member per month paid amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_paid
+        description: Per member per month paid amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_paid
+        description: Per member per month paid amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_paid
+        description: Per member per month paid amount for office based radiology services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_paid
+        description: Per member per month paid amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_paid
+        description: Per member per month paid amount for office based visit services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient hospital or clinic
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_paid
+        description: Per member per month paid amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_paid
+        description: Per member per month paid amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Per member per month paid amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_paid
+        description: Per member per month paid amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
       - name: skilled_nursing_paid
-        description: Total skilled nursing paid amount per member per month (PMPM).
+        description: Per member per month paid amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_paid
+        description: Per member per month paid amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_paid
-        description: Total urgent care paid amount per member per month (PMPM).
+        description: Per member per month paid amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: total_allowed
-        description: Total allowed amount per member per month (PMPM).
+        description: Total allowed amount per member per month.
+        config:
+          meta:
+            data_type: number
       - name: medical_allowed
-        description: Total medical allowed amount per member per month (PMPM).
+        description: Medical allowed amount per member per month, excluding pharmacy
+          allowed amount.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_allowed
-        description: Total inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_allowed
-        description: Total outpatient allowed amount per member per month (PMPM).
-      - name: office_visit_allowed
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_allowed
+        description: Per member per month allowed amount for office based services.
+        config:
+          meta:
+            data_type: number
       - name: ancillary_allowed
-        description: Total ancillary allowed amount per member per month (PMPM).
-      - name: pharmacy_allowed
-        description: Total pharmacy allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ancillary services.
+        config:
+          meta:
+            data_type: number
       - name: other_allowed
-        description: Total other allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for other services.
+        config:
+          meta:
+            data_type: number
+      - name: pharmacy_allowed
+        description: Per member per month allowed amount for pharmacy services.
+        config:
+          meta:
+            data_type: number
       - name: acute_inpatient_allowed
-        description: Total acute inpatient allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for acute inpatient services.
+        config:
+          meta:
+            data_type: number
       - name: ambulance_allowed
-        description: Total ambulance allowed amount per member per month (PMPM).
-      - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for ambulance services.
+        config:
+          meta:
+            data_type: number
+      - name: ambulatory_surgery_center_allowed
+        description: Per member per month allowed amount for ambulatory surgery center
+          services.
+        config:
+          meta:
+            data_type: number
       - name: dialysis_allowed
-        description: Total dialysis allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for dialysis services.
+        config:
+          meta:
+            data_type: number
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for durable medical equipment
+          services.
+        config:
+          meta:
+            data_type: number
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for emergency department services.
+        config:
+          meta:
+            data_type: number
       - name: home_health_allowed
-        description: Total home health allowed amount per member per month (PMPM).
-      - name: hospice_allowed
-        description: Total hospice allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for home health services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_hospice_allowed
+        description: Per member per month allowed amount for inpatient hospice services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient psychiatric services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for inpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
       - name: lab_allowed
-        description: Total lab allowed amount per member per month (PMPM).
-      - name: office_visit_allowed_2
-        description: Total office visit allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for lab services.
+        config:
+          meta:
+            data_type: number
+      - name: observation_allowed
+        description: Per member per month allowed amount for observation services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_other_allowed
+        description: Per member per month allowed amount for office based other services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_pt_ot_st_allowed
+        description: Per member per month allowed amount for office based pt ot st services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_radiology_allowed
+        description: Per member per month allowed amount for office based radiology
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_surgery_allowed
+        description: Per member per month allowed amount for office based surgery services.
+        config:
+          meta:
+            data_type: number
+      - name: office_based_visit_allowed
+        description: Per member per month allowed amount for office based visit services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient hospital or
+          clinic services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_pt_ot_st_allowed
+        description: Per member per month allowed amount for outpatient pt ot st services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient psychiatric
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_radiology_allowed
+        description: Per member per month allowed amount for outpatient radiology services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for outpatient rehabilitation
+          services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_surgery_allowed
+        description: Per member per month allowed amount for outpatient surgery services.
+        config:
+          meta:
+            data_type: number
       - name: skilled_nursing_allowed
-        description: Total skilled nursing allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for skilled nursing services.
+        config:
+          meta:
+            data_type: number
+      - name: telehealth_visit_allowed
+        description: Per member per month allowed amount for telehealth visit services.
+        config:
+          meta:
+            data_type: number
       - name: urgent_care_allowed
-        description: Total urgent care allowed amount per member per month (PMPM).
+        description: Per member per month allowed amount for urgent care services.
+        config:
+          meta:
+            data_type: number
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
 
-#### Intermediate
+  #### Intermediate
 
   - name: financial_pmpm__patient_spend_with_service_categories
     config:
@@ -448,7 +1319,8 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Adds service categories to claims and sums paid and allowed amounts to the year-month level.
+      Adds service categories to claims and sums paid and allowed amounts to the
+      year-month level.
 
   - name: financial_pmpm__service_category_1_allowed_pivot
     config:
@@ -498,7 +1370,7 @@ models:
     description: >
       Pivots out paid amounts into columns by service category level 2.
 
-## Staging
+  ## Staging
   - name: financial_pmpm__stg_eligibility
     config:
       tags:

@@ -11,8 +11,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , all_conditions.data_source
     , all_conditions.tuva_last_run
+    , all_conditions.data_source
 {%- endset -%}
 
 with all_conditions as (

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import { DEFAULT_BRANCH, fetchModelDefinition } from './fetchModelColumns';
 import './inputLayerDictionary.css';
@@ -28,30 +28,13 @@ const BASE_TABLE_COLUMNS = [
   { key: 'type', label: 'Data Type', className: 'input-dict-col-type' },
   { key: 'description', label: 'Description', className: 'input-dict-col-description' },
   {
-    key: 'mapping_instructions',
-    label: 'Mapping Instructions',
-    className: 'input-dict-col-mapping',
-  },
-  {
     key: 'required_for_data_marts',
-    label: 'Required For Data Mart',
+    label: 'Impacts Data Marts',
     className: 'input-dict-col-required',
   },
 ];
 
 const TABLE_COLUMN = { key: 'table', label: 'Table', className: 'input-dict-col-table' };
-
-function truncateText(text, limit = 140) {
-  if (!text) {
-    return '';
-  }
-
-  if (text.length <= limit) {
-    return text;
-  }
-
-  return `${text.slice(0, limit).trim()}...`;
-}
 
 function toTitleCase(value = '') {
   return value
@@ -75,14 +58,14 @@ function getRequiredForDataMarts(row) {
 
 function renderDataType(typeValue) {
   if (!typeValue) {
-    return <span className="input-dict-type-chip input-dict-type-empty">unknown</span>;
+    return <span className="input-dict-type-text input-dict-type-empty">unknown</span>;
   }
 
-  return <span className="input-dict-type-chip">{typeValue}</span>;
+  return <span className="input-dict-type-text">{typeValue}</span>;
 }
 
 function renderCellPreview(text, fallbackText) {
-  return <span className="input-dict-cell-preview">{truncateText(text || fallbackText, 165)}</span>;
+  return <span className="input-dict-cell-preview">{text || fallbackText}</span>;
 }
 
 function renderRequiredTags(tags) {
@@ -117,6 +100,93 @@ function getRowKey(row, index) {
   return `${row.__model_name || 'table'}::${row.name || `column-${index}`}`;
 }
 
+function flattenOptionGroups(optionGroups = []) {
+  return optionGroups.flatMap((group) => group.options || []);
+}
+
+function DictionarySelect({ id, label, value, optionGroups, onChange, className = '' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef(null);
+  const options = useMemo(() => flattenOptionGroups(optionGroups), [optionGroups]);
+  const selectedOption = options.find((option) => option.value === value) || options[0];
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const handleClickAway = (event) => {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickAway);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickAway);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className={`input-dict-control input-dict-custom-select ${className}`} ref={wrapperRef}>
+      <label id={`${id}-label`} htmlFor={id}>
+        {label}
+      </label>
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-labelledby={`${id}-label ${id}`}
+        className="input-dict-select-trigger"
+        id={id}
+        onClick={() => setIsOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            setIsOpen(false);
+          }
+        }}
+        type="button"
+      >
+        <span className="input-dict-select-value">{selectedOption?.label || 'Select'}</span>
+        <span className={`input-dict-select-caret ${isOpen ? 'is-open' : ''}`} aria-hidden="true" />
+      </button>
+
+      {isOpen ? (
+        <div
+          aria-labelledby={`${id}-label`}
+          className="input-dict-select-menu"
+          role="listbox"
+          tabIndex={-1}
+        >
+          {optionGroups.map((group, groupIndex) => (
+            <div className="input-dict-select-group" key={group.label || `group-${groupIndex}`}>
+              {group.label ? <div className="input-dict-select-group-label">{group.label}</div> : null}
+              {(group.options || []).map((option) => {
+                const isSelected = option.value === value;
+                return (
+                  <button
+                    aria-selected={isSelected}
+                    className={`input-dict-select-option ${isSelected ? 'is-selected' : ''}`}
+                    key={option.value}
+                    onClick={() => {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }}
+                    role="option"
+                    type="button"
+                  >
+                    <span className="input-dict-select-option-label">{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function normalizeTableOptions({ tableOptions, modelName, yamlPath }) {
   if (Array.isArray(tableOptions) && tableOptions.length) {
     return tableOptions;
@@ -143,7 +213,6 @@ export default function InputLayerDictionaryTable({
   tableOptions,
   defaultModelName = 'input_layer__eligibility',
   branch = DEFAULT_BRANCH,
-  showMappingInstructions = true,
   showRequiredForDataMart = true,
 }) {
   const normalizedOptions = useMemo(
@@ -271,6 +340,42 @@ export default function InputLayerDictionaryTable({
     return Array.from(marts).sort();
   }, [allRows, showRequiredForDataMart]);
 
+  const tableSelectGroups = useMemo(() => {
+    const groupLabels = Array.from(
+      new Set(normalizedOptions.map((option) => option.groupLabel || 'Input Layer'))
+    );
+
+    return [
+      {
+        options: [{ label: 'All Tables', value: ALL_TABLES_VALUE }],
+      },
+      ...groupLabels.map((groupLabel) => ({
+        label: groupLabel,
+        options: normalizedOptions
+          .filter((option) => (option.groupLabel || 'Input Layer') === groupLabel)
+          .map((option) => ({
+            label: option.label,
+            value: option.modelName,
+          })),
+      })),
+    ];
+  }, [normalizedOptions]);
+
+  const dataMartSelectGroups = useMemo(
+    () => [
+      {
+        options: [
+          { label: 'All Data Marts', value: ALL_DATA_MARTS_VALUE },
+          ...availableDataMarts.map((mart) => ({
+            label: formatDataMartLabel(mart),
+            value: mart,
+          })),
+        ],
+      },
+    ],
+    [availableDataMarts]
+  );
+
   const scopedRows = useMemo(() => {
     if (selectedModelName === ALL_TABLES_VALUE) {
       return allRows;
@@ -301,17 +406,13 @@ export default function InputLayerDictionaryTable({
         row.full_description,
       ];
 
-      if (showMappingInstructions) {
-        valuesToSearch.push(row.mapping_instructions);
-      }
-
       if (showRequiredForDataMart) {
         valuesToSearch.push(getRequiredForDataMarts(row).join(' '));
       }
 
       return valuesToSearch.some((value) => value && String(value).toLowerCase().includes(filterValue));
     });
-  }, [scopedRows, selectedDataMart, searchInput, showMappingInstructions, showRequiredForDataMart]);
+  }, [scopedRows, selectedDataMart, searchInput, showRequiredForDataMart]);
 
   const groupedRows = useMemo(() => {
     if (selectedModelName !== ALL_TABLES_VALUE) {
@@ -343,10 +444,6 @@ export default function InputLayerDictionaryTable({
 
   const showAllTables = selectedModelName === ALL_TABLES_VALUE;
   const configuredColumns = BASE_TABLE_COLUMNS.filter((column) => {
-    if (column.key === 'mapping_instructions') {
-      return showMappingInstructions;
-    }
-
     if (column.key === 'required_for_data_marts') {
       return showRequiredForDataMart;
     }
@@ -359,22 +456,27 @@ export default function InputLayerDictionaryTable({
     const columns = [];
 
     if (showAllTables) {
-      columns.push('minmax(110px, 0.75fr)');
+      columns.push('minmax(150px, 0.8fr)');
     }
 
-    columns.push('minmax(180px, 1.2fr)');
-    columns.push('minmax(100px, 0.75fr)');
-    columns.push('minmax(260px, 1.9fr)');
-
-    if (showMappingInstructions) {
-      columns.push('minmax(230px, 1.85fr)');
-    }
+    columns.push('minmax(220px, 1fr)');
+    columns.push('minmax(130px, 0.55fr)');
+    columns.push('minmax(420px, 2fr)');
 
     if (showRequiredForDataMart) {
-      columns.push('minmax(220px, 1.6fr)');
+      columns.push('minmax(300px, 1.35fr)');
     }
 
     return columns.join(' ');
+  })();
+
+  const gridMinWidth = (() => {
+    let minWidth = showAllTables ? 150 : 0;
+    minWidth += 220 + 130 + 420;
+    if (showRequiredForDataMart) {
+      minWidth += 300;
+    }
+    return `${minWidth}px`;
   })();
 
   const renderTableRows = (rows) =>
@@ -395,7 +497,7 @@ export default function InputLayerDictionaryTable({
               isExpanded ? 'is-expanded' : ''
             }`}
             onClick={() => setExpandedRow(isExpanded ? null : rowKey)}
-            style={{ gridTemplateColumns }}
+            style={{ gridTemplateColumns, minWidth: gridMinWidth }}
           >
             {showAllTables ? (
               <div className="input-dict-cell input-dict-col-table">
@@ -419,15 +521,6 @@ export default function InputLayerDictionaryTable({
             <div className="input-dict-cell input-dict-col-description">
               {renderCellPreview(row.description || row.full_description, 'No description provided.')}
             </div>
-
-            {showMappingInstructions ? (
-              <div className="input-dict-cell input-dict-col-mapping">
-                {renderCellPreview(
-                  row.mapping_instructions,
-                  'No explicit mapping instructions provided.'
-                )}
-              </div>
-            ) : null}
 
             {showRequiredForDataMart ? (
               <div className="input-dict-cell input-dict-col-required">
@@ -461,15 +554,9 @@ export default function InputLayerDictionaryTable({
                   <h5>Description</h5>
                   <p>{row.full_description || 'No description provided.'}</p>
                 </section>
-                {showMappingInstructions ? (
-                  <section className="input-dict-expanded-section">
-                    <h5>Mapping Instructions</h5>
-                    <p>{row.mapping_instructions || 'No explicit mapping instructions provided.'}</p>
-                  </section>
-                ) : null}
                 {showRequiredForDataMart ? (
                   <section className="input-dict-expanded-section">
-                    <h5>Required For Data Mart</h5>
+                    <h5>Impacts Data Marts</h5>
                     <div>{renderRequiredTags(visibleRequiredDataMarts)}</div>
                   </section>
                 ) : null}
@@ -487,54 +574,30 @@ export default function InputLayerDictionaryTable({
           showRequiredForDataMart ? '' : 'input-dict-toolbar-no-mart'
         }`}
       >
-        <div className="input-dict-control input-dict-control-table">
-          <label htmlFor="input-dict-table-selector">Select Table</label>
-          <select
-            id="input-dict-table-selector"
-            value={selectedModelName}
-            onChange={(event) => {
-              setSelectedModelName(event.target.value);
-              setExpandedRow(null);
-            }}
-            className="input-dict-table-selector"
-          >
-            <option value={ALL_TABLES_VALUE}>All Tables</option>
-            {Array.from(new Set(normalizedOptions.map((option) => option.groupLabel || 'Input Layer'))).map(
-              (groupLabel) => (
-                <optgroup key={groupLabel} label={groupLabel}>
-                  {normalizedOptions
-                    .filter((option) => (option.groupLabel || 'Input Layer') === groupLabel)
-                    .map((option) => (
-                      <option key={option.modelName} value={option.modelName}>
-                        {option.label}
-                      </option>
-                    ))}
-                </optgroup>
-              )
-            )}
-          </select>
-        </div>
+        <DictionarySelect
+          className="input-dict-control-table"
+          id="input-dict-table-selector"
+          label="Select Table"
+          onChange={(nextValue) => {
+            setSelectedModelName(nextValue);
+            setExpandedRow(null);
+          }}
+          optionGroups={tableSelectGroups}
+          value={selectedModelName}
+        />
 
         {showRequiredForDataMart ? (
-          <div className="input-dict-control input-dict-control-mart">
-            <label htmlFor="input-dict-data-mart-selector">Required For Data Mart</label>
-            <select
-              id="input-dict-data-mart-selector"
-              value={selectedDataMart}
-              onChange={(event) => {
-                setSelectedDataMart(event.target.value);
-                setExpandedRow(null);
-              }}
-              className="input-dict-table-selector"
-            >
-              <option value={ALL_DATA_MARTS_VALUE}>All Data Marts</option>
-              {availableDataMarts.map((mart) => (
-                <option key={mart} value={mart}>
-                  {formatDataMartLabel(mart)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <DictionarySelect
+            className="input-dict-control-mart"
+            id="input-dict-data-mart-selector"
+            label="Data Mart Impact"
+            onChange={(nextValue) => {
+              setSelectedDataMart(nextValue);
+              setExpandedRow(null);
+            }}
+            optionGroups={dataMartSelectGroups}
+            value={selectedDataMart}
+          />
         ) : null}
 
         <label className="input-dict-search-wrapper" htmlFor="input-dict-dictionary-search">
@@ -549,11 +612,7 @@ export default function InputLayerDictionaryTable({
             type="text"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
-            placeholder={
-              showMappingInstructions
-                ? 'Search column, type, description, mapping'
-                : 'Search column, type, description'
-            }
+            placeholder="Search column, type, description"
             className="input-dict-search"
           />
         </label>
@@ -587,7 +646,7 @@ export default function InputLayerDictionaryTable({
         <div
           className={`input-dict-grid-header ${showAllTables ? 'has-table' : ''}`}
           role="row"
-          style={{ gridTemplateColumns }}
+          style={{ gridTemplateColumns, minWidth: gridMinWidth }}
         >
           {activeColumns.map((column) => (
             <div key={column.key} className={`input-dict-cell ${column.className}`}>

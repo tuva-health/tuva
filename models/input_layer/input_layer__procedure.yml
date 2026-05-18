@@ -1,13 +1,33 @@
 version: 2
 models:
   - name: input_layer__procedure
-    description: >-
-      The procedure table contains information about procedures performed on
-      patients in the dataset.
-    grain: Intended to be one record per procedure record per data source.
-    transformation_steps: |-
-      This model brings the input layer procedure table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: |-
+      The procedure table contains one record per procedure per data source. It stores clinical procedures performed for a patient, including the person, patient, encounter, procedure date, source procedure code, optional modifiers, and practitioner who performed or documented the procedure.
+
+      The procedure_id should identify a unique procedure record within a source system. Procedure codes should be mapped to source_code_type and source_code; Tuva derives normalized procedure fields downstream in core.procedure when the source code can be matched to supported terminology or custom mappings.
+
+      Primary key: procedure_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_1
+              - dqi
+              - dqi_service_categories
+              - dqi_ccsr
+              - dqi_cms_chronic_conditions
+              - dqi_tuva_chronic_conditions
+              - dqi_cms_hccs
+              - dqi_ed_classification
+              - dqi_financial_pmpm
+              - dqi_quality_measures
+              - dqi_readmission
+          arguments:
+            combination_of_columns:
+              - procedure_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -15,27 +35,10 @@ models:
       materialized: view
     columns:
       - name: procedure_id
-        description: The unique identifier for the performed procedure.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source-system identifier for the procedure record. This value should be unique within a data source.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - unique:
               config:
                 severity: error
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -72,8 +75,7 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: person_id
-        description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Globally unique identifier for the person across the dataset.
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -100,8 +102,7 @@ models:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Clinical source-system patient identifier, such as medical record number or MRN.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -123,8 +124,7 @@ models:
           meta:
             data_type: varchar
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source-system identifier for the clinical encounter associated with the procedure, when available.
         required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -149,32 +149,8 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
       - name: procedure_date
-        description: Date when the procedure was performed.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Date the procedure was performed or documented.
         required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -212,8 +188,7 @@ models:
           meta:
             data_type: date
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source procedure code system. Expected values are snomed-ct, hcpcs, icd-10-pcs, or icd-9-pcs.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -242,8 +217,7 @@ models:
           meta:
             data_type: varchar
       - name: source_code
-        description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Procedure code from the source system.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -267,87 +241,7 @@ models:
           meta:
             data_type: varchar
       - name: source_description
-        description: Description of the source code in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_code_type
-        description: The normalized type of code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''bigquery'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-              arguments:
-                to: ref('reference_data__code_type')
-                field: code_type
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_code
-        description: The normalized code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_description
-        description: Normalized description of the code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source-system description of the procedure code.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -369,8 +263,7 @@ models:
           meta:
             data_type: varchar
       - name: modifier_1
-        description: First modifier for the procedure code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: First procedure code modifier, when applicable.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -382,7 +275,7 @@ models:
                   - dqi
                   - dqi_quality_measures
           - relationships:
-              description: Procedure modifier should be a valid code set
+              description: Procedure modifier should be a valid code set.
               config:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -397,8 +290,7 @@ models:
           meta:
             data_type: varchar
       - name: modifier_2
-        description: Second modifier for the procedure code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Second procedure code modifier, when applicable.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -410,7 +302,7 @@ models:
                   - dqi
                   - dqi_quality_measures
           - relationships:
-              description: Procedure modifier should be a valid code set
+              description: Procedure modifier should be a valid code set.
               config:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -425,8 +317,7 @@ models:
           meta:
             data_type: varchar
       - name: modifier_3
-        description: Third modifier for the procedure code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Third procedure code modifier, when applicable.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -438,7 +329,7 @@ models:
                   - dqi
                   - dqi_quality_measures
           - relationships:
-              description: Procedure modifier should be a valid code set
+              description: Procedure modifier should be a valid code set.
               config:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -453,8 +344,7 @@ models:
           meta:
             data_type: varchar
       - name: modifier_4
-        description: Fourth modifier for the procedure code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Fourth procedure code modifier, when applicable.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -466,7 +356,7 @@ models:
                   - dqi
                   - dqi_quality_measures
           - relationships:
-              description: Procedure modifier should be a valid code set
+              description: Procedure modifier should be a valid code set.
               config:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -481,8 +371,7 @@ models:
           meta:
             data_type: varchar
       - name: modifier_5
-        description: Fifth modifier for the procedure code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Fifth procedure code modifier, when applicable.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -494,7 +383,7 @@ models:
                   - dqi
                   - dqi_quality_measures
           - relationships:
-              description: Procedure modifier should be a valid code set
+              description: Procedure modifier should be a valid code set.
               config:
                 severity: warn
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
@@ -509,8 +398,7 @@ models:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source-system practitioner identifier for the clinician associated with the procedure.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -527,54 +415,12 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_cms_chronic_conditions
-        config:
-          meta:
-            data_type: varchar
-            is_primary_key: true
-      - name: file_name
-        description: The file name of the source file.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
                   - dqi
         config:
           meta:
             data_type: varchar
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Date and time the record was ingested or refreshed.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -610,3 +456,28 @@ models:
         config:
           meta:
             data_type: timestamp
+      - name: data_source
+        description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with procedure_id.
+        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+                  - dqi_cms_chronic_conditions
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_5
+                  - dqi
+                  - dqi_cms_chronic_conditions
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

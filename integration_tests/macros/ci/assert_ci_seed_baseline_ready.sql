@@ -9,7 +9,7 @@
       We validate one canonical relation per schema to keep this precheck fast.
     #}
     {% set required_relations = [
-        {'schema': 'raw_data', 'identifier': 'eligibility'},
+        {'schema': 'synthetic_data', 'identifier': 'eligibility'},
         {'schema': 'provider_data', 'identifier': 'provider'},
         {'schema': 'terminology', 'identifier': 'admit_type'},
         {'schema': 'reference_data', 'identifier': 'calendar'},
@@ -34,7 +34,7 @@
         {% do exceptions.raise_compiler_error(
             "CI baseline seed schemas are not ready for run-only mode. Missing required objects: "
             ~ (missing | join(', '))
-            ~ ". Run a seed-refreshing CI command such as `/ci snowflake dbt seed` or `/ci snowflake dbt build --full-refresh` to refresh `raw_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
+            ~ ". Run a seed-refreshing CI command such as `/ci snowflake dbt seed` or `/ci snowflake dbt build --full-refresh` to refresh `synthetic_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
         ) %}
     {% endif %}
 

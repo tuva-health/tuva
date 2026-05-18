@@ -25,6 +25,4 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_float() }}) as longitude
 {{ tuva_synthetic_extensions }}
 , cast(null as {{ dbt.type_string() }}) as data_source
-, cast(null as {{ dbt.type_string() }}) as file_name
-, cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
 {{ limit_zero() }}

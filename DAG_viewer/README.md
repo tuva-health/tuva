@@ -27,6 +27,20 @@ npm run build:local
 npm run serve
 ```
 
+For local editing mode, use the dev server instead:
+
+```bash
+npm install
+npm run dev
+```
+
+The dev server listens on `127.0.0.1:8000`, serves the app in live mode, and
+enables the modal `Edit`/`Save` controls. Saves write back to the checked-out dbt
+SQL and YAML files and run `scripts/dbt-local parse` so the local DAG reflects
+dependency changes. The committed `public/index.html` remains hard-coded to
+static mode, and the Netlify build publishes only `dist`, so edit mode is not
+available on the public site.
+
 To force a different source checkout or Git ref:
 
 ```bash

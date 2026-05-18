@@ -35,8 +35,8 @@
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
-    , cast(appts.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(appts.data_source as {{ dbt.type_string() }}) as data_source
 from {{ ref('input_layer__appointment') }} as appts
     left outer join {{ ref('terminology__appointment_type') }} as appointment_type
         on lower(trim(appts.type_code)) = lower(trim(appointment_type.code))

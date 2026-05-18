@@ -1,7 +1,7 @@
 version: 2
 
 models:
-## Final
+  ## Final
   - name: readmissions__encounter_augmented
     config:
       schema: |
@@ -10,97 +10,153 @@ models:
       alias: encounter_augmented
       tags: readmissions
       materialized: table
-    description: "This model includes all encounters from the stg_encounter model, and for each encounter_id we add fields relevant for the encounter."
+    description: "This model includes all encounters from the stg_encounter model,
+      and for each encounter_id we add fields relevant for the encounter."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: "The unique identifier for the patient"
+        config:
+          meta:
+            data_type: varchar
       - name: admit_date
         description: "The date of admission for the inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: discharge_date
         description: "The date of discharge for the inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: discharge_disposition_code
         description: "The valid 2-digit discharge status for the inpatient visit"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/discharge-disposition
+            data_type: varchar
       - name: facility_npi
         description: "An ID for the facility where the inpatient visit occurred"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: ms_drg_code
-        description: "The MS-DRG associted with the inpatient visit"
+            terminology_note: "**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters."
+            data_type: varchar
+      - name: drg_code_type
+        description: Coding system used for the diagnosis-related group code.
+        config:
+          meta:
+            data_type: varchar
+      - name: drg_code
+        description: "Diagnosis-related group code for the encounter."
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/ms-drg
+            data_type: varchar
       - name: paid_amount
         description: "The number of dollars paid on the encounter"
+        config:
+          meta:
+            data_type: number
       - name: length_of_stay
-        description: "Integer representing the length of stay of the inpatient visit in days"
+        description: "Integer representing the length of stay of the inpatient visit in
+          days"
         data_type: integer
       - name: index_admission_flag
         description: "Flag to indicate if the encounter is an index admission"
-        data_type: boolean
+        data_type: integer
       - name: planned_flag
         description: "Flag to indicate if the encounter was planned"
-        data_type: boolean
+        data_type: integer
       - name: specialty_cohort
         description: "Specialty cohort the encounter belongs to"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
+            data_type: varchar
       - name: died_flag
         description: "Flag to indicate of the patient died in this encounter"
-        data_type: boolean
+        data_type: integer
       - name: diagnosis_ccs
         description: "CCS code associated with the primary diagnosis for the encounter"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
+            data_type: varchar
       - name: disqualified_encounter_flag
-        description: "A flag that indicates whether this encounter is disqualified from being used in readmission measures for any critical data quality problem."
-        data_type: boolean
+        description: "A flag that indicates whether this encounter is disqualified from
+          being used in readmission measures for any critical data quality
+          problem."
+        data_type: integer
       - name: missing_admit_date_flag
-        description: "A flag that indicates whether the admit date is missing from this encounter."
-        data_type: boolean
+        description: "A flag that indicates whether the admit date is missing from this
+          encounter."
+        data_type: integer
       - name: missing_discharge_date_flag
-        description: "A flag that indicates whether the discharge date is missing from this encounter."
-        data_type: boolean
+        description: "A flag that indicates whether the discharge date is missing from
+          this encounter."
+        data_type: integer
       - name: admit_after_discharge_flag
-        description: "A flag that indicates whether the admit date for the encounter is after the discharge date for the encounter."
-        data_type: boolean
+        description: "A flag that indicates whether the admit date for the encounter is
+          after the discharge date for the encounter."
+        data_type: integer
       - name: missing_discharge_disposition_code_flag
-        description: "A flag that indicates whether the discharge status code is missing for the encounter."
-        data_type: boolean
+        description: "A flag that indicates whether the discharge status code is missing
+          for the encounter."
+        data_type: integer
       - name: invalid_discharge_disposition_code_flag
-        description: "A flag that indicates whether the discharge status code that is present for this encounter is invalid. This flag is 1 only when the discharge status code is present but invalid."
-        data_type: boolean
+        description: "A flag that indicates whether the discharge status code that is
+          present for this encounter is invalid. This flag is 1 only when the
+          discharge status code is present but invalid."
+        data_type: integer
       - name: missing_primary_diagnosis_flag
-        description: "A flag that indicates whether there is no primary diagnosis associated with the encounter."
-        data_type: boolean
-      - name: multiple_primary_diagnoses_flag
-        description: "A flag that indicates whether there are multiple primary diagnoses associated with the encounter."
-        data_type: boolean
+        description: "A flag that indicates whether there is no primary diagnosis
+          associated with the encounter."
+        data_type: integer
       - name: invalid_primary_diagnosis_code_flag
-        description: "A flag that indicates whether the primary diagnosis present for this encounter is invalid, i.e. a non existing ICD-10-CM code. This flag indicates that a primary diagnosis code is indeed present for the encounter, but it is not a valid ICD-10-CM code."
-        data_type: boolean
+        description: "A flag that indicates whether the primary diagnosis present for
+          this encounter is invalid, i.e. a non existing ICD-10-CM code. This
+          flag indicates that a primary diagnosis code is indeed present for the
+          encounter, but it is not a valid ICD-10-CM code."
+        data_type: integer
       - name: no_diagnosis_ccs_flag
-        description: "A flag that indicates whether there is no CCS diagnosis category associated with the primary ICD-10-CM diagnosis code for the encounter. This flag indicates that there is a valid primary ICD-10-CM diagnosis code associated with the encounter, but there is no CCS diagnosis category associated with that ICD-10-CM code."
-        data_type: boolean
+        description: "A flag that indicates whether there is no CCS diagnosis category
+          associated with the primary ICD-10-CM diagnosis code for the
+          encounter. This flag indicates that there is a valid primary ICD-10-CM
+          diagnosis code associated with the encounter, but there is no CCS
+          diagnosis category associated with that ICD-10-CM code."
+        data_type: integer
       - name: overlaps_with_another_encounter_flag
-        description: "A flag that indicates whether this encounter's dates overlap with those of another encounter in the dataset"
-        data_type: boolean
-      - name: missing_ms_drg_flag
-        description: "A flag that indicates whether this encounter contains a claim with a missing ms-drg code"
-        data_type: boolean
-      - name: invalid_ms_drg_flag
-        description: "A flag that indicates whether this encounter contains a claim with an invalid missing ms-drg code"
-        data_type: boolean
+        description: "A flag that indicates whether this encounter's dates overlap with
+          those of another encounter in the dataset"
+        data_type: integer
+      - name: missing_drg_flag
+        description: "Flag indicating whether the encounter contains a claim with a
+          missing diagnosis-related group code."
+        data_type: integer
+      - name: invalid_drg_flag
+        description: "Flag indicating whether the encounter contains a claim with an
+          invalid diagnosis-related group code."
+        data_type: integer
+      - name: data_source
+        description: Source dataset associated with the encounter.
+        config:
+          meta:
+            data_type: varchar
       - name: tuva_last_run
-        description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: The time at with the model was materialized. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: readmissions__readmission_summary
     config:
@@ -110,128 +166,200 @@ models:
       alias: readmission_summary
       tags: readmissions
       materialized: table
-    description: "This model includes all rows from the encounter_augmented model where disqualified_encounter_flag = 0 (all rows for encounters that are not disqualified for data quality issues). For each of these encounters we add fields to indicate whether it had a readmission and, when a readmission was present, to show relevant fields for the readmission."
+    description: "This model includes all rows from the encounter_augmented model
+      where disqualified_encounter_flag = 0 (all rows for encounters that are
+      not disqualified for data quality issues). For each of these encounters we
+      add fields to indicate whether it had a readmission and, when a
+      readmission was present, to show relevant fields for the readmission."
     tests:
       - the_tuva_project.expect_table_row_count_to_be_between:
-          description: This is a check in one of the final downstream marts to see if readmissions__readmission_summary is populated. If this is flagging, please check other areas further upstream on the input layer.
+          description: This is a check in one of the final downstream marts to see if
+            readmissions__readmission_summary is populated. If this is flagging,
+            please check other areas further upstream on the input layer.
           config:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
             meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to see if readmissions__readmission_summary is populated. If this is flagging, please check other areas further upstream on the input layer."
-            tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_readmission', 'dqi_usability']
+              dqi_test_description: "This is a check in one of the final downstream marts to
+                see if readmissions__readmission_summary is populated. If this
+                is flagging, please check other areas further upstream on the
+                input layer."
+            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_readmission', 'dqi_usability' ]
           arguments:
             min_value: 1
             strictly: false
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: "The unique identifier for the patient"
+        config:
+          meta:
+            data_type: varchar
       - name: admit_date
         description: "The date of admission for the inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: discharge_date
         description: "The date of discharge for the inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: discharge_disposition_code
         description: "The valid 2-digit discharge status for the inpatient visit"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/discharge-disposition
+            data_type: varchar
       - name: facility_npi
         description: "An ID for the facility where the inpatient visit occurred"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: ms_drg_code
-        description: "The MS-DRG associted with the inpatient visit"
+            terminology_note: "**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters."
+            data_type: varchar
+      - name: drg_code_type
+        description: Coding system used for the index encounter diagnosis-related group
+          code.
+        config:
+          meta:
+            data_type: varchar
+      - name: drg_code
+        description: "Diagnosis-related group code for the index encounter."
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/ms-drg
+            data_type: varchar
       - name: paid_amount
         description: "The amount paid for the visit"
+        config:
+          meta:
+            data_type: number
       - name: length_of_stay
-        description: "Integer representing the length of stay of the inpatient visit in days"
+        description: "Integer representing the length of stay of the inpatient visit in
+          days"
         data_type: integer
       - name: index_admission_flag
         description: "Flag to indicate if the encounter is an index admission"
-        data_type: boolean
+        data_type: integer
       - name: planned_flag
         description: "Flag to indicate if the encounter was planned"
-        data_type: boolean
+        data_type: integer
       - name: specialty_cohort
         description: "Specialty cohort the encounter belongs to"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
+            data_type: varchar
       - name: died_flag
         description: "Flag to indicate of the patient died in this encounter"
-        data_type: boolean
+        data_type: integer
       - name: diagnosis_ccs
         description: "CCS code associated with the primary diagnosis for the encounter"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
+            data_type: varchar
       - name: had_readmission_flag
-        description: "A flag to indicate whether the encounter had a readmission any number of days after discharge"
-        data_type: boolean
+        description: "A flag to indicate whether the encounter had a readmission any
+          number of days after discharge"
+        data_type: integer
       - name: days_to_readmit
         description: "An integer to indicate the number of days to readmission"
         data_type: integer
       - name: readmit_30_flag
         description: "A flag to indicate whether the encounter had a 30-day readmission"
-        data_type: boolean
+        data_type: integer
       - name: unplanned_readmit_30_flag
-        description: "A flag to indicate whether the encounter had an unplanned 30-day readmission"
-        data_type: boolean
+        description: "A flag to indicate whether the encounter had an unplanned 30-day
+          readmission"
+        data_type: integer
       - name: readmission_encounter_id
         description: "The unique identifier for the readmission encounter"
+        config:
+          meta:
+            data_type: integer
       - name: readmission_admit_date
         description: "The date of admission for the readmission inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: readmission_discharge_date
         description: "The date of discharge for the readmission inpatient visit"
+        config:
+          meta:
+            data_type: date
       - name: readmission_discharge_disposition_code
-        description: "The valid 2-digit discharge status for the readmission inpatient visit"
+        description: "The valid 2-digit discharge status for the readmission inpatient
+          visit"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/discharge-disposition
+            data_type: number
       - name: readmission_facility
-        description: "A name or ID for the facility where the readmission inpatient visit occured"
+        description: "A name or ID for the facility where the readmission inpatient
+          visit occured"
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: readmission_ms_drg
-        description: "The MS-DRG associted with the readmission inpatient visit"
+            terminology_note: "**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters."
+            data_type: varchar
+      - name: readmission_drg_code_type
+        description: Coding system used for the readmission encounter diagnosis-related
+          group code.
+        config:
+          meta:
+            data_type: varchar
+      - name: readmission_drg
+        description: "Diagnosis-related group code for the readmission encounter."
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/ms-drg
+            data_type: varchar
       - name: readmission_length_of_stay
-        description: "Integer representing the length of stay of the readmission inpatient visit in days"
+        description: "Integer representing the length of stay of the readmission
+          inpatient visit in days"
         data_type: integer
       - name: readmission_index_admission_flag
         description: "Flag to indicate if the readmission encounter is an index admission"
-        data_type: boolean
+        data_type: integer
       - name: readmission_planned_flag
         description: "Flag to indicate if the readmission encounter was planned"
-        data_type: boolean
+        data_type: integer
       - name: readmission_specialty_cohort
         description: "Specialty cohort the readmission encounter belongs to"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
+            data_type: varchar
       - name: readmission_died_flag
         description: "Flag to indicate of the patient died in the readmission encounter"
-        data_type: boolean
+        data_type: integer
       - name: readmission_diagnosis_ccs
-        description: "CCS code associated with the primary diagnosis for the readmission encounter"
+        description: "CCS code associated with the primary diagnosis for the readmission
+          encounter"
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
+            data_type: varchar
       - name: tuva_last_run
-        description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: The time at with the model was materialized. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+        config:
+          meta:
+            data_type: timestamp
 
-##### Intermediate
+  ##### Intermediate
   - name: readmissions__encounter_data_quality
     config:
       schema: |
@@ -240,34 +368,59 @@ models:
       alias: _int_encounter_data_quality
       tags: readmissions
       materialized: view
-    description: "This model has the same number of rows as the stg_encounter model. Here we have one row for every unique encounter in the stg_encounter model, and for each encounter we have a flag (disqualified_encounter_flag) to indicte if the encounter is disqualified from being useful for readmission measures. We also have other flags to indicate which specific data quality issues this encounter has that may disqualify it from being used in readmission measures."
+    description: "This model has the same number of rows as the stg_encounter model.
+      Here we have one row for every unique encounter in the stg_encounter
+      model, and for each encounter we have a flag (disqualified_encounter_flag)
+      to indicte if the encounter is disqualified from being useful for
+      readmission measures. We also have other flags to indicate which specific
+      data quality issues this encounter has that may disqualify it from being
+      used in readmission measures."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
       - name: diagnosis_ccs
-        description: "The CCS diagnosis category associated with the primary diagnosis of this encounter"
+        description: "The CCS diagnosis category associated with the primary diagnosis
+          of this encounter"
       - name: disqualified_encounter_flag
-        description: "A flag that indicates whether this encounter is disqualified from being used in readmission measures for any critical data quality problem."
+        description: "A flag that indicates whether this encounter is disqualified from
+          being used in readmission measures for any critical data quality
+          problem."
       - name: missing_admit_date_flag
-        description: "A flag that indicates whether the admit date is missing from this encounter."
+        description: "A flag that indicates whether the admit date is missing from this
+          encounter."
       - name: missing_discharge_date_flag
-        description: "A flag that indicates whether the discharge date is missing from this encounter."
+        description: "A flag that indicates whether the discharge date is missing from
+          this encounter."
       - name: admit_after_discharge_flag
-        description: "A flag that indicates whether the admit date for the encounter is after the discharge date for the encounter."
+        description: "A flag that indicates whether the admit date for the encounter is
+          after the discharge date for the encounter."
       - name: missing_discharge_status_code_flag
-        description: "A flag that indicates whether the discharge status code is missing for the encounter."
+        description: "A flag that indicates whether the discharge status code is missing
+          for the encounter."
       - name: invalid_discharge_status_code_flag
-        description: "A flag that indicates whether the discharge status code that is present for this encounter is invalid. This flag is 1 only when the discharge status code is present but invalid."
+        description: "A flag that indicates whether the discharge status code that is
+          present for this encounter is invalid. This flag is 1 only when the
+          discharge status code is present but invalid."
       - name: missing_primary_diagnosis_flag
-        description: "A flag that indicates whether there is no primary diagnosis associated with the encounter."
+        description: "A flag that indicates whether there is no primary diagnosis
+          associated with the encounter."
       - name: multiple_primary_diagnosis
-        description: "A flag that indicates whether there are multiple primary diagnoses associated with the encounter."
+        description: "A flag that indicates whether there are multiple primary diagnoses
+          associated with the encounter."
       - name: invalid_primary_diagnosis_code
-        description: "A flag that indicates whether the primary diagnosis present for this encounter is invalid, i.e. a non existing ICD-10-CM code. This flag indicates that a primary diagnosis code is indeed present for the encounter, but it is not a valid ICD-10-CM code."
+        description: "A flag that indicates whether the primary diagnosis present for
+          this encounter is invalid, i.e. a non existing ICD-10-CM code. This
+          flag indicates that a primary diagnosis code is indeed present for the
+          encounter, but it is not a valid ICD-10-CM code."
       - name: no_diagnosis_ccs_flag
-        description: "A flag that indicates whether there is no CCS diagnosis category associated with the primary ICD-10-CM diagnosis code for the encounter. This flag indicates that there is a valid primary ICD-10-CM diagnosis code associated with the encounter, but there is no CCS diagnosis category associated with that ICD-10-CM code."
+        description: "A flag that indicates whether there is no CCS diagnosis category
+          associated with the primary ICD-10-CM diagnosis code for the
+          encounter. This flag indicates that there is a valid primary ICD-10-CM
+          diagnosis code associated with the encounter, but there is no CCS
+          diagnosis category associated with that ICD-10-CM code."
       - name: overlaps_with_another_encounter_flag
-        description: "A flag that indicates whether this encounter's dates overlap with those of another encounter in the dataset"
+        description: "A flag that indicates whether this encounter's dates overlap with
+          those of another encounter in the dataset"
 
   - name: readmissions__encounter_overlap
     config:
@@ -277,14 +430,17 @@ models:
       alias: _int_encounter_overlap
       tags: readmissions
       materialized: view
-    description: "This model lists and labels encounters that overlap to identify the best one out of the group."
+    description: "This model lists and labels encounters that overlap to identify
+      the best one out of the group."
     columns:
       - name: person_id
         description: "The unique identifier for the patient"
       - name: is_best_encounter
-        description: "Flag that identifies the best encounter that has overlapping dates between encounters for the same patient."
+        description: "Flag that identifies the best encounter that has overlapping dates
+          between encounters for the same patient."
       - name: selection_reason
-        description: "Reason why or why not a particular encounter is selected as best for overlapping dates"
+        description: "Reason why or why not a particular encounter is selected as best
+          for overlapping dates"
 
   - name: readmissions__encounter_specialty_cohort
     config:
@@ -294,7 +450,12 @@ models:
       alias: _int_encounter_specialty_cohort
       tags: readmissions
       materialized: view
-    description: "This model lists the specialty cohort associated with each inpatient encounter. All encounters in the stg_encounter model are present here, and each gets a specialty cohort assigned from the following list of 5 options: Surgery/Gynecology, Medicine, Cardiorespiratory, Cardiovascular, Neurology. Encounters that don't have a specialty cohort get 'Medicine' assigned by default."
+    description: "This model lists the specialty cohort associated with each
+      inpatient encounter. All encounters in the stg_encounter model are present
+      here, and each gets a specialty cohort assigned from the following list of
+      5 options: Surgery/Gynecology, Medicine, Cardiorespiratory,
+      Cardiovascular, Neurology. Encounters that don't have a specialty cohort
+      get 'Medicine' assigned by default."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -318,7 +479,8 @@ models:
       alias: _int_exclusion
       tags: readmissions
       materialized: view
-    description: "This model lists all encounters that are excluded from being index admissions because they belong to one of the exclusion categories."
+    description: "This model lists all encounters that are excluded from being index
+      admissions because they belong to one of the exclusion categories."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -331,7 +493,9 @@ models:
       alias: _int_index_admission
       tags: readmissions
       materialized: view
-    description: "This model lists all index admissions for the hospital wide readmissions measure. These represent encounter_ids that meet the requirements to be an index admission for the HWR measure."
+    description: "This model lists all index admissions for the hospital wide
+      readmissions measure. These represent encounter_ids that meet the
+      requirements to be an index admission for the HWR measure."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -344,7 +508,8 @@ models:
       alias: _int_index_discharge_requirement
       tags: readmissions
       materialized: view
-    description: "This model lists all encounters that meet the discharge disposition requirement to be an index admission."
+    description: "This model lists all encounters that meet the discharge
+      disposition requirement to be an index admission."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -357,7 +522,8 @@ models:
       alias: _int_index_time_requirement
       tags: readmissions
       materialized: view
-    description: "This model lists all encounters that meet the time requirement to be an index admission."
+    description: "This model lists all encounters that meet the time requirement to
+      be an index admission."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -370,7 +536,8 @@ models:
       alias: _int_planned_encounter
       tags: readmissions
       materialized: view
-    description: "This model gives a list of all encounter_ids that were planned encounters."
+    description: "This model gives a list of all encounter_ids that were planned
+      encounters."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -383,7 +550,10 @@ models:
       alias: _int_procedure_ccs
       tags: readmissions
       materialized: view
-    description: "This model includes all procedures from the stg_procedure model and adds a valid_icd_10_pcs_flag to indicate if the ICD-10-PCS code for this procedure is valid. We also add the CCS procedure category associated with the procedure"
+    description: "This model includes all procedures from the stg_procedure model
+      and adds a valid_icd_10_pcs_flag to indicate if the ICD-10-PCS code for
+      this procedure is valid. We also add the CCS procedure category associated
+      with the procedure"
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -402,7 +572,9 @@ models:
       alias: _int_readmission_crude
       tags: readmissions
       materialized: view
-    description: "This model lists all encounters and whether they had a 'crude' readmission, meaning that the encounter had a hospitalization after discharge, without regard to all CMS readmission logic."
+    description: "This model lists all encounters and whether they had a 'crude'
+      readmission, meaning that the encounter had a hospitalization after
+      discharge, without regard to all CMS readmission logic."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -412,7 +584,8 @@ models:
         description: "The date of admission for the inpatient visit"
       - name: discharge_date
       - name: had_readmission_flag
-        description: "A flag to indicate whether the encounter had a readmission any number of days after discharge"
+        description: "A flag to indicate whether the encounter had a readmission any
+          number of days after discharge"
       - name: days_to_readmit
         description: "An integer to indicate the number of days to readmission"
       - name: readmit_30_flag
@@ -426,7 +599,8 @@ models:
       alias: _int_encounter
       tags: readmissions
       materialized: view
-    description: "This is a staging table for the input layer. Each row represents a unique acute inpatient encounter."
+    description: "This is a staging table for the input layer. Each row represents a
+      unique acute inpatient encounter."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -443,7 +617,7 @@ models:
       - name: ms_drg
         description: "The MS-DRG associted with the inpatient visit"
 
-## Staging
+  ## Staging
   - name: readmissions__stg_core__encounter
     config:
       tags: readmissions

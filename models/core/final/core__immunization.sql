@@ -9,8 +9,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , immune.data_source
     , immune.tuva_last_run
+    , immune.data_source
 {%- endset -%}
 
 {% if var('enable_normalize_engine',false) != true %}
@@ -25,25 +25,16 @@ select
     , immune.source_code
     , immune.source_description
     , case
-        when immune.normalized_code_type is not null then immune.normalized_code_type
         when cvx.cvx is not null then 'cvx'
         else null end as normalized_code_type
-    , coalesce(
-        immune.normalized_code
-        , cvx.cvx
-        ) as normalized_code
-    , coalesce(
-        immune.normalized_description
-        , cvx.long_description
-        ) as normalized_description
-    , case when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
-         when cvx.cvx is not null then 'automatic'
-         end as mapping_method
+    , cvx.cvx as normalized_code
+    , cvx.long_description as normalized_description
+    , case when cvx.cvx is not null then 'automatic' end as mapping_method
     , coalesce(immunization_status.status, immune.status) as status
     , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason
     , immune.occurrence_date
     , immune.source_dose
-    , immune.normalized_dose
+    , cast(null as {{ dbt.type_string() }}) as normalized_dose
     , immune.lot_number
     , coalesce(act_site.description, immune.body_site) as body_site
     , coalesce(immunization_route.description, immune.route) as route
@@ -53,7 +44,7 @@ select
     {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_immunization') }} as immune
 left outer join {{ ref('terminology__cvx') }} as cvx
-    on immune.source_code_type = 'cvx'
+    on lower(immune.source_code_type) = 'cvx'
         and immune.source_code = cvx.cvx
 left outer join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code
@@ -79,29 +70,26 @@ select
     , immune.source_code
     , immune.source_description
     , case
-        when immune.normalized_code_type is not null then immune.normalized_code_type
         when cvx.cvx is not null then 'cvx'
         else custom_mapped.normalized_code_type end as normalized_code_type
     , coalesce(
-        immune.normalized_code
-        , cvx.cvx
+        cvx.cvx
         , custom_mapped.normalized_code
         ) as normalized_code
     , coalesce(
-        immune.normalized_description
-        , cvx.long_description
+        cvx.long_description
         , custom_mapped.normalized_description
         ) as normalized_description
-  , case  when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
+    , case
         when cvx.cvx is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
-        when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
+        when coalesce(custom_mapped.normalized_code, custom_mapped.normalized_description) is not null then 'custom'
         end as mapping_method
     , coalesce(immunization_status.status, immune.status) as status
     , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason
     , immune.occurrence_date
     , immune.source_dose
-    , immune.normalized_dose
+    , cast(null as {{ dbt.type_string() }}) as normalized_dose
     , immune.lot_number
     , coalesce(act_site.description, immune.body_site) as body_site
     , coalesce(immunization_route.description, immune.route) as route
@@ -111,7 +99,7 @@ select
     {{ tuva_metadata_columns }}
 from {{ ref('core__stg_clinical_immunization') }} as immune
 left outer join {{ ref('terminology__cvx') }} as cvx
-    on immune.source_code_type = 'cvx'
+    on lower(immune.source_code_type) = 'cvx'
         and immune.source_code = cvx.cvx
 left outer join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code

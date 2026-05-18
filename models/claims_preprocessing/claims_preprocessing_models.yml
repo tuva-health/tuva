@@ -72,48 +72,18 @@ models:
       - name: paid_year_month
         description: the year and month of the date the pharmacy claim was paid.
 
-  - name: claims_enrollment__member_months
-    description: This table contains member months matching enrollment
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: member_months
-      tags:
-        - claims_preprocessing
-      materialized: table
-    columns:
-      - name: member_month_key
-        description: Unique identifier for each member month.
-        tests:
-          - unique
-      - name: person_id
-        description: Unique identifier for each patient in the dataset.
-      - name: member_id
-        description: >
-          Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.
-      - name: year_month
-        description: The year and month of the member month.
-      - name: payer
-        description: Name of the payer.
-      - name: plan
-        description: Name of the plan.
-      - name: data_source
-        description: 'User-configured field that indicates the data source.'
-
-
-      
 ###   Normalized Claim Input Layer
 ##    Final
-  - name: normalized_input__eligibility
-    description: |
-      The eligibility table contains information on patient health plan and 
-      supplemental insurance eligibility.
+  - name: normalized__eligibility
+    description: |-
+      This model assembles normalized eligibility records from the eligibility preprocessing models. It starts from int_eligibility_casting, selects the eligibility, demographic, source, metadata, and extension columns needed downstream, and left joins to int_eligibility_dates_normalized on person_id_key to replace birth_date, death_date, enrollment_start_date, and enrollment_end_date with calendar-normalized date values. It also left joins to int_eligibility_state_normalized on person_id_key to add normalized_state_name, fips_state_code, and fips_state_abbreviation.
+
+      This model creates eligibility_id as a synthetic eligibility record key by concatenating person_id, member_id, normalized enrollment_start_date, normalized enrollment_end_date, payer, plan, and data_source with hyphen delimiters. It does not deduplicate eligibility records.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      alias: normalized_input_eligibility
+      alias: normalized_eligibility
       meta:
         dag:
           node_type: intermediate
@@ -122,42 +92,72 @@ models:
         - normalized_input
         - claims_preprocessing
     columns:
+      - name: eligibility_id
+        description: Synthetic eligibility record key created by concatenating person_id, member_id, normalized enrollment_start_date, normalized enrollment_end_date, payer, plan, and data_source with hyphen delimiters.
+        config:
+          meta:
+            is_primary_key: true
       - name: person_id
-        description: Unique identifier for each patient in the dataset.
+        description: Unique identifier for each person in the dataset.
       - name: member_id
-        description: >
-          Identifier that links a patient to a particular insurance product or  health plan. A patient can have more than one member_id because they  can have more than one insurance product/plan.
+        description: Identifier assigned by the payer or health plan for the covered member.
       - name: subscriber_id
-        description: Identifier that links a patient to a particular insurance product or health plan.
-      - name: gender
-        description: Biological sex of the patient.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/gender
-      - name: race
-        description: Race of the patient.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/race
-      - name: birth_date
-        description: Date the patient was born.
-      - name: death_date
-        description: Date the patient died.
-      - name: death_flag
-        description: Flag indicating if the patient is deceased
+        description: Identifier assigned by the payer or health plan for the subscriber or policyholder.
+      - name: subscriber_relation
+        description: Member relationship to the subscriber or policyholder.
       - name: enrollment_start_date
-        description: Date the patient's insurance eligibility began.
+        description: Calendar-normalized first date of the enrollment span from int_eligibility_dates_normalized. This value is null when the source enrollment_start_date does not match reference_data__calendar.full_date.
       - name: enrollment_end_date
-        description: Date the patient's insurance eligibility ended.
+        description: Calendar-normalized last date of the enrollment span from int_eligibility_dates_normalized. This value is null when the source enrollment_end_date does not match reference_data__calendar.full_date.
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: Name of the payer or health insurer providing coverage during the enrollment span.
       - name: payer_type
-        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+        description: Type of payer providing coverage during the enrollment span.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/payer-type
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: Name of the health plan providing coverage during the enrollment span.
+      - name: first_name
+        description: Member first name from the eligibility input record.
+      - name: middle_name
+        description: Member middle name from the eligibility input record.
+      - name: last_name
+        description: Member last name from the eligibility input record.
+      - name: name_suffix
+        description: Member name suffix from the eligibility input record.
+      - name: social_security_number
+        description: Member Social Security number from the eligibility input record.
+      - name: address
+        description: Member street address from the eligibility input record.
+      - name: city
+        description: Member city from the eligibility input record.
+      - name: state
+        description: Source state value from the eligibility input record. This value is used by int_eligibility_state_normalized to derive ANSI/FIPS state fields.
+      - name: zip_code
+        description: Member ZIP code from the eligibility input record.
+      - name: phone
+        description: Member phone number from the eligibility input record.
+      - name: email
+        description: Member email address from the eligibility input record.
+      - name: ethnicity
+        description: Member ethnicity from the eligibility input record.
+      - name: gender
+        description: Biological sex of the member from the eligibility input record.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
+      - name: race
+        description: Race of the member from the eligibility input record.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
+      - name: birth_date
+        description: Calendar-normalized birth date from int_eligibility_dates_normalized. This value is null when the source birth_date does not match reference_data__calendar.full_date.
+      - name: death_date
+        description: Calendar-normalized death date from int_eligibility_dates_normalized. This value is null when the source death_date is null or does not match reference_data__calendar.full_date.
+      - name: death_flag
+        description: Integer flag from the eligibility input record indicating whether the member is deceased.
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code.
         config:
@@ -175,12 +175,97 @@ models:
           meta:
             terminology: https://thetuvaproject.com/terminology/medicare-status
       - name: enrollment_status
-        description: >
-          Indicates the type of enrollment status for a beneficiary. Used for determining risk score coefficients. If unsure of the enrollment status,  leave this field null so Tuva can determine the enrollment status based on the beneficiary information.
+        description: Enrollment status value from the eligibility input record.
+      - name: hospice_flag
+        description: Integer flag indicating whether the member is in hospice during the enrollment span.
+      - name: institutional_snp_flag
+        description: Integer flag indicating whether the enrollment span is associated with an institutional special needs plan.
+      - name: medicaid_indicator
+        description: Integer indicator for Medicaid coverage during the enrollment span. Generally 1 means yes and 0 means no.
+        config:
+          meta:
+            data_type: integer
+      - name: long_term_institutional_flag
+        description: Integer flag indicating whether the member is in a long-term institutional setting during the enrollment span.
+      - name: part_d_raf_type
+        description: Part D risk adjustment factor type for the enrollment span. Null when the record is not related to Part D coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: low_income_subsidy_indicator
+        description: Integer indicator for Low Income Subsidy, also known as Extra Help, during the enrollment span. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: metal_level
+        description: ACA exchange metal tier for the health plan. Null when the record is not related to ACA exchange coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: csr_indicator
+        description: Integer cost sharing reduction variant indicator for ACA exchange coverage. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: enrollment_duration_months
+        description: Number of months covered during the benefit year for ACA exchange enrollment. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: esrd_status
+        description: Integer indicator for end-stage renal disease status from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: transplant_duration_months
+        description: Number of months since kidney transplant from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
       - name: group_id
-        description: 'The group id which multiple members are enrolled for health coverage.'
+        description: Identifier for the employer, purchasing group, or other group under which the member is enrolled.
       - name: group_name
-        description: 'The group name under which multiple members are enrolled for health coverage.'
+        description: Name of the employer, purchasing group, or other group under which the member is enrolled.
+      - name: fips_state_code
+        description: ANSI/FIPS state code matched from the source state value in int_eligibility_state_normalized.
+      - name: normalized_state_name
+        description: ANSI/FIPS state name matched from the source state value in int_eligibility_state_normalized.
+      - name: fips_state_abbreviation
+        description: ANSI/FIPS state abbreviation matched from the source state value in int_eligibility_state_normalized.
+      - name: file_date
+        description: Timestamp associated with the source eligibility file, typically reflecting the reporting period for the file.
+      - name: file_name
+        description: Name of the source file from which the eligibility record was loaded.
+      - name: ingest_datetime
+        description: Timestamp when the source eligibility file was ingested into the data warehouse or landed in cloud storage.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current dbt invocation.
+
+      - name: data_source
+        description: User-configured field that identifies the source system, payer feed, or other origin of the eligibility record.
+  - name: normalized__eligibility_remove_duplicates
+    description: |-
+      This model creates eligibility-derived patient records and removes duplicate records for each person_id and data_source. When multiple eligibility records exist, it keeps the record with the latest enrollment_end_date, treating null enrollment_end_date as 2050-01-01.
+
+      Primary key: person_id, data_source.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: normalized_eligibility_remove_duplicates
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset.
+        config:
+          meta:
+            is_primary_key: true
       - name: name_suffix
         description: Patient's name suffix (e.g. Jr., Sr., III, etc).
       - name: first_name
@@ -189,24 +274,38 @@ models:
         description: Patient's middle name.
       - name: last_name
         description: Patient's last name.
+      - name: sex
+        description: Biological sex of the patient.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
+      - name: race
+        description: Race of the patient.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
+      - name: birth_date
+        description: Date the patient was born.
+      - name: death_date
+        description: Date the patient died.
+      - name: death_flag
+        description: Flag indicating if the patient is deceased
       - name: social_security_number
         description: Patient's social security number.
-      - name: subscriber_relation
-        description: Relationship to the policy holder (self, spouse, dependent, etc)
       - name: address
         description: Patient's street address.
       - name: city
         description: Patient's city of address.
       - name: state
-        description: State the patient lives in (most recent known address)
+        description: State the patient lives in (most recent known address).
       - name: zip_code
         description: Zip code the patient lives in (most recent known address).
-      - name: fips_state_code
-        description: FIPS code for the state the patient lives in (most recent known address).
-      - name: normalized_state_name
-        description: State for the patient (most recent known address).
-      - name: fips_state_abbreviation
-        description: Abbreviated form of the state for the patient (most recent known address).
+      - name: county
+        description: County where the patient lives.
+      - name: latitude
+        description: Latitude of the patient's address.
+      - name: longitude
+        description: Longitude of the patient's address.
       - name: phone
         description: Patient's phone number.
       - name: email
@@ -216,16 +315,16 @@ models:
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+        config:
+          meta:
+            is_primary_key: true
+      - name: file_name
+        description: 'The file name of the source file.'
+      - name: ingest_datetime
+        description: 'The date and time the source file was ingested into the data warehouse or landed in cloud storage.'
       - name: tuva_last_run
         description: >
           The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.
-      - name: file_name
-        description: 'The file name of the source file.'
-      - name: file_date
-        description: 'The date associated with the claims file, typically reflecting the reporting period of the claims data.'
-      - name: ingest_datetime
-        description: 'The date and time the source file was ingested into the data warehouse or landed in cloud storage.'
-
 
   - name: normalized_input__medical_claim
     description: |
@@ -1128,12 +1227,16 @@ models:
         - normalized_input
         - claims_preprocessing
 
-  - name: normalized_input__int_eligibility_dates_normalize
+  - name: int_eligibility_dates_normalized
+    description: |-
+      This model normalizes the eligibility date fields by joining int_eligibility_casting to reference_data__calendar once for each source date field: birth_date, death_date, enrollment_start_date, and enrollment_end_date. Each normalized_* date column is populated from reference_data__calendar.full_date. If a source date is null or does not match a row in reference_data__calendar, the corresponding normalized_* date column is null.
+
+      The model keeps one distinct row per person_id and person_id_key.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_eligibility_dates_normalize
+      alias: int_eligibility_dates_normalized
       meta:
         dag:
           node_type: intermediate
@@ -1141,6 +1244,19 @@ models:
       tags:
         - normalized_input
         - claims_preprocessing
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset from int_eligibility_casting.
+      - name: person_id_key
+        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized date values back to the eligibility record.
+      - name: normalized_birth_date
+        description: Birth date matched to reference_data__calendar.full_date. Null when the source birth_date is null or does not match the calendar.
+      - name: normalized_death_date
+        description: Death date matched to reference_data__calendar.full_date. Null when the source death_date is null or does not match the calendar.
+      - name: normalized_enrollment_start_date
+        description: Enrollment start date matched to reference_data__calendar.full_date. Null when the source enrollment_start_date is null or does not match the calendar.
+      - name: normalized_enrollment_end_date
+        description: Enrollment end date matched to reference_data__calendar.full_date. Null when the source enrollment_end_date is null or does not match the calendar.
 
   - name: normalized_input__int_medical_claim_date_normalize
     config:
@@ -1323,16 +1439,150 @@ models:
         - claims_preprocessing
 
 ##    Staging
-  - name: normalized_input__stg_eligibility
+  - name: int_eligibility_casting
+    description: |-
+      This model performs the following data transformations:
+      1. Casts fields to the appropriate data types expected by the input_layer__eligibility table. This is meant to account for data types if they are not cast by the user in the input layer.
+      2. Passes through all column extensions that the user has created in the input layer with the x_ extension prefix.
+      3. Creates a synthetic join key called person_id_key. The person_id_key is created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+
+      Primary key: person_id_key.
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: int_eligibility_casting
       meta:
         dag:
           node_type: intermediate
-      materialized: ephemeral
+      materialized: table
       tags:
         - normalized_input
         - claims_preprocessing
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset, cast to string from input_layer__eligibility.
+      - name: person_id_key
+        description: Synthetic join key created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+      - name: member_id
+        description: Identifier assigned by the payer or health plan for the covered member, cast to string from input_layer__eligibility.
+      - name: subscriber_id
+        description: Identifier assigned by the payer or health plan for the subscriber or policyholder, cast to string from input_layer__eligibility.
+      - name: subscriber_relation
+        description: Member relationship to the subscriber or policyholder, cast to string from input_layer__eligibility.
+      - name: enrollment_start_date
+        description: Source enrollment start date cast to date from input_layer__eligibility before calendar normalization.
+      - name: enrollment_end_date
+        description: Source enrollment end date cast to date from input_layer__eligibility before calendar normalization.
+      - name: payer
+        description: Name of the payer or health insurer, cast to string from input_layer__eligibility.
+      - name: payer_type
+        description: Type of payer, cast to string from input_layer__eligibility.
+      - name: plan
+        description: Name of the health plan, cast to string from input_layer__eligibility.
+      - name: first_name
+        description: Member first name cast to string from input_layer__eligibility.
+      - name: middle_name
+        description: Member middle name cast to string from input_layer__eligibility.
+      - name: last_name
+        description: Member last name cast to string from input_layer__eligibility.
+      - name: name_suffix
+        description: Member name suffix cast to string from input_layer__eligibility.
+      - name: social_security_number
+        description: Member Social Security number cast to string from input_layer__eligibility.
+      - name: address
+        description: Member street address cast to string from input_layer__eligibility.
+      - name: city
+        description: Member city cast to string from input_layer__eligibility.
+      - name: state
+        description: Source state value cast to string from input_layer__eligibility before ANSI/FIPS state normalization.
+      - name: zip_code
+        description: Member ZIP code cast to string from input_layer__eligibility.
+      - name: phone
+        description: Member phone number cast to string from input_layer__eligibility.
+      - name: email
+        description: Member email address cast to string from input_layer__eligibility.
+      - name: ethnicity
+        description: Member ethnicity cast to string from input_layer__eligibility.
+      - name: gender
+        description: Biological sex of the member, cast to string from input_layer__eligibility.
+      - name: race
+        description: Race of the member, cast to string from input_layer__eligibility.
+      - name: birth_date
+        description: Source birth date cast to date from input_layer__eligibility before calendar normalization.
+      - name: death_date
+        description: Source death date cast to date from input_layer__eligibility before calendar normalization.
+      - name: death_flag
+        description: Source death flag cast to integer from input_layer__eligibility.
+      - name: original_reason_entitlement_code
+        description: Original reason for Medicare entitlement code, cast to string from input_layer__eligibility.
+      - name: dual_status_code
+        description: Medicare-Medicaid dual eligibility status code, cast to string from input_layer__eligibility.
+      - name: medicare_status_code
+        description: Medicare status code, cast to string from input_layer__eligibility.
+      - name: enrollment_status
+        description: Enrollment status value, cast to string from input_layer__eligibility.
+      - name: hospice_flag
+        description: Hospice flag cast to integer from input_layer__eligibility.
+      - name: institutional_snp_flag
+        description: Institutional special needs plan flag cast to integer from input_layer__eligibility.
+      - name: medicaid_indicator
+        description: Integer indicator for Medicaid coverage during the enrollment span. Generally 1 means yes and 0 means no.
+        config:
+          meta:
+            data_type: integer
+      - name: long_term_institutional_flag
+        description: Long-term institutional flag cast to integer from input_layer__eligibility.
+      - name: part_d_raf_type
+        description: Part D risk adjustment factor type for the enrollment span. Null when the record is not related to Part D coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: low_income_subsidy_indicator
+        description: Integer indicator for Low Income Subsidy, also known as Extra Help, during the enrollment span. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: metal_level
+        description: ACA exchange metal tier for the health plan. Null when the record is not related to ACA exchange coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: csr_indicator
+        description: Integer cost sharing reduction variant indicator for ACA exchange coverage. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: enrollment_duration_months
+        description: Number of months covered during the benefit year for ACA exchange enrollment. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: esrd_status
+        description: Integer indicator for end-stage renal disease status from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: transplant_duration_months
+        description: Number of months since kidney transplant from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: group_id
+        description: Group identifier cast to string from input_layer__eligibility.
+      - name: group_name
+        description: Group name cast to string from input_layer__eligibility.
+      - name: file_name
+        description: Source file name cast to string from input_layer__eligibility.
+      - name: file_date
+        description: Source file date cast to timestamp from input_layer__eligibility.
+      - name: ingest_datetime
+        description: Source file ingest timestamp cast to timestamp from input_layer__eligibility.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current dbt invocation.
 
+      - name: data_source
+        description: User-configured source identifier cast to string from input_layer__eligibility.
   - name: normalized_input__stg_medical_claim
     config:
       materialized: ephemeral
@@ -1348,12 +1598,31 @@ models:
         - claims_preprocessing
 
 
-  - name: normalized_input__int_eligibility_state_normalize
+  - name: int_eligibility_state_normalized
+    description: |-
+      This model normalizes the source state value from int_eligibility_casting by left joining to reference_data__ansi_fips_state. The join matches when trim(lower(state)) equals trim(lower(ansi_fips_state_abbreviation)), trim(lower(ansi_fips_state_code)), or trim(lower(ansi_fips_state_name)).
+
+      The model returns the matched ANSI/FIPS state name, state code, and state abbreviation. If the source state value does not match the reference table, normalized_state_name, fips_state_code, and fips_state_abbreviation are null.
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: int_eligibility_state_normalized
       meta:
         dag:
           node_type: intermediate
-      materialized: ephemeral
+      materialized: table
       tags:
         - normalized_input
         - claims_preprocessing
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset from int_eligibility_casting.
+      - name: person_id_key
+        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized state values back to the eligibility record.
+      - name: normalized_state_name
+        description: ANSI/FIPS state name from reference_data__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
+      - name: fips_state_code
+        description: ANSI/FIPS state code from reference_data__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
+      - name: fips_state_abbreviation
+        description: ANSI/FIPS state abbreviation from reference_data__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.

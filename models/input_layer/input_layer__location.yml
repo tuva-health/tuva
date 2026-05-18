@@ -1,13 +1,33 @@
 version: 2
 models:
   - name: input_layer__location
-    description: >-
-      The location table contains information about the practice and facility
-      locations where patients receive medical care.
-    grain: Intended to be one record per location per data source.
-    transformation_steps: |-
-      This model brings the input layer location table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: |-
+      The location table contains information about physical locations where clinical care is delivered, documented, or managed. A location may represent a facility, clinic, department, practice site, laboratory, imaging center, or other service location.
+
+      This table is intended to have one record per location ID and data source. The location_id field should identify the location within the clinical source system and can be referenced by other clinical input layer tables, such as appointment and immunization, when those records are associated with a location.
+
+      Primary key: location_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_1
+              - dqi
+              - dqi_service_categories
+              - dqi_ccsr
+              - dqi_cms_chronic_conditions
+              - dqi_tuva_chronic_conditions
+              - dqi_cms_hccs
+              - dqi_ed_classification
+              - dqi_financial_pmpm
+              - dqi_quality_measures
+              - dqi_readmission
+          arguments:
+            combination_of_columns:
+              - location_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -15,30 +35,13 @@ models:
       materialized: view
     columns:
       - name: location_id
-        description: Unique identifier for each location.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Identifier for a location within a data source. This should be the stable source system identifier for the facility, department, clinic, practice site, or other location.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - unique:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
@@ -72,8 +75,7 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: npi
-        description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: National Provider Identifier associated with the location, when available. For facilities or organizations, this should generally be an organization NPI rather than an individual practitioner NPI. Leave null when the location does not have an NPI.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -95,8 +97,7 @@ models:
           meta:
             data_type: varchar
       - name: name
-        description: The name of the location.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Name of the location as represented in the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -118,8 +119,7 @@ models:
           meta:
             data_type: varchar
       - name: facility_type
-        description: The type of facility e.g. acute care hospital.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Type or category of location, for example hospital, clinic, emergency department, ambulatory surgery center, laboratory, imaging center, or department. Use the source system value.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -141,8 +141,7 @@ models:
           meta:
             data_type: varchar
       - name: parent_organization
-        description: The parent organization associated with the facility.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Organization, health system, practice group, or parent facility associated with the location, when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -164,8 +163,7 @@ models:
           meta:
             data_type: varchar
       - name: address
-        description: The street address of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Street address of the location.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -187,8 +185,7 @@ models:
           meta:
             data_type: varchar
       - name: city
-        description: The city of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: City of the location.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -210,8 +207,7 @@ models:
           meta:
             data_type: varchar
       - name: state
-        description: The state of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: State of the location. For US addresses, use the two-character state abbreviation when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -233,8 +229,7 @@ models:
           meta:
             data_type: varchar
       - name: zip_code
-        description: The zip code of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: ZIP code or postal code of the location.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -256,8 +251,7 @@ models:
           meta:
             data_type: varchar
       - name: latitude
-        description: The latitude of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Latitude of the location in decimal degrees, when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -279,8 +273,7 @@ models:
           meta:
             data_type: float
       - name: longitude
-        description: The longitude of the record (e.g., facility location, patient, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Longitude of the location in decimal degrees, when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -302,8 +295,7 @@ models:
           meta:
             data_type: float
       - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: User-defined name that identifies the source system for the location data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:

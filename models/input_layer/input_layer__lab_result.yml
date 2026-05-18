@@ -1,14 +1,35 @@
 version: 2
 models:
   - name: input_layer__lab_result
-    description: >-
-      The lab_result table contains information about lab test results,
-      including the LOINC code and description, units, reference range, and
-      result.
-    grain: Intended to be one record per lab result per data source.
-    transformation_steps: |-
-      This model brings the input layer lab_result table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: |-
+      The lab_result table stores laboratory test result records from clinical source systems. It includes information about the ordered test or panel, the resulted component or analyte, the result value, result and collection dates, units, reference ranges, abnormal flags, specimen, and ordering practitioner.
+
+      This table is intended to have one record per lab result ID and data source. When a source system stores a panel with multiple resulted components, map each resulted component to a separate row when possible so that the result value, component code, units, and reference range all describe the same analyte. Use the source order fields for the ordered test or panel and the source component fields for the resulted component or analyte.
+
+      LOINC is preferred for source lab codes when available. SNOMED-CT or local source codes may also be used when that is what the source system provides, but source descriptions should be populated so codes can be normalized downstream.
+
+      Primary key: lab_result_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_1
+              - dqi
+              - dqi_service_categories
+              - dqi_ccsr
+              - dqi_cms_chronic_conditions
+              - dqi_tuva_chronic_conditions
+              - dqi_cms_hccs
+              - dqi_ed_classification
+              - dqi_financial_pmpm
+              - dqi_quality_measures
+              - dqi_readmission
+          arguments:
+            combination_of_columns:
+              - lab_result_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -16,30 +37,14 @@ models:
       materialized: view
     columns:
       - name: lab_result_id
-        description: Unique identifier for each lab result.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for a lab result record within a data source. This value should be populated on every record and should uniquely identify the lab result when combined with data_source. If the source system does not provide a unique result-level identifier, create a stable identifier from the source order, component, result date, and other fields needed to uniquely identify the row.
         required_for_data_marts: ['hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - unique:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
@@ -73,8 +78,8 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: person_id
-        description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Globally unique identifier for the person associated with the lab result. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
         required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -106,8 +111,8 @@ models:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -129,8 +134,8 @@ models:
           meta:
             data_type: varchar
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the encounter associated with the lab result, when available. Leave null when the result is not tied to a specific encounter in the source system.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -152,8 +157,8 @@ models:
           meta:
             data_type: varchar
       - name: accession_number
-        description: The lab order number from the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Lab accession number, order number, or specimen tracking identifier from the source system. This value often groups multiple result components that came from the same order or specimen.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -175,8 +180,8 @@ models:
           meta:
             data_type: varchar
       - name: source_order_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Code system for source_order_code. This field describes the ordered lab test or panel. LOINC is preferred when available; SNOMED-CT or a local source code system may be used when that is what the source system provides.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -213,8 +218,8 @@ models:
           meta:
             data_type: varchar
       - name: source_order_code
-        description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Code for the ordered lab test or panel from the source system. LOINC is preferred when available. Local or other source codes may be used when standard codes are not available, but source_order_description should also be populated to support downstream normalization.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -238,8 +243,8 @@ models:
           meta:
             data_type: varchar
       - name: source_order_description
-        description: Description of the source code in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Human-readable description of source_order_code from the source system. This should describe the ordered lab test or panel.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -261,8 +266,8 @@ models:
           meta:
             data_type: varchar
       - name: source_component_type
-        description: The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Code system for source_component_code. This field describes the resulted component or analyte. LOINC is preferred when available; SNOMED-CT or a local source code system may be used when that is what the source system provides.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -280,17 +285,17 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_cms_hccs
+                  - dqi_quality_measures
               arguments:
                 values:
                   - loinc
                   - snomed-ct
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: source_component_code
-        description: The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Code for the resulted component or analyte from the source system. Populate this when the resulted component differs from the ordered test or when a panel contains multiple resulted components.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -312,8 +317,8 @@ models:
           meta:
             data_type: varchar
       - name: source_component_description
-        description: Description of the source code for the component in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Human-readable description of source_component_code from the source system. This should describe the resulted component or analyte.
         required_for_data_marts: []
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -322,140 +327,13 @@ models:
                 enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_order_type
-        description: The normalized type of code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_order_code
-        description: The normalized code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_order_description
-        description: Normalized description of the code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_component_type
-        description: The normalized type of code for the component.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_component_code
-        description: The normalized code for the component.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_component_description
-        description: Normalized description of the code for the component.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
                   - dqi
         config:
           meta:
             data_type: varchar
       - name: status
-        description: Status of the record (e.g., condition, test, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source status of the lab result, for example final, preliminary, corrected, cancelled, or entered in error. Use the source system value.
         required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -477,8 +355,8 @@ models:
           meta:
             data_type: varchar
       - name: result
-        description: The result of the record (e.g., lab test, observation, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Result value reported by the source system. This may be numeric, coded, or text. Preserve the source representation unless the source system already provides a clean standardized value.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -500,8 +378,8 @@ models:
           meta:
             data_type: varchar
       - name: result_datetime
-        description: Datetime of the test result.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Date and time the lab result was resulted, reported, or finalized, formatted as a timestamp.
         required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -561,8 +439,8 @@ models:
           meta:
             data_type: timestamp
       - name: collection_datetime
-        description: Datetime the specimen was collected.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Date and time the specimen was collected, formatted as a timestamp. Leave null when the source system does not provide specimen collection time.
         required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -622,8 +500,8 @@ models:
           meta:
             data_type: timestamp
       - name: source_units
-        description: Source units of the lab test.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Units for result as reported by the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -645,8 +523,8 @@ models:
           meta:
             data_type: varchar
       - name: normalized_units
-        description: Normalized units of the lab test.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Standardized units for result, when available. Use a consistent standard such as UCUM when the source data has already been normalized upstream; otherwise leave null.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -668,8 +546,8 @@ models:
           meta:
             data_type: varchar
       - name: source_reference_range_low
-        description: The low end of the reference range from the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Lower bound of the reference range as reported by the source system. This field is a string because source reference ranges may include symbols, text, or non-numeric values.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -691,8 +569,8 @@ models:
           meta:
             data_type: varchar
       - name: source_reference_range_high
-        description: The high end of the reference range from the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Upper bound of the reference range as reported by the source system. This field is a string because source reference ranges may include symbols, text, or non-numeric values.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -714,8 +592,8 @@ models:
           meta:
             data_type: varchar
       - name: normalized_reference_range_low
-        description: The normalized low end of the reference range.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Standardized lower bound of the reference range, when available. This should use the same unit convention as normalized_units.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -737,8 +615,8 @@ models:
           meta:
             data_type: varchar
       - name: normalized_reference_range_high
-        description: The normalized high end of the reference range.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Standardized upper bound of the reference range, when available. This should use the same unit convention as normalized_units.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -760,8 +638,8 @@ models:
           meta:
             data_type: varchar
       - name: source_abnormal_flag
-        description: Indicates whether the result is abnormal or normal.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Abnormal or interpretation flag from the source system, for example high, low, abnormal, normal, critical, or the source system's equivalent code.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -781,10 +659,10 @@ models:
                   - dqi
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: normalized_abnormal_flag
-        description: Normalized abnormal flag.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Standardized abnormal or interpretation flag, when available. Populate this when the source abnormal flag has already been normalized upstream; otherwise leave null.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -804,10 +682,10 @@ models:
                   - dqi
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: specimen
-        description: The type of specimen e.g. blood, plasma, urine.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Specimen type for the lab result, for example blood, serum, plasma, urine, or the source system's equivalent value.
         required_for_data_marts: ['hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -829,8 +707,8 @@ models:
           meta:
             data_type: varchar
       - name: ordering_practitioner_id
-        description: Unique identifier for the practitioner who ordered the lab test.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the practitioner who ordered the lab test, when available. This may be an NPI or a source system practitioner ID and should map to practitioner_id in the practitioner input layer when possible.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -847,52 +725,13 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-            is_primary_key: true
-      - name: file_name
-        description: The file name of the source file.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
                   - dqi
         config:
           meta:
             data_type: varchar
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Date and time the source lab result record was loaded into the data warehouse. This is useful when multiple versions of the same lab result record are received over time.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -928,3 +767,27 @@ models:
         config:
           meta:
             data_type: timestamp
+      - name: data_source
+        description: >-
+          User-defined name that identifies the source of the lab result data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
+        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_5
+                  - dqi
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

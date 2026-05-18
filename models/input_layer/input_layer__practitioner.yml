@@ -1,13 +1,33 @@
 version: 2
 models:
   - name: input_layer__practitioner
-    description: >-
-      The practitioner table contains information about providers in the
-      dataset, such as physicians and physician assistants.
-    grain: Intended to be one record per practitioner per data source.
-    transformation_steps: |-
-      This model brings the input layer practitioner table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: |-
+      The practitioner table contains one record per practitioner per data source. It stores clinical provider records from source systems, including source-system practitioner identifiers, NPIs when available, provider names, practice affiliation, specialty, and sub-specialty. Practitioner records are used to describe clinicians referenced by other clinical input tables, such as appointments, immunizations, medications, procedures, and lab results.
+
+      The practitioner_id should be the source-system identifier used consistently across the clinical input layer to reference the same practitioner. This identifier does not need to be an NPI. If an NPI is available, it should be populated in the npi field.
+
+      Primary key: practitioner_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_1
+              - dqi
+              - dqi_service_categories
+              - dqi_ccsr
+              - dqi_cms_chronic_conditions
+              - dqi_tuva_chronic_conditions
+              - dqi_cms_hccs
+              - dqi_ed_classification
+              - dqi_financial_pmpm
+              - dqi_quality_measures
+              - dqi_readmission
+          arguments:
+            combination_of_columns:
+              - practitioner_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -15,30 +35,13 @@ models:
       materialized: view
     columns:
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Source-system identifier for the practitioner. This should be the same identifier used in other clinical input layer tables when referencing the practitioner. This field does not need to be an NPI and is unique only within a data source.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
                 enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - unique:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
@@ -72,8 +75,7 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: npi
-        description: The national provider identifier associated with the record e.g. facility_npi, provider_npi
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: The practitioner's 10-digit National Provider Identifier, when available. This should be the individual practitioner NPI, not a facility or organization NPI. If the source only has a local practitioner ID, populate practitioner_id and leave npi null.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -95,8 +97,7 @@ models:
           meta:
             data_type: varchar
       - name: first_name
-        description: The first name of the healthcare provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: First name of the practitioner as represented in the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -118,8 +119,7 @@ models:
           meta:
             data_type: varchar
       - name: last_name
-        description: The last name of the healthcare provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Last name of the practitioner as represented in the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -141,8 +141,7 @@ models:
           meta:
             data_type: varchar
       - name: practice_affiliation
-        description: Practice affiliation of the provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Practice, group, department, clinic, or organization with which the practitioner is affiliated in the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -164,8 +163,7 @@ models:
           meta:
             data_type: varchar
       - name: specialty
-        description: Specialty of the provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: Primary clinical specialty for the practitioner, such as family medicine, cardiology, or emergency medicine.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -187,8 +185,7 @@ models:
           meta:
             data_type: varchar
       - name: sub_specialty
-        description: Sub specialty of the provider.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: More specific specialty or subspecialty for the practitioner, when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -210,8 +207,7 @@ models:
           meta:
             data_type: varchar
       - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with practitioner_id.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:

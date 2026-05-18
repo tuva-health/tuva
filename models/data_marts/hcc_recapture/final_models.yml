@@ -8,39 +8,85 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
         {% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates
-      tags: ["hcc_recapture", "final"]
+      tags: [ "hcc_recapture", "final" ]
       materialized: table
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
-            - payer
-            - payment_year
+              - payer
+              - payment_year
     columns:
       - name: payer
-        description: The name of the person (i.e. beneficiary) insurance provider.  
+        description: The name of the person (i.e. beneficiary) insurance provider.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
-          an open HCC from 2023 will have a payment year = 2025.       
+          This is the year that the HCC should be coded. Typically the
+          collection year + 1, but for open HCCs it will be the collection year
+          + 2.  To illustrate, if we have an HCC claim in 2023, but not in 2024,
+          that means it is open in 2024. The payment year is 2024 + 1 = 2025.
+          So  an open HCC from 2023 will have a payment year = 2025.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: no_suspects_closed_hccs
-        description: The number of HCCs that were closed in the payment year excluding suspect HCCs. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed in the payment year excluding
+          suspect HCCs. See the definition of closed HCCs in the gap_status
+          field in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_open_hccs
-        description: The number of HCCs that are open in the payment year excluding suspect HCCs. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment year excluding
+          suspect HCCs. See the definition of open HCCs in the gap_status field
+          in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_total_hccs
-        description: The total number of HCCs that were open or closed in the payment year excluding suspect HCCs. Excludes new and inappropriate for recapture HCCs.
+        description: The total number of HCCs that were open or closed in the payment
+          year excluding suspect HCCs. Excludes new and inappropriate for
+          recapture HCCs.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_recapture_rate
-        description: Closed HCCs divided by no suspects total HCCs in the given payment year excluding suspect HCCs.
+        description: Closed HCCs divided by no suspects total HCCs in the given payment
+          year excluding suspect HCCs.
+        config:
+          meta:
+            data_type: number
       - name: closed_hccs
-        description: The number of HCCs that were closed in the payment year. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed in the payment year. See the
+          definition of closed HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: open_hccs
-        description: The number of HCCs that are open in the payment year. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment year. See the
+          definition of open HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: total_hccs
-        description: The total number of HCCs that were open or closed in the payment year. Excludes new and inappropriate for recapture HCCs.
+        description: The total number of HCCs that were open or closed in the payment
+          year. Excludes new and inappropriate for recapture HCCs.
+        config:
+          meta:
+            data_type: integer
       - name: recapture_rate
         description: Closed HCCs divided by total HCCs in the given payment year.
-  
+        config:
+          meta:
+            data_type: number
+
   - name: hcc_recapture__recapture_rates_monthly
     description: HCC recapture rates by payment year month.
     config:
@@ -48,43 +94,94 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
         {% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates_monthly
-      tags: ["hcc_recapture", "final"]
+      tags: [ "hcc_recapture", "final" ]
       materialized: table
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
-            - payer
-            - payment_year
-            - payment_year_month
+              - payer
+              - payment_year
+              - payment_year_month
     columns:
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
-          an open HCC from 2023 will have a payment year = 2025.       
+          This is the year that the HCC should be coded. Typically the
+          collection year + 1, but for open HCCs it will be the collection year
+          + 2.  To illustrate, if we have an HCC claim in 2023, but not in 2024,
+          that means it is open in 2024. The payment year is 2024 + 1 = 2025.
+          So  an open HCC from 2023 will have a payment year = 2025.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: payment_year_month
         description: >
-          The month in the collection year that the HCC was closed. Collection year month is not used since this differs for open vs closed HCCs, but payment year month
-          will be the same for both open and closed HCCs.
+          The month in the collection year that the HCC was closed. Collection
+          year month is not used since this differs for open vs closed HCCs, but
+          payment year month will be the same for both open and closed HCCs.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: no_suspects_closed_hccs
-        description: The number of HCCs that were closed the payment month excluding suspect HCCs. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed the payment month excluding
+          suspect HCCs. See the definition of closed HCCs in the gap_status
+          field in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_open_hccs
-        description: The number of HCCs that are open in the payment month excluding suspect HCCs. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment month excluding
+          suspect HCCs. See the definition of open HCCs in the gap_status field
+          in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_total_hccs
-        description: The total number of HCCs that were open or closed in the payment month excluding suspect HCCs. Excludes new and inappropriate for recapture HCCs.
+        description: The total number of HCCs that were open or closed in the payment
+          month excluding suspect HCCs. Excludes new and inappropriate for
+          recapture HCCs.
+        config:
+          meta:
+            data_type: integer
       - name: no_suspects_recapture_rate
-        description: Closed HCCs divided by Total HCCs in the given payment month excluding suspect HCCs.
+        description: Closed HCCs divided by Total HCCs in the given payment month
+          excluding suspect HCCs.
+        config:
+          meta:
+            data_type: number
       - name: closed_hccs
-        description: The number of HCCs that were closed the payment month. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed the payment month. See the
+          definition of closed HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: open_hccs
-        description: The number of HCCs that are open in the payment month. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment month. See the
+          definition of open HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: total_hccs
-        description: The total number of HCCs that were open or closed in the payment month. Excludes new and inappropriate for recapture HCCs.
+        description: The total number of HCCs that were open or closed in the payment
+          month. Excludes new and inappropriate for recapture HCCs.
+        config:
+          meta:
+            data_type: integer
       - name: recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment month.
+        config:
+          meta:
+            data_type: number
 
   - name: hcc_recapture__recapture_rates_monthly_ytd
     description: HCC recapture rates by payment month year-to-date.
@@ -93,44 +190,93 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
         {% else %}hcc_recapture{%- endif -%}
       alias: recapture_rates_monthly_ytd
-      tags: ["hcc_recapture", "final"]
+      tags: [ "hcc_recapture", "final" ]
       materialized: table
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
-            - payer
-            - payment_year
-            - payment_year_month
+              - payer
+              - payment_year
+              - payment_year_month
     columns:
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
-          an open HCC from 2023 will have a payment year = 2025.   
+          This is the year that the HCC should be coded. Typically the
+          collection year + 1, but for open HCCs it will be the collection year
+          + 2.  To illustrate, if we have an HCC claim in 2023, but not in 2024,
+          that means it is open in 2024. The payment year is 2024 + 1 = 2025.
+          So  an open HCC from 2023 will have a payment year = 2025.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: payment_year_month
         description: >
-          The month in the collection year that the HCC was closed. Collection year month is not used since this differs for open vs closed HCCs, but payment year month
-          will be the same for both open and closed HCCs.
+          The month in the collection year that the HCC was closed. Collection
+          year month is not used since this differs for open vs closed HCCs, but
+          payment year month will be the same for both open and closed HCCs.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: monthly_closed_hccs
-        description: The number of HCCs that were closed the payment month. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed the payment month. See the
+          definition of closed HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: monthly_open_hccs
-        description: The number of HCCs that are open in the payment month. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment month. See the
+          definition of open HCCs in the gap_status field in the gap_status
+          model.
+        config:
+          meta:
+            data_type: integer
       - name: monthly_total_hccs
-        description: The total number of HCCs that were open or closed in the payment month. Excludes new and inappropriate for recapture HCCs.
+        description: The total number of HCCs that were open or closed in the payment
+          month. Excludes new and inappropriate for recapture HCCs.
+        config:
+          meta:
+            data_type: integer
       - name: monthly_recapture_rate
         description: Closed HCCs divided by Total HCCs in the given payment month.
+        config:
+          meta:
+            data_type: number
       - name: ytd_closed_hccs
-        description: The number of HCCs that were closed the payment month + all prior payment months in the payment year. See the definition of closed HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that were closed the payment month + all prior
+          payment months in the payment year. See the definition of closed HCCs
+          in the gap_status field in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: ytd_open_hccs
-        description: The number of HCCs that are open in the payment month + all prior payment months in the payment year. See the definition of open HCCs in the gap_status field in the gap_status model.
+        description: The number of HCCs that are open in the payment month + all prior
+          payment months in the payment year. See the definition of open HCCs in
+          the gap_status field in the gap_status model.
+        config:
+          meta:
+            data_type: integer
       - name: yearly_total_hccs
         description: The number of HCCs open and closed in a payment year.
+        config:
+          meta:
+            data_type: integer
       - name: ytd_recapture_rate
-        description: The running total of closed HCCs divided by total HCCs in a payment year.
-  
+        description: The running total of closed HCCs divided by total HCCs in a payment
+          year.
+        config:
+          meta:
+            data_type: number
+
   - name: hcc_recapture__hcc_status
     description: Combines claims data with HCC gap status.
     config:
@@ -138,7 +284,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
         {% else %}hcc_recapture{%- endif -%}
       alias: hcc_status
-      tags: ["hcc_recapture", "final"]
+      tags: [ "hcc_recapture", "final" ]
       materialized: table
     data_tests:
       - dbt_utils.unique_combination_of_columns:
@@ -162,51 +308,136 @@ models:
     columns:
       - name: person_id
         description: A unique identifier for a person.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: data_source
-        description: The name of the data source origin. Filled in by the user in the input layer files.
+        description: The name of the data source origin. Filled in by the user in the
+          input layer files.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2.
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
-          an open HCC from 2023 will have a payment year = 2025.   - name: payment_year
+          This is the year that the HCC should be coded. Typically the
+          collection year + 1, but for open HCCs it will be the collection year
+          + 2. To illustrate, if we have an HCC claim in 2023, but not in 2024,
+          that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
+          an open HCC from 2023 will have a payment year = 2025.   - name:
+          payment_year
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: recorded_date
-        description: The date the claim was originally recorded. Based on admission date, but if null then filled in by claim start date followed by claim end date.
+        description: The date the claim was originally recorded. Based on admission
+          date, but if null then filled in by claim start date followed by claim
+          end date.
+        config:
+          meta:
+            data_type: date
+            is_primary_key: true
       - name: claim_id
         description: A unique identifier for the claim.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: rendering_npi
-        description: The National Provider Identifier (NPI) of the physician who rendered services to the beneficiary.
+        description: The National Provider Identifier (NPI) of the physician who
+          rendered services to the beneficiary.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: model_version
-        description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment
-          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+        description: |
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: hcc_code
         description: The hierarchical condition category code.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: hcc_description
         description: A description of the HCC code.
+        config:
+          meta:
+            data_type: varchar
       - name: hcc_hierarchy_group
         description: >
-          The name of the HCC hierarchy group. Determined based off of the CMS risk adjustment website model software.
-          For example, in 2025, the hierarchies were stored in a file called `V28115H1.txt`. The file will end in an H.
+          The name of the HCC hierarchy group. Determined based off of the CMS
+          risk adjustment website model software. For example, in 2025, the
+          hierarchies were stored in a file called `V28115H1.txt`. The file will
+          end in an H.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: hcc_hierarchy_group_rank
         description: >
-          The rank within the HCC hierarchy group. The lower the number, the higher the rank. When 2 HCCs within the same group are
-          coded within the same collection year, the HCC with the lower rank will be chosen of the two for a given beneficiary.
+          The rank within the HCC hierarchy group. The lower the number, the
+          higher the rank. When 2 HCCs within the same group are coded within
+          the same collection year, the HCC with the lower rank will be chosen
+          of the two for a given beneficiary.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
+      - name: suspect_hcc_flag
+        description: Flag indicating whether the HCC comes from suspecting logic rather
+          than a billed diagnosis.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: risk_model_code
         description: >
-          There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
-          This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
-          the 2025 CMS risk adjustment software.
-      - name: eligible_claim_flag
+          There are different coefficients depending on a few factors such as
+          dual eligibility, new enrollee, institutional status, etc... This
+          column provides acronyms based off of the CMS risk adjustment SAS
+          code. For example, these can be found in the `C2824T2N_25.csv` file
+          for the 2025 CMS risk adjustment software.
+        config:
+          meta:
+            data_type: varchar
+      - name: hcc_type
         description: >
-          Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
-          on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
-      - name: eligible_bene_flag
-        description: A 1 is indicated for a beneficiary who is in the eligibility files. A 0 is indicated if they are not in the eligibility files.
-      - name: hcc_chronic_flag
-        description: Whether the HCC is considered chronic or not. A 1 indicates the HCC is chronic.
+          The type of HCC. Includes the following values:
+            - 'coded': condition was coded in a claim during the collection year
+            - 'captured': condition is considered captured according to a different source besides claims, such as a clinical source
+            - 'suspect': condition is suspected to be present based on some other criteria besides claims diagnoses
+        tests:
+          - accepted_values:
+              values: [ 'coded', 'captured', 'suspect' ]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: hcc_source
+        description: >
+          The source of the HCC information. Includes the following values:
+            - 'payer': HCC was identified in data received from the payer such as claims or suspect lists
+            - 'clinical': HCC was identified in clinical data such as the EHR
+        tests:
+          - accepted_values:
+              values: [ 'payer', 'clinical' ]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: gap_status
         description: >
           definitions for gap_status:
@@ -218,29 +449,51 @@ models:
             - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
         tests:
           - accepted_values:
-              values: ['closed - higher coefficient hcc in hierarchy group', 'closed', 'closed - lower coefficient hcc in hierarchy group', 'new', 'open', 'ineligible for recapture']
+              values:
+                [
+                  'closed - higher coefficient hcc in hierarchy group',
+                  'closed',
+                  'closed - lower coefficient hcc in hierarchy group',
+                  'new',
+                  'open',
+                  'ineligible for recapture'
+                ]
+        config:
+          meta:
+            data_type: varchar
+      - name: hcc_chronic_flag
+        description: Whether the HCC is considered chronic or not. A 1 indicates the HCC
+          is chronic.
+        config:
+          meta:
+            data_type: integer
       - name: recapturable_flag
         description: >
           Whether or not the HCC is recapturable. Includes the following values:
             - '1': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
             - '0': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
-      - name: hcc_type
-        description: >
-          The type of HCC. Includes the following values:
-            - 'coded': condition was coded in a claim during the collection year
-            - 'captured': condition is considered captured according to a different source besides claims, such as a clinical source
-            - 'suspect': condition is suspected to be present based on some other criteria besides claims diagnoses
-        tests:
-          - accepted_values:
-              values: ['coded', 'captured', 'suspect']
-      - name: hcc_source
-        description: >
-          The source of the HCC information. Includes the following values:
-            - 'payer': HCC was identified in data received from the payer such as claims or suspect lists
-            - 'clinical': HCC was identified in clinical data such as the EHR 
-        tests:
-          - accepted_values:
-              values: ['payer', 'clinical']
+        config:
+          meta:
+            data_type: integer
+      - name: eligible_claim_flag
+        description: |
+          Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+        config:
+          meta:
+            data_type: integer
+      - name: eligible_bene_flag
+        description: A 1 is indicated for a beneficiary who is in the eligibility files.
+          A 0 is indicated if they are not in the eligibility files.
+        config:
+          meta:
+            data_type: integer
+      - name: filtered_by_hierarchy_flag
+        description: Flag indicating whether the HCC was filtered out by HCC hierarchy
+          logic.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
 
   - name: hcc_recapture__gap_status
     description: The gap status for each HCC.
@@ -249,8 +502,8 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_recapture
         {% else %}hcc_recapture{%- endif -%}
       alias: gap_status
-      tags: ["hcc_recapture", "final"]
-      materialized: table  
+      tags: [ "hcc_recapture", "final" ]
+      materialized: table
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -265,30 +518,70 @@ models:
     columns:
       - name: person_id
         description: A unique identifier for a person.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payer
         description: The name of the person (i.e. beneficiary) insurance provider.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: hcc_code
         description: The hierarchical condition category code.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: risk_model_code
         description: >
-          There are different coefficients depending on a few factors such as dual eligibility, new enrollee, institutional status, etc...
-          This column provides acronyms based off of the CMS risk adjustment SAS code. For example, these can be found in the `C2824T2N_25.csv` file for
-          the 2025 CMS risk adjustment software.
+          There are different coefficients depending on a few factors such as
+          dual eligibility, new enrollee, institutional status, etc... This
+          column provides acronyms based off of the CMS risk adjustment SAS
+          code. For example, these can be found in the `C2824T2N_25.csv` file
+          for the 2025 CMS risk adjustment software.
+        config:
+          meta:
+            data_type: varchar
       - name: model_version
-        description: >
-          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the
-          yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment
-          website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment.
+        description: |
+          The CMS Medicare risk model version. This includes models such as v22,v24, and v28 which are documented in the yearly rate announcement (e.g. https://www.cms.gov/files/document/2026-announcement.pdf) and on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: payment_year
         description: >
-          This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2.
-          To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
+          This is the year that the HCC should be coded. Typically the
+          collection year + 1, but for open HCCs it will be the collection year
+          + 2. To illustrate, if we have an HCC claim in 2023, but not in 2024,
+          that means it is open in 2024. The payment year is 2024 + 1 = 2025. So
           an open HCC from 2023 will have a payment year = 2025.
+        config:
+          meta:
+            data_type: integer
+            is_primary_key: true
       - name: recapturable_flag
         description: >
           Whether or not the HCC is recapturable. Includes the following values:
             - '1': condition is a chronic condition appropriate for recapture and has been documented in the prior 2 years
             - '0': condition is not a chronic condition appropriate for recapture or has not been documented in the prior 2 years
+        config:
+          meta:
+            data_type: integer
+      - name: hcc_type
+        description: The type of HCC, such as coded, captured, or suspect.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: hcc_source
+        description: The source of the HCC information, such as payer or clinical.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: gap_status
         description: >
           definitions for gap_status:
@@ -298,3 +591,12 @@ models:
             - 'new': defined as an hcc that has not been coded in the past 2 years
             - 'open': for gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year
             - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
+        config:
+          meta:
+            data_type: varchar
+      - name: suspect_hcc_flag
+        description: Flag indicating whether the HCC comes from suspecting logic rather
+          than a billed diagnosis.
+        config:
+          meta:
+            data_type: integer

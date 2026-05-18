@@ -14,11 +14,8 @@
     , cast(source_code as {{ dbt.type_string() }}) as source_code
     , cast(source_description as {{ dbt.type_string() }}) as source_description
     , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code
-    , cast(ndc_description as {{ dbt.type_string() }}) as ndc_description
     , cast(rxnorm_code as {{ dbt.type_string() }}) as rxnorm_code
-    , cast(rxnorm_description as {{ dbt.type_string() }}) as rxnorm_description
     , cast(atc_code as {{ dbt.type_string() }}) as atc_code
-    , cast(atc_description as {{ dbt.type_string() }}) as atc_description
     , cast(route as {{ dbt.type_string() }}) as route
     , cast(strength as {{ dbt.type_string() }}) as strength
     , cast(quantity as {{ dbt.type_int() }}) as quantity
@@ -28,8 +25,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}

@@ -15,12 +15,6 @@
     , cast(source_component_type as {{ dbt.type_string() }}) as source_component_type
     , cast(source_component_code as {{ dbt.type_string() }}) as source_component_code
     , cast(source_component_description as {{ dbt.type_string() }}) as source_component_description
-    , cast(normalized_order_type as {{ dbt.type_string() }}) as normalized_order_type
-    , cast(normalized_order_code as {{ dbt.type_string() }}) as normalized_order_code
-    , cast(normalized_order_description as {{ dbt.type_string() }}) as normalized_order_description
-    , cast(normalized_component_type as {{ dbt.type_string() }}) as normalized_component_type
-    , cast(normalized_component_code as {{ dbt.type_string() }}) as normalized_component_code
-    , cast(normalized_component_description as {{ dbt.type_string() }}) as normalized_component_description
     , cast(status as {{ dbt.type_string() }}) as status
     , cast(result as {{ dbt.type_string() }}) as result
     , {{ try_to_cast_datetime('result_datetime') }} as result_datetime
@@ -38,8 +32,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}

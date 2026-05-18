@@ -312,6 +312,5 @@ Every Data Mart is fully documented in this section, including:
 <InputLayerDictionaryTable
   tableOptions={DATA_MART_TABLE_OPTIONS}
   defaultModelName="ahrq_measures__pqi_denom_long"
-  showMappingInstructions={false}
   showRequiredForDataMart={false}
 />

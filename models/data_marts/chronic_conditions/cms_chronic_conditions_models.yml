@@ -1,7 +1,7 @@
 version: 2
 
 models:
-## Final
+  ## Final
   - name: chronic_conditions__cms_chronic_conditions_wide
     config:
       schema: |
@@ -13,241 +13,252 @@ models:
         - chronic_conditions
       materialized: table
     description: >
-      This model pivots conditions on the patient level (i.e. one record per patient) with flags for each chronic condition.
+      This model pivots conditions on the patient level (i.e. one record per
+      patient) with flags for each chronic condition.
     columns:
       - name: person_id
         description: Unique ID for the patient.
         tests:
           - unique
           - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: acute_myocardial_infarction
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: adhd_conduct_disorders_and_hyperkinetic_syndrome
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: alcohol_use_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: alzheimers_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: anemia
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: anxiety_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: asthma
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: atrial_fibrillation_and_flutter
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: autism_spectrum_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: benign_prostatic_hyperplasia
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: bipolar_disorder
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_breast
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_colorectal
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_endometrial
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_lung
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_prostate
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cancer_urologic_kidney_renal_pelvis_and_ureter
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cataract
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cerebral_palsy
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: chronic_kidney_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: chronic_obstructive_pulmonary_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: cystic_fibrosis_and_other_metabolic_developmental_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: depression_bipolar_or_other_depressive_mood_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: depressive_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: diabetes
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: drug_use_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: epilepsy
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: fibromyalgia_and_chronic_pain_and_fatigue
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: glaucoma
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: heart_failure_and_non_ischemic_heart_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_a
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_b_acute_or_unspecified
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_b_chronic
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_c_acute
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_c_chronic
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_c_unspecified
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_d
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hepatitis_e
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hip_pelvic_fracture
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: human_immunodeficiency_virus_and_or_acquired_immunodeficiency_syndrome_hiv_aids
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hyperlipidemia
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hypertension
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: hypothyroidism
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: intellectual_disabilities_and_related_conditions
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: ischemic_heart_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: learning_disabilities
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: leukemias_and_lymphomas
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: liver_disease_cirrhosis_and_other_liver_conditions_except_viral_hepatitis
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: migraine_and_chronic_headache
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: mobility_impairments
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: multiple_sclerosis_and_transverse_myelitis
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: muscular_dystrophy
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: non_alzheimers_dementia
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: obesity
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: opioid_use_disorder_oud
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: osteoporosis_with_or_without_pathological_fracture
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: other_developmental_delays
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: parkinsons_disease_and_secondary_parkinsonism
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: peripheral_vascular_disease_pvd
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: personality_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: pneumonia_all_cause
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: post_traumatic_stress_disorder_ptsd
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: pressure_and_chronic_ulcers
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: rheumatoid_arthritis_osteoarthritis
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: schizophrenia
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: schizophrenia_and_other_psychotic_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: sensory_blindness_and_visual_impairment
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: sensory_deafness_and_hearing_impairment
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: sickle_cell_disease
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: spina_bifida_and_other_congenital_anomalies_of_the_nervous_system
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: spinal_cord_injury
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: stroke_transient_ischemic_attack
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: tobacco_use
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: viral_hepatitis_general
         description: flag indicating if the condition is present
-        data_type: boolean
+        data_type: integer
       - name: tuva_last_run
         description: >
-          The time at which the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run`  environment. Timezone is configurable via the `tuva_last_run` var.
+          The time at which the model was materialized. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt
+          run`  environment. Timezone is configurable via the `tuva_last_run`
+          var.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: chronic_conditions__cms_chronic_conditions_long
     config:
@@ -272,13 +283,16 @@ models:
               - start_date
               - condition
       - the_tuva_project.expect_table_row_count_to_be_between:
-# description: This is a check in one of the final downstream marts to see if chronic_conditions__cms_chronic_conditions_long is populated. If this is flagging, please check other areas further upstream on the input layer.
+          # description: This is a check in one of the final downstream marts to see if chronic_conditions__cms_chronic_conditions_long is populated. If this is flagging, please check other areas further upstream on the input layer.
           config:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
             meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to see if chronic_conditions__cms_chronic_conditions_long is populated. If this is flagging, please check other areas further upstream on the input layer."
-            tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_usability']
+              dqi_test_description: "This is a check in one of the final downstream marts to
+                see if chronic_conditions__cms_chronic_conditions_long is
+                populated. If this is flagging, please check other areas further
+                upstream on the input layer."
+            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_usability' ]
           arguments:
             min_value: 1
             strictly: false
@@ -287,25 +301,41 @@ models:
         description: Unique ID for the patient.
         tests:
           - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: claim_id
         description: Unique identifier for each claim.
         tests:
           - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: start_date
         description: >
-          Start date of the chronic condition derived from diagnosis, procedure, or medication.
+          Start date of the chronic condition derived from diagnosis, procedure,
+          or medication.
+        config:
+          meta:
+            data_type: date
+            is_primary_key: true
       - name: chronic_condition_type
         description: >
-          The type of chronic condition as defined by CMS. ('Common' or 'Other chronic or potentially disabling conditions')
+          The type of chronic condition as defined by CMS. ('Common' or 'Other
+          chronic or potentially disabling conditions')
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
+            data_type: integer
       - name: condition_category
         description: >
           The category of the condition (e.g. Cardiovascular Disease).
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
+            data_type: integer
       - name: condition
         description: The name of the chronic condition.
         tests:
@@ -313,13 +343,24 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
+            data_type: integer
+            is_primary_key: true
       - name: data_source
         description: >
           Indicates the name of the source dataset (e.g. Medicare Claims).
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: tuva_last_run
-        description: The time at which the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.
+        description: The time at which the model was materialized. Generated by
+          `dbt_utils.pretty_time` as the local time of the `dbt run`
+          environment. Timezone is configurable via the `tuva_last_run` var.
+        config:
+          meta:
+            data_type: timestamp
 
-## Intermediate
+  ## Intermediate
   - name: chronic_conditions__cms_chronic_conditions_all
     config:
       schema: |
@@ -331,9 +372,10 @@ models:
         - chronic_conditions
       materialized: table
     description: >
-      This model contains logic for all chronic conditions where additional_logic is not 'None'. This model includes standard exclusions
-      and maps ICD-10-CM diagnosis codes, ICD-10-PCS procedure codes,
-      HCPCS codes, and MS DRG codes to chronic conditions.
+      This model contains logic for all chronic conditions where
+      additional_logic is not 'None'. This model includes standard exclusions
+      and maps ICD-10-CM diagnosis codes, ICD-10-PCS procedure codes, HCPCS
+      codes, and MS DRG codes to chronic conditions.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -345,10 +387,12 @@ models:
           - not_null
       - name: start_date
         description: >
-          Start date of the chronic condition derived from diagnosis, procedure, or medication.
+          Start date of the chronic condition derived from diagnosis, procedure,
+          or medication.
       - name: chronic_condition_type
         description: >
-          The type of chronic condition as defined by CMS. ('Common' or 'Other chronic or potentially disabling conditions')
+          The type of chronic condition as defined by CMS. ('Common' or 'Other
+          chronic or potentially disabling conditions')
       - name: condition_category
         description: >
           The category of the condition (e.g. Cardiovascular Disease).
@@ -371,10 +415,9 @@ models:
         - chronic_conditions
       materialized: table
     description: >
-      This model contains logic for the chronic condition Human
-      Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome
-      (HIV/AIDS). This model maps ICD-10-CM diagnosis codes and MS DRG
-      codes to the chronic condition.
+      This model contains logic for the chronic condition Human Immunodeficiency
+      Virus and/or Acquired Immunodeficiency Syndrome (HIV/AIDS). This model
+      maps ICD-10-CM diagnosis codes and MS DRG codes to the chronic condition.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -386,10 +429,12 @@ models:
           - not_null
       - name: start_date
         description: >
-          Start date of the chronic condition derived from diagnosis, procedure, or medication.
+          Start date of the chronic condition derived from diagnosis, procedure,
+          or medication.
       - name: chronic_condition_type
         description: >
-          The type of chronic condition as defined by CMS. ('Common' or 'Other chronic or potentially disabling conditions')
+          The type of chronic condition as defined by CMS. ('Common' or 'Other
+          chronic or potentially disabling conditions')
       - name: condition_category
         description: The category of the condition (e.g. Other).
       - name: condition
@@ -398,7 +443,11 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['Human Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome (HIV/AIDS)']
+                values:
+                  [
+                    'Human Immunodeficiency Virus and/or Acquired
+                      Immunodeficiency Syndrome (HIV/AIDS)'
+                  ]
       - name: data_source
         description: >
           Indicates the name of the source dataset (e.g. Medicare Claims).
@@ -414,8 +463,9 @@ models:
         - chronic_conditions
       materialized: table
     description: >
-      This model contains logic for the chronic condition Opioid Use Disorder  (OUD). This model maps ICD-10-CM diagnosis codes, ICD-10-PCS procedure
-      codes, HCPCS codes, and NDC codes to the chronic condition.
+      This model contains logic for the chronic condition Opioid Use
+      Disorder  (OUD). This model maps ICD-10-CM diagnosis codes, ICD-10-PCS
+      procedure codes, HCPCS codes, and NDC codes to the chronic condition.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -427,10 +477,12 @@ models:
           - not_null
       - name: start_date
         description: >
-          Start date of the chronic condition derived from diagnosis, procedure, or medication.
+          Start date of the chronic condition derived from diagnosis, procedure,
+          or medication.
       - name: chronic_condition_type
         description: >
-          The type of chronic condition as defined by CMS. ('Common' or 'Other chronic or potentially disabling conditions')
+          The type of chronic condition as defined by CMS. ('Common' or 'Other
+          chronic or potentially disabling conditions')
       - name: condition_category
         description: The category of the condition (e.g. Substance Abuse).
       - name: condition
@@ -439,12 +491,12 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['Opioid Use Disorder (OUD)']
+                values: [ 'Opioid Use Disorder (OUD)' ]
       - name: data_source
         description: >
           Indicates the name of the source dataset (e.g. Medicare Claims).
 
-## Staging
+  ## Staging
   - name: cms_chronic_conditions__stg_core__condition
     config:
       tags:

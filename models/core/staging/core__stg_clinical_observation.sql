@@ -14,9 +14,6 @@
     , cast(source_code_type as {{ dbt.type_string() }}) as source_code_type
     , cast(source_code as {{ dbt.type_string() }}) as source_code
     , cast(source_description as {{ dbt.type_string() }}) as source_description
-    , cast(normalized_code_type as {{ dbt.type_string() }}) as normalized_code_type
-    , cast(normalized_code as {{ dbt.type_string() }}) as normalized_code
-    , cast(normalized_description as {{ dbt.type_string() }}) as normalized_description
     , cast(result as {{ dbt.type_string() }}) as result
     , cast(source_units as {{ dbt.type_string() }}) as source_units
     , cast(normalized_units as {{ dbt.type_string() }}) as normalized_units
@@ -27,8 +24,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}
