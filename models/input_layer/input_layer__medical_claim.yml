@@ -12,6 +12,8 @@ models:
       these nuances and filter out all but final claims; otherwise key metrics
       such as cost, utilization, and outcomes will be incorrect.
     grain: Intended to be one record per claim line per data source.
+    transformation_steps: |-
+      This model brings the input layer medical_claim table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:

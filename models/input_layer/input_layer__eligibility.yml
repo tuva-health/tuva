@@ -9,6 +9,8 @@ models:
       Eligibility data is also used to calculate member months, which are
       needed for measures such as PMPM.
     grain: Intended to be one record per person, member, enrollment span, payer, plan, and data source.
+    transformation_steps: |-
+      This model brings the input layer eligibility table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: ''
     tests:
       - dbt_utils.unique_combination_of_columns:

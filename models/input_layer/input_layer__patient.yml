@@ -6,6 +6,8 @@ models:
       patients. Patients in this table may have more than one record because
       their source system identifier, patient_id, may change over time.
     grain: Intended to be one record per person, patient identifier, and data source.
+    transformation_steps: |-
+      This model brings the input layer patient table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     tests:
       - dbt_utils.unique_combination_of_columns:

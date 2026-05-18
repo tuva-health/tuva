@@ -11,15 +11,15 @@ const {
 } = require('../src/lib/tuvaReleaseChannels');
 
 const stableRelease = {
-  tag_name: 'v0.17.2',
-  name: 'the_tuva_project v0.17.2',
+  tag_name: 'v0.18.0',
+  name: 'the_tuva_project v0.18.0',
   draft: false,
   prerelease: false,
-  published_at: '2026-04-02T17:07:35Z',
-  html_url: 'https://github.com/tuva-health/tuva/releases/tag/v0.17.2',
+  published_at: '2026-05-07T21:06:08Z',
+  html_url: 'https://github.com/tuva-health/tuva/releases/tag/v0.18.0',
 };
 
-const rcRelease = {
+const retiredRcRelease = {
   tag_name: 'v0.18.0-rc',
   name: 'the_tuva_project v0.18.0-rc',
   draft: false,
@@ -37,8 +37,8 @@ const uppercaseRcRelease = {
   html_url: 'https://github.com/tuva-health/tuva/releases/tag/v0.19.0-RC',
 };
 
-assert.equal(isReleaseCandidate(rcRelease), true);
-assert.equal(isStableRelease(rcRelease), false);
+assert.equal(isReleaseCandidate(retiredRcRelease), true);
+assert.equal(isStableRelease(retiredRcRelease), false);
 
 assert.equal(isStableRelease(stableRelease), true);
 assert.equal(isReleaseCandidate(stableRelease), false);
@@ -48,15 +48,18 @@ assert.equal(isStableRelease(uppercaseRcRelease), false);
 
 const channels = buildTuvaReleaseChannels([
   stableRelease,
-  rcRelease,
+  retiredRcRelease,
   uppercaseRcRelease,
 ]);
 
-assert.equal(channels.stable.version, '0.17.2');
+assert.equal(channels.stable.version, '0.18.0');
 assert.equal(channels.candidate.version, '0.19.0-RC');
 assert.equal(channels.bleedingEdge.label, 'main');
 
-const channelsWithoutCandidate = buildTuvaReleaseChannels([stableRelease]);
+const channelsWithoutCandidate = buildTuvaReleaseChannels([
+  stableRelease,
+  retiredRcRelease,
+]);
 
 assert.equal(channelsWithoutCandidate.candidate, null);
 assert.equal(

@@ -1,0 +1,40 @@
+name: DAG Viewer Build
+
+on:
+  pull_request:
+    paths:
+      - "DAG_viewer/**"
+      - "models/**"
+      - "seeds/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "DAG_viewer/**"
+      - "models/**"
+      - "seeds/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build static DAG viewer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: DAG_viewer/package-lock.json
+
+      - name: Install dependencies
+        working-directory: DAG_viewer
+        run: npm ci
+
+      - name: Build against checked-out Tuva source
+        working-directory: DAG_viewer
+        run: npm run build:local

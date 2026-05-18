@@ -59,7 +59,11 @@ function buildTuvaReleaseChannels(releases) {
     .sort((left, right) => releaseTimestamp(right) - releaseTimestamp(left));
 
   const stable = publishedReleases.find(isStableRelease) || null;
-  const candidate = publishedReleases.find(isReleaseCandidate) || null;
+  const stablePublishedAt = releaseTimestamp(stable);
+  const candidate = publishedReleases.find((release) =>
+    isReleaseCandidate(release) &&
+    (!stable || releaseTimestamp(release) > stablePublishedAt)
+  ) || null;
 
   return {
     stable: formatRelease(stable),

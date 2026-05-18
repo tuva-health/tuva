@@ -8,6 +8,8 @@ models:
       encounter_type field correctly for clinical data; in claims data this
       field is determined automatically.
     grain: Intended to be one record per encounter per data source.
+    transformation_steps: |-
+      This model brings the input layer encounter table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |

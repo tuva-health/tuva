@@ -5,7 +5,7 @@ models:
       The appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed, or scheduled appointments.
     grain: One record per appointment per patient.
     transformation_steps: |-
-      This model brings the input layer appointment table into the Tuva package -- it does not do any transformation.
+      This model brings the input layer appointment table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
@@ -121,3 +121,4 @@ models:
         config:
           meta:
             data_type: varchar
+            is_primary_key: true

@@ -6,6 +6,8 @@ models:
       patients have been officially diagnosed with or are suspected of having.
       This includes problems, admitting diagnosis codes, and billable diagnoses.
     grain: Intended to be one record per condition record per data source.
+    transformation_steps: |-
+      This model brings the input layer condition table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: "{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}\n"

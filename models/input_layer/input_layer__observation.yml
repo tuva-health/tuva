@@ -5,6 +5,8 @@ models:
       The observation table contains information about measurements other than
       lab tests, such as blood pressure, height, and weight.
     grain: Intended to be one record per observation record per data source.
+    transformation_steps: |-
+      This model brings the input layer observation table into the Tuva package. It does not do any transformation; it's just `select *`.
     mapping_instructions: 'No explicit mapping instructions provided.'
     config:
       schema: |
