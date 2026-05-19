@@ -1,12 +1,11 @@
 version: 2
 models:
   - name: input_layer__appointment
-    description: |-
-      The appointment table contains information related to appointments at a healthcare facility. This table may include canceled, completed, or scheduled appointments.
-    grain: One record per appointment per patient.
-    transformation_steps: |-
-      This model brings the input layer appointment table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: >-
+      The appointment table is intended to have one record per appointment per patient per data source. This table stores scheduling information for clinical appointments, including scheduled, completed, canceled, and no-show appointments when those records are available from the source system. Appointments may be linked to an encounter when the appointment resulted in a clinical visit, but not every appointment will have an encounter_id.
+
+
+      Primary key: appointment_id, data_source.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -17,9 +16,8 @@ models:
       materialized: view
     columns:
       - name: appointment_id
-        description: This field is the unique identifier for an appointment within a
-          data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for an appointment within a data source. This value should be populated on every record and should uniquely identify the appointment when combined with data_source.
         config:
           meta:
             data_type: varchar
@@ -32,92 +30,92 @@ models:
               config:
                 severity: error
       - name: person_id
-        description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Globally unique identifier for the person associated with the appointment. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
         config:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
         config:
           meta:
             data_type: varchar
       - name: encounter_id
-        description: Unique identifier for each encounter associated with the appointment.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the clinical encounter associated with the appointment. Populate this when the appointment resulted in, or is linked to, a clinical encounter. Leave null when no encounter is available.
         config:
           meta:
             data_type: varchar
       - name: start_datetime
-        description: The scheduled start date and time of the appointment.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Scheduled start date and time of the appointment. This should include both date and time when available.
         config:
           meta:
             data_type: timestamp
       - name: end_datetime
-        description: The scheduled end date and time of the appointment.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Scheduled end date and time of the appointment. This should be greater than or equal to start_datetime when both values are populated.
         config:
           meta:
             data_type: timestamp
       - name: duration
-        description: The scheduled duration of the appointment in minutes.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Scheduled duration of the appointment in minutes. This may be supplied by the source or derived from start_datetime and end_datetime.
         config:
           meta:
             data_type: integer
       - name: location_id
-        description: Unique identifier for the location where the appointment is scheduled.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the location where the appointment is scheduled, such as a clinic, department, facility, or site in the source system.
         config:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner associated with the appointment.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the practitioner associated with the appointment. When multiple practitioners are associated with an appointment, map the primary, scheduled, or rendering practitioner according to the source system's convention.
         config:
           meta:
             data_type: varchar
       - name: type_code
-        description: Source appointment type code, such as a walk-in or routine visit code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source appointment type code. This field should preserve the appointment type value from the source system and is used downstream to normalize appointment type.
         config:
           meta:
             data_type: varchar
       - name: type_description
-        description: Human-readable description of the source appointment type.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Human-readable description of the source appointment type. Populate this when the source provides a display name or description for type_code.
         config:
           meta:
             data_type: varchar
       - name: status_code
-        description: Source appointment status code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source appointment status code, such as scheduled, completed, canceled, or no-show. This field is used downstream to normalize appointment status.
         config:
           meta:
             data_type: varchar
       - name: status_description
-        description: Human-readable description of the source appointment status.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Human-readable description of the source appointment status. Populate this when the source provides a display name or description for status_code.
         config:
           meta:
             data_type: varchar
       - name: reason
-        description: Free-text reason entered for the appointment.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Free-text reason for the appointment. This may represent the patient-stated reason, scheduling reason, visit reason, or chief complaint depending on the source system.
         config:
           meta:
             data_type: varchar
       - name: cancellation_reason
-        description: Free-text reason the appointment was canceled.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source cancellation reason for canceled appointments. Populate this only when the appointment was canceled and the source provides a cancellation reason.
         config:
           meta:
             data_type: varchar
       - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          User-defined name that identifies the source of the appointment data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         config:
           meta:
             data_type: varchar

@@ -55,18 +55,20 @@ LOCAL_REPO_DIRS = {
 }
 
 SYNTHETIC_TABLE_TO_SEED_MODEL = {
-    "appointment": "raw_data__appointment",
-    "appointment_small": "raw_data__appointment",
-    "eligibility": "raw_data__eligibility",
-    "eligibility_small": "raw_data__eligibility",
-    "immunization": "raw_data__immunization",
-    "lab_result": "raw_data__lab_result",
-    "medical_claim": "raw_data__medical_claim",
-    "medical_claim_small": "raw_data__medical_claim",
-    "observation": "raw_data__observation",
-    "pharmacy_claim": "raw_data__pharmacy_claim",
-    "pharmacy_claim_small": "raw_data__pharmacy_claim",
-    "provider_attribution": "raw_data__provider_attribution",
+    "appointment": "synthetic_data__appointment",
+    "appointment_small": "synthetic_data__appointment",
+    "eligibility": "synthetic_data__eligibility",
+    "eligibility_small": "synthetic_data__eligibility",
+    "immunization": "synthetic_data__immunization",
+    "lab_result": "synthetic_data__lab_result",
+    "medical_claim": "synthetic_data__medical_claim",
+    "medical_claim_small": "synthetic_data__medical_claim",
+    "observation": "synthetic_data__observation",
+    "patient": "synthetic_data__patient",
+    "patient_small": "synthetic_data__patient",
+    "pharmacy_claim": "synthetic_data__pharmacy_claim",
+    "pharmacy_claim_small": "synthetic_data__pharmacy_claim",
+    "provider_attribution": "synthetic_data__provider_attribution",
 }
 
 HOOK_PATTERN = re.compile(
@@ -361,16 +363,17 @@ def load_seed_column_types() -> dict[str, set[str]]:
             seed_column_types[seed["name"]] = date_columns
 
     integration_seed_path = repo_root() / "integration_tests" / "seeds" / "_seeds.yml"
-    document = yaml.safe_load(integration_seed_path.read_text()) or {}
-    for seed in document.get("seeds", []):
-        config = seed.get("config", {})
-        column_types = config.get("column_types", {})
-        date_columns = {
-            column_name
-            for column_name, expression in column_types.items()
-            if is_date_type(str(expression))
-        }
-        seed_column_types[seed["name"]] = date_columns
+    if integration_seed_path.exists():
+        document = yaml.safe_load(integration_seed_path.read_text()) or {}
+        for seed in document.get("seeds", []):
+            config = seed.get("config", {})
+            column_types = config.get("column_types", {})
+            date_columns = {
+                column_name
+                for column_name, expression in column_types.items()
+                if is_date_type(str(expression))
+            }
+            seed_column_types[seed["name"]] = date_columns
 
     return seed_column_types
 

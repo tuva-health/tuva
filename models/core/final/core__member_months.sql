@@ -21,12 +21,12 @@
 {%- endset -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__eligibility')) }}
+    {{ select_extension_columns(ref('core__stg_claims_member_months')) }}
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , data_source
     , tuva_last_run
+    , data_source
 {%- endset %}
 
 select

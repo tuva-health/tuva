@@ -4,13 +4,14 @@ models:
   - name: ed_classification__summary
     description: |-
       One record per emergency department visit, including ED classification results when the primary diagnosis code is captured by the Johnston algorithm.
-    grain: One record per emergency department encounter.
-    transformation_steps: |-
+
       This model starts with all emergency department encounters from core__encounter.
 
       It left joins the classified ED encounter subset to retain visits whose primary diagnosis code did not match the Johnston ED classification lookup.
 
       It then joins the ED classification categories, provider terminology, and patient attributes to assemble the final summary table.
+
+      Table grain: One record per emergency department encounter.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -28,81 +29,149 @@ models:
           - not_null:
               config:
                 severity: error
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: ed_classification_description
-        description: Human-readable ED classification category for the encounter. Null when the encounter was not classified.
+        description: Human-readable ED classification category for the encounter. Null
+          when the encounter was not classified.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/ed-classification
+            data_type: varchar
       - name: ed_classification_order
-        description: Relative sort order of the ED classification category. Null when the encounter was not classified.
+        description: Relative sort order of the ED classification category. Null when
+          the encounter was not classified.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/ed-classification
+            data_type: integer
       - name: person_id
         description: Unique identifier for each patient in the dataset.
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_end_date
-        description: Date when the patient was discharged from the emergency department encounter.
+        description: Date when the patient was discharged from the emergency department
+          encounter.
+        config:
+          meta:
+            data_type: date
       - name: year_month
         description: Year and month derived from the encounter end date.
+        config:
+          meta:
+            data_type: varchar
       - name: primary_diagnosis_code
-        description: Primary diagnosis code for the encounter. If from claims, the primary diagnosis code comes from the institutional claim.
+        description: Primary diagnosis code for the encounter. If from claims, the
+          primary diagnosis code comes from the institutional claim.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
-            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+            terminology_note: "**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters."
+            data_type: varchar
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
+        config:
+          meta:
+            data_type: varchar
       - name: paid_amount
         description: The total paid amount across all claims for the encounter.
+        config:
+          meta:
+            data_type: number
       - name: allowed_amount
         description: The total allowed amount across all claims for the encounter.
+        config:
+          meta:
+            data_type: number
       - name: charge_amount
         description: The total charge amount across all claims for the encounter.
+        config:
+          meta:
+            data_type: number
       - name: facility_npi
         description: The ID for the facility where the encounter occurred.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+            terminology_note: "**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters."
+            data_type: varchar
       - name: facility_name
         description: The name of the facility.
+        config:
+          meta:
+            data_type: varchar
       - name: facility_state
         description: The state of the facility.
+        config:
+          meta:
+            data_type: varchar
       - name: facility_city
         description: The city of the facility.
+        config:
+          meta:
+            data_type: varchar
       - name: facility_zip_code
         description: The zip code of the facility.
+        config:
+          meta:
+            data_type: varchar
       - name: patient_sex
         description: The sex of the patient.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/gender
+            data_type: varchar
       - name: patient_age
         description: The age of the patient at the time of the encounter.
+        config:
+          meta:
+            data_type: integer
       - name: patient_zip_code
         description: The zip code for the patient.
+        config:
+          meta:
+            data_type: varchar
       - name: patient_latitude
         description: The latitude for the patient.
+        config:
+          meta:
+            data_type: number
       - name: patient_longitude
         description: The longitude for the patient.
+        config:
+          meta:
+            data_type: number
       - name: patient_race
         description: The race of the patient.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/race
+            data_type: varchar
       - name: data_source
-        description: The data source associated with the patient record used to enrich the encounter.
+        description: The data source associated with the patient record used to enrich
+          the encounter.
+        config:
+          meta:
+            data_type: varchar
 
   - name: ed_classification__int_filter_encounter_with_classification
     description: |-
       ED encounters that received a single resolved ED classification category.
-    grain: One record per classified emergency department encounter.
-    transformation_steps: |-
+
       This model reads the diagnosis-code probability mappings from ed_classification__map_primary_dx.
 
       It keeps only rows where ed_classification_capture = 1, meaning the primary diagnosis code matched a Johnston algorithm lookup row and has classification probabilities available.
 
       It assigns the encounter to the category with the highest Johnston probability across the ED classification columns.
+
+      Table grain: One record per classified emergency department encounter.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -134,9 +203,11 @@ models:
       - name: drug
         description: Drug-related probability.
       - name: ed_classification_capture
-        description: Indicator that the primary diagnosis code matched a Johnston lookup row and has ED classification probabilities available.
+        description: Indicator that the primary diagnosis code matched a Johnston lookup
+          row and has ED classification probabilities available.
       - name: classification
-        description: ED classification code selected from the highest available Johnston probability.
+        description: ED classification code selected from the highest available Johnston
+          probability.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/ed-classification
@@ -144,13 +215,14 @@ models:
   - name: ed_classification__map_primary_dx
     description: |-
       Emergency department encounter primary diagnosis codes mapped to the Johnston ED classification probability columns.
-    grain: One record per emergency department encounter diagnosis mapping result.
-    transformation_steps: |-
+
       This model reads emergency department encounters from core__encounter and keeps only encounter_id, primary_diagnosis_code, and primary_diagnosis_code_type.
 
       It joins ICD-10-CM and ICD-9-CM diagnosis codes to the Johnston ED classification lookup seeds.
 
       It outputs the Johnston probability columns together with ed_classification_capture, which flags diagnosis codes that were found in the lookup.
+
+      Table grain: One record per emergency department encounter diagnosis mapping result.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -182,4 +254,5 @@ models:
       - name: drug
         description: Drug-related probability.
       - name: ed_classification_capture
-        description: Indicator that the primary diagnosis code matched a Johnston lookup row and has ED classification probabilities available.
+        description: Indicator that the primary diagnosis code matched a Johnston lookup
+          row and has ED classification probabilities available.

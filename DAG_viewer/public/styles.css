@@ -271,6 +271,25 @@ pre {
   text-transform: uppercase;
 }
 
+.target-panel-subgroups {
+  display: grid;
+  gap: 14px;
+}
+
+.target-panel-subgroup {
+  display: grid;
+  gap: 7px;
+}
+
+.target-panel-subgroup h3 {
+  color: rgba(36, 35, 32, 0.68);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
 .target-panel-list {
   display: grid;
   gap: 8px;
@@ -508,15 +527,24 @@ body.is-panning {
   overflow: visible;
   pointer-events: none;
   position: absolute;
-  z-index: 0;
+  z-index: 1;
+}
+
+.system-overview-connector-underlay {
+  fill: none;
+  opacity: 0.9;
+  stroke: rgba(255, 255, 255, 0.88);
+  stroke-linecap: round;
+  stroke-width: 6.5;
 }
 
 .system-overview-connector {
   fill: none;
   marker-end: url(#overview-arrowhead);
-  opacity: 0.86;
+  opacity: 0.94;
   stroke: #373632;
-  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-width: 2.6;
 }
 
 .system-overview-stage-frame {
@@ -552,12 +580,20 @@ body.is-panning {
   font-size: 2.15rem;
   font-weight: 500;
   letter-spacing: -0.03em;
+  line-height: 1.08;
   pointer-events: auto;
   position: absolute;
   text-align: center;
   transform: translateX(-50%);
   width: 320px;
-  z-index: 0;
+  z-index: 2;
+}
+
+.system-overview-stage-label[data-stage-key="claimsNormalization"],
+.system-overview-stage-label[data-stage-key="claimsPreprocessing"] {
+  display: grid;
+  line-height: 1.02;
+  width: 260px;
 }
 
 .system-overview-group-frame {
@@ -581,7 +617,7 @@ body.is-panning {
   text-transform: uppercase;
   transform: translateX(-50%);
   width: 240px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .system-overview-entry {
@@ -600,7 +636,7 @@ body.is-panning {
   text-align: center;
   transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
   width: 212px;
-  z-index: 1;
+  z-index: 3;
 }
 
 .system-overview-entry:hover {

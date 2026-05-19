@@ -9,8 +9,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-   , data_source
    , tuva_last_run
+   , data_source
 {%- endset -%}
 
 with source_mapping as (
@@ -30,8 +30,7 @@ with source_mapping as (
        , ndc.ndc
        ) as ndc_code
    , coalesce(
-       meds.ndc_description
-       , ndc.fda_description
+       ndc.fda_description
        , ndc.rxnorm_description
        ) as ndc_description
    , case
@@ -42,10 +41,7 @@ with source_mapping as (
         meds.rxnorm_code
         , rxatc.rxcui
         ) as rxnorm_code
-   , coalesce(
-       meds.rxnorm_description
-       , rxatc.rxnorm_description
-       ) as rxnorm_description
+   , rxatc.rxnorm_description as rxnorm_description
    , case
         when meds.rxnorm_code is not null then 'manual'
         when rxatc.rxcui is not null then 'automatic'
@@ -54,10 +50,7 @@ with source_mapping as (
         meds.atc_code
         , rxatc.atc_3_code
         ) as atc_code
-   , coalesce(
-        meds.atc_description
-        , rxatc.atc_4_name
-        ) as atc_description
+   , rxatc.atc_4_name as atc_description
    , case
         when meds.atc_code is not null then 'manual'
         when rxatc.atc_3_name is not null then 'automatic'
@@ -98,8 +91,7 @@ from {{ ref('core__stg_clinical_medication') }} as meds
         , custom_mapped_ndc.normalized_code
         ) as ndc_code
    , coalesce(
-        meds.ndc_description
-        , ndc.fda_description
+        ndc.fda_description
         , ndc.rxnorm_description
         , custom_mapped_ndc.normalized_description
         ) as ndc_description
@@ -115,8 +107,7 @@ from {{ ref('core__stg_clinical_medication') }} as meds
         , custom_mapped_rxnorm.normalized_code
         ) as rxnorm_code
    , coalesce(
-        meds.rxnorm_code
-        , rxatc.rxnorm_description
+        rxatc.rxnorm_description
         , custom_mapped_rxnorm.normalized_description
         ) as rxnorm_description
    , case
@@ -131,8 +122,7 @@ from {{ ref('core__stg_clinical_medication') }} as meds
         , custom_mapped_atc.normalized_code
         ) as atc_code
    , coalesce(
-        meds.atc_description
-        , rxatc.atc_3_name
+        rxatc.atc_3_name
         , custom_mapped_atc.normalized_description
         ) as atc_description
    , case
@@ -209,7 +199,11 @@ select
    , sm.source_code
    , sm.source_description
    , sm.ndc_code
-   , sm.ndc_description
+   , coalesce(
+        sm.ndc_description
+        , ndc.fda_description
+        , ndc.rxnorm_description
+        ) as ndc_description
    , sm.ndc_mapping_method
    , coalesce(
         sm.rxnorm_code
@@ -218,6 +212,7 @@ select
    , coalesce(
         sm.rxnorm_description
         , ndc.rxnorm_description
+        , rxatc.rxnorm_description
         ) as rxnorm_description
    , case
         when sm.rxnorm_mapping_method is not null then sm.rxnorm_mapping_method

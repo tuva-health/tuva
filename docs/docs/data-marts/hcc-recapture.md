@@ -25,12 +25,12 @@ The type of gap closure if provided using the `gap_status` field. Here are the g
 
 | Gap Status | Definition |
 |------------|------------|
-| closed using higher coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is greater than the prior year HCC |
+| closed - higher coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is greater than the prior year HCC |
 | closed | The specific HCC in question has been observed in a risk adjustable claim during the collection year |
-| closed using lower coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is less than the prior year HCC |
+| closed - lower coefficient hcc in hierarchy group | An HCC in the same group was closed, but its coefficient is less than the prior year HCC |
 | new | Defined as an HCC that has not been coded in the past 2 years |
 | open | For gaps and claims, it's a chronic condition appropriate for recapture that has not been documented in current collection year |
-| inappropriate for recapture | The specific HCC in question is "Open" and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it's not a chronic diagnosis |
+| ineligible for recapture | The specific HCC in question is "Open" and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it's not a chronic diagnosis |
 
 Instead of just listing an HCC as closed, more detail is provided which presents an opportunity to improve future HCC recapture initiatives.
 
@@ -39,3 +39,13 @@ When calculating HCC gap closure, YTD recapture curves are often used. Recapture
 
 All of the models below are the final models output from the HCC recapture data mart.
 
+## Customizations
+The following options are customizable in the HCC recapture mart to provide greater flexibility.
+
+### HCC Suspect Lists
+
+The `hcc_recapture_suspect_list` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own HCC suspect list from a payer or clinical source. The data needs to be input into a model called `suspect_hccs`. The required fields can be found in the `hcc_recapture__stg_suspect_hccs` model.
+
+### Chronic HCCs
+
+The `hcc_recapture_chronic_hccs` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.

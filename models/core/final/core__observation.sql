@@ -9,8 +9,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , obs.data_source
     , obs.tuva_last_run
+    , obs.data_source
 {%- endset -%}
 
 {% if var('enable_normalize_engine',false) != true %}
@@ -29,18 +29,16 @@ select
     , obs.source_code
     , obs.source_description
     , case
-        when obs.normalized_code_type is not null then obs.normalized_code_type
         when icd10cm.icd_10_cm is not null then 'icd-10-cm'
         when icd9cm.icd_9_cm is not null then 'icd-9-cm'
         when icd10pcs.icd_10_pcs is not null then 'icd-10-pcs'
-        when icd9pcs.icd_9_pcs is not null then 'icd-10-pcs'
+        when icd9pcs.icd_9_pcs is not null then 'icd-9-pcs'
         when hcpcs.hcpcs is not null then 'hcpcs'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         when loinc.loinc is not null then 'loinc'
         end as normalized_code_type
   , coalesce(
-        obs.normalized_code
-      , icd10cm.icd_10_cm
+        icd10cm.icd_10_cm
       , icd9cm.icd_9_cm
       , icd10pcs.icd_10_pcs
       , icd9pcs.icd_9_pcs
@@ -49,8 +47,7 @@ select
       , loinc.loinc
       ) as normalized_code
       , coalesce(
-        obs.normalized_description
-      , icd10cm.short_description
+        icd10cm.short_description
       , icd9cm.short_description
       , icd10pcs.description
       , icd9pcs.short_description
@@ -59,7 +56,6 @@ select
       , loinc.long_common_name
       ) as normalized_description
      , case
-         when coalesce(obs.normalized_code, obs.normalized_description) is not null then 'manual'
          when coalesce(
             icd10cm.icd_10_cm
           , icd9cm.icd_9_cm
@@ -120,18 +116,16 @@ select
     , obs.source_code
     , obs.source_description
     , case
-        when obs.normalized_code_type is not null then obs.normalized_code_type
         when icd10cm.icd_10_cm is not null then 'icd-10-cm'
         when icd9cm.icd_9_cm is not null then 'icd-9-cm'
         when icd10pcs.icd_10_pcs is not null then 'icd-10-pcs'
-        when icd9pcs.icd_9_pcs is not null then 'icd-10-pcs'
+        when icd9pcs.icd_9_pcs is not null then 'icd-9-pcs'
         when hcpcs.hcpcs is not null then 'hcpcs'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         when loinc.loinc is not null then 'loinc'
         else custom_mapped.normalized_code_type end as normalized_code_type
    , coalesce(
-        obs.normalized_code
-      , icd10cm.icd_10_cm
+        icd10cm.icd_10_cm
       , icd9cm.icd_9_cm
       , icd10pcs.icd_10_pcs
       , icd9pcs.icd_9_pcs
@@ -141,8 +135,7 @@ select
       , custom_mapped.normalized_code
       ) as normalized_code
    , coalesce(
-        obs.normalized_description
-      , icd10cm.short_description
+        icd10cm.short_description
       , icd9cm.short_description
       , icd10pcs.description
       , icd9pcs.short_description
@@ -152,7 +145,6 @@ select
       , custom_mapped.normalized_description
       ) as normalized_description
    , case
-         when coalesce(obs.normalized_code, obs.normalized_description) is not null then 'manual'
          when coalesce(
             icd10cm.icd_10_cm
           , icd9cm.icd_9_cm

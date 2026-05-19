@@ -1,5 +1,5 @@
 models:
-#final
+  #final
   - name: service_category__service_category_grouper
     description: Assigns every claim line into a unique service category.
     config:
@@ -13,82 +13,179 @@ models:
         - claims_preprocessing
     tests:
       - the_tuva_project.expect_table_row_count_to_be_between:
-          description: This is a check in one of the final downstream marts to see if service_category__service_category_grouper is populated. If this is flagging, please check other areas further upstream on the input layer.
+          description: This is a check in one of the final downstream marts to see if
+            service_category__service_category_grouper is populated. If this is
+            flagging, please check other areas further upstream on the input
+            layer.
           config:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
             meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to see if service_category__service_category_grouper is populated. If this is flagging, please check other areas further upstream on the input layer."
-            tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_service_categories', 'dqi_usability']
+              dqi_test_description: "This is a check in one of the final downstream marts to
+                see if service_category__service_category_grouper is populated.
+                If this is flagging, please check other areas further upstream
+                on the input layer."
+            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_service_categories', 'dqi_usability' ]
           arguments:
             min_value: 1
             strictly: false
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
+        config:
+          meta:
+            data_type: varchar
       - name: claim_line_number
         description: Indicates the line number for the particular line of the claim.
+        config:
+          meta:
+            data_type: integer
       - name: claim_type
         description: Indicated the type of claims
+        config:
+          meta:
+            data_type: varchar
       - name: service_category_1
         description: The first service category of the claim line
+        config:
+          meta:
+            data_type: varchar
       - name: service_category_2
         description: The second, more specific service category of the claim line
+        config:
+          meta:
+            data_type: varchar
       - name: service_category_3
         description: The third, even more specific service category of the claim line.
+        config:
+          meta:
+            data_type: varchar
       - name: original_service_cat_2
-        description: Original categorization of service category 2 before any transformation or normalization.
+        description: Original categorization of service category 2 before any
+          transformation or normalization.
+        config:
+          meta:
+            data_type: varchar
       - name: original_service_cat_3
-        description: Original categorization of service category 3 before any transformation or normalization.
-      - name: claim_line_id
-        description: Concatenated field of claim_id and claim_line_number, providing a unique identifier for each line within a claim.
+        description: Original categorization of service category 3 before any
+          transformation or normalization.
+        config:
+          meta:
+            data_type: varchar
       - name: duplicate_row_number
         description: Row number used to identify duplicate entries within the data set.
+        config:
+          meta:
+            data_type: integer
       - name: ccs_category
-        description: Clinical Classifications Software category associated with the service provided.
+        description: Clinical Classifications Software category associated with the
+          service provided.
+        config:
+          meta:
+            data_type: varchar
       - name: ccs_category_description
         description: Description of the Clinical Classifications Software category.
+        config:
+          meta:
+            data_type: varchar
       - name: drg_code
         description: Medicare Severity Diagnosis Related Group code related to the claim.
+        config:
+          meta:
+            data_type: varchar
       - name: drg_description
         description: Description of the Medicare Severity Diagnosis Related Group code.
+        config:
+          meta:
+            data_type: varchar
       - name: place_of_service_code
         description: Code that identifies the place where service was provided.
+        config:
+          meta:
+            data_type: varchar
       - name: place_of_service_description
         description: Description of the place where service was provided.
+        config:
+          meta:
+            data_type: varchar
       - name: revenue_center_code
-        description: Revenue center code associated with the financial aspects of the care provided.
+        description: Revenue center code associated with the financial aspects of the
+          care provided.
+        config:
+          meta:
+            data_type: varchar
       - name: revenue_center_description
         description: Description of the revenue center code.
+        config:
+          meta:
+            data_type: varchar
       - name: hcpcs_code
-        description: Healthcare Common Procedure Coding System code that identifies specific services provided.
+        description: Healthcare Common Procedure Coding System code that identifies
+          specific services provided.
+        config:
+          meta:
+            data_type: varchar
       - name: default_ccsr_category_ip
-        description: Default Clinical Classifications Software for Services and Procedures category for inpatient services.
+        description: Default Clinical Classifications Software for Services and
+          Procedures category for inpatient services.
+        config:
+          meta:
+            data_type: varchar
       - name: default_ccsr_category_op
-        description: Default Clinical Classifications Software for Services and Procedures category for outpatient services.
+        description: Default Clinical Classifications Software for Services and
+          Procedures category for outpatient services.
+        config:
+          meta:
+            data_type: varchar
       - name: default_ccsr_category_description_ip
-        description: Description of the default CCS for Services and Procedures category for inpatient.
+        description: Description of the default CCS for Services and Procedures category
+          for inpatient.
+        config:
+          meta:
+            data_type: varchar
       - name: default_ccsr_category_description_op
-        description: Description of the default CCS for Services and Procedures category for outpatient.
+        description: Description of the default CCS for Services and Procedures category
+          for outpatient.
+        config:
+          meta:
+            data_type: varchar
       - name: primary_taxonomy_code
         description: Taxonomy code that classifies the providers type or specialization.
+        config:
+          meta:
+            data_type: varchar
       - name: primary_specialty_description
         description: Description of the providers primary specialty.
+        config:
+          meta:
+            data_type: varchar
       - name: modality
         description: The type of modality used in the service provided.
+        config:
+          meta:
+            data_type: varchar
       - name: bill_type_code
         description: Code that identifies the type of bill submitted for the claim.
+        config:
+          meta:
+            data_type: varchar
       - name: bill_type_description
         description: Description of the bill type code.
+        config:
+          meta:
+            data_type: varchar
       - name: source_model_name
         description: Name of the source model from which this data was derived.
+        config:
+          meta:
+            data_type: varchar
       - name: data_source
         description: The original source of the data used in this model.
+        config:
+          meta:
+            data_type: varchar
 
-
-
-
-#intermediate:
+  #intermediate:
   - name: service_category__combined_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -124,7 +221,6 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-
 
   - name: service_category__acute_inpatient_professional
     description: service categories flagged by corresponding codes and value sets
@@ -575,7 +671,6 @@ models:
         - service_category_grouper
         - claims_preprocessing
 
-
   - name: service_category__inpatient_substance_use_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -596,7 +691,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__office_based_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -628,7 +722,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__pharmacy_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -638,7 +731,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__pharmacy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -650,7 +742,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__outpatient_physical_therapy_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -660,7 +751,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__outpatient_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -672,7 +762,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__outpatient_radiology_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -682,7 +771,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__outpatient_radiology_professional
     description: service categories flagged by corresponding codes and value sets
@@ -694,7 +782,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__outpatient_substance_use_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -704,7 +791,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__outpatient_substance_use_professional
     description: service categories flagged by corresponding codes and value sets
@@ -716,7 +802,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__outpatient_surgery_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -726,7 +811,6 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-
 
   - name: service_category__outpatient_surgery_professional
     description: service categories flagged by corresponding codes and value sets
@@ -738,7 +822,6 @@ models:
       tags:
         - service_category_grouper
 
-
   - name: service_category__outpatient_rehab_institutional
     description: flagging outpatient claims for outpatient rehab service categories
     config:
@@ -749,7 +832,7 @@ models:
       tags:
         - service_category_grouper
 
-#staging:
+  #staging:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper
     config:

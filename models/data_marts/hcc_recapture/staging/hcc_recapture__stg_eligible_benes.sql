@@ -7,6 +7,7 @@
 select distinct
   person_id
   , {{ date_part('year', 'collection_end_date') }} as collection_year
+  , age_group
   , payer
 from {{ ref('cms_hcc__int_members') }}
 -- Don't support ESRD risk scores yet

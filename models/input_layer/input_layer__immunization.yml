@@ -1,13 +1,24 @@
 version: 2
 models:
   - name: input_layer__immunization
-    description: >-
-      The immunization table contains information about immunizations
-      administered to patients.
-    grain: Intended to be one record per immunization event per data source.
-    transformation_steps: |-
-      This model brings the input layer immunization table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: 'No explicit mapping instructions provided.'
+    description: |-
+      The immunization table stores clinical immunization events from source systems. It includes vaccines administered to patients and, when available, records documenting that an immunization was not performed.
+
+      This table is intended to have one record per immunization ID and data source. Use the source code fields to capture the vaccine code from the source system; CVX is preferred when available, but local or other source codes may be used with source descriptions so they can be normalized downstream. Claims-derived vaccine administrations should not be mapped here unless they originate from clinical immunization records.
+
+      Primary key: immunization_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          config:
+            severity: error
+            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+            tags:
+              - tuva_dqi_sev_1
+              - dqi
+          arguments:
+            combination_of_columns:
+              - immunization_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -15,21 +26,14 @@ models:
       materialized: view
     columns:
       - name: immunization_id
-        description: Unique identifier for each immunization.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for an immunization event within a data source. This value should be populated on every record and should uniquely identify the immunization event when combined with data_source.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
                 severity: error
                 enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - unique:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
                 tags:
                   - tuva_dqi_sev_1
                   - dqi
@@ -42,8 +46,8 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: person_id
-        description: Unique identifier for each person in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Globally unique identifier for the person associated with the immunization. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -61,8 +65,8 @@ models:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Identifier that links a patient to a particular clinical source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -76,8 +80,8 @@ models:
           meta:
             data_type: varchar
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the encounter associated with the immunization, when available. Leave null when the immunization is not tied to a specific encounter in the source system.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -91,8 +95,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code_type
-        description: The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Code system for source_code. CVX is preferred when available. If the source system uses a local vaccine code or another code system, populate this field with the source code system name so the code can be normalized downstream.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -106,8 +110,8 @@ models:
           meta:
             data_type: varchar
       - name: source_code
-        description: The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Vaccine code from the source system. CVX is preferred when available. Local or other vaccine codes may be used when CVX is not available, but source_description should also be populated to support downstream normalization.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -121,53 +125,8 @@ models:
           meta:
             data_type: varchar
       - name: source_description
-        description: Description of the source code in the source system.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_code_type
-        description: The normalized type of code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_code
-        description: The normalized code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_description
-        description: Normalized description of the code.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Human-readable description of source_code from the source system. This is especially important when source_code is a local or non-CVX code.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -181,8 +140,8 @@ models:
           meta:
             data_type: varchar
       - name: status
-        description: Status of the record (e.g., condition, test, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Status code for the immunization event. This can indicate whether the immunization was completed, not done, entered in error, or otherwise documented by the source system. Tuva maps supported status codes to immunization status terminology downstream.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -196,8 +155,8 @@ models:
           meta:
             data_type: varchar
       - name: status_reason
-        description: Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Reason code explaining why an immunization was not performed, when applicable. Tuva maps supported reason codes to immunization status reason terminology downstream.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -211,8 +170,8 @@ models:
           meta:
             data_type: varchar
       - name: occurrence_date
-        description: Date the event occured or was to be occured.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Date the immunization occurred or was documented as not performed, formatted as YYYY-MM-DD.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -235,23 +194,8 @@ models:
           meta:
             data_type: date
       - name: source_dose
-        description: The quantity of vaccine product that was administered.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: normalized_dose
-        description: Normalized quantity of vaccine product that was administered.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Dose quantity or dose text from the source system, when available. This field is source-system specific and is not normalized by Tuva.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -265,8 +209,8 @@ models:
           meta:
             data_type: varchar
       - name: lot_number
-        description: Lot number of the vaccine product.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Lot number of the vaccine product administered, when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -280,8 +224,8 @@ models:
           meta:
             data_type: varchar
       - name: body_site
-        description: The body site where the vaccine was administered.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source code or description for the body site where the vaccine was administered, when available. Tuva maps supported body site codes to immunization body site terminology downstream.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -295,8 +239,8 @@ models:
           meta:
             data_type: varchar
       - name: route
-        description: The route used to administer the medication and/or vaccine.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Source code or description for the route used to administer the vaccine, when available. Tuva maps supported route codes to immunization route terminology downstream.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -310,8 +254,8 @@ models:
           meta:
             data_type: varchar
       - name: location_id
-        description: Unique identifier for each location.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the location or facility where the immunization was administered or documented, when available. This should map to location_id in the location input layer when the source system provides a location reference.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -325,39 +269,8 @@ models:
           meta:
             data_type: varchar
       - name: practitioner_id
-        description: Unique identifier for the practitioner on record (e.g., ordered medication, performed the procedure, etc).
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-      - name: data_source
-        description: User-configured field that indicates the data source.
-        mapping_instructions: 'No explicit mapping instructions provided.'
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-            is_primary_key: true
-      - name: file_name
-        description: The file name of the source file.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Identifier for the practitioner associated with the immunization, when available. This may represent the ordering, administering, or documenting practitioner depending on the source system and should map to practitioner_id in the practitioner input layer when possible.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -371,8 +284,8 @@ models:
           meta:
             data_type: varchar
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage.
-        mapping_instructions: 'No explicit mapping instructions provided.'
+        description: >-
+          Date and time the source immunization record was loaded into the data warehouse. This is useful when multiple versions of the same immunization record are received over time.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -408,3 +321,19 @@ models:
         config:
           meta:
             data_type: timestamp
+      - name: data_source
+        description: >-
+          User-defined name that identifies the source of the immunization data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

@@ -28,6 +28,7 @@ with stg_eligibility as (
         , elig.enrollment_status
         , elig.long_term_institutional_flag
         , elig.institutional_snp_flag
+        , elig.data_source
         , dates.collection_year
         , dates.payment_year
         , dates.collection_start_date
@@ -60,6 +61,7 @@ with stg_eligibility as (
           patient.person_id
         , patient.sex
         , patient.birth_date
+        , patient.data_source
         , dates.payment_year
         , floor({{ datediff('birth_date', 'payment_year_age_date', 'day') }} / 365.25) as payment_year_age
         , patient.death_date
@@ -171,6 +173,7 @@ with stg_eligibility as (
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
             on stg_eligibility.person_id = stg_patient.person_id
+            and stg_eligibility.data_source = stg_patient.data_source
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
         and stg_patient.payment_year_age is not null

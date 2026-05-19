@@ -154,6 +154,10 @@
           'small': 'observation.csv',
           'large': 'observation.csv'
       },
+      'patient': {
+          'small': 'patient_small.csv',
+          'large': 'patient.csv'
+      },
       'pharmacy_claim': {
           'small': 'pharmacy_claim_small.csv',
           'large': 'pharmacy_claim.csv'

@@ -6,7 +6,20 @@
 
 with valid_conditions as (
     select
-        *
+        data_source
+        , source_date
+        , table_name
+        , drill_down_key
+        , drill_down_value
+        , 'PERSON_ID, PATIENT_ID, DATA_SOURCE' as field_name
+        , {{ dbt.concat([
+            "coalesce(drill_down_value, 'NULL')",
+            "'|'",
+            "coalesce(field_value, 'NULL')",
+            "'|'",
+            "coalesce(data_source, 'NULL')"
+        ]) }} as field_value
+        , bucket_name
     from
         {{ ref('data_quality__patient_patient_id') }}
     where
@@ -37,7 +50,7 @@ with valid_conditions as (
         , ROW_NUMBER() over (
 order by drill_down_key) as row_number_value
     from
-        {{ ref('data_quality__patient_patient_id') }}
+        valid_conditions
     where
         bucket_name = 'valid'
 
@@ -57,7 +70,7 @@ order by drill_down_key) as row_number_value
         , ROW_NUMBER() over (
 order by drill_down_key) as row_number_value
     from
-        {{ ref('data_quality__patient_patient_id') }} as a
+        valid_conditions as a
     inner join
         uniqueness_check as b on a.field_value = b.field_value
 )

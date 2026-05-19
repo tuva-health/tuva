@@ -69,6 +69,6 @@ select
     , cast(practice_zip_code as {{ dbt.type_string() }}) as zip_code
     , cast(null as {{ dbt.type_numeric() }}) as latitude
     , cast(null as {{ dbt.type_numeric() }}) as longitude
-    , cast(null as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(null as {{ dbt.type_string() }}) as data_source
 from provider

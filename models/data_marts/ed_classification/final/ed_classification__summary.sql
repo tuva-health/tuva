@@ -40,4 +40,5 @@ left outer join {{ ref('provider_data__provider') }} as fac_prov
     on encounter.facility_npi = fac_prov.npi
 left outer join {{ ref('core__patient') }} as pat
     on encounter.person_id = pat.person_id
+    and encounter.data_source = pat.data_source
 where encounter.encounter_type = 'emergency department'

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-## Final
+  ## Final
   - name: quality_measures__summary_counts
     config:
       schema: |
@@ -16,34 +16,64 @@ models:
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: measure_name
         description: Name of the measure.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: measure_version
         description: Version of the measure.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
+        config:
+          meta:
+            data_type: date
       - name: performance_period_end
         description: Ending date of the performance or measurement period.
+        config:
+          meta:
+            data_type: date
       - name: denominator_sum
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
+        config:
+          meta:
+            data_type: integer
       - name: numerator_sum
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved with exclusion logic applied.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved with exclusion logic applied.
+        config:
+          meta:
+            data_type: integer
       - name: exclusion_sum
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
+        config:
+          meta:
+            data_type: varchar
       - name: performance_rate
         description: >
-          Calculated performance rate. The numerator sum divided by the denominator sum after exclusion logic applied and multiplied by 100.
+          Calculated performance rate. The numerator sum divided by the
+          denominator sum after exclusion logic applied and multiplied by 100.
+        config:
+          meta:
+            data_type: number
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: quality_measures__summary_long
     config:
@@ -53,69 +83,120 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Long view of the results for the reporting version of all measures.
-      Each row represents the results a measure per patient. A null for the denominator
-      indicates that the patient was not eligible for that measure.
+      Long view of the results for the reporting version of all measures. Each
+      row represents the results a measure per patient. A null for the
+      denominator indicates that the patient was not eligible for that measure.
     tests:
       - the_tuva_project.expect_table_row_count_to_be_between:
-          description: This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer.
+          description: This is a check in one of the final downstream marts to see if
+            quality_measures__summary_long is populated. If this is flagging,
+            please check other areas further upstream on the input layer.
           config:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
             meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer."
-            tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures', 'dqi_usability']
+              dqi_test_description: "This is a check in one of the final downstream marts to
+                see if quality_measures__summary_long is populated. If this is
+                flagging, please check other areas further upstream on the input
+                layer."
+            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures', 'dqi_usability' ]
           arguments:
             min_value: 1
             strictly: false
     columns:
       - name: person_id
         description: Unique person_id for each person.
+        config:
+          meta:
+            data_type: varchar
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
+        config:
+          meta:
+            data_type: integer
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
+        config:
+          meta:
+            data_type: integer
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
+        config:
+          meta:
+            data_type: integer
       - name: performance_flag
         description: >
-          Performance flag calculated by using exclusion, numerator, and denominator flags. When excluded from a measure the flag is null.
+          Performance flag calculated by using exclusion, numerator, and
+          denominator flags. When excluded from a measure the flag is null.
+        config:
+          meta:
+            data_type: integer
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
+        config:
+          meta:
+            data_type: date
       - name: evidence_value
         description: >
           Observed evidence value for the patients in the numerator.
+        config:
+          meta:
+            data_type: varchar
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
+        config:
+          meta:
+            data_type: date
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
+        config:
+          meta:
+            data_type: varchar
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
+        config:
+          meta:
+            data_type: date
       - name: performance_period_end
         description: Ending date of the performance or measurement period.
+        config:
+          meta:
+            data_type: date
       - name: measure_id
         description: Unique measure identification number.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: measure_name
         description: Name of the measure.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: measure_version
         description: Version of the measure.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+            data_type: varchar
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: quality_measures__summary_wide
     config:
@@ -125,39 +206,76 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Wide view of the results for the reporting version of all measures.
-      This model pivots measures on the patient level (i.e. one row per patient
-      with flags for each measure. The false flags can be treated as care gaps
-      as exclusions have been included in the pivot logic.
+      Wide view of the results for the reporting version of all measures. This
+      model pivots measures on the patient level (i.e. one row per patient with
+      flags for each measure. The false flags can be treated as care gaps as
+      exclusions have been included in the pivot logic.
     columns:
       - name: person_id
         description: Unique person_id for each person.
+        config:
+          meta:
+            data_type: varchar
       - name: cqm_438
         description: >
-          Performance flag for CQM438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease. A null indicates that the measure was not applicable for the patient.
+          Performance flag for CQM438, Statin Therapy for the Prevention and
+          Treatment of Cardiovascular Disease. A null indicates that the measure
+          was not applicable for the patient.
+        config:
+          meta:
+            data_type: integer
       - name: cqm_130
         description: >
-          Performance flag for CQM130, Documentation of Current Medications in the Medical Record. A null indicates that the measure was not applicable for the patient.
+          Performance flag for CQM130, Documentation of Current Medications in
+          the Medical Record. A null indicates that the measure was not
+          applicable for the patient.
+        config:
+          meta:
+            data_type: integer
       - name: nqf_0420
         description: >
-          Performance flag for NQF0420, Pain Assessment and Follow-Up. A null indicates that the measure was not applicable for the patient.
+          Performance flag for NQF0420, Pain Assessment and Follow-Up. A null
+          indicates that the measure was not applicable for the patient.
+        config:
+          meta:
+            data_type: integer
       - name: adh_diabetes
         description: >
-          Performance flag for ADH-Diabetes, Medication Adherence for Diabetes Medications. A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-Diabetes, Medication Adherence for Diabetes
+          Medications. A null indicates that the measure was not applicable for
+          the patient.
+        config:
+          meta:
+            data_type: integer
       - name: adh_ras
         description: >
-          Performance flag for ADH-RAS, Medication Adherence for Hypertension. A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-RAS, Medication Adherence for Hypertension. A
+          null indicates that the measure was not applicable for the patient.
+        config:
+          meta:
+            data_type: integer
       - name: supd
         description: >
-          Performance flag for SUPD, Statin Use in Persons with Diabetes.
-          A null indicates that the measure was not applicable for the patient.
+          Performance flag for SUPD, Statin Use in Persons with Diabetes. A null
+          indicates that the measure was not applicable for the patient.
+        config:
+          meta:
+            data_type: integer
       - name: adh_statins
         description: >
-          Performance flag for ADH-Statins, Medication Adherence for Cholesterol. A null indicates that the measure was not applicable for the patient.
+          Performance flag for ADH-Statins, Medication Adherence for
+          Cholesterol. A null indicates that the measure was not applicable for
+          the patient.
+        config:
+          meta:
+            data_type: integer
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
+        config:
+          meta:
+            data_type: timestamp
 
-## Shared Exclusions
+  ## Shared Exclusions
   - name: quality_measures__int_shared_exclusions_frailty
     config:
       schema: |
@@ -176,7 +294,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Exclusion logic for patients with frailty and advanced illness for entire patient population.
+      Exclusion logic for patients with frailty and advanced illness for entire
+      patient population.
 
   - name: quality_measures__int_shared_exclusions_dementia
     config:
@@ -186,7 +305,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Exclusion logic for patients with frailty and taking dementia medications for entire patient population.
+      Exclusion logic for patients with frailty and taking dementia medications
+      for entire patient population.
 
   - name: quality_measures__int_shared_exclusions_hospice_palliative
     config:
@@ -196,7 +316,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Exclusion logic for patients using hospice or palliative services for the reporting for entire patient population.
+      Exclusion logic for patients using hospice or palliative services for the
+      reporting for entire patient population.
 
   - name: quality_measures__int_shared_exclusions_institutional_snp
     config:
@@ -206,11 +327,12 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Exclusion logic for patients staying in an institution for the reporting for entire patient population. 
+      Exclusion logic for patients staying in an institution for the reporting
+      for entire patient population.
 
-## Intermediate
+  ## Intermediate
 
-### Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+  ### Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
   - name: quality_measures__int_cqm438__performance_period
     config:
       schema: |
@@ -219,7 +341,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Performance Period definition for Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Performance Period definition for Statin Therapy for the Prevention and
+      Treatment of Cardiovascular Disease
 
   - name: quality_measures__int_cqm438_denominator_criteria1
     config:
@@ -229,7 +352,9 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Subset of denominator logic for submission of criteria 1 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Subset of denominator logic for submission of criteria 1 of the reporting
+      version of Statin Therapy for the Prevention and Treatment of
+      Cardiovascular Disease
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -254,7 +379,9 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Subset of denominator logic for submission of criteria 2 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Subset of denominator logic for submission of criteria 2 of the reporting
+      version of Statin Therapy for the Prevention and Treatment of
+      Cardiovascular Disease
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -279,7 +406,9 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Subset of denominator logic for submission of criteria 3 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Subset of denominator logic for submission of criteria 3 of the reporting
+      version of Statin Therapy for the Prevention and Treatment of
+      Cardiovascular Disease
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -304,7 +433,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for submission of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Denominator logic for submission of the reporting version of Statin
+      Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -322,7 +452,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -334,7 +465,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease.
+      Combined exclusion logic for the reporting version of CQM 438, Statin
+      Therapy for the Prevention and Treatment of Cardiovascular Disease.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -343,10 +475,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -358,19 +493,26 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease before combining with other measures.
+      Final preparation of the reporting version of CQM 438, Statin Therapy for
+      the Prevention and Treatment of Cardiovascular Disease before combining
+      with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -382,7 +524,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -404,7 +547,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+      Numerator logic for the reporting version of CQM 438, Statin Therapy for
+      the Prevention and Treatment of Cardiovascular Disease
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -426,11 +570,13 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Documentation of Current Medications in the Medical Record
+  ### Documentation of Current Medications in the Medical Record
   - name: quality_measures__int_cqm130__performance_period
     config:
       schema: |
@@ -439,7 +585,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Performance Period definition for Documentation of Current Medications in the Medical Record.
+      Performance Period definition for Documentation of Current Medications in
+      the Medical Record.
 
   - name: quality_measures__int_cqm130_denominator
     config:
@@ -449,7 +596,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of Documentation of Current Medications in the Medical Record.
+      Denominator logic for the reporting version of Documentation of Current
+      Medications in the Medical Record.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -458,7 +606,8 @@ models:
       - name: procedure_encounter_date
         description: Patient's date of encounter in the performance period for procedures.
       - name: claims_encounter_date
-        description: Patient's date of encounter in the performance period for medical claims.
+        description: Patient's date of encounter in the performance period for medical
+          claims.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -471,7 +620,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -483,7 +633,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
+      Combined exclusion logic for the reporting version of CQM 130,
+      Documentation of Current Medications in the Medical Record.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -492,10 +643,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -507,19 +661,26 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of CQM 130, Documentation of Current Medications in the Medical Record before combining with other measures.
+      Final preparation of the reporting version of CQM 130, Documentation of
+      Current Medications in the Medical Record before combining with other
+      measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -531,7 +692,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -553,7 +715,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
+      Numerator logic for the reporting version of CQM 130, Documentation of
+      Current Medications in the Medical Record.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -575,11 +738,13 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Pain Assessment and Follow-Up
+  ### Pain Assessment and Follow-Up
   - name: quality_measures__int_nqf0420__performance_period
     config:
       schema: |
@@ -598,7 +763,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
+      Denominator logic for the reporting version of NQF 0420, Pain Assessment
+      and Follow-Up.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -616,7 +782,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -628,7 +795,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
+      Combined exclusion logic for the reporting version of NQF 0420, Pain
+      Assessment and Follow-Up.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -637,10 +805,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -652,19 +823,25 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of NQF 0420, Pain Assessment and Follow-Up before combining with other measures.
+      Final preparation of the reporting version of NQF 0420, Pain Assessment
+      and Follow-Up before combining with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -676,7 +853,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -698,7 +876,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
+      Numerator logic for the reporting version of NQF 0420, Pain Assessment and
+      Follow-Up.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -720,11 +899,13 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Medication Adherence for Diabetes Medications
+  ### Medication Adherence for Diabetes Medications
   - name: quality_measures__int_adh_diabetes__performance_period
     config:
       schema: |
@@ -733,7 +914,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Performance Period definition for Medication Adherence for Diabetes Medications.
+      Performance Period definition for Medication Adherence for Diabetes
+      Medications.
 
   - name: quality_measures__int_adh_diabetes_denominator
     config:
@@ -743,7 +925,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
+      Denominator logic for the reporting version of ADH-Diabetes, Medication
+      Adherence for Diabetes Medications.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -756,7 +939,8 @@ models:
       - name: days_supply
         description: Number of days the filled medication lasts for.
       - name: days_in_treatment_period
-        description: Number of days from first dispensing_date to performance_period_end in the performance or measurement period.
+        description: Number of days from first dispensing_date to performance_period_end
+          in the performance or measurement period.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -769,7 +953,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -781,7 +966,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
+      Combined exclusion logic for the reporting version of ADH-Diabetes,
+      Medication Adherence for Diabetes Medications.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -790,10 +976,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -805,19 +994,25 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications before combining with other measures.
+      Final preparation of the reporting version of ADH-Diabetes, Medication
+      Adherence for Diabetes Medications before combining with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -829,7 +1024,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -851,7 +1047,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
+      Numerator logic for the reporting version of ADH-Diabetes, Medication
+      Adherence for Diabetes Medications.
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -863,14 +1060,17 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: adherence
         description: >
-          The degree to which the person behaviour corresponds with taking a medicine optimally in percentage.
+          The degree to which the person behaviour corresponds with taking a
+          medicine optimally in percentage.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Medication Adherence for Hypertension
+  ### Medication Adherence for Hypertension
   - name: quality_measures__int_adhras__performance_period
     config:
       schema: |
@@ -889,7 +1089,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Denominator logic for the reporting version of ADH-RAS, Medication
+      Adherence for Hypertension
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -913,7 +1114,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -925,7 +1127,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Combined exclusion logic for the reporting version of ADH-RAS, Medication
+      Adherence for Hypertension
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -934,10 +1137,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -949,19 +1155,25 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of ADH-RAS, Medication Adherence for Hypertension before combining with other measures.
+      Final preparation of the reporting version of ADH-RAS, Medication
+      Adherence for Hypertension before combining with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -973,7 +1185,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -995,7 +1208,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Numerator logic for the reporting version of ADH-RAS, Medication Adherence
+      for Hypertension
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1007,14 +1221,17 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: adherence
         description: >
-          The extent to which a person's behaviour corresponds with taking a medicine optimally.
+          The extent to which a person's behaviour corresponds with taking a
+          medicine optimally.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Statin Use in Persons with Diabetes
+  ### Statin Use in Persons with Diabetes
   - name: quality_measures__int_supd__performance_period
     config:
       schema: |
@@ -1033,7 +1250,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
+      Denominator logic for the reporting version of SUPD, Statin Use in Persons
+      with Diabetes
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1051,7 +1269,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1063,7 +1282,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
+      Combined exclusion logic for the reporting version of SUPD, Statin Use in
+      Persons with Diabetes
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1072,10 +1292,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1087,19 +1310,25 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of SUPD, Statin Use in Persons with Diabetes before combining with other measures.
+      Final preparation of the reporting version of SUPD, Statin Use in Persons
+      with Diabetes before combining with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1111,7 +1340,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -1133,7 +1363,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
+      Numerator logic for the reporting version of SUPD, Statin Use in Persons
+      with Diabetes
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1145,11 +1376,13 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Medication Adherence for Cholesterol
+  ### Medication Adherence for Cholesterol
   - name: quality_measures__int_adh_statins__performance_period
     config:
       schema: |
@@ -1168,7 +1401,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
+      Denominator logic for the reporting version of ADH-Statins, Medication
+      Adherence for Cholesterol
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1192,7 +1426,8 @@ models:
         description: Version of the measure.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1204,7 +1439,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
+      Combined exclusion logic for the reporting version of ADH-Statins,
+      Medication Adherence for Cholesterol
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1213,10 +1449,13 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1228,19 +1467,25 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of ADH-Statins, Medication Adherence for Cholesterol before combining with other measures.
+      Final preparation of the reporting version of ADH-Statins, Medication
+      Adherence for Cholesterol before combining with other measures.
     columns:
       - name: person_id
         description: Unique person_id for each person.
       - name: denominator_flag
         description: >
-          The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+          The denominator is associated with a given patient population that may
+          be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: exclusion_flag
         description: >
-          Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+          Specifications of those characteristics that would cause groups of
+          individuals to be removed from the numerator and/or denominator of a
+          measure although they experience the denominator index event.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1252,7 +1497,8 @@ models:
           Date of event or service that excludes patient from the measure.
       - name: exclusion_reason
         description: >
-          Reason (usually the value set concept name) that excludes patient from the measure.
+          Reason (usually the value set concept name) that excludes patient from
+          the measure.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -1274,7 +1520,8 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
+      Numerator logic for the reporting version of ADH-Statins, Medication
+      Adherence for Cholesterol
     columns:
       - name: person_id
         description: Unique person_id for each person.
@@ -1286,14 +1533,17 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: adherence
         description: >
-          The extent to which a person's behaviour corresponds with taking a medicine optimally.
+          The extent to which a person's behaviour corresponds with taking a
+          medicine optimally.
       - name: numerator_flag
         description: >
-          The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved.
+          The numerator reflects the subset of patients in the denominator for
+          whom a particular service has been provided or for whom a particular
+          outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-## Staging
+  ## Staging
   - name: quality_measures__stg_core__condition
     config:
       schema: |
@@ -1402,7 +1652,7 @@ models:
               config:
                 severity: warn
               arguments:
-                values: ['female', 'male', 'unknown']
+                values: [ 'female', 'male', 'unknown' ]
       - name: birth_date
         tests:
           - not_null:
@@ -1445,7 +1695,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging medical claims from the input layer. Creates an empty table if using clinical only.
+      Staging medical claims from the input layer. Creates an empty table if
+      using clinical only.
     columns:
       - name: person_id
       - name: claim_start_date
@@ -1467,7 +1718,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging pharmacy claims from the input layer. Creates an empty table if using clinical only.
+      Staging pharmacy claims from the input layer. Creates an empty table if
+      using clinical only.
     columns:
       - name: person_id
       - name: dispensing_date
@@ -1475,7 +1727,6 @@ models:
       - name: days_supply
       - name: paid_date
       - name: tuva_last_run
-
 
   - name: quality_measures__stg_core__lab_result
     config:
@@ -1485,7 +1736,8 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Staging lab results from the input layer. Creates an empty table if using claims only.
+      Staging lab results from the input layer. Creates an empty table if using
+      claims only.
     columns:
       - name: person_id
       - name: result

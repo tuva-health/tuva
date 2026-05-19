@@ -48,7 +48,7 @@ vars:
     terminology: "1.1.1"
     value_sets: "1.0.0"
     provider_data: "1.0.0"
-    synthetic_data: "1.0.0"
+    synthetic_data: "1.1.0"
   tuva_seed_buckets: {}
 
   ## Run metadata
@@ -249,6 +249,8 @@ seeds:
         +post-hook: "{{ load_versioned_synthetic_seed('medical_claim') }}"
       synthetic_data__observation:
         +post-hook: "{{ load_versioned_synthetic_seed('observation') }}"
+      synthetic_data__patient:
+        +post-hook: "{{ load_versioned_synthetic_seed('patient') }}"
       synthetic_data__pharmacy_claim:
         +post-hook: "{{ load_versioned_synthetic_seed('pharmacy_claim') }}"
       synthetic_data__provider_attribution:

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-## Final
+  ## Final
   - name: hcc_suspecting__list
     config:
       schema: |
@@ -10,33 +10,68 @@ models:
       tags: hcc_suspecting
       materialized: table
     description: >
-      This final model displays the list of suspecting conditions per patient,  data_source, hcc, and diagnosis code with the reason and contributing  factors.
-      It is filtered by current_year_billed.
+      This final model displays the list of suspecting conditions per
+      patient,  data_source, hcc, and diagnosis code with the reason and
+      contributing  factors. It is filtered by current_year_billed.
     columns:
       - name: person_id
         description: Unique ID for the patient.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer
+        description: Name of the payer associated with the suspected HCC.
+        config:
+          meta:
+            data_type: varchar
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
+        config:
+          meta:
+            data_type: varchar
+      - name: model_version
+        description: CMS-HCC model version used for suspecting logic.
+        config:
+          meta:
+            data_type: varchar
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
+            data_type: varchar
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
+        config:
+          meta:
+            data_type: varchar
       - name: reason
         description: Standardized reason for the suspecting condition.
+        config:
+          meta:
+            data_type: varchar
       - name: contributing_factor
         description: >
           Description of the contributing factor(s) for the suspecting condition.
+        config:
+          meta:
+            data_type: varchar
       - name: suspect_date
         description: >
-          Date when the suspecting condition, observation, result, etc.  was recorded or billed.
+          Date when the suspecting condition, observation, result, etc.  was
+          recorded or billed.
+        config:
+          meta:
+            data_type: date
       - name: tuva_last_run
         description: The date the model was run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: hcc_suspecting__list_all
     config:
@@ -46,7 +81,9 @@ models:
       tags: hcc_suspecting
       materialized: table
     description: >
-      This final model displays the list of suspecting conditions per patient,  data_source, hcc, and diagnosis code with the reason and contributing  factors.
+      This final model displays the list of suspecting conditions per
+      patient,  data_source, hcc, and diagnosis code with the reason and
+      contributing  factors.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -54,7 +91,8 @@ models:
         description: Name of the payer.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: model_version
         description: The CMS model version of the HCC code.
       - name: hcc_code
@@ -73,12 +111,14 @@ models:
           Description of the contributing factor(s) for the suspecting condition.
       - name: suspect_date
         description: >
-          Date when the suspecting condition, observation, result, etc.  was recorded or billed.
+          Date when the suspecting condition, observation, result, etc.  was
+          recorded or billed.
       - name: current_year_billed
         description: >
-          Flag indicating that the HCC has been billed during the payment year.      
+          Flag indicating that the HCC has been billed during the payment
+          year.
       - name: tuva_last_run
-        description: The date the model was run.        
+        description: The date the model was run.
 
   - name: hcc_suspecting__list_rollup
     config:
@@ -88,29 +128,60 @@ models:
       tags: hcc_suspecting
       materialized: table
     description: >
-      This final model displays the list of suspecting conditions per patient  and hcc with the latest contributing factor rolled up.
+      This final model displays the list of suspecting conditions per
+      patient  and hcc with the latest contributing factor rolled up.
     columns:
       - name: person_id
         description: Unique ID for the patient.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer
+        description: Name of the payer associated with the suspected HCC.
+        config:
+          meta:
+            data_type: varchar
+      - name: model_version
+        description: CMS-HCC model version used for suspecting logic.
+        config:
+          meta:
+            data_type: varchar
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         config:
           meta:
             terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
+            data_type: varchar
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
+        config:
+          meta:
+            data_type: varchar
       - name: reason
         description: Standardized reason for the suspecting condition.
+        config:
+          meta:
+            data_type: varchar
       - name: contributing_factor
         description: >
           Description of the contributing factor(s) for the suspecting condition.
+        config:
+          meta:
+            data_type: varchar
       - name: latest_suspect_date
         description: >
-          Latest date when the suspecting condition, observation, result, etc.  was recorded or billed.
+          Latest date when the suspecting condition, observation, result,
+          etc.  was recorded or billed.
+        config:
+          meta:
+            data_type: date
       - name: tuva_last_run
         description: The date the model was run.
+        config:
+          meta:
+            data_type: timestamp
 
   - name: hcc_suspecting__summary
     config:
@@ -124,19 +195,42 @@ models:
     columns:
       - name: person_id
         description: Unique ID for the patient.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer
+        description: Name of the payer associated with the suspected HCC rollup.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: patient_sex
         description: The gender of the patient.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/gender
+            data_type: varchar
       - name: patient_birth_date
         description: The birth date of the patient.
+        config:
+          meta:
+            data_type: date
       - name: patient_age
         description: The patient's current age.
+        config:
+          meta:
+            data_type: integer
       - name: suspecting_gaps
         description: Count of suspecting conditions.
+        config:
+          meta:
+            data_type: integer
       - name: tuva_last_run
         description: The date the model was run.
+        config:
+          meta:
+            data_type: timestamp
 
   ## Intermediate
   - name: hcc_suspecting__int_all_conditions
@@ -164,7 +258,8 @@ models:
           HCC description from the latest CMS HCC model available in the mart.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -187,7 +282,8 @@ models:
         description: The type of drug code.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -204,7 +300,8 @@ models:
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
@@ -253,7 +350,8 @@ models:
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: result_date
         description: Date of the test result.
       - name: result
@@ -297,7 +395,8 @@ models:
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
@@ -339,7 +438,8 @@ models:
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: observation_date
         description: Date the observation was recorded.
       - name: observation_result
@@ -382,14 +482,15 @@ models:
       tags: hcc_suspecting
       materialized: table
     description: >
-      This intermediate model displays the full history of a patient's recorded HCCs
-      with a flag for recorded during the current year.
+      This intermediate model displays the full history of a patient's recorded
+      HCCs with a flag for recorded during the current year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: recorded_date
         description: Date in which the ICD-10-CM condition was recorded.
       - name: condition_type
@@ -414,7 +515,8 @@ models:
         description: Date the HCC was last recorded in the patient's record.
       - name: last_billed
         description: >
-          Date the HCC was last billed in the patient's record (where condition_type <> 'problem').
+          Date the HCC was last billed in the patient's record (where
+          condition_type <> 'problem').
       - name: current_year_billed
         description: >
           Flag indicating that the ICD-10-CM code mapped to the HCC has been
@@ -451,13 +553,15 @@ models:
         description: The type of condition.
       - name: code_type
         description: >
-          The type of condition code reported in the source system e.g.  ICD-10-CM.
+          The type of condition code reported in the source system
+          e.g.  ICD-10-CM.
       - name: code
         description: >
           The condition code in the source system e.g. the ICD-10 code.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
     tests:
@@ -486,7 +590,8 @@ models:
         description: Unique ID for the patient.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g.
+          typically  named after the payer and state "BCBS Tennessee").
       - name: code_type
         description: The normalized code type or source code type.
       - name: code

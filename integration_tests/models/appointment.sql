@@ -40,4 +40,4 @@ select
     , normalized_cancellation_reason_code
     , normalized_cancellation_reason_description
     , data_source
-from {{ ref('raw_data__appointment') }}
+from {{ ref('the_tuva_project', 'synthetic_data__appointment') }}

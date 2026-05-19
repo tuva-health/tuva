@@ -7,6 +7,9 @@ with monthly_hcc_counts as (
 select
       payer
     , payment_year
+    , sum(no_suspects_closed_hccs) as no_suspects_closed_hccs
+    , sum(no_suspects_open_hccs) as no_suspects_open_hccs
+    , sum(no_suspects_total_hccs) as no_suspects_total_hccs
     , sum(closed_hccs) as closed_hccs
     , sum(open_hccs) as open_hccs
     , sum(total_hccs) as total_hccs
@@ -19,6 +22,10 @@ group by
 select
       payer
     , payment_year
+    , no_suspects_closed_hccs
+    , no_suspects_open_hccs
+    , no_suspects_total_hccs
+    , no_suspects_closed_hccs / no_suspects_total_hccs as no_suspects_recapture_rate
     , closed_hccs
     , open_hccs
     , total_hccs

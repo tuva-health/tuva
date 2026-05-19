@@ -11,14 +11,10 @@
     , cast(source_code_type as {{ dbt.type_string() }}) as source_code_type
     , cast(source_code as {{ dbt.type_string() }}) as source_code
     , cast(source_description as {{ dbt.type_string() }}) as source_description
-    , cast(normalized_code_type as {{ dbt.type_string() }}) as normalized_code_type
-    , cast(normalized_code as {{ dbt.type_string() }}) as normalized_code
-    , cast(normalized_description as {{ dbt.type_string() }}) as normalized_description
     , cast(status as {{ dbt.type_string() }}) as status
     , cast(status_reason as {{ dbt.type_string() }}) as status_reason
     , {{ try_to_cast_date('occurrence_date', 'YYYY-MM-DD') }} as occurrence_date
     , cast(source_dose as {{ dbt.type_string() }}) as source_dose
-    , cast(normalized_dose as {{ dbt.type_string() }}) as normalized_dose
     , cast(lot_number as {{ dbt.type_string() }}) as lot_number
     , cast(body_site as {{ dbt.type_string() }}) as body_site
     , cast(route as {{ dbt.type_string() }}) as route
@@ -27,8 +23,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-      , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+      , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}

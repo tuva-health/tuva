@@ -16,7 +16,7 @@ union distinct
 
 select distinct person_id
 , data_source
-from {{ ref('normalized_input__eligibility') }}
+from {{ ref('normalized__eligibility') }}
 )
 
 select

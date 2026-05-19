@@ -1,0 +1,59 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
+with stg_eligibility as (
+  select
+    person_id
+    , member_id
+    , payer
+    , {{ quote_column('plan') }}
+    , enrollment_start_date
+    , enrollment_end_date
+    , tuva_last_run
+    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig') }}
+    , data_source
+  from {{ ref('normalized__eligibility') }} as elig
+)
+
+, month_start_and_end_dates as (
+  select
+    {{ concat_custom(["year",
+                  dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
+    , min(full_date) as month_start_date
+    , max(full_date) as month_end_date
+  from {{ ref('reference_data__calendar') }}
+  group by year, month
+)
+
+, joined as (
+select distinct
+  a.person_id
+  , a.member_id
+  , b.year_month
+  , a.payer
+  , a.{{ quote_column('plan') }}
+  , a.tuva_last_run
+  {{ select_extension_columns(ref('normalized__eligibility'), alias='a') }}
+  , a.data_source
+from stg_eligibility as a
+inner join month_start_and_end_dates as b
+  on a.enrollment_start_date <= b.month_end_date
+  and a.enrollment_end_date >= b.month_start_date
+)
+
+select
+  cast(
+    {{ dbt_utils.generate_surrogate_key([
+        'person_id',
+        'member_id',
+        'year_month',
+        'payer',
+        quote_column('plan'),
+        'data_source'
+    ]) }}
+    as {{ dbt.type_string() }}
+  ) as member_month_key
+, *
+from joined

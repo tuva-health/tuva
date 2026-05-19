@@ -11,8 +11,9 @@ select
     ,'Encounter ID' as drill_down_key
     , coalesce(encounter_id, 'NULL') as drill_down_value
     ,'LENGTH_OF_STAY' as field_name
-    ,case when m.length_of_stay is not null then 'valid' else 'null' end as bucket_name
+    ,cast(null as {{ dbt.type_string() }}) as bucket_name
     ,cast(null as {{ dbt.type_string() }}) as invalid_reason
-    ,cast(length_of_stay as {{ dbt.type_string() }}) as field_value
+    ,cast(null as {{ dbt.type_string() }}) as field_value
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('encounter') }} as m
+where 1 = 0

@@ -22,11 +22,8 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as source_code
 , cast(null as {{ dbt.type_string() }}) as source_description
 , cast(null as {{ dbt.type_string() }}) as ndc_code
-, cast(null as {{ dbt.type_string() }}) as ndc_description
 , cast(null as {{ dbt.type_string() }}) as rxnorm_code
-, cast(null as {{ dbt.type_string() }}) as rxnorm_description
 , cast(null as {{ dbt.type_string() }}) as atc_code
-, cast(null as {{ dbt.type_string() }}) as atc_description
 , cast(null as {{ dbt.type_string() }}) as route
 , cast(null as {{ dbt.type_string() }}) as strength
 , cast(null as {{ dbt.type_int() }}) as quantity
@@ -34,7 +31,6 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_int() }}) as days_supply
 , cast(null as {{ dbt.type_string() }}) as practitioner_id
 {{ tuva_synthetic_extensions }}
-, cast(null as {{ dbt.type_string() }}) as data_source
-, cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
+, cast(null as {{ dbt.type_string() }}) as data_source
 {{ limit_zero() }}

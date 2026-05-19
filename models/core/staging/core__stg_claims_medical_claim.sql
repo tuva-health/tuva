@@ -87,11 +87,11 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-       , cast(med.data_source as {{ dbt.type_string() }}) as data_source
     , cast(med.file_date as {{ dbt.type_timestamp() }}) as file_date
     , cast(med.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(med.file_name as {{ dbt.type_string() }}) as file_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+       , cast(med.data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}

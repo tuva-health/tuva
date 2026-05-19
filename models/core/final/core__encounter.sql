@@ -51,8 +51,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , data_source
     , tuva_last_run
+    , data_source
 {%- endset -%}
 
 {% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}

@@ -2,15 +2,13 @@ version: 2
 models:
   - name: input_layer__pharmacy_claim
     description: >-
-      The pharmacy_claim table includes information about retail and specialty
-      drug prescriptions that have been filled for a patient, billed by a
-      pharmacy, and paid by an insurer. Prescriptions that are ordered but not
-      filled should not make it into the table. Claim adjustments, denials, and
-      reversals should be handled similarly to the medical_claim table.
-    grain: Intended to be one record per claim line per data source.
-    transformation_steps: |-
-      This model brings the input layer pharmacy_claim table into the Tuva package. It does not do any transformation; it's just `select *`.
-    mapping_instructions: ''
+      The pharmacy_claim table is intended to have one record per pharmacy claim line per data source. A pharmacy claim represents a prescription medication that was dispensed by a pharmacy, submitted for payment, and adjudicated by a payer. Prescriptions that were ordered but not filled should not be included.
+
+
+      This table should contain final adjudicated pharmacy claim lines after the source data has been filtered or transformed to account for adjustments, denials, reversals, voids, and replacement claims. If non-final claim activity is included, downstream cost, medication adherence, utilization, quality, and risk adjustment outputs may be incorrect. Most pharmacy claims have one line, but claim_line_number is included to support sources that represent a single claim with multiple lines and to keep the grain consistent with medical_claim.
+
+
+      Primary key: claim_id, claim_line_number, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
           config:
@@ -40,8 +38,8 @@ models:
       materialized: view
     columns:
       - name: claim_id
-        description: Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient. This is a string that links each row in the table to the unique claim to which it belongs. Keep in mind that the pharmacy_claim table is at the claim line grain, i.e. each row in the table corresponds to a unique claim line. If a given claim has N lines, there are N lines in the pharmacy_claim table with the same claim_id value (one for each line in the claim). The claim_id value is required to be populated for every row in the pharmacy_claim table. DQI checks that every row in the pharmacy_claim table has a populated claim_id.
-        mapping_instructions: ''
+        description: >-
+          Identifier for a pharmacy claim. Most pharmacy claims have one claim line, but the same claim_id may appear on multiple rows when a source represents a single claim with multiple lines. This value should be populated on every row and should remain consistent across all lines for the same claim.
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'hcc_recapture', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -81,8 +79,8 @@ models:
             data_type: varchar
             is_primary_key: true
       - name: claim_line_number
-        description: Indicates the line number for the particular line of the claim. This is a positive integer that identifies the claim line that a given row on the table represents. The values of claim_line_number for a given claim_id must be sequential positive integers starting at 1. For example, if claim_id = ABC has 4 claim lines (i.e., 4 rows on the pharmacy_claim table), those 4 rows must have claim_line_number equal to 1, 2, 3, and 4, respectively. The claim_line_number field should be populated for every row in the pharmacy_claim table. Pharmacy claims datasets do not often have a claim_line_number field. In these cases, you can set claim_line_number = 1 for each claim_id. We include claim_line_number in the input layer for pharmacy_claim to handle the case where there may be multiple claim lines per claim_id, and for consistency with medical_claim. DQI checks that the values of claim_line_number are different for all lines within the same claim.
-        mapping_instructions: ''
+        description: >-
+          Line number for the pharmacy claim line represented by the row. Values should be positive integers and should uniquely identify each line within a claim_id. If the source does not provide line numbers and each claim_id has one row, set claim_line_number to 1.
         required_for_data_marts: ['claims_enrollment', 'pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -122,8 +120,8 @@ models:
             data_type: integer
             is_primary_key: true
       - name: person_id
-        description: Unique identifier for each person in the dataset. person_id is a required (string) field that ideally contains a person-level UUID (Universally Unique Identifier), if available. This can be populated from the Tuva EMPI Engine or with your own Master Patient Index identifier. If you dont have a UUID, we recommend mapping the source patient identifier to this field (member_id for claims and patient_id for clinical).
-        mapping_instructions: 'Map the unique identifier that represents a single person. The same person should not have multiple person_ids. Every pharmacy claim should have one and only one person_id.'
+        description: >-
+          Globally unique identifier for the person who received the dispensed medication. A person may have multiple member IDs over time or across plans, but person_id should remain stable for the same person.
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -148,8 +146,8 @@ models:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan. This field is a string that links each row to a given member. This field should be populated for every row in the pharmacy_claim table. It is a header-level field, so its value must be the same for all lines in a given claim.
-        mapping_instructions: 'Map the member identifier assigned to the person for the specific health plan covering the claim. A person can have multiple member_ids across plans, so member_id does not need to be globally unique to the person. A given pharmacy claim should typically carry one member_id.'
+        description: >-
+          Identifier assigned by the payer or health plan for the person's coverage. This should identify the member associated with the pharmacy claim and should be consistent across all lines for the same claim_id.
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'pharmacy']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -163,8 +161,8 @@ models:
           meta:
             data_type: varchar
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
-        mapping_instructions: 'Map the name of the insurer responsible for the pharmacy claim. In many source systems payer effectively matches the data source, so it is acceptable to hard-code a stable payer value when the source represents a single insurer.'
+        description: >-
+          Name of the payer responsible for the pharmacy claim, for example Aetna, Blue Cross Blue Shield, or Medicare Part D. If the source data is scoped to one payer, this value may be hard-coded.
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -188,8 +186,8 @@ models:
           meta:
             data_type: varchar
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage. This field is a string that links every row to the the specific health insurance plan or sub-contract specific to a members enrollment (e.g. Aetna Gold, BCBS Chicago, etc). plan values may not come in the source data. This field should be hard-coded if not present.
-        mapping_instructions: 'Map the health plan or product name associated with the pharmacy claim, such as Humana PPO or Humana HMO. If the source does not provide a plan value, it is acceptable to hard-code a stable plan label during mapping.'
+        description: >-
+          Name of the health insurance plan or product associated with the pharmacy claim, for example Aetna PPO, Humana HMO, or a Medicare Part D plan. If unavailable in the source, this value may be hard-coded to a stable plan value for the data source.
         required_for_data_marts: ['claims_enrollment', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -213,8 +211,8 @@ models:
           meta:
             data_type: varchar
       - name: prescribing_provider_npi
-        description: NPI for the provider that wrote the prescription (e.g. primary care physician). This field is a string that contains NPI (National Provider Identifier) values. precribing_provider_npi is populated with the NPI of the provider who prescribed the medication (e.g. primary care physician).
-        mapping_instructions: 'Map the NPI of the provider who prescribed the medication. Every pharmacy claim should have a prescribing_provider_npi, and the mapped value should be a valid 10-digit NPI that matches the provider table.'
+        description: >-
+          NPI of the provider who prescribed the medication. This should be a 10-digit NPI stored as a string when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -251,8 +249,8 @@ models:
           meta:
             data_type: varchar
       - name: dispensing_provider_npi
-        description: NPI for the provider that dispensed the prescription (e.g. pharmacy). This field is a string that contains NPI (National Provider Identifier) values. dispensing_provider_npi is populated with the NPI of the provider who dispensed the medication. This NPI may represent the pharmacist or the pharmacy.
-        mapping_instructions: 'Map the NPI of the provider or pharmacy that dispensed the medication. Every pharmacy claim should have a dispensing_provider_npi, and the mapped value should be a valid 10-digit NPI that matches the provider table.'
+        description: >-
+          NPI of the provider or pharmacy that dispensed the medication. This often identifies the dispensing pharmacy organization rather than an individual pharmacist and should be stored as a 10-digit string when available.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -289,8 +287,8 @@ models:
           meta:
             data_type: varchar
       - name: dispensing_date
-        description: Date the medication was dispensed. This field is a date that corresponds to the date a medication was given to the patient. This may also be denoted as fill_date depending on the data source.
-        mapping_instructions: 'Map the date the medication was dispensed. Cast source text or timestamps to a date in YYYY-MM-DD format during mapping. Every pharmacy claim should have a dispensing_date.'
+        description: >-
+          Date the medication was dispensed to the patient, formatted as YYYY-MM-DD. This may be called fill date in source data.
         required_for_data_marts: ['financial_pmpm', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -349,8 +347,8 @@ models:
           meta:
             data_type: date
       - name: ndc_code
-        description: 'National Drug Code (NDC) for the medication dispensed on the pharmacy claim line. Each pharmacy claim line should have an ndc_code. NDCs are often shown on packaging as 10-digit codes, but pharmacy claims typically require the 11-digit billing format. If your source data contains 10-digit NDCs, convert them to 11 digits before mapping. The 11-digit format follows a 5-4-2 pattern; when converting from a dashed 10-digit format, add a leading zero to the segment that is short. If the source stores a 10-digit NDC without dashes or segment boundaries, you generally cannot determine where the extra zero belongs reliably. Remove dashes before mapping. Tuva expects this field to be populated with an 11-character string, but downstream validation determines whether the mapped value is a valid terminology code.'
-        mapping_instructions: 'Map the NDC for the medication that was dispensed. Every pharmacy claim line should have an ndc_code. Normalize 10-digit source NDCs to the 11-digit billing format, remove dashes, and make sure the final mapped value is valid against Tuva terminology.'
+        description: >-
+          National Drug Code for the medication dispensed on the pharmacy claim line. Tuva expects the 11-digit billing format with dashes removed. If the source contains a dashed 10-digit NDC, convert it to the 11-digit 5-4-2 format by adding the missing leading zero to the appropriate segment.
         required_for_data_marts: ['cms_chronic_conditions', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -374,8 +372,8 @@ models:
           meta:
             data_type: varchar
       - name: quantity
-        description: The quantity of the medication. This field is a positive integer that represents the number of doses of the medication. Before the application of Adjustments, Denials, and Reversals (ADR), quantity may be represented as a negative value on some claim lines, but appropriately handing ADR should result in only positive integer values.
-        mapping_instructions: ''
+        description: >-
+          Quantity of the medication dispensed on the pharmacy claim line. This should be a positive value after adjustments, denials, reversals, voids, and replacement claims have been handled.
         required_for_data_marts: ['pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -397,8 +395,8 @@ models:
           meta:
             data_type: integer
       - name: days_supply
-        description: The number of days supply included. This field is a positive integer that represents the number of days supply for the medication. Before the application of Adjustments, Denials, and Reversals (ADR), days_supply may be represented as a negative value on some claim lines, but appropriately handing ADR should result in only positive integer values.
-        mapping_instructions: ''
+        description: >-
+          Number of days the dispensed medication is expected to last. This should be a positive integer after adjustments, denials, reversals, voids, and replacement claims have been handled.
         required_for_data_marts: ['pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -421,8 +419,8 @@ models:
           meta:
             data_type: integer
       - name: refills
-        description: Number of refills for the prescription. This field is a positive integer that represents the number of refills for the prescription. Before the application of Adjustments, Denials, and Reversals (ADR), refills may be represented as negative values on some claim lines, but appropriately handing ADR should result in only positive integer values.
-        mapping_instructions: ''
+        description: >-
+          Refill number or refill count associated with the dispensed prescription, as represented by the source. In many pharmacy sources, 0 represents the original fill, 1 represents the first refill, and so on.
         required_for_data_marts: ['pharmacy']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -436,8 +434,8 @@ models:
           meta:
             data_type: integer
       - name: paid_date
-        description: The date the claim was paid. This field is a date that corresponds to when the health insurer processed the claim for payment, and in the context of pharmacy claims should coincide with the date the pharmacy received reimbursement from the health insurer.
-        mapping_instructions: 'Map the date the pharmacy claim was paid. Cast source text or timestamps to a date in YYYY-MM-DD format during mapping. Every pharmacy claim should have a paid_date.'
+        description: >-
+          Date the pharmacy claim was paid or processed for payment by the payer, formatted as YYYY-MM-DD.
         required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_suspecting', 'pharmacy', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -498,8 +496,8 @@ models:
           meta:
             data_type: date
       - name: paid_amount
-        description: The total amount paid by the insurer. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the dollar amount paid by the health insurer for the covered medication. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: 'Map the final insurer-paid amount after any source-level Adjustments, Denials, and Reversals logic has been applied. Temporary negative values may exist upstream before ADR is resolved, but the final mapped paid_amount in the input layer should be greater than zero.'
+        description: >-
+          Amount paid by the payer for the pharmacy claim line. This should represent the final adjudicated payer-paid amount after adjustments, denials, reversals, voids, and replacement claims have been handled.
         required_for_data_marts: ['financial_pmpm', 'pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -544,8 +542,8 @@ models:
           meta:
             data_type: float
       - name: allowed_amount
-        description: The total amount allowed (includes amount paid by the insurer and patient). This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the total amount allowed for a medication, including dollars paid by both the payer and the patient. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete. The expectation is that the sum of paid_amount, coinsurance_amount, copayment_amount, and deductible_amount will be equivalent to allowed_amount.
-        mapping_instructions: 'Map the final allowed amount after any source-level Adjustments, Denials, and Reversals logic has been applied. Temporary negative values may exist upstream before ADR is resolved, but the final mapped allowed_amount in the input layer should be greater than zero.'
+        description: >-
+          Total allowed amount for the pharmacy claim line. This generally represents the sum of the payer-paid amount and patient responsibility amounts, including coinsurance, copayment, and deductible amounts, when those fields are available.
         required_for_data_marts: ['financial_pmpm', 'pharmacy', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -581,8 +579,8 @@ models:
           meta:
             data_type: float
       - name: charge_amount
-        description: The total amount charged for the services provided, before any adjustments or payments. This is typically in US dollars. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the total amount charged for a medication before any adjustments. This may also be called billed amount in source data. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        description: >-
+          Amount charged or billed by the pharmacy for the medication before payer adjudication, discounts, or payment adjustments.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -618,8 +616,8 @@ models:
           meta:
             data_type: float
       - name: coinsurance_amount
-        description: The total coinsurance charged on the claim by the provider. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the dollar amount a member has paid for a covered service as part of cost-sharing with the health insurance provicer. After a deductible is met, covered services may still require members to cover a percentage of the cost (e.g. 80/20 - 80% paid by the health insurer and 20% paid by the member). In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        description: >-
+          Coinsurance amount owed by the member for the pharmacy claim line. This is the member responsibility amount based on a percentage of allowed cost.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -653,8 +651,8 @@ models:
           meta:
             data_type: float
       - name: copayment_amount
-        description: The total copayment charged on the claim by the provider. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the total copayment charged on the claim by a provider. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        description: >-
+          Copayment amount owed by the member for the pharmacy claim line. This is the fixed member responsibility amount for the dispensed medication when applicable.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -688,8 +686,8 @@ models:
           meta:
             data_type: float
       - name: deductible_amount
-        description: The total deductible charged on the claim by the provider. This field is numeric with two decimal points (e.g. numeric(38,2)) that corresponds to the dollar amount a member has paid for a covered medication before the health insurer will pay the cost for covered services. In source data that has not yet applied Adjustments, Denials, and Reversals (ADR) logic, these values may be negative. When mapping to the Tuva Project input layer, the expectation is that ADR is handled before the input layer. Most often, this means that negative values are not present when the mapping process is complete.
-        mapping_instructions: ''
+        description: >-
+          Deductible amount owed by the member for the pharmacy claim line before other coverage or cost sharing is applied.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -723,8 +721,8 @@ models:
           meta:
             data_type: float
       - name: in_network_flag
-        description: Flag indicating if the claim was in or out of network. This field is an integer indicating whether a claim was in or out of network. It can take on values of 0 (claim was out of network) or 1 (claim was in network). Sources may not always contain network information; in these cases, in_network_flag may be mapped to null.
-        mapping_instructions: ''
+        description: >-
+          Indicator for whether the pharmacy claim was in network. Accepted values are 1 for in network, 0 for out of network, and null when unknown.
         required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -745,33 +743,9 @@ models:
         config:
           meta:
             data_type: boolean
-      - name: data_source
-        description: User-configured field that indicates the data source. This field is a user-defined string that indicates the data source. This string is typically named after the payer and state, for example, "BCBS Tennessee". This field should be populated for every line in the pharmacy_claim table and is a header-level field, so its value must be the same for all lines in a given claim.
-        mapping_instructions: ''
-        required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-        config:
-          meta:
-            data_type: varchar
-            is_primary_key: true
       - name: file_name
-        description: 'The file name of the source file. This field is a string that corresponds to the name of the specific file that a particular row came from. Claims sources are different: some carriers may share one file, one time. Others may share a file on some regular cadence. We suggest mapping the name of the file, if available, to file_name. This might be most important in cases where multiple files come from a carrier on a schedule, and the ability to tie specific rows to specific files is needed.'
-        mapping_instructions: ''
+        description: >-
+          Name of the source file from which the pharmacy claim line originated. This field is useful for tracing source records across file-based claims extracts.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -785,8 +759,8 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: The date associated with the claims file, typically reflecting the reporting period of the claims data. This field is a date, corresponding to the date associated with a particular claims file and typically representing the reporting period of the claims data. Carriers may name files according to a specific pattern (e.g. "CarrierName_Pharmacy_Claims_YYYYMMDD.csv"). In these cases, the file_date can be retrieved from the file_name. No matter how the information is represented, including it can be helpful, especially when tracking information across different claims files over time is relevant to your use cases.
-        mapping_instructions: ''
+        description: >-
+          Date associated with the source file, formatted as YYYY-MM-DD. This may represent the delivery date, reporting period, or date embedded in the file name.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -811,8 +785,8 @@ models:
           meta:
             data_type: date
       - name: ingest_datetime
-        description: The date and time the source file was ingested into the data warehouse or landed in cloud storage. This field is a timestamp that corresponds to the date and time a source file landed in the data warehouse or cloud storage. If this information is available or easy to track, we recommend mapping it to ingest_datetime. A field like this is particularly useful when there may be multiple versions of the same claim line present across multiple files, but the most recent version of the claim line is the most relevant for your use case.
-        mapping_instructions: ''
+        description: >-
+          Date and time the source pharmacy claim line or file was loaded into the data warehouse. This is useful when multiple versions of the same claim line are received over time.
         required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
@@ -848,3 +822,27 @@ models:
         config:
           meta:
             data_type: timestamp
+      - name: data_source
+        description: >-
+          User-defined name that identifies the source of the pharmacy claim data, for example BCBS Tennessee, Medicare Part D, or Medicaid Ohio. This value should be populated on every record and should be consistent across all lines for the same claim_id.
+        required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'pharmacy', 'semantic_layer']
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_5
+                  - dqi
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

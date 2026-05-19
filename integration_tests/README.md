@@ -5,5 +5,5 @@
    - Set `synthetic_data_size` to `small` or `large` (`small` is the default)
    - Set `tuva_seed_version`, `tuva_seed_versions`, and the appropriate bucket vars when testing published artifacts
 3. Run `dbt deps`.
-4. Run `dbt seed` or `dbt build` to load the synthetic data into `raw_data`.
+4. Run `dbt seed` or `dbt build` to load the package-owned synthetic data into `synthetic_data`.
 5. Run `dbt run` only after the synthetic seed tables have already been loaded.

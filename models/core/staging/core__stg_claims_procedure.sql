@@ -66,8 +66,8 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
-    , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 with unpivot_cte as (
