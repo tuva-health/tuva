@@ -16,7 +16,10 @@
     split_part(
         {{ string_text }},
         {{ delimiter_text }},
-        length({{ string_text }}) - length(replace({{ string_text }}, {{ delimiter_text }}, '')) + 1
+        cast(
+            (length({{ string_text }}) - length(replace({{ string_text }}, {{ delimiter_text }}, ''))) / length({{ delimiter_text }}) + 1
+            as integer
+        )
     )
 {%- endmacro %}
 
