@@ -113,6 +113,32 @@
     )
     --there is an internal dbt test that is run after this that calculates the failure count
     --this test evaluates the number of records, so the column of interest (column_name) is pulled
+  {% elif target.type == 'athena' %}
+    {#- Athena/Trino does not implicitly coerce a string literal to a date when
+        comparing against a date/timestamp column, so wrap date-literal bounds in
+        date(...). Numeric bounds are left untouched. -#}
+    {%- set min_operator = '>' if strictly else '>=' -%}
+    {%- set max_operator = '<' if strictly else '<=' -%}
+    {%- set min_str = (min_value | string | replace("'", "")) if min_value is not none else '' -%}
+    {%- set max_str = (max_value | string | replace("'", "")) if max_value is not none else '' -%}
+    {%- set min_bound = ('date(' ~ min_value ~ ')') if (min_value is not none and modules.re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', min_str)) else min_value -%}
+    {%- set max_bound = ('date(' ~ max_value ~ ')') if (max_value is not none and modules.re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', max_str)) else max_value -%}
+
+    WITH filtered_data AS (
+      SELECT *
+      FROM {{ model }}
+      {% if row_condition %}
+      WHERE {{ row_condition }}
+      {% endif %}
+    )
+
+    SELECT {{ column_name }}
+    FROM filtered_data
+    WHERE NOT (
+      {% if min_value is not none %} {{ column_name }}  {{ min_operator }} {{ min_bound }} {% endif %}
+      {% if min_value is not none and max_value is not none %}AND{% endif %}
+      {% if max_value is not none %} {{ column_name }}  {{ max_operator }} {{ max_bound }} {% endif %}
+    )
   {% else %}
     {{ dbt_expectations.test_expect_column_values_to_be_between(model, column_name, min_value, max_value, strictly, row_condition) }}
   {% endif %}
