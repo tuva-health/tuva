@@ -8,29 +8,16 @@
       person_id
     , member_id
     , subscriber_id
-    , subscriber_relation
-    , enrollment_start_date
-    , enrollment_end_date
-    , payer
-    , payer_type
-    , {{ the_tuva_project.quote_column('plan') }}
-    , first_name
-    , middle_name
-    , last_name
-    , name_suffix
-    , social_security_number
-    , address
-    , city
-    , state
-    , zip_code
-    , phone
-    , email
-    , ethnicity
     , gender
     , race
     , birth_date
     , death_date
     , death_flag
+    , enrollment_start_date
+    , enrollment_end_date
+    , payer
+    , payer_type
+    , {{ the_tuva_project.quote_column('plan') }}
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
@@ -48,6 +35,19 @@
     , transplant_duration_months
     , group_id
     , group_name
+    , name_suffix
+    , first_name
+    , middle_name
+    , last_name
+    , social_security_number
+    , subscriber_relation
+    , address
+    , city
+    , state
+    , zip_code
+    , phone
+    , email
+    , ethnicity
 {%- endset -%}
 
 {# Extension columns for testing passthrough to core.member_months #}
@@ -61,14 +61,14 @@
 {%- endset -%}
 
 {%- set tuva_metadata -%}
+    , data_source
     , file_date
     , file_name
     , ingest_datetime
-    , data_source
 {%- endset -%}
 
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__eligibility') }}
+from {{ source('source_input', 'eligibility') }}

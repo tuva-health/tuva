@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: source_input
+    database: >-
+      {%- if var('use_synthetic_data', false) | string | lower == 'true' -%}
+        {{ target.database }}
+      {%- else -%}
+        {{ var('input_database', target.database) }}
+      {%- endif -%}
+    schema: >-
+      {%- if var('use_synthetic_data', false) | string | lower == 'true' -%}
+        {{ var('tuva_schema_prefix') ~ '_synthetic_data' if var('tuva_schema_prefix', none) is not none else 'synthetic_data' }}
+      {%- else -%}
+        {{ var('input_schema', target.schema) }}
+      {%- endif -%}
+    tables:
+      - name: appointment
+      - name: condition
+      - name: eligibility
+      - name: encounter
+      - name: immunization
+      - name: lab_result
+      - name: location
+      - name: medical_claim
+      - name: medication
+      - name: observation
+      - name: patient
+      - name: pharmacy_claim
+      - name: practitioner
+      - name: procedure
+      - name: provider_attribution

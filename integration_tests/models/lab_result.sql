@@ -16,6 +16,12 @@
     , source_component_type
     , source_component_code
     , source_component_description
+    , normalized_order_type
+    , normalized_order_code
+    , normalized_order_description
+    , normalized_component_type
+    , normalized_component_code
+    , normalized_component_description
     , status
     , result
     , result_datetime
@@ -41,12 +47,13 @@
 {%- endset -%}
 
 {%- set tuva_metadata -%}
-    , ingest_datetime
     , data_source
+    , file_name
+    , ingest_datetime
 {%- endset -%}
 
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__lab_result') }}
+from {{ source('source_input', 'lab_result') }}

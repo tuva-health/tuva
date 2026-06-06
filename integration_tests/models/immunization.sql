@@ -12,10 +12,14 @@
     , source_code_type
     , source_code
     , source_description
+    , normalized_code_type
+    , normalized_code
+    , normalized_description
     , status
     , status_reason
     , occurrence_date
     , source_dose
+    , normalized_dose
     , lot_number
     , body_site
     , route
@@ -31,12 +35,13 @@
 {%- endset -%}
 
 {%- set tuva_metadata -%}
-    , ingest_datetime
     , data_source
+    , file_name
+    , ingest_datetime
 {%- endset -%}
 
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__immunization') }}
+from {{ source('source_input', 'immunization') }}

@@ -6,11 +6,7 @@
    )
 }}
 
-{# Extension columns not supported for provider_attribution #}
-{%- set tuva_extensions -%}
-{%- endset -%}
-
-{%- set provider_attribution_relation = ref('the_tuva_project', 'synthetic_data__provider_attribution') -%}
+{%- set provider_attribution_relation = source('source_input', 'provider_attribution') -%}
 
 {%- if execute -%}
   {%- set provider_attribution_columns = adapter.get_columns_in_relation(provider_attribution_relation) -%}
@@ -27,31 +23,10 @@
   {%- endif -%}
 {%- endset -%}
 
-{%- set file_name_expr -%}
-  {%- if 'file_name' in provider_attribution_column_names -%}
-    file_name
-  {%- else -%}
-    cast(null as {{ dbt.type_string() }})
-  {%- endif -%}
-{%- endset -%}
-
-{%- set ingest_datetime_expr -%}
-  {%- if 'ingest_datetime' in provider_attribution_column_names -%}
-    ingest_datetime
-  {%- else -%}
-    cast(null as {{ dbt.type_timestamp() }})
-  {%- endif -%}
-{%- endset -%}
-
-{%- set tuva_metadata -%}
-    , {{ file_name_expr }} as file_name
-    , {{ ingest_datetime_expr }} as ingest_datetime
-    , data_source
-{%- endset -%}
-
-select
+{%- set tuva_columns -%}
       person_id
     , {{ member_id_expr }} as member_id
+    , patient_id
     , year_month
     , payer
     , {{ the_tuva_project.quote_column('plan') }}
@@ -63,6 +38,18 @@ select
     , custom_attributed_provider_practice
     , custom_attributed_provider_organization
     , custom_attributed_provider_lob
+{%- endset -%}
+
+{# Extension columns not supported for provider_attribution #}
+{%- set tuva_extensions -%}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
+    , data_source
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ provider_attribution_relation }}

@@ -3,9 +3,9 @@ version: 2
 models:
 # claim input models
   - name: eligibility
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
+      schema: &input_layer_schema |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
       meta:
@@ -17,33 +17,27 @@ models:
       materialized: table
 
   - name: medical_claim
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - claims
         - input_layer
       materialized: table
 
   - name: pharmacy_claim
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - claims
         - input_layer
       materialized: table
 
   - name: provider_attribution
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - attribution
         - input_layer
@@ -52,11 +46,9 @@ models:
 
 # clinical input models
   - name: appointment
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       meta:
         dag:
           node_type: input
@@ -68,9 +60,7 @@ models:
   - name: condition
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
@@ -79,31 +69,25 @@ models:
   - name: encounter
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
       materialized: table
 
   - name: immunization
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
       materialized: table
 
   - name: lab_result
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
@@ -112,9 +96,7 @@ models:
   - name: location
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
@@ -123,20 +105,16 @@ models:
   - name: medication
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
       materialized: table
 
   - name: observation
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the synthetic_data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
@@ -145,9 +123,7 @@ models:
   - name: patient
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       meta:
         dag:
           node_type: input
@@ -159,9 +135,7 @@ models:
   - name: practitioner
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer
@@ -170,9 +144,7 @@ models:
   - name: procedure
     description: Created as an empty input_layer table for unsupported synthetic input.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
+      schema: *input_layer_schema
       tags:
         - clinical
         - input_layer

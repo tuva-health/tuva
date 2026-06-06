@@ -44,4 +44,4 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__pharmacy_claim') }}
+from {{ source('source_input', 'pharmacy_claim') }}

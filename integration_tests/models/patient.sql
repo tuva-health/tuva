@@ -7,13 +7,12 @@
 {%- set tuva_columns -%}
       person_id
     , patient_id
+    , name_suffix
     , first_name
     , middle_name
     , last_name
-    , name_suffix
     , sex
     , race
-    , ethnicity
     , birth_date
     , death_date
     , death_flag
@@ -27,6 +26,7 @@
     , longitude
     , phone
     , email
+    , ethnicity
 {%- endset -%}
 
 {# Uncomment the columns below to test extension columns passthrough feature #}
@@ -40,24 +40,13 @@
 {%- endset -%}
 
 {%- set tuva_metadata -%}
-    , ingest_datetime
     , data_source
+    , file_name
+    , ingest_datetime
 {%- endset -%}
-
-{% if var('use_synthetic_data') == true -%}
-
-select
-    {{ tuva_columns }}
-    {{ tuva_extensions }}
-    {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__patient') }}
-
-{%- else -%}
 
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
 from {{ source('source_input', 'patient') }}
-
-{%- endif %}

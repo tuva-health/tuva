@@ -15,6 +15,9 @@
     , source_code_type
     , source_code
     , source_description
+    , normalized_code_type
+    , normalized_code
+    , normalized_description
     , result
     , source_units
     , normalized_units
@@ -31,12 +34,13 @@
 {%- endset -%}
 
 {%- set tuva_metadata -%}
-    , ingest_datetime
     , data_source
+    , file_name
+    , ingest_datetime
 {%- endset -%}
 
 select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__observation') }}
+from {{ source('source_input', 'observation') }}
