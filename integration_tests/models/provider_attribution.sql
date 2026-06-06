@@ -6,6 +6,9 @@
    )
 }}
 
+{% if var('use_synthetic_data', false) | string | lower == 'true' %}
+-- depends_on: {{ ref('synthetic_data__provider_attribution') }}
+{% endif %}
 {%- set provider_attribution_relation = source('source_input', 'provider_attribution') -%}
 
 {%- if execute -%}

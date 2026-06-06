@@ -44,4 +44,7 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
+{% if var('use_synthetic_data', false) | string | lower == 'true' %}
+-- depends_on: {{ ref('synthetic_data__pharmacy_claim') }}
+{% endif %}
 from {{ source('source_input', 'pharmacy_claim') }}
