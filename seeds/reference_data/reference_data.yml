@@ -1,5 +1,9 @@
 version: 2
 
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+
 seeds:
   - name: reference_data__ansi_fips_state
     description: 'Seed containing ANSI FIPS state codes and names.'
@@ -12,12 +16,9 @@ seeds:
         - medicare_cclf_connector
         - reference_data
       column_types:
-        ansi_fips_state_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ansi_fips_state_abbreviation : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ansi_fips_state_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ansi_fips_state_code: *string
+        ansi_fips_state_abbreviation: *string
+        ansi_fips_state_name: *string
     columns:
       - name: ansi_fips_state_code
         description: 'The unique ANSI FIPS state code.'
@@ -41,15 +42,12 @@ seeds:
         year: integer
         month: integer
         day: integer
-        month_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        month_name: *string
         day_of_week_number: integer
-        day_of_week_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        day_of_week_name: *string
         week_of_year: integer
         day_of_year: integer
-        year_month: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        year_month: *string
         first_day_of_month: date
         last_day_of_month: date
         year_month_int: integer
@@ -91,8 +89,7 @@ seeds:
         - data_profiling
         - reference_data
       column_types:
-        code_type : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        code_type: *string
     columns:
       - name: code_type
         description: 'The type of the code.'
@@ -107,12 +104,9 @@ seeds:
         - terminology
         - reference_data
       column_types:
-        fips_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        county : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        state : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        fips_code: *string
+        county: *string
+        state: *string
     columns:
       - name: fips_code
         description: 'The FIPS code for the county.'
@@ -131,10 +125,8 @@ seeds:
         - terminology
         - reference_data
       column_types:
-        ssa_fips_state_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ssa_fips_state_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ssa_fips_state_code: *string
+        ssa_fips_state_name: *string
     columns:
       - name: ssa_fips_state_code
         description: 'The SSA FIPS state code.'
@@ -150,324 +142,165 @@ seeds:
         - terminology
         - reference_data
       column_types:
-        ST: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        STATE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ST_ABBR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        STCNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        COUNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        FIPS: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        LOCATION: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        AREA_SQMI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_TOTAL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_DAYPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        YEAR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ST: *string
+        STATE: *string
+        ST_ABBR: *string
+        STCNTY: *string
+        COUNTY: *string
+        FIPS: *string
+        LOCATION: *string
+        AREA_SQMI: *string
+        E_TOTPOP: *string
+        M_TOTPOP: *string
+        E_HU: *string
+        M_HU: *string
+        E_HH: *string
+        M_HH: *string
+        E_POV150: *string
+        M_POV150: *string
+        E_UNEMP: *string
+        M_UNEMP: *string
+        E_HBURD: *string
+        M_HBURD: *string
+        E_NOHSDP: *string
+        M_NOHSDP: *string
+        E_UNINSUR: *string
+        M_UNINSUR: *string
+        E_AGE65: *string
+        M_AGE65: *string
+        E_AGE17: *string
+        M_AGE17: *string
+        E_DISABL: *string
+        M_DISABL: *string
+        E_SNGPNT: *string
+        M_SNGPNT: *string
+        E_LIMENG: *string
+        M_LIMENG: *string
+        E_MINRTY: *string
+        M_MINRTY: *string
+        E_MUNIT: *string
+        M_MUNIT: *string
+        E_MOBILE: *string
+        M_MOBILE: *string
+        E_CROWD: *string
+        M_CROWD: *string
+        E_NOVEH: *string
+        M_NOVEH: *string
+        E_GROUPQ: *string
+        M_GROUPQ: *string
+        EP_POV150: *string
+        MP_POV150: *string
+        EP_UNEMP: *string
+        MP_UNEMP: *string
+        EP_HBURD: *string
+        MP_HBURD: *string
+        EP_NOHSDP: *string
+        MP_NOHSDP: *string
+        EP_UNINSUR: *string
+        MP_UNINSUR: *string
+        EP_AGE65: *string
+        MP_AGE65: *string
+        EP_AGE17: *string
+        MP_AGE17: *string
+        EP_DISABL: *string
+        MP_DISABL: *string
+        EP_SNGPNT: *string
+        MP_SNGPNT: *string
+        EP_LIMENG: *string
+        MP_LIMENG: *string
+        EP_MINRTY: *string
+        MP_MINRTY: *string
+        EP_MUNIT: *string
+        MP_MUNIT: *string
+        EP_MOBILE: *string
+        MP_MOBILE: *string
+        EP_CROWD: *string
+        MP_CROWD: *string
+        EP_NOVEH: *string
+        MP_NOVEH: *string
+        EP_GROUPQ: *string
+        MP_GROUPQ: *string
+        EPL_POV150: *string
+        EPL_UNEMP: *string
+        EPL_HBURD: *string
+        EPL_NOHSDP: *string
+        EPL_UNINSUR: *string
+        SPL_THEME1: *string
+        RPL_THEME1: *string
+        EPL_AGE65: *string
+        EPL_AGE17: *string
+        EPL_DISABL: *string
+        EPL_SNGPNT: *string
+        EPL_LIMENG: *string
+        SPL_THEME2: *string
+        RPL_THEME2: *string
+        EPL_MINRTY: *string
+        SPL_THEME3: *string
+        RPL_THEME3: *string
+        EPL_MUNIT: *string
+        EPL_MOBILE: *string
+        EPL_CROWD: *string
+        EPL_NOVEH: *string
+        EPL_GROUPQ: *string
+        SPL_THEME4: *string
+        RPL_THEME4: *string
+        SPL_THEMES: *string
+        RPL_THEMES: *string
+        F_POV150: *string
+        F_UNEMP: *string
+        F_HBURD: *string
+        F_NOHSDP: *string
+        F_UNINSUR: *string
+        F_THEME1: *string
+        F_AGE65: *string
+        F_AGE17: *string
+        F_DISABL: *string
+        F_SNGPNT: *string
+        F_LIMENG: *string
+        F_THEME2: *string
+        F_MINRTY: *string
+        F_THEME3: *string
+        F_MUNIT: *string
+        F_MOBILE: *string
+        F_CROWD: *string
+        F_NOVEH: *string
+        F_GROUPQ: *string
+        F_THEME4: *string
+        F_TOTAL: *string
+        E_DAYPOP: *string
+        E_NOINT: *string
+        M_NOINT: *string
+        E_AFAM: *string
+        M_AFAM: *string
+        E_HISP: *string
+        M_HISP: *string
+        E_ASIAN: *string
+        M_ASIAN: *string
+        E_AIAN: *string
+        M_AIAN: *string
+        E_NHPI: *string
+        M_NHPI: *string
+        E_TWOMORE: *string
+        M_TWOMORE: *string
+        E_OTHERRACE: *string
+        M_OTHERRACE: *string
+        EP_NOINT: *string
+        MP_NOINT: *string
+        EP_AFAM: *string
+        MP_AFAM: *string
+        EP_HISP: *string
+        MP_HISP: *string
+        EP_ASIAN: *string
+        MP_ASIAN: *string
+        EP_AIAN: *string
+        MP_AIAN: *string
+        EP_NHPI: *string
+        MP_NHPI: *string
+        EP_TWOMORE: *string
+        MP_TWOMORE: *string
+        EP_OTHERRACE: *string
+        MP_OTHERRACE: *string
+        YEAR: *string
     columns:
       - name: ST
       - name: STATE
@@ -639,324 +472,165 @@ seeds:
         - terminology
         - reference_data
       column_types:
-        ST: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        STATE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ST_ABBR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        STCNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        COUNTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        FIPS: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        LOCATION: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        AREA_SQMI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_TOTPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HU: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EPL_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        SPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        RPL_THEMES: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_POV150: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_UNEMP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_HBURD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_NOHSDP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_UNINSUR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME1: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_AGE65: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_AGE17: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_DISABL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_SNGPNT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_LIMENG: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME2: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MINRTY: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME3: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MUNIT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_MOBILE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_CROWD: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_NOVEH: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_GROUPQ: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_THEME4: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        F_TOTAL: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_DAYPOP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        E_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        M_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NOINT: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AFAM: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_HISP: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_ASIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_AIAN: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_NHPI: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_TWOMORE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        EP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        MP_OTHERRACE: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        YEAR: |-
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        ST: *string
+        STATE: *string
+        ST_ABBR: *string
+        STCNTY: *string
+        COUNTY: *string
+        FIPS: *string
+        LOCATION: *string
+        AREA_SQMI: *string
+        E_TOTPOP: *string
+        M_TOTPOP: *string
+        E_HU: *string
+        M_HU: *string
+        E_HH: *string
+        M_HH: *string
+        E_POV150: *string
+        M_POV150: *string
+        E_UNEMP: *string
+        M_UNEMP: *string
+        E_HBURD: *string
+        M_HBURD: *string
+        E_NOHSDP: *string
+        M_NOHSDP: *string
+        E_UNINSUR: *string
+        M_UNINSUR: *string
+        E_AGE65: *string
+        M_AGE65: *string
+        E_AGE17: *string
+        M_AGE17: *string
+        E_DISABL: *string
+        M_DISABL: *string
+        E_SNGPNT: *string
+        M_SNGPNT: *string
+        E_LIMENG: *string
+        M_LIMENG: *string
+        E_MINRTY: *string
+        M_MINRTY: *string
+        E_MUNIT: *string
+        M_MUNIT: *string
+        E_MOBILE: *string
+        M_MOBILE: *string
+        E_CROWD: *string
+        M_CROWD: *string
+        E_NOVEH: *string
+        M_NOVEH: *string
+        E_GROUPQ: *string
+        M_GROUPQ: *string
+        EP_POV150: *string
+        MP_POV150: *string
+        EP_UNEMP: *string
+        MP_UNEMP: *string
+        EP_HBURD: *string
+        MP_HBURD: *string
+        EP_NOHSDP: *string
+        MP_NOHSDP: *string
+        EP_UNINSUR: *string
+        MP_UNINSUR: *string
+        EP_AGE65: *string
+        MP_AGE65: *string
+        EP_AGE17: *string
+        MP_AGE17: *string
+        EP_DISABL: *string
+        MP_DISABL: *string
+        EP_SNGPNT: *string
+        MP_SNGPNT: *string
+        EP_LIMENG: *string
+        MP_LIMENG: *string
+        EP_MINRTY: *string
+        MP_MINRTY: *string
+        EP_MUNIT: *string
+        MP_MUNIT: *string
+        EP_MOBILE: *string
+        MP_MOBILE: *string
+        EP_CROWD: *string
+        MP_CROWD: *string
+        EP_NOVEH: *string
+        MP_NOVEH: *string
+        EP_GROUPQ: *string
+        MP_GROUPQ: *string
+        EPL_POV150: *string
+        EPL_UNEMP: *string
+        EPL_HBURD: *string
+        EPL_NOHSDP: *string
+        EPL_UNINSUR: *string
+        SPL_THEME1: *string
+        RPL_THEME1: *string
+        EPL_AGE65: *string
+        EPL_AGE17: *string
+        EPL_DISABL: *string
+        EPL_SNGPNT: *string
+        EPL_LIMENG: *string
+        SPL_THEME2: *string
+        RPL_THEME2: *string
+        EPL_MINRTY: *string
+        SPL_THEME3: *string
+        RPL_THEME3: *string
+        EPL_MUNIT: *string
+        EPL_MOBILE: *string
+        EPL_CROWD: *string
+        EPL_NOVEH: *string
+        EPL_GROUPQ: *string
+        SPL_THEME4: *string
+        RPL_THEME4: *string
+        SPL_THEMES: *string
+        RPL_THEMES: *string
+        F_POV150: *string
+        F_UNEMP: *string
+        F_HBURD: *string
+        F_NOHSDP: *string
+        F_UNINSUR: *string
+        F_THEME1: *string
+        F_AGE65: *string
+        F_AGE17: *string
+        F_DISABL: *string
+        F_SNGPNT: *string
+        F_LIMENG: *string
+        F_THEME2: *string
+        F_MINRTY: *string
+        F_THEME3: *string
+        F_MUNIT: *string
+        F_MOBILE: *string
+        F_CROWD: *string
+        F_NOVEH: *string
+        F_GROUPQ: *string
+        F_THEME4: *string
+        F_TOTAL: *string
+        E_DAYPOP: *string
+        E_NOINT: *string
+        M_NOINT: *string
+        E_AFAM: *string
+        M_AFAM: *string
+        E_HISP: *string
+        M_HISP: *string
+        E_ASIAN: *string
+        M_ASIAN: *string
+        E_AIAN: *string
+        M_AIAN: *string
+        E_NHPI: *string
+        M_NHPI: *string
+        E_TWOMORE: *string
+        M_TWOMORE: *string
+        E_OTHERRACE: *string
+        M_OTHERRACE: *string
+        EP_NOINT: *string
+        MP_NOINT: *string
+        EP_AFAM: *string
+        MP_AFAM: *string
+        EP_HISP: *string
+        MP_HISP: *string
+        EP_ASIAN: *string
+        MP_ASIAN: *string
+        EP_AIAN: *string
+        MP_AIAN: *string
+        EP_NHPI: *string
+        MP_NHPI: *string
+        EP_TWOMORE: *string
+        MP_TWOMORE: *string
+        EP_OTHERRACE: *string
+        MP_OTHERRACE: *string
+        YEAR: *string
     columns:
       - name: ST
       - name: STATE

@@ -1,5 +1,11 @@
 version: 2
 
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+  - &text |
+    {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+
 seeds:
   - name: concept_library__clinical_concepts
     config:
@@ -8,35 +14,21 @@ seeds:
       alias: clinical_concepts
       tags: concept_library
       column_types:
-        concept_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        concept_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        concept_oid: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        concept_id: *string
+        concept_name: *string
+        status: *string
+        concept_oid: *string
         last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        concept_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        content_source: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        external_source_detail: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        concept_scope: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        value_set_search_notes: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        last_update_note: *string
+        concept_type: *string
+        content_source: *text
+        external_source_detail: *text
+        concept_scope: *text
+        value_set_search_notes: *text
+        code: *string
+        code_description: *string
+        coding_system_id: *string
+        coding_system_version: *string
     columns:
       - name: concept_id
         description: Primary key for the table
@@ -77,27 +69,17 @@ seeds:
       alias: value_set_members
       tags: concept_library
       column_types:
-        value_set_member_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        concept_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        value_set_member_id: *string
+        concept_id: *string
+        status: *string
         last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
-        coding_system_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_version: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        include_descendants: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        comment: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+        last_update_note: *string
+        code: *string
+        code_description: *text
+        coding_system_id: *string
+        coding_system_version: *string
+        include_descendants: *string
+        comment: *text
     columns:
       - name: value_set_member_id
         description: Primary key for the table
@@ -129,14 +111,10 @@ seeds:
       alias: coding_systems
       tags: concept_library
       column_types:
-        coding_system_id: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_uri: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        coding_system_oid: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        coding_system_id: *string
+        coding_system_name: *string
+        coding_system_uri: *string
+        coding_system_oid: *string
     columns:
       - name: coding_system_id
         description: Primary key for the table

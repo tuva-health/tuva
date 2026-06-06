@@ -1,5 +1,11 @@
 version: 2
 
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+  - &text |
+    {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+
 seeds:
   - name: provider_data__other_provider_taxonomy
     description: 'Seed containing other provider taxonomy codes and descriptions.'
@@ -11,14 +17,10 @@ seeds:
         - claims_preprocessing
       alias: other_provider_taxonomy
       column_types:
-        npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
-        taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
-        medicare_specialty_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
-        description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
+        npi: *string
+        taxonomy_code: *string
+        medicare_specialty_code: *string
+        description: *string
         primary_flag: integer
     columns:
       - name: npi
@@ -42,52 +44,30 @@ seeds:
         - claims_preprocessing
       alias: provider
       column_types:
-        npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
-        entity_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(26) {%- endif -%}
-        entity_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(37) {%- endif -%}
-        primary_taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
-        primary_specialty_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
-        provider_first_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
-        provider_last_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
-        provider_credential: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
-        provider_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        provider_other_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        provider_other_organization_name_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
-        provider_other_organization_name_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        parent_organization_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        practice_address_line_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
-        practice_address_line_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
-        practice_city: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
-        practice_state: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
-        practice_zip_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
-        mailing_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
-        location_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
-        official_telephone_number: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+        npi: *string
+        entity_type_code: *string
+        entity_type_description: *string
+        primary_taxonomy_code: *string
+        primary_specialty_description: *string
+        provider_first_name: *string
+        provider_last_name: *string
+        provider_credential: *string
+        provider_organization_name: *string
+        provider_other_organization_name: *string
+        provider_other_organization_name_type_code: *string
+        provider_other_organization_name_type_description: *string
+        parent_organization_name: *string
+        practice_address_line_1: *string
+        practice_address_line_2: *string
+        practice_city: *string
+        practice_state: *string
+        practice_zip_code: *string
+        mailing_telephone_number: *string
+        location_telephone_number: *string
+        official_telephone_number: *string
         last_updated: date
         deactivation_date: date
-        deactivation_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        deactivation_flag: *string
     columns:
       - name: npi
         description: 'The National Provider Identifier (NPI).'
@@ -149,14 +129,10 @@ seeds:
       tags:
         - provider_data
       column_types:
-        medicare_specialty_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
-        medicare_provider_supplier_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        provider_taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
-        provider_taxonomy_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+        medicare_specialty_code: *string
+        medicare_provider_supplier_type_description: *string
+        provider_taxonomy_code: *string
+        provider_taxonomy_description: *text
 
   - name: provider_data__provider_taxonomy_unpivot
     description: |
@@ -168,16 +144,11 @@ seeds:
       tags:
         - provider_data
       column_types:
-        npi: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%} 
-        taxonomy_col: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
-        taxonomy_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
-        switch_col: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
-        taxonomy_switch: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        npi: *string
+        taxonomy_col: *string
+        taxonomy_code: *string
+        switch_col: *string
+        taxonomy_switch: *string
       meta:
         columns:
           - name: npi
