@@ -56,7 +56,7 @@ validation_errors AS (
             CAST(ROUND(null_percentage_raw, 2) AS STRING) AS null_percentage_formatted
         {% elif target.type == 'fabric' %}
             CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS {{ varchar() }}) AS null_percentage_formatted
-        {% elif target.type in ('databricks', 'duckdb', 'athena') %}
+        {% elif target.type in ('databricks', 'duckdb') %}
             CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS STRING) AS null_percentage_formatted
         {% else %}
             CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS {{ varchar() }}) AS null_percentage_formatted
