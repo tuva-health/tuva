@@ -36,7 +36,6 @@ models:
     columns:
       - name: observation_id
         description: Identifier for an observation record within a data source. This value should be populated on every record and should uniquely identify the observation when combined with data_source.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -72,11 +71,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the observation. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -94,9 +93,11 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_quality_measures
+        config:
+          meta:
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
       - name: patient_id
         description: Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -115,10 +116,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: encounter_id
         description: Identifier for the encounter associated with the observation, when available. Leave null when the observation is not tied to a specific encounter.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -139,10 +140,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: panel_id
         description: Identifier for a group or panel of related observations, when available. Use this when multiple observation rows belong to the same source panel, flowsheet group, survey, or assessment.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -161,10 +162,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: observation_date
         description: Date the observation was recorded, observed, or resulted, formatted as YYYY-MM-DD.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -207,10 +208,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: date
       - name: observation_type
         description: High-level category of observation. Use one of the supported Tuva categories such as vital-signs, social-history, imaging, survey, exam, therapy, activity, laboratory, procedure, or other.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -247,10 +248,10 @@ models:
                   - other
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_code_type
         description: Code system for source_code. Use standard values such as loinc or snomed-ct when available. If the source system uses a local observation code, populate this field with the source code system name.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -273,10 +274,10 @@ models:
                   - dqi_cms_hccs
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: source_code
         description: Observation code from the source system before Tuva normalization. Preserve the source-system value here so downstream terminology and custom mapping can trace back to the original code.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -297,10 +298,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: source_description
         description: Observation name or description from the source system. This is especially important when source_code is local or not directly mapped to a standard terminology.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -319,10 +320,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: result
         description: Observation result value as represented in the source system. This may be numeric or text depending on the observation. Units should be stored separately in source_units or normalized_units.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -343,10 +344,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: source_units
         description: Unit of measure for result as represented in the source system.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -365,10 +366,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: normalized_units
         description: Standardized unit of measure for result, when available. Use a consistent standard such as UCUM when the source data has already been normalized upstream; otherwise leave null.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -387,10 +388,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_reference_range_low
         description: Lower bound of the reference range from the source system, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -409,10 +410,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_reference_range_high
         description: Upper bound of the reference range from the source system, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -431,10 +432,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: normalized_reference_range_low
         description: Standardized lower bound of the reference range, when available. This should use the same unit convention as normalized_units.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -453,10 +454,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: normalized_reference_range_high
         description: Standardized upper bound of the reference range, when available. This should use the same unit convention as normalized_units.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -475,10 +476,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the observation record was extracted from the source system or ingested into the data warehouse.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -512,10 +513,10 @@ models:
                   - datetimeoffset
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: User-defined name that identifies the source of the observation data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -534,5 +535,6 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
             data_type: varchar
             is_primary_key: true

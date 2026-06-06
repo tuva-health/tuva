@@ -53,7 +53,6 @@ models:
     columns:
       - name: person_id
         description: Globally unique identifier for the person across the dataset. This should remain stable even when the person has multiple patient IDs or medical record numbers.
-        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -89,11 +88,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
             data_type: varchar
             is_primary_key: true
       - name: patient_id
         description: Identifier for the person in a specific clinical source system, such as MRN. A single person can have multiple patient IDs.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -129,11 +128,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: first_name
         description: Patient first name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -152,10 +151,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: middle_name
         description: Patient middle name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -166,10 +165,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: last_name
         description: Patient last name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -188,10 +187,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: name_suffix
         description: Patient name suffix, such as Jr., Sr., or III.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -202,10 +201,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: sex
         description: Biological sex of the patient. Accepted values are male, female, or unknown, all lowercase.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -238,10 +237,10 @@ models:
                   - unknown
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
             data_type: varchar
       - name: race
         description: Patient race. This value should match a Tuva race terminology description.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -270,10 +269,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['ed_classification', 'semantic_layer']
             data_type: varchar
       - name: ethnicity
         description: Patient ethnicity. This value should match a Tuva ethnicity terminology code.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -284,10 +283,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: birth_date
         description: Patient date of birth in YYYY-MM-DD format.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -330,10 +329,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
             data_type: date
       - name: death_date
         description: Patient date of death in YYYY-MM-DD format. Leave null if the patient is not deceased or if no death date is available.
-        required_for_data_marts: ['cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -367,10 +366,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
             data_type: date
       - name: death_flag
         description: Indicator that the patient is deceased. Use 1 for deceased and 0 for not known deceased.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -405,10 +404,10 @@ models:
                 quote: false
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: number
       - name: social_security_number
         description: Patient Social Security number as a string in XXX-XX-XXXX format, including dashes, when available and permitted.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -419,10 +418,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: address
         description: Street address where the patient lives.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -441,10 +440,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: city
         description: City where the patient lives.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -463,10 +462,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: state
         description: State where the patient lives.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -495,10 +494,10 @@ models:
                 field: ansi_fips_state_abbreviation
         config:
           meta:
+            required_for_data_marts: ['ed_classification', 'semantic_layer']
             data_type: varchar
       - name: zip_code
         description: ZIP code where the patient lives.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -517,10 +516,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['ed_classification', 'semantic_layer']
             data_type: varchar
       - name: county
         description: County where the patient lives.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -539,10 +538,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: latitude
         description: Decimal-degree latitude for the patient's address, when available.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -561,10 +560,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['ed_classification', 'semantic_layer']
             data_type: float
       - name: longitude
         description: Decimal-degree longitude for the patient's address, when available.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -583,10 +582,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['ed_classification', 'semantic_layer']
             data_type: float
       - name: phone
         description: Patient phone number as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -597,10 +596,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: email
         description: Patient email address as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
         tests:
           - dbt_expectations.expect_column_to_exist:
               config:
@@ -611,10 +610,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['semantic_layer']
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the patient record was extracted from the source system or ingested into the data warehouse.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -648,10 +647,10 @@ models:
                   - datetimeoffset
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: User-defined name that identifies the clinical source, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'hcc_recapture', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -670,5 +669,6 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'hcc_recapture', 'semantic_layer']
             data_type: varchar
             is_primary_key: true

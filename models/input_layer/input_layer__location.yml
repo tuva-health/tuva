@@ -36,7 +36,6 @@ models:
     columns:
       - name: location_id
         description: Identifier for a location within a data source. This should be the stable source system identifier for the facility, department, clinic, practice site, or other location.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -72,11 +71,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: npi
         description: National Provider Identifier associated with the location, when available. For facilities or organizations, this should generally be an organization NPI rather than an individual practitioner NPI. Leave null when the location does not have an NPI.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -95,10 +94,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: name
         description: Name of the location as represented in the source system.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -117,10 +116,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: facility_type
         description: Type or category of location, for example hospital, clinic, emergency department, ambulatory surgery center, laboratory, imaging center, or department. Use the source system value.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -139,10 +138,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: parent_organization
         description: Organization, health system, practice group, or parent facility associated with the location, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -161,10 +160,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: address
         description: Street address of the location.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -183,10 +182,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: city
         description: City of the location.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -205,10 +204,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: state
         description: State of the location. For US addresses, use the two-character state abbreviation when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -227,10 +226,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: zip_code
         description: ZIP code or postal code of the location.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -249,10 +248,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: latitude
         description: Latitude of the location in decimal degrees, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -271,10 +270,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: float
       - name: longitude
         description: Longitude of the location in decimal degrees, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -293,10 +292,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: float
       - name: data_source
         description: User-defined name that identifies the source system for the location data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -315,5 +314,6 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true

@@ -28,7 +28,6 @@ models:
       - name: immunization_id
         description: >-
           Identifier for an immunization event within a data source. This value should be populated on every record and should uniquely identify the immunization event when combined with data_source.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -43,12 +42,12 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: person_id
         description: >-
           Globally unique identifier for the person associated with the immunization. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -63,11 +62,11 @@ models:
                 enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: patient_id
         description: >-
           Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -78,11 +77,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: encounter_id
         description: >-
           Identifier for the encounter associated with the immunization, when available. Leave null when the immunization is not tied to a specific encounter in the source system.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -93,11 +92,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_code_type
         description: >-
           Code system for source_code. CVX is preferred when available. If the source system uses a local vaccine code or another code system, populate this field with the source code system name so the code can be normalized downstream.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -108,11 +107,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_code
         description: >-
           Vaccine code from the source system. CVX is preferred when available. Local or other vaccine codes may be used when CVX is not available, but source_description should also be populated to support downstream normalization.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -123,11 +122,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: source_description
         description: >-
           Human-readable description of source_code from the source system. This is especially important when source_code is a local or non-CVX code.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -138,11 +137,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: status
         description: >-
           Status code for the immunization event. This can indicate whether the immunization was completed, not done, entered in error, or otherwise documented by the source system. Tuva maps supported status codes to immunization status terminology downstream.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -153,11 +152,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: status_reason
         description: >-
           Reason code explaining why an immunization was not performed, when applicable. Tuva maps supported reason codes to immunization status reason terminology downstream.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -168,11 +167,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: occurrence_date
         description: >-
           Date the immunization occurred or was documented as not performed, formatted as YYYY-MM-DD.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -192,11 +191,11 @@ models:
                 column_type: date
         config:
           meta:
+            required_for_data_marts: []
             data_type: date
       - name: source_dose
         description: >-
           Dose quantity or dose text from the source system, when available. This field is source-system specific and is not normalized by Tuva.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -207,11 +206,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: lot_number
         description: >-
           Lot number of the vaccine product administered, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -222,11 +221,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: body_site
         description: >-
           Source code or description for the body site where the vaccine was administered, when available. Tuva maps supported body site codes to immunization body site terminology downstream.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -237,11 +236,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: route
         description: >-
           Source code or description for the route used to administer the vaccine, when available. Tuva maps supported route codes to immunization route terminology downstream.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -252,11 +251,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: location_id
         description: >-
           Identifier for the location or facility where the immunization was administered or documented, when available. This should map to location_id in the location input layer when the source system provides a location reference.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -267,11 +266,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: practitioner_id
         description: >-
           Identifier for the practitioner associated with the immunization, when available. This may represent the ordering, administering, or documenting practitioner depending on the source system and should map to practitioner_id in the practitioner input layer when possible.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -282,11 +281,11 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ingest_datetime
         description: >-
           Date and time the source immunization record was loaded into the data warehouse. This is useful when multiple versions of the same immunization record are received over time.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -320,11 +319,11 @@ models:
                   - datetimeoffset
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: >-
           User-defined name that identifies the source of the immunization data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -335,5 +334,6 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true

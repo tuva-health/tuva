@@ -40,7 +40,6 @@ models:
     columns:
       - name: person_id
         description: Globally unique identifier for each person in the dataset.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -76,11 +75,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
             data_type: varchar
             is_primary_key: true
       - name: member_id
         description: Identifier that links the person to a specific insurance product or health plan. This should match the member_id used in eligibility and member months data.
-        required_for_data_marts: ['financial_pmpm']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -100,11 +99,11 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm']
             data_type: varchar
             is_primary_key: true
       - name: year_month
         description: Calendar month for the attribution assignment, formatted as YYYY-MM. The value should represent the month during which the person is attributed to the listed provider, practice, organization, or line of business.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -140,11 +139,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
             data_type: varchar
             is_primary_key: true
       - name: payer
         description: Name of the payer or health plan associated with the attribution assignment.
-        required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -156,11 +155,11 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
             data_type: varchar
             is_primary_key: true
       - name: plan
         description: Name of the insurance plan or product associated with the attribution assignment.
-        required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -172,11 +171,11 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['cms_hccs', 'financial_pmpm', 'semantic_layer']
             data_type: varchar
             is_primary_key: true
       - name: payer_attributed_provider
         description: Provider assigned to the member by the payer, health plan, contract, or other external attribution source. Use a stable provider identifier when available.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -188,10 +187,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: payer_attributed_provider_practice
         description: Practice assigned to the member by the payer or external attribution source.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -203,10 +202,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: payer_attributed_provider_organization
         description: Organization assigned to the member by the payer or external attribution source.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -218,10 +217,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: payer_attributed_provider_lob
         description: Line of business assigned to the member by the payer or external attribution source.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -233,10 +232,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: custom_attributed_provider
         description: Provider assigned to the member by a user-defined or custom attribution methodology. Use a stable provider identifier when available.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -248,10 +247,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: custom_attributed_provider_practice
         description: Practice assigned to the member by a user-defined or custom attribution methodology.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -263,10 +262,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: custom_attributed_provider_organization
         description: Organization assigned to the member by a user-defined or custom attribution methodology.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -278,10 +277,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: custom_attributed_provider_lob
         description: Line of business assigned to the member by a user-defined or custom attribution methodology.
-        required_for_data_marts: ['financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -293,10 +292,10 @@ models:
                   - dqi_financial_pmpm
         config:
           meta:
+            required_for_data_marts: ['financial_pmpm', 'semantic_layer']
             data_type: varchar
       - name: file_name
         description: Name of the file that supplied the attribution record, when the data is loaded from files. This field is useful for lineage, troubleshooting, and reconciling source submissions.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -307,10 +306,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ingest_datetime
         description: Date and time when the attribution record was loaded into the data warehouse. This field is useful for lineage, auditing, and identifying the most recent file load when attribution data is refreshed over time.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -321,10 +320,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: User-defined name of the source system or dataset that supplied the attribution record. This field is part of the primary key and should be populated consistently across related input layer tables.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -360,5 +359,6 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
             data_type: varchar
             is_primary_key: true

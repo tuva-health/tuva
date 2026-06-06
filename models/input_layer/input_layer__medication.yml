@@ -36,7 +36,6 @@ models:
     columns:
       - name: medication_id
         description: Identifier for a medication record within a data source. This value should be populated on every record and should uniquely identify the medication record when combined with data_source. If the source system does not provide a stable medication-level identifier, create one from the fields needed to uniquely identify the record.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -72,11 +71,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the medication record. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -94,9 +93,11 @@ models:
                   - tuva_dqi_sev_2
                   - dqi
                   - dqi_quality_measures
+        config:
+          meta:
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
       - name: patient_id
         description: Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -115,10 +116,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: encounter_id
         description: Identifier for the encounter associated with the medication record, when available. Leave null when the medication is not tied to a specific encounter in the source system.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -139,10 +140,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: dispensing_date
         description: Date the medication was dispensed or administered, when available. For medication orders that were prescribed but not dispensed or administered, leave this field null.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -184,10 +185,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: date
       - name: prescribing_date
         description: Date the medication was prescribed or ordered, when available. When both prescribing_date and dispensing_date are populated, prescribing_date should generally be on or before dispensing_date.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -229,10 +230,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: date
       - name: source_code_type
         description: Code system for source_code. Use ndc or rxnorm when the source code is already an NDC or RxNorm code. If the source system uses a local medication code, populate this field with the source code system name so the medication can be normalized downstream.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -254,10 +255,10 @@ models:
                   - dqi_cms_hccs
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: source_code
         description: Medication code from the source system before Tuva normalization. This may be an NDC, RxNorm RxCUI, or local medication code depending on the source system. Preserve the source-system value here even when standardized NDC, RxNorm, or ATC fields are also populated so downstream normalization and custom mapping can trace back to the original code.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -278,10 +279,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: source_description
         description: Medication name or description from the source system. This should be populated when available, especially when source_code is local or not directly mapped to a standard terminology.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -300,10 +301,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ndc_code
         description: National Drug Code for the medication, when available. Store NDCs in normalized 11-digit format without hyphens when possible.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -332,10 +333,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: rxnorm_code
         description: RxNorm RxCUI for the medication, when available.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -367,10 +368,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
             data_type: varchar
       - name: atc_code
         description: WHO Anatomical Therapeutic Chemical classification code for the medication, when available.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -389,10 +390,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: route
         description: Route by which the medication was administered or intended to be administered, for example oral, intravenous, subcutaneous, or topical.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -411,10 +412,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: strength
         description: Medication strength as represented by the source system, for example 500 mg or 10 mg/mL.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -433,10 +434,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: quantity
         description: Numeric quantity of medication associated with the record. Interpret this together with quantity_unit.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -455,10 +456,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: number
       - name: quantity_unit
         description: Unit of measure for quantity, for example tablet, mL, dose, vial, or capsule.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -477,10 +478,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: days_supply
         description: Number of days the medication supply is expected to last. This is most applicable to dispensed medications and may be null for administrations or orders.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -506,10 +507,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: number
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication record, such as the ordering, prescribing, or administering practitioner. This may be an NPI or source system practitioner identifier, but should link to practitioner_id in the practitioner input layer when possible.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -528,10 +529,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the medication record was extracted from the source system or ingested into the data warehouse.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -565,10 +566,10 @@ models:
                   - datetimeoffset
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: User-defined name that identifies the source of the medication data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -587,5 +588,6 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
             data_type: varchar
             is_primary_key: true

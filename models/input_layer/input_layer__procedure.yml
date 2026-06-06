@@ -36,7 +36,6 @@ models:
     columns:
       - name: procedure_id
         description: Source-system identifier for the procedure record. This value should be unique within a data source.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -72,11 +71,11 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person across the dataset.
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -100,10 +99,10 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'quality_measures', 'readmissions', 'semantic_layer']
             data_type: varchar
       - name: patient_id
         description: Clinical source-system patient identifier, such as medical record number or MRN.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -122,10 +121,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: encounter_id
         description: Source-system identifier for the clinical encounter associated with the procedure, when available.
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'readmissions', 'semantic_layer']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -148,10 +147,10 @@ models:
                   - dqi_readmission
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'quality_measures', 'readmissions', 'semantic_layer']
             data_type: varchar
       - name: procedure_date
         description: Date the procedure was performed or documented.
-        required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -186,10 +185,10 @@ models:
                 strictly: false
         config:
           meta:
+            required_for_data_marts: ['cms_chronic_conditions', 'quality_measures']
             data_type: date
       - name: source_code_type
         description: Source procedure code system. Expected values are snomed-ct, hcpcs, icd-10-pcs, or icd-9-pcs.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -215,10 +214,10 @@ models:
                   - icd-9-pcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: source_code
         description: Procedure code from the source system.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -239,10 +238,10 @@ models:
                   - dqi_quality_measures
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: source_description
         description: Source-system description of the procedure code.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -261,10 +260,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: modifier_1
         description: First procedure code modifier, when applicable.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -288,10 +287,10 @@ models:
                 field: hcpcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: modifier_2
         description: Second procedure code modifier, when applicable.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -315,10 +314,10 @@ models:
                 field: hcpcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: modifier_3
         description: Third procedure code modifier, when applicable.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -342,10 +341,10 @@ models:
                 field: hcpcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: modifier_4
         description: Fourth procedure code modifier, when applicable.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -369,10 +368,10 @@ models:
                 field: hcpcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: modifier_5
         description: Fifth procedure code modifier, when applicable.
-        required_for_data_marts: ['quality_measures']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -396,10 +395,10 @@ models:
                 field: hcpcs
         config:
           meta:
+            required_for_data_marts: ['quality_measures']
             data_type: varchar
       - name: practitioner_id
         description: Source-system practitioner identifier for the clinician associated with the procedure.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -418,10 +417,10 @@ models:
                   - dqi
         config:
           meta:
+            required_for_data_marts: []
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the record was ingested or refreshed.
-        required_for_data_marts: []
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -455,10 +454,10 @@ models:
                   - datetimeoffset
         config:
           meta:
+            required_for_data_marts: []
             data_type: timestamp
       - name: data_source
         description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with procedure_id.
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
         tests:
           - the_tuva_project.expect_column_to_exist:
               config:
@@ -479,5 +478,6 @@ models:
                   - dqi_cms_chronic_conditions
         config:
           meta:
+            required_for_data_marts: ['ahrq_measures', 'ccsr', 'cms_chronic_conditions', 'readmissions']
             data_type: varchar
             is_primary_key: true
