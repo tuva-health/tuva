@@ -71,7 +71,12 @@
 {% endmacro %}
 
 {% macro dq_analytical_string_literal(value) %}
-    {{ return("'" ~ (value | string | replace("'", "''")) ~ "'") }}
+    {%- set text = value | string -%}
+    {%- if target.type == 'bigquery' -%}
+        {{ return("'" ~ (text | replace('\\', '\\\\') | replace("'", "\\'")) ~ "'") }}
+    {%- else -%}
+        {{ return("'" ~ (text | replace("'", "''")) ~ "'") }}
+    {%- endif -%}
 {% endmacro %}
 
 {% macro dq_analytical_normalize_text_sql(expression) %}
