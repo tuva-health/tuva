@@ -9,7 +9,7 @@ select
     , data_source
     , suspect_date as recorded_date
     , model_version
-    , null as claim_id
+    , cast(null as {{ dbt.type_string() }}) as claim_id
     , hcc_code
     , hcc_description
     , 1 as suspect_hcc_flag
