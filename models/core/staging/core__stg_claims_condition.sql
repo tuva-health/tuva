@@ -64,22 +64,14 @@ with combine_diag_poa as (
     , diag.diagnosis_code_type as source_code_type
     , diag.diagnosis_code as source_code
     , cast('discharge_diagnosis' as {{ dbt.type_string() }}) as condition_type
-    {% if target.type == 'fabric' %}
-    , reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) as diagnosis_rank
-    {% else %}
-    , {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} as diagnosis_rank
-    {% endif %}
+    , {{ last_split_part('diag.column_name', "'_'") }} as diagnosis_rank
     , poa.normalized_code as present_on_admit_code
  from {{ ref('normalized_input__int_diagnosis_code_intermediate') }} as diag
   -- noqa: disable=ambiguous.join
  left join {{ ref('normalized_input__int_present_on_admit_voting') }} as poa
     on diag.claim_id = poa.claim_id
     and diag.data_source = poa.data_source
-    {% if target.type == 'fabric' %}
-    and reverse(left(reverse(diag.column_name), charindex('_', reverse(diag.column_name)) - 1)) = reverse(left(reverse(poa.column_name), charindex('_', reverse(poa.column_name)) - 1))
-    {% else %}
-    and {{ dbt.split_part(string_text='diag.column_name', delimiter_text="'_'", part_number=-1) }} = {{ dbt.split_part(string_text='poa.column_name', delimiter_text="'_'", part_number=-1) }}
-    {% endif %}
+    and {{ last_split_part('diag.column_name', "'_'") }} = {{ last_split_part('poa.column_name', "'_'") }}
   -- noqa: enable=ambiguous.join
 )
 
