@@ -370,7 +370,7 @@
                     , data_source
                     , person_id
                 from (
-                    {{ claims_member_queries | join('\nunion\n') }}
+                    {{ claims_member_queries | join('\nunion' ~ (' distinct' if target.type == 'bigquery' else '') ~ '\n') }}
                 ) as claim_members
             ) as claim_members
             left join (
