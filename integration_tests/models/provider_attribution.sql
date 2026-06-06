@@ -47,7 +47,25 @@
 {%- set tuva_extensions -%}
 {%- endset -%}
 
+{%- set file_name_expr -%}
+  {%- if 'file_name' in provider_attribution_column_names -%}
+    file_name
+  {%- else -%}
+    cast(null as {{ dbt.type_string() }})
+  {%- endif -%}
+{%- endset -%}
+
+{%- set ingest_datetime_expr -%}
+  {%- if 'ingest_datetime' in provider_attribution_column_names -%}
+    ingest_datetime
+  {%- else -%}
+    cast(null as {{ dbt.type_timestamp() }})
+  {%- endif -%}
+{%- endset -%}
+
 {%- set tuva_metadata -%}
+    , {{ file_name_expr }} as file_name
+    , {{ ingest_datetime_expr }} as ingest_datetime
     , data_source
 {%- endset -%}
 
