@@ -29,7 +29,6 @@
 {%- set tuva_columns -%}
       person_id
     , {{ member_id_expr }} as member_id
-    , patient_id
     , year_month
     , payer
     , {{ the_tuva_project.quote_column('plan') }}
