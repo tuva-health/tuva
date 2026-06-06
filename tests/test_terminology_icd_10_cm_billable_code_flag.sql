@@ -6,12 +6,12 @@
 
 with invalid_flags as (
     select
-        icd_10_cm
-        , billable_code_flag
+        terminology__icd_10_cm.icd_10_cm
+        , terminology__icd_10_cm.billable_code_flag
         , 'billable_code_flag must be 0 or 1' as failure_reason
-    from {{ ref('terminology__icd_10_cm') }}
-    where billable_code_flag is null
-       or billable_code_flag not in ('0', '1')
+    from {{ ref('terminology__icd_10_cm') }} as terminology__icd_10_cm
+    where terminology__icd_10_cm.billable_code_flag is null
+       or terminology__icd_10_cm.billable_code_flag not in ('0', '1')
 )
 
 , expected_values as (
