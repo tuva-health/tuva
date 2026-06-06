@@ -163,7 +163,7 @@ copy  {{ this }}
             CREATE TABLE {{ table_name }} AS
                 SELECT
                 {% for col in columns %}
-                    cast(nullif({{ col.name }},'{{ null_char }}') as {{ dml_data_type(col.dtype) }}) as {{ col.name }} {%-if not loop.last -%},{%- endif %}
+                    cast(nullif(nullif({{ col.name }},'{{ null_char }}'),'') as {{ dml_data_type(col.dtype) }}) as {{ col.name }} {%-if not loop.last -%},{%- endif %}
                 {% endfor %}
                 FROM {{ tmp_table }}
                 WHERE "$path" like '{{ full_path }}%';
