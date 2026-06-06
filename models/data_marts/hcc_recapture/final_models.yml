@@ -421,7 +421,8 @@ models:
             - 'suspect': condition is suspected to be present based on some other criteria besides claims diagnoses
         tests:
           - accepted_values:
-              values: [ 'coded', 'captured', 'suspect' ]
+              arguments:
+                values: [ 'coded', 'captured', 'suspect' ]
         config:
           meta:
             data_type: varchar
@@ -433,7 +434,8 @@ models:
             - 'clinical': HCC was identified in clinical data such as the EHR
         tests:
           - accepted_values:
-              values: [ 'payer', 'clinical' ]
+              arguments:
+                values: [ 'payer', 'clinical' ]
         config:
           meta:
             data_type: varchar
@@ -449,15 +451,16 @@ models:
             - 'ineligible for recapture': the specific HCC in question is “Open” and no related/equivalent HCC has been closed, but it is not appropriate for risk adjustment because it’s not a chronic diagnosis.
         tests:
           - accepted_values:
-              values:
-                [
-                  'closed - higher coefficient hcc in hierarchy group',
-                  'closed',
-                  'closed - lower coefficient hcc in hierarchy group',
-                  'new',
-                  'open',
-                  'ineligible for recapture'
-                ]
+              arguments:
+                values:
+                  [
+                    'closed - higher coefficient hcc in hierarchy group',
+                    'closed',
+                    'closed - lower coefficient hcc in hierarchy group',
+                    'new',
+                    'open',
+                    'ineligible for recapture'
+                  ]
         config:
           meta:
             data_type: varchar
