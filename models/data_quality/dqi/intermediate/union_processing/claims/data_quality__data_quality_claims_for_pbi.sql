@@ -99,7 +99,7 @@ select
        , drill_down_value as drill_down_value
        , field_value as field_value
        , frequency
-       , '{{ var('tuva_last_run') }}'
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from ranked_examples
 where rn <= 5 -- 5 Example claims per unique SK / field value
 union all
@@ -115,7 +115,7 @@ select
        , 'All Others' as drill_down_value
        , field_value as field_value
        , sum(frequency) as frequency
-       , '{{ var('tuva_last_run') }}'
+       , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from ranked_examples
 where rn > 5 -- Aggregating all other rows
 group by
