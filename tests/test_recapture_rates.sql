@@ -8,5 +8,5 @@ left join {{ref('hcc_recapture__recapture_rates')}} recap
     and ytd.payment_year = recap.payment_year
     and ytd.ytd_recapture_rate = recap.recapture_rate
 where 
-    month(ytd.payment_year_month) = 12
+    {{ date_part('month', 'ytd.payment_year_month') }} = 12
     and recap.payer is null
