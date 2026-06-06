@@ -336,7 +336,7 @@ seeds:
         rbcs_subcat_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         rbcs_famnumb: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} decimal(38,0) {%- else -%} numeric {%- endif -%}
         rbcs_family_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         rbcs_major_ind: |
@@ -348,7 +348,7 @@ seeds:
         rbcs_assignment_eff_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
         current_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} decimal(38,0) {%- else -%} numeric {%- endif -%}
     columns:
       - name: hcpcs_cd
         description: HCPCS or CPT code.
