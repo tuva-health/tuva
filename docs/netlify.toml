@@ -45,3 +45,10 @@
   to = "https://tuva-blog.netlify.app/img/tuva-favicon.ico"
   status = 200
   force = true
+
+# The proxied blog emits root-relative post links like
+# /building-a-claims-data-platform. Route those misses back through /blog.
+[[redirects]]
+  from = "/:slug"
+  to = "/blog/:slug"
+  status = 301
