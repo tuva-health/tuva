@@ -445,11 +445,10 @@ const config = {
             hideExternalLinkIcon: true,
           },
           {
-            href: 'https://www.thetuvaproject.com/blog/',
+            type: 'custom-blogLink',
             label: 'Blog',
             position: 'left',
             className: 'navbar-no-ext-icon',
-            hideExternalLinkIcon: true,
           },          // {
           //   type: 'docSidebar',
           //   sidebarId: 'moreSidebar',
