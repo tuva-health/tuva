@@ -1,10 +1,174 @@
 version: 2
 
 seeds:
-  - name: service_category__service_categories
-    description: >
-      Heirarchy and ranking of Tuva service category logic
+  - name: service_category__ccs_services_procedures
+    description: |-
+      CCS Services and Procedures categories group CPT and HCPCS procedure codes into clinically
+      meaningful service categories. Claims preprocessing uses this value set to map procedure codes to
+      CCS categories for service category and encounter grouping. It is maintained by AHRQ HCUP. Tuva uses
+      this asset in claims preprocessing service category and encounter grouping models.
     config:
+      meta:
+        primary_key_columns:
+          - hcpcs_code
+          - start_valid_date
+          - end_valid_date
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "CCS Services and Procedures"
+          maintainer: "AHRQ HCUP"
+          source_url: "https://hcup-us.ahrq.gov/toolssoftware/ccs_svcsproc/ccssvcproc.jsp"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-04-29"
+          update_frequency: "ad hoc"
+          notes: "Used by claims preprocessing for service category and encounter grouping."
+      post_hook: "{{ load_versioned_seed('value_sets','ccs_services_procedures.csv') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      alias: ccs_services_procedures
+      column_types:
+        hcpcs_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
+        ccs_category: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3) {%- endif -%}
+        ccs_category_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        release_year: integer
+        start_valid_date: date
+        end_valid_date: date
+        code_range: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        source_file: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: hcpcs_code
+        description: CPT or HCPCS code mapped to a CCS Services and Procedures category.
+      - name: ccs_category
+        description: CCS Services and Procedures category assigned to the CPT or HCPCS code.
+      - name: ccs_category_description
+        description: Description of the CCS Services and Procedures category.
+      - name: release_year
+        description: AHRQ release year for the category mapping.
+      - name: start_valid_date
+        description: First date when this CPT or HCPCS to CCS category mapping is valid.
+      - name: end_valid_date
+        description: Last date when this CPT or HCPCS to CCS category mapping is valid.
+      - name: code_range
+        description: Source code range from the AHRQ mapping file when the row represents a range-based mapping.
+      - name: source_file
+        description: Source file used to create the mapping row.
+
+  - name: service_category__dxccsr_v2023_1_cleaned_map
+    description: |-
+      AHRQ DXCCSR categories group ICD-10-CM diagnosis codes into clinically meaningful diagnosis
+      categories. Service categories use the default inpatient and outpatient DXCCSR categories to
+      identify substance-use related claims. It is maintained by AHRQ HCUP. Tuva uses this asset in claims
+      preprocessing service category and encounter grouping models.
+    config:
+      meta:
+        data_asset:
+          display_name: "AHRQ CCSRs: DXCCSR v2023.1"
+          maintainer: "AHRQ HCUP"
+          source_url: "https://hcup-us.ahrq.gov/toolssoftware/ccsr/ccs_refined.jsp"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_seed('value_sets','ccsr__dxccsr_v2023_1_cleaned_map.csv') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      column_types:
+        icd_10_cm_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        icd_10_cm_code_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        default_ccsr_category_ip: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        default_ccsr_category_description_ip: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        default_ccsr_category_op: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        default_ccsr_category_description_op: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_1_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_2_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_3: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_3_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_4: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_4_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_5: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_5_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_6: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ccsr_category_6_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: icd_10_cm_code
+        description: ICD-10-CM diagnosis code.
+      - name: icd_10_cm_code_description
+        description: Description of the ICD-10-CM diagnosis code.
+      - name: default_ccsr_category_ip
+        description: Default DXCCSR category for inpatient claims.
+      - name: default_ccsr_category_description_ip
+        description: Description of the default DXCCSR category for inpatient claims.
+      - name: default_ccsr_category_op
+        description: Default DXCCSR category for outpatient claims.
+      - name: default_ccsr_category_description_op
+        description: Description of the default DXCCSR category for outpatient claims.
+      - name: ccsr_category_1
+        description: First DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_1_description
+        description: Description of the first DXCCSR category.
+      - name: ccsr_category_2
+        description: Second DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_2_description
+        description: Description of the second DXCCSR category.
+      - name: ccsr_category_3
+        description: Third DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_3_description
+        description: Description of the third DXCCSR category.
+      - name: ccsr_category_4
+        description: Fourth DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_4_description
+        description: Description of the fourth DXCCSR category.
+      - name: ccsr_category_5
+        description: Fifth DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_5_description
+        description: Description of the fifth DXCCSR category.
+      - name: ccsr_category_6
+        description: Sixth DXCCSR category associated with the diagnosis code.
+      - name: ccsr_category_6_description
+        description: Description of the sixth DXCCSR category.
+
+  - name: service_category__service_categories
+    description: |-
+      Service category rules group claim lines and encounters into standardized cost and utilization
+      categories. They are maintained by Tuva Health for claims preprocessing and downstream analytics.
+      Tuva uses this asset in claims preprocessing service category and encounter grouping models and
+      semantic layer models.
+    config:
+      meta:
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_seed('value_sets','service_category__service_categories.csv') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       column_types:

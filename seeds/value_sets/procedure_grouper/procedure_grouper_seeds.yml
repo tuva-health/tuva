@@ -1,0 +1,142 @@
+version: 2
+
+seeds:
+  - name: tuva_procedure_grouper
+    description: |-
+      The Tuva Procedure Grouper defines the procedure hierarchy used to classify normalized procedure records in core.procedure. Each row represents one mutually exclusive procedure and its parent procedure family.
+    config:
+      meta:
+        primary_key_columns:
+          - procedure_family
+          - procedure
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Tuva Procedure Grouper"
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva Procedure Grouper v1"
+          source_last_updated: "2026-05-27"
+          tuva_last_updated: "2026-05-27"
+          update_frequency: "ad hoc"
+          notes: "Initial hierarchy is derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 and Tuva clinical review."
+      post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper.csv') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      alias: tuva_procedure_grouper
+      tags:
+        - value_sets
+        - procedure_grouper
+      column_types:
+        procedure_family: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        procedure: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+        last_update_date: date
+        last_update_note: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+    columns:
+      - name: procedure_family
+        description: Analytic rollup family for the procedure, such as Cardiovascular, Gastrointestinal, Musculoskeletal, or Urinary System.
+        tests:
+          - not_null
+      - name: procedure
+        description: Mutually exclusive procedure name assigned by the Tuva Procedure Grouper.
+      - name: status
+        description: Governance status of the procedure row. Active rows are available for use in Tuva Procedure Grouper mappings.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['active', 'inactive']
+      - name: description
+        description: Human-readable description of the procedure and its placement in the procedure family.
+      - name: last_update_date
+        description: Date this procedure row was last reviewed or updated.
+      - name: last_update_note
+        description: Short note describing the reason for the most recent update to the procedure row.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - procedure_family
+              - "{{ quote_column('procedure') }}"
+
+  - name: tuva_procedure_grouper_code_map
+    description: |-
+      The Tuva Procedure Grouper Code Map assigns supported procedure codes to exactly one Tuva procedure. The code_system and code columns form the primary key and join to code_system and normalized_code in core.procedure. Tuva currently supports ICD-10-PCS procedure mappings; unsupported procedure code systems remain null in core.procedure.
+    config:
+      meta:
+        primary_key_columns:
+          - code_system
+          - code
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Tuva Procedure Grouper Code Map"
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva Procedure Grouper v1"
+          source_last_updated: "2026-05-27"
+          tuva_last_updated: "2026-05-27"
+          update_frequency: "ad hoc"
+          notes: "Initial mappings are derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 with Tuva overrides for active CMS April 2026 ICD-10-PCS codes not yet present in AHRQ PRCCSR v2026.1."
+      post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper_code_map.csv') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      alias: tuva_procedure_grouper_code_map
+      tags:
+        - value_sets
+        - procedure_grouper
+      column_types:
+        procedure_family: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        procedure: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        code_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+        code_system: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        last_update_date: date
+        last_update_note: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+    columns:
+      - name: procedure_family
+        description: Analytic procedure family assigned to the procedure code.
+        tests:
+          - not_null
+      - name: procedure
+        description: Mutually exclusive Tuva procedure assigned to the procedure code.
+      - name: code
+        description: Procedure code mapped to the Tuva procedure. ICD-10-PCS codes are stored without decimal formatting.
+        tests:
+          - not_null
+      - name: code_description
+        description: Human-readable description for the mapped procedure code from the source terminology.
+      - name: code_system
+        description: Procedure code system for the mapped code. Current supported value is icd-10-pcs.
+        tests:
+          - not_null
+      - name: status
+        description: Status of the code mapping. Active mappings are available for current use; inactive mappings are retained for historical codes.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['active', 'inactive']
+      - name: last_update_date
+        description: Date this code mapping row was last reviewed or updated.
+      - name: last_update_note
+        description: Short note describing the reason for the most recent update to the code mapping row.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - code_system
+              - code

@@ -1,5 +1,5 @@
 {% macro substring(string, start, length) %}
-  {{ return(adapter.dispatch('substring', 'macros')(string, start, length)) }}
+  {{ return(adapter.dispatch('substring', 'the_tuva_project')(string, start, length)) }}
 {% endmacro %}
 
 {% macro default__substring(string, start, length) %}

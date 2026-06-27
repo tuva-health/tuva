@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -30,7 +30,7 @@ order by stg.claim_type, stg.start_date) as encounter_row_number --institutional
     select
         patient_data_source_id
         , birth_date
-        , gender
+        , sex
         , race
     from {{ ref('encounters__stg_eligibility') }}
     where patient_row_num = 1
@@ -122,7 +122,7 @@ select d.encounter_id
     then 1
     else {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day") }}
   end as length_of_stay
-, e.gender
+, e.sex
 , e.race
 , hp.diagnosis_code_type as primary_diagnosis_code_type
 , hp.diagnosis_code_1 as primary_diagnosis_code

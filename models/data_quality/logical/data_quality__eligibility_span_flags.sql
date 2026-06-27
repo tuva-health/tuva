@@ -27,8 +27,8 @@ final as (
         , source_rows.enrollment_start_date
         , source_rows.enrollment_end_date
         , source_rows.data_source
-        , {{ dq_logical_int_flag_sql("source_rows.gender is null") }} as gender_null
-        , {{ dq_logical_int_flag_sql("source_rows.gender is not null and lower(cast(source_rows.gender as " ~ string_type ~ ")) not in ('male', 'female', 'unknown')") }} as gender_invalid
+        , {{ dq_logical_int_flag_sql("source_rows.sex is null") }} as sex_null
+        , {{ dq_logical_int_flag_sql("source_rows.sex is not null and lower(cast(source_rows.sex as " ~ string_type ~ ")) not in ('male', 'female', 'unknown')") }} as sex_invalid
         , {{ dq_logical_int_flag_sql("source_rows.race is null") }} as race_null
         , {{ dq_logical_int_flag_sql("source_rows.race is not null and race_lookup.description is null") }} as race_invalid
         , {{ dq_logical_int_flag_sql("source_rows.birth_date is null") }} as birth_date_null

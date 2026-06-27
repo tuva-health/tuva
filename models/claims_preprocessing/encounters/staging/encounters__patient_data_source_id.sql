@@ -6,7 +6,7 @@
 with multiple_sources as (
 select distinct person_id
 , data_source
-from {{ ref('normalized_input__medical_claim') }}
+from {{ ref('normalized__medical_claim') }}
 
 {% if target.type == 'fabric' %}
 union

@@ -38,7 +38,7 @@
         object_col_name,
         object_col_list
         ) %}
-  {{ return(adapter.dispatch('create_json_object')(table_ref, group_by_col, object_col_name, object_col_list)) }}
+  {{ return(adapter.dispatch('create_json_object', 'the_tuva_project')(table_ref, group_by_col, object_col_name, object_col_list)) }}
 {% endmacro %}
 
 /* default */

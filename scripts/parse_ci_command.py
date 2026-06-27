@@ -371,11 +371,11 @@ def run_parse_comment() -> int:
             {
                 "allowed": "false",
                 "message": (
-                    f"{exc} Examples: `/ci`, `/ci snowflake dbt run`, "
-                    "`/ci snowflake fabric dbt seed dbt run`, `/ci run-snowflake`."
-                ),
-            }
-        )
+                f"{exc} Examples: `/ci`, `/ci snowflake dbt run`, "
+                "`/ci snowflake fabric dbt seed dbt run`, `/ci run-snowflake`."
+            ),
+        }
+    )
         return 0
 
     _emit_parsed_request(parsed, validated)

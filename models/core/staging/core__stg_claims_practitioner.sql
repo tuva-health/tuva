@@ -13,7 +13,7 @@
 
 with all_providers_in_claims_dataset as (
 select distinct facility_npi as npi
-from {{ ref('core__stg_claims_medical_claim') }}
+from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
 union
@@ -22,7 +22,7 @@ union distinct
 {% endif %}
 
 select distinct rendering_npi as npi
-from {{ ref('core__stg_claims_medical_claim') }}
+from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
 union
@@ -31,7 +31,7 @@ union distinct
 {% endif %}
 
 select distinct billing_npi as npi
-from {{ ref('core__stg_claims_medical_claim') }}
+from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
 union
@@ -40,7 +40,7 @@ union distinct
 {% endif %}
 
 select distinct prescribing_provider_id as npi
-from {{ ref('core__stg_claims_pharmacy_claim') }}
+from {{ ref('core__pharmacy_claim') }}
 
 {% if target.type == 'fabric' %}
 union
@@ -49,7 +49,7 @@ union distinct
 {% endif %}
 
 select distinct dispensing_provider_id as npi
-from {{ ref('core__stg_claims_pharmacy_claim') }}
+from {{ ref('core__pharmacy_claim') }}
 )
 
 

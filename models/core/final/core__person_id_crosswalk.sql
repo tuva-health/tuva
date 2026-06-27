@@ -24,7 +24,7 @@ select distinct
     , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-from {{ ref('input_layer__patient') }}
+from {{ ref('normalized__patient') }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -36,7 +36,7 @@ select distinct
     , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-from {{ ref('input_layer__patient') }}
+from {{ ref('normalized__patient') }}
 
 {% elif var('claims_enabled', False) == true -%}
 

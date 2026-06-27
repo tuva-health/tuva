@@ -1,5 +1,0 @@
----
-id: pharmacy
-title: "Pharmacy"
----
-

@@ -1,24 +1,35 @@
+# Tuva Core
+
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.10%2B&color=orange)
 
-![Tuva Project Overview](./docs/static/img/tuva_project_overview_from_downloads.jpg)
+Tuva Core is the dbt package that aggregates and transforms payer claims, EHR, and other healthcare data into a common analytics- and AI-ready data model inside your cloud data warehouse.
 
-## What is the Tuva Project?
+The package includes:
 
-The Tuva Project is a dbt package for transforming raw healthcare data into analytics-ready data. The package includes:
+- Input Layer contracts for payer and provider source data
+- Normalized Layer models
+- Claims Preprocessing models
+- Core Data Model tables
+- Neutral data quality result tables
+- Tuva Data Assets, including terminology, value sets, provider data, and synthetic data
 
-- Input Layer
-- Claims Preprocessing
-- Core Data Model
-- Data Marts
-- Terminology and Value Sets
-
-## Docs
+## Documentation
 
 - [Getting Started](https://www.thetuvaproject.com/getting-started)
 - [dbt Variables](https://www.thetuvaproject.com/dbt-variables)
 - [Full Documentation](https://www.thetuvaproject.com/)
 
-The docs source for the getting-started runbook lives in [docs/docs/getting-started.md](./docs/docs/getting-started.md).
+The docs site and DAG Viewer live in separate sibling repositories. During local development they read dbt, YAML, and SQL metadata from this Tuva Core checkout through `TUVA_CORE_PATH`.
+
+Example local validation:
+
+```bash
+cd ../docs
+TUVA_CORE_PATH=../tuva-core npm run build
+
+cd ../dag-viewer
+TUVA_CORE_PATH=../tuva-core npm run build:local
+```
 
 ## Local Development
 
@@ -28,105 +39,58 @@ Recommended local setup:
 - DuckDB
 - `dbt-core` and `dbt-duckdb`
 
-Use `integration_tests` as your development project. Configure a DuckDB connection in `profiles.yml`, then run from the repo root:
+Use `integration_tests` as the local development project. It maps Tuva synthetic data into the Input Layer, imports the local package, and exercises the Tuva Core path.
+
+Create or update `~/.dbt/profiles.yml` with a local DuckDB profile. For DuckDB seed stability, use one thread:
+
+```yaml
+default:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /tmp/tuva_core.duckdb
+      threads: 1
+```
+
+Run dbt from the repo root with the helper script:
 
 ```bash
 ./scripts/dbt-local deps
 ./scripts/dbt-local build --full-refresh
 ```
 
-`dbt seed` and `dbt build` load package-owned synthetic data into `synthetic_data` from versioned S3 artifacts. `dbt run` assumes those relations already exist, so on a fresh database you should run `seed` or `build` first.
+`dbt seed` and `dbt build` load Tuva Data Assets from versioned public object-storage releases. `dbt run` assumes those relations already exist, so on a fresh database run `seed` or `build` first.
 
-Once the synthetic data is loaded, iterate with:
+Once the data assets are loaded, iterate with:
 
 ```bash
 ./scripts/dbt-local run
 ```
 
+## dbt Variables
+
+Set Tuva vars under the `vars:` key in your dbt project's `dbt_project.yml`.
+
+Tuva Core keeps root package defaults focused on explicit data asset family versions and run metadata. The most complete commented example for development lives in `integration_tests/dbt_project.yml`; the public docs reference is maintained at [thetuvaproject.com/dbt-variables](https://www.thetuvaproject.com/dbt-variables).
+
+Common variable groups:
+
+- Domain enablement: `claims_enabled`, `clinical_enabled`, `provider_attribution_enabled`
+- Data quality: `enable_data_quality`
+- Data assets: `custom_bucket_name`, `tuva_seed_versions`, `tuva_seed_buckets`
+- Synthetic data validation: `use_synthetic_data`, `synthetic_data_size`
+- Runtime metadata and schemas: `tuva_last_run`, `tuva_schema_prefix`
+- Extension columns: `passthrough`
+
+## Maintainer Scripts
+
+General local development should use `scripts/dbt-local`. Release, data-asset publishing, synthetic-data generation, and repository-maintenance helper scripts live in the sibling `tuva-maintenance` checkout.
+
 ## Agentic Workflow
 
 If you are using coding agents in this repo, the local workflow guidance lives in [AGENTS.md](AGENTS.md).
 
-## dbt Variables
+## License
 
-Set Tuva vars under the `vars:` key in your `dbt_project.yml`. Use dbt selectors to run individual marts; the vars below control broad data domains, shared runtime behavior, and the synthetic bootstrap flow used by `integration_tests`.
-
-### Broad Enablement
-
-| Variable | Root Default | `integration_tests` Default | Description |
-|----------|--------------|-----------------------------|-------------|
-| `claims_enabled` | `false` | `true` | Enable claims-based models. |
-| `clinical_enabled` | `false` | `true` | Enable clinical-based models. |
-| `provider_attribution_enabled` | `false` | `true` | Enable provider attribution models. Claims input must also be enabled. |
-| `semantic_layer_enabled` | `false` | `true` | Enable semantic-layer models. Claims-dependent semantic models also require `claims_enabled`. |
-| `fhir_preprocessing_enabled` | `false` | `false` | Enable FHIR preprocessing models. |
-
-### Shared Runtime Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `tuva_last_run` | Current UTC timestamp | Populates the `tuva_last_run` column in output models. |
-| `tuva_schema_prefix` | unset | Prefixes output schemas, for example `myprefix_core`. |
-| `cms_hcc_payment_year` | Current year | CMS-HCC payment year used for risk scoring. |
-| `quality_measures_period_end` | Current year-end | Optional reporting-period end date for quality measures. |
-| `record_type` | `"ip"` | CCSR record type: `"ip"` for inpatient or `"op"` for outpatient. |
-| `dxccsr_version` | `"2023.1"` | CCSR diagnosis mapping version. |
-| `prccsr_version` | `"2023.1"` | CCSR procedure mapping version. |
-| `provider_attribution_as_of_date` | unset | Optional `YYYY-MM-DD` override for provider attribution current-state calculations. |
-
-### Seed And Feature Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `custom_bucket_name` | `"tuva-public-resources"` | Default bucket for versioned Tuva seed artifacts. |
-| `tuva_seed_version` | `"1.0.0"` | Default versioned seed folder used when no per-database override is provided. Leading `v` is optional. |
-| `tuva_seed_versions` | `{concept_library: "1.0.1", reference_data: "1.0.0", terminology: "1.1.1", value_sets: "1.0.0", provider_data: "1.0.0", synthetic_data: "1.1.0"}` | Optional per-database version overrides keyed by `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
-| `tuva_seed_buckets` | `{}` | Optional per-database bucket overrides for `concept_library`, `reference_data`, `terminology`, `value_sets`, `provider_data`, or `synthetic_data`. |
-| `synthetic_data_size` | `small` in `integration_tests` | Selects the `small` or `large` synthetic input payload when running `integration_tests`. |
-| `enable_input_layer_testing` | `true` | Runs DQI checks on the input layer. |
-| `enable_legacy_data_quality` | `false` | Builds the legacy pre-DQI data-quality models. |
-| `enable_normalize_engine` | `false` | Set to `unmapped` to surface unmapped code models, or `true` to also use custom mappings. |
-
-See the maintained docs reference at [thetuvaproject.com/dbt-variables](https://www.thetuvaproject.com/dbt-variables) for examples and more detail.
-
-## Publishing Versioned Seed Artifacts
-
-Use `scripts/publish-dolthub-seeds` to publish the latest public DoltHub databases to versioned S3 folders.
-
-Required inputs:
-- `--version v1.0.0`
-- AWS CLI credentials via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-
-Optional inputs:
-- `--bucket reference_data=my-bucket`
-- `--bucket value_sets=my-other-bucket/prefix`
-- `--database terminology`
-- `--download-only`
-
-The script publishes to the normalized layout:
-- `s3://<bucket>/<database-folder>/<version>/<table>.csv.gz`
-
-## Mirroring Seed Releases To GCS And Azure
-
-Use `scripts/mirror-seed-release` after an S3 publish to copy the same versioned release to GCS and Azure Blob Storage.
-
-Required access:
-- AWS CLI access to read `s3://tuva-public-resources`
-- `gsutil` access to write `gs://tuva-public-resources`
-- Azure `Storage Blob Data Contributor` or equivalent on storage account `tuvapublicresources`, container `tuva-public-resources`
-
-Example:
-
-```bash
-scripts/mirror-seed-release --version v1.0.0
-```
-
-The script mirrors:
-- `s3://tuva-public-resources/<database-folder>/<version>/...`
-- `gs://tuva-public-resources/<database-folder>/<version>/...`
-- `https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/<database-folder>/<version>/...`
-
-Current published defaults:
-- `concept-library` uses `1.0.1`
-- `terminology` uses `1.1.1`
-- `reference-data`, `value-sets`, `provider-data`, and `synthetic-data` use `1.0.0`
+Tuva Core is released under the [Apache 2.0 License](license/license-2.0.txt).

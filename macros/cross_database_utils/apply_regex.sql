@@ -1,6 +1,6 @@
 {%- macro apply_regex(column_name, regex) -%}
 
-    {{ return(adapter.dispatch('apply_regex')(column_name, regex)) }}
+    {{ return(adapter.dispatch('apply_regex', 'the_tuva_project')(column_name, regex)) }}
 
 {%- endmacro -%}
 
@@ -39,5 +39,4 @@
     regexp_matches({{ column_name }}, '{{ regex }}')
 
 {%- endmacro -%}
-
 

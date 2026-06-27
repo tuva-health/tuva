@@ -2,7 +2,23 @@ version: 2
 
 seeds:
   - name: synthetic_data__appointment
+    description: |-
+      Synthetic appointment records provide non-PHI clinical scheduling data for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - appointment_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('appointment') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: appointment
@@ -19,14 +35,6 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         encounter_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_appointment_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_appointment_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_appointment_type_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_appointment_type_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         start_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         end_datetime: |
@@ -36,49 +44,168 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         practitioner_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_status: |
+        type_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_status: |
+        type_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        appointment_specialty: |
+        status_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        status_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         reason: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         cancellation_reason: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_cancellation_reason_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_code_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        normalized_cancellation_reason_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        file_name: |
+
+  - name: synthetic_data__condition
+    description: |-
+      Synthetic condition records provide non-PHI Athena Health problem-list and diagnosis data for local
+      development, demos, documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns:
+          - source_condition_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('condition') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: condition
+      tags:
+        - synthetic_data
+        - clinical
+      enabled: true
+      column_types:
+        source_condition_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        patient_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        encounter_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        recorded_date: date
+        onset_date: date
+        resolved_date: date
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        condition_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        code_system: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        condition_rank: integer
+        present_on_admit_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        data_source: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+
+  - name: synthetic_data__encounter
+    description: |-
+      Synthetic encounter records provide non-PHI Athena Health clinical visit data for local development,
+      demos, documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns:
+          - encounter_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('encounter') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: encounter
+      tags:
+        - synthetic_data
+        - clinical
+      enabled: true
+      column_types:
+        encounter_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        patient_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        encounter_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        encounter_start_date: date
+        encounter_end_date: date
+        admit_source_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        admit_type_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        discharge_disposition_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        attending_provider_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        attending_provider_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        facility_npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        facility_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        primary_diagnosis_code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        primary_diagnosis_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        drg_code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        drg_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        paid_amount: |
+          {%- if target.type == "bigquery" -%} float64 {%- elif target.type == "databricks" -%} double {%- elif target.type == "fabric" -%} float {%- else -%} double precision {%- endif -%}
+        allowed_amount: |
+          {%- if target.type == "bigquery" -%} float64 {%- elif target.type == "databricks" -%} double {%- elif target.type == "fabric" -%} float {%- else -%} double precision {%- endif -%}
+        charge_amount: |
+          {%- if target.type == "bigquery" -%} float64 {%- elif target.type == "databricks" -%} double {%- elif target.type == "fabric" -%} float {%- else -%} double precision {%- endif -%}
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        data_source: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
   - name: synthetic_data__eligibility
+    description: |-
+      Synthetic eligibility records provide non-PHI insurance enrollment spans for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - person_id
+          - member_id
+          - enrollment_start_date
+          - enrollment_end_date
+          - payer
+          - plan
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('eligibility') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: eligibility
@@ -93,7 +220,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         subscriber_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        gender: |
+        sex: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         race: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -154,8 +281,7 @@ seeds:
         enrollment_status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         hospice_flag: integer
-        snp_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        institutional_snp_flag: integer
         medicaid_indicator: integer
         long_term_institutional_flag: integer
         part_d_raf_type: |
@@ -169,7 +295,23 @@ seeds:
         transplant_duration_months: integer
 
   - name: synthetic_data__immunization
+    description: |-
+      Synthetic immunization records provide non-PHI vaccine administration data for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - immunization_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('immunization') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: immunization
@@ -225,7 +367,23 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: synthetic_data__lab_result
+    description: |-
+      Synthetic lab result records provide non-PHI laboratory data for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - lab_result_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('lab_result') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: lab_result
@@ -288,8 +446,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_reference_range_high: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        source_abnormal_flag: integer
-        normalized_abnormal_flag: integer
+        source_abnormal_flag: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_abnormal_flag: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         specimen: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ordering_practitioner_id: |
@@ -300,8 +460,178 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
-  - name: synthetic_data__medical_claim
+
+  - name: synthetic_data__location
+    description: |-
+      Synthetic location records provide non-PHI Athena Health facility and clinic data for local development,
+      demos, documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns: [location_id, data_source]
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('location') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: location
+      tags: [synthetic_data, clinical]
+      enabled: true
+      column_types:
+        location_id: &synthetic_string |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        npi: *synthetic_string
+        name: *synthetic_string
+        facility_type: *synthetic_string
+        parent_organization: *synthetic_string
+        address: *synthetic_string
+        city: *synthetic_string
+        state: *synthetic_string
+        zip_code: *synthetic_string
+        latitude: &synthetic_float |
+          {%- if target.type == "bigquery" -%} float64 {%- elif target.type == "databricks" -%} double {%- elif target.type == "fabric" -%} float {%- else -%} double precision {%- endif -%}
+        longitude: *synthetic_float
+        data_source: *synthetic_string
+
+  - name: synthetic_data__medication
+    description: |-
+      Synthetic medication records provide non-PHI Athena Health medication order and dispensing data for local
+      development, demos, documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns: [medication_id, data_source]
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('medication') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: medication
+      tags: [synthetic_data, clinical]
+      enabled: true
+      column_types:
+        medication_id: *synthetic_string
+        person_id: *synthetic_string
+        patient_id: *synthetic_string
+        encounter_id: *synthetic_string
+        dispensing_date: date
+        prescribing_date: date
+        source_code_type: *synthetic_string
+        source_code: *synthetic_string
+        source_description: *synthetic_string
+        ndc_code: *synthetic_string
+        rxnorm_code: *synthetic_string
+        atc_code: *synthetic_string
+        route: *synthetic_string
+        strength: *synthetic_string
+        quantity: integer
+        quantity_unit: *synthetic_string
+        days_supply: integer
+        practitioner_id: *synthetic_string
+        ingest_datetime: &synthetic_datetime |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
+        data_source: *synthetic_string
+
+  - name: synthetic_data__practitioner
+    description: |-
+      Synthetic practitioner records provide non-PHI Athena Health clinician data for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns: [practitioner_id, data_source]
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('practitioner') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: practitioner
+      tags: [synthetic_data, clinical]
+      enabled: true
+      column_types:
+        practitioner_id: *synthetic_string
+        npi: *synthetic_string
+        first_name: *synthetic_string
+        last_name: *synthetic_string
+        practice_affiliation: *synthetic_string
+        specialty: *synthetic_string
+        sub_specialty: *synthetic_string
+        data_source: *synthetic_string
+
+  - name: synthetic_data__procedure
+    description: |-
+      Synthetic procedure records provide non-PHI Athena Health clinical procedure data for local development,
+      demos, documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns: [source_procedure_id, data_source]
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('procedure') }}"
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      alias: procedure
+      tags: [synthetic_data, clinical]
+      enabled: true
+      column_types:
+        source_procedure_id: *synthetic_string
+        person_id: *synthetic_string
+        patient_id: *synthetic_string
+        encounter_id: *synthetic_string
+        procedure_date: date
+        code_system: *synthetic_string
+        source_code: *synthetic_string
+        source_description: *synthetic_string
+        modifier_1: *synthetic_string
+        modifier_2: *synthetic_string
+        modifier_3: *synthetic_string
+        modifier_4: *synthetic_string
+        modifier_5: *synthetic_string
+        practitioner_id: *synthetic_string
+        ingest_datetime: *synthetic_datetime
+        data_source: *synthetic_string
+
+  - name: synthetic_data__medical_claim
+    description: |-
+      Synthetic medical claim records provide non-PHI professional and institutional claim lines for local
+      development, demos, documentation, and integration testing. They are maintained by Tuva Health.
+    config:
+      meta:
+        primary_key_columns:
+          - claim_id
+          - claim_line_number
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Synthetic Medical Claim"
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('medical_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: medical_claim
@@ -572,7 +902,23 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: synthetic_data__observation
+    description: |-
+      Synthetic observation records provide non-PHI clinical observation data for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - observation_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('observation') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: observation
@@ -628,7 +974,25 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: synthetic_data__pharmacy_claim
+    description: |-
+      Synthetic pharmacy claim records provide non-PHI prescription claim lines for local development, demos,
+      documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - claim_id
+          - claim_line_number
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Synthetic Pharmacy Claim"
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('pharmacy_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: pharmacy_claim
@@ -681,7 +1045,24 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: synthetic_data__patient
+    description: |-
+      Synthetic patient records provide non-PHI demographic and geographic patient data for local development,
+      demos, documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - person_id
+          - patient_id
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('patient') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: patient
@@ -739,7 +1120,27 @@ seeds:
           {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: synthetic_data__provider_attribution
+    description: |-
+      Synthetic provider attribution records provide non-PHI member-month attribution data for local
+      development, demos, documentation, and integration testing. They are maintained by Tuva Health.
     config:
+      meta:
+        primary_key_columns:
+          - person_id
+          - member_id
+          - year_month
+          - payer
+          - plan
+          - data_source
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "Tuva Health"
+          source_url: "Tuva Health"
+          source_release: "Tuva synthetic data v1.2.4"
+          source_last_updated: ""
+          tuva_last_updated: "2026-06-25"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_synthetic_seed('provider_attribution') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: provider_attribution
@@ -750,7 +1151,7 @@ seeds:
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
+        member_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         year_month: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -776,3 +1177,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         custom_attributed_provider_lob: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}

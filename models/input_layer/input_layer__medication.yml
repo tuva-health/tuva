@@ -4,30 +4,9 @@ models:
     description: |-
       The medication table stores medication records from clinical source systems, including medication orders, administrations, and dispense records documented in an EHR or other clinical system. Payer-adjudicated pharmacy claims should not be mapped to this table; those belong in the pharmacy claim input layer.
 
-      This table is intended to have one record per medication ID and data source. Use the source code fields to represent the medication code as it appears in the source system. NDC, RxNorm, and ATC fields may be populated when standardized codes are already available or have been mapped by the user; otherwise Tuva can derive standardized medication codes downstream using terminology and custom mapping logic.
+      This table is intended to have one record per medication ID and data source. Use the source code fields to represent the medication code as it appears in the source system. NDC, RxNorm, and ATC fields may be populated when standardized codes are already available or have been mapped by the user; otherwise Tuva can derive standardized medication codes downstream using supported terminology.
 
       Primary key: medication_id, data_source.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_1
-              - dqi
-              - dqi_service_categories
-              - dqi_ccsr
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            combination_of_columns:
-              - medication_id
-              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -36,556 +15,123 @@ models:
     columns:
       - name: medication_id
         description: Identifier for a medication record within a data source. This value should be populated on every record and should uniquely identify the medication record when combined with data_source. If the source system does not provide a stable medication-level identifier, create one from the fields needed to uniquely identify the record.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the medication record. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - not_null:
-              config:
-                severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
+        config:
+          meta:
+            data_type: varchar
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
       - name: patient_id
         description: Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: encounter_id
         description: Identifier for the encounter associated with the medication record, when available. Leave null when the medication is not tied to a specific encounter in the source system.
-        required_for_data_marts: ['quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['quality_measures']
       - name: dispensing_date
         description: Date the medication was dispensed or administered, when available. For medication orders that were prescribed but not dispensed or administered, leave this field null.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: '''1900-01-01'''
-                max_value: '''2100-01-01'''
-                strictly: false
         config:
           meta:
             data_type: date
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: prescribing_date
         description: Date the medication was prescribed or ordered, when available. When both prescribing_date and dispensing_date are populated, prescribing_date should generally be on or before dispensing_date.
-        required_for_data_marts: ['quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: '''1900-01-01'''
-                max_value: '''2100-01-01'''
-                strictly: false
         config:
           meta:
             data_type: date
+            required_for_data_marts: ['quality_measures']
       - name: source_code_type
         description: Code system for source_code. Use ndc or rxnorm when the source code is already an NDC or RxNorm code. If the source system uses a local medication code, populate this field with the source code system name so the medication can be normalized downstream.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-                  - dqi_cms_hccs
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_code
-        description: Medication code from the source system before Tuva normalization. This may be an NDC, RxNorm RxCUI, or local medication code depending on the source system. Preserve the source-system value here even when standardized NDC, RxNorm, or ATC fields are also populated so downstream normalization and custom mapping can trace back to the original code.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
+        description: Medication code from the source system before Tuva normalization. This may be an NDC, RxNorm RxCUI, or local medication code depending on the source system. Preserve the source-system value here even when standardized NDC, RxNorm, or ATC fields are also populated so downstream terminology matching can trace back to the original code.
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_description
         description: Medication name or description from the source system. This should be populated when available, especially when source_code is local or not directly mapped to a standard terminology.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: ndc_code
         description: National Drug Code for the medication, when available. Store NDCs in normalized 11-digit format without hyphens when possible.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: rxnorm_code
         description: RxNorm RxCUI for the medication, when available.
-        required_for_data_marts: ['hcc_suspecting', 'quality_measures']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                to: ref('terminology__rxnorm_to_atc')
-                field: rxcui
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: atc_code
         description: WHO Anatomical Therapeutic Chemical classification code for the medication, when available.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: route
         description: Route by which the medication was administered or intended to be administered, for example oral, intravenous, subcutaneous, or topical.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: strength
         description: Medication strength as represented by the source system, for example 500 mg or 10 mg/mL.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: quantity
         description: Numeric quantity of medication associated with the record. Interpret this together with quantity_unit.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: number
+            required_for_data_marts: []
       - name: quantity_unit
         description: Unit of measure for quantity, for example tablet, mL, dose, vial, or capsule.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: days_supply
         description: Number of days the medication supply is expected to last. This is most applicable to dispensed medications and may be null for administrations or orders.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: number
+            required_for_data_marts: []
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication record, such as the ordering, prescribing, or administering practitioner. This may be an NPI or source system practitioner identifier, but should link to practitioner_id in the practitioner input layer when possible.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: ingest_datetime
         description: Date and time the medication record was extracted from the source system or ingested into the data warehouse.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - date
-                  - datetime
-                  - time
-                  - timestamp
-                  - timestamp_ntz
-                  - timestampntz
-                  - timestamp_ltz
-                  - timestampltz
-                  - timestamp_tz
-                  - timestamptz
-                  - timestamp with time zone
-                  - timestamp without time zone
-                  - datetime2
-                  - datetimeoffset
         config:
           meta:
             data_type: timestamp
+            required_for_data_marts: []
       - name: data_source
         description: User-defined name that identifies the source of the medication data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
             is_primary_key: true

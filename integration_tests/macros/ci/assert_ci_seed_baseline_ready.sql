@@ -12,8 +12,8 @@
         {'schema': 'synthetic_data', 'identifier': 'eligibility'},
         {'schema': 'provider_data', 'identifier': 'provider'},
         {'schema': 'terminology', 'identifier': 'admit_type'},
-        {'schema': 'reference_data', 'identifier': 'calendar'},
-        {'schema': 'concept_library', 'identifier': 'clinical_concepts'}
+        {'schema': 'terminology', 'identifier': 'calendar'},
+        {'schema': 'value_sets', 'identifier': 'tuva_concepts'}
     ] %}
 
     {% set db_name = target.database if target.database is not none else none %}
@@ -34,7 +34,7 @@
         {% do exceptions.raise_compiler_error(
             "CI baseline seed schemas are not ready for run-only mode. Missing required objects: "
             ~ (missing | join(', '))
-            ~ ". Run a seed-refreshing CI command such as `/ci snowflake dbt seed` or `/ci snowflake dbt build --full-refresh` to refresh `synthetic_data`, `provider_data`, `terminology`, `reference_data`, and `concept_library`."
+            ~ ". Run a seed-refreshing CI command such as `/ci snowflake dbt seed` or `/ci snowflake dbt build --full-refresh` to refresh `synthetic_data`, `provider_data`, `terminology`, and `value_sets`."
         ) %}
     {% endif %}
 

@@ -208,6 +208,5 @@ class ParseCiCommandTests(unittest.TestCase):
         self.assertFalse(validated.requires_seed_baseline)
         self.assertTrue(validated.refreshes_seeds)
 
-
 if __name__ == "__main__":
     unittest.main()

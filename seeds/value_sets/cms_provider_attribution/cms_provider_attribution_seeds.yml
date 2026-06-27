@@ -2,10 +2,27 @@ version: 2
 
 seeds:
   - name: cms_provider_attribution__assignment_windows
-    description: |
-      Taken from p.82-86 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX B: ASSIGNMENT WINDOW, EXPANDED WINDOW FOR ASSIGNMENT, AND EXPENDITURES PERIOD DATES".
-      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    description: |-
+      Assignment windows define the date ranges used by the Medicare Shared Savings Program attribution
+      methodology. They are maintained by CMS in the Shared Savings and Losses and Assignment Methodology
+      specifications. Tuva publishes this asset for CMS provider attribution methodology and user-led
+      attribution review; current Tuva Core models do not join to it directly.
     config:
+      meta:
+        primary_key_columns:
+          - performance_year
+          - service_year
+          - assignment_methodology
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "CMS Provider Attribution: Assignment Windows"
+          maintainer: "CMS Shared Savings Program"
+          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
+          source_release: "Shared Savings and Losses and Assignment Methodology v7"
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "annually"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___assignment_windows.csv') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _assignment_windows
@@ -26,10 +43,21 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
 
   - name: cms_provider_attribution__primary_care_hcpcs_codes
-    description: |
-      Taken from p.87 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX C: PRIMARY CARE AND SPECIALTY CODES USED IN ASSIGNMENT".
-      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    description: |-
+      Primary care HCPCS codes identify services that count toward Medicare Shared Savings Program
+      beneficiary assignment. They are maintained by CMS in the Shared Savings and Losses and Assignment
+      Methodology specifications. Tuva uses this asset in provider attribution models.
     config:
+      meta:
+        data_asset:
+          display_name: "CMS Provider Attribution: Primary Care HCPCS Codes"
+          maintainer: "CMS Shared Savings Program"
+          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
+          source_release: "Shared Savings and Losses and Assignment Methodology v7"
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "annually"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___primary_care_hcpcs_codes.csv') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _primary_care_hcpcs_codes
@@ -43,10 +71,21 @@ seeds:
 
         
   - name: cms_provider_attribution__provider_specialty_assignment_codes
-    description: |
-       Taken from p.93 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), in Table 11 and 12.
-       Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    description: |-
+      Provider specialty assignment codes identify specialties eligible to support Medicare Shared Savings
+      Program beneficiary assignment. They are maintained by CMS in the Shared Savings and Losses and
+      Assignment Methodology specifications. Tuva uses this asset in provider attribution models.
     config:
+      meta:
+        data_asset:
+          display_name: "CMS Provider Attribution: Provider Specialty Assignment Codes"
+          maintainer: "CMS Shared Savings Program"
+          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
+          source_release: "Shared Savings and Losses and Assignment Methodology v7"
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "annually"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___provider_specialty_assignment_codes.csv') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _provider_specialty_assignment_codes

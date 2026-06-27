@@ -7,7 +7,7 @@
 
 {%- macro ltrim(column_name, trimstr) -%}
 
-    {{ return(adapter.dispatch('ltrim')(column_name, trimstr)) }}
+    {{ return(adapter.dispatch('ltrim', 'the_tuva_project')(column_name, trimstr)) }}
 
 {%- endmacro -%}
 

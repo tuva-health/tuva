@@ -11,74 +11,67 @@
    )
 }}
 
-{% set claim_model_names = dq_claims_structural_model_names() %}
-
-{% for model_name in claim_model_names %}
--- depends_on: {{ ref(model_name) }}
-{% endfor %}
-
-{% if execute %}
-    {% set detail_queries = [] %}
-
-    {% for model_name in claim_model_names %}
-        {% set model_node = dq_find_model_node(model_name) %}
-
-        {% if model_node is not none %}
-            {% set table_name = model_name | replace('input_layer__', '') %}
-            {% set relation = dq_actual_relation(model_node) %}
-            {% set expected_columns = dq_expected_columns(model_node) %}
-            {% set actual_column_types = {} %}
-
-            {% if relation is not none %}
-                {% for column in dq_actual_columns(relation) %}
-                    {% do actual_column_types.update({column.name | lower: column.dtype}) %}
-                {% endfor %}
-                {% set source_dimension_sql = dq_source_dimension_sql(relation) %}
-            {% else %}
-                {% set source_dimension_sql = dq_missing_source_dimension_sql() %}
-            {% endif %}
-
-            {% for expected_column in expected_columns %}
-                {% set expected_name = expected_column['name'] %}
-                {% set expected_type = expected_column['data_type'] %}
-                {% set actual_type = actual_column_types.get(expected_name) %}
-                {% set column_exists = 'yes' if actual_type is not none else 'no' %}
-
-                {% if actual_type is none %}
-                    {% set data_type_correct = 'no' %}
-                {% elif expected_type is none or dq_type_families_match(expected_type, actual_type) %}
-                    {% set data_type_correct = 'yes' %}
-                {% else %}
-                    {% set data_type_correct = 'no' %}
-                {% endif %}
-
-                {% set query %}
-                    select
-                          sources.data_source
-                        , '{{ table_name }}' as {{ adapter.quote('table') }}
-                        , '{{ expected_name }}' as {{ adapter.quote('column') }}
-                        , '{{ column_exists }}' as column_exists
-                        , '{{ data_type_correct }}' as data_type_correct
-                    from (
-                        {{ source_dimension_sql }}
-                    ) as sources
-                {% endset %}
-
-                {% do detail_queries.append(query) %}
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
+with expected as (
 
     select *
-    from (
-        {{ detail_queries | join('\nunion all\n') }}
-    ) as structural_column_details
-{% else %}
+    from {{ ref('data_quality__structural_expected_columns') }}
+
+)
+
+, actual_sources as (
+
     select
-          cast(null as {{ dbt.type_string() }}) as data_source
-        , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('table') }}
-        , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('column') }}
-        , cast(null as {{ dbt.type_string() }}) as column_exists
-        , cast(null as {{ dbt.type_string() }}) as data_type_correct
-    {{ dq_empty_result_guard_sql() }}
-{% endif %}
+          table_name
+        , model_name
+        , data_source
+        , data_source_key
+        , max(table_exists) as table_exists
+        , max(row_count) as row_count
+    from {{ ref('data_quality__structural_actual_columns') }}
+    group by
+          table_name
+        , model_name
+        , data_source
+        , data_source_key
+
+)
+
+, actual_columns as (
+
+    select *
+    from {{ ref('data_quality__structural_actual_columns') }}
+    where column_name is not null
+
+)
+
+select
+      actual_sources.data_source
+    , expected.table_name as {{ adapter.quote('table') }}
+    , expected.column_name as {{ adapter.quote('column') }}
+    , expected.expected_data_type
+    , actual_columns.actual_data_type
+    , expected.required
+    , expected.is_primary_key
+    , actual_sources.table_exists
+    , cast(actual_sources.row_count as {{ dbt.type_int() }}) as row_count
+    , case
+        when actual_columns.column_name is not null then 'yes'
+        else 'no'
+      end as column_exists
+    , case
+        when actual_columns.column_name is null then 'no'
+        when expected.expected_type_family is null then 'no'
+        when actual_columns.actual_type_family is null then 'no'
+        when {{ dq_type_families_match_sql('expected.expected_type_family', 'actual_columns.actual_type_family') }} then 'yes'
+        else 'no'
+      end as data_type_correct
+    , expected.column_order
+from expected
+inner join actual_sources
+    on expected.table_name = actual_sources.table_name
+    and expected.model_name = actual_sources.model_name
+left outer join actual_columns
+    on expected.table_name = actual_columns.table_name
+    and expected.model_name = actual_columns.model_name
+    and expected.column_name = actual_columns.column_name
+    and actual_sources.data_source_key = actual_columns.data_source_key

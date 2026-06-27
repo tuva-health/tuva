@@ -11,24 +11,6 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-    tests:
-      - the_tuva_project.expect_table_row_count_to_be_between:
-          description: This is a check in one of the final downstream marts to see if
-            service_category__service_category_grouper is populated. If this is
-            flagging, please check other areas further upstream on the input
-            layer.
-          config:
-            severity: warn
-            enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-            meta:
-              dqi_test_description: "This is a check in one of the final downstream marts to
-                see if service_category__service_category_grouper is populated.
-                If this is flagging, please check other areas further upstream
-                on the input layer."
-            tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_service_categories', 'dqi_usability' ]
-          arguments:
-            min_value: 1
-            strictly: false
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -186,6 +168,88 @@ models:
             data_type: varchar
 
   #intermediate:
+  - name: int_claim_level_diagnosis
+    description: |
+      Creates one claim-level diagnosis array per claim_id and data_source for downstream claims-preprocessing algorithms that require a single diagnosis value per diagnosis position. This model uses normalized__medical_claim_diagnoses and intentionally preserves the legacy max() behavior used by service categories and encounters.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate
+        {% else %}intermediate{%- endif -%}
+      alias: int_claim_level_diagnosis
+      materialized: table
+      tags:
+        - service_category_grouper_base
+        - claims_preprocessing
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - data_source
+    columns:
+      - name: claim_id
+        description: Source claim identifier from input_layer__medical_claim.
+        tests:
+          - not_null
+      - name: data_source
+        description: Data source associated with the claim.
+        tests:
+          - not_null
+      - name: diagnosis_code_type
+        description: Claim-level diagnosis code system selected from diagnosis rows for the claim.
+      - name: diagnosis_code_1
+        description: Claim-level diagnosis code in position 1 selected with legacy max() behavior.
+      - name: diagnosis_code_2
+        description: Claim-level diagnosis code in position 2 selected with legacy max() behavior.
+      - name: diagnosis_code_3
+        description: Claim-level diagnosis code in position 3 selected with legacy max() behavior.
+      - name: diagnosis_code_4
+        description: Claim-level diagnosis code in position 4 selected with legacy max() behavior.
+      - name: diagnosis_code_5
+        description: Claim-level diagnosis code in position 5 selected with legacy max() behavior.
+      - name: diagnosis_code_6
+        description: Claim-level diagnosis code in position 6 selected with legacy max() behavior.
+      - name: diagnosis_code_7
+        description: Claim-level diagnosis code in position 7 selected with legacy max() behavior.
+      - name: diagnosis_code_8
+        description: Claim-level diagnosis code in position 8 selected with legacy max() behavior.
+      - name: diagnosis_code_9
+        description: Claim-level diagnosis code in position 9 selected with legacy max() behavior.
+      - name: diagnosis_code_10
+        description: Claim-level diagnosis code in position 10 selected with legacy max() behavior.
+      - name: diagnosis_code_11
+        description: Claim-level diagnosis code in position 11 selected with legacy max() behavior.
+      - name: diagnosis_code_12
+        description: Claim-level diagnosis code in position 12 selected with legacy max() behavior.
+      - name: diagnosis_code_13
+        description: Claim-level diagnosis code in position 13 selected with legacy max() behavior.
+      - name: diagnosis_code_14
+        description: Claim-level diagnosis code in position 14 selected with legacy max() behavior.
+      - name: diagnosis_code_15
+        description: Claim-level diagnosis code in position 15 selected with legacy max() behavior.
+      - name: diagnosis_code_16
+        description: Claim-level diagnosis code in position 16 selected with legacy max() behavior.
+      - name: diagnosis_code_17
+        description: Claim-level diagnosis code in position 17 selected with legacy max() behavior.
+      - name: diagnosis_code_18
+        description: Claim-level diagnosis code in position 18 selected with legacy max() behavior.
+      - name: diagnosis_code_19
+        description: Claim-level diagnosis code in position 19 selected with legacy max() behavior.
+      - name: diagnosis_code_20
+        description: Claim-level diagnosis code in position 20 selected with legacy max() behavior.
+      - name: diagnosis_code_21
+        description: Claim-level diagnosis code in position 21 selected with legacy max() behavior.
+      - name: diagnosis_code_22
+        description: Claim-level diagnosis code in position 22 selected with legacy max() behavior.
+      - name: diagnosis_code_23
+        description: Claim-level diagnosis code in position 23 selected with legacy max() behavior.
+      - name: diagnosis_code_24
+        description: Claim-level diagnosis code in position 24 selected with legacy max() behavior.
+      - name: diagnosis_code_25
+        description: Claim-level diagnosis code in position 25 selected with legacy max() behavior.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current dbt invocation.
+
   - name: service_category__combined_professional
     description: service categories flagged by corresponding codes and value sets
     config:

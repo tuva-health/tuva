@@ -23,11 +23,7 @@
     , practitioner_id
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
-    {# , person_id as x_temp_person_id #}
-    {# , source_code as x_temp_source_code #}
-    {# , source_code_type as zzz_temp_source_code_type #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}

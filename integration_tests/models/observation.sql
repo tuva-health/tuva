@@ -24,10 +24,7 @@
     , normalized_reference_range_high
 {%- endset -%}
 
-{# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
-    {# , observation_id as x_temp_observation_id #}
-    {# , observation_date as zzz_temp_observation_date #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}

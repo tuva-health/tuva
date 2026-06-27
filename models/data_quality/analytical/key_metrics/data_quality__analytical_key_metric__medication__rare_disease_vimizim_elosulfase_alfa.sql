@@ -1,3 +1,0 @@
-{{ dq_config_analytical_metric_model('analytical_key_metric__medication__rare_disease_vimizim_elosulfase_alfa') }}
-
-{{ dq_analytical_metric_model_sql('data_quality__analytical_key_metric__medication__rare_disease_vimizim_elosulfase_alfa') }}

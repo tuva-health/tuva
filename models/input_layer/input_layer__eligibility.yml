@@ -11,59 +11,6 @@ models:
       dates, payer and plan details, eligibility status indicators, and
       demographics. A person may have many eligibility spans with the same
       health plan or with multiple health plans.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_1
-              - dqi
-              - dqi_service_categories
-              - dqi_ccsr
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            combination_of_columns:
-              - person_id
-              - member_id
-              - enrollment_start_date
-              - enrollment_end_date
-              - '{{ ''"plan"'' if (target.type == ''fabric'') else ''plan'' }}'
-              - payer
-              - data_source
-      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
-          config:
-            severity: warn
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_3
-              - dqi
-              - dqi_cms_hccs
-              - dqi_financial_pmpm
-          arguments:
-            column_A: enrollment_end_date
-            column_B: enrollment_start_date
-            or_equal: true
-      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
-          description: Death date cannot be after birth date.
-          config:
-            severity: warn
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_3
-              - dqi
-              - dqi_cms_hccs
-          arguments:
-            column_A: death_date
-            column_B: birth_date
-            or_equal: true
-            row_condition: death_date is not null
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -77,7 +24,6 @@ models:
         description: Globally unique identifier for a person across all data sources.
           A person may have multiple member_id or subscriber_id values over
           time, but person_id should remain stable for the same person.
-        required_for_data_marts:
           [
             'ahrq_measures',
             'claims_enrollment',
@@ -95,42 +41,10 @@ models:
             'semantic_layer',
             'tuva_chronic_conditions'
           ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: 
             is_primary_key: true
       - name: member_id
         description: member_id identifies a person’s enrollment in a specific insurance
@@ -138,161 +52,49 @@ models:
           to uniquely identify an individual within its system. A person may
           have multiple member_id values if they are enrolled in more than one
           insurance product or plan, or if their coverage changes over time.
-        required_for_data_marts: [ 'claims_enrollment', 'financial_pmpm', 'pharmacy' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'claims_enrollment', 'financial_pmpm', 'pharmacy' ]
             is_primary_key: true
       - name: subscriber_id
         description: Identifier for the policyholder or primary subscriber through
           whom coverage is obtained. Spouses and dependents may have their own
           person_id and member_id while sharing a subscriber_id. Leave null when
           unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: subscriber_relation
         description: subscriber_relation represents the person's relationship to the
           subscriber (e.g., self, spouse, child). This field may be left blank
           if the eligibility data doesn't contain subscriber information.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: enrollment_start_date
         description: Date the person's enrollment span begins, formatted as YYYY-MM-DD.
-        required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm' ]
-        tests:
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable
-                range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a
-                    reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
+            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm' ]
             is_primary_key: true
       - name: enrollment_end_date
         description: Date the person's enrollment span ends, formatted as YYYY-MM-DD.
           Use 9999-12-31 when the enrollment span has not ended.
-        required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm' ]
-        tests:
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable
-                range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a
-                    reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-                  - dqi_financial_pmpm
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: date
+            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm' ]
             is_primary_key: true
       - name: payer
         description: Name of the payer providing coverage for the enrollment span,
           for example Aetna or Blue Cross Blue Shield. If the source data is
           scoped to a single payer, this value may be hard-coded.
-        required_for_data_marts:
           [
             'claims_enrollment',
             'cms_hccs',
@@ -301,468 +103,137 @@ models:
             'hcc_suspecting',
             'semantic_layer'
           ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: 
             is_primary_key: true
       - name: payer_type
         description: 'Line of business for the payer. Values must map to the Tuva
           payer type terminology: commercial, medicaid, medicare, or
           self-insured.'
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''bigquery'') and
-                  var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__payer_type')
-                field: payer_type
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: plan
         description: Name of the specific health insurance product for the enrollment
           span, for example Aetna PPO or Aetna HMO. This enables analysis at
           the plan level rather than only at the payer level.
-        required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer' ]
             is_primary_key: true
       - name: first_name
         description: The first name of the person in the enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and
-                  var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: middle_name
         description: The middle name of the person in the enrollment span. This should
           be left null if not available.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: last_name
         description: The last name of the person in the enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: name_suffix
         description: Name suffix for the person, for example Jr., Sr., or III. Leave
           null when unavailable.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and
-                  var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: social_security_number
         description: Social Security number for the person, formatted as XXX-XX-XXXX.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: address
         description: The person's street address for their place of residence associated
           with the enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: city
         description: The person's city for their place of residence associated with the
           enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: state
         description: The person's state for their place of residence associated with the
           enrollment span.
-        required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-              arguments:
-                to: ref('reference_data__ansi_fips_state')
-                field: ansi_fips_state_abbreviation
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
             is_primary_key: false
       - name: zip_code
         description: The person's zip code for their place of residence associated with
           the enrollment span.
-        required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-          - the_tuva_project.expect_column_value_lengths_to_be_between:
-              description: 'Zip codes should be between 5 and 10 digits long, more
-                specifically 5,9, or 10 digits. '
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-              arguments:
-                min_value: 5
-                max_value: 10
-                strictly: false
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
             is_primary_key: false
       - name: phone
         description: The person's phone number associated with the enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and
-                  var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: email
         description: The person's email address associated with the enrollment span.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and
-                  var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: ethnicity
         description: Ethnicity of the person, mapped from the source eligibility data
           when available.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
-      - name: gender
+      - name: sex
         description: Biological sex of the person. Accepted values are male, female,
           or unknown.
-        required_for_data_marts: [ 'ahrq_measures', 'cms_hccs', 'encounters' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - accepted_values:
-              config:
-                severity: warn
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                values:
-                  - male
-                  - female
-                  - unknown
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A person should not have multiple genders.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A person should not have multiple genders.
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - person_id
-                strictly: false
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'ahrq_measures', 'cms_hccs', 'encounters' ]
             is_primary_key: false
       - name: race
         description: Race of the person, mapped to Tuva race terminology when available.
-        required_for_data_marts: [ 'ed_classification', 'encounters', 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A person should not have multiple races.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A person should not have multiple races.
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - person_id
-                strictly: false
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-              arguments:
-                to: ref('terminology__race')
-                field: description
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'ed_classification', 'encounters', 'semantic_layer' ]
             is_primary_key: false
       - name: birth_date
         description: Birth date of the person, formatted as YYYY-MM-DD.
-        required_for_data_marts:
           [
             'ahrq_measures',
             'cms_hccs',
@@ -772,211 +243,37 @@ models:
             'quality_measures',
             'semantic_layer'
           ]
-        tests:
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable
-                range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a
-                    reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A person should not have multiple birthdays.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A person should not have multiple birthdays.
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - person_id
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                column_type: date
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
         config:
           meta:
             data_type: date
+            required_for_data_marts: 
             is_primary_key: false
       - name: death_date
         description: Date the person died, formatted as YYYY-MM-DD. Leave null if the
           person is alive or the death date is unavailable.
-        required_for_data_marts: [ 'cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable
-                range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a
-                    reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
+            required_for_data_marts: [ 'cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer' ]
             is_primary_key: false
       - name: death_flag
         description: A flag indicating if the person has died. Allowed values are 1 for
           yes, 0 for no, or null. If `death_flag` is 1, `death_date` should also
           be populated.
-        required_for_data_marts: [ 'semantic_layer' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ target.type != ''bigquery'' }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                values:
-                  - '0'
-                  - '1'
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ target.type == ''bigquery'' }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              column_name: CAST(death_flag AS STRING)
-              arguments:
-                values:
-                  - '0'
-                  - '1'
-                quote: false
-          - dbt_utils.expression_is_true:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                expression: "is null or cast(death_flag as {{ dbt.type_string() }}) <> '1' or
-                  death_date is not null"
         config:
           meta:
             data_type: boolean
+            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: original_reason_entitlement_code
         description: Medicare Original Reason for Entitlement Code, or OREC. This
           single-character code identifies the original reason the person became
           eligible for Medicare. It supports CMS-HCC risk adjustment and can
           take values 0, 1, 2, or 3.
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                value: 1
-          - accepted_values:
-              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                values:
-                  - '0'
-                  - '1'
-                  - '2'
-                  - '3'
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: dual_status_code
         description: dual_status_code indicates whether the person is dually eligible
@@ -985,348 +282,168 @@ models:
           score. If this status is not known, the CMS-HCC data mart will default
           to "Non" (non-dual) in risk score calculations. This field can take
           the values 00, 01, 02, 03, 04, 05, 06, 08, 09, or 10.
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - accepted_values:
-              description: https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                values:
-                  - '00'
-                  - '01'
-                  - '02'
-                  - '03'
-                  - '04'
-                  - '05'
-                  - '06'
-                  - '08'
-                  - '09'
-                  - '10'
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: medicare_status_code
         description: Two-character Medicare status code indicating how the person
           currently qualifies for Medicare. This is used in CMS-HCC risk
           adjustment when original_reason_entitlement_code is not available.
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - accepted_values:
-              description: https://resdac.org/cms-data/variables/medicare-status-code-january
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: "https://resdac.org/cms-data/variables/medicare-status-co\
-                    de-january"
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                values:
-                  - '00'
-                  - '10'
-                  - '11'
-                  - '20'
-                  - '21'
-                  - '31'
-                  - '40'
         config:
           meta:
+            data_type: varchar
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: enrollment_status
         description: >-
           Enrollment status used to determine CMS-HCC risk score coefficients.
           Leave null when unknown so Tuva can infer enrollment status from other
           available eligibility fields.
-        required_for_data_marts: [ 'cms_hccs', 'hcc_recapture' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-                tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs' ]
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-                tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs' ]
-              arguments:
-                values: [ 'Continuing', 'New', 'Institutional', 'ESRD', null ]
         config:
           meta:
+            data_type: varchar
+            required_for_data_marts: [ 'cms_hccs', 'hcc_recapture' ]
             is_primary_key: false
       - name: hospice_flag
         description: Indicator for whether the person is enrolled in hospice during
           the enrollment span. Accepted values are 0 and 1.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
+            data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: institutional_snp_flag
         description: Indicator for whether the person is enrolled in an institutional
           Special Needs Plan and requires a nursing-home level of care. Accepted
           values are 0 and 1.
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
+            data_type: integer
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: medicaid_indicator
         description: medicaid_indicator is a 0 or 1 field that indicates whether the
           person has Medicaid coverage during the enrollment span.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: long_term_institutional_flag
         description: Indicator for whether the person has been in an institutional
           setting for more than 30 days. Accepted values are 0 and 1.
-        required_for_data_marts: [ 'cms_hccs' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
+            data_type: integer
+            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: part_d_raf_type
         description: This field indicates the Medicare Part D risk adjustment factor
           type for the enrollment span. Null when the record is not related to
           Part D coverage.
-        required_for_data_marts: []
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: low_income_subsidy_indicator
         description: This field is an integer indicator for Low Income Subsidy, also
           known as Extra Help, during the enrollment span. Null when not
           applicable.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: metal_level
         description: ACA exchange metal tier for the health plan, if applicable.
           Leave null when the enrollment span is not related to ACA exchange
           coverage.
-        required_for_data_marts: []
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
       - name: csr_indicator
         description: Cost Sharing Reduction, or CSR, variant indicator for ACA
           exchange coverage. Leave null when not applicable.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: enrollment_duration_months
         description: This field indicates the number of months covered during the
           benefit year for ACA exchange enrollment. Null when not applicable.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: esrd_status
         description: This field is an integer indicator for end-stage renal disease
           status. Most commonly available with Medicare eligibility. Null when
           not applicable.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: transplant_duration_months
         description: Number of months since kidney transplant, if applicable. Most
           commonly available with Medicare eligibility data.
-        required_for_data_marts: []
         config:
           meta:
             data_type: integer
+            required_for_data_marts: []
             is_primary_key: false
       - name: group_id
         description: Identifier for the employer group or plan group associated with
           the enrollment span. Leave null when not applicable.
-        required_for_data_marts: [ 'quality_measures' ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: [ 'quality_measures' ]
             is_primary_key: false
       - name: group_name
         description: Name of the employer group or plan group associated with
           group_id. Leave null when not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: file_name
         description: Name of the source file from which the eligibility record
           originated. This field is useful for tracing source records across
           file-based eligibility extracts.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: []
             is_primary_key: false
       - name: file_date
         description: Date the source file identified by file_name was delivered,
           formatted as YYYY-MM-DD.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - date
-                  - datetime
-          - the_tuva_project.expect_column_values_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                min_value: '''1900-01-01'''
-                max_value: '''2100-01-01'''
-                strictly: false
         config:
           meta:
             data_type: date
+            required_for_data_marts: []
             is_primary_key: false
       - name: ingest_datetime
         description: Date and time the source eligibility record or file was loaded
           into the data warehouse. This is useful when multiple versions of the
           same source record are received over time.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - date
-                  - datetime
-                  - time
-                  - timestamp
-                  - timestamp_ntz
-                  - timestampntz
-                  - timestamp_ltz
-                  - timestampltz
-                  - timestamp_tz
-                  - timestamptz
-                  - timestamp with time zone
-                  - timestamp without time zone
-                  - datetime2
-                  - datetimeoffset
         config:
           meta:
             data_type: timestamp
+            required_for_data_marts: []
             is_primary_key: false
       - name: data_source
         description: User-defined name that identifies the source of the eligibility
           data, for example BCBS Tennessee, Medicare FFS, or Medicaid Ohio. This
           value should be populated on every record.
-        required_for_data_marts:
           [
             'ahrq_measures',
             'claims_enrollment',
@@ -1342,24 +459,8 @@ models:
             'readmissions',
             'semantic_layer'
           ]
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
+            required_for_data_marts: 
             is_primary_key: true

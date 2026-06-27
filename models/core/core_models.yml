@@ -14,8 +14,6 @@ models:
       Primary key: appointment_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - appointment_id
@@ -39,7 +37,6 @@ models:
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the
           appointment. A person may have multiple patient IDs over time or
@@ -83,7 +80,7 @@ models:
           end_datetime.
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: location_id
         description: Identifier for the location where the appointment is scheduled,
           such as a clinic, department, facility, or site in the source system.
@@ -195,21 +192,134 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
-  - name: core__condition
+  - name: int_condition_from_claims
     description: |
-      The condition table stores diagnoses, problem list records, encounter diagnoses, admitting diagnoses, discharge diagnoses, and other condition records from claims and clinical sources. Claims-derived rows come from diagnosis codes on medical claims. Clinical rows come from input_layer__condition.
-
-      Tuva normalizes supported source condition code systems in this model by joining source_code_type and source_code to terminology tables, or to custom mappings when the normalization engine is enabled. Present-on-admission descriptions are derived from present_on_admit_code using Tuva terminology.
-
-      Primary key: condition_id, data_source.
+      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the Tuva synthetic condition_id used by core.condition.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - condition_id
-              - data_source
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate
+        {% else %}intermediate{%- endif -%}
+      alias: int_condition_from_claims
+      tags: core
+      materialized: table
+    columns:
+      - name: condition_id
+        description: Tuva synthetic identifier for the claims-derived condition row.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: encounter_id
+        description: Encounter identifier assigned to the source claim line by the claims preprocessing encounter grouper.
+        config:
+          meta:
+            data_type: varchar
+      - name: claim_id
+        description: Source claim identifier from normalized__medical_claim_diagnoses.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+      - name: code_system
+        description: Diagnosis code system for source_code and normalized_code.
+        config:
+          meta:
+            data_type: varchar
+      - name: source_code
+        description: Diagnosis code from the source claim after removing decimal formatting.
+        config:
+          meta:
+            data_type: varchar
+      - name: normalized_code
+        description: Diagnosis code after matching to Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Data source associated with the claim line.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+  - name: int_procedure_from_claims
+    description: |-
+      Creates core-ready claims-derived procedure rows from normalized__medical_claim_procedures. This model joins normalized procedure rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the Tuva synthetic procedure_id used by core.procedure.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - procedure_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate
+        {% else %}intermediate{%- endif -%}
+      alias: int_procedure_from_claims
+      tags: core
+      materialized: table
+    columns:
+      - name: procedure_id
+        description: Tuva synthetic identifier for the claims-derived procedure row.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: encounter_id
+        description: Encounter identifier assigned to the source claim line or claim by the claims preprocessing encounter grouper.
+        config:
+          meta:
+            data_type: varchar
+      - name: claim_id
+        description: Source claim identifier from normalized__medical_claim_procedures.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+      - name: code_system
+        description: Procedure code system for source_code and normalized_code.
+        config:
+          meta:
+            data_type: varchar
+      - name: source_code
+        description: Procedure code from the source claim.
+        config:
+          meta:
+            data_type: varchar
+      - name: normalized_code
+        description: Procedure code after matching to Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Data source associated with the claim.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+  - name: core__condition
+    description: |
+      The condition table stores diagnoses, problem list records, encounter diagnoses, admitting diagnoses, discharge diagnoses, and other condition records from claims and clinical sources. Claims-derived rows come from int_condition_from_claims. Clinical rows come from normalized__condition.
+
+      The Normalized Layer unpivots claims diagnosis fields and normalizes supported diagnosis code systems. The int_condition_from_claims model attaches claim-line encounter_id for claims-derived rows and creates the Tuva synthetic condition_id. Core condition unions normalized clinical and claims condition rows, then joins normalized ICD-10-CM and SNOMED CT diagnosis codes to the Tuva Condition Grouper to populate condition_family and condition.
+
+      Primary key: condition_id.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - condition_id
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -219,101 +329,115 @@ models:
       materialized: table
     columns:
       - name: condition_id
-        description: Unique identifier for each condition record. For claims-derived
-          rows, Tuva creates this value from payer, data_source, claim_id,
-          diagnosis rank, source_code_type, and source_code. For clinical rows,
-          this value is passed through from input_layer__condition.
+        description: Tuva synthetic record-level identifier for the condition. Clinical IDs are created in normalized__condition from source_condition_id and data_source. Claims-derived IDs are created in int_condition_from_claims from source data, claim, encounter, diagnosis rank, code system, and diagnosis code.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
-      - name: payer
-        description: Name of the payer or health insurer for claims-derived condition
-          rows. This field is null for clinical condition rows sourced from
-          input_layer__condition.
-        config:
-          meta:
-            data_type: varchar
       - name: person_id
-        description: Globally unique identifier for the person associated with the
-          condition. A person may have multiple patient IDs or member IDs over
-          time or across source systems, but person_id should remain stable for
-          the same person.
+        description: Globally unique identifier for the person associated with this
+          condition. For claims-derived rows, this comes from the medical claim
+          record. For clinical rows, this comes from input_layer__condition.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier assigned by the payer or health plan for the person's
-          coverage. Populated for claims-derived condition rows and null for
-          clinical condition rows when no member identifier is available.
+        description: Payer or health plan member identifier. For claims-derived rows,
+          this comes from the medical claim record. For clinical rows, this is
+          null because input_layer__condition does not include a member_id.
         config:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Identifier that links the person to a particular clinical source
-          system, for example a medical record number or MRN. Populated for
-          clinical condition rows when available.
+        description: Clinical source system patient identifier, such as a medical
+          record number. For clinical rows, this comes from
+          input_layer__condition. For claims-derived rows, this is null because
+          medical claims use member_id rather than patient_id.
         config:
           meta:
             data_type: varchar
       - name: encounter_id
-        description: Identifier for the encounter associated with the condition.
-          Populated when the condition was documented during, or is linked to,
-          an encounter.
+        description: Identifier for the clinical encounter associated with the
+          condition. For clinical rows, this comes from input_layer__condition
+          when the condition is linked to an encounter. For claims-derived rows,
+          this is populated from the selected claim-line encounter assignment in
+          claims preprocessing.
         config:
           meta:
             data_type: varchar
       - name: claim_id
-        description: Unique identifier for the medical claim associated with the
-          condition. This field is populated for claims-derived condition rows
-          sourced from medical claims and is null for clinical condition rows
-          sourced from input_layer__condition.
+        description: Medical claim identifier associated with the condition. For
+          claims-derived rows, this comes from the medical claim record that
+          supplied the diagnosis code. For clinical rows, this is null because
+          claims should not be mapped to input_layer__condition.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer
+        description: Name of the payer or health insurer. For claims-derived rows, this
+          comes from the medical claim record. For clinical rows, this is null
+          because input_layer__condition does not include payer.
         config:
           meta:
             data_type: varchar
       - name: recorded_date
-        description: Date the condition was recorded or documented in the source system.
+        description: Date the condition was recorded or documented. For claims-derived
+          rows, Tuva derives this from the best available claim date, preferring
+          admission_date, then claim_start_date, discharge_date, and
+          claim_end_date. For clinical rows, this comes from
+          input_layer__condition.
         config:
           meta:
             data_type: date
       - name: onset_date
-        description: Date the condition began or was first clinically present, when
-          available.
+        description: Date the condition began or was first clinically present. For
+          clinical rows, this comes from input_layer__condition when available.
+          For claims-derived rows, this is null.
         config:
           meta:
             data_type: date
       - name: resolved_date
-        description: Date the condition resolved or became inactive, when available.
+        description: Date the condition resolved or became inactive. For clinical rows,
+          this comes from input_layer__condition when available. For
+          claims-derived rows, this is null.
         config:
           meta:
             data_type: date
       - name: status
-        description: Status of the condition record, such as active, resolved, inactive,
-          historical, suspected, or entered-in-error.
+        description: Status of the condition record. For claims-derived rows, Tuva sets
+          this to active. For clinical rows, this comes from
+          input_layer__condition and may include values such as active,
+          resolved, inactive, historical, suspected, or entered-in-error.
         config:
           meta:
             data_type: varchar
       - name: condition_type
-        description: Category of condition record, such as problem, encounter diagnosis,
-          admitting diagnosis, discharge diagnosis, or billing diagnosis.
+        description: Category of condition record. For claims-derived rows, Tuva sets
+          this to discharge_diagnosis after unpivoting medical claim diagnosis
+          fields. For clinical rows, this comes from input_layer__condition and
+          may include values such as problem, encounter diagnosis, admitting
+          diagnosis, discharge diagnosis, or billing diagnosis.
         config:
           meta:
             data_type: varchar
-      - name: source_code_type
-        description: Code system for source_code. Common condition code systems include
-          icd-10-cm, icd-9-cm, and snomed-ct.
+      - name: code_system
+        description: Code system for source_code. For claims-derived rows, this comes
+          from the medical claim diagnosis_code_type. For clinical rows, this
+          comes from input_layer__condition.code_system. Common condition code systems
+          include icd-10-cm, icd-9-cm, and snomed-ct.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: source_code
-        description: Condition code from the source system before Tuva normalization.
-          For ICD diagnosis codes, the source may include or omit decimal
-          formatting.
+        description: Condition code before Tuva normalization. For claims-derived rows,
+          this comes from the unpivoted diagnosis code fields on medical claims.
+          For clinical rows, this comes from input_layer__condition. ICD
+          diagnosis codes may include or omit decimal formatting.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
@@ -323,25 +447,18 @@ models:
             data_type: varchar
       - name: source_description
         description: Human-readable description of the source condition code or
-          condition record, when available from the source system.
+          condition record. For clinical rows, this comes from
+          input_layer__condition when available. For claims-derived rows, this
+          is null because descriptions are populated downstream from terminology
+          into normalized_description.
         config:
           meta:
-            data_type: varchar
-      - name: normalized_code_type
-        description: Normalized code system for the condition code. For clinical rows,
-          this is derived in core.condition by matching source_code_type and
-          source_code to Tuva terminology, or by using custom mappings when the
-          normalization engine is enabled. This field is not expected in
-          input_layer__condition.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: normalized_code
-        description: Normalized condition code after Tuva maps source_code_type and
-          source_code to the supported terminology code system. For clinical
-          rows, this field is derived in core.condition and is not expected in
-          input_layer__condition.
+        description: Normalized condition code. Tuva populates this by preserving an
+          upstream normalized_code when present, otherwise by matching
+          code_system and source_code to supported condition terminology tables
+          in the Normalized Layer.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-cm
@@ -350,18 +467,27 @@ models:
               adapters.'
             data_type: varchar
       - name: normalized_description
-        description: Human-readable description for normalized_code, populated from Tuva
-          terminology or custom mappings when a supported mapping is available.
+        description: Human-readable description for normalized_code. Tuva populates
+          this by preserving an upstream normalized_description when present,
+          otherwise by matching code_system and source_code to supported
+          condition terminology tables in the Normalized Layer.
         config:
           meta:
             data_type: varchar
-      - name: mapping_method
-        description: Method used to populate normalized_code_type, normalized_code, and
-          normalized_description. Automatic means Tuva matched the source code
-          to a terminology table. Custom means the normalization engine
-          populated the normalized fields from a custom mapping. Manual means
-          normalized fields were already populated in upstream staged condition
-          data.
+      - name: condition_family
+        description: Analytic condition family assigned by the Tuva Condition Grouper.
+          This field is populated when code_system is icd-10-cm or
+          snomed-ct and normalized_code maps to tuva_condition_grouper_code_map.
+          Unsupported code systems, including icd-9-cm, remain null.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition
+        description: Mutually exclusive condition assigned by the Tuva Condition
+          Grouper. This field is populated when code_system is
+          icd-10-cm or snomed-ct and normalized_code maps to
+          tuva_condition_grouper_code_map. Unsupported code systems, including
+          icd-9-cm, remain null.
         config:
           meta:
             data_type: varchar
@@ -408,7 +534,6 @@ models:
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
   - name: core__eligibility
     description: |-
       This table stores health insurance eligibility and enrollment spans. It is designed to contain one record per person per enrollment span, where an enrollment span is the period during which a person is enrolled in a health plan. That period usually begins on enrollment_start_date and ends on enrollment_end_date. A person may have multiple records in this table when they have multiple enrollment spans with different health plans or multiple enrollment spans with the same health plan.
@@ -680,8 +805,6 @@ models:
       Primary key: encounter_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - encounter_id
@@ -968,19 +1091,6 @@ models:
             data_type: number
       - name: prof_claim_count
         description: Number of professional claims generated from the encounter.
-        tests:
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: Inpatient encounter missing professional claim
-              config:
-                severity: warn
-                enabled: '{{ (var(''claims_enabled'', false)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-              arguments:
-                min_value: 1
-                row_condition: encounter_type = 'acute inpatient'
-                strictly: false
         config:
           meta:
             data_type: number
@@ -1016,15 +1126,13 @@ models:
     description: |-
       The immunization table stores clinical immunization events from source systems. It includes vaccines administered to patients and, when available, records documenting that an immunization was not performed.
 
-      Tuva normalizes supported source vaccine codes in this model by joining source_code_type and source_code to CVX terminology, or to custom mappings when the normalization engine is enabled. Status, status reason, body site, and route are also enriched from Tuva terminology when supported source codes are available. Normalized dose is retained for schema compatibility but is not currently populated by Tuva.
+      Tuva normalizes supported source vaccine codes in normalized__immunization by joining source_code_type and source_code to CVX terminology. Status, status reason, body site, and route are also enriched from Tuva terminology when supported source codes are available. Normalized dose is retained for schema compatibility but is not currently populated by Tuva.
 
       This table is intended to have one record per immunization ID and data source.
 
       Primary key: immunization_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - immunization_id
@@ -1092,17 +1200,13 @@ models:
             data_type: varchar
       - name: normalized_code_type
         description: Normalized vaccine code system. This is set to cvx when
-          source_code_type and source_code match Tuva CVX terminology, or
-          populated from custom mappings when the normalization engine is
-          enabled.
+          source_code_type and source_code match Tuva CVX terminology.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: normalized_code
-        description: Normalized CVX vaccine code. This is derived from Tuva CVX
-          terminology or from custom mappings when the normalization engine is
-          enabled.
+        description: Normalized CVX vaccine code derived from Tuva CVX terminology.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/cvx
@@ -1112,17 +1216,7 @@ models:
             data_type: varchar
       - name: normalized_description
         description: Human-readable description for normalized_code, populated from Tuva
-          CVX terminology or from custom mappings when available.
-        config:
-          meta:
-            data_type: varchar
-      - name: mapping_method
-        description: Method used to populate normalized_code_type, normalized_code, and
-          normalized_description. Automatic means Tuva matched the source code
-          to CVX terminology. Custom means the normalization engine populated
-          the normalized fields from a custom mapping. Not-mapped values may be
-          populated by the normalization engine when a custom mapping explicitly
-          marks the source value as unmapped.
+          CVX terminology.
         config:
           meta:
             data_type: varchar
@@ -1213,15 +1307,13 @@ models:
     description: |-
       The lab_result table stores laboratory test result records from clinical source systems. It includes information about the ordered test or panel, the resulted component or analyte, the result value, result and collection dates, units, reference ranges, abnormal flags, specimen, and ordering practitioner.
 
-      Tuva normalizes supported source order and component codes in this model by joining source_order_type, source_order_code, source_component_type, and source_component_code to LOINC and SNOMED-CT terminology, or to custom mappings when the normalization engine is enabled. Normalized units, normalized reference ranges, and normalized abnormal flags are passed through from the input layer when they are populated upstream.
+      Tuva normalizes supported source order and component codes in normalized__lab_result by joining source_order_type, source_order_code, source_component_type, and source_component_code to LOINC and SNOMED-CT terminology. Normalized units, normalized reference ranges, and normalized abnormal flags are passed through from the input layer when they are populated upstream.
 
       This table is intended to have one record per lab result ID and data source.
 
       Primary key: lab_result_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - lab_result_id
@@ -1313,16 +1405,14 @@ models:
             data_type: varchar
       - name: normalized_order_type
         description: Normalized code system for the ordered lab test or panel. This is
-          derived from LOINC or SNOMED-CT terminology, or from custom mappings
-          when the normalization engine is enabled.
+          derived from LOINC or SNOMED-CT terminology.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: normalized_order_code
         description: Normalized code for the ordered lab test or panel. This is derived
-          from LOINC or SNOMED-CT terminology, or from custom mappings when the
-          normalization engine is enabled.
+          from LOINC or SNOMED-CT terminology.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
@@ -1332,31 +1422,19 @@ models:
             data_type: varchar
       - name: normalized_order_description
         description: Human-readable description for normalized_order_code, populated
-          from terminology or custom mappings when available.
-        config:
-          meta:
-            data_type: varchar
-      - name: mapping_method
-        description: Method used to populate normalized order and component code fields.
-          Automatic means Tuva matched the source code to LOINC or SNOMED-CT
-          terminology. Custom means the normalization engine populated
-          normalized fields from a custom mapping. Not-mapped values may be
-          populated by the normalization engine when a custom mapping explicitly
-          marks the source value as unmapped.
+          from terminology when available.
         config:
           meta:
             data_type: varchar
       - name: normalized_component_type
         description: Normalized code system for the resulted component or analyte. This
-          is derived from LOINC or SNOMED-CT terminology, or from custom
-          mappings when the normalization engine is enabled.
+          is derived from LOINC or SNOMED-CT terminology.
         config:
           meta:
             data_type: varchar
       - name: normalized_component_code
         description: Normalized code for the resulted component or analyte. This is
-          derived from LOINC or SNOMED-CT terminology, or from custom mappings
-          when the normalization engine is enabled.
+          derived from LOINC or SNOMED-CT terminology.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/loinc
@@ -1366,7 +1444,7 @@ models:
             data_type: varchar
       - name: normalized_component_description
         description: Human-readable description for normalized_component_code, populated
-          from terminology or custom mappings when available.
+          from terminology when available.
         config:
           meta:
             data_type: varchar
@@ -1491,9 +1569,7 @@ models:
           source system location identifier. For claims-derived organization
           locations, this is the organization NPI.
         tests:
-          - unique:
-              config:
-                severity: warn
+          - unique
         config:
           meta:
             data_type: varchar
@@ -1983,7 +2059,7 @@ models:
         config:
           meta:
             data_type: number
-      - name: member_month_key
+      - name: member_month_id
         description: Synthetic key for the member month associated with the claim line
           when matching eligibility is available.
         config:
@@ -2026,15 +2102,13 @@ models:
             data_type: varchar
   - name: core__medication
     description: |-
-      The medication table contains medication records from clinical source systems, including medication orders, administrations, and dispense records documented in an EHR or other clinical system.
+      The medication table contains medication records from clinical source systems and pharmacy claims. Clinical rows represent medication orders, administrations, and dispense records documented in an EHR or other clinical system. Claims rows represent adjudicated pharmacy claim lines from core.pharmacy_claim.
 
-      This model pulls from input_layer__medication, casts fields to the core medication data types, and derives NDC, RxNorm, and ATC descriptions from terminology and custom mapping logic. Standardized medication codes may come from fields populated by the user in the input layer, automatic terminology joins, or custom mappings from the normalization engine.
+      When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC descriptions from terminology when standard medication codes are available. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
 
       Primary key: medication_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - medication_id
@@ -2048,154 +2122,207 @@ models:
       materialized: table
     columns:
       - name: medication_id
-        description: Identifier for a medication record within a data source.
+        description: Identifier for a medication record within a data source. Clinical rows
+          are populated from input_layer__medication.medication_id. Claims rows
+          are populated from core.pharmacy_claim.pharmacy_claim_id.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
+      - name: source_type
+        description: Indicates whether the medication row came from claims or clinical
+          data. Accepted values are claims and clinical.
+        config:
+          meta:
+            data_type: varchar
       - name: person_id
         description: Globally unique identifier for the person associated with the
-          medication record.
+          medication record. Clinical rows are populated from
+          input_layer__medication.person_id. Claims rows are populated from
+          core.pharmacy_claim.person_id.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
+      - name: member_id
+        description: Identifier assigned by the payer or health plan for the person's
+          coverage. This is populated from core.pharmacy_claim.member_id for
+          claims rows and is null for clinical rows.
+        config:
+          meta:
+            data_type: varchar
       - name: patient_id
         description: Identifier that links the person to a particular clinical source
-          system, for example a medical record number or MRN.
+          system, for example a medical record number or MRN. This is populated
+          from input_layer__medication.patient_id for clinical rows and is null
+          for claims rows.
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_id
         description: Identifier for the encounter associated with the medication record,
-          when available.
+          when available. This is populated from
+          input_layer__medication.encounter_id for clinical rows and is null for
+          claims rows.
+        config:
+          meta:
+            data_type: varchar
+      - name: claim_id
+        description: Identifier for the pharmacy claim associated with the medication
+          row. This is populated from core.pharmacy_claim.claim_id for claims rows
+          and is null for clinical rows.
+        config:
+          meta:
+            data_type: varchar
+      - name: claim_line_number
+        description: Line number for the pharmacy claim line associated with the
+          medication row. This is populated from
+          core.pharmacy_claim.claim_line_number for claims rows and is null for
+          clinical rows.
+        config:
+          meta:
+            data_type: number
+      - name: payer
+        description: Name of the payer responsible for the pharmacy claim. This is
+          populated from core.pharmacy_claim.payer for claims rows and is null
+          for clinical rows.
+        config:
+          meta:
+            data_type: varchar
+      - name: plan
+        description: Name of the health insurance plan or product associated with the
+          pharmacy claim. This is populated from core.pharmacy_claim.plan for
+          claims rows and is null for clinical rows.
         config:
           meta:
             data_type: varchar
       - name: dispensing_date
         description: Date the medication was dispensed or administered, when available.
+          Clinical rows are populated from input_layer__medication.dispensing_date.
+          Claims rows are populated from core.pharmacy_claim.dispensing_date.
         config:
           meta:
             data_type: date
       - name: prescribing_date
         description: Date the medication was prescribed or ordered, when available.
+          Clinical rows are populated from input_layer__medication.prescribing_date.
+          Claims rows are null because core.pharmacy_claim does not currently
+          contain a prescribing date.
         config:
           meta:
             data_type: date
       - name: source_code_type
-        description: Code system for source_code. This may be a standard code system
-          such as NDC or RxNorm, or a local source system code type.
+        description: Code system for source_code. Clinical rows are populated from
+          input_layer__medication.source_code_type. Claims rows are set to ndc
+          because the source code comes from core.pharmacy_claim.ndc_code.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: source_code
         description: Medication code from the source system before Tuva normalization.
-          This field preserves the original medication identifier used for
-          terminology and custom mapping.
+          Clinical rows are populated from input_layer__medication.source_code.
+          Claims rows are populated from core.pharmacy_claim.ndc_code.
         config:
           meta:
             terminology: https://www.nlm.nih.gov/research/umls/rxnorm/index.html
             data_type: varchar
       - name: source_description
-        description: Medication name or description from the source system.
+        description: Medication name or description from the source system. Clinical
+          rows are populated from input_layer__medication.source_description.
+          Claims rows are populated from core.pharmacy_claim.ndc_description.
         config:
           meta:
             data_type: varchar
       - name: ndc_code
-        description: National Drug Code for the medication. This may be populated from
-          the input layer, automatic terminology matching, or custom mapping.
+        description: National Drug Code for the medication. Clinical rows may be
+          populated from input_layer__medication.ndc_code or derived from
+          terminology. Claims rows are populated from core.pharmacy_claim.ndc_code.
         config:
           meta:
             terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
             data_type: varchar
       - name: ndc_description
-        description: Medication description associated with ndc_code, derived from
-          terminology or custom mapping when available.
-        config:
-          meta:
-            data_type: varchar
-      - name: ndc_mapping_method
-        description: Method used to populate ndc_code and ndc_description. Values can
-          include manual when the input layer supplied the code, automatic when
-          Tuva terminology matched the source code, or custom when the
-          normalization engine supplied the mapping.
+        description: Medication description associated with ndc_code. This is derived
+          from Tuva NDC terminology when available and may also come from
+          core.pharmacy_claim.ndc_description for claims rows.
         config:
           meta:
             data_type: varchar
       - name: rxnorm_code
-        description: RxNorm RxCUI for the medication. This may be populated from the
-          input layer, automatic terminology matching, or custom mapping.
+        description: RxNorm RxCUI for the medication. Clinical rows may be populated
+          from input_layer__medication.rxnorm_code or derived from terminology.
+          Claims rows are derived from NDC terminology when available.
         config:
           meta:
             terminology: https://www.nlm.nih.gov/research/umls/rxnorm/index.html
             data_type: varchar
       - name: rxnorm_description
         description: Medication description associated with rxnorm_code, derived from
-          terminology or custom mapping when available.
-        config:
-          meta:
-            data_type: varchar
-      - name: rxnorm_mapping_method
-        description: Method used to populate rxnorm_code and rxnorm_description. Values
-          can include manual when the input layer supplied the code, automatic
-          when Tuva terminology matched the source code, or custom when the
-          normalization engine supplied the mapping.
+          RxNorm terminology when available.
         config:
           meta:
             data_type: varchar
       - name: atc_code
         description: WHO Anatomical Therapeutic Chemical classification code for the
-          medication. This may be populated from the input layer, automatic
-          terminology matching, or custom mapping.
+          medication. Clinical rows may be populated from
+          input_layer__medication.atc_code or derived from terminology. Claims rows
+          are derived through NDC/RxNorm terminology when available.
         config:
           meta:
             terminology: https://www.who.int/tools/atc-ddd-toolkit/atc-classification
             data_type: varchar
       - name: atc_description
         description: Medication classification description associated with atc_code,
-          derived from terminology or custom mapping when available.
-        config:
-          meta:
-            data_type: varchar
-      - name: atc_mapping_method
-        description: Method used to populate atc_code and atc_description. Values can
-          include manual when the input layer supplied the code, automatic when
-          Tuva terminology matched the source code, or custom when the
-          normalization engine supplied the mapping.
+          derived from terminology when available.
         config:
           meta:
             data_type: varchar
       - name: route
         description: Route by which the medication was administered or intended to be
-          administered.
+          administered. This is populated from input_layer__medication.route for
+          clinical rows and is null for claims rows.
         config:
           meta:
             data_type: varchar
       - name: strength
-        description: Medication strength as represented by the source system.
+        description: Medication strength as represented by the source system. This is
+          populated from input_layer__medication.strength for clinical rows and is
+          null for claims rows.
         config:
           meta:
             data_type: varchar
       - name: quantity
         description: Numeric quantity of medication associated with the record.
+          Clinical rows are populated from input_layer__medication.quantity.
+          Claims rows are populated from core.pharmacy_claim.quantity.
         config:
           meta:
             data_type: number
       - name: quantity_unit
-        description: Unit of measure for quantity.
+        description: Unit of measure for quantity. This is populated from
+          input_layer__medication.quantity_unit for clinical rows and is null for
+          claims rows.
         config:
           meta:
             data_type: varchar
       - name: days_supply
-        description: Number of days the medication supply is expected to last.
+        description: Number of days the medication supply is expected to last. Clinical
+          rows are populated from input_layer__medication.days_supply. Claims rows
+          are populated from core.pharmacy_claim.days_supply.
         config:
           meta:
             data_type: number
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication
-          record, such as the ordering, prescribing, or administering
-          practitioner.
+          record. Clinical rows are populated from
+          input_layer__medication.practitioner_id and may represent the ordering,
+          prescribing, or administering practitioner. Claims rows are populated
+          from core.pharmacy_claim.prescribing_provider_id, which is generally the
+          prescribing provider NPI.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/provider
@@ -2215,34 +2342,34 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
-  - name: core__member_months
+  - name: core__member_month
     description: |-
-      The member months table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity.
+      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity.
 
-      This model expands eligibility spans into covered member months, creates member_month_key as a synthetic key, joins externally supplied provider attribution when available, and passes through payer-attributed and custom-attributed provider fields for downstream financial, quality, and population health analysis.
+      This model is the final Core projection of the Claims Preprocessing member-month output plus Claims Preprocessing attribution. Member-month construction happens in member_month__member_month, and payer-attributed, custom-attributed, and Tuva-attributed provider fields are supplied by provider_attribution__member_month_attribution. Tuva-assigned attribution is calculated at person, data source, and performance year grain and copied to each member month in the matching year.
 
-      Primary key: member_month_key.
+      Primary key: member_month_id.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: member_months
+      alias: member_month
       tags: core
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
-              - member_month_key
+              - member_month_id
     columns:
-      - name: member_month_key
+      - name: member_month_id
         description: Synthetic key created from person_id, member_id, year_month, payer,
           plan, and data_source.
         tests:
           - not_null
         config:
           meta:
-            data_type: number
+            data_type: varchar
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person covered during the member
@@ -2305,6 +2432,21 @@ models:
       - name: custom_attributed_provider_lob
         description: Line of business assigned to the member by a user-defined or custom
           attribution methodology.
+      - name: tuva_attributed_provider
+        description: Provider assigned to the member month by Tuva's claims-based attribution logic. This is copied from the yearly attribution assignment for the same person, data source, and calendar year, and is null when no assignable claims history exists.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_bucket
+        description: Tuva attribution provider classification bucket, such as PCP, NPP, specialist, or no eligible history.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_specialty
+        description: Specialty description for the Tuva-attributed provider when available.
+        config:
+          meta:
+            data_type: varchar
       - name: data_source
         description: User-defined name that identifies the source of the eligibility
           data used to create the member month.
@@ -2317,13 +2459,11 @@ models:
     description: |-
       The observation table contains normalized clinical observation records from source systems, including vital signs, social history observations, survey results, exam findings, imaging observations, therapy observations, activity observations, and other non-laboratory clinical observations.
 
-      This model pulls from input_layer__observation, casts fields to the core observation data types, normalizes observation_type using Tuva reference data, and derives normalized_code_type, normalized_code, and normalized_description from terminology joins or custom mapping logic. Normalized units and normalized reference ranges are passed through from the input layer when they are populated upstream.
+      This model pulls from normalized__observation after the Normalized Layer casts fields to the core observation data types, normalizes observation_type using Tuva reference data, and derives normalized_code_type, normalized_code, and normalized_description from terminology joins. Normalized units and normalized reference ranges are passed through from the input layer when they are populated upstream.
 
       Primary key: observation_id, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - observation_id
@@ -2377,7 +2517,7 @@ models:
           meta:
             data_type: date
       - name: observation_type
-        description: High-level category of observation after Tuva reference-data
+        description: High-level category of observation after Tuva terminology
           normalization.
         config:
           meta:
@@ -2399,28 +2539,18 @@ models:
           meta:
             data_type: varchar
       - name: normalized_code_type
-        description: Normalized observation code system derived from Tuva terminology or
-          custom mapping logic.
+        description: Normalized observation code system derived from Tuva terminology.
         config:
           meta:
             data_type: varchar
       - name: normalized_code
-        description: Normalized observation code derived from Tuva terminology or custom
-          mapping logic.
+        description: Normalized observation code derived from Tuva terminology.
         config:
           meta:
             data_type: varchar
       - name: normalized_description
         description: Human-readable description for normalized_code, derived from Tuva
-          terminology or custom mapping logic.
-        config:
-          meta:
-            data_type: varchar
-      - name: mapping_method
-        description: Method used to populate normalized_code_type, normalized_code, and
-          normalized_description. Automatic means Tuva matched the source code
-          to terminology. Custom means the normalization engine supplied the
-          mapping.
+          terminology.
         config:
           meta:
             data_type: varchar
@@ -2478,100 +2608,7 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
-  - name: core__int_patient_casting
-    description: |-
-      This model transforms input layer patient by:
-      1. Casting all patient fields to their appropriate core data type for the core patient model
-      2. Pulling through all extension columns from input_layer__patient
-      3. Adding tuva_last_run as a timestamp
 
-      Primary key: person_id, patient_id, data_source.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: int_patient_casting
-      meta:
-        dag:
-          node_type: intermediate
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: table
-    columns:
-      - name: person_id
-        description: Globally unique identifier for the person across the dataset. This
-          should remain stable even when the person has multiple patient IDs or
-          medical record numbers.
-        config:
-          meta:
-            is_primary_key: true
-      - name: patient_id
-        description: Identifier for the person in a specific clinical source system,
-          such as MRN. A single person can have multiple patient IDs.
-        config:
-          meta:
-            is_primary_key: true
-      - name: first_name
-        description: Patient first name as represented in the source system.
-      - name: middle_name
-        description: Patient middle name as represented in the source system.
-      - name: last_name
-        description: Patient last name as represented in the source system.
-      - name: name_suffix
-        description: Patient name suffix, such as Jr., Sr., or III.
-      - name: sex
-        description: Biological sex of the patient. Accepted values are male, female, or
-          unknown, all lowercase.
-      - name: race
-        description: Patient race. This value should match a Tuva race terminology
-          description.
-      - name: ethnicity
-        description: Patient ethnicity. This value should match a Tuva ethnicity
-          terminology code.
-      - name: birth_date
-        description: Patient date of birth in YYYY-MM-DD format.
-      - name: death_date
-        description: Patient date of death in YYYY-MM-DD format. Leave null if the
-          patient is not deceased or if no death date is available.
-      - name: death_flag
-        description: Indicator that the patient is deceased. Use 1 for deceased and 0
-          for not known deceased.
-      - name: social_security_number
-        description: Patient Social Security number as a string in XXX-XX-XXXX format,
-          including dashes, when available and permitted.
-      - name: address
-        description: Street address where the patient lives.
-      - name: city
-        description: City where the patient lives.
-      - name: state
-        description: State where the patient lives.
-      - name: zip_code
-        description: ZIP code where the patient lives.
-      - name: county
-        description: County where the patient lives.
-      - name: latitude
-        description: Decimal-degree latitude for the patient's address, when available.
-      - name: longitude
-        description: Decimal-degree longitude for the patient's address, when available.
-      - name: phone
-        description: Patient phone number as represented in the source system.
-      - name: email
-        description: Patient email address as represented in the source system.
-      - name: ingest_datetime
-        description: Date and time the patient record was extracted from the source
-          system or ingested into the data warehouse.
-      - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by
-          `dbt_utils.pretty_time` as the local time of the `dbt run`
-          environment. Timezone is configurable via the `tuva_last_run` var.
-      - name: data_source
-        description: User-defined name that identifies the clinical source, for example
-          Epic, Athena Health, or Cerner. This value should be populated on
-          every record.
-        config:
-          meta:
-            is_primary_key: true
   - name: core__int_patient_remove_duplicates
     description: |-
       This model removes duplicate clinical patient records for each person_id and data_source. When multiple upstream records exist, it keeps the record with the latest non-null ingest_datetime, then uses patient_id descending as a tie-breaker.
@@ -2691,8 +2728,6 @@ models:
             combination_of_columns:
               - person_id
               - data_source
-          config:
-            severity: error
     columns:
       - name: person_id
         description: Globally unique identifier for the person across the dataset. This
@@ -2709,7 +2744,7 @@ models:
           unknown.
         config:
           meta:
-            terminology: https://thetuvaproject.com/terminology/gender
+            terminology: https://thetuvaproject.com/terminology/sex
             data_type: varchar
       - name: race
         description: Patient race, mapped to Tuva race terminology when available.
@@ -2733,7 +2768,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: name_suffix
         description: Patient name suffix, such as Jr., Sr., or III.
         config:
@@ -3110,7 +3145,7 @@ models:
         config:
           meta:
             data_type: number
-      - name: member_month_key
+      - name: member_month_id
         description: Synthetic key for the member month associated with the pharmacy
           claim line when matching eligibility is available.
         config:
@@ -3172,9 +3207,7 @@ models:
           clinical tables. For claims-derived rows, this is generally derived
           from the provider identifier on the claim.
         tests:
-          - unique:
-              config:
-                severity: warn
+          - unique
         config:
           meta:
             data_type: varchar
@@ -3237,19 +3270,18 @@ models:
             data_type: varchar
   - name: core__procedure
     description: |-
-      The procedure table stores procedures performed for patients from claims and clinical sources. Claims-derived rows come from procedure codes on medical claims. Clinical rows come from input_layer__procedure.
+      The procedure table stores procedures performed for patients from claims and clinical sources.
 
-      Tuva normalizes supported source procedure code systems in this model by joining source_code_type and source_code to terminology tables, or to custom mappings when the normalization engine is enabled. Procedure modifiers are retained when available. Clinical extension columns are pulled through when clinical data is enabled.
+      Claims-derived rows are created from the input layer medical_claim table. Tuva creates one procedure row for each non-null HCPCS code on a medical claim line and one procedure row for each non-null procedure_code_1 through procedure_code_25 value on the claim header. HCPCS rows retain HCPCS modifiers from the medical claim line and use the rendering NPI as practitioner_id. Clinical rows are created directly from input_layer__procedure when the clinical input layer is enabled.
 
-      Primary key: procedure_id, data_source.
+      The Normalized Layer unpivots claims procedure fields and normalizes supported procedure code systems. The int_procedure_from_claims model attaches encounter_id for claims-derived rows and creates the Tuva synthetic procedure_id. Core procedure unions normalized clinical procedure rows with claims-derived procedure rows from int_procedure_from_claims, then joins normalized ICD-10-PCS codes to the Tuva Procedure Grouper to populate procedure_family and procedure. Clinical extension columns are pulled through when clinical data is enabled.
+
+      Primary key: procedure_id.
     tests:
       - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: warn
           arguments:
             combination_of_columns:
               - procedure_id
-              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -3259,64 +3291,89 @@ models:
       materialized: table
     columns:
       - name: procedure_id
-        description: Identifier for a procedure record within a data source. For
-          claims-derived rows, Tuva creates this value from claim and procedure
-          attributes. For clinical rows, this value is passed through from
-          input_layer__procedure.
+        description: Tuva synthetic record-level identifier for the procedure. Clinical IDs are created in normalized__procedure from source_procedure_id and data_source. Claims-derived IDs are created in int_procedure_from_claims from source data, claim, encounter, procedure sequence, code system, source code, HCPCS modifiers when present, and rendering NPI when present.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
-      - name: encounter_id
-        description: Identifier for the encounter associated with the procedure, when
-          available.
-        config:
-          meta:
-            data_type: varchar
-      - name: claim_id
-        description: Identifier for the medical claim associated with the procedure.
-          This field is populated for claims-derived procedure rows and null for
-          clinical procedure rows.
-        config:
-          meta:
-            data_type: varchar
       - name: person_id
-        description: Globally unique identifier for the person associated with the
-          procedure.
+        description: Globally unique identifier for the person associated with the procedure.
+          For claims-derived rows, this is populated from input_layer__medical_claim.person_id.
+          For clinical rows, this is populated from input_layer__procedure.person_id.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
       - name: member_id
-        description: Identifier assigned by the payer or health plan for the person's
-          coverage. Populated for claims-derived procedure rows and null for
-          clinical procedure rows when no member identifier is available.
+        description: Payer or health plan member identifier associated with the procedure.
+          This is populated from input_layer__medical_claim.member_id for claims-derived
+          rows. Clinical procedure rows do not currently populate member_id.
         config:
           meta:
             data_type: varchar
       - name: patient_id
-        description: Clinical source-system patient identifier, such as medical record
-          number or MRN. Populated for clinical procedure rows when available.
+        description: Clinical source-system patient identifier associated with the procedure,
+          such as a medical record number or MRN. This is populated from
+          input_layer__procedure.patient_id for clinical rows. Claims-derived rows do
+          not currently populate patient_id.
+        config:
+          meta:
+            data_type: varchar
+      - name: encounter_id
+        description: Identifier for the encounter associated with the procedure. For
+          claims-derived rows, this is populated from the claims encounter grouping
+          output through core__medical_claim. For clinical rows, this is
+          populated from input_layer__procedure.encounter_id when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: claim_id
+        description: Medical claim identifier associated with the procedure. This is
+          populated from input_layer__medical_claim.claim_id for claims-derived rows
+          and is null for clinical procedure rows.
         config:
           meta:
             data_type: varchar
       - name: procedure_date
-        description: Date the procedure was performed or documented.
+        description: Date the procedure was performed or documented. For HCPCS rows
+          created from medical claim lines, Tuva uses the first available date from
+          claim_line_start_date, claim_start_date, admission_date, discharge_date, and
+          claim_end_date. For claim header procedure-code rows, Tuva uses the
+          corresponding procedure_date_1 through procedure_date_25 field. For clinical
+          rows, this is populated from input_layer__procedure.procedure_date.
         config:
           meta:
+            data_type: date
+      - name: practitioner_id
+        description: Clinician identifier associated with the procedure. For claims-derived
+          rows, this is populated from input_layer__medical_claim.rendering_npi. For
+          clinical rows, this is populated from input_layer__procedure.practitioner_id.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/provider
+            terminology_note: '**Note: this terminology set is too large to be loaded as a
+              seed and is instead loaded from public cloud storage for supported
+              adapters.'
             data_type: varchar
-      - name: source_code_type
-        description: Source procedure code system. Expected values include snomed-ct,
-          hcpcs, icd-10-pcs, and icd-9-pcs.
+      - name: code_system
+        description: Code system for source_code. For claims-derived HCPCS rows, Tuva sets
+          this to hcpcs from input_layer__medical_claim.hcpcs_code. For claims-derived
+          header procedure rows, this is populated from
+          input_layer__medical_claim.procedure_code_type. For clinical rows, this is
+          populated from input_layer__procedure.code_system.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: source_code
-        description: Procedure code from the source system before Tuva normalization.
+        description: Procedure code from the source data before Tuva normalization. For
+          claims-derived HCPCS rows, this is populated from
+          input_layer__medical_claim.hcpcs_code. For claims-derived header procedure
+          rows, this is populated from procedure_code_1 through procedure_code_25. For
+          clinical rows, this is populated from input_layer__procedure.source_code.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-pcs
@@ -3325,20 +3382,18 @@ models:
               adapters.'
             data_type: varchar
       - name: source_description
-        description: Source-system description of the procedure code, when available.
+        description: Source-system description of source_code. This is populated from
+          input_layer__procedure.source_description for clinical rows. Claims-derived
+          rows do not currently populate source_description because medical claims
+          generally carry procedure codes without code descriptions.
         config:
           meta:
-            data_type: varchar
-      - name: normalized_code_type
-        description: Normalized procedure code system derived from Tuva terminology or
-          custom mapping logic.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/code-type
             data_type: varchar
       - name: normalized_code
-        description: Normalized procedure code derived from Tuva terminology or custom
-          mapping logic.
+        description: Normalized procedure code produced by matching code_system and
+          source_code to Tuva terminology in the Normalized Layer. For supported source code systems this will
+          usually match source_code, but it is only populated when the source code is
+          present in the corresponding Tuva terminology asset.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/icd-10-pcs
@@ -3347,90 +3402,91 @@ models:
               adapters.'
             data_type: varchar
       - name: normalized_description
-        description: Human-readable description for normalized_code, derived from Tuva
-          terminology or custom mapping logic.
+        description: Human-readable description for normalized_code, populated from the
+          matched Tuva terminology table for ICD-10-PCS, ICD-9-PCS, HCPCS, or SNOMED CT.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
-      - name: mapping_method
-        description: Method used to populate normalized_code_type, normalized_code, and
-          normalized_description. Automatic means Tuva matched the source code
-          to terminology. Custom means the normalization engine supplied the
-          mapping. Manual means normalized fields were already populated in
-          upstream staged procedure data.
+      - name: procedure_family
+        description: Higher-level procedure family assigned by the Tuva Procedure Grouper.
+          Tuva populates this by joining normalized ICD-10-PCS procedure codes to
+          tuva_procedure_grouper_code_map. This field remains null for HCPCS, ICD-9-PCS,
+          SNOMED CT, and other code systems that are not currently mapped by the
+          grouper.
+        config:
+          meta:
+            data_type: varchar
+      - name: procedure
+        description: Mutually exclusive analytic procedure assigned by the Tuva Procedure
+          Grouper. Tuva populates this by joining normalized ICD-10-PCS procedure codes
+          to tuva_procedure_grouper_code_map. This field remains null for HCPCS,
+          ICD-9-PCS, SNOMED CT, and other code systems that are not currently mapped by
+          the grouper.
         config:
           meta:
             data_type: varchar
       - name: modifier_1
-        description: First modifier for the procedure code.
+        description: First procedure modifier. For claims-derived HCPCS rows, this is
+          populated from input_layer__medical_claim.hcpcs_modifier_1. For clinical rows,
+          this is populated from input_layer__procedure.modifier_1. Claim header
+          procedure-code rows do not currently populate modifiers.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: modifier_2
-        description: Second modifier for the procedure code.
+        description: Second procedure modifier. For claims-derived HCPCS rows, this is
+          populated from input_layer__medical_claim.hcpcs_modifier_2. For clinical rows,
+          this is populated from input_layer__procedure.modifier_2. Claim header
+          procedure-code rows do not currently populate modifiers.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: modifier_3
-        description: Third modifier for the procedure code.
+        description: Third procedure modifier. For claims-derived HCPCS rows, this is
+          populated from input_layer__medical_claim.hcpcs_modifier_3. For clinical rows,
+          this is populated from input_layer__procedure.modifier_3. Claim header
+          procedure-code rows do not currently populate modifiers.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: modifier_4
-        description: Fourth modifier for the procedure code.
+        description: Fourth procedure modifier. For claims-derived HCPCS rows, this is
+          populated from input_layer__medical_claim.hcpcs_modifier_4. For clinical rows,
+          this is populated from input_layer__procedure.modifier_4. Claim header
+          procedure-code rows do not currently populate modifiers.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
       - name: modifier_5
-        description: Fifth modifier for the procedure code.
+        description: Fifth procedure modifier. For claims-derived HCPCS rows, this is
+          populated from input_layer__medical_claim.hcpcs_modifier_5. For clinical rows,
+          this is populated from input_layer__procedure.modifier_5. Claim header
+          procedure-code rows do not currently populate modifiers.
         config:
           meta:
             terminology: https://thetuvaproject.com/terminology/hcpcs-level-2
             data_type: varchar
-      - name: practitioner_id
-        description: Source-system practitioner identifier for the clinician associated
-          with the procedure, when available.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/provider
-            terminology_note: '**Note: this terminology set is too large to be loaded as a
-              seed and is instead loaded from public cloud storage for supported
-              adapters.'
-            data_type: varchar
       - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by
-          `dbt_utils.pretty_time` as the local time of the `dbt run`
-          environment. Timezone is configurable via the `tuva_last_run` var.
+        description: Timestamp for the dbt run that created the procedure record. Tuva
+          populates this from the tuva_last_run variable.
         config:
           meta:
             data_type: timestamp
       - name: data_source
-        description: User-defined name that identifies the source of the procedure data,
-          for example a claims payer data source or a clinical system such as
-          Epic, Athena Health, or Cerner.
+        description: User-defined name that identifies the source system or dataset for the
+          procedure record. For claims-derived rows, this is populated from
+          input_layer__medical_claim.data_source. For clinical rows, this is populated
+          from input_layer__procedure.data_source.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
-  - name: core__stg_claims_medical_claim
-    description: Staging core medical claims
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_medical_claim
-      tags:
-        - core
-        - core_stage_claims
-        - encounters
-      materialized: table
   - name: core__stg_claims_encounter
     description: Staging core claims encounters
     config:
@@ -3454,134 +3510,14 @@ models:
         - core
         - core_stage_claims
       materialized: table
-  - name: core__int_member_months
+  - name: core__stg_claims_medication
     description: |-
-      This model creates member-month records from normalized eligibility spans. It joins normalized eligibility records to the calendar reference table so that each eligibility span is expanded into one record for each covered year-month. It then creates member_month_key as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source, and pulls through eligibility extension columns.
-
-      Table grain: One record per person, member, year month, payer, plan, and data source.
+      This model maps core pharmacy claim rows into the medication structure so pharmacy claims can contribute claims-derived rows to core.medication.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _int_member_months
-      meta:
-        dag:
-          node_type: intermediate
-      tags:
-        - core
-        - core_stage_claims
-      materialized: table
-    columns:
-      - name: member_month_key
-        description: Synthetic key created from person_id, member_id, year_month, payer,
-          plan, and data_source.
-        tests:
-          - unique
-        config:
-          meta:
-            is_primary_key: true
-            data_type: varchar
-      - name: person_id
-        description: Unique identifier for each person in the dataset.
-        config:
-          meta:
-            data_type: varchar
-      - name: member_id
-        description: Identifier assigned by the payer or health plan for the covered member.
-        config:
-          meta:
-            data_type: varchar
-      - name: year_month
-        description: Year and month of eligibility in YYYYMM format.
-        config:
-          meta:
-            data_type: varchar
-      - name: payer
-        description: Name of the payer or health insurer providing coverage during the
-          member month.
-        config:
-          meta:
-            data_type: varchar
-      - name: plan
-        description: Name of the health plan providing coverage during the member month.
-        config:
-          meta:
-            data_type: varchar
-      - name: tuva_last_run
-        description: The last time the data was refreshed. Generated by
-          `dbt_utils.pretty_time` as the local time of the `dbt run`
-          environment. Timezone is configurable via the `tuva_last_run` var.
-        config:
-          meta:
-            data_type: timestamp
-      - name: data_source
-        description: User-configured field that indicates the data source.
-        config:
-          meta:
-            data_type: varchar
-  - name: core__stg_provider_attribution
-    description: |-
-      This model stages provider attribution records for core member months. When provider attribution is enabled, it reads directly from input_layer__provider_attribution and casts attribution fields to core data types. When provider attribution is disabled, it returns an empty relation with the same columns so member_months can still build.
-
-      Table grain: One record per person, member, year month, payer, plan, and data source.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_provider_attribution
-      meta:
-        dag:
-          node_type: intermediate
-      tags:
-        - core
-        - core_stage_claims
-      materialized: view
-  - name: core__stg_claims_member_months
-    description: |-
-      This model joins core member-month records to staged provider attribution records. It preserves the member-month grain from core__int_member_months, adds payer and custom attribution fields when provider attribution is available, and pulls through eligibility extension columns.
-
-      Table grain: One record per person, member, year month, payer, plan, and data source.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_member_months
-      meta:
-        dag:
-          node_type: intermediate
-      tags:
-        - core
-        - core_stage_claims
-      materialized: view
-  - name: core__stg_claims_condition
-    description: Staging core claims conditions
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_condition
-      tags:
-        - core
-        - core_stage_claims
-      materialized: table
-  - name: core__stg_claims_procedure
-    description: Staging core claims procedures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_procedure
-      tags:
-        - core
-        - core_stage_claims
-      materialized: table
-  - name: core__stg_claims_pharmacy_claim
-    description: Staging core pharmacy claims
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_pharmacy_claim
+      alias: _stg_claims_medication
       tags:
         - core
         - core_stage_claims
@@ -3597,101 +3533,3 @@ models:
         - core
         - core_stage_claims
       materialized: table
-  - name: core__stg_clinical_condition
-    description: Staging core clinical conditions
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_condition
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_encounter
-    description: Staging core clinical encounters
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_encounter
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_immunization
-    description: Staging core clinical immunization
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_immunization
-      tags: core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_lab_result
-    description: This model casts input layer lab_result fields to their core data
-      types, adds tuva_last_run, and passes through extension columns.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_lab_result
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_location
-    description: Staging core clinical locations
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_location
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_medication
-    description: Staging core clinical medications
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_medication
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_observation
-    description: Staging core clinical observations
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_observation
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_practitioner
-    description: Staging core clinical providers
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_practitioner
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view
-  - name: core__stg_clinical_procedure
-    description: Staging core clinical procedures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_procedure
-      tags:
-        - core
-        - core_stage_clinical
-      materialized: view

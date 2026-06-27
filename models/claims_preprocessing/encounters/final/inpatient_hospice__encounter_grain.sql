@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -65,7 +65,7 @@ where claim_type = 'institutional'
     select
         patient_data_source_id
         , birth_date
-        , gender
+        , sex
         , race
     from {{ ref('encounters__stg_eligibility') }}
     where patient_row_num = 1
@@ -115,7 +115,7 @@ select
 , tot.encounter_type
 , tot.encounter_group
 , {{ dbt.datediff("birth_date","encounter_end_date","day") }} / 365 as admit_age
-, e.gender
+, e.sex
 , e.race
 , c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code

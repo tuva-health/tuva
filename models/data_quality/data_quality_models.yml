@@ -1,37 +1,8 @@
 version: 2
-models:
-  - name: data_quality__testing_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: testing_summary
-      tags:
-        - data_quality
-        - dqi
-  - name: data_quality__exploratory_charts
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: exploratory_charts
-      tags:
-        - data_quality
-        - dqi
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: "{{ (var('enable_legacy_data_quality', false) | as_bool) and (var('enable_input_layer_testing', true) | as_bool) }}"
 
-          arguments:
-            combination_of_columns:
-              - data_quality_category
-              - graph_name
-              - level_of_detail
-              - y_axis
-              - x_axis
+models:
   - name: data_quality__structural
+    description: One row per data source and input-layer table with structural pass/fail results for table existence, population, expected columns, data types, and primary keys.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -39,27 +10,59 @@ models:
       alias: structural
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_structural
       materialized: table
     columns:
       - name: data_source
-        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
       - name: table_name
-        description: The input-layer table being evaluated.
       - name: table_exists
-        description: Pass or fail result indicating whether the expected input-layer relation exists.
       - name: columns_exist
-        description: Pass or fail result indicating whether all documented input-layer columns are present. For the three claims input tables, this is derived from the structural column detail table.
       - name: data_types
-        description: Pass or fail result indicating whether all documented input-layer columns match the expected data-type family. For the three claims input tables, this is derived from the structural column detail table.
       - name: primary_keys
-        description: Pass or fail result indicating whether the documented primary-key columns exist, are non-null, and remain unique at the documented grain. For the three claims input tables, this is derived from the structural column detail and structural primary-key test tables.
       - name: row_count
-        description: The integer number of rows present for the evaluated data_source and input-layer table. Null means the relation does not exist.
+
+  - name: data_quality__structural_expected_columns
+    description: One row per enabled Input Layer column expected by the Tuva contract, generated from Input Layer YAML metadata.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_expected_columns
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: table_name
+      - name: model_name
+      - name: column_name
+      - name: expected_data_type
+      - name: expected_type_family
+      - name: required
+      - name: is_primary_key
+      - name: column_order
+
+  - name: data_quality__structural_actual_columns
+    description: One row per actual warehouse column and data source for enabled Input Layer tables, generated through dbt adapter metadata APIs.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_actual_columns
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: data_source
+      - name: data_source_key
+      - name: table_name
+      - name: model_name
+      - name: column_name
+      - name: actual_data_type
+      - name: actual_type_family
+      - name: table_exists
+      - name: row_count
 
   - name: data_quality__structural_column_details
+    description: One row per data source, input-layer table, and expected column with expected-vs-actual column metadata and structural pass/fail results.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -67,23 +70,23 @@ models:
       alias: structural_column_details
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_structural
       materialized: table
     columns:
       - name: data_source
-        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
       - name: table
-        description: The claims input-layer table being evaluated.
       - name: column
-        description: The documented input-layer column being evaluated.
+      - name: expected_data_type
+      - name: actual_data_type
+      - name: required
+      - name: is_primary_key
+      - name: table_exists
+      - name: row_count
       - name: column_exists
-        description: Yes or no indicator for whether the documented column exists on the input-layer relation.
       - name: data_type_correct
-        description: Yes or no indicator for whether the documented column matches the expected data-type family.
+      - name: column_order
 
   - name: data_quality__structural_primary_key_tests
+    description: One row per primary-key test result for each data source and input-layer table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -91,21 +94,13 @@ models:
       alias: structural_primary_key_tests
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_structural
       materialized: table
     columns:
       - name: data_source
-        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
       - name: table
-        description: The claims input-layer table being evaluated.
       - name: column
-        description: The primary-key column under test, or the comma-separated set of documented primary-key columns for the duplicate value test.
       - name: test
-        description: The primary-key test being evaluated. Current values are not null and duplicate value.
       - name: test_result
-        description: Integer test result where healthy values are expected to be zero. Not-null tests count null values, and duplicate value tests return total rows minus distinct primary-key combinations.
 
   - name: data_quality__logical
     description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.
@@ -116,22 +111,15 @@ models:
       alias: logical
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
     columns:
       - name: data_source
-        description: The input-layer data source being evaluated. Null means the source could not be determined from the relation.
       - name: table
-        description: The primary input-layer table being evaluated by the logical test.
       - name: test_name
-        description: The plain-language logical consistency test being evaluated.
       - name: test_result
-        description: The integer sum of the persisted native-grain flag column for the logical test. Healthy results are expected to be zero.
 
   - name: data_quality__medical_claim_line_flags
-    description: One row per medical claim line per data source. Stores only the native-grain keys plus 0/1 logical test flags that can be evaluated directly at the claim-line grain.
+    description: One row per medical claim line per data source with native-grain keys and 0/1 logical test flags evaluated at the claim-line grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -139,27 +127,14 @@ models:
       alias: medical_claim_line_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - claim_id
-              - claim_line_number
-              - data_source
     columns:
       - name: claim_id
-        description: Medical claim identifier at the claim-line grain.
       - name: claim_line_number
-        description: Claim-line number within the claim.
       - name: data_source
-        description: Input-layer data source associated with the claim line.
 
   - name: data_quality__medical_claim_claim_flags
-    description: One row per medical claim per data source. Stores only the claim-grain keys plus 0/1 logical test flags that must be evaluated at the claim header grain.
+    description: One row per medical claim per data source with claim-grain keys and 0/1 logical test flags evaluated at the claim header grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -167,24 +142,13 @@ models:
       alias: medical_claim_claim_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - claim_id
-              - data_source
     columns:
       - name: claim_id
-        description: Medical claim identifier at the claim grain.
       - name: data_source
-        description: Input-layer data source associated with the claim.
 
   - name: data_quality__pharmacy_claim_line_flags
-    description: One row per pharmacy claim line per data source. Stores only the native-grain keys plus 0/1 logical test flags that can be evaluated directly at the claim-line grain.
+    description: One row per pharmacy claim line per data source with native-grain keys and 0/1 logical test flags evaluated at the claim-line grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -192,27 +156,14 @@ models:
       alias: pharmacy_claim_line_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - claim_id
-              - claim_line_number
-              - data_source
     columns:
       - name: claim_id
-        description: Pharmacy claim identifier at the claim-line grain.
       - name: claim_line_number
-        description: Claim-line number within the claim.
       - name: data_source
-        description: Input-layer data source associated with the claim line.
 
   - name: data_quality__pharmacy_claim_claim_flags
-    description: One row per pharmacy claim per data source. Stores only the claim-grain keys plus 0/1 logical test flags that must be evaluated at the claim header grain.
+    description: One row per pharmacy claim per data source with claim-grain keys and 0/1 logical test flags evaluated at the claim header grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -220,24 +171,13 @@ models:
       alias: pharmacy_claim_claim_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - claim_id
-              - data_source
     columns:
       - name: claim_id
-        description: Pharmacy claim identifier at the claim grain.
       - name: data_source
-        description: Input-layer data source associated with the claim.
 
   - name: data_quality__eligibility_span_flags
-    description: One row per eligibility span per data source. Stores only the span-grain keys plus 0/1 logical test flags that can be evaluated directly from a single eligibility span row.
+    description: One row per eligibility span per data source with native-grain keys and 0/1 logical test flags evaluated at the eligibility-span grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -245,33 +185,16 @@ models:
       alias: eligibility_span_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - person_id
-              - member_id
-              - enrollment_start_date
-              - enrollment_end_date
-              - data_source
     columns:
       - name: person_id
-        description: Person identifier for the eligibility span.
       - name: member_id
-        description: Member identifier for the eligibility span.
       - name: enrollment_start_date
-        description: Start date of the eligibility span.
       - name: enrollment_end_date
-        description: End date of the eligibility span.
       - name: data_source
-        description: Input-layer data source associated with the eligibility span.
 
   - name: data_quality__eligibility_person_flags
-    description: One row per person per data source. Stores only the person-grain keys plus 0/1 logical test flags that must be evaluated across multiple eligibility rows for the same person.
+    description: One row per person per data source with 0/1 logical test flags evaluated across eligibility spans for the person.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -279,683 +202,77 @@ models:
       alias: eligibility_person_flags
       tags:
         - data_quality
-        - dq
-        - dq1
-        - dq_logical
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - person_id
-              - data_source
     columns:
       - name: person_id
-        description: Person identifier at the person-grain logical flag level.
       - name: data_source
-        description: Input-layer data source associated with the person.
 
-  - name: data_quality__analytical_key_metrics
-    description: Analytical key metrics aggregated by unioning persisted per-metric models from the analytical key_metrics layer in the data_quality schema. Results are formatted from the analytical metric manifest, which is also the source of truth for each metric model and result type.
+  - name: data_quality__appointment_flags
+    description: One row per clinical appointment input record per data source with native-grain keys and 0/1 logical test flags evaluated at the appointment-record grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: analytical_key_metrics
+      alias: appointment_flags
       tags:
         - data_quality
-        - dq
-        - dq2
-        - dq_analytics
-        - dq_analytical
       materialized: table
     columns:
+      - name: appointment_id
       - name: data_source
-        description: The data source for the analytical metric.
-      - name: domain
-        description: The high-level analytical domain for the metric.
-      - name: metric
-        description: The analytical metric name.
-      - name: result
-        description: Formatted analytical metric output. Count-style metrics are rendered as whole-number text values, while utilization, PMPM, prevalence, percentage, and average metrics are rendered as text values rounded to at most two decimal places.
-      - name: medicare
-        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
-      - name: commercial
-        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
-      - name: medicaid
-        description: Placeholder payer-segment result column. This pass leaves the value null for every row.
 
-
-  - name: data_quality__analytical_data_marts
+  - name: data_quality__condition_flags
+    description: One row per clinical condition input record per data source with native-grain keys and 0/1 logical test flags evaluated at the condition-record grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: analytical_data_marts
-      tags:
-        - data_quality
-        - dq
-        - dq2
-        - dq_analytics
-        - dq_analytical
-      materialized: table
-    columns:
-      - name: data_mart
-        description: The Tuva data mart being summarized.
-      - name: row_count
-        description: The integer row count for the representative output table of the mart. Null indicates the mart relation does not exist.
-
-  - name: data_quality__chronic_conditions_prevalence
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: chronic_conditions_prevalence
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__chronic_conditions_none
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: chronic_conditions_none
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__encounters_cost_and_utilization_trend
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: encounters_cost_and_utilization_trend
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__service_category_pmpm_trend
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: service_category_pmpm_trend
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__dx_and_px
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: dx_and_px
+      alias: condition_flags
       tags:
         - data_quality
       materialized: table
     columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-      - name: result_count
-        description: The number of rows in the input layer that match the data quality check criteria
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
+      - name: source_condition_id
+      - name: data_source
 
-  - name: data_quality__eligibility_date_checks
+  - name: data_quality__encounter_flags
+    description: One row per clinical encounter input record per data source with native-grain keys and 0/1 logical test flags evaluated at the encounter-record grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: eligibility_date_checks
+      alias: encounter_flags
       tags:
         - data_quality
       materialized: table
     columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-      - name: result_count
-        description: The number of eligibility spans in the input layer that match the data quality check criteria
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
+      - name: encounter_id
+      - name: data_source
 
-
-  - name: data_quality__eligibility_demographics
+  - name: data_quality__immunization_flags
+    description: One row per clinical immunization input record per data source with native-grain keys and 0/1 logical test flags evaluated at the immunization-record grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: eligibility_demographics
+      alias: immunization_flags
       tags:
         - data_quality
       materialized: table
     columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-      - name: result_count
-        description: |
-          The number of eligibility spans in the input layer that match the data quality check criteria (multiple birth dates
-          count unique members)
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
+      - name: immunization_id
+      - name: data_source
 
-
-  - name: data_quality__eligibility_missing_person_id
+  - name: data_quality__lab_result_flags
+    description: One row per clinical lab result input record per data source with native-grain keys and 0/1 logical test flags evaluated at the lab-result-record grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: eligibility_missing_person_id
+      alias: lab_result_flags
       tags:
         - data_quality
       materialized: table
     columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-      - name: result_count
-        description: The number of eligibility spans in the input layer that match the data quality check criteria
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-
-  - name: data_quality__eligibility_missing_payer
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: eligibility_missing_payer
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-      - name: result_count
-        description: The number of eligibility spans in the input layer that match the data quality check criteria
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-  - name: data_quality__encounters_cost_and_utilization
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: encounters_cost_and_utilization
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__encounters_missing_groups_union
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: encounters_missing_groups_union
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__encounters_missing_groups
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: encounters_missing_groups
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__eligibility_trend
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: eligibility_trend
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: year_month
-        description: The year and month
-      - name: member_months
-        description: The count of distinct members with eligibility in the corresponding year and month
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-  - name: data_quality__claim_date_trends
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: claim_date_trends
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: year_month
-        description: The name of the data quality check
-      - name: claim_start_date
-        description: The count of distinct claims with a claim start date in the corresponding year and month.
-      - name: claim_end_date
-        description: The count of distinct claims with a claim end date in the corresponding year and month.
-      - name: admission_date
-        description: The count of distinct claims with a admission date in the corresponding year and month.
-      - name: discharge_date
-        description: The count of distinct claims with a discharge date in the corresponding year and month.
-      - name: medical_paid_date
-        description: The count of distinct claims with a medical paid date in the corresponding year and month.
-      - name: dispensing_date
-        description: The count of distinct claims with a dispensing date in the corresponding year and month.
-      - name: pharmacy_paid_date
-        description: The count of distinct claims with a pharmacy paid date in the corresponding year and month.
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-  - name: data_quality__data_quality_test_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_test_summary
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-        tests:
-          - unique
-          - not_null
-      - name: result_count
-        description: the count of records that match the result of the data quality check
-      - name: tuva_last_run
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-  - name: data_quality__analytics_reference_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: analytics_reference_summary
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__analytics_checks_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: analytics_checks_summary
-      tags:
-        - data_quality
-      materialized: table
-
-    columns:
-      - name: data_quality_check
-        description: The name of the data quality check
-        tests:
-          - unique
-          - not_null
-      - name: result_count
-        description: the count of records that match the result of the data quality check
-      - name: tuva_last_run
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-  - name: data_quality__pharmacy_claim_person_id
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_person_id
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__pharmacy_claim_date_checks
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_date_checks
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__pharmacy_claim_ndc
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_ndc
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__pharmacy_claim_prescription_details
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_prescription_details
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__pharmacy_claim_npi
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_npi
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__pharmacy_claim_volume_and_dollars
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: pharmacy_claim_volume_and_dollars
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: year_month
-        description: the year and month in format yyyymm
-      - name: claim_volume
-        description: the unique count of claims
-      - name: paid_amount
-        description: 'The total amount paid by the insurer.'
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-
-  - name: data_quality__primary_key_check
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: primary_key_check
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_person_id
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_person_id
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_date_checks
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_date_checks
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_inst_header_fields
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_inst_header_fields
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_claim_line_fields
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_claim_line_fields
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_provider_npi
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_provider_npi
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__medical_claim_volume_and_dollars
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: medical_claim_volume_and_dollars
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: year_month
-        description: the year and month in format yyyymm
-      - name: claim_volume
-        description: the unique count of claims
-      - name: paid_amount
-        description: 'The total amount paid by the insurer.'
-      - name: tuva_last_ran
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-
-  - name: data_quality__data_loss
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_loss
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: table_name
-        description: the name of the table's records being counted
-      - name: metric
-        description: the name of the metric being analyzed
-      - name: input_layer_value
-        description: the count of the metric found in the input layer schema of the table
-      - name: core_value
-        description: the count of the metric found in the core layer schema of the table
-      - name: tuva_last_run
-        description: 'The last time the data was refreshed. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment. Timezone is configurable via the `tuva_last_run` var.'
-
-
-
-
-  - name: data_quality__core_populated
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: core_populated
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: table_name
-        description: the name of the table's records being counted
-      - name: record_count
-        description: the total number of records belonging to the specific data quality check
-
-
-  - name: data_quality__analytics_populated
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: analytics_populated
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: table_name
-        description: the name of the table's records being counted
-      - name: record_count
-        description: the total number of records belonging to the specific data quality check
-
-  - name: data_quality__readmissions
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_readmissions
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__readmissions_reference
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_readmissions_reference
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__service_categories_pmpm
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: service_categories_pmpm
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__cms_hcc
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_cms_hcc
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__cms_hcc_reference
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_cms_hcc_reference
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__quality_measures_reference
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_quality_measures_reference
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__quality_measures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_quality_measures
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__acute_inpatient_reference
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_acute_inpatient_reference
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__acute_inpatient_prevalence
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_acute_inpatient_prevalence
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__ed_classification
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_ed_classification
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__ed_classification_reference
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_ed_classification_reference
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__financial_pmpm
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_financial_pmpm
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__claim_percent
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_claim_percent
-      tags:
-        - data_quality
-      materialized: table
-
-
-
-#### stage
-  - name: data_quality__eligibility_dq_stage
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      tags:
-        - data_quality
-      materialized: view
-
-  - name: data_quality__inpatient_dq_stage
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      tags:
-        - data_quality
-      materialized: table
+      - name: lab_result_id
+      - name: data_source

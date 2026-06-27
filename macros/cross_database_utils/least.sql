@@ -1,5 +1,5 @@
 {% macro least(a, b) %}
-  {{ return(adapter.dispatch('least', 'macros')(a, b)) }}
+  {{ return(adapter.dispatch('least', 'the_tuva_project')(a, b)) }}
 {% endmacro %}
 
 {% macro default__least(a, b) %}

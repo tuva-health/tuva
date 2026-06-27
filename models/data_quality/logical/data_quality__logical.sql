@@ -1,5 +1,6 @@
 {{ config(
-     enabled = (var('enable_data_quality', false) | as_bool) and (var('claims_enabled', false) | as_bool),
+     enabled = (var('enable_data_quality', false) | as_bool)
+       and ((var('claims_enabled', false) | as_bool) or (var('clinical_enabled', false) | as_bool)),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
@@ -11,7 +12,7 @@
    )
 }}
 
-{% if var('claims_enabled', false) | as_bool %}
+{% if (var('claims_enabled', false) | as_bool) or (var('clinical_enabled', false) | as_bool) %}
     {% set logical_queries = [] %}
 
     {% for definition in dq_logical_test_manifest() %}

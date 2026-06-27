@@ -16,9 +16,9 @@
         'eligibility__death_flag_without_death_date': 'death_flag indicates death without death_date',
         'eligibility__death_date_out_of_reasonable_range': 'death_date out of reasonable range',
         'eligibility__enrollment_start_after_end': 'enrollment_start_date after enrollment_end_date',
-        'eligibility__gender_invalid': 'gender invalid',
-        'eligibility__multiple_genders_per_person': 'gender has multiple values per person_id',
-        'eligibility__gender_null': 'gender null',
+        'eligibility__sex_invalid': 'sex invalid',
+        'eligibility__multiple_sexes_per_person': 'sex has multiple values per person_id',
+        'eligibility__sex_null': 'sex null',
         'eligibility__payer_type_invalid': 'payer_type invalid',
         'eligibility__payer_type_null': 'payer_type null',
         'eligibility__race_invalid': 'race invalid',
@@ -48,6 +48,7 @@
         'medical_claim__institutional_indicators_present_for_professional_claim': 'institutional indicators present for professional claim',
         'medical_claim__diagnosis_code_1_invalid': 'diagnosis_code_1 invalid',
         'medical_claim__diagnosis_code_1_null': 'diagnosis_code_1 null',
+        'medical_claim__diagnosis_code_count_gt_one_per_position_for_institutional_claim': 'diagnosis_code has multiple values per position for institutional claim',
         'medical_claim__diagnosis_code_2_to_25_invalid': 'diagnosis_code_2 to diagnosis_code_25 invalid',
         'medical_claim__diagnosis_code_type_invalid': 'diagnosis_code_type invalid',
         'medical_claim__diagnosis_code_type_null_when_diagnosis_code_present': 'diagnosis_code_type null when diagnosis_code present',
@@ -63,6 +64,7 @@
         'medical_claim__discharge_date_null_for_inpatient_claim': 'discharge_date null for inpatient claim',
         'medical_claim__facility_npi_invalid': 'facility_npi invalid',
         'medical_claim__facility_npi_null_for_inpatient_claim': 'facility_npi null for inpatient claim',
+        'medical_claim__facility_npi_has_multiple_values_per_claim': 'facility_npi has multiple values per claim_id',
         'medical_claim__hcpcs_code_null_for_professional_claim': 'hcpcs_code null for professional claim',
         'medical_claim__no_matching_eligibility_span': 'no matching eligibility span',
         'medical_claim__paid_amount_null': 'paid_amount null',
@@ -95,10 +97,101 @@
         'pharmacy_claim__multiple_person_ids_per_claim': 'person_id has multiple values per claim',
         'pharmacy_claim__person_id_null': 'person_id null',
         'pharmacy_claim__prescribing_provider_npi_invalid': 'prescribing_provider_npi invalid',
-        'pharmacy_claim__prescribing_provider_npi_null': 'prescribing_provider_npi null'
+        'pharmacy_claim__prescribing_provider_npi_null': 'prescribing_provider_npi null',
+        'appointment__person_id_not_in_patient': 'person_id not found in patient',
+        'appointment__patient_id_not_in_patient': 'patient_id not found in patient',
+        'appointment__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'appointment__start_datetime_null': 'start_datetime null',
+        'condition__person_id_null': 'person_id null',
+        'condition__patient_id_null': 'patient_id null',
+        'condition__source_code_null': 'source_code null',
+        'condition__code_system_null': 'code_system null',
+        'condition__person_id_not_in_patient': 'person_id not found in patient',
+        'condition__patient_id_not_in_patient': 'patient_id not found in patient',
+        'condition__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'condition__code_system_invalid': 'code_system invalid',
+        'condition__source_code_invalid': 'source_code invalid',
+        'condition__present_on_admit_code_invalid': 'present_on_admit_code invalid',
+        'encounter__person_id_null': 'person_id null',
+        'encounter__patient_id_null': 'patient_id null',
+        'encounter__person_id_not_in_patient': 'person_id not found in patient',
+        'encounter__patient_id_not_in_patient': 'patient_id not found in patient',
+        'encounter__encounter_type_invalid': 'encounter_type invalid',
+        'encounter__encounter_start_date_null': 'encounter_start_date null',
+        'encounter__encounter_end_date_null': 'encounter_end_date null',
+        'encounter__encounter_start_date_out_of_reasonable_range': 'encounter_start_date out of reasonable range',
+        'encounter__encounter_end_date_out_of_reasonable_range': 'encounter_end_date out of reasonable range',
+        'encounter__admit_source_code_invalid': 'admit_source_code invalid',
+        'encounter__admit_type_code_invalid': 'admit_type_code invalid',
+        'encounter__discharge_disposition_code_invalid': 'discharge_disposition_code invalid',
+        'encounter__facility_npi_invalid': 'facility_npi invalid',
+        'encounter__primary_diagnosis_code_type_null': 'primary_diagnosis_code_type null',
+        'encounter__primary_diagnosis_code_type_invalid': 'primary_diagnosis_code_type invalid',
+        'encounter__primary_diagnosis_code_null': 'primary_diagnosis_code null',
+        'encounter__primary_diagnosis_code_invalid': 'primary_diagnosis_code invalid',
+        'encounter__drg_code_type_null': 'drg_code_type null',
+        'encounter__drg_code_type_invalid': 'drg_code_type invalid',
+        'encounter__drg_code_null': 'drg_code null',
+        'encounter__drg_code_invalid': 'drg_code invalid',
+        'immunization__person_id_null': 'person_id null',
+        'immunization__patient_id_null': 'patient_id null',
+        'immunization__person_id_not_in_patient': 'person_id not found in patient',
+        'immunization__patient_id_not_in_patient': 'patient_id not found in patient',
+        'immunization__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'lab_result__person_id_null': 'person_id null',
+        'lab_result__patient_id_null': 'patient_id null',
+        'lab_result__person_id_not_in_patient': 'person_id not found in patient',
+        'lab_result__patient_id_not_in_patient': 'patient_id not found in patient',
+        'lab_result__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'lab_result__accession_number_null': 'accession_number null',
+        'lab_result__source_component_type_invalid': 'source_component_type invalid',
+        'lab_result__source_component_code_invalid': 'source_component_code invalid'
     } %}
 
     {{ return(display_names.get(test_name, test_name)) }}
+{% endmacro %}
+
+{% macro dq_logical_test_description(table_name, test_name) %}
+    {% set display_name = dq_logical_display_name(table_name, test_name) %}
+    {% set table_label = "input_layer." ~ table_name %}
+
+    {% if test_name.endswith('__person_id_null') %}
+        {{ return("Checks whether person_id is null in " ~ table_label ~ ".") }}
+    {% elif test_name.endswith('__patient_id_null') %}
+        {{ return("Checks whether patient_id is null in " ~ table_label ~ ".") }}
+    {% elif test_name.endswith('__person_id_not_in_patient') %}
+        {{ return("Checks whether person_id values in " ~ table_label ~ " have a corresponding person_id in input_layer.patient for the same data_source.") }}
+    {% elif test_name.endswith('__patient_id_not_in_patient') %}
+        {{ return("Checks whether patient_id values in " ~ table_label ~ " have a corresponding patient_id in input_layer.patient for the same data_source.") }}
+    {% elif test_name.endswith('__encounter_id_not_in_encounter') %}
+        {{ return("Checks whether populated encounter_id values in " ~ table_label ~ " have a corresponding encounter_id in input_layer.encounter for the same data_source.") }}
+    {% elif test_name.endswith('__no_matching_eligibility_span') %}
+        {{ return("Checks whether records in " ~ table_label ~ " have no matching eligibility span for the same person_id and data_source during the relevant claim or dispensing dates.") }}
+    {% elif 'multiple_person_ids_per_claim' in test_name %}
+        {{ return("Checks whether a claim_id in " ~ table_label ~ " is associated with more than one person_id within the same data_source.") }}
+    {% elif 'multiple_' in test_name or '_has_multiple_values_' in test_name or '_count_ne_one_' in test_name or '_count_gt_one_' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% elif test_name.endswith('_null') or '_null_' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% elif test_name.endswith('_invalid') or '_invalid_' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ " by comparing populated values to Tuva's accepted values or terminology data assets.") }}
+    {% elif '_out_of_reasonable_range' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ " using Tuva's configured healthcare data quality date range.") }}
+    {% elif '_after_' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% elif '_lt_zero' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% elif '_gt_allowed_amount' in test_name %}
+        {{ return("Checks whether paid_amount is greater than allowed_amount in " ~ table_label ~ ".") }}
+    {% elif 'institutional_indicators_present_for_professional_claim' in test_name %}
+        {{ return("Checks whether professional claims in " ~ table_label ~ " contain institutional-only fields such as bill type, revenue center, admit, discharge, or DRG fields.") }}
+    {% elif 'present_for_institutional_claim' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% elif 'null_for_institutional_claim' in test_name or 'null_for_professional_claim' in test_name or 'null_for_inpatient_claim' in test_name or 'null_for_acute_inpatient_claim' in test_name %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% else %}
+        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
+    {% endif %}
 {% endmacro %}
 
 {% macro dq_logical_source_key_expression_sql(relation, relation_alias='source_rows') %}
@@ -139,211 +232,4 @@
         ~ " and " ~ relation_alias ~ ".bill_type_code is not null"
         ~ " and " ~ bill_type_prefix_expression ~ " in ('11', '12')"
     ) }}
-{% endmacro %}
-
-{% macro dq_logical_count_where_sql(relation, table_name, test_name, where_sql, distinct_expression=None) %}
-    {% set source_key_expression = dq_logical_source_key_expression_sql(relation, 'source_rows') %}
-    {% set count_expression = "count(*)" if distinct_expression is none else "count(distinct " ~ distinct_expression ~ ")" %}
-    {% set display_name = dq_logical_display_name(table_name, test_name) %}
-
-    select
-          sources.data_source
-        , '{{ table_name }}' as {{ adapter.quote('table') }}
-        , '{{ display_name }}' as test_name
-        , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
-    from (
-        {{ dq_source_dimension_sql(relation) }}
-    ) as sources
-    left join (
-        select
-              {{ source_key_expression }} as data_source_key
-            , cast({{ count_expression }} as {{ dbt.type_int() }}) as test_result
-        from {{ relation }} as source_rows
-        where {{ where_sql }}
-        group by {{ source_key_expression }}
-    ) as violations
-        on sources.data_source_key = violations.data_source_key
-{% endmacro %}
-
-{% macro dq_logical_group_having_sql(relation, table_name, test_name, group_expression, having_sql, where_sql=None) %}
-    {% set source_key_expression = dq_logical_source_key_expression_sql(relation, 'source_rows') %}
-    {% set display_name = dq_logical_display_name(table_name, test_name) %}
-
-    select
-          sources.data_source
-        , '{{ table_name }}' as {{ adapter.quote('table') }}
-        , '{{ display_name }}' as test_name
-        , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
-    from (
-        {{ dq_source_dimension_sql(relation) }}
-    ) as sources
-    left join (
-        select
-              grouped_rows.data_source_key
-            , cast(count(*) as {{ dbt.type_int() }}) as test_result
-        from (
-            select
-                  {{ source_key_expression }} as data_source_key
-                , {{ group_expression }} as group_key
-            from {{ relation }} as source_rows
-            {% if where_sql is not none %}
-            where {{ where_sql }}
-            {% endif %}
-            group by
-                  {{ source_key_expression }}
-                , {{ group_expression }}
-            having {{ having_sql }}
-        ) as grouped_rows
-        group by grouped_rows.data_source_key
-    ) as violations
-        on sources.data_source_key = violations.data_source_key
-{% endmacro %}
-
-{% macro dq_logical_lookup_count_sql(
-    relation,
-    table_name,
-    test_name,
-    source_expression,
-    lookup_relation,
-    lookup_expression,
-    lookup_null_expression,
-    distinct_expression=None,
-    where_sql=None,
-    extra_join_sql=None
-) %}
-    {% set source_key_expression = dq_logical_source_key_expression_sql(relation, 'source_rows') %}
-    {% set count_expression = "count(*)" if distinct_expression is none else "count(distinct " ~ distinct_expression ~ ")" %}
-    {% set display_name = dq_logical_display_name(table_name, test_name) %}
-
-    select
-          sources.data_source
-        , '{{ table_name }}' as {{ adapter.quote('table') }}
-        , '{{ display_name }}' as test_name
-        , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
-    from (
-        {{ dq_source_dimension_sql(relation) }}
-    ) as sources
-    left join (
-        select
-              {{ source_key_expression }} as data_source_key
-            , cast({{ count_expression }} as {{ dbt.type_int() }}) as test_result
-        from {{ relation }} as source_rows
-        left join {{ lookup_relation }} as lookup_rows
-            on {{ source_expression }} = {{ lookup_expression }}
-            {% if extra_join_sql is not none %}
-            and {{ extra_join_sql }}
-            {% endif %}
-        where {{ source_expression }} is not null
-          and {{ lookup_null_expression }} is null
-          {% if where_sql is not none %}
-          and {{ where_sql }}
-          {% endif %}
-        group by {{ source_key_expression }}
-    ) as violations
-        on sources.data_source_key = violations.data_source_key
-{% endmacro %}
-
-{% macro dq_logical_claim_span_match_sql(
-    claim_relation,
-    table_name,
-    test_name,
-    eligibility_relation,
-    claim_where_sql,
-    match_sql
-) %}
-    {% set claim_source_key_expression = dq_logical_source_key_expression_sql(claim_relation, 'claim_rows') %}
-    {% set eligibility_source_key_expression = dq_logical_source_key_expression_sql(eligibility_relation, 'eligibility_rows') %}
-    {% set display_name = dq_logical_display_name(table_name, test_name) %}
-
-    select
-          sources.data_source
-        , '{{ table_name }}' as {{ adapter.quote('table') }}
-        , '{{ display_name }}' as test_name
-        , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
-    from (
-        {{ dq_source_dimension_sql(claim_relation) }}
-    ) as sources
-    left join (
-        select
-              missing_claims.data_source_key
-            , cast(count(distinct missing_claims.claim_id) as {{ dbt.type_int() }}) as test_result
-        from (
-            select distinct
-                  {{ claim_source_key_expression }} as data_source_key
-                , claim_rows.claim_id
-            from {{ claim_relation }} as claim_rows
-            where {{ claim_where_sql }}
-              and not exists (
-                  select 1
-                  from {{ eligibility_relation }} as eligibility_rows
-                  where {{ eligibility_source_key_expression }} = {{ claim_source_key_expression }}
-                    and eligibility_rows.person_id = claim_rows.person_id
-                    and {{ match_sql }}
-              )
-        ) as missing_claims
-        group by missing_claims.data_source_key
-    ) as violations
-        on sources.data_source_key = violations.data_source_key
-{% endmacro %}
-
-{% macro dq_logical_multi_column_code_lookup_sql(
-    relation,
-    table_name,
-    test_name,
-    code_columns,
-    type_column,
-    code_type_to_lookup_map,
-    distinct_expression='claim_codes.claim_id',
-    base_where_sql=None
-) %}
-    {% set source_key_expression = dq_logical_source_key_expression_sql(relation, 'source_rows') %}
-    {% set union_queries = [] %}
-    {% set display_name = dq_logical_display_name(table_name, test_name) %}
-
-    {% for code_column in code_columns %}
-        {% set query %}
-            select
-                  {{ source_key_expression }} as data_source_key
-                , source_rows.claim_id as claim_id
-                , lower(cast(source_rows.{{ quote_column(type_column) }} as {{ dbt.type_string() }})) as code_type
-                , replace(cast(source_rows.{{ quote_column(code_column) }} as {{ dbt.type_string() }}), '.', '') as code_value
-            from {{ relation }} as source_rows
-            where source_rows.{{ quote_column(code_column) }} is not null
-            {% if base_where_sql is not none %}
-              and {{ base_where_sql }}
-            {% endif %}
-        {% endset %}
-        {% do union_queries.append(query) %}
-    {% endfor %}
-
-    select
-          sources.data_source
-        , '{{ table_name }}' as {{ adapter.quote('table') }}
-        , '{{ display_name }}' as test_name
-        , cast(coalesce(violations.test_result, 0) as {{ dbt.type_int() }}) as test_result
-    from (
-        {{ dq_source_dimension_sql(relation) }}
-    ) as sources
-    left join (
-        select
-              claim_codes.data_source_key
-            , cast(count(distinct {{ distinct_expression }}) as {{ dbt.type_int() }}) as test_result
-        from (
-            {{ union_queries | join('\nunion all\n') }}
-        ) as claim_codes
-        {% for code_map in code_type_to_lookup_map %}
-        left join {{ ref(code_map['lookup_model']) }} as lookup_{{ loop.index }}
-            on claim_codes.code_type = '{{ code_map['code_type'] }}'
-           and claim_codes.code_value = replace(cast(lookup_{{ loop.index }}.{{ quote_column(code_map['lookup_column']) }} as {{ dbt.type_string() }}), '.', '')
-        {% endfor %}
-        where (
-            {% for code_map in code_type_to_lookup_map %}
-            (claim_codes.code_type = '{{ code_map['code_type'] }}'
-             and lookup_{{ loop.index }}.{{ quote_column(code_map['lookup_column']) }} is null)
-            {% if not loop.last %} or {% endif %}
-            {% endfor %}
-        )
-        group by claim_codes.data_source_key
-    ) as violations
-        on sources.data_source_key = violations.data_source_key
 {% endmacro %}

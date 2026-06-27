@@ -58,11 +58,11 @@
 {% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__encounter')) }}
+    {{ select_extension_columns(ref('normalized__encounter')) }}
 {%- endset -%}
 
 with enc as (
-    {{ smart_union([ref('core__stg_claims_encounter'), ref('core__stg_clinical_encounter')], source_index=none) }}
+    {{ smart_union([ref('core__stg_claims_encounter'), ref('normalized__encounter')], source_index=none) }}
 )
 
 select
@@ -74,14 +74,14 @@ from enc
 {% elif var('clinical_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__encounter')) }}
+    {{ select_extension_columns(ref('normalized__encounter')) }}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_clinical_encounter') }}
+from {{ ref('normalized__encounter') }}
 
 {% elif var('claims_enabled', False) == true -%}
 
