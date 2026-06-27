@@ -74,7 +74,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
-              workflow_id: "dbt_ci_modes.yml",
+              workflow_id: "ci.yml",
               ref: dispatchRef,
               inputs: {
                 pr_number: String(issue_number),

@@ -21,7 +21,10 @@ profile when available. Set `DBT_PROFILES_DIR`, `TUVA_DBT_PROFILE`, or
 ## CI Command Parsing
 
 `parse_ci_command.py` is used by GitHub Actions to parse and authorize `/ci`
-pull request comments. Its unit tests live next to it:
+pull request comments. The default `/ci` command runs Snowflake Tuva Core seed
+and run. `/ci build` runs Tuva Core build across active warehouses, and
+`/ci marts` runs Snowflake seed and run across Tuva Core plus external data mart
+packages. Its unit tests live next to it:
 
 ```bash
 python -m unittest scripts/test_parse_ci_command.py

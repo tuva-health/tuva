@@ -150,10 +150,18 @@ content is loaded from public object storage.
 
 ## CI Guidance
 
-- Default PR CI is Snowflake-focused unless workflow configuration changes.
-- Comment commands may be available for warehouse-specific or full builds.
-- If a PR changes seed/config files that require a full refresh, use a
-  seed-refreshing CI command before run/test-only commands.
+- Default PR CI runs Snowflake Tuva Core `dbt seed --full-refresh` followed by
+  `dbt run`.
+- Comment commands on PRs:
+  - `/ci` runs Snowflake Tuva Core seed + run.
+  - `/ci run` runs Tuva Core seed + run across active warehouses.
+  - `/ci run-<warehouse>` runs Tuva Core seed + run on one warehouse.
+  - `/ci build` runs Tuva Core `dbt build --full-refresh` across active warehouses.
+  - `/ci build-<warehouse>` runs Tuva Core `dbt build --full-refresh` on one warehouse.
+  - `/ci marts` runs Snowflake seed + run across Tuva Core plus external data mart packages.
+  - `/ci <warehouse> dbt ...` runs an explicit dbt command sequence on one or more warehouses.
+- Active multi-warehouse CI targets are Snowflake, BigQuery, Databricks, Fabric,
+  and DuckDB. Redshift remains explicit-only while its CI warehouse is turned off.
 - Do not edit `.github/workflows/create-release.yml` unless the task explicitly
   targets release automation.
 

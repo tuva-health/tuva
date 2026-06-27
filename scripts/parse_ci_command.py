@@ -10,13 +10,15 @@ from dataclasses import dataclass
 
 
 WAREHOUSES = ["snowflake", "bigquery", "databricks", "fabric", "redshift", "duckdb"]
+ACTIVE_WAREHOUSES = ["snowflake", "bigquery", "databricks", "fabric", "duckdb"]
 WAREHOUSE_SET = set(WAREHOUSES)
 COLLABORATOR_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER"}
 VALID_SUBCOMMANDS = {"build", "compile", "debug", "run", "seed", "test"}
 MULTI_VALUE_FLAGS = {"--exclude", "--select", "-s"}
 SINGLE_VALUE_FLAGS = {"--selector", "--vars"}
-BOOLEAN_FLAGS = {"--empty", "--fail-fast", "--full-refresh"}
+BOOLEAN_FLAGS = {"--empty", "--fail-fast", "--full-refresh", "--no-partial-parse"}
+CORE_SELECTOR = ["--select", "package:integration_tests", "package:the_tuva_project"]
 
 
 class ValidationError(ValueError):
@@ -31,7 +33,7 @@ class ParsedRequest:
 
     @property
     def all_targets(self) -> bool:
-        return self.targets == WAREHOUSES
+        return self.targets == ACTIVE_WAREHOUSES
 
     @property
     def targets_csv(self) -> str:
@@ -46,7 +48,6 @@ class ParsedRequest:
 class ValidatedCommand:
     command_tokens: list[str]
     subcommand: str
-    requires_seed_baseline: bool
     refreshes_seeds: bool
 
     @property
@@ -57,7 +58,6 @@ class ValidatedCommand:
 @dataclass(frozen=True)
 class ValidatedCommandSequence:
     commands: list[ValidatedCommand]
-    requires_seed_baseline: bool
     refreshes_seeds: bool
 
     @property
@@ -95,15 +95,16 @@ def _split_shell_words(raw: str) -> list[str]:
         raise ValidationError(f"Unable to parse command: {exc}") from exc
 
 
-def _normalize_targets(tokens: list[str]) -> list[str]:
+def _normalize_targets(tokens: list[str], default: list[str] | None = None) -> list[str]:
+    default_targets = ACTIVE_WAREHOUSES.copy() if default is None else default
     if not tokens:
-        return WAREHOUSES.copy()
+        return default_targets
 
     lowered = [token.lower() for token in tokens]
     if "all" in lowered and len(lowered) > 1:
         raise ValidationError("Do not combine `all` with specific warehouses in a `/ci` command.")
     if lowered == ["all"]:
-        return WAREHOUSES.copy()
+        return ACTIVE_WAREHOUSES.copy()
 
     normalized: list[str] = []
     for token in lowered:
@@ -115,11 +116,34 @@ def _normalize_targets(tokens: list[str]) -> list[str]:
     return normalized
 
 
-def _normalize_targets_csv(raw: str) -> list[str]:
+def _normalize_targets_csv(raw: str, default: list[str] | None = None) -> list[str]:
     trimmed = raw.strip().lower()
-    if not trimmed or trimmed == "all":
-        return WAREHOUSES.copy()
+    if not trimmed:
+        return ACTIVE_WAREHOUSES.copy() if default is None else default
+    if trimmed == "all":
+        return ACTIVE_WAREHOUSES.copy()
     return _normalize_targets([part.strip() for part in trimmed.split(",") if part.strip()])
+
+
+def _core_seed_run_commands() -> list[list[str]]:
+    return [
+        ["dbt", "seed", "--full-refresh", *CORE_SELECTOR],
+        ["dbt", "run", *CORE_SELECTOR],
+    ]
+
+
+def _core_build_command(extra_tokens: list[str] | None = None) -> list[list[str]]:
+    extra = extra_tokens or []
+    if extra:
+        return [["dbt", "build", "--full-refresh", *extra]]
+    return [["dbt", "build", "--full-refresh", *CORE_SELECTOR]]
+
+
+def _all_package_seed_run_commands() -> list[list[str]]:
+    return [
+        ["dbt", "seed", "--full-refresh"],
+        ["dbt", "run"],
+    ]
 
 
 def _split_command_sequences(command_tokens: list[str]) -> list[list[str]]:
@@ -144,39 +168,40 @@ def _split_command_sequences(command_tokens: list[str]) -> list[list[str]]:
     return sequences
 
 
-def _parse_legacy_alias(tokens: list[str]) -> ParsedRequest | None:
+def _parse_alias(tokens: list[str]) -> ParsedRequest | None:
     if not tokens:
-        return None
+        return ParsedRequest(command_sequences=_core_seed_run_commands(), targets=["snowflake"], source="default")
 
     alias = tokens[0].strip().lower()
     remainder = tokens[1:]
+
+    if alias in {"marts", "all-packages"}:
+        if remainder:
+            raise ValidationError(f"`/ci {alias}` does not accept additional arguments.")
+        return ParsedRequest(command_sequences=_all_package_seed_run_commands(), targets=["snowflake"], source="alias")
+
     if alias in {"run", "build"}:
         operation = alias
-        targets = WAREHOUSES.copy()
+        targets = ACTIVE_WAREHOUSES.copy()
     elif alias.startswith("run-") or alias.startswith("build-"):
         operation, _, target = alias.partition("-")
         if not target:
-            raise ValidationError(
-                "Missing warehouse in legacy CI alias. Example: `/ci run-snowflake`."
-            )
+            raise ValidationError("Missing warehouse in CI alias. Example: `/ci run-snowflake`.")
         targets = _normalize_targets([target])
     else:
         return None
 
-    base_command = ["dbt", operation]
     if operation == "build":
-        base_command.append("--full-refresh")
+        return ParsedRequest(command_sequences=_core_build_command(remainder), targets=targets, source="alias")
 
-    return ParsedRequest(
-        command_sequences=[base_command + remainder],
-        targets=targets,
-        source="alias",
-    )
+    if remainder:
+        return ParsedRequest(command_sequences=[["dbt", "run", *remainder]], targets=targets, source="alias")
+    return ParsedRequest(command_sequences=_core_seed_run_commands(), targets=targets, source="alias")
 
 
 def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
     if not command_tokens:
-        raise ValidationError("Missing dbt command. Example: `dbt run --select tag:tuva_demo`.")
+        raise ValidationError("Missing dbt command. Example: `dbt run`.")
     if command_tokens[0].lower() != "dbt":
         raise ValidationError("CI commands must start with `dbt`.")
     if len(command_tokens) < 2:
@@ -234,28 +259,15 @@ def validate_dbt_command(command_tokens: list[str]) -> ValidatedCommand:
     return ValidatedCommand(
         command_tokens=normalized,
         subcommand=subcommand,
-        requires_seed_baseline=subcommand in {"run", "test"},
         refreshes_seeds=subcommand in {"seed", "build"},
     )
 
 
 def validate_dbt_sequence(command_sequences: list[list[str]]) -> ValidatedCommandSequence:
     validated_commands = [validate_dbt_command(command_tokens) for command_tokens in command_sequences]
-
-    requires_seed_baseline = False
-    refreshes_seeds = False
-    seen_seed_refresh = False
-    for command in validated_commands:
-        if command.requires_seed_baseline and not seen_seed_refresh:
-            requires_seed_baseline = True
-        if command.refreshes_seeds:
-            refreshes_seeds = True
-            seen_seed_refresh = True
-
     return ValidatedCommandSequence(
         commands=validated_commands,
-        requires_seed_baseline=requires_seed_baseline,
-        refreshes_seeds=refreshes_seeds,
+        refreshes_seeds=any(command.refreshes_seeds for command in validated_commands),
     )
 
 
@@ -269,10 +281,7 @@ def parse_comment_body(body: str) -> ParsedRequest:
         raise ValidationError("CI commands must start with `/ci`.")
 
     remainder = tokens[1:]
-    if not remainder:
-        return ParsedRequest(command_sequences=[["dbt", "run"]], targets=WAREHOUSES.copy(), source="default")
-
-    alias_request = _parse_legacy_alias(remainder)
+    alias_request = _parse_alias(remainder)
     if alias_request is not None:
         return alias_request
 
@@ -286,8 +295,8 @@ def parse_comment_body(body: str) -> ParsedRequest:
         )
 
     return ParsedRequest(
-        command_sequences=[["dbt", "run"]],
-        targets=_normalize_targets(remainder),
+        command_sequences=_core_seed_run_commands(),
+        targets=_normalize_targets(remainder, default=["snowflake"]),
         source="default",
     )
 
@@ -301,7 +310,7 @@ def resolve_dispatch_inputs(
     if dbt_command.strip():
         return ParsedRequest(
             command_sequences=_split_command_sequences(_split_shell_words(dbt_command)),
-            targets=_normalize_targets_csv(targets_csv),
+            targets=_normalize_targets_csv(targets_csv, default=["snowflake"]),
             source="explicit",
         )
 
@@ -312,13 +321,9 @@ def resolve_dispatch_inputs(
     if lowered_target != "all" and lowered_target not in WAREHOUSE_SET:
         raise ValidationError(f"Invalid workflow_dispatch input target `{target}`.")
 
-    return ParsedRequest(
-        command_sequences=[
-            ["dbt", "build", "--full-refresh"] if lowered_operation == "build" else ["dbt", "run"]
-        ],
-        targets=WAREHOUSES.copy() if lowered_target == "all" else [lowered_target],
-        source="legacy",
-    )
+    targets = ACTIVE_WAREHOUSES.copy() if lowered_target == "all" else [lowered_target]
+    command_sequences = _core_build_command() if lowered_operation == "build" else _core_seed_run_commands()
+    return ParsedRequest(command_sequences=command_sequences, targets=targets, source="legacy")
 
 
 def _authorize_request(
@@ -342,7 +347,6 @@ def _emit_parsed_request(parsed: ParsedRequest, validated: ValidatedCommandSeque
             "dbt_command_json": json.dumps(validated.commands[0].command_tokens),
             "dbt_commands_json": json.dumps(normalized_sequences),
             "command_label": f"{parsed.targets_display}: {validated.command_display}",
-            "requires_seed_baseline": str(validated.requires_seed_baseline).lower(),
             "refreshes_seeds": str(validated.refreshes_seeds).lower(),
             "source": parsed.source,
             "subcommand": validated.first_subcommand,
@@ -371,11 +375,11 @@ def run_parse_comment() -> int:
             {
                 "allowed": "false",
                 "message": (
-                f"{exc} Examples: `/ci`, `/ci snowflake dbt run`, "
-                "`/ci snowflake fabric dbt seed dbt run`, `/ci run-snowflake`."
-            ),
-        }
-    )
+                    f"{exc} Examples: `/ci`, `/ci build`, `/ci marts`, "
+                    "`/ci snowflake dbt seed dbt run`."
+                ),
+            }
+        )
         return 0
 
     _emit_parsed_request(parsed, validated)
@@ -393,7 +397,7 @@ def run_resolve_dispatch() -> int:
         validated = validate_dbt_sequence(parsed.command_sequences)
     except ValidationError as exc:
         return _emit_failure(
-            f"{exc} Examples: `dbt run`, `dbt seed dbt run`, `dbt seed --select tag:tuva_demo dbt run`."
+            f"{exc} Examples: `dbt seed --full-refresh dbt run`, `dbt build --full-refresh`."
         )
 
     _emit_parsed_request(parsed, validated)
