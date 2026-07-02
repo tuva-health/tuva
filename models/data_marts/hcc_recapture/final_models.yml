@@ -301,7 +301,6 @@ models:
               - model_version
               - hcc_hierarchy_group
               - hcc_hierarchy_group_rank
-              - suspect_hcc_flag
               - filtered_by_hierarchy_flag
               - hcc_type
               - hcc_source
@@ -396,9 +395,8 @@ models:
           meta:
             data_type: integer
             is_primary_key: true
-      - name: suspect_hcc_flag
-        description: Flag indicating whether the HCC comes from suspecting logic rather
-          than a billed diagnosis.
+      - name: external_hcc_flag
+        description: "These HCCs are not based on claims, but based on data provided from clinical or additional payer HCC lists."
         config:
           meta:
             data_type: integer
@@ -594,9 +592,4 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: suspect_hcc_flag
-        description: Flag indicating whether the HCC comes from suspecting logic rather
-          than a billed diagnosis.
-        config:
-          meta:
-            data_type: integer
+

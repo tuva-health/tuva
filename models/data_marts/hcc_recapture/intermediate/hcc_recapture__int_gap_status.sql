@@ -9,12 +9,13 @@ with add_rankings as (
         person_id
         , payer
         , hcc_code
-        , suspect_hcc_flag
         , model_version
         , collection_year + 1 as payment_year
         , recapturable_flag
         , hcc_type
         , hcc_source
+        , hcc_gap_type
+        , hcc_gap_source
         , eligible_bene_flag
         , gap_status
         , risk_model_code
@@ -35,14 +36,16 @@ with add_rankings as (
 
 -- Pick the best hcc type
     -- 1. Best rank
-    -- 2. If tie → prefer recapture (suspect_hcc_flag = 0)
+    -- 2. If tie → prefer recapture
 , best_hcc_type as (
     select *
     , row_number() over (
         partition by person_id, payer, hcc_code, model_version, payment_year
         order by 
             hcc_type_rank asc,
-            suspect_hcc_flag asc   -- 0 preferred over 1
+            -- If it was already coded, prefer coded > suspect
+            case when hcc_type = 'suspect' then 1 else 0 end asc,
+            case when hcc_gap_type = 'suspect' then 1 else 0 end asc
     ) as best_rank
     from add_rankings
 )
@@ -90,10 +93,11 @@ select distinct
     , bgap.recapturable_flag
     , bgap.hcc_type
     , bgap.hcc_source
+    , bgap.hcc_gap_type
+    , bgap.hcc_gap_source    
     , bgap.gap_status
     , bgap.hcc_hierarchy_group
     , bgap.hcc_hierarchy_group_rank
-    , bgap.suspect_hcc_flag
     -- Apply hierarchies (i.e. if the hierarchy is not the min hierarchy, then remove it)
     , case when bgap.hcc_hierarchy_group is not null and mhier.hcc_hierarchy_group is null then 1 else 0 end as filtered_by_hierarchy_flag
 from best_gap_status as bgap

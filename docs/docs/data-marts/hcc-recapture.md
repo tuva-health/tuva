@@ -10,7 +10,7 @@ The HCC recapture data mart enables organizations to track HCCs which have been 
 - It affects that patient's risk score
 - The risk score affects reimbursement for value-based care contracts
 
-This mart not only tracks HCCs which were previously coded, but also automatically includes any suspect HCCs from the suspect HCC mart and flags them using the `suspect_hcc_flag`.
+This mart not only tracks HCCs which were previously coded, but also automatically includes any suspect HCCs from the suspect HCC mart.
 
 Additionally, the mart provides recapture rates and a lot of detail into the type of gap closure.
 
@@ -44,8 +44,12 @@ The following options are customizable in the HCC recapture mart to provide grea
 
 ### HCC Suspect Lists
 
-The `hcc_recapture_suspect_list` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own HCC suspect list from a payer or clinical source. The data needs to be input into a model called `suspect_hccs`. The required fields can be found in the `hcc_recapture__stg_suspect_hccs` model.
+The `hcc_recapture_external_suspect_list` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own HCC suspect list from a payer or clinical source. The data needs to be input into a model called `suspect_hccs`. The required fields can be found in the `hcc_recapture__stg_suspect_hccs` model.
 
 ### Chronic HCCs
 
-The `hcc_recapture_chronic_hccs` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.
+The `hcc_recapture_external_chronic_hccs` variable defaults to `false` and can be set to `true` in the `dbt_project.yml` in order to provide your own custom chronic HCC definition instead of using the CMS chronic HCC definitions already provided. The data needs to be input into a model called `chronic_hccs`. The required fields can be found in the `hcc_recapture__stg_chronic_hccs` model.
+
+### Lookback Period
+
+The `hcc_recapture_year_lookback` variable defaults to 1 and can be changed to determine the number of years to lookback to find coded HCCs.
