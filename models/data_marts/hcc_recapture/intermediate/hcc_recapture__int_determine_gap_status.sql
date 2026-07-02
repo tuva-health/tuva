@@ -110,11 +110,11 @@ select
             gap.hcc_code is not null and base.hcc_code is not null and gap.hcc_code != base.hcc_code and equiv.risk_model_code is not null
             then 'closed - equivalent coefficient hcc in hierarchy group'
         when
-            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank < grp.best_hcc_rank
+            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank > grp.best_hcc_rank
             then 'closed - higher coefficient hcc in hierarchy group'
         when gap.hcc_code is not null and base.hcc_code is not null then 'closed'
         when
-            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank > grp.best_hcc_rank
+            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank < grp.best_hcc_rank
             then 'closed - lower coefficient hcc in hierarchy group'
         when gap.hcc_code is not null and base.hcc_code is null then 'open'
         when gap.hcc_code is null and base.hcc_code is not null then 'new'
