@@ -32,7 +32,8 @@
         ethnicity_column: name/expression of the ethnicity column.
 #}
 case
-    when lower(trim(cast({{ ethnicity_column }} as {{ dbt.type_string() }}))) = 'hispanic or latino'
+    when lower(trim(cast({{ ethnicity_column }} as {{ dbt.type_string() }}))) like 'hispanic%'
+      or lower(trim(cast({{ ethnicity_column }} as {{ dbt.type_string() }}))) = 'latino'
         then 'Hispanic or Latino'
     when lower(trim(cast({{ race_column }} as {{ dbt.type_string() }}))) = 'white'
         then 'White'
