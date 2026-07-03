@@ -42,7 +42,7 @@ with cte as (
     left outer join {{ ref('ccsr__dx_vertical_pivot') }} as p
       on e.primary_diagnosis_code = p.code
       and p.ccsr_category_rank = 1
-    left outer join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} as b
+    left outer join {{ ref('ccsr__dxccsr_v2025_1_body_systems') }} as b
       on p.ccsr_parent_category = b.ccsr_parent_category
     left outer join {{ ref('terminology__ms_drg_weights_los') }} as weights
       on e.drg_code = weights.ms_drg and {{ date_part('year', 'e.encounter_start_date') }} = cast (weights.fiscal_year as {{ dbt.type_numeric() }})

@@ -346,7 +346,7 @@ inner join first_last as fl on e.person_id = fl.person_id
   er.data_source = fl.data_source
   and
   fl.year_nbr = c.year
-left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
+left outer join {{ ref('ccsr__dxccsr_v2025_1_cleaned_map') }} as ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left outer join {{ ref('reference_data__ansi_fips_state') }} as st_ab on p.state = st_ab.ansi_fips_state_abbreviation
 left outer join {{ ref('reference_data__ansi_fips_state') }} as st_full on p.state = st_full.ansi_fips_state_name
 left outer join {{ ref('terminology__race') }} as r on p.race = r.description

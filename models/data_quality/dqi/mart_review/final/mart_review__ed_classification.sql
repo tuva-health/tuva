@@ -58,5 +58,5 @@ left outer join cte on e.facility_npi = cte.location_id
 left outer join {{ ref('ccsr__dx_vertical_pivot') }} as p
   on e.primary_diagnosis_code = p.code
   and p.ccsr_category_rank = 1
-left outer join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} as b on p.ccsr_parent_category = b.ccsr_parent_category
+left outer join {{ ref('ccsr__dxccsr_v2025_1_body_systems') }} as b on p.ccsr_parent_category = b.ccsr_parent_category
 where e.encounter_type = 'emergency department'

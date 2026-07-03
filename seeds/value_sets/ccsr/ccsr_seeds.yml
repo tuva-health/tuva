@@ -1,14 +1,14 @@
 version: 2
 
 seeds:
-  - name: ccsr__dxccsr_v2023_1_body_systems
+  - name: ccsr__dxccsr_v2025_1_body_systems
     description: |
       A table containing descriptions of the top level categories used in the CCSR condition mapper.
       This was manually extracted from the User Guide PDF included with the DXCCSR SAS program.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _value_set_dxccsr_v2023_1_body_systems
+      alias: _value_set_dxccsr_v2025_1_body_systems
       tags:
         - ccsr
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -27,7 +27,7 @@ seeds:
       - name: parent_category_description
         description: Description of the parent category in the CCSR condition mapper.
 
-  - name: ccsr__dxccsr_v2023_1_cleaned_map
+  - name: ccsr__dxccsr_v2025_1_cleaned_map
     description: |
       A table containing the CSV mapping file included with the DXCCSR SAS program.
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
@@ -35,7 +35,7 @@ seeds:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _value_set_dxccsr_v2023_1_cleaned_map
+      alias: _value_set_dxccsr_v2025_1_cleaned_map
       tags:
         - ccsr
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"
@@ -117,14 +117,14 @@ seeds:
       - name: ccsr_category_6_description
         description: Description of the sixth CCSR category code
 
-  - name: ccsr__prccsr_v2023_1_cleaned_map
+  - name: ccsr__prccsr_v2025_1_cleaned_map
     description: |
       A table containing the CSV mapping file included with the PRCCSR SAS program.
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _value_set_prccsr_v2023_1_cleaned_map
+      alias: _value_set_prccsr_v2025_1_cleaned_map
       tags:
         - ccsr
       enabled: "{{ var('claims_enabled', var('clinical_enabled', False)) }}"

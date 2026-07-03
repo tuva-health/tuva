@@ -16,6 +16,6 @@ select
     , ont.device
     , ont.qualifier
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('ccsr__prccsr_v2023_1_cleaned_map') }} as ccsr_map
+from {{ ref('ccsr__prccsr_v2025_1_cleaned_map') }} as ccsr_map
 left outer join {{ ref('terminology__icd10_pcs_cms_ontology') }} as ont
     on ccsr_map.icd_10_pcs = ont.icd10pcs_code
