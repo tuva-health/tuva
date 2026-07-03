@@ -16,6 +16,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 , cast(null as {{ dbt.type_string() }}) as person_id
 , cast(null as {{ dbt.type_string() }}) as patient_id
 , cast(null as {{ dbt.type_string() }}) as encounter_type
+, cast(null as {{ dbt.type_string() }}) as encounter_status
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_end_date
 , cast(null as {{ dbt.type_string() }}) as admit_source_code
