@@ -49,6 +49,7 @@ select
   , cast(p.person_id as {{ dbt.type_string() }}) as person_id
   , cast(encounter_type as {{ dbt.type_string() }}) as encounter_type
   , cast(encounter_group as {{ dbt.type_string() }}) as encounter_group
+  , cast(null as {{ dbt.type_string() }}) as encounter_status
   , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
   , coalesce({{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }}, {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }}) as encounter_end_date
   , cast(length_of_stay as {{ dbt.type_int() }}) as length_of_stay

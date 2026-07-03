@@ -738,6 +738,17 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: encounter_status
+        description: Lifecycle status of the encounter for clinical (EHR-sourced)
+          encounters, aligned with the FHIR Encounter.status value set, such as
+          planned, arrived, in-progress, onleave, finished, cancelled, or
+          entered-in-error. Populated from input_layer__encounter when clinical
+          data is enabled so downstream analytics can distinguish completed
+          encounters from in-progress or unsigned documentation. Null for
+          claims-derived encounters, which have no clinical lifecycle status.
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_start_date
         description: Date the encounter started. For inpatient and multi-day encounters,
           this is the admission or first service date.

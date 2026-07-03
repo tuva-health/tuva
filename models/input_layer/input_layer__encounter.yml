@@ -149,6 +149,29 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: encounter_status
+        description: >-
+          Lifecycle status of the encounter as reported by the clinical source system, aligned with the FHIR Encounter.status value set, such as planned, arrived, in-progress, onleave, finished, cancelled, or entered-in-error. Populate this to distinguish completed encounters (for example finished) from encounters that are still in-progress or that represent unsigned or not-yet-completed documentation. Preserve the source status value when available. This lets downstream analytics filter incomplete encounters instead of relying on the connector to drop them from the input layer.
+        required_for_data_marts: []
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_1
+                  - dqi
+          - the_tuva_project.warn_if_null_percentage_is_100:
+              description: Percentage of values that are null.
+              config:
+                severity: warn
+                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
+                tags:
+                  - tuva_dqi_sev_5
+                  - dqi
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_start_date
         description: >-
           Date the encounter started, formatted as YYYY-MM-DD. For inpatient and multi-day encounters, this is the admission or first service date.

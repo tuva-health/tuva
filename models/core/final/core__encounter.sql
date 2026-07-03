@@ -9,6 +9,7 @@
     , person_id
     , encounter_type
     , encounter_group
+    , encounter_status
     , encounter_start_date
     , encounter_end_date
     , length_of_stay

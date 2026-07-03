@@ -8,6 +8,7 @@
     , cast(enc.person_id as {{ dbt.type_string() }}) as person_id
     , cast(enc.encounter_type as {{ dbt.type_string() }}) as encounter_type
     , cast('clinical' as {{ dbt.type_string() }}) as encounter_group
+    , cast(enc.encounter_status as {{ dbt.type_string() }}) as encounter_status
     , enc.normalized_encounter_start_date as encounter_start_date
     , enc.normalized_encounter_end_date as encounter_end_date
     , cast(
