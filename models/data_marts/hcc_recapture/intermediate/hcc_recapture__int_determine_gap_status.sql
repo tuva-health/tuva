@@ -93,7 +93,8 @@ select
     , coalesce(base.risk_model_code, gap.risk_model_code) as risk_model_code
     , coalesce(base.eligible_bene_flag, gap.eligible_bene_flag) as eligible_bene_flag
     , coalesce(base.hcc_code, gap.hcc_code) as hcc_code
-    , gap.hcc_code as recaptured_hcc_code
+    , base.hcc_code as closing_hcc_code
+    , gap.hcc_code as gap_hcc_code
     , grp.hcc_code as best_current_year_hcc_code
     , coalesce(base.model_version, gap.model_version) as model_version
     , coalesce(base.collection_year, gap.collection_year) as collection_year
@@ -109,11 +110,11 @@ select
             gap.hcc_code is not null and base.hcc_code is not null and gap.hcc_code != base.hcc_code and equiv.risk_model_code is not null
             then 'closed - equivalent coefficient hcc in hierarchy group'
         when
-            grp.hcc_hierarchy_group is not null and base.hcc_hierarchy_group_rank < grp.best_hcc_rank
+            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank > grp.best_hcc_rank
             then 'closed - higher coefficient hcc in hierarchy group'
         when gap.hcc_code is not null and base.hcc_code is not null then 'closed'
         when
-            grp.hcc_hierarchy_group is not null and base.hcc_hierarchy_group_rank > grp.best_hcc_rank
+            grp.hcc_hierarchy_group is not null and gap.hcc_hierarchy_group_rank < grp.best_hcc_rank
             then 'closed - lower coefficient hcc in hierarchy group'
         when gap.hcc_code is not null and base.hcc_code is null then 'open'
         when gap.hcc_code is null and base.hcc_code is not null then 'new'
@@ -133,11 +134,11 @@ left join equiv_coef as equiv
     and base.hcc_code = equiv.hcc_code
     and base.risk_model_code = equiv.risk_model_code
 left join hcc_rank as grp
-    on base.person_id = grp.person_id
-    and base.payer = grp.payer
-    and base.collection_year = grp.collection_year
-    and base.model_version = grp.model_version
-    and base.hcc_hierarchy_group = grp.hcc_hierarchy_group
+    on gap.person_id = grp.person_id
+    and gap.payer = grp.payer
+    and gap.collection_year = grp.collection_year
+    and gap.model_version = grp.model_version
+    and gap.hcc_hierarchy_group = grp.hcc_hierarchy_group
     and grp.best_hcc_rank = grp.hcc_hierarchy_group_rank
 -- Gaps are only eligible to be closed by claims data and the base table here is closing the gap aliased table
 -- The or hcc_type is null allows open HCCs to flow through
