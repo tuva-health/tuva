@@ -19,7 +19,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
             is_primary_key: true
       - name: person_id
         description: >-
@@ -27,145 +26,124 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
       - name: patient_id
         description: >-
           Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: encounter_type
         description: >-
           Type of clinical encounter, such as acute inpatient, emergency department, outpatient, office visit, or skilled nursing facility. Values should map to Tuva encounter type terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
       - name: encounter_start_date
         description: >-
           Date the encounter started, formatted as YYYY-MM-DD. For inpatient and multi-day encounters, this is the admission or first service date.
         config:
           meta:
             data_type: date
-            required_for_data_marts: ['ahrq_measures', 'quality_measures', 'readmissions', 'semantic_layer']
       - name: encounter_end_date
         description: >-
           Date the encounter ended, formatted as YYYY-MM-DD. For inpatient and multi-day encounters, this is the discharge or last service date. For same-day encounters, this may be the same as encounter_start_date.
         config:
           meta:
             data_type: date
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'quality_measures', 'readmissions', 'semantic_layer']
       - name: admit_source_code
         description: >-
           Source code indicating where the patient was immediately before admission, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'semantic_layer']
       - name: admit_type_code
         description: >-
           Source code indicating the type or priority of admission, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
       - name: discharge_disposition_code
         description: >-
           Source code indicating the patient's disposition at discharge, such as home, expired, or transferred to another care setting. This is most relevant for inpatient and emergency department encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['readmissions', 'semantic_layer']
       - name: attending_provider_id
         description: >-
           Identifier for the attending provider associated with the encounter, when available. This may be the provider's National Provider Identifier (NPI) or a source-system provider identifier.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
       - name: attending_provider_name
         description: >-
           Name of the attending provider associated with the encounter, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
       - name: facility_npi
         description: >-
           National Provider Identifier for the facility where the encounter occurred, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
       - name: facility_name
         description: >-
           Name of the facility or care site where the encounter occurred, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ed_classification', 'semantic_layer']
       - name: primary_diagnosis_code_type
         description: >-
           Code system for primary_diagnosis_code. Accepted values should map to Tuva code type terminology, such as icd-10-cm or icd-9-cm.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ed_classification', 'semantic_layer']
       - name: primary_diagnosis_code
         description: >-
           Primary diagnosis code associated with the encounter, when available from the clinical source system. For ICD diagnosis codes, the source may include or omit decimal formatting. The Tuva package derives the corresponding description downstream from Tuva terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
       - name: drg_code_type
         description: >-
           Diagnosis-related group code system for drg_code, when a DRG is assigned to the encounter. Examples include ms-drg and apr-drg.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['readmissions', 'semantic_layer']
       - name: drg_code
         description: >-
           Diagnosis-related group code assigned to the encounter, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'readmissions', 'semantic_layer']
       - name: paid_amount
         description: >-
           Total paid amount associated with the encounter, when available from the clinical source system. Claims-derived payment amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
         config:
           meta:
             data_type: number
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
       - name: allowed_amount
         description: >-
           Total allowed amount associated with the encounter, when available from the clinical source system. Claims-derived allowed amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
         config:
           meta:
             data_type: number
-            required_for_data_marts: ['ed_classification', 'semantic_layer']
       - name: charge_amount
         description: >-
           Total charge amount associated with the encounter before adjustments or payments, when available from the clinical source system. Claims-derived charge amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
         config:
           meta:
             data_type: number
-            required_for_data_marts: ['ed_classification', 'semantic_layer']
       - name: ingest_datetime
         description: >-
           Date and time the source encounter record was loaded into the data warehouse. This is useful when multiple versions of the same encounter record are received over time.
         config:
           meta:
             data_type: timestamp
-            required_for_data_marts: []
       - name: data_source
         description: >-
           User-defined name that identifies the source of the encounter data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['ahrq_measures', 'ed_classification', 'readmissions', 'semantic_layer']
             is_primary_key: true

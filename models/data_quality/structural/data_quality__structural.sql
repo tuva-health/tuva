@@ -50,6 +50,12 @@ select
         else 'fail'
       end as table_exists
     , case
+        when column_status.table_exists = 'yes'
+         and coalesce(column_status.row_count, 0) > 0
+        then 'pass'
+        else 'fail'
+      end as table_populated
+    , case
         when column_status.missing_column_count = 0 then 'pass'
         else 'fail'
       end as columns_exist
@@ -58,6 +64,9 @@ select
         else 'fail'
       end as data_types
     , case
+        when column_status.table_exists = 'yes'
+         and coalesce(column_status.row_count, 0) = 0
+        then 'n/a'
         when column_status.table_exists = 'yes'
          and column_status.expected_pk_column_count > 0
          and column_status.missing_pk_column_count = 0

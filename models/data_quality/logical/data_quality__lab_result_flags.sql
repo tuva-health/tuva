@@ -50,6 +50,7 @@ final as (
         , {{ dq_logical_int_flag_sql("source_rows.patient_id is not null and patient_patient.patient_id is null") }} as patient_id_not_in_patient
         , {{ dq_logical_int_flag_sql("source_rows.encounter_id is not null and encounter_rows.encounter_id is null") }} as encounter_id_not_in_encounter
         , {{ dq_logical_int_flag_sql("source_rows.accession_number is null") }} as accession_number_null
+        , {{ dq_logical_int_flag_sql("source_rows.source_component_code is not null and source_rows.source_component_type is null") }} as source_component_type_null_when_source_component_code_present
         , {{ dq_logical_int_flag_sql("source_rows.source_component_type is not null and not (" ~ source_component_type_valid_where ~ ")") }} as source_component_type_invalid
         , {{ dq_logical_int_flag_sql(
               "source_rows.source_component_code is not null "

@@ -18,48 +18,40 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
             is_primary_key: true
       - name: npi
         description: The practitioner's 10-digit National Provider Identifier, when available. This should be the individual practitioner NPI, not a facility or organization NPI. If the source only has a local practitioner ID, populate practitioner_id and leave npi null.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
       - name: first_name
         description: First name of the practitioner as represented in the source system.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: last_name
         description: Last name of the practitioner as represented in the source system.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: practice_affiliation
         description: Practice, group, department, clinic, or organization with which the practitioner is affiliated in the source system.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: specialty
         description: Primary clinical specialty for the practitioner, such as family medicine, cardiology, or emergency medicine.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
       - name: sub_specialty
         description: More specific specialty or subspecialty for the practitioner, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: data_source
         description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with practitioner_id.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['semantic_layer']
             is_primary_key: true

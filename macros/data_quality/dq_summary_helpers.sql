@@ -104,7 +104,6 @@
             {
                 'name': column.name | lower,
                 'data_type': meta.get('data_type'),
-                'required': meta.get('required', false),
                 'is_primary_key': meta.get('is_primary_key', false),
                 'column_order': loop.index
             }

@@ -15,6 +15,7 @@ models:
       - name: data_source
       - name: table_name
       - name: table_exists
+      - name: table_populated
       - name: columns_exist
       - name: data_types
       - name: primary_keys
@@ -36,7 +37,6 @@ models:
       - name: column_name
       - name: expected_data_type
       - name: expected_type_family
-      - name: required
       - name: is_primary_key
       - name: column_order
 
@@ -77,7 +77,6 @@ models:
       - name: column
       - name: expected_data_type
       - name: actual_data_type
-      - name: required
       - name: is_primary_key
       - name: table_exists
       - name: row_count
@@ -116,6 +115,7 @@ models:
       - name: data_source
       - name: table
       - name: test_name
+      - name: display_name
       - name: test_result
 
   - name: data_quality__medical_claim_line_flags
@@ -275,4 +275,89 @@ models:
       materialized: table
     columns:
       - name: lab_result_id
+      - name: data_source
+
+  - name: data_quality__location_flags
+    description: One row per clinical location input record per data source with native-grain keys and 0/1 logical test flags evaluated at the location-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: location_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: location_id
+      - name: data_source
+
+  - name: data_quality__medication_flags
+    description: One row per clinical medication input record per data source with native-grain keys and 0/1 logical test flags evaluated at the medication-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medication_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: medication_id
+      - name: data_source
+
+  - name: data_quality__observation_flags
+    description: One row per clinical observation input record per data source with native-grain keys and 0/1 logical test flags evaluated at the observation-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: observation_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: observation_id
+      - name: data_source
+
+  - name: data_quality__patient_flags
+    description: One row per clinical patient input record per data source with native-grain keys and 0/1 logical test flags evaluated at the patient-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: person_id
+      - name: patient_id
+      - name: data_source
+
+  - name: data_quality__practitioner_flags
+    description: One row per clinical practitioner input record per data source with native-grain keys and 0/1 logical test flags evaluated at the practitioner-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: practitioner_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: practitioner_id
+      - name: data_source
+
+  - name: data_quality__procedure_flags
+    description: One row per clinical procedure input record per data source with native-grain keys and 0/1 logical test flags evaluated at the procedure-record grain.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: procedure_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: source_procedure_id
       - name: data_source

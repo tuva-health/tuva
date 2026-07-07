@@ -50,7 +50,6 @@ select
     , expected.column_name as {{ adapter.quote('column') }}
     , expected.expected_data_type
     , actual_columns.actual_data_type
-    , expected.required
     , expected.is_primary_key
     , actual_sources.table_exists
     , cast(actual_sources.row_count as {{ dbt.type_int() }}) as row_count

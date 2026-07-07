@@ -24,27 +24,9 @@ models:
         description: Globally unique identifier for a person across all data sources.
           A person may have multiple member_id or subscriber_id values over
           time, but person_id should remain stable for the same person.
-          [
-            'ahrq_measures',
-            'claims_enrollment',
-            'cms_chronic_conditions',
-            'cms_hccs',
-            'ed_classification',
-            'encounters',
-            'financial_pmpm',
-            'hcc_recapture',
-            'hcc_suspecting',
-            'pharmacy',
-            'provider_attribution',
-            'quality_measures',
-            'readmissions',
-            'semantic_layer',
-            'tuva_chronic_conditions'
-          ]
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: 
             is_primary_key: true
       - name: member_id
         description: member_id identifies a person’s enrollment in a specific insurance
@@ -55,7 +37,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'claims_enrollment', 'financial_pmpm', 'pharmacy' ]
             is_primary_key: true
       - name: subscriber_id
         description: Identifier for the policyholder or primary subscriber through
@@ -65,7 +46,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: subscriber_relation
         description: subscriber_relation represents the person's relationship to the
@@ -74,14 +54,12 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: enrollment_start_date
         description: Date the person's enrollment span begins, formatted as YYYY-MM-DD.
         config:
           meta:
             data_type: date
-            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm' ]
             is_primary_key: true
       - name: enrollment_end_date
         description: Date the person's enrollment span ends, formatted as YYYY-MM-DD.
@@ -89,24 +67,14 @@ models:
         config:
           meta:
             data_type: date
-            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm' ]
             is_primary_key: true
       - name: payer
         description: Name of the payer providing coverage for the enrollment span,
           for example Aetna or Blue Cross Blue Shield. If the source data is
           scoped to a single payer, this value may be hard-coded.
-          [
-            'claims_enrollment',
-            'cms_hccs',
-            'financial_pmpm',
-            'hcc_recapture',
-            'hcc_suspecting',
-            'semantic_layer'
-          ]
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: 
             is_primary_key: true
       - name: payer_type
         description: 'Line of business for the payer. Values must map to the Tuva
@@ -115,7 +83,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: plan
         description: Name of the specific health insurance product for the enrollment
@@ -124,14 +91,12 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer' ]
             is_primary_key: true
       - name: first_name
         description: The first name of the person in the enrollment span.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: middle_name
         description: The middle name of the person in the enrollment span. This should
@@ -139,14 +104,12 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: last_name
         description: The last name of the person in the enrollment span.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: name_suffix
         description: Name suffix for the person, for example Jr., Sr., or III. Leave
@@ -154,14 +117,12 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: social_security_number
         description: Social Security number for the person, formatted as XXX-XX-XXXX.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: address
         description: The person's street address for their place of residence associated
@@ -169,7 +130,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: city
         description: The person's city for their place of residence associated with the
@@ -177,7 +137,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: state
         description: The person's state for their place of residence associated with the
@@ -185,7 +144,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
             is_primary_key: false
       - name: zip_code
         description: The person's zip code for their place of residence associated with
@@ -193,21 +151,18 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'ed_classification', 'semantic_layer' ]
             is_primary_key: false
       - name: phone
         description: The person's phone number associated with the enrollment span.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: email
         description: The person's email address associated with the enrollment span.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: ethnicity
         description: Ethnicity of the person, mapped from the source eligibility data
@@ -215,7 +170,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: sex
         description: Biological sex of the person. Accepted values are male, female,
@@ -223,30 +177,18 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'ahrq_measures', 'cms_hccs', 'encounters' ]
             is_primary_key: false
       - name: race
         description: Race of the person, mapped to Tuva race terminology when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'ed_classification', 'encounters', 'semantic_layer' ]
             is_primary_key: false
       - name: birth_date
         description: Birth date of the person, formatted as YYYY-MM-DD.
-          [
-            'ahrq_measures',
-            'cms_hccs',
-            'ed_classification',
-            'encounters',
-            'hcc_suspecting',
-            'quality_measures',
-            'semantic_layer'
-          ]
         config:
           meta:
             data_type: date
-            required_for_data_marts: 
             is_primary_key: false
       - name: death_date
         description: Date the person died, formatted as YYYY-MM-DD. Leave null if the
@@ -254,7 +196,6 @@ models:
         config:
           meta:
             data_type: date
-            required_for_data_marts: [ 'cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer' ]
             is_primary_key: false
       - name: death_flag
         description: A flag indicating if the person has died. Allowed values are 1 for
@@ -263,7 +204,6 @@ models:
         config:
           meta:
             data_type: boolean
-            required_for_data_marts: [ 'semantic_layer' ]
             is_primary_key: false
       - name: original_reason_entitlement_code
         description: Medicare Original Reason for Entitlement Code, or OREC. This
@@ -273,7 +213,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: dual_status_code
         description: dual_status_code indicates whether the person is dually eligible
@@ -285,7 +224,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: medicare_status_code
         description: Two-character Medicare status code indicating how the person
@@ -294,7 +232,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: enrollment_status
         description: >-
@@ -304,7 +241,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'cms_hccs', 'hcc_recapture' ]
             is_primary_key: false
       - name: hospice_flag
         description: Indicator for whether the person is enrolled in hospice during
@@ -312,7 +248,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: institutional_snp_flag
         description: Indicator for whether the person is enrolled in an institutional
@@ -321,7 +256,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: medicaid_indicator
         description: medicaid_indicator is a 0 or 1 field that indicates whether the
@@ -329,7 +263,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: long_term_institutional_flag
         description: Indicator for whether the person has been in an institutional
@@ -337,7 +270,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: [ 'cms_hccs' ]
             is_primary_key: false
       - name: part_d_raf_type
         description: This field indicates the Medicare Part D risk adjustment factor
@@ -346,7 +278,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: low_income_subsidy_indicator
         description: This field is an integer indicator for Low Income Subsidy, also
@@ -355,7 +286,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: metal_level
         description: ACA exchange metal tier for the health plan, if applicable.
@@ -364,14 +294,12 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: csr_indicator
         description: Cost Sharing Reduction, or CSR, variant indicator for ACA
           exchange coverage. Leave null when not applicable.
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: enrollment_duration_months
         description: This field indicates the number of months covered during the
@@ -379,7 +307,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: esrd_status
         description: This field is an integer indicator for end-stage renal disease
@@ -388,7 +315,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: transplant_duration_months
         description: Number of months since kidney transplant, if applicable. Most
@@ -396,7 +322,6 @@ models:
         config:
           meta:
             data_type: integer
-            required_for_data_marts: []
             is_primary_key: false
       - name: group_id
         description: Identifier for the employer group or plan group associated with
@@ -404,7 +329,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: [ 'quality_measures' ]
             is_primary_key: false
       - name: group_name
         description: Name of the employer group or plan group associated with
@@ -412,7 +336,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: file_name
         description: Name of the source file from which the eligibility record
@@ -421,7 +344,6 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: false
       - name: file_date
         description: Date the source file identified by file_name was delivered,
@@ -429,7 +351,6 @@ models:
         config:
           meta:
             data_type: date
-            required_for_data_marts: []
             is_primary_key: false
       - name: ingest_datetime
         description: Date and time the source eligibility record or file was loaded
@@ -438,29 +359,12 @@ models:
         config:
           meta:
             data_type: timestamp
-            required_for_data_marts: []
             is_primary_key: false
       - name: data_source
         description: User-defined name that identifies the source of the eligibility
           data, for example BCBS Tennessee, Medicare FFS, or Medicaid Ohio. This
           value should be populated on every record.
-          [
-            'ahrq_measures',
-            'claims_enrollment',
-            'cms_chronic_conditions',
-            'cms_hccs',
-            'ed_classification',
-            'encounters',
-            'financial_pmpm',
-            'hcc_recapture',
-            'hcc_suspecting',
-            'pharmacy',
-            'provider_attribution',
-            'readmissions',
-            'semantic_layer'
-          ]
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: 
             is_primary_key: true

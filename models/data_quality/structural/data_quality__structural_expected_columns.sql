@@ -39,7 +39,6 @@
                     , '{{ expected_name }}' as column_name
                     , {% if expected_type is not none %}'{{ expected_type }}'{% else %}cast(null as {{ dbt.type_string() }}){% endif %} as expected_data_type
                     , {% if expected_type is not none %}'{{ dq_type_family(expected_type) }}'{% else %}cast(null as {{ dbt.type_string() }}){% endif %} as expected_type_family
-                    , '{{ "yes" if expected_column["required"] else "no" }}' as required
                     , '{{ "yes" if expected_column["is_primary_key"] else "no" }}' as is_primary_key
                     , cast({{ expected_column['column_order'] }} as {{ dbt.type_int() }}) as column_order
             {% endset %}
@@ -66,7 +65,6 @@
             , cast(null as {{ dbt.type_string() }}) as column_name
             , cast(null as {{ dbt.type_string() }}) as expected_data_type
             , cast(null as {{ dbt.type_string() }}) as expected_type_family
-            , cast(null as {{ dbt.type_string() }}) as required
             , cast(null as {{ dbt.type_string() }}) as is_primary_key
             , cast(null as {{ dbt.type_int() }}) as column_order
         {{ dq_empty_result_guard_sql() }}
@@ -78,7 +76,6 @@
         , cast(null as {{ dbt.type_string() }}) as column_name
         , cast(null as {{ dbt.type_string() }}) as expected_data_type
         , cast(null as {{ dbt.type_string() }}) as expected_type_family
-        , cast(null as {{ dbt.type_string() }}) as required
         , cast(null as {{ dbt.type_string() }}) as is_primary_key
         , cast(null as {{ dbt.type_int() }}) as column_order
     {{ dq_empty_result_guard_sql() }}

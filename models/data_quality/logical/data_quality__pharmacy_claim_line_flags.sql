@@ -12,6 +12,8 @@
 }}
 
 {% set string_type = dbt.type_string() %}
+{% set current_date_sql = dq_current_date_sql() %}
+{% set min_recent_claim_date_sql = dq_date_literal_sql('2000-01-01') %}
 
 with source_rows as (
     select *
@@ -26,6 +28,8 @@ final as (
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null") }} as person_id_null
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is null") }} as dispensing_date_null
         , {{ dq_logical_int_flag_sql("source_rows.paid_date is null") }} as paid_date_null
+        , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is not null and (source_rows.dispensing_date < " ~ min_recent_claim_date_sql ~ " or source_rows.dispensing_date > " ~ current_date_sql ~ ")") }} as dispensing_date_out_of_reasonable_range
+        , {{ dq_logical_int_flag_sql("source_rows.paid_date is not null and (source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql ~ ")") }} as paid_date_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is null") }} as prescribing_provider_npi_null
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is not null and prescribing_provider_lookup.npi is null") }} as prescribing_provider_npi_invalid
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_provider_npi is null") }} as dispensing_provider_npi_null

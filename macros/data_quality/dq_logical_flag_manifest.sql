@@ -12,8 +12,9 @@
 {% endmacro %}
 
 {% macro dq_logical_investigation_sql(definition) %}
-    {% set input_schema = 'input_layer' %}
-    {% set flag_schema = 'data_quality' %}
+    {% set schema_prefix = var('tuva_schema_prefix', None) %}
+    {% set input_schema = schema_prefix ~ '_input_layer' if schema_prefix is not none else 'input_layer' %}
+    {% set flag_schema = schema_prefix ~ '_data_quality' if schema_prefix is not none else 'data_quality' %}
     {% set input_table_name = definition.get('input_table_name', definition['table_name']) %}
     {% set flag_table_name = definition.get('flag_table_name', definition['source_model_name'].replace('data_quality__', '')) %}
     {% set key_columns = definition.get('key_columns', ['data_source']) %}
@@ -90,6 +91,10 @@
                 'medical_claim__claim_end_date_null',
                 'medical_claim__claim_line_start_date_null',
                 'medical_claim__claim_line_end_date_null',
+                'medical_claim__claim_start_date_out_of_reasonable_range',
+                'medical_claim__claim_end_date_out_of_reasonable_range',
+                'medical_claim__claim_line_start_date_out_of_reasonable_range',
+                'medical_claim__claim_line_end_date_out_of_reasonable_range',
                 'medical_claim__claim_start_after_claim_end',
                 'medical_claim__claim_line_start_after_claim_line_end',
                 'medical_claim__admission_date_after_discharge_date',
@@ -165,6 +170,8 @@
                 'pharmacy_claim__person_id_null',
                 'pharmacy_claim__dispensing_date_null',
                 'pharmacy_claim__paid_date_null',
+                'pharmacy_claim__dispensing_date_out_of_reasonable_range',
+                'pharmacy_claim__paid_date_out_of_reasonable_range',
                 'pharmacy_claim__prescribing_provider_npi_null',
                 'pharmacy_claim__prescribing_provider_npi_invalid',
                 'pharmacy_claim__dispensing_provider_npi_null',
@@ -243,6 +250,7 @@
                 'encounter__encounter_type_invalid',
                 'encounter__encounter_start_date_null',
                 'encounter__encounter_end_date_null',
+                'encounter__encounter_start_date_after_encounter_end_date',
                 'encounter__encounter_start_date_out_of_reasonable_range',
                 'encounter__encounter_end_date_out_of_reasonable_range',
                 'encounter__admit_source_code_invalid',
@@ -290,8 +298,137 @@
                 'lab_result__patient_id_not_in_patient',
                 'lab_result__encounter_id_not_in_encounter',
                 'lab_result__accession_number_null',
+                'lab_result__source_component_type_null_when_source_component_code_present',
                 'lab_result__source_component_type_invalid',
                 'lab_result__source_component_code_invalid'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__location_flags',
+            'input_model_name': 'input_layer__location',
+            'input_table_name': 'location',
+            'flag_table_name': 'location_flags',
+            'table_name': 'location',
+            'grain': 'location record',
+            'key_columns': ['location_id', 'data_source'],
+            'test_names': [
+                'location__npi_invalid',
+                'location__state_invalid',
+                'location__zip_code_invalid_format'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__medication_flags',
+            'input_model_name': 'input_layer__medication',
+            'input_table_name': 'medication',
+            'flag_table_name': 'medication_flags',
+            'table_name': 'medication',
+            'grain': 'medication record',
+            'key_columns': ['medication_id', 'data_source'],
+            'test_names': [
+                'medication__person_id_null',
+                'medication__patient_id_null',
+                'medication__person_id_not_in_patient',
+                'medication__patient_id_not_in_patient',
+                'medication__encounter_id_not_in_encounter',
+                'medication__practitioner_id_not_in_practitioner',
+                'medication__dispensing_date_out_of_range',
+                'medication__prescribing_date_out_of_range',
+                'medication__prescribing_date_after_dispensing_date',
+                'medication__source_code_type_null_when_source_code_present',
+                'medication__source_code_type_invalid',
+                'medication__source_code_null',
+                'medication__source_code_invalid',
+                'medication__ndc_code_invalid',
+                'medication__rxnorm_code_invalid',
+                'medication__atc_code_invalid',
+                'medication__quantity_negative',
+                'medication__days_supply_negative'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__observation_flags',
+            'input_model_name': 'input_layer__observation',
+            'input_table_name': 'observation',
+            'flag_table_name': 'observation_flags',
+            'table_name': 'observation',
+            'grain': 'observation record',
+            'key_columns': ['observation_id', 'data_source'],
+            'test_names': [
+                'observation__person_id_null',
+                'observation__patient_id_null',
+                'observation__person_id_not_in_patient',
+                'observation__patient_id_not_in_patient',
+                'observation__encounter_id_not_in_encounter',
+                'observation__observation_date_null',
+                'observation__observation_date_out_of_range',
+                'observation__observation_type_invalid',
+                'observation__source_code_type_null_when_source_code_present',
+                'observation__source_code_type_invalid',
+                'observation__source_code_null',
+                'observation__source_code_invalid'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__patient_flags',
+            'input_model_name': 'input_layer__patient',
+            'input_table_name': 'patient',
+            'flag_table_name': 'patient_flags',
+            'table_name': 'patient',
+            'grain': 'patient record',
+            'key_columns': ['person_id', 'patient_id', 'data_source'],
+            'test_names': [
+                'patient__sex_null',
+                'patient__sex_invalid',
+                'patient__race_invalid',
+                'patient__ethnicity_invalid',
+                'patient__birth_date_null',
+                'patient__birth_date_out_of_range',
+                'patient__death_date_out_of_range',
+                'patient__birth_date_after_death_date',
+                'patient__death_flag_invalid',
+                'patient__death_flag_without_death_date',
+                'patient__death_date_without_death_flag',
+                'patient__state_invalid',
+                'patient__zip_code_invalid_format',
+                'patient__multiple_sexes_per_person',
+                'patient__multiple_birth_dates_per_person'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__practitioner_flags',
+            'input_model_name': 'input_layer__practitioner',
+            'input_table_name': 'practitioner',
+            'flag_table_name': 'practitioner_flags',
+            'table_name': 'practitioner',
+            'grain': 'practitioner record',
+            'key_columns': ['practitioner_id', 'data_source'],
+            'test_names': [
+                'practitioner__npi_invalid',
+                'practitioner__npi_not_individual'
+            ]
+        },
+        {
+            'source_model_name': 'data_quality__procedure_flags',
+            'input_model_name': 'input_layer__procedure',
+            'input_table_name': 'procedure',
+            'flag_table_name': 'procedure_flags',
+            'table_name': 'procedure',
+            'grain': 'procedure record',
+            'key_columns': ['source_procedure_id', 'data_source'],
+            'test_names': [
+                'procedure__person_id_null',
+                'procedure__patient_id_null',
+                'procedure__person_id_not_in_patient',
+                'procedure__patient_id_not_in_patient',
+                'procedure__encounter_id_not_in_encounter',
+                'procedure__practitioner_id_not_in_practitioner',
+                'procedure__procedure_date_null',
+                'procedure__procedure_date_out_of_range',
+                'procedure__code_system_null',
+                'procedure__code_system_invalid',
+                'procedure__source_code_null',
+                'procedure__source_code_invalid'
             ]
         }
     ] %}
@@ -327,6 +464,19 @@
     {{ return(dq_logical_test_manifest()) }}
 {% endmacro %}
 
+{% macro dq_enabled_logical_test_manifest() %}
+    {% set enabled_model_names = dq_enabled_input_layer_model_names() %}
+    {% set filtered_manifest = [] %}
+
+    {% for definition in dq_logical_test_manifest() %}
+        {% if definition['input_model_name'] in enabled_model_names %}
+            {% do filtered_manifest.append(definition) %}
+        {% endif %}
+    {% endfor %}
+
+    {{ return(filtered_manifest) }}
+{% endmacro %}
+
 {% macro dq_logical_test_manifest_for_model(source_model_name) %}
     {% set filtered_manifest = [] %}
 
@@ -343,7 +493,8 @@
     select
           cast(data_source as {{ dbt.type_string() }}) as data_source
         , '{{ definition['table_name'] }}' as {{ adapter.quote('table') }}
-        , '{{ definition['display_name'] }}' as test_name
+        , '{{ definition['test_name'] }}' as test_name
+        , '{{ definition['display_name'] }}' as display_name
         , cast(sum(cast(coalesce({{ quote_column(definition['flag_column_name']) }}, 0) as {{ dbt.type_int() }})) as {{ dbt.type_int() }}) as test_result
     from {{ ref(definition['source_model_name']) }}
     group by cast(data_source as {{ dbt.type_string() }})

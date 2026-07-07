@@ -18,120 +18,100 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the medication record. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
       - name: patient_id
         description: Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: encounter_id
         description: Identifier for the encounter associated with the medication record, when available. Leave null when the medication is not tied to a specific encounter in the source system.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['quality_measures']
       - name: dispensing_date
         description: Date the medication was dispensed or administered, when available. For medication orders that were prescribed but not dispensed or administered, leave this field null.
         config:
           meta:
             data_type: date
-            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: prescribing_date
         description: Date the medication was prescribed or ordered, when available. When both prescribing_date and dispensing_date are populated, prescribing_date should generally be on or before dispensing_date.
         config:
           meta:
             data_type: date
-            required_for_data_marts: ['quality_measures']
       - name: source_code_type
         description: Code system for source_code. Use ndc or rxnorm when the source code is already an NDC or RxNorm code. If the source system uses a local medication code, populate this field with the source code system name so the medication can be normalized downstream.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_code
         description: Medication code from the source system before Tuva normalization. This may be an NDC, RxNorm RxCUI, or local medication code depending on the source system. Preserve the source-system value here even when standardized NDC, RxNorm, or ATC fields are also populated so downstream terminology matching can trace back to the original code.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: source_description
         description: Medication name or description from the source system. This should be populated when available, especially when source_code is local or not directly mapped to a standard terminology.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: ndc_code
         description: National Drug Code for the medication, when available. Store NDCs in normalized 11-digit format without hyphens when possible.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: rxnorm_code
         description: RxNorm RxCUI for the medication, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_suspecting', 'quality_measures']
       - name: atc_code
         description: WHO Anatomical Therapeutic Chemical classification code for the medication, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: route
         description: Route by which the medication was administered or intended to be administered, for example oral, intravenous, subcutaneous, or topical.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: strength
         description: Medication strength as represented by the source system, for example 500 mg or 10 mg/mL.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: quantity
         description: Numeric quantity of medication associated with the record. Interpret this together with quantity_unit.
         config:
           meta:
             data_type: number
-            required_for_data_marts: []
       - name: quantity_unit
         description: Unit of measure for quantity, for example tablet, mL, dose, vial, or capsule.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: days_supply
         description: Number of days the medication supply is expected to last. This is most applicable to dispensed medications and may be null for administrations or orders.
         config:
           meta:
             data_type: number
-            required_for_data_marts: []
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication record, such as the ordering, prescribing, or administering practitioner. This may be an NPI or source system practitioner identifier, but should link to practitioner_id in the practitioner input layer when possible.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: ingest_datetime
         description: Date and time the medication record was extracted from the source system or ingested into the data warehouse.
         config:
           meta:
             data_type: timestamp
-            required_for_data_marts: []
       - name: data_source
         description: User-defined name that identifies the source of the medication data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: ['hcc_recapture', 'hcc_suspecting']
             is_primary_key: true

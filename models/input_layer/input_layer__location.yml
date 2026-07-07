@@ -18,72 +18,60 @@ models:
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: true
       - name: npi
         description: National Provider Identifier associated with the location, when available. For facilities or organizations, this should generally be an organization NPI rather than an individual practitioner NPI. Leave null when the location does not have an NPI.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: name
         description: Name of the location as represented in the source system.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: facility_type
         description: Type or category of location, for example hospital, clinic, emergency department, ambulatory surgery center, laboratory, imaging center, or department. Use the source system value.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: parent_organization
         description: Organization, health system, practice group, or parent facility associated with the location, when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: address
         description: Street address of the location.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: city
         description: City of the location.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: state
         description: State of the location. For US addresses, use the two-character state abbreviation when available.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: zip_code
         description: ZIP code or postal code of the location.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
       - name: latitude
         description: Latitude of the location in decimal degrees, when available.
         config:
           meta:
             data_type: float
-            required_for_data_marts: []
       - name: longitude
         description: Longitude of the location in decimal degrees, when available.
         config:
           meta:
             data_type: float
-            required_for_data_marts: []
       - name: data_source
         description: User-defined name that identifies the source system for the location data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         config:
           meta:
             data_type: varchar
-            required_for_data_marts: []
             is_primary_key: true

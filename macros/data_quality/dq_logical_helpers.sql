@@ -37,11 +37,15 @@
         'medical_claim__billing_npi_invalid': 'billing_npi invalid',
         'medical_claim__billing_npi_null': 'billing_npi null',
         'medical_claim__claim_end_date_null': 'claim_end_date null',
+        'medical_claim__claim_end_date_out_of_reasonable_range': 'claim_end_date out of reasonable range',
         'medical_claim__claim_line_end_date_null': 'claim_line_end_date null',
+        'medical_claim__claim_line_end_date_out_of_reasonable_range': 'claim_line_end_date out of reasonable range',
         'medical_claim__claim_line_start_date_null': 'claim_line_start_date null',
+        'medical_claim__claim_line_start_date_out_of_reasonable_range': 'claim_line_start_date out of reasonable range',
         'medical_claim__claim_line_start_after_claim_line_end': 'claim_line_start_date after claim_line_end_date',
         'medical_claim__claim_start_after_claim_end': 'claim_start_date after claim_end_date',
         'medical_claim__claim_start_date_null': 'claim_start_date null',
+        'medical_claim__claim_start_date_out_of_reasonable_range': 'claim_start_date out of reasonable range',
         'medical_claim__claim_type_count_ne_one_per_claim': 'claim_type has multiple values per claim_id',
         'medical_claim__claim_type_invalid': 'claim_type invalid',
         'medical_claim__claim_type_null': 'claim_type null',
@@ -85,6 +89,7 @@
         'pharmacy_claim__allowed_amount_null': 'allowed_amount null',
         'pharmacy_claim__allowed_amount_lt_zero': 'allowed_amount less than zero',
         'pharmacy_claim__dispensing_date_null': 'dispensing_date null',
+        'pharmacy_claim__dispensing_date_out_of_reasonable_range': 'dispensing_date out of reasonable range',
         'pharmacy_claim__dispensing_provider_npi_invalid': 'dispensing_provider_npi invalid',
         'pharmacy_claim__dispensing_provider_npi_null': 'dispensing_provider_npi null',
         'pharmacy_claim__ndc_code_invalid': 'ndc_code invalid',
@@ -94,6 +99,7 @@
         'pharmacy_claim__paid_amount_gt_allowed_amount': 'paid_amount greater than allowed_amount',
         'pharmacy_claim__paid_amount_lt_zero': 'paid_amount less than zero',
         'pharmacy_claim__paid_date_null': 'paid_date null',
+        'pharmacy_claim__paid_date_out_of_reasonable_range': 'paid_date out of reasonable range',
         'pharmacy_claim__multiple_person_ids_per_claim': 'person_id has multiple values per claim',
         'pharmacy_claim__person_id_null': 'person_id null',
         'pharmacy_claim__prescribing_provider_npi_invalid': 'prescribing_provider_npi invalid',
@@ -119,6 +125,7 @@
         'encounter__encounter_type_invalid': 'encounter_type invalid',
         'encounter__encounter_start_date_null': 'encounter_start_date null',
         'encounter__encounter_end_date_null': 'encounter_end_date null',
+        'encounter__encounter_start_date_after_encounter_end_date': 'encounter_start_date after encounter_end_date',
         'encounter__encounter_start_date_out_of_reasonable_range': 'encounter_start_date out of reasonable range',
         'encounter__encounter_end_date_out_of_reasonable_range': 'encounter_end_date out of reasonable range',
         'encounter__admit_source_code_invalid': 'admit_source_code invalid',
@@ -144,54 +151,319 @@
         'lab_result__patient_id_not_in_patient': 'patient_id not found in patient',
         'lab_result__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
         'lab_result__accession_number_null': 'accession_number null',
+        'lab_result__source_component_type_null_when_source_component_code_present': 'source_component_type null when source_component_code present',
         'lab_result__source_component_type_invalid': 'source_component_type invalid',
-        'lab_result__source_component_code_invalid': 'source_component_code invalid'
+        'lab_result__source_component_code_invalid': 'source_component_code invalid',
+        'location__npi_invalid': 'NPI invalid',
+        'location__state_invalid': 'state invalid',
+        'location__zip_code_invalid_format': 'zip_code invalid format',
+        'medication__person_id_null': 'person_id null',
+        'medication__patient_id_null': 'patient_id null',
+        'medication__person_id_not_in_patient': 'person_id not found in patient',
+        'medication__patient_id_not_in_patient': 'patient_id not found in patient',
+        'medication__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'medication__practitioner_id_not_in_practitioner': 'practitioner_id not found in practitioner',
+        'medication__dispensing_date_out_of_range': 'dispensing_date out of range',
+        'medication__prescribing_date_out_of_range': 'prescribing_date out of range',
+        'medication__prescribing_date_after_dispensing_date': 'prescribing_date after dispensing_date',
+        'medication__source_code_type_null_when_source_code_present': 'source_code_type null when source_code present',
+        'medication__source_code_type_invalid': 'source_code_type invalid',
+        'medication__source_code_null': 'source_code null',
+        'medication__source_code_invalid': 'source_code invalid',
+        'medication__ndc_code_invalid': 'ndc_code invalid',
+        'medication__rxnorm_code_invalid': 'rxnorm_code invalid',
+        'medication__atc_code_invalid': 'atc_code invalid',
+        'medication__quantity_negative': 'quantity negative',
+        'medication__days_supply_negative': 'days_supply negative',
+        'observation__person_id_null': 'person_id null',
+        'observation__patient_id_null': 'patient_id null',
+        'observation__person_id_not_in_patient': 'person_id not found in patient',
+        'observation__patient_id_not_in_patient': 'patient_id not found in patient',
+        'observation__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'observation__observation_date_null': 'observation_date null',
+        'observation__observation_date_out_of_range': 'observation_date out of range',
+        'observation__observation_type_invalid': 'observation_type invalid',
+        'observation__source_code_type_null_when_source_code_present': 'source_code_type null when source_code present',
+        'observation__source_code_type_invalid': 'source_code_type invalid',
+        'observation__source_code_null': 'source_code null',
+        'observation__source_code_invalid': 'source_code invalid',
+        'patient__sex_null': 'sex null',
+        'patient__sex_invalid': 'sex invalid',
+        'patient__race_invalid': 'race invalid',
+        'patient__ethnicity_invalid': 'ethnicity invalid',
+        'patient__birth_date_null': 'birth_date null',
+        'patient__birth_date_out_of_range': 'birth_date out of range',
+        'patient__death_date_out_of_range': 'death_date out of range',
+        'patient__birth_date_after_death_date': 'birth_date after death_date',
+        'patient__death_flag_invalid': 'death_flag invalid',
+        'patient__death_flag_without_death_date': 'death_flag indicates death without death_date',
+        'patient__death_date_without_death_flag': 'death_date populated without death_flag',
+        'patient__state_invalid': 'state invalid',
+        'patient__zip_code_invalid_format': 'zip_code invalid format',
+        'patient__multiple_sexes_per_person': 'sex has multiple values per person_id',
+        'patient__multiple_birth_dates_per_person': 'birth_date has multiple values per person_id',
+        'practitioner__npi_invalid': 'NPI invalid',
+        'practitioner__npi_not_individual': 'NPI not individual',
+        'procedure__person_id_null': 'person_id null',
+        'procedure__patient_id_null': 'patient_id null',
+        'procedure__person_id_not_in_patient': 'person_id not found in patient',
+        'procedure__patient_id_not_in_patient': 'patient_id not found in patient',
+        'procedure__encounter_id_not_in_encounter': 'encounter_id not found in encounter',
+        'procedure__practitioner_id_not_in_practitioner': 'practitioner_id not found in practitioner',
+        'procedure__procedure_date_null': 'procedure_date null',
+        'procedure__procedure_date_out_of_range': 'procedure_date out of range',
+        'procedure__code_system_null': 'code_system null',
+        'procedure__code_system_invalid': 'code_system invalid',
+        'procedure__source_code_null': 'source_code null',
+        'procedure__source_code_invalid': 'source_code invalid'
     } %}
 
-    {{ return(display_names.get(test_name, test_name)) }}
+    {% set display_name = display_names.get(test_name, test_name) %}
+    {% set display_name = display_name
+        | replace(' null when ', ' is null when ')
+        | replace(' null for ', ' is null for ')
+        | replace(' null on ', ' is null on ')
+        | replace(' null', ' is null')
+        | replace(' invalid format', ' has invalid format')
+        | replace(' invalid', ' is invalid')
+        | replace(' out of reasonable range', ' is out of reasonable range')
+        | replace(' out of range', ' is out of range')
+        | replace(' less than zero', ' is less than zero')
+        | replace(' greater than ', ' is greater than ')
+        | replace(' not found in ', ' is not found in ')
+        | replace(' after ', ' is after ')
+        | replace(' indicates', ' indicates')
+    %}
+    {% set display_name = display_name
+        | replace('is is ', 'is ')
+        | replace('when source_code present', 'when source_code is present')
+        | replace('when diagnosis_code present', 'when diagnosis_code is present')
+        | replace('when procedure_code present', 'when procedure_code is present')
+        | replace('when drg_code present', 'when drg_code is present')
+        | replace('source_code is is present', 'source_code is present')
+        | replace('diagnosis_code is is present', 'diagnosis_code is present')
+        | replace('procedure_code is is present', 'procedure_code is present')
+        | replace('drg_code is is present', 'drg_code is present')
+    %}
+
+    {{ return(display_name) }}
 {% endmacro %}
 
 {% macro dq_logical_test_description(table_name, test_name) %}
     {% set display_name = dq_logical_display_name(table_name, test_name) %}
     {% set table_label = "input_layer." ~ table_name %}
+    {% set descriptions = {
+        'eligibility__birth_date_after_death_date': 'Checks whether birth_date is after death_date in input_layer.eligibility.',
+        'eligibility__multiple_birth_dates_per_person': 'Checks whether the same person_id and data_source has more than one non-null birth_date in input_layer.eligibility.',
+        'eligibility__birth_date_null': 'Checks whether birth_date is null in input_layer.eligibility.',
+        'eligibility__birth_date_out_of_reasonable_range': 'Checks whether birth_date in input_layer.eligibility is before 1900-01-01 or after the current date.',
+        'eligibility__death_flag_invalid': 'Checks whether death_flag in input_layer.eligibility is populated with a value other than 0 or 1.',
+        'eligibility__death_flag_without_death_date': 'Checks whether death_flag is 1 in input_layer.eligibility while death_date is null.',
+        'eligibility__death_date_out_of_reasonable_range': 'Checks whether death_date in input_layer.eligibility is before 1900-01-01 or after the current date.',
+        'eligibility__enrollment_start_after_end': 'Checks whether enrollment_start_date is after enrollment_end_date in input_layer.eligibility.',
+        'eligibility__sex_invalid': 'Checks whether sex in input_layer.eligibility is populated with a value other than male, female, or unknown.',
+        'eligibility__multiple_sexes_per_person': 'Checks whether the same person_id and data_source has more than one non-null sex value in input_layer.eligibility.',
+        'eligibility__sex_null': 'Checks whether sex is null in input_layer.eligibility.',
+        'eligibility__payer_type_invalid': 'Checks whether payer_type in input_layer.eligibility is populated but not found in Tuva payer type terminology.',
+        'eligibility__payer_type_null': 'Checks whether payer_type is null in input_layer.eligibility.',
+        'eligibility__race_invalid': 'Checks whether race in input_layer.eligibility is populated but not found in Tuva race terminology.',
+        'eligibility__multiple_races_per_person': 'Checks whether the same person_id and data_source has more than one non-null race value in input_layer.eligibility.',
+        'eligibility__race_null': 'Checks whether race is null in input_layer.eligibility.',
+        'medical_claim__admission_date_after_discharge_date': 'Checks whether admission_date is after discharge_date on a medical claim line.',
+        'medical_claim__admission_date_has_multiple_values_per_inpatient_claim': 'Checks whether an inpatient facility claim_id has more than one non-null admission_date across claim lines.',
+        'medical_claim__admission_date_out_of_reasonable_range': 'Checks whether admission_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__admit_source_code_invalid': 'Checks whether admit_source_code is populated but not found in Tuva admit source terminology.',
+        'medical_claim__admit_type_code_invalid': 'Checks whether admit_type_code is populated but not found in Tuva admit type terminology.',
+        'medical_claim__allowed_amount_null': 'Checks whether allowed_amount is null on a medical claim line.',
+        'medical_claim__allowed_amount_lt_zero': 'Checks whether allowed_amount is less than zero on a medical claim line.',
+        'medical_claim__bill_type_code_count_ne_one_for_institutional_claim': 'Checks whether an institutional claim_id has zero or more than one bill_type_code across claim lines.',
+        'medical_claim__bill_type_code_invalid': 'Checks whether bill_type_code is populated but not found in Tuva bill type terminology.',
+        'medical_claim__bill_type_code_null_for_institutional_claim': 'Checks whether bill_type_code is null on an institutional medical claim line.',
+        'medical_claim__billing_npi_invalid': 'Checks whether billing_npi is populated but not found in Tuva provider data.',
+        'medical_claim__billing_npi_null': 'Checks whether billing_npi is null on a medical claim line.',
+        'medical_claim__claim_end_date_null': 'Checks whether claim_end_date is null on a medical claim line.',
+        'medical_claim__claim_end_date_out_of_reasonable_range': 'Checks whether claim_end_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__claim_line_end_date_null': 'Checks whether claim_line_end_date is null on a medical claim line.',
+        'medical_claim__claim_line_end_date_out_of_reasonable_range': 'Checks whether claim_line_end_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__claim_line_start_date_null': 'Checks whether claim_line_start_date is null on a medical claim line.',
+        'medical_claim__claim_line_start_date_out_of_reasonable_range': 'Checks whether claim_line_start_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__claim_line_start_after_claim_line_end': 'Checks whether claim_line_start_date is after claim_line_end_date on a medical claim line.',
+        'medical_claim__claim_start_after_claim_end': 'Checks whether claim_start_date is after claim_end_date on a medical claim line.',
+        'medical_claim__claim_start_date_null': 'Checks whether claim_start_date is null on a medical claim line.',
+        'medical_claim__claim_start_date_out_of_reasonable_range': 'Checks whether claim_start_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__claim_type_count_ne_one_per_claim': 'Checks whether a claim_id has zero or more than one claim_type across claim lines.',
+        'medical_claim__claim_type_invalid': 'Checks whether claim_type is populated but not found in Tuva claim type terminology.',
+        'medical_claim__claim_type_null': 'Checks whether claim_type is null on a medical claim line.',
+        'medical_claim__institutional_indicators_present_for_professional_claim': 'Checks whether a professional claim line contains institutional-only fields such as bill type, revenue center, admit, discharge, or DRG fields.',
+        'medical_claim__diagnosis_code_1_invalid': 'Checks whether diagnosis_code_1 is populated but not found in the ICD terminology indicated by diagnosis_code_type.',
+        'medical_claim__diagnosis_code_1_null': 'Checks whether diagnosis_code_1 is null on a medical claim line.',
+        'medical_claim__diagnosis_code_count_gt_one_per_position_for_institutional_claim': 'Checks whether an institutional claim_id has more than one distinct non-null diagnosis code in the same diagnosis position across claim lines.',
+        'medical_claim__diagnosis_code_2_to_25_invalid': 'Checks whether diagnosis_code_2 through diagnosis_code_25 contain populated codes not found in the ICD terminology indicated by diagnosis_code_type.',
+        'medical_claim__diagnosis_code_type_invalid': 'Checks whether diagnosis_code_type is populated with a value other than icd-9-cm or icd-10-cm.',
+        'medical_claim__diagnosis_code_type_null_when_diagnosis_code_present': 'Checks whether diagnosis_code_type is null when any diagnosis code is populated on a medical claim line.',
+        'medical_claim__discharge_disposition_code_invalid': 'Checks whether discharge_disposition_code is populated but not found in Tuva discharge disposition terminology.',
+        'medical_claim__discharge_date_has_multiple_values_per_inpatient_claim': 'Checks whether an inpatient facility claim_id has more than one non-null discharge_date across claim lines.',
+        'medical_claim__discharge_date_out_of_reasonable_range': 'Checks whether discharge_date on a medical claim line is before 2000-01-01 or after the current date.',
+        'medical_claim__drg_code_count_ne_one_for_acute_inpatient_claim': 'Checks whether an acute inpatient claim_id has zero or more than one DRG code across claim lines.',
+        'medical_claim__drg_code_invalid': 'Checks whether drg_code is populated but not found in the DRG terminology indicated by drg_code_type.',
+        'medical_claim__drg_code_null_for_acute_inpatient_claim': 'Checks whether drg_code is null on an acute inpatient claim line.',
+        'medical_claim__drg_code_type_invalid': 'Checks whether drg_code_type is populated with a value other than ms-drg or apr-drg.',
+        'medical_claim__drg_code_type_null_when_drg_code_present': 'Checks whether drg_code_type is null when drg_code is populated on a medical claim line.',
+        'medical_claim__admission_date_null_for_inpatient_claim': 'Checks whether admission_date is null on an inpatient facility claim line.',
+        'medical_claim__discharge_date_null_for_inpatient_claim': 'Checks whether discharge_date is null on an inpatient facility claim line.',
+        'medical_claim__facility_npi_invalid': 'Checks whether facility_npi is populated but not found in Tuva provider data.',
+        'medical_claim__facility_npi_null_for_inpatient_claim': 'Checks whether facility_npi is null on an inpatient facility claim line.',
+        'medical_claim__facility_npi_has_multiple_values_per_claim': 'Checks whether a claim_id has more than one non-null facility_npi across claim lines.',
+        'medical_claim__hcpcs_code_null_for_professional_claim': 'Checks whether hcpcs_code is null on a professional claim line.',
+        'medical_claim__no_matching_eligibility_span': 'Checks whether a medical claim line has no eligibility span for the same person_id, data_source, and claim dates.',
+        'medical_claim__paid_amount_null': 'Checks whether paid_amount is null on a medical claim line.',
+        'medical_claim__paid_amount_gt_allowed_amount': 'Checks whether paid_amount is greater than allowed_amount on a medical claim line.',
+        'medical_claim__paid_amount_lt_zero': 'Checks whether paid_amount is less than zero on a medical claim line.',
+        'medical_claim__multiple_person_ids_per_claim': 'Checks whether a claim_id is associated with more than one person_id within the same data_source.',
+        'medical_claim__person_id_null': 'Checks whether person_id is null on a medical claim line.',
+        'medical_claim__place_of_service_code_invalid': 'Checks whether place_of_service_code is populated but not found in Tuva place of service terminology.',
+        'medical_claim__place_of_service_code_present_for_institutional_claim': 'Checks whether place_of_service_code is populated on an institutional claim line.',
+        'medical_claim__place_of_service_code_null_for_professional_claim': 'Checks whether place_of_service_code is null on a professional claim line.',
+        'medical_claim__procedure_code_1_to_25_invalid': 'Checks whether procedure_code_1 through procedure_code_25 contain populated codes not found in the ICD procedure terminology indicated by procedure_code_type.',
+        'medical_claim__procedure_code_type_invalid': 'Checks whether procedure_code_type is populated with a value other than icd-9-pcs or icd-10-pcs.',
+        'medical_claim__procedure_code_type_null_when_procedure_code_present': 'Checks whether procedure_code_type is null when any procedure code is populated on a medical claim line.',
+        'medical_claim__rendering_npi_invalid': 'Checks whether rendering_npi is populated but not found in Tuva provider data.',
+        'medical_claim__rendering_npi_null': 'Checks whether rendering_npi is null on a medical claim line.',
+        'medical_claim__revenue_center_code_invalid': 'Checks whether revenue_center_code is populated but not found in Tuva revenue center terminology.',
+        'medical_claim__revenue_center_code_null_for_institutional_claim': 'Checks whether revenue_center_code is null on an institutional claim line.',
+        'pharmacy_claim__allowed_amount_null': 'Checks whether allowed_amount is null on a pharmacy claim line.',
+        'pharmacy_claim__allowed_amount_lt_zero': 'Checks whether allowed_amount is less than zero on a pharmacy claim line.',
+        'pharmacy_claim__dispensing_date_null': 'Checks whether dispensing_date is null on a pharmacy claim line.',
+        'pharmacy_claim__dispensing_date_out_of_reasonable_range': 'Checks whether dispensing_date on a pharmacy claim line is before 2000-01-01 or after the current date.',
+        'pharmacy_claim__dispensing_provider_npi_invalid': 'Checks whether dispensing_provider_npi is populated but not found in Tuva provider data.',
+        'pharmacy_claim__dispensing_provider_npi_null': 'Checks whether dispensing_provider_npi is null on a pharmacy claim line.',
+        'pharmacy_claim__ndc_code_invalid': 'Checks whether ndc_code is populated but not found in Tuva NDC terminology.',
+        'pharmacy_claim__ndc_code_null': 'Checks whether ndc_code is null on a pharmacy claim line.',
+        'pharmacy_claim__no_matching_eligibility_span': 'Checks whether a pharmacy claim has no eligibility span for the same person_id, data_source, and dispensing date.',
+        'pharmacy_claim__paid_amount_null': 'Checks whether paid_amount is null on a pharmacy claim line.',
+        'pharmacy_claim__paid_amount_gt_allowed_amount': 'Checks whether paid_amount is greater than allowed_amount on a pharmacy claim line.',
+        'pharmacy_claim__paid_amount_lt_zero': 'Checks whether paid_amount is less than zero on a pharmacy claim line.',
+        'pharmacy_claim__paid_date_null': 'Checks whether paid_date is null on a pharmacy claim line.',
+        'pharmacy_claim__paid_date_out_of_reasonable_range': 'Checks whether paid_date on a pharmacy claim line is before 2000-01-01 or after the current date.',
+        'pharmacy_claim__multiple_person_ids_per_claim': 'Checks whether a pharmacy claim_id is associated with more than one person_id within the same data_source.',
+        'pharmacy_claim__person_id_null': 'Checks whether person_id is null on a pharmacy claim line.',
+        'pharmacy_claim__prescribing_provider_npi_invalid': 'Checks whether prescribing_provider_npi is populated but not found in Tuva provider data.',
+        'pharmacy_claim__prescribing_provider_npi_null': 'Checks whether prescribing_provider_npi is null on a pharmacy claim line.',
+        'appointment__person_id_not_in_patient': 'Checks whether person_id values in input_layer.appointment have a corresponding person_id in input_layer.patient for the same data_source.',
+        'appointment__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.appointment have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'appointment__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.appointment have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'appointment__start_datetime_null': 'Checks whether start_datetime is null in input_layer.appointment.',
+        'condition__person_id_null': 'Checks whether person_id is null in input_layer.condition.',
+        'condition__patient_id_null': 'Checks whether patient_id is null in input_layer.condition.',
+        'condition__source_code_null': 'Checks whether source_code is null in input_layer.condition.',
+        'condition__code_system_null': 'Checks whether code_system is null in input_layer.condition.',
+        'condition__person_id_not_in_patient': 'Checks whether person_id values in input_layer.condition have a corresponding person_id in input_layer.patient for the same data_source.',
+        'condition__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.condition have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'condition__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.condition have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'condition__code_system_invalid': 'Checks whether code_system in input_layer.condition is populated with a value other than icd-9-cm, icd-10-cm, snomed-ct, or unknown.',
+        'condition__source_code_invalid': 'Checks whether source_code in input_layer.condition is populated for a supported standard code system but not found in the corresponding terminology table.',
+        'condition__present_on_admit_code_invalid': 'Checks whether present_on_admit_code is populated but not found in Tuva present on admission terminology.',
+        'encounter__person_id_null': 'Checks whether person_id is null in input_layer.encounter.',
+        'encounter__patient_id_null': 'Checks whether patient_id is null in input_layer.encounter.',
+        'encounter__person_id_not_in_patient': 'Checks whether person_id values in input_layer.encounter have a corresponding person_id in input_layer.patient for the same data_source.',
+        'encounter__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.encounter have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'encounter__encounter_type_invalid': 'Checks whether encounter_type is populated but not found in Tuva encounter type terminology.',
+        'encounter__encounter_start_date_null': 'Checks whether encounter_start_date is null in input_layer.encounter.',
+        'encounter__encounter_end_date_null': 'Checks whether encounter_end_date is null in input_layer.encounter.',
+        'encounter__encounter_start_date_after_encounter_end_date': 'Checks whether encounter_start_date is after encounter_end_date in input_layer.encounter.',
+        'encounter__encounter_start_date_out_of_reasonable_range': 'Checks whether encounter_start_date in input_layer.encounter is before 2000-01-01 or after the current date.',
+        'encounter__encounter_end_date_out_of_reasonable_range': 'Checks whether encounter_end_date in input_layer.encounter is before 2000-01-01 or after the current date.',
+        'encounter__admit_source_code_invalid': 'Checks whether admit_source_code is populated but not found in Tuva admit source terminology.',
+        'encounter__admit_type_code_invalid': 'Checks whether admit_type_code is populated but not found in Tuva admit type terminology.',
+        'encounter__discharge_disposition_code_invalid': 'Checks whether discharge_disposition_code is populated but not found in Tuva discharge disposition terminology.',
+        'encounter__facility_npi_invalid': 'Checks whether facility_npi is populated but not found in Tuva provider data.',
+        'encounter__primary_diagnosis_code_type_null': 'Checks whether primary_diagnosis_code_type is null in input_layer.encounter.',
+        'encounter__primary_diagnosis_code_type_invalid': 'Checks whether primary_diagnosis_code_type is populated with a value other than icd-9-cm or icd-10-cm.',
+        'encounter__primary_diagnosis_code_null': 'Checks whether primary_diagnosis_code is null in input_layer.encounter.',
+        'encounter__primary_diagnosis_code_invalid': 'Checks whether primary_diagnosis_code is populated but not found in the ICD terminology indicated by primary_diagnosis_code_type.',
+        'encounter__drg_code_type_null': 'Checks whether drg_code_type is null in input_layer.encounter.',
+        'encounter__drg_code_type_invalid': 'Checks whether drg_code_type is populated with a value other than ms-drg or apr-drg.',
+        'encounter__drg_code_null': 'Checks whether drg_code is null in input_layer.encounter.',
+        'encounter__drg_code_invalid': 'Checks whether drg_code is populated but not found in the DRG terminology indicated by drg_code_type.',
+        'immunization__person_id_null': 'Checks whether person_id is null in input_layer.immunization.',
+        'immunization__patient_id_null': 'Checks whether patient_id is null in input_layer.immunization.',
+        'immunization__person_id_not_in_patient': 'Checks whether person_id values in input_layer.immunization have a corresponding person_id in input_layer.patient for the same data_source.',
+        'immunization__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.immunization have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'immunization__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.immunization have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'lab_result__person_id_null': 'Checks whether person_id is null in input_layer.lab_result.',
+        'lab_result__patient_id_null': 'Checks whether patient_id is null in input_layer.lab_result.',
+        'lab_result__person_id_not_in_patient': 'Checks whether person_id values in input_layer.lab_result have a corresponding person_id in input_layer.patient for the same data_source.',
+        'lab_result__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.lab_result have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'lab_result__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.lab_result have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'lab_result__accession_number_null': 'Checks whether accession_number is null in input_layer.lab_result.',
+        'lab_result__source_component_type_null_when_source_component_code_present': 'Checks whether source_component_type is null when source_component_code is populated in input_layer.lab_result.',
+        'lab_result__source_component_type_invalid': 'Checks whether source_component_type in input_layer.lab_result is populated with a value other than loinc, snomed-ct, local, or unknown.',
+        'lab_result__source_component_code_invalid': 'Checks whether source_component_code in input_layer.lab_result is populated for LOINC or SNOMED CT but not found in the corresponding terminology table.',
+        'location__npi_invalid': 'Checks whether npi is populated in input_layer.location but not found in Tuva provider data.',
+        'location__state_invalid': 'Checks whether state is populated in input_layer.location but does not match an ANSI/FIPS state abbreviation, state name, or state code.',
+        'location__zip_code_invalid_format': 'Checks whether zip_code is populated in input_layer.location but is not a 5-digit ZIP code, 9-digit ZIP code, or ZIP+4 value.',
+        'medication__person_id_null': 'Checks whether person_id is null in input_layer.medication.',
+        'medication__patient_id_null': 'Checks whether patient_id is null in input_layer.medication.',
+        'medication__person_id_not_in_patient': 'Checks whether person_id values in input_layer.medication have a corresponding person_id in input_layer.patient for the same data_source.',
+        'medication__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.medication have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'medication__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.medication have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'medication__practitioner_id_not_in_practitioner': 'Checks whether populated practitioner_id values in input_layer.medication have a corresponding practitioner_id in input_layer.practitioner for the same data_source.',
+        'medication__dispensing_date_out_of_range': 'Checks whether dispensing_date in input_layer.medication is before 2000-01-01 or after the current date.',
+        'medication__prescribing_date_out_of_range': 'Checks whether prescribing_date in input_layer.medication is before 2000-01-01 or after the current date.',
+        'medication__prescribing_date_after_dispensing_date': 'Checks whether prescribing_date is after dispensing_date in input_layer.medication.',
+        'medication__source_code_type_null_when_source_code_present': 'Checks whether source_code_type is null when source_code is populated in input_layer.medication.',
+        'medication__source_code_type_invalid': 'Checks whether source_code_type in input_layer.medication is populated with a value other than ndc, rxnorm, atc, local, or unknown.',
+        'medication__source_code_null': 'Checks whether source_code is null when source_code_type is populated in input_layer.medication.',
+        'medication__source_code_invalid': 'Checks whether source_code in input_layer.medication is populated for NDC, RxNorm, or ATC but not found in the corresponding terminology table.',
+        'medication__ndc_code_invalid': 'Checks whether ndc_code is populated in input_layer.medication but not found in Tuva NDC terminology.',
+        'medication__rxnorm_code_invalid': 'Checks whether rxnorm_code is populated in input_layer.medication but not found in Tuva RxNorm terminology.',
+        'medication__atc_code_invalid': 'Checks whether atc_code is populated in input_layer.medication but not found in Tuva ATC terminology.',
+        'medication__quantity_negative': 'Checks whether quantity is less than zero in input_layer.medication.',
+        'medication__days_supply_negative': 'Checks whether days_supply is less than zero in input_layer.medication.',
+        'observation__person_id_null': 'Checks whether person_id is null in input_layer.observation.',
+        'observation__patient_id_null': 'Checks whether patient_id is null in input_layer.observation.',
+        'observation__person_id_not_in_patient': 'Checks whether person_id values in input_layer.observation have a corresponding person_id in input_layer.patient for the same data_source.',
+        'observation__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.observation have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'observation__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.observation have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'observation__observation_date_null': 'Checks whether observation_date is null in input_layer.observation.',
+        'observation__observation_date_out_of_range': 'Checks whether observation_date in input_layer.observation is before 2000-01-01 or after the current date.',
+        'observation__observation_type_invalid': 'Checks whether observation_type is populated in input_layer.observation but not found in Tuva observation type terminology.',
+        'observation__source_code_type_null_when_source_code_present': 'Checks whether source_code_type is null when source_code is populated in input_layer.observation.',
+        'observation__source_code_type_invalid': 'Checks whether source_code_type in input_layer.observation is populated with a value other than loinc, snomed-ct, icd-10-cm, icd-9-cm, icd-10-pcs, icd-9-pcs, hcpcs, local, or unknown.',
+        'observation__source_code_null': 'Checks whether source_code is null when source_code_type is populated in input_layer.observation.',
+        'observation__source_code_invalid': 'Checks whether source_code in input_layer.observation is populated for a supported standard code system but not found in the corresponding terminology table.',
+        'patient__sex_null': 'Checks whether sex is null in input_layer.patient.',
+        'patient__sex_invalid': 'Checks whether sex in input_layer.patient is populated with a value other than male, female, or unknown.',
+        'patient__race_invalid': 'Checks whether race in input_layer.patient is populated but not found in Tuva race terminology.',
+        'patient__ethnicity_invalid': 'Checks whether ethnicity in input_layer.patient is populated but not found in Tuva ethnicity terminology.',
+        'patient__birth_date_null': 'Checks whether birth_date is null in input_layer.patient.',
+        'patient__birth_date_out_of_range': 'Checks whether birth_date in input_layer.patient is before 1900-01-01 or after the current date.',
+        'patient__death_date_out_of_range': 'Checks whether death_date in input_layer.patient is before 1900-01-01 or after the current date.',
+        'patient__birth_date_after_death_date': 'Checks whether birth_date is after death_date in input_layer.patient.',
+        'patient__death_flag_invalid': 'Checks whether death_flag in input_layer.patient is populated with a value other than 0 or 1.',
+        'patient__death_flag_without_death_date': 'Checks whether death_flag is 1 in input_layer.patient while death_date is null.',
+        'patient__death_date_without_death_flag': 'Checks whether death_date is populated in input_layer.patient while death_flag is null or 0.',
+        'patient__state_invalid': 'Checks whether state is populated in input_layer.patient but does not match an ANSI/FIPS state abbreviation, state name, or state code.',
+        'patient__zip_code_invalid_format': 'Checks whether zip_code is populated in input_layer.patient but is not a 5-digit ZIP code, 9-digit ZIP code, or ZIP+4 value.',
+        'patient__multiple_sexes_per_person': 'Checks whether the same person_id and data_source has more than one non-null sex value in input_layer.patient.',
+        'patient__multiple_birth_dates_per_person': 'Checks whether the same person_id and data_source has more than one non-null birth_date in input_layer.patient.',
+        'practitioner__npi_invalid': 'Checks whether npi is populated in input_layer.practitioner but not found in Tuva provider data.',
+        'practitioner__npi_not_individual': 'Checks whether npi in input_layer.practitioner is found in Tuva provider data but has an NPPES entity type other than individual.',
+        'procedure__person_id_null': 'Checks whether person_id is null in input_layer.procedure.',
+        'procedure__patient_id_null': 'Checks whether patient_id is null in input_layer.procedure.',
+        'procedure__person_id_not_in_patient': 'Checks whether person_id values in input_layer.procedure have a corresponding person_id in input_layer.patient for the same data_source.',
+        'procedure__patient_id_not_in_patient': 'Checks whether patient_id values in input_layer.procedure have a corresponding patient_id in input_layer.patient for the same data_source.',
+        'procedure__encounter_id_not_in_encounter': 'Checks whether populated encounter_id values in input_layer.procedure have a corresponding encounter_id in input_layer.encounter for the same data_source.',
+        'procedure__practitioner_id_not_in_practitioner': 'Checks whether populated practitioner_id values in input_layer.procedure have a corresponding practitioner_id in input_layer.practitioner for the same data_source.',
+        'procedure__procedure_date_null': 'Checks whether procedure_date is null in input_layer.procedure.',
+        'procedure__procedure_date_out_of_range': 'Checks whether procedure_date in input_layer.procedure is before 2000-01-01 or after the current date.',
+        'procedure__code_system_null': 'Checks whether code_system is null in input_layer.procedure.',
+        'procedure__code_system_invalid': 'Checks whether code_system in input_layer.procedure is populated with a value other than icd-10-pcs, icd-9-pcs, hcpcs, snomed-ct, or unknown.',
+        'procedure__source_code_null': 'Checks whether source_code is null in input_layer.procedure.',
+        'procedure__source_code_invalid': 'Checks whether source_code in input_layer.procedure is populated for a supported standard code system but not found in the corresponding terminology table.'
+    } %}
 
-    {% if test_name.endswith('__person_id_null') %}
-        {{ return("Checks whether person_id is null in " ~ table_label ~ ".") }}
-    {% elif test_name.endswith('__patient_id_null') %}
-        {{ return("Checks whether patient_id is null in " ~ table_label ~ ".") }}
-    {% elif test_name.endswith('__person_id_not_in_patient') %}
-        {{ return("Checks whether person_id values in " ~ table_label ~ " have a corresponding person_id in input_layer.patient for the same data_source.") }}
-    {% elif test_name.endswith('__patient_id_not_in_patient') %}
-        {{ return("Checks whether patient_id values in " ~ table_label ~ " have a corresponding patient_id in input_layer.patient for the same data_source.") }}
-    {% elif test_name.endswith('__encounter_id_not_in_encounter') %}
-        {{ return("Checks whether populated encounter_id values in " ~ table_label ~ " have a corresponding encounter_id in input_layer.encounter for the same data_source.") }}
-    {% elif test_name.endswith('__no_matching_eligibility_span') %}
-        {{ return("Checks whether records in " ~ table_label ~ " have no matching eligibility span for the same person_id and data_source during the relevant claim or dispensing dates.") }}
-    {% elif 'multiple_person_ids_per_claim' in test_name %}
-        {{ return("Checks whether a claim_id in " ~ table_label ~ " is associated with more than one person_id within the same data_source.") }}
-    {% elif 'multiple_' in test_name or '_has_multiple_values_' in test_name or '_count_ne_one_' in test_name or '_count_gt_one_' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% elif test_name.endswith('_null') or '_null_' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% elif test_name.endswith('_invalid') or '_invalid_' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ " by comparing populated values to Tuva's accepted values or terminology data assets.") }}
-    {% elif '_out_of_reasonable_range' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ " using Tuva's configured healthcare data quality date range.") }}
-    {% elif '_after_' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% elif '_lt_zero' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% elif '_gt_allowed_amount' in test_name %}
-        {{ return("Checks whether paid_amount is greater than allowed_amount in " ~ table_label ~ ".") }}
-    {% elif 'institutional_indicators_present_for_professional_claim' in test_name %}
-        {{ return("Checks whether professional claims in " ~ table_label ~ " contain institutional-only fields such as bill type, revenue center, admit, discharge, or DRG fields.") }}
-    {% elif 'present_for_institutional_claim' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% elif 'null_for_institutional_claim' in test_name or 'null_for_professional_claim' in test_name or 'null_for_inpatient_claim' in test_name or 'null_for_acute_inpatient_claim' in test_name %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% else %}
-        {{ return("Checks whether " ~ display_name ~ " in " ~ table_label ~ ".") }}
-    {% endif %}
+    {{ return(descriptions.get(test_name, "Checks whether " ~ display_name ~ " in " ~ table_label ~ ".")) }}
 {% endmacro %}
 
 {% macro dq_logical_source_key_expression_sql(relation, relation_alias='source_rows') %}

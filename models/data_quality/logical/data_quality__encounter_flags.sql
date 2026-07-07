@@ -56,6 +56,7 @@ final as (
         , {{ dq_logical_int_flag_sql("source_rows.encounter_type is not null and encounter_type_lookup.encounter_type is null") }} as encounter_type_invalid
         , {{ dq_logical_int_flag_sql("source_rows.encounter_start_date is null") }} as encounter_start_date_null
         , {{ dq_logical_int_flag_sql("source_rows.encounter_end_date is null") }} as encounter_end_date_null
+        , {{ dq_logical_int_flag_sql("source_rows.encounter_start_date is not null and source_rows.encounter_end_date is not null and source_rows.encounter_start_date > source_rows.encounter_end_date") }} as encounter_start_date_after_encounter_end_date
         , {{ dq_logical_int_flag_sql("source_rows.encounter_start_date is not null and (source_rows.encounter_start_date < " ~ min_encounter_date_sql ~ " or source_rows.encounter_start_date > " ~ current_date_sql ~ ")") }} as encounter_start_date_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.encounter_end_date is not null and (source_rows.encounter_end_date < " ~ min_encounter_date_sql ~ " or source_rows.encounter_end_date > " ~ current_date_sql ~ ")") }} as encounter_end_date_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.admit_source_code is not null and admit_source_lookup.admit_source_code is null") }} as admit_source_code_invalid
