@@ -14,8 +14,9 @@ select distinct
     , recapturable_flag
     , hcc_type
     , hcc_source
+    , hcc_gap_type
+    , hcc_gap_source
     , gap_status
-    , suspect_hcc_flag
-from {{ ref('hcc_recapture__int_gap_status')}}
+from {{ ref('hcc_recapture__int_gap_status') }}
 -- Apply hierarchies
 where filtered_by_hierarchy_flag = 0

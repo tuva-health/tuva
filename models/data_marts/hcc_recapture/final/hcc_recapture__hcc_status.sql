@@ -16,7 +16,8 @@ select distinct
     , hccs.hcc_description
     , hccs.hcc_hierarchy_group
     , hccs.hcc_hierarchy_group_rank
-    , coalesce(gap.suspect_hcc_flag, hccs.suspect_hcc_flag) as suspect_hcc_flag
+    , hccs.external_hcc_flag
+    , hccs.reason
     -- Latest risk_model_code per person/year/model_version based on recorded_date
     , first_value(hccs.risk_model_code) over (
         partition by 
@@ -27,13 +28,15 @@ select distinct
     ) as risk_model_code
     , hccs.hcc_type
     , hccs.hcc_source
+    , gap.hcc_gap_type
+    , gap.hcc_gap_source
     , coalesce(gap.gap_status,'ineligible for recapture') as gap_status
     -- Filters that may lead to an 'ineligible for recapture' gap status
     , hccs.hcc_chronic_flag
     , hccs.recapturable_flag
     , hccs.eligible_claim_flag
     , hccs.eligible_bene_flag
-    , coalesce(gap.filtered_by_hierarchy_flag, recap.filtered_by_hierarchy_flag,0) as filtered_by_hierarchy_flag
+    , coalesce(gap.filtered_by_hierarchy_flag, recap.filtered_by_hierarchy_flag, 0) as filtered_by_hierarchy_flag
 from {{ ref('hcc_recapture__int_all_hccs') }} as hccs
 left join {{ ref('hcc_recapture__int_recapturable_hccs') }} as recap
     on hccs.person_id = recap.person_id
