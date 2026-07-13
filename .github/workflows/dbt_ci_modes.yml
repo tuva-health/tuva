@@ -357,6 +357,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Validate external seed placeholders
+        run: |
+          python scripts/check_external_seed_placeholders.py
+          python -m unittest scripts/test_check_external_seed_placeholders.py
+
       - name: Install ODBC Driver 18 for SQL Server
         if: ${{ matrix.adapter == 'fabric' }}
         run: |
