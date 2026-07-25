@@ -41,6 +41,15 @@ with ccs_release_year as (
     , p.primary_specialty_description
     , rend.primary_specialty_description as rend_primary_specialty_description
     , n.modality
+    /* Therapy discipline from the HCPCS therapy modifiers Medicare requires on
+       therapy lines: GP = physical therapy, GO = occupational therapy,
+       GN = speech-language pathology. Used to split the pt/ot/st service
+       category into its individual disciplines. */
+    , case
+        when 'GP' in (m.hcpcs_modifier_1, m.hcpcs_modifier_2, m.hcpcs_modifier_3, m.hcpcs_modifier_4) then 'physical therapy'
+        when 'GO' in (m.hcpcs_modifier_1, m.hcpcs_modifier_2, m.hcpcs_modifier_3, m.hcpcs_modifier_4) then 'occupational therapy'
+        when 'GN' in (m.hcpcs_modifier_1, m.hcpcs_modifier_2, m.hcpcs_modifier_3, m.hcpcs_modifier_4) then 'speech therapy'
+      end as therapy_modifier_discipline
     , m.data_source
   from {{ ref('normalized_input__medical_claim') }} as m
   left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as dx on m.diagnosis_code_1 = dx.icd_10_cm_code
@@ -86,6 +95,7 @@ select
   , f.primary_specialty_description
   , f.rend_primary_specialty_description
   , f.modality
+  , f.therapy_modifier_discipline
   , f.data_source
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from final as f

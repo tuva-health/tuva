@@ -37,6 +37,9 @@ The Tuva Project Service Category Grouper has three levels in a hierarchy with e
 | inpatient | inpatient rehabilitation | inpatient rehabilitation |
 | inpatient | inpatient substance use | inpatient substance use |
 | inpatient | skilled nursing | skilled nursing |
+| office-based | office-based pt/ot/st | physical therapy |
+| office-based | office-based pt/ot/st | occupational therapy |
+| office-based | office-based pt/ot/st | speech therapy |
 | office-based | office-based pt/ot/st | office-based pt/ot/st |
 | office-based | office-based radiology | ct |
 | office-based | office-based radiology | general |
@@ -54,6 +57,9 @@ The Tuva Project Service Category Grouper has three levels in a hierarchy with e
 | outpatient | outpatient hospice | outpatient hospice |
 | outpatient | outpatient hospital or clinic | outpatient hospital or clinic |
 | outpatient | outpatient psychiatric | outpatient psychiatric |
+| outpatient | outpatient pt/ot/st | physical therapy |
+| outpatient | outpatient pt/ot/st | occupational therapy |
+| outpatient | outpatient pt/ot/st | speech therapy |
 | outpatient | outpatient pt/ot/st | outpatient pt/ot/st |
 | outpatient | outpatient radiology | ct |
 | outpatient | outpatient radiology | general |

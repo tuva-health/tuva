@@ -1,0 +1,69 @@
+version: 2
+
+# Validates the PT/OT/ST service_category_3 split. service_category_2 stays the
+# 'outpatient pt/ot/st' umbrella; service_category_3 resolves to the individual
+# discipline using the HCPCS therapy modifier first (GP/GO/GN), then the
+# rendering provider specialty, then the umbrella when neither is conclusive.
+
+unit_tests:
+  - name: test_service_category_pt_ot_st_split_by_discipline
+    description: >
+      Verifies service_category_3 splits outpatient pt/ot/st into physical,
+      occupational, and speech therapy: the therapy modifier takes precedence
+      over the provider specialty, the specialty is used as a fallback, and rows
+      with no discipline signal stay in the pt/ot/st umbrella.
+    model: service_category__outpatient_physical_therapy_professional
+    config:
+      enabled: "{{ var('claims_enabled', False) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        format: sql
+        rows: |
+          -- modifier wins
+          select 'C1' as claim_id, 1 as claim_line_number, 'test' as data_source, 'C1|1' as claim_line_id
+            , '213' as ccs_category, 'Physical Therapist' as primary_specialty_description
+            , '21' as place_of_service_code, 'physical therapy' as therapy_modifier_discipline
+          union all
+          -- specialty fallback (no modifier)
+          select 'C2', 1, 'test', 'C2|1'
+            , '212', 'Occupational Therapist in Private Practice', '22', cast(null as varchar)
+          union all
+          -- specialty fallback, selected via specialty (no qualifying ccs)
+          select 'C3', 1, 'test', 'C3|1'
+            , cast(null as varchar), 'Speech Language Pathologist', '22', cast(null as varchar)
+          union all
+          -- no discipline signal -> umbrella (selected via ccs)
+          select 'C4', 1, 'test', 'C4|1'
+            , '215', 'Cardiology', '22', cast(null as varchar)
+          union all
+          -- modifier takes precedence over a conflicting specialty
+          select 'C5', 1, 'test', 'C5|1'
+            , '213', 'Speech Language Pathologist', '22', 'physical therapy'
+      - input: ref('service_category__stg_professional')
+        format: sql
+        rows: |
+          select 'C1' as claim_id, 1 as claim_line_number, 'test' as data_source
+          union all select 'C2', 1, 'test'
+          union all select 'C3', 1, 'test'
+          union all select 'C4', 1, 'test'
+          union all select 'C5', 1, 'test'
+    expect:
+      rows:
+        - claim_id: 'C1'
+          service_category_2: 'outpatient pt/ot/st'
+          service_category_3: 'physical therapy'
+        - claim_id: 'C2'
+          service_category_2: 'outpatient pt/ot/st'
+          service_category_3: 'occupational therapy'
+        - claim_id: 'C3'
+          service_category_2: 'outpatient pt/ot/st'
+          service_category_3: 'speech therapy'
+        - claim_id: 'C4'
+          service_category_2: 'outpatient pt/ot/st'
+          service_category_3: 'outpatient pt/ot/st'
+        - claim_id: 'C5'
+          service_category_2: 'outpatient pt/ot/st'
+          service_category_3: 'physical therapy'

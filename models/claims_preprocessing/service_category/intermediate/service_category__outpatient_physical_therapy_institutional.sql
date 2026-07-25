@@ -9,7 +9,10 @@ select distinct
     , med.data_source
     , 'outpatient' as service_category_1
     , 'outpatient pt/ot/st' as service_category_2
-    , 'outpatient pt/ot/st' as service_category_3
+    /* Split into discipline using the HCPCS therapy modifier; institutional
+       claims carry no rendering specialty, so fall back to the pt/ot/st
+       umbrella when no discipline modifier is present. */
+    , coalesce(med.therapy_modifier_discipline, 'outpatient pt/ot/st') as service_category_3
     , '{{ this.name }}' as source_model_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as med
