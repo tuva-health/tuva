@@ -8,6 +8,7 @@
 
 with cte as (
 select claim_id
+ , patient_data_source_id
  , claim_line_number
  , encounter_id
  , 'acute inpatient' as encounter_type
@@ -21,6 +22,7 @@ union all
 
 /* Intentionally bringing in professional claims assigned to inpatient stays in case admit is assigned to ED  */
 select claim_id
+ , patient_data_source_id
  , claim_line_number
  , encounter_id
  , 'emergency department' as encounter_type
@@ -33,6 +35,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+ , patient_data_source_id
  , claim_line_number
  , encounter_id
  , 'emergency department' as encounter_type
@@ -45,6 +48,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , 'inpatient psych' as encounter_type
@@ -57,6 +61,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , 'inpatient rehabilitation' as encounter_type
@@ -69,6 +74,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , 'inpatient long term acute care' as encounter_type
@@ -81,6 +87,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , 'inpatient skilled nursing' as encounter_type
@@ -93,6 +100,7 @@ where claim_attribution_number = 1
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , 'inpatient substance use' as encounter_type
@@ -106,6 +114,7 @@ union all
 
 /* Priority of sub office based types from office based group are set within office_visits__int_office_visits_union model */
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , encounter_type
@@ -118,6 +127,7 @@ where encounter_type = 'office visit radiology'
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , encounter_type
@@ -131,6 +141,7 @@ union all
 
 /* urgent care set at lower priority than ed and inpatient to avoid over flagging urgent care due to variations in billing practices */
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'urgent care' as encounter_type
@@ -142,6 +153,7 @@ from {{ ref('urgent_care__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient psych' as encounter_type
@@ -153,6 +165,7 @@ from {{ ref('outpatient_psych__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient rehabilitation' as encounter_type
@@ -164,6 +177,7 @@ from {{ ref('outpatient_rehab__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'ambulatory surgery center' as encounter_type
@@ -175,6 +189,7 @@ from {{ ref('asc__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'dialysis' as encounter_type
@@ -186,6 +201,7 @@ from {{ ref('dialysis__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient hospice' as encounter_type
@@ -197,6 +213,7 @@ from {{ ref('outpatient_hospice__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'home health' as encounter_type
@@ -208,6 +225,7 @@ from {{ ref('home_health__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient surgery' as encounter_type
@@ -219,6 +237,7 @@ from {{ ref('outpatient_surgery__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient injections' as encounter_type
@@ -230,6 +249,7 @@ from {{ ref('outpatient_injections__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient pt/ot/st' as encounter_type
@@ -241,6 +261,7 @@ from {{ ref('outpatient_ptotst__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient substance use' as encounter_type
@@ -252,6 +273,7 @@ from {{ ref('outpatient_substance_use__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient radiology' as encounter_type
@@ -264,6 +286,7 @@ union all
 
 /* Set as lowest outpatient priority "catch all", roll up to more specific encounter type when available */
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'outpatient hospital or clinic' as encounter_type
@@ -275,6 +298,7 @@ from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id
 , encounter_type
@@ -288,6 +312,7 @@ union all
 /* orphaned encounters are "last resort". Labs/DME/ambulance should roll up to inpatient/home health/etc. If unable to match, then they get their own encounter*/
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'lab - orphaned' as encounter_type
@@ -299,6 +324,7 @@ from {{ ref('lab__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'dme - orphaned' as encounter_type
@@ -310,6 +336,7 @@ from {{ ref('dme__match_claims_to_anchor') }}
 union all
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'ambulance - orphaned' as encounter_type
@@ -323,10 +350,18 @@ from {{ ref('ambulance__match_claims_to_anchor') }}
 
 select
   claim_id
+, patient_data_source_id
 , claim_line_number
 , encounter_id as old_encounter_id
+-- Oasis fix: this final dense_rank previously ranked globally on (encounter_type, encounter_id)
+-- with no patient scoping. encounter_id at this point can be a bare claim_id-derived value from
+-- upstream models, which is only guaranteed unique within (claim_id, claim_line_number,
+-- data_source) -- not globally, and a single data_source spans many different patients. Ordering
+-- by patient_data_source_id first keeps this a single global sequence (no partition, so ranks
+-- don't restart per patient and collide in value downstream) while guaranteeing two different
+-- patients' rows never land on the same rank, since their sort tuples always differ.
 , dense_rank() over (
-order by encounter_type, encounter_id) as encounter_id
+order by patient_data_source_id, encounter_type, encounter_id) as encounter_id
 , encounter_type
 , encounter_group
 , priority_number

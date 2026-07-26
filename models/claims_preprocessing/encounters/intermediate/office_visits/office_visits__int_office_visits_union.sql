@@ -5,6 +5,7 @@
 
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit radiology' as encounter_type
@@ -18,6 +19,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit surgery' as encounter_type
@@ -31,6 +33,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit injections' as encounter_type
@@ -44,6 +47,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit pt/ot/st' as encounter_type
@@ -57,6 +61,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit' as encounter_type
@@ -70,6 +75,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'telehealth' as encounter_type
@@ -83,6 +89,7 @@ union distinct
 {% endif %}
 
 select claim_id
+, patient_data_source_id
 , claim_line_number
 , old_encounter_id
 , 'office visit - other' as encounter_type

@@ -20,6 +20,7 @@ with detail_values as (
     and
     cli.claim_line_attribution_number = 1
     inner join {{ ref('acute_inpatient__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
+    and cli.patient_data_source_id = ed.patient_data_source_id
 )
 
 , encounter_cross_walk as (

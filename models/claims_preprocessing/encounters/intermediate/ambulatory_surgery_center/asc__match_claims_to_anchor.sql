@@ -5,6 +5,7 @@
 
 select
     dat.old_encounter_id
+  , med.patient_data_source_id
   , dat.encounter_start_date
   , dat.encounter_end_date
   , med.claim_id

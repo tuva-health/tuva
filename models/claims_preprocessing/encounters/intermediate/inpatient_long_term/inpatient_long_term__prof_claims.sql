@@ -23,12 +23,14 @@ with first_claim as (
     from first_claim as f
     inner join {{ ref('inpatient_long_term__start_end_dates') }} as dat
          on f.encounter_id = dat.encounter_id
+         and f.patient_data_source_id = dat.patient_data_source_id
 
 )
 
 -- ensuring each prof claim is only attributed to one institutional claim with claim_attribution_number
 select
       dat.encounter_id
+    , dat.patient_data_source_id
     , dat.encounter_start_date
     , dat.encounter_end_date
     , med.claim_id

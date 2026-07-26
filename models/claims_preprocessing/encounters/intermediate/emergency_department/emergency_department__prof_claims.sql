@@ -15,12 +15,14 @@ with first_claim as (
     , dat.encounter_start_date
     from first_claim as f
     inner join {{ ref('emergency_department__start_end_dates') }} as dat on f.encounter_id = dat.encounter_id
+    and f.patient_data_source_id = dat.patient_data_source_id
 )
 
 
 -- ensuring each claim is only attributed to one encounter with claim_attribution_number
 , inst_and_prof as (
 select dat.encounter_id
+, dat.patient_data_source_id
 , dat.encounter_start_date
 , dat.encounter_end_date
 , prof.claim_id
@@ -33,6 +35,7 @@ and med.start_date between dat.encounter_start_date and dat.encounter_end_date
 union all
 
 select dat.encounter_id
+, dat.patient_data_source_id
 , dat.encounter_start_date
 , dat.encounter_end_date
 , med.claim_id
@@ -45,6 +48,7 @@ where dat.claim_id <> med.claim_id
 )
 
 select distinct encounter_id
+, patient_data_source_id
 , encounter_start_date
 , encounter_end_date
 , claim_id

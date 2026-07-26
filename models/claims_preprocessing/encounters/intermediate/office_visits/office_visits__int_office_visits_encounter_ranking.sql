@@ -10,6 +10,7 @@ from {{ ref('office_visits__int_office_visits_union') }}
 
 , dist_encounter as (
 select distinct old_encounter_id
+, patient_data_source_id
 , encounter_type
 , priority_number
 from rank_cte
@@ -17,6 +18,7 @@ from rank_cte
 
 select
 old_encounter_id
+, patient_data_source_id
 , encounter_type
 , priority_number
 , row_number() over (partition by old_encounter_id
