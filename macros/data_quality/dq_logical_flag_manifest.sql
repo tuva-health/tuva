@@ -21,7 +21,10 @@
     {% set join_conditions = [] %}
 
     {% for key_column in key_columns %}
-        {% do join_conditions.append("source_rows." ~ key_column ~ " = flags." ~ key_column) %}
+        {% do join_conditions.append(
+            "(source_rows." ~ key_column ~ " = flags." ~ key_column
+            ~ " or (source_rows." ~ key_column ~ " is null and flags." ~ key_column ~ " is null))"
+        ) %}
     {% endfor %}
 
     {{ return(
@@ -448,7 +451,9 @@
                 'test_name': test_name,
                 'flag_column_name': dq_logical_flag_column_name(test_name),
                 'display_name': dq_logical_display_name(definition['table_name'], test_name),
-                'description': dq_logical_test_description(definition['table_name'], test_name)
+                'description': dq_logical_test_description(definition['table_name'], test_name),
+                'test_type': dq_logical_test_type(test_name),
+                'severity': dq_logical_test_severity(test_name)
             } %}
             {% do registry_entry.update({
                 'investigation_sql': dq_logical_investigation_sql(registry_entry)

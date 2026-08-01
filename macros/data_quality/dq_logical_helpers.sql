@@ -230,7 +230,6 @@
         | replace(' out of range', ' is out of range')
         | replace(' less than zero', ' is less than zero')
         | replace(' greater than ', ' is greater than ')
-        | replace(' not found in ', ' is not found in ')
         | replace(' after ', ' is after ')
         | replace(' indicates', ' indicates')
     %}
@@ -245,6 +244,10 @@
         | replace('procedure_code is is present', 'procedure_code is present')
         | replace('drg_code is is present', 'drg_code is present')
     %}
+
+    {% if ' not found in ' in display_name %}
+        {% set display_name = display_name ~ ' table' %}
+    {% endif %}
 
     {{ return(display_name) }}
 {% endmacro %}
@@ -464,6 +467,131 @@
     } %}
 
     {{ return(descriptions.get(test_name, "Checks whether " ~ display_name ~ " in " ~ table_label ~ ".")) }}
+{% endmacro %}
+
+{% macro dq_logical_test_type(test_name) %}
+    {#
+      Logical test types describe the kind of defect, independently from its
+      downstream impact (severity). Keep these ordered from most specific to
+      most general because some referential and consistency tests also contain
+      words such as "null" or "invalid".
+    #}
+    {% set referential_test_patterns = [
+        'not_in_',
+        'no_matching_'
+    ] %}
+    {% set consistency_test_patterns = [
+        'multiple_',
+        '_has_multiple_values_',
+        '_count_ne_one_',
+        '_count_gt_one_',
+        '_without_',
+        'indicators_present_for_',
+        '_present_for_'
+    ] %}
+    {% set missing_test_patterns = [
+        '_null'
+    ] %}
+    {% set temporal_test_patterns = [
+        '_out_of_range',
+        '_out_of_reasonable_range',
+        '_after_',
+        '_start_after_',
+        '_end_before_'
+    ] %}
+    {% set invalid_test_patterns = [
+        '_invalid',
+        '_invalid_format',
+        '_negative',
+        '_lt_zero',
+        '_gt_allowed_amount',
+        '_not_individual'
+    ] %}
+
+    {% for pattern in referential_test_patterns %}
+        {% if pattern in test_name %}
+            {{ return('referential') }}
+        {% endif %}
+    {% endfor %}
+    {% for pattern in consistency_test_patterns %}
+        {% if pattern in test_name %}
+            {{ return('consistency') }}
+        {% endif %}
+    {% endfor %}
+    {% for pattern in missing_test_patterns %}
+        {% if pattern in test_name %}
+            {{ return('missing') }}
+        {% endif %}
+    {% endfor %}
+    {% for pattern in temporal_test_patterns %}
+        {% if pattern in test_name %}
+            {{ return('temporal') }}
+        {% endif %}
+    {% endfor %}
+    {% for pattern in invalid_test_patterns %}
+        {% if pattern in test_name %}
+            {{ return('invalid') }}
+        {% endif %}
+    {% endfor %}
+
+    {{ return('consistency') }}
+{% endmacro %}
+
+{% macro dq_logical_test_severity(test_name) %}
+    {#
+      Severity describes downstream impact, not defect frequency:
+        1 = blocking keys, grain, or required routing fields
+        2 = material analytic impact
+        3 = secondary dimensional or enrichment impact
+    #}
+    {% set severity_1_patterns = [
+        'person_id_null',
+        'patient_id_null',
+        'person_id_not_in_patient',
+        'patient_id_not_in_patient',
+        'claim_type_null',
+        'claim_start_date_null',
+        'claim_end_date_null',
+        'claim_line_start_date_null',
+        'claim_line_end_date_null',
+        'dispensing_date_null',
+        'enrollment_start_after_end',
+        'multiple_person_ids_per_claim',
+        'claim_type_count_ne_one_per_claim'
+    ] %}
+    {% set severity_3_patterns = [
+        'sex_null',
+        'sex_invalid',
+        'race_null',
+        'race_invalid',
+        'ethnicity_invalid',
+        'multiple_sexes_per_person',
+        'multiple_races_per_person',
+        'death_flag_invalid',
+        'death_flag_without_death_date',
+        'death_date_without_death_flag',
+        'state_invalid',
+        'zip_code_invalid_format',
+        'paid_date_null',
+        'accession_number_null',
+        'practitioner_id_not_in_practitioner',
+        'prescribing_provider_npi_null',
+        'dispensing_provider_npi_null',
+        'location__'
+    ] %}
+
+    {% for pattern in severity_1_patterns %}
+        {% if pattern in test_name %}
+            {{ return(1) }}
+        {% endif %}
+    {% endfor %}
+    {% for pattern in severity_3_patterns %}
+        {% if pattern in test_name %}
+            {{ return(3) }}
+        {% endif %}
+    {% endfor %}
+
+    {{ return(2) }}
 {% endmacro %}
 
 {% macro dq_logical_source_key_expression_sql(relation, relation_alias='source_rows') %}
