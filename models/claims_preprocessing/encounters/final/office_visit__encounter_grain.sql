@@ -105,6 +105,8 @@ order by sum(paid_amount) desc) as paid_order
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
     scr.claim_line_number = d.claim_line_number
+    and
+    scr.data_source = d.data_source
     group by d.encounter_id
 )
 

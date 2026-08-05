@@ -33,6 +33,7 @@ select
     , dat.encounter_end_date
     , med.claim_id
     , med.claim_line_number
+    , med.data_source
     , row_number() over (
         partition by med.claim_id, med.claim_line_number, med.data_source
         order by dat.encounter_id

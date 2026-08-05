@@ -4,6 +4,7 @@
 }}
 
 select distinct m.patient_data_source_id
+ , m.data_source
  , m.start_date
  , m.claim_id
  , m.claim_line_number

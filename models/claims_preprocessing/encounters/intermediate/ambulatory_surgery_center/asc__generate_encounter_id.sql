@@ -5,12 +5,14 @@
 with base_data as (
     select distinct
         m.patient_data_source_id
+      , m.data_source
       , m.start_date
       , m.end_date
       , m.claim_id
     from {{ ref('encounters__stg_medical_claim') }} as m
     inner join {{ ref('asc__anchor_events') }} as u
       on m.claim_id = u.claim_id
+      and m.data_source = u.data_source
 )
 
 -- Determine Previous Maximum End Date
@@ -74,6 +76,7 @@ with base_data as (
 -- Merge Encounters with Claims
 select
     nd.patient_data_source_id
+  , nd.data_source
   , nd.start_date
   , nd.end_date
   , nd.claim_id

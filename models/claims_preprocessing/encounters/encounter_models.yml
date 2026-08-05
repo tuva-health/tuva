@@ -1079,7 +1079,12 @@ models:
         description: 'Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.'
 
   - name: encounters__combined_claim_line_crosswalk
-    description: all claim lines that belong to an encounter
+    description: |-
+      all claim lines that belong to an encounter
+
+      Primary key: claim_id, claim_line_number, data_source, encounter_type.
+      claim_id is only unique within a data_source, so consumers must include
+      data_source when joining this model back to claim-level tables.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -1093,6 +1098,8 @@ models:
         description: 'Unique identifier for a claim. Each claim represents a distinct healthcare service or set of services provided to a patient.'
       - name: claim_line_number
         description: 'Indicates the line number for the particular line of the claim.'
+      - name: data_source
+        description: 'Indicates the name of the source dataset the claim line came from. Part of the claim-line key: claim_id is only unique within a data_source.'
       - name: old_encounter_id
         description: 'Unique identifier for each encounter in the dataset.'
       - name: encounter_id

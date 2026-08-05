@@ -7,6 +7,7 @@ with encounter_crosswalk as (
     select
         claim_id
         , claim_line_number
+        , data_source
         , encounter_id
     from {{ ref('encounters__combined_claim_line_crosswalk') }}
     where claim_line_attribution_number = 1
@@ -37,6 +38,7 @@ with encounter_crosswalk as (
     left join encounter_crosswalk as enc
         on diag.claim_id = enc.claim_id
         and diag.claim_line_number = enc.claim_line_number
+        and diag.data_source = enc.data_source
 )
 
 select distinct

@@ -9,8 +9,9 @@ select
   , dat.encounter_end_date
   , med.claim_id
   , med.claim_line_number
+  , med.data_source
   , row_number() over (
-        partition by med.claim_id, med.claim_line_number
+        partition by med.claim_id, med.claim_line_number, med.data_source
         order by dat.old_encounter_id
     ) as claim_attribution_number
 from {{ ref('encounters__stg_medical_claim') }} as med

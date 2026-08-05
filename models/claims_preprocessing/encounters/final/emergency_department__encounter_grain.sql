@@ -16,6 +16,8 @@ with detail_values as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
+    stg.data_source = cli.data_source
+    and
     cli.encounter_type = 'emergency department'
     and
     cli.claim_line_attribution_number = 1
@@ -111,6 +113,8 @@ group by encounter_id
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
     scr.claim_line_number = d.claim_line_number
+    and
+    scr.data_source = d.data_source
     group by d.encounter_id
 )
 

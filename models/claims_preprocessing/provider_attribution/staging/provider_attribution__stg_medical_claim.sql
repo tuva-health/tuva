@@ -7,6 +7,7 @@ with all_encounters as (
     select
         claim_id
       , claim_line_number
+      , data_source
       , encounter_id
     from {{ ref('encounters__combined_claim_line_crosswalk') }}
     where claim_line_attribution_number = 1
@@ -16,6 +17,7 @@ with all_encounters as (
     select
         claim_id
       , claim_line_number
+      , data_source
       , encounter_id
     from {{ ref('encounters__orphaned_claims') }}
 )
@@ -36,7 +38,9 @@ from {{ ref('normalized__medical_claim') }} as med
 inner join {{ ref('service_category__service_category_grouper') }} as srv_group
   on med.claim_id = srv_group.claim_id
   and med.claim_line_number = srv_group.claim_line_number
+  and med.data_source = srv_group.data_source
   and srv_group.duplicate_row_number = 1
 inner join all_encounters as enc
   on med.claim_id = enc.claim_id
   and med.claim_line_number = enc.claim_line_number
+  and med.data_source = enc.data_source

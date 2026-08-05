@@ -29,6 +29,8 @@ order by stg.claim_type, stg.start_date) as encounter_row_number --institutional
     inner join {{ ref('encounters__orphaned_claims') }} as cli on stg.claim_id = cli.claim_id
     and
     stg.claim_line_number = cli.claim_line_number
+    and
+    stg.data_source = cli.data_source
     inner join encounter_date as d on cli.encounter_id = d.encounter_id
 )
 
@@ -117,6 +119,8 @@ order by sum(paid_amount) desc) as paid_order
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
     scr.claim_line_number = d.claim_line_number
+    and
+    scr.data_source = d.data_source
     group by d.encounter_id
 )
 

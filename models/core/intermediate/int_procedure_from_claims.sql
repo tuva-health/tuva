@@ -7,6 +7,7 @@ with encounter_crosswalk as (
     select
         claim_id
         , claim_line_number
+        , data_source
         , encounter_id
     from {{ ref('encounters__combined_claim_line_crosswalk') }}
     where claim_line_attribution_number = 1
@@ -15,6 +16,7 @@ with encounter_crosswalk as (
 , distinct_claim_encounters as (
     select distinct
         claim_id
+        , data_source
         , encounter_id
     from encounter_crosswalk
 )
@@ -45,6 +47,7 @@ with encounter_crosswalk as (
     left join encounter_crosswalk as enc
         on procedure_source.claim_id = enc.claim_id
         and procedure_source.claim_line_number = enc.claim_line_number
+        and procedure_source.data_source = enc.data_source
     where procedure_source.claim_line_number is not null
 )
 
@@ -73,6 +76,7 @@ with encounter_crosswalk as (
     from {{ ref('normalized__medical_claim_procedures') }} as procedure_source
     left join distinct_claim_encounters as enc
         on procedure_source.claim_id = enc.claim_id
+        and procedure_source.data_source = enc.data_source
     where procedure_source.claim_line_number is null
 )
 

@@ -4,6 +4,7 @@
 }}
 
 select patient_data_source_id
+, data_source
 , start_date
 , hcpcs_code
 , dense_rank() over (
