@@ -25,18 +25,11 @@ with cte as (
   where enc.claim_id is null -- missing from encounter mapping table
 )
 
-, max_encounter as (
-  select max(encounter_id) as max_encounter_id
-  from {{ ref('encounters__combined_claim_line_crosswalk') }}
-)
-
 select
   claim_id
 , claim_line_number
 , data_source
-, dense_rank() over (
-order by patient_data_source_id, claim_id) + max_encounter.max_encounter_id as encounter_id
+, {{ the_tuva_project.encounter_id_hash(["'orphaned claim'", 'patient_data_source_id', 'claim_id']) }} as encounter_id
 , 'orphaned claim' as encounter_type
 , 'other' as encounter_group
 from cte
-cross join max_encounter

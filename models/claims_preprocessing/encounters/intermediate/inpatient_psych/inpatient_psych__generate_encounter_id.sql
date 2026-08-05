@@ -200,6 +200,6 @@ order by start_date, end_date, claim_id) as encounter_claim_number
 order by start_date desc, end_date desc, claim_id desc) as encounter_claim_number_desc
   , close_flag
   , min_closing_row
-  , dense_rank() over (
-order by encounter_id) as encounter_id
+  , encounter_id as anchor_claim_id
+  , {{ the_tuva_project.encounter_id_hash(["'inpatient psych'", 'patient_data_source_id', 'encounter_id']) }} as encounter_id
 from add_encounter_id

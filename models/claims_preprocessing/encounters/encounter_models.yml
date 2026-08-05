@@ -1101,9 +1101,14 @@ models:
       - name: data_source
         description: 'Indicates the name of the source dataset the claim line came from. Part of the claim-line key: claim_id is only unique within a data_source.'
       - name: old_encounter_id
-        description: 'Unique identifier for each encounter in the dataset.'
+        description: 'Identifier for the encounter within its own encounter type, before the encounter type is folded in to make it unique across types.'
       - name: encounter_id
-        description: 'Unique identifier for each encounter in the dataset.'
+        description: |-
+          Unique identifier for each encounter in the dataset. Derived by hashing
+          the encounter type together with the natural key of the encounter, so
+          the same encounter keeps the same id across runs, incremental loads and
+          partial runs, and ids stay comparable with tables built from an earlier
+          run.
       - name: encounter_type
         description: 'Indicates the type of encounter e.g. acute inpatient, emergency department, etc.'
       - name: encounter_group
@@ -4537,6 +4542,10 @@ models:
         - encounters
 
   - name: encounters__patient_data_source_id
+    description: |-
+      One row per person per data source. patient_data_source_id is the person
+      and the source concatenated rather than a rank, so it does not change when
+      other people are added to the data.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

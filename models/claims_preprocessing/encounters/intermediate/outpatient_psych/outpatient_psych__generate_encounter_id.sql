@@ -18,6 +18,5 @@ select patient_data_source_id
 , data_source
 , start_date
 , claim_id
-, dense_rank() over (
-order by patient_data_source_id, start_date) as old_encounter_id
+, {{ the_tuva_project.encounter_id_hash(["'outpatient psych'", 'patient_data_source_id', 'start_date']) }} as old_encounter_id
 from anchor

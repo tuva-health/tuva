@@ -353,12 +353,12 @@ select
 , claim_line_number
 , data_source
 , encounter_id as old_encounter_id
-, dense_rank() over (
-order by encounter_type, encounter_id) as encounter_id
+, {{ the_tuva_project.encounter_id_hash(['encounter_type', 'encounter_id']) }} as encounter_id
 , encounter_type
 , encounter_group
 , priority_number
 , anchor_claim_id
 , row_number() over (partition by claim_id, claim_line_number, data_source
-order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end) as claim_line_attribution_number
+order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end
+       , encounter_type, encounter_id) as claim_line_attribution_number
 from cte

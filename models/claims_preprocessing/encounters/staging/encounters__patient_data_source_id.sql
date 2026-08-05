@@ -22,6 +22,5 @@ from {{ ref('normalized__eligibility') }}
 select
 person_id
 , data_source
-, dense_rank() over (
-order by concat(person_id, data_source)) as patient_data_source_id
+, {{ the_tuva_project.concat_custom(['person_id', "'|'", 'data_source']) }} as patient_data_source_id
 from multiple_sources

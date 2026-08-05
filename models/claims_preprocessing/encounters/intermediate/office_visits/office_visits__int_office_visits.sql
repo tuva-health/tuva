@@ -30,6 +30,5 @@ select
   , service_category_1
   , service_category_2
   , service_category_3
-  , dense_rank() over (
-order by patient_data_source_id, start_date) as old_encounter_id
+  , {{ the_tuva_project.encounter_id_hash(["'office based'", 'patient_data_source_id', 'start_date']) }} as old_encounter_id
 from anchor

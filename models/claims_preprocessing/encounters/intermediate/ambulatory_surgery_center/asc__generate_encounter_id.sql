@@ -67,9 +67,7 @@ with base_data as (
     select
         patient_data_source_id
       , encounter_group
-      , row_number() over (
-            order by patient_data_source_id, encounter_start_date
-        ) as encounter_id
+      , {{ the_tuva_project.encounter_id_hash(["'ambulatory surgery center'", 'patient_data_source_id', 'encounter_start_date']) }} as encounter_id
     from unique_encounters
 )
 
