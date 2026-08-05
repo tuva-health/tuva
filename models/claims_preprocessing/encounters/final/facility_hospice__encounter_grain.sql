@@ -18,10 +18,10 @@ with detail_values as (
     and
     stg.data_source = cli.data_source
     and
-    cli.encounter_type = 'inpatient hospice'
+    cli.encounter_type = 'facility hospice'
     and
     cli.claim_line_attribution_number = 1
-    inner join {{ ref('inpatient_hospice__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
+    inner join {{ ref('facility_hospice__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
 )
 
 , encounter_cross_walk as (
@@ -160,7 +160,7 @@ select
   end as mortality_flag
 , c.data_source
 , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('inpatient_hospice__start_end_dates') }} as a
+from {{ ref('facility_hospice__start_end_dates') }} as a
 inner join encounter_cross_walk as x on a.encounter_id = x.old_encounter_id
 inner join total_amounts as tot on x.encounter_id = tot.encounter_id
 inner join service_category_flags as sc on x.encounter_id = sc.encounter_id

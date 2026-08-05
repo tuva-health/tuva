@@ -26,7 +26,7 @@ with claim_start_end as (
     on enc.claim_id = c.claim_id
     and c.patient_data_source_id = enc.patient_data_source_id
   where
-    enc.service_category_2 in ('inpatient hospice')
+    enc.service_category_2 in ('facility hospice')
     and enc.claim_type = 'institutional'
 )
 
@@ -201,5 +201,5 @@ order by start_date desc, end_date desc, claim_id desc) as encounter_claim_numbe
   , close_flag
   , min_closing_row
   , encounter_id as anchor_claim_id
-  , {{ the_tuva_project.encounter_id_hash(["'inpatient hospice'", 'patient_data_source_id', 'encounter_id']) }} as encounter_id
+  , {{ the_tuva_project.encounter_id_hash(["'facility hospice'", 'patient_data_source_id', 'encounter_id']) }} as encounter_id
 from add_encounter_id

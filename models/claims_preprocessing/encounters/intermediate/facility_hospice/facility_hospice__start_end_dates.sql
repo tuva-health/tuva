@@ -7,5 +7,5 @@ select encounter_id
 , min(anchor_claim_id) as anchor_claim_id
 , min(start_date) as encounter_start_date
 , max(end_date) as encounter_end_date
-from {{ ref('inpatient_hospice__generate_encounter_id') }}
+from {{ ref('facility_hospice__generate_encounter_id') }}
 group by encounter_id

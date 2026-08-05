@@ -15,7 +15,7 @@ with base as (
     relations=[
        ref('acute_inpatient__encounter_grain')
       , ref('emergency_department__encounter_grain')
-      , ref('inpatient_hospice__encounter_grain')
+      , ref('facility_hospice__encounter_grain')
       , ref('inpatient_psych__encounter_grain')
       , ref('inpatient_rehab__encounter_grain')
       , ref('inpatient_snf__encounter_grain')
@@ -23,7 +23,7 @@ with base as (
       , ref('inpatient_long_term__encounter_grain')
       , ref('urgent_care__encounter_grain')
       , ref('office_visit__encounter_grain')
-      , ref('outpatient_hospice__encounter_grain')
+      , ref('home_hospice__encounter_grain')
       , ref('outpatient_hospital_or_clinic__encounter_grain')
       , ref('outpatient_injections__encounter_grain')
       , ref('outpatient_psych__encounter_grain')

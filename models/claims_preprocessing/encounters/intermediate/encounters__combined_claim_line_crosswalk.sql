@@ -204,11 +204,11 @@ select claim_id
 , claim_line_number
 , data_source
 , old_encounter_id
-, 'outpatient hospice' as encounter_type
+, 'home hospice' as encounter_type
 , 'outpatient' as encounter_group
 , 14 as priority_number
 , null as anchor_claim_id
-from {{ ref('outpatient_hospice__match_claims_to_anchor') }}
+from {{ ref('home_hospice__match_claims_to_anchor') }}
 
 union all
 

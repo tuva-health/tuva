@@ -58,7 +58,7 @@ with member_months as (
     , sum(case when encounter_type = 'dme - orphaned' then 1 else 0 end) as dme_orphaned_count
     , sum(case when encounter_type = 'emergency department' then 1 else 0 end) as emergency_department_count
     , sum(case when encounter_type = 'home health' then 1 else 0 end) as home_health_count
-    , sum(case when encounter_type = 'inpatient hospice' then 1 else 0 end) as inpatient_hospice_count
+    , sum(case when encounter_type = 'facility hospice' then 1 else 0 end) as facility_hospice_count
     , sum(case when encounter_type = 'inpatient long term acute care' then 1 else 0 end) as inpatient_long_term_acute_care_count
     , sum(case when encounter_type = 'inpatient psych' then 1 else 0 end) as inpatient_psych_count
     , sum(case when encounter_type = 'inpatient rehabilitation' then 1 else 0 end) as inpatient_rehabilitation_count
@@ -72,7 +72,7 @@ with member_months as (
     , sum(case when encounter_type = 'office visit radiology' then 1 else 0 end) as office_visit_radiology_count
     , sum(case when encounter_type = 'office visit surgery' then 1 else 0 end) as office_visit_surgery_count
     , sum(case when encounter_type = 'orphaned claim' then 1 else 0 end) as orphaned_claim_count
-    , sum(case when encounter_type = 'outpatient hospice' then 1 else 0 end) as outpatient_hospice_count
+    , sum(case when encounter_type = 'home hospice' then 1 else 0 end) as home_hospice_count
     , sum(case when encounter_type = 'outpatient hospital or clinic' then 1 else 0 end) as outpatient_hospital_or_clinic_count
     , sum(case when encounter_type = 'outpatient injections' then 1 else 0 end) as outpatient_injections_count
     , sum(case when encounter_type = 'outpatient psych' then 1 else 0 end) as outpatient_psych_count
@@ -119,7 +119,7 @@ select
   , coalesce(utilization.dme_orphaned_count, 0) as dme_orphaned_count
   , coalesce(utilization.emergency_department_count, 0) as emergency_department_count
   , coalesce(utilization.home_health_count, 0) as home_health_count
-  , coalesce(utilization.inpatient_hospice_count, 0) as inpatient_hospice_count
+  , coalesce(utilization.facility_hospice_count, 0) as facility_hospice_count
   , coalesce(utilization.inpatient_long_term_acute_care_count, 0) as inpatient_long_term_acute_care_count
   , coalesce(utilization.inpatient_psych_count, 0) as inpatient_psych_count
   , coalesce(utilization.inpatient_rehabilitation_count, 0) as inpatient_rehabilitation_count
@@ -133,7 +133,7 @@ select
   , coalesce(utilization.office_visit_radiology_count, 0) as office_visit_radiology_count
   , coalesce(utilization.office_visit_surgery_count, 0) as office_visit_surgery_count
   , coalesce(utilization.orphaned_claim_count, 0) as orphaned_claim_count
-  , coalesce(utilization.outpatient_hospice_count, 0) as outpatient_hospice_count
+  , coalesce(utilization.home_hospice_count, 0) as home_hospice_count
   , coalesce(utilization.outpatient_hospital_or_clinic_count, 0) as outpatient_hospital_or_clinic_count
   , coalesce(utilization.outpatient_injections_count, 0) as outpatient_injections_count
   , coalesce(utilization.outpatient_psych_count, 0) as outpatient_psych_count

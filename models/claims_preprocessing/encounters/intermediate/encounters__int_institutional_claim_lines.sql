@@ -31,11 +31,11 @@ union all
 select enc.claim_id
 , enc.patient_data_source_id
 , enc.encounter_id
-, 'inpatient hospice' as encounter_type
+, 'facility hospice' as encounter_type
 , 'inpatient' as encounter_group
 , 1 as priority_number
 , null as anchor_claim_id
-from {{ ref('inpatient_hospice__generate_encounter_id') }} as enc
+from {{ ref('facility_hospice__generate_encounter_id') }} as enc
 
 
 union all
