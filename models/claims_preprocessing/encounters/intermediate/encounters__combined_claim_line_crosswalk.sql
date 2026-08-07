@@ -353,13 +353,7 @@ select
 , patient_data_source_id
 , claim_line_number
 , encounter_id as old_encounter_id
--- Oasis fix: this final dense_rank previously ranked globally on (encounter_type, encounter_id)
--- with no patient scoping. encounter_id at this point can be a bare claim_id-derived value from
--- upstream models, which is only guaranteed unique within (claim_id, claim_line_number,
--- data_source) -- not globally, and a single data_source spans many different patients. Ordering
--- by patient_data_source_id first keeps this a single global sequence (no partition, so ranks
--- don't restart per patient and collide in value downstream) while guaranteeing two different
--- patients' rows never land on the same rank, since their sort tuples always differ.
+-- order by patient_data_source_id first so two different patients' rows never land on the same rank
 , dense_rank() over (
 order by patient_data_source_id, encounter_type, encounter_id) as encounter_id
 , encounter_type
