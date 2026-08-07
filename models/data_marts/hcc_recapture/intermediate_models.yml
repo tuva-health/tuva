@@ -27,6 +27,7 @@ models:
               - external_hcc_flag
               - hcc_type
               - hcc_source
+              - reason
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -72,6 +73,10 @@ models:
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
           on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+      - name: reason
+        description: >
+          Explains how the HCC was identified. The same HCC can appear more than once for a person when it is found for
+          different reasons (for example, Observation suspect vs Medication suspect).
   
   - name: hcc_recapture__int_gap_status
     description: >
@@ -228,6 +233,7 @@ models:
               - claim_id
               - hcc_type
               - hcc_source
+              - reason
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -272,7 +278,11 @@ models:
       - name: eligible_claim_flag
         description: >
           Whether the claim is eligible for risk adjustment as determined based on a list of accepted CPT/HCPCs codes from CMS. These are available
-          on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment               
+          on the CMS risk adjustment website: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment
+      - name: reason
+        description: >
+          Explains how the HCC was identified. The same HCC can appear more than once for a person when it is found for
+          different reasons (for example, Observation suspect vs Medication suspect).
 
   - name: hcc_recapture__int_suspect_hccs
     description: Suspect HCCs which are identified from sources besides medical claims conditions.
@@ -295,6 +305,7 @@ models:
             - hcc_type
             - hcc_source
             - claim_id
+            - reason
     columns:
       - name: person_id
         description: A unique identifier for a person.
@@ -317,6 +328,10 @@ models:
           This is the year that the HCC should be coded. Typically the collection year + 1, but for open HCCs it will be the collection year + 2. 
           To illustrate, if we have an HCC claim in 2023, but not in 2024, that means it is open in 2024. The payment year is 2024 + 1 = 2025. So 
           an open HCC from 2023 will have a payment year = 2025.
+      - name: reason
+        description: >
+          Explains how the HCC was identified. The same HCC can appear more than once for a person when it is found for
+          different reasons (for example, Observation suspect vs Medication suspect).
       - name: recapture_flag
         description: > 
           Whether or not the HCC is recapturable. Includes the following values:

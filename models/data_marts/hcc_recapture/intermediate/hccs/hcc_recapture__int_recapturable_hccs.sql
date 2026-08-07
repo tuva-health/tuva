@@ -53,6 +53,7 @@ select
     , base.recapturable_flag
     , base.hcc_type
     , base.hcc_source
+    , base.reason
     , CASE WHEN mhier.hcc_hierarchy_group IS NOT NULL THEN 0 ELSE 1 END as filtered_by_hierarchy_flag
 from base
 left join min_hierarchy as mhier
