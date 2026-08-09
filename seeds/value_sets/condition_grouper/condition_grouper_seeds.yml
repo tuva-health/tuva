@@ -1,5 +1,23 @@
 version: 2
 
+# Column type vocabulary for this seed file. Every column_types entry uses one
+# of these anchors so a warehouse type difference is fixed in exactly one place.
+# Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
+# databricks, fabric.
+#   &string - short codes and identifiers
+#   &text   - long free text
+#   &date   - calendar date
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- else -%} varchar(256)
+    {%- endif -%}
+  - &text |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- else -%} varchar(3000)
+    {%- endif -%}
+  - &date date
+
 seeds:
   - name: tuva_condition_grouper
     description: |-
@@ -27,17 +45,12 @@ seeds:
         - value_sets
         - condition_grouper
       column_types:
-        condition_family: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        condition: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        condition_family: *string
+        condition: *string
+        status: *string
+        description: *text
+        last_update_date: *date
+        last_update_note: *text
     columns:
       - name: condition_family
         description: Analytic rollup family for the condition, such as Cardiovascular Disease, Cancer, or Mental Health Disorders.
@@ -93,21 +106,14 @@ seeds:
         - value_sets
         - condition_grouper
       column_types:
-        condition_family: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        condition: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        code_system: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        condition_family: *string
+        condition: *string
+        code: *string
+        code_description: *text
+        code_system: *string
+        status: *string
+        last_update_date: *date
+        last_update_note: *text
     columns:
       - name: condition_family
         description: Analytic condition family assigned to the diagnosis code.

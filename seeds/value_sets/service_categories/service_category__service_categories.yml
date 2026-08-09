@@ -1,5 +1,20 @@
 version: 2
 
+# Column type vocabulary for this seed file. Every column_types entry uses one
+# of these anchors so a warehouse type difference is fixed in exactly one place.
+# Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
+# databricks, fabric.
+#   &string  - short codes and identifiers
+#   &date    - calendar date
+#   &integer - whole number
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- else -%} varchar(256)
+    {%- endif -%}
+  - &date date
+  - &integer integer
+
 seeds:
   - name: service_category__ccs_services_procedures
     description: |-
@@ -28,19 +43,14 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: ccs_services_procedures
       column_types:
-        hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
-        ccs_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3) {%- endif -%}
-        ccs_category_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        release_year: integer
-        start_valid_date: date
-        end_valid_date: date
-        code_range: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        source_file: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        hcpcs_code: *string
+        ccs_category: *string
+        ccs_category_description: *string
+        release_year: *integer
+        start_valid_date: *date
+        end_valid_date: *date
+        code_range: *string
+        source_file: *string
     columns:
       - name: hcpcs_code
         description: CPT or HCPCS code mapped to a CCS Services and Procedures category.
@@ -79,42 +89,24 @@ seeds:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       column_types:
-        icd_10_cm_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        icd_10_cm_code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        default_ccsr_category_ip: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        default_ccsr_category_description_ip: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        default_ccsr_category_op: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        default_ccsr_category_description_op: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_1_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_2_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_3_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_4: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_4_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_5: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_5_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_6: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ccsr_category_6_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        icd_10_cm_code: *string
+        icd_10_cm_code_description: *string
+        default_ccsr_category_ip: *string
+        default_ccsr_category_description_ip: *string
+        default_ccsr_category_op: *string
+        default_ccsr_category_description_op: *string
+        ccsr_category_1: *string
+        ccsr_category_1_description: *string
+        ccsr_category_2: *string
+        ccsr_category_2_description: *string
+        ccsr_category_3: *string
+        ccsr_category_3_description: *string
+        ccsr_category_4: *string
+        ccsr_category_4_description: *string
+        ccsr_category_5: *string
+        ccsr_category_5_description: *string
+        ccsr_category_6: *string
+        ccsr_category_6_description: *string
     columns:
       - name: icd_10_cm_code
         description: ICD-10-CM diagnosis code.
@@ -172,14 +164,10 @@ seeds:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       column_types:
-        service_category_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        service_category_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        service_category_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        priority: |
-          integer
+        service_category_1: *string
+        service_category_2: *string
+        service_category_3: *string
+        priority: *integer
     columns:
       - name: service_category_1
         description: service category 1 in the Tuva model 

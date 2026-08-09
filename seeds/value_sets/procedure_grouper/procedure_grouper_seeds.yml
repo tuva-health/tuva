@@ -1,5 +1,25 @@
 version: 2
 
+# Column type vocabulary for this seed file. Every column_types entry uses one
+# of these anchors so a warehouse type difference is fixed in exactly one place.
+# Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
+# databricks, fabric.
+#   &string   - short codes and identifiers
+#   &text_max - widest text the adapter supports
+#   &date     - calendar date
+anchors:
+  - &string |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- else -%} varchar(256)
+    {%- endif -%}
+  - &text_max |
+    {%- if target.type in ("bigquery", "databricks") -%} string
+    {%- elif target.type == "snowflake" -%} varchar(16777216)
+    {%- elif target.type == "fabric" -%} varchar(max)
+    {%- else -%} varchar(3000)
+    {%- endif -%}
+  - &date date
+
 seeds:
   - name: tuva_procedure_grouper
     description: |-
@@ -27,17 +47,12 @@ seeds:
         - value_sets
         - procedure_grouper
       column_types:
-        procedure_family: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
-        last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+        procedure_family: *string
+        procedure: *string
+        status: *string
+        description: *text_max
+        last_update_date: *date
+        last_update_note: *text_max
     columns:
       - name: procedure_family
         description: Analytic rollup family for the procedure, such as Cardiovascular, Gastrointestinal, Musculoskeletal, or Urinary System.
@@ -91,21 +106,14 @@ seeds:
         - value_sets
         - procedure_grouper
       column_types:
-        procedure_family: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
-        code_system: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        status: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        last_update_date: date
-        last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+        procedure_family: *string
+        procedure: *string
+        code: *string
+        code_description: *text_max
+        code_system: *string
+        status: *string
+        last_update_date: *date
+        last_update_note: *text_max
     columns:
       - name: procedure_family
         description: Analytic procedure family assigned to the procedure code.
