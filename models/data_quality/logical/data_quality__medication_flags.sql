@@ -45,8 +45,8 @@ practitioner_rows as (
 
 ndc_rows as (
     select distinct
-          ndc
-    from {{ ref('terminology__ndc') }}
+          ndc_terminology.ndc
+    from {{ ref('terminology__ndc') }} as ndc_terminology
 ),
 
 rxnorm_rows as (
@@ -59,11 +59,11 @@ atc_rows as (
     select distinct atc_code
     from (
         select atc_1_code as atc_code from {{ ref('terminology__rxnorm_to_atc') }}
-        union
+        union all
         select atc_2_code as atc_code from {{ ref('terminology__rxnorm_to_atc') }}
-        union
+        union all
         select atc_3_code as atc_code from {{ ref('terminology__rxnorm_to_atc') }}
-        union
+        union all
         select atc_4_code as atc_code from {{ ref('terminology__rxnorm_to_atc') }}
     ) as atc_union
     where atc_code is not null

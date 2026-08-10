@@ -39,8 +39,8 @@ encounter_rows as (
 
 observation_type_rows as (
     select distinct
-          observation_type
-    from {{ ref('terminology__observation_type') }}
+          observation_type_terminology.observation_type
+    from {{ ref('terminology__observation_type') }} as observation_type_terminology
 ),
 
 final as (
