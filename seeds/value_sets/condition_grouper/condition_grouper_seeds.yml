@@ -8,6 +8,8 @@ version: 2
 #   &text   - long free text
 #   &date   - calendar date
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -38,8 +40,7 @@ seeds:
           update_frequency: "ad hoc"
           notes: "Source of truth is the Tuva Conditions & Procedures Google Sheet."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_condition_grouper
       tags:
         - value_sets
@@ -54,15 +55,15 @@ seeds:
     columns:
       - name: condition_family
         description: Analytic rollup family for the condition, such as Cardiovascular Disease, Cancer, or Mental Health Disorders.
-        tests:
+        data_tests:
           - not_null
       - name: condition
         description: Mutually exclusive condition name assigned by the Tuva Condition Grouper.
-        tests:
+        data_tests:
           - not_null
       - name: status
         description: Governance status of the condition row. Active rows are available for use in Tuva Condition Grouper mappings.
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
               arguments:
@@ -73,7 +74,7 @@ seeds:
         description: Date this condition row was last reviewed or updated.
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the condition row.
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
@@ -99,8 +100,7 @@ seeds:
           update_frequency: "ad hoc"
           notes: "Source of truth is the Tuva Conditions & Procedures Google Sheet."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper_code_map.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_condition_grouper_code_map
       tags:
         - value_sets
@@ -117,25 +117,25 @@ seeds:
     columns:
       - name: condition_family
         description: Analytic condition family assigned to the diagnosis code.
-        tests:
+        data_tests:
           - not_null
       - name: condition
         description: Mutually exclusive Tuva condition assigned to the diagnosis code.
-        tests:
+        data_tests:
           - not_null
       - name: code
         description: Diagnosis code mapped to the Tuva condition. ICD-10-CM codes are stored without decimal formatting.
-        tests:
+        data_tests:
           - not_null
       - name: code_description
         description: Human-readable description for the mapped diagnosis code from the source terminology.
       - name: code_system
         description: Diagnosis code system for the mapped code. Current supported values are icd-10-cm and snomed-ct.
-        tests:
+        data_tests:
           - not_null
       - name: status
         description: Status of the code mapping. Active mappings are available for current use; inactive mappings are retained for historical codes.
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
               arguments:
@@ -144,7 +144,7 @@ seeds:
         description: Date this code mapping row was last reviewed or updated.
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the code mapping row.
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:

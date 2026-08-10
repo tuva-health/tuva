@@ -4,11 +4,14 @@ version: 2
 # of these anchors so a warehouse type difference is fixed in exactly one place.
 # Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
 # databricks, fabric.
+#   &schema  - target schema for this data asset family
 #   &string  - short codes and identifiers
 #   &text    - long free text
 #   &date    - calendar date
 #   &integer - whole number
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -39,8 +42,7 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      schema: *schema
       tags:
         - provider_data
         - claims_preprocessing
@@ -77,8 +79,7 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "monthly"
       post_hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      schema: *schema
       tags:
         - provider_data
         - claims_preprocessing
@@ -179,8 +180,7 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      schema: *schema
       alias: medicare_provider_and_supplier_taxonomy_crosswalk
       tags:
         - provider_data
@@ -206,8 +206,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('provider_data','electing_teaching_hospital_list.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      schema: *schema
       alias: electing_teaching_hospital_list
       tags:
         - provider_data
@@ -264,18 +263,6 @@ seeds:
       Provider taxonomy unpivot records list one row per NPI and taxonomy relationship so provider specialties
       can be queried directly. They are derived from CMS NPPES provider data.
     config:
-      post_hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
-      alias: provider_taxonomy_unpivot
-      tags:
-        - provider_data
-      column_types:
-        npi: *string
-        taxonomy_col: *string
-        taxonomy_code: *string
-        switch_col: *string
-        taxonomy_switch: *string
       meta:
         primary_key_columns:
           - npi
@@ -289,14 +276,25 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-        columns:
-          - name: npi
-            description: 'The National Provider Identifier (NPI).'
-          - name: taxonomy_col
-            description: 'The taxonomy column identifier.'
-          - name: taxonomy_code
-            description: 'The provider taxonomy code.'
-          - name: switch_col
-            description: 'The switch column identifier.'
-          - name: taxonomy_switch
-            description: 'The taxonomy switch value.'
+      post_hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
+      schema: *schema
+      alias: provider_taxonomy_unpivot
+      tags:
+        - provider_data
+      column_types:
+        npi: *string
+        taxonomy_col: *string
+        taxonomy_code: *string
+        switch_col: *string
+        taxonomy_switch: *string
+    columns:
+      - name: npi
+        description: 'The National Provider Identifier (NPI).'
+      - name: taxonomy_col
+        description: 'The taxonomy column identifier.'
+      - name: taxonomy_code
+        description: 'The provider taxonomy code.'
+      - name: switch_col
+        description: 'The switch column identifier.'
+      - name: taxonomy_switch
+        description: 'The taxonomy switch value.'

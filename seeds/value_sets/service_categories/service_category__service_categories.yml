@@ -4,10 +4,13 @@ version: 2
 # of these anchors so a warehouse type difference is fixed in exactly one place.
 # Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
 # databricks, fabric.
+#   &schema  - target schema for this data asset family
 #   &string  - short codes and identifiers
 #   &date    - calendar date
 #   &integer - whole number
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -39,9 +42,11 @@ seeds:
           update_frequency: "ad hoc"
           notes: "Used by claims preprocessing for service category and encounter grouping."
       post_hook: "{{ load_versioned_seed('value_sets','ccs_services_procedures.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: ccs_services_procedures
+      tags:
+        - value_sets
+        - claims_preprocessing
       column_types:
         hcpcs_code: *string
         ccs_category: *string
@@ -86,8 +91,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','ccsr__dxccsr_v2023_1_cleaned_map.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
+      alias: dxccsr_v2023_1_cleaned_map
+      tags:
+        - value_sets
+        - claims_preprocessing
       column_types:
         icd_10_cm_code: *string
         icd_10_cm_code_description: *string
@@ -161,8 +169,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','service_category__service_categories.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
+      alias: service_categories
+      tags:
+        - value_sets
+        - claims_preprocessing
       column_types:
         service_category_1: *string
         service_category_2: *string

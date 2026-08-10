@@ -4,10 +4,13 @@ version: 2
 # of these anchors so a warehouse type difference is fixed in exactly one place.
 # Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
 # databricks, fabric.
+#   &schema  - target schema for this data asset family
 #   &string  - short codes and identifiers
 #   &text    - long free text
 #   &integer - whole number
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -41,10 +44,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___assignment_windows.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _assignment_windows
-      tags: cms_provider_attribution
+      schema: *schema
+      alias: assignment_windows
+      tags:
+        - value_sets
+        - cms_provider_attribution
       enabled: "{{ var('provider_attribution_enabled', False) }}"
       column_types:
         performance_year: *string
@@ -70,10 +74,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___primary_care_hcpcs_codes.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _primary_care_hcpcs_codes
-      tags: cms_provider_attribution
+      schema: *schema
+      alias: primary_care_hcpcs_codes
+      tags:
+        - value_sets
+        - cms_provider_attribution
       enabled: "{{ var('provider_attribution_enabled', False) }}"
       column_types:
         hcpcs_code: *string
@@ -96,10 +101,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___provider_specialty_assignment_codes.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
-      alias: _provider_specialty_assignment_codes
-      tags: cms_provider_attribution
+      schema: *schema
+      alias: provider_specialty_assignment_codes
+      tags:
+        - value_sets
+        - cms_provider_attribution
       enabled: "{{ var('provider_attribution_enabled', False) }}"
       column_types:
         specialty_code: *string

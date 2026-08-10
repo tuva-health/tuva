@@ -8,6 +8,8 @@ version: 2
 #   &text_max - widest text the adapter supports
 #   &date     - calendar date
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -40,8 +42,7 @@ seeds:
           update_frequency: "ad hoc"
           notes: "Initial hierarchy is derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 and Tuva clinical review."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_procedure_grouper
       tags:
         - value_sets
@@ -56,13 +57,13 @@ seeds:
     columns:
       - name: procedure_family
         description: Analytic rollup family for the procedure, such as Cardiovascular, Gastrointestinal, Musculoskeletal, or Urinary System.
-        tests:
+        data_tests:
           - not_null
       - name: procedure
         description: Mutually exclusive procedure name assigned by the Tuva Procedure Grouper.
       - name: status
         description: Governance status of the procedure row. Active rows are available for use in Tuva Procedure Grouper mappings.
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
               arguments:
@@ -73,7 +74,7 @@ seeds:
         description: Date this procedure row was last reviewed or updated.
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the procedure row.
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
@@ -99,8 +100,7 @@ seeds:
           update_frequency: "ad hoc"
           notes: "Initial mappings are derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 with Tuva overrides for active CMS April 2026 ICD-10-PCS codes not yet present in AHRQ PRCCSR v2026.1."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper_code_map.csv') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_procedure_grouper_code_map
       tags:
         - value_sets
@@ -117,23 +117,23 @@ seeds:
     columns:
       - name: procedure_family
         description: Analytic procedure family assigned to the procedure code.
-        tests:
+        data_tests:
           - not_null
       - name: procedure
         description: Mutually exclusive Tuva procedure assigned to the procedure code.
       - name: code
         description: Procedure code mapped to the Tuva procedure. ICD-10-PCS codes are stored without decimal formatting.
-        tests:
+        data_tests:
           - not_null
       - name: code_description
         description: Human-readable description for the mapped procedure code from the source terminology.
       - name: code_system
         description: Procedure code system for the mapped code. Current supported value is icd-10-pcs.
-        tests:
+        data_tests:
           - not_null
       - name: status
         description: Status of the code mapping. Active mappings are available for current use; inactive mappings are retained for historical codes.
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
               arguments:
@@ -142,7 +142,7 @@ seeds:
         description: Date this code mapping row was last reviewed or updated.
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the code mapping row.
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:

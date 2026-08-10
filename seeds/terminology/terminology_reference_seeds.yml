@@ -4,10 +4,13 @@ version: 2
 # of these anchors so a warehouse type difference is fixed in exactly one place.
 # Supported adapters: bigquery, snowflake, redshift, postgres, duckdb, athena,
 # databricks, fabric.
+#   &schema  - target schema for this data asset family
 #   &string  - short codes and identifiers
 #   &date    - calendar date
 #   &integer - whole number
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -31,13 +34,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','ansi_fips_state.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: ansi_fips_state
       tags:
         - terminology
         - medicare_cclf_connector
-        - terminology
       column_types:
         ansi_fips_state_code: *string
         ansi_fips_state_abbreviation: *string
@@ -66,13 +67,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','calendar.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: calendar
       tags:
         - terminology
         - pmpm
-        - terminology
       column_types:
         full_date: *date
         year: *integer
@@ -113,6 +112,8 @@ seeds:
         description: 'The first day of the month.'
       - name: last_day_of_month
         description: 'The last day of the month.'
+      - name: year_month_int
+        description: 'Year and month expressed as an integer in YYYYMM format.'
 
   - name: terminology__code_type
     description: |-
@@ -130,13 +131,11 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','code_type.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: code_type
       tags:
         - terminology
         - data_profiling
-        - terminology
       column_types:
         code_type: *string
     columns:
@@ -159,11 +158,9 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','fips_county.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: fips_county
       tags:
-        - terminology
         - terminology
       column_types:
         fips_code: *string
@@ -193,11 +190,9 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','ssa_fips_state.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: ssa_fips_state
       tags:
-        - terminology
         - terminology
       column_types:
         ssa_fips_state_code: *string
@@ -229,11 +224,9 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','svi_us_county.csv') }}"
-      schema: |-
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: svi_us_county
       tags:
-        - terminology
         - terminology
       column_types:
         ST: *string
@@ -556,7 +549,6 @@ seeds:
       - name: MP_OTHERRACE
       - name: YEAR
 
-
   - name: terminology__svi_us
     description: |-
       Tract-level Social Vulnerability Index records measure social risk factors used for geography-based
@@ -574,11 +566,9 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','svi_us.csv') }}"
-      schema: |-
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: *schema
       alias: svi_us
       tags:
-        - terminology
         - terminology
       column_types:
         ST: *string

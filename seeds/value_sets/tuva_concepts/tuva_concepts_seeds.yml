@@ -8,6 +8,8 @@ version: 2
 #   &text   - long free text
 #   &date   - calendar date
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -40,10 +42,10 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','tuva_concepts.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_concepts
-      tags: value_sets
+      tags:
+        - value_sets
       column_types:
         concept_id: *string
         concept_name: *string
@@ -114,10 +116,10 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','tuva_value_set_members.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: tuva_value_set_members
-      tags: value_sets
+      tags:
+        - value_sets
       column_types:
         value_set_member_id: *string
         concept_id: *string
@@ -175,10 +177,10 @@ seeds:
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','coding_systems.csv') }}"
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
+      schema: *schema
       alias: coding_systems
-      tags: value_sets
+      tags:
+        - value_sets
       column_types:
         coding_system_id: *string
         coding_system_name: *string

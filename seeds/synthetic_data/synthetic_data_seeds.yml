@@ -10,6 +10,8 @@ version: 2
 #   &integer  - whole number
 #   &float    - 64-bit floating point
 anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
   - &string |
     {%- if target.type in ("bigquery", "databricks") -%} string
     {%- else -%} varchar(256)
@@ -47,13 +49,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('appointment') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: appointment
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         appointment_id: *string
         person_id: *string
@@ -90,13 +91,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('condition') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: condition
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         source_condition_id: *string
         person_id: *string
@@ -133,13 +133,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('encounter') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: encounter
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         encounter_id: *string
         person_id: *string
@@ -187,13 +186,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('eligibility') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: eligibility
       tags:
         - synthetic_data
         - claims
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         person_id: *string
         member_id: *string
@@ -261,27 +259,26 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('immunization') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: immunization
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         immunization_id: *string
         person_id: *string
         patient_id: *string
         encounter_id: *string
-        status: *string
-        status_reason: *string
-        occurrence_date: *date
         source_code_type: *string
         source_code: *string
         source_description: *string
         normalized_code_type: *string
         normalized_code: *string
         normalized_description: *string
+        status: *string
+        status_reason: *string
+        occurrence_date: *date
         source_dose: *string
         normalized_dose: *string
         lot_number: *string
@@ -311,13 +308,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('lab_result') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: lab_result
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         lab_result_id: *string
         person_id: *string
@@ -370,11 +366,10 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('location') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: location
       tags: [synthetic_data, clinical]
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         location_id: *string
         npi: *string
@@ -405,11 +400,10 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('medication') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: medication
       tags: [synthetic_data, clinical]
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         medication_id: *string
         person_id: *string
@@ -448,11 +442,10 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('practitioner') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: practitioner
       tags: [synthetic_data, clinical]
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         practitioner_id: *string
         npi: *string
@@ -479,11 +472,10 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('procedure') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: procedure
       tags: [synthetic_data, clinical]
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         source_procedure_id: *string
         person_id: *string
@@ -522,13 +514,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('medical_claim') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: medical_claim
       tags:
         - synthetic_data
         - claims
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         claim_id: *string
         claim_line_number: *integer
@@ -697,13 +688,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('observation') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: observation
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         observation_id: *string
         person_id: *string
@@ -749,13 +739,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('pharmacy_claim') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: pharmacy_claim
       tags:
         - synthetic_data
         - claims
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         claim_id: *string
         claim_line_number: *integer
@@ -802,13 +791,12 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('patient') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: patient
       tags:
         - synthetic_data
         - clinical
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         person_id: *string
         patient_id: *string
@@ -858,20 +846,18 @@ seeds:
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('provider_attribution') }}"
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
+      schema: *schema
       alias: provider_attribution
       tags:
         - synthetic_data
         - provider_attribution
-      enabled: true
+      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
       column_types:
         person_id: *string
         member_id: *string
         year_month: *string
         payer: *string
         plan: *string
-        data_source: *string
         payer_attributed_provider: *string
         payer_attributed_provider_practice: *string
         payer_attributed_provider_organization: *string
@@ -882,3 +868,4 @@ seeds:
         custom_attributed_provider_lob: *string
         file_name: *string
         ingest_datetime: *datetime
+        data_source: *string
