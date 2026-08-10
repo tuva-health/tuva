@@ -213,6 +213,19 @@
 
 
 {% macro load_versioned_synthetic_seed(seed_name, version=none, compression=true, headers=true, null_marker=true) %}
+
+  {#
+      Do nothing when synthetic data is turned off. Without this, a project that
+      never uses synthetic data still fails to parse if synthetic_data_size is
+      set to something invalid.
+
+      The same check is written out again in synthetic_data_seeds.yml (enabled)
+      and in the integration_tests models. Change one, change the others.
+  #}
+  {% if var('use_synthetic_data', false) | string | trim | lower != 'true' %}
+    {{ return('') }}
+  {% endif %}
+
   {{ return(the_tuva_project.load_versioned_seed(
       'synthetic_data',
       the_tuva_project.get_synthetic_seed_pattern(seed_name),
