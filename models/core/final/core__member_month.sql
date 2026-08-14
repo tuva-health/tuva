@@ -21,10 +21,10 @@ select
     , attr.tuva_attributed_provider
     , attr.tuva_attributed_provider_bucket
     , attr.tuva_attributed_provider_specialty
-    {{ select_extension_columns(ref('member_month__member_month'), alias='mm') }}
+    {{ select_extension_columns(ref('enrollment__member_month'), alias='mm') }}
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , mm.data_source
-from {{ ref('member_month__member_month') }} as mm
+from {{ ref('enrollment__member_month') }} as mm
 left outer join {{ ref('provider_attribution__member_month_attribution') }} as attr
   on mm.person_id = attr.person_id
   and mm.member_id = attr.member_id

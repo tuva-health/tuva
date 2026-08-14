@@ -62,7 +62,7 @@
 {%- endset -%}
 
 with enc as (
-    {{ smart_union([ref('core__stg_claims_encounter'), ref('normalized__encounter')], source_index=none) }}
+    {{ smart_union([ref('int_core__encounter_from_claim'), ref('normalized__encounter')], source_index=none) }}
 )
 
 select
@@ -86,13 +86,13 @@ from {{ ref('normalized__encounter') }}
 {% elif var('claims_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-{# No extension columns — input_layer__encounter is clinical-only #}
+{# No extension columns — stg_input_layer__encounter is clinical-only #}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_claims_encounter') }}
+from {{ ref('int_core__encounter_from_claim') }}
 
 {%- endif %}

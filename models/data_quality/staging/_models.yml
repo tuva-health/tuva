@@ -1,0 +1,50 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_staging |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_staging{%- else -%}staging{%- endif -%}
+
+models:
+  - name: stg_data_quality__encounter_key
+    description: |-
+      Distinct encounter keys from stg_input_layer__encounter, materialized once for the logical flag models to join against.
+
+      The logical flag models test referential integrity by checking whether a record's encounter_id exists in the encounter input table. Each of them previously derived this distinct set inline; because stg_input_layer__encounter is a view, that scanned the underlying encounter table once per flag model. This model resolves the distinct set a single time.
+
+      Table grain: One record per encounter_id and data_source.
+    config:
+      schema: *schema_staging
+      tags:
+        - data_quality
+        - dq
+        - dq_logical
+      materialized: table
+    columns:
+      - name: encounter_id
+        description: Identifier for the encounter record within a data source.
+      - name: data_source
+        description: User-configured field that identifies the source system or payer feed of the encounter record.
+
+  - name: stg_data_quality__patient_key
+    description: |-
+      Distinct patient keys from stg_input_layer__patient, materialized once for the logical flag models to join against.
+
+      The logical flag models test referential integrity by checking whether a record's person_id or patient_id exists in the patient input table. Each of them previously derived this distinct set inline; because stg_input_layer__patient is a view, that scanned the underlying patient table once per flag model. This model resolves the distinct set a single time.
+
+      Table grain: One record per person_id, patient_id, and data_source.
+    config:
+      schema: *schema_staging
+      tags:
+        - data_quality
+        - dq
+        - dq_logical
+      materialized: table
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset.
+      - name: patient_id
+        description: Identifier for the patient record within a data source.
+      - name: data_source
+        description: User-configured field that identifies the source system or payer feed of the patient record.

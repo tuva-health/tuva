@@ -1,0 +1,108 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
+with unioned as (
+    select enc.claim_id
+, enc.encounter_id
+, 'acute inpatient' as encounter_type
+, 'inpatient' as encounter_group
+, 0 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__acute_inpatient_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'emergency department' as encounter_type
+, 'outpatient' as encounter_group
+, 1 as priority_number
+, original_anchor_claim as anchor_claim_id
+from {{ ref('int_encounter__emergency_department_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient hospice' as encounter_type
+, 'inpatient' as encounter_group
+, 1 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_hospice_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient psych' as encounter_type
+, 'inpatient' as encounter_group
+, 2 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_psychiatric_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient rehabilitation' as encounter_type
+, 'inpatient' as encounter_group
+, 3 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_rehab_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient long term acute care' as encounter_type
+, 'inpatient' as encounter_group
+, 4 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_long_term_generate_id') }} as enc
+
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient skilled nursing' as encounter_type
+, 'inpatient' as encounter_group
+, 5 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_skilled_nursing_generate_id') }} as enc
+
+
+union all
+
+select enc.claim_id
+, enc.encounter_id
+, 'inpatient substance use' as encounter_type
+, 'inpatient' as encounter_group
+, 6 as priority_number
+, null as anchor_claim_id
+from {{ ref('int_encounter__inpatient_substance_use_generate_id') }} as enc
+
+)
+
+, final as (
+    select
+        enc.claim_id
+        , med.claim_line_number
+        , enc.encounter_id
+        , encounter_type
+        , encounter_group
+        , priority_number
+        , anchor_claim_id
+    from unioned as enc
+    inner join {{ ref('int_encounter__claim_line') }} as med on enc.claim_id = med.claim_id
+)
+
+select * from final

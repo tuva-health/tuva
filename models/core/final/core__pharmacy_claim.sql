@@ -60,7 +60,7 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from {{ ref('normalized__pharmacy_claim') }} as pharm
-left outer join {{ ref('claims_enrollment__flag_rx_claims_with_enrollment') }} as enroll
+left outer join {{ ref('enrollment__pharmacy_claim_flag') }} as enroll
   on pharm.claim_id = enroll.claim_id
   and pharm.claim_line_number = enroll.claim_line_number
   and pharm.person_id = enroll.person_id

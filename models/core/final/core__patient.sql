@@ -64,7 +64,7 @@ cast(
     {%- set claims_extension_column_map = {} -%}
     {%- set clinical_extension_column_map = {} -%}
 
-    {%- for col in adapter.get_columns_in_relation(ref('normalized__eligibility_remove_duplicates')) -%}
+    {%- for col in adapter.get_columns_in_relation(ref('int_normalized__eligibility_deduplicated')) -%}
         {%- if col.name.lower().startswith(passthrough_prefix) -%}
             {%- set column_key = col.name.lower() -%}
             {%- do claims_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
@@ -74,7 +74,7 @@ cast(
         {%- endif -%}
     {%- endfor -%}
 
-    {%- for col in adapter.get_columns_in_relation(ref('core__int_patient_remove_duplicates')) -%}
+    {%- for col in adapter.get_columns_in_relation(ref('int_core__patient_deduplicated')) -%}
         {%- if col.name.lower().startswith(passthrough_prefix) -%}
             {%- set column_key = col.name.lower() -%}
             {%- do clinical_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
@@ -134,7 +134,7 @@ cast(
 with claims_patient as (
     select
         *
-    from {{ ref('normalized__eligibility_remove_duplicates') }}
+    from {{ ref('int_normalized__eligibility_deduplicated') }}
 )
 
 , person_list_to_exclude_because_in_claims as (
@@ -147,7 +147,7 @@ with claims_patient as (
 , clinical_patient as (
     select
         *
-    from {{ ref('core__int_patient_remove_duplicates') }}
+    from {{ ref('int_core__patient_deduplicated') }}
 )
 
 , unioned as (
@@ -291,11 +291,11 @@ from patient_base
 {% elif var('clinical_enabled', False) == true -%}
 
 {%- set source_extension_columns -%}
-    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_source', strip_prefix=false) }}
+    {{ select_extension_columns(ref('int_core__patient_deduplicated'), alias='patient_source', strip_prefix=false) }}
 {%- endset -%}
 
 {%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_base', strip_prefix=false) }}
+    {{ select_extension_columns(ref('int_core__patient_deduplicated'), alias='patient_base', strip_prefix=false) }}
 {%- endset -%}
 
 with patient_base as (
@@ -326,7 +326,7 @@ with patient_base as (
         , patient_source.ingest_datetime
         , patient_source.tuva_last_run
         , cast(substring(cast(patient_source.tuva_last_run as {{ dbt.type_string() }}), 1, 10) as date) as tuva_last_run_date
-    from {{ ref('core__int_patient_remove_duplicates') }} as patient_source
+    from {{ ref('int_core__patient_deduplicated') }} as patient_source
 )
 
 select
@@ -340,11 +340,11 @@ from patient_base
 {% elif var('claims_enabled', False) == true -%}
 
 {%- set source_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_source', strip_prefix=false) }}
+    {{ select_extension_columns(ref('int_normalized__eligibility_deduplicated'), alias='patient_source', strip_prefix=false) }}
 {%- endset -%}
 
 {%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_base', strip_prefix=false) }}
+    {{ select_extension_columns(ref('int_normalized__eligibility_deduplicated'), alias='patient_base', strip_prefix=false) }}
 {%- endset -%}
 
 with patient_base as (
@@ -375,7 +375,7 @@ with patient_base as (
         , patient_source.ingest_datetime
         , patient_source.tuva_last_run
         , cast(substring(cast(patient_source.tuva_last_run as {{ dbt.type_string() }}), 1, 10) as date) as tuva_last_run_date
-    from {{ ref('normalized__eligibility_remove_duplicates') }} as patient_source
+    from {{ ref('int_normalized__eligibility_deduplicated') }} as patient_source
 )
 
 select

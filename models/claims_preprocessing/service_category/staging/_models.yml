@@ -1,0 +1,101 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_staging |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_staging{%- else -%}staging{%- endif -%}
+
+models:
+  - name: stg_service_category__claim_level_diagnosis
+    description: |
+      Creates one claim-level diagnosis array per claim_id and data_source for downstream claims-preprocessing algorithms that require a single diagnosis value per diagnosis position. This model uses normalized__medical_claim_diagnosis and intentionally preserves the legacy max() behavior used by service categories and encounters.
+    config:
+      schema: *schema_staging
+      materialized: table
+      tags:
+        - service_category_grouper_base
+        - claims_preprocessing
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - claim_id
+              - data_source
+    columns:
+      - name: claim_id
+        description: Source claim identifier from stg_input_layer__medical_claim.
+        data_tests:
+          - not_null
+      - name: data_source
+        description: Data source associated with the claim.
+        data_tests:
+          - not_null
+      - name: diagnosis_code_type
+        description: Claim-level diagnosis code system selected from diagnosis rows for the claim.
+      - name: diagnosis_code_1
+        description: Claim-level diagnosis code in position 1 selected with legacy max() behavior.
+      - name: diagnosis_code_2
+        description: Claim-level diagnosis code in position 2 selected with legacy max() behavior.
+      - name: diagnosis_code_3
+        description: Claim-level diagnosis code in position 3 selected with legacy max() behavior.
+      - name: diagnosis_code_4
+        description: Claim-level diagnosis code in position 4 selected with legacy max() behavior.
+      - name: diagnosis_code_5
+        description: Claim-level diagnosis code in position 5 selected with legacy max() behavior.
+      - name: diagnosis_code_6
+        description: Claim-level diagnosis code in position 6 selected with legacy max() behavior.
+      - name: diagnosis_code_7
+        description: Claim-level diagnosis code in position 7 selected with legacy max() behavior.
+      - name: diagnosis_code_8
+        description: Claim-level diagnosis code in position 8 selected with legacy max() behavior.
+      - name: diagnosis_code_9
+        description: Claim-level diagnosis code in position 9 selected with legacy max() behavior.
+      - name: diagnosis_code_10
+        description: Claim-level diagnosis code in position 10 selected with legacy max() behavior.
+      - name: diagnosis_code_11
+        description: Claim-level diagnosis code in position 11 selected with legacy max() behavior.
+      - name: diagnosis_code_12
+        description: Claim-level diagnosis code in position 12 selected with legacy max() behavior.
+      - name: diagnosis_code_13
+        description: Claim-level diagnosis code in position 13 selected with legacy max() behavior.
+      - name: diagnosis_code_14
+        description: Claim-level diagnosis code in position 14 selected with legacy max() behavior.
+      - name: diagnosis_code_15
+        description: Claim-level diagnosis code in position 15 selected with legacy max() behavior.
+      - name: diagnosis_code_16
+        description: Claim-level diagnosis code in position 16 selected with legacy max() behavior.
+      - name: diagnosis_code_17
+        description: Claim-level diagnosis code in position 17 selected with legacy max() behavior.
+      - name: diagnosis_code_18
+        description: Claim-level diagnosis code in position 18 selected with legacy max() behavior.
+      - name: diagnosis_code_19
+        description: Claim-level diagnosis code in position 19 selected with legacy max() behavior.
+      - name: diagnosis_code_20
+        description: Claim-level diagnosis code in position 20 selected with legacy max() behavior.
+      - name: diagnosis_code_21
+        description: Claim-level diagnosis code in position 21 selected with legacy max() behavior.
+      - name: diagnosis_code_22
+        description: Claim-level diagnosis code in position 22 selected with legacy max() behavior.
+      - name: diagnosis_code_23
+        description: Claim-level diagnosis code in position 23 selected with legacy max() behavior.
+      - name: diagnosis_code_24
+        description: Claim-level diagnosis code in position 24 selected with legacy max() behavior.
+      - name: diagnosis_code_25
+        description: Claim-level diagnosis code in position 25 selected with legacy max() behavior.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current dbt invocation.
+
+  - name: stg_service_category__medical_claim
+    description: |-
+      Enriched medical claim line spine for the service category grouper. Joins normalized__medical_claim to the claim-level diagnosis rows, the DXCCSR and CCS category maps, NPPES provider data for the facility and rendering NPIs, and the NITOS, revenue center, place of service, and bill type terminology tables.
+
+      Materialized as a table rather than a view because 61 models read it: all 62 service category classifiers plus service_category__grouper and int_service_category__office_based. As a view, every one of those re-executed the full nine-join query, including two passes over the NPPES provider roster.
+
+      Table grain: One record per medical claim line.
+    config:
+      schema: *schema_staging
+      materialized: table
+      tags:
+        - service_category_grouper_base
+        - claims_preprocessing

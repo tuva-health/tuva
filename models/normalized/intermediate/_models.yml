@@ -1,0 +1,478 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_intermediate |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate{%- else -%}intermediate{%- endif -%}
+
+models:
+  - name: int_normalized__admit_source_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__admit_source_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__admit_type_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__admit_type_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__bill_type_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__bill_type_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__discharge_disposition_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__discharge_disposition_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__drg_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__drg_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__eligibility_casting
+    description: |-
+      This model performs the following data transformations:
+      1. Casts fields to the appropriate data types expected by the stg_input_layer__eligibility table. This is meant to account for data types if they are not cast by the user in the input layer.
+      2. Passes through all column extensions that the user has created in the input layer with the x_ extension prefix.
+      3. Creates a synthetic join key called person_id_key. The person_id_key is created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+
+      Primary key: person_id_key.
+    config:
+      schema: *schema_intermediate
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - normalized_layer
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset, cast to string from stg_input_layer__eligibility.
+      - name: person_id_key
+        description: Synthetic join key created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+      - name: member_id
+        description: Identifier assigned by the payer or health plan for the covered member, cast to string from stg_input_layer__eligibility.
+      - name: subscriber_id
+        description: Identifier assigned by the payer or health plan for the subscriber or policyholder, cast to string from stg_input_layer__eligibility.
+      - name: subscriber_relation
+        description: Member relationship to the subscriber or policyholder, cast to string from stg_input_layer__eligibility.
+      - name: enrollment_start_date
+        description: Source enrollment start date cast to date from stg_input_layer__eligibility before calendar normalization.
+      - name: enrollment_end_date
+        description: Source enrollment end date cast to date from stg_input_layer__eligibility before calendar normalization.
+      - name: payer
+        description: Name of the payer or health insurer, cast to string from stg_input_layer__eligibility.
+      - name: payer_type
+        description: Type of payer, cast to string from stg_input_layer__eligibility.
+      - name: plan
+        description: Name of the health plan, cast to string from stg_input_layer__eligibility.
+      - name: first_name
+        description: Member first name cast to string from stg_input_layer__eligibility.
+      - name: middle_name
+        description: Member middle name cast to string from stg_input_layer__eligibility.
+      - name: last_name
+        description: Member last name cast to string from stg_input_layer__eligibility.
+      - name: name_suffix
+        description: Member name suffix cast to string from stg_input_layer__eligibility.
+      - name: social_security_number
+        description: Member Social Security number cast to string from stg_input_layer__eligibility.
+      - name: address
+        description: Member street address cast to string from stg_input_layer__eligibility.
+      - name: city
+        description: Member city cast to string from stg_input_layer__eligibility.
+      - name: state
+        description: Source state value cast to string from stg_input_layer__eligibility before ANSI/FIPS state normalization.
+      - name: zip_code
+        description: Member ZIP code cast to string from stg_input_layer__eligibility.
+      - name: phone
+        description: Member phone number cast to string from stg_input_layer__eligibility.
+      - name: email
+        description: Member email address cast to string from stg_input_layer__eligibility.
+      - name: ethnicity
+        description: Member ethnicity cast to string from stg_input_layer__eligibility.
+      - name: sex
+        description: Biological sex of the member, cast to string from stg_input_layer__eligibility.
+      - name: race
+        description: Race of the member, cast to string from stg_input_layer__eligibility.
+      - name: birth_date
+        description: Source birth date cast to date from stg_input_layer__eligibility before calendar normalization.
+      - name: death_date
+        description: Source death date cast to date from stg_input_layer__eligibility before calendar normalization.
+      - name: death_flag
+        description: Source death flag cast to integer from stg_input_layer__eligibility.
+      - name: original_reason_entitlement_code
+        description: Original reason for Medicare entitlement code, cast to string from stg_input_layer__eligibility.
+      - name: dual_status_code
+        description: Medicare-Medicaid dual eligibility status code, cast to string from stg_input_layer__eligibility.
+      - name: medicare_status_code
+        description: Medicare status code, cast to string from stg_input_layer__eligibility.
+      - name: enrollment_status
+        description: Enrollment status value, cast to string from stg_input_layer__eligibility.
+      - name: hospice_flag
+        description: Hospice flag cast to integer from stg_input_layer__eligibility.
+      - name: institutional_snp_flag
+        description: Institutional special needs plan flag cast to integer from stg_input_layer__eligibility.
+      - name: medicaid_indicator
+        description: Integer indicator for Medicaid coverage during the enrollment span. Generally 1 means yes and 0 means no.
+        config:
+          meta:
+            data_type: integer
+      - name: long_term_institutional_flag
+        description: Long-term institutional flag cast to integer from stg_input_layer__eligibility.
+      - name: part_d_raf_type
+        description: Part D risk adjustment factor type for the enrollment span. Null when the record is not related to Part D coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: low_income_subsidy_indicator
+        description: Integer indicator for Low Income Subsidy, also known as Extra Help, during the enrollment span. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: metal_level
+        description: ACA exchange metal tier for the health plan. Null when the record is not related to ACA exchange coverage.
+        config:
+          meta:
+            data_type: varchar
+      - name: csr_indicator
+        description: Integer cost sharing reduction variant indicator for ACA exchange coverage. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: enrollment_duration_months
+        description: Number of months covered during the benefit year for ACA exchange enrollment. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: esrd_status
+        description: Integer indicator for end-stage renal disease status from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: transplant_duration_months
+        description: Number of months since kidney transplant from the eligibility input record. Null when not applicable.
+        config:
+          meta:
+            data_type: integer
+      - name: group_id
+        description: Group identifier cast to string from stg_input_layer__eligibility.
+      - name: group_name
+        description: Group name cast to string from stg_input_layer__eligibility.
+      - name: file_name
+        description: Source file name cast to string from stg_input_layer__eligibility.
+      - name: file_date
+        description: Source file date cast to timestamp from stg_input_layer__eligibility.
+      - name: ingest_datetime
+        description: Source file ingest timestamp cast to timestamp from stg_input_layer__eligibility.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current dbt invocation.
+
+      - name: data_source
+        description: User-configured source identifier cast to string from stg_input_layer__eligibility.
+
+  - name: int_normalized__eligibility_date_normalized
+    description: |-
+      This model normalizes the eligibility date fields by joining int_normalized__eligibility_casting to terminology__calendar once for each source date field: birth_date, death_date, enrollment_start_date, and enrollment_end_date. Each normalized_* date column is populated from terminology__calendar.full_date. If a source date is null or does not match a row in terminology__calendar, the corresponding normalized_* date column is null.
+
+      The model keeps one distinct row per person_id and person_id_key.
+    config:
+      schema: *schema_intermediate
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - normalized_layer
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset from int_normalized__eligibility_casting.
+      - name: person_id_key
+        description: Synthetic join key from int_normalized__eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized date values back to the eligibility record.
+      - name: normalized_birth_date
+        description: Birth date matched to terminology__calendar.full_date. Null when the source birth_date is null or does not match the calendar.
+      - name: normalized_death_date
+        description: Death date matched to terminology__calendar.full_date. Null when the source death_date is null or does not match the calendar.
+      - name: normalized_enrollment_start_date
+        description: Enrollment start date matched to terminology__calendar.full_date. Null when the source enrollment_start_date is null or does not match the calendar.
+      - name: normalized_enrollment_end_date
+        description: Enrollment end date matched to terminology__calendar.full_date. Null when the source enrollment_end_date is null or does not match the calendar.
+
+  - name: int_normalized__eligibility_deduplicated
+    description: |-
+      This model creates eligibility-derived patient records and removes duplicate records for each person_id and data_source. When multiple eligibility records exist, it keeps the record with the latest enrollment_end_date, treating null enrollment_end_date as 2050-01-01.
+
+      Primary key: person_id, data_source.
+    config:
+      schema: *schema_intermediate
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - normalized_layer
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset.
+        config:
+          meta:
+            is_primary_key: true
+      - name: name_suffix
+        description: Patient's name suffix (e.g. Jr., Sr., III, etc).
+      - name: first_name
+        description: Patient's first name.
+      - name: middle_name
+        description: Patient's middle name.
+      - name: last_name
+        description: Patient's last name.
+      - name: sex
+        description: Biological sex of the patient.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/sex
+      - name: race
+        description: Race of the patient.
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
+      - name: birth_date
+        description: Date the patient was born.
+      - name: death_date
+        description: Date the patient died.
+      - name: death_flag
+        description: Flag indicating if the patient is deceased
+      - name: social_security_number
+        description: Patient's social security number.
+      - name: address
+        description: Patient's street address.
+      - name: city
+        description: Patient's city of address.
+      - name: state
+        description: State the patient lives in (most recent known address).
+      - name: zip_code
+        description: Zip code the patient lives in (most recent known address).
+      - name: county
+        description: County where the patient lives.
+      - name: latitude
+        description: Latitude of the patient's address.
+      - name: longitude
+        description: Longitude of the patient's address.
+      - name: phone
+        description: Patient's phone number.
+      - name: email
+        description: Patient's email address.
+      - name: ethnicity
+        description: Patient's ethnicity
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").
+        config:
+          meta:
+            is_primary_key: true
+      - name: file_name
+        description: 'The file name of the source file.'
+      - name: ingest_datetime
+        description: 'The date and time the source file was ingested into the data warehouse or landed in cloud storage.'
+      - name: tuva_last_run
+        description: >
+          The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time` as the local time of the `dbt run`  environment.  Timezone is configurable via the `tuva_last_run` var.
+
+  - name: int_normalized__eligibility_state_normalized
+    description: |-
+      This model normalizes the source state value from int_normalized__eligibility_casting by left joining to terminology__ansi_fips_state. The join matches when trim(lower(state)) equals trim(lower(ansi_fips_state_abbreviation)), trim(lower(ansi_fips_state_code)), or trim(lower(ansi_fips_state_name)).
+
+      The model returns the matched ANSI/FIPS state name, state code, and state abbreviation. If the source state value does not match the reference table, normalized_state_name, fips_state_code, and fips_state_abbreviation are null.
+    config:
+      schema: *schema_intermediate
+      meta:
+        dag:
+          node_type: intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - normalized_layer
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset from int_normalized__eligibility_casting.
+      - name: person_id_key
+        description: Synthetic join key from int_normalized__eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized state values back to the eligibility record.
+      - name: normalized_state_name
+        description: ANSI/FIPS state name from terminology__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
+      - name: fips_state_code
+        description: ANSI/FIPS state code from terminology__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
+      - name: fips_state_abbreviation
+        description: ANSI/FIPS state abbreviation from terminology__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
+
+  - name: int_normalized__medical_claim_date_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__medical_date_aggregation
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__medical_npi_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__place_of_service_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__present_on_admit_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__present_on_admit_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__present_on_admit_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__procedure_code_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__procedure_code_intermediate
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__procedure_date_final
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__procedure_date_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__procedure_date_voting
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__revenue_center_normalize
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+  - name: int_normalized__undetermined_claim_type
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+##    Staging

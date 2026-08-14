@@ -1,0 +1,550 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else -%}claims_preprocessing{%- endif -%}
+
+models:
+  - name: provider_attribution__assigned_beneficiary_current
+    config:
+      schema: *schema
+      materialized: table
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ person_id, data_source, as_of_date ]
+    columns:
+      - name: person_id
+        description: Unique identifier for the person assigned to a provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Data source within which the current provider attribution assignment was calculated.
+        data_tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+      - name: as_of_date
+        description: Anchor date used to calculate the current attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: provider_id
+        description: Identifier for the assigned provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: assigned_step
+        description: Attribution step that produced the final provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that produced the final
+          provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank providers.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          providers.
+        config:
+          meta:
+            data_type: integer
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: attribution_key
+        description: Synthetic key for the current attribution assignment record.
+        data_tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
+
+  - name: provider_attribution__assigned_beneficiary_yearly
+    config:
+      schema: *schema
+      materialized: table
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ person_id, data_source, performance_year ]
+    columns:
+      - name: person_id
+        description: Unique identifier for the person assigned to a provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Data source within which the yearly provider attribution assignment was calculated.
+        data_tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+      - name: performance_year
+        description: Calendar year used to calculate the yearly attribution assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: provider_id
+        description: Identifier for the assigned provider.
+        config:
+          meta:
+            data_type: varchar
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: assigned_step
+        description: Attribution step that produced the final provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that produced the final
+          provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank providers.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          providers.
+        config:
+          meta:
+            data_type: integer
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: attribution_key
+        description: Synthetic key for the yearly attribution assignment record.
+        data_tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
+
+  - name: provider_attribution__member_month_attribution
+    description: |-
+      Unified member-month attribution bridge used by Core member_month, cost, and utilization outputs. It starts from the Claims Preprocessing member-month table and joins externally supplied attribution from normalized__provider_attribution plus Tuva-assigned yearly attribution when provider attribution is enabled. The output remains at one record per person, member, year month, payer, plan, and data source.
+    config:
+      schema: *schema
+      materialized: table
+      tags: [ "claims_preprocessing", "provider_attribution" ]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - person_id
+              - member_id
+              - year_month
+              - payer
+              - "{{ quote_column('plan') }}"
+              - data_source
+    columns:
+      - name: person_id
+        description: Unique identifier for the person represented by the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: member_id
+        description: Member identifier for the eligibility span represented by the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: year_month
+        description: Calendar month formatted as YYYYMM.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer
+        description: Payer associated with the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: plan
+        description: Plan associated with the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer_attributed_provider
+        description: Provider assigned to the member by the payer, health plan, contract, or other external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_practice
+        description: Practice assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_organization
+        description: Organization assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_lob
+        description: Line of business assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider
+        description: Provider assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_practice
+        description: Practice assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_organization
+        description: Organization assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_lob
+        description: Line of business assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider
+        description: Provider assigned by Tuva's claims-based attribution logic for the member month. This is null when no assignable claims history exists or provider attribution is disabled.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_bucket
+        description: Attribution provider classification bucket, such as PCP, NPP, specialist, or no eligible history.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_specialty
+        description: Specialty description for the Tuva-attributed provider when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attribution_assigned_step
+        description: Ordered attribution step that produced the yearly provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: tuva_attribution_step_description
+        description: Human-readable description of the attribution step that produced the yearly provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attribution_allowed_amount
+        description: Allowed amount used to rank providers for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: number
+      - name: tuva_attribution_visits
+        description: Visit count used to rank providers for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: tuva_attribution_lookback_start_date
+        description: First date in the lookback window used for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: tuva_attribution_lookback_end_date
+        description: Last date in the lookback window used for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: tuva_attribution_key
+        description: Synthetic key for the yearly Tuva attribution assignment joined to the member month.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
+      - name: data_source
+        description: Data source associated with the member month and attribution assignments.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+
+  - name: provider_attribution__provider_ranking
+    config:
+      schema: *schema
+      materialized: table
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ attribution_key, provider_id ]
+    columns:
+      - name: person_id
+        description: Unique identifier for the person included in provider attribution
+          ranking.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Data source within which the provider attribution candidate ranking was calculated.
+        data_tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+      - name: performance_year
+        description: Calendar year for yearly attribution rows. Null for current
+          attribution rows.
+        config:
+          meta:
+            data_type: integer
+      - name: as_of_date
+        description: Anchor date for current attribution rows. Null for yearly
+          attribution rows.
+        config:
+          meta:
+            data_type: date
+      - name: provider_id
+        description: Identifier for the ranked provider.
+        data_tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: provider_bucket
+        description: Provider classification bucket used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: prov_specialty
+        description: Provider specialty used by the attribution logic.
+        config:
+          meta:
+            data_type: varchar
+      - name: step
+        description: Attribution step that qualified the provider for ranking.
+        config:
+          meta:
+            data_type: integer
+      - name: step_description
+        description: Description of the attribution step that qualified the provider for
+          ranking.
+        config:
+          meta:
+            data_type: varchar
+      - name: allowed_amount
+        description: Allowed amount used by the attribution logic to rank the provider.
+        config:
+          meta:
+            data_type: number
+      - name: visits
+        description: Count of qualifying visits used by the attribution logic to rank
+          the provider.
+        config:
+          meta:
+            data_type: integer
+      - name: scope
+        description: Attribution scope for the ranked row, either current or yearly.
+        config:
+          meta:
+            data_type: varchar
+      - name: lookback_start_date
+        description: First date in the lookback window used for the attribution ranking.
+        config:
+          meta:
+            data_type: date
+      - name: lookback_end_date
+        description: Last date in the lookback window used for the attribution ranking.
+        config:
+          meta:
+            data_type: date
+      - name: ranking
+        description: Provider rank within the attribution scope and person.
+        config:
+          meta:
+            data_type: integer
+      - name: attribution_key
+        description: Synthetic key for the attribution scope and person.
+        data_tests: [not_null]
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
+
+  - name: provider_attribution__tuva_member_month_attribution
+    description: |-
+      Projects Tuva-assigned yearly provider attribution onto each eligible member month. The attribution assignment is calculated at person, data source, and performance year grain, then copied to every member-month row for that person and data source in the matching calendar year. This output contains only Tuva-assigned attribution fields and is joined into the unified member-month attribution output.
+    config:
+      schema: *schema
+      materialized: table
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - person_id
+              - member_id
+              - year_month
+              - payer
+              - "{{ quote_column('plan') }}"
+              - data_source
+    columns:
+      - name: person_id
+        description: Unique identifier for the person represented by the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: member_id
+        description: Member identifier for the eligibility span represented by the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: year_month
+        description: Calendar month, formatted as YYYYMM, onto which yearly Tuva attribution is projected.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer
+        description: Payer associated with the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: plan
+        description: Plan associated with the member month.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: data_source
+        description: Data source associated with the member month and yearly attribution assignment.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: tuva_attributed_provider
+        description: Provider assigned by Tuva's claims-based attribution logic for the member month. This is null when no assignable claims history exists.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_bucket
+        description: Attribution provider classification bucket, such as PCP, NPP, specialist, or no eligible history.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attributed_provider_specialty
+        description: Specialty description for the Tuva-attributed provider when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attribution_assigned_step
+        description: Ordered attribution step that produced the yearly provider assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: tuva_attribution_step_description
+        description: Human-readable description of the attribution step that produced the yearly provider assignment.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_attribution_allowed_amount
+        description: Allowed amount used to rank providers for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: number
+      - name: tuva_attribution_visits
+        description: Visit count used to rank providers for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: integer
+      - name: tuva_attribution_lookback_start_date
+        description: First date in the lookback window used for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: tuva_attribution_lookback_end_date
+        description: Last date in the lookback window used for the yearly attribution assignment.
+        config:
+          meta:
+            data_type: date
+      - name: tuva_attribution_key
+        description: Synthetic key for the yearly Tuva attribution assignment joined to the member month.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp

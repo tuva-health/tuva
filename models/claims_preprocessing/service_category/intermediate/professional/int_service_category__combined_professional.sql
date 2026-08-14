@@ -1,0 +1,53 @@
+{{ config(
+     enabled = var('claims_enabled', False) | as_bool
+   )
+}}
+
+with combined_professional_services as (
+  {{ dbt_utils.union_relations(
+    relations=[
+      ref('int_service_category__acute_inpatient_professional'),
+      ref('int_service_category__ambulatory_surgery_center_professional'),
+      ref('int_service_category__dialysis_professional'),
+      ref('int_service_category__emergency_department_professional'),
+      ref('int_service_category__home_health_professional'),
+      ref('int_service_category__inpatient_hospice_professional'),
+      ref('int_service_category__inpatient_psychiatric_professional'),
+      ref('int_service_category__inpatient_rehab_professional'),
+      ref('int_service_category__inpatient_substance_use_professional'),
+      ref('int_service_category__lab_professional'),
+      ref('int_service_category__office_based_other_professional'),
+      ref('int_service_category__office_based_therapy_professional'),
+      ref('int_service_category__office_based_radiology_professional'),
+      ref('int_service_category__office_based_surgery_professional'),
+      ref('int_service_category__office_based_visit_professional'),
+      ref('int_service_category__outpatient_hospital_or_clinic_professional'),
+      ref('int_service_category__outpatient_psychiatric_professional'),
+      ref('int_service_category__outpatient_rehab_professional'),
+      ref('int_service_category__inpatient_skilled_nursing_professional'),
+      ref('int_service_category__urgent_care_professional'),
+      ref('int_service_category__outpatient_hospice_professional'),
+      ref('int_service_category__pharmacy_professional'),
+      ref('int_service_category__outpatient_substance_use_professional'),
+      ref('int_service_category__outpatient_therapy_professional'),
+      ref('int_service_category__outpatient_radiology_professional'),
+      ref('int_service_category__observation_professional'),
+      ref('int_service_category__dme_professional'),
+      ref('int_service_category__ambulance_professional'),
+      ref('int_service_category__outpatient_surgery_professional')
+    ],
+    exclude=["_loaded_at"]
+  ) }}
+)
+
+select
+    p.claim_id
+    , p.claim_line_number
+    , p.data_source
+    , p.claim_line_id
+    , p.service_category_1
+    , p.service_category_2
+    , p.service_category_3
+    , p.tuva_last_run
+    , p.source_model_name
+from combined_professional_services as p

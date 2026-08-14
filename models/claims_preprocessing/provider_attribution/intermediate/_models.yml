@@ -1,0 +1,45 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_intermediate |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate{%- else -%}intermediate{%- endif -%}
+
+models:
+  - name: int_provider_attribution__current_step
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+
+  - name: int_provider_attribution__medical_claim
+    description: Staging view of normalized medical claims, restricted to claim lines that have service category and encounter preprocessing outputs, used for provider attribution.
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+
+  - name: int_provider_attribution__person_year
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+
+  - name: int_provider_attribution__primary_care_claim
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+
+  - name: int_provider_attribution__provider_classification
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
+
+  - name: int_provider_attribution__yearly_step
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]

@@ -26,7 +26,7 @@
 {%- endset -%}
 
 with prac as (
-    {{ smart_union([ref('core__stg_claims_practitioner'), ref('normalized__practitioner')], source_index=none) }}
+    {{ smart_union([ref('int_core__practitioner_from_claim'), ref('normalized__practitioner')], source_index=none) }}
 )
 
 select
@@ -50,13 +50,13 @@ from {{ ref('normalized__practitioner') }}
 {% elif var('claims_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-{# No extension columns — input_layer__practitioner is clinical-only #}
+{# No extension columns — stg_input_layer__practitioner is clinical-only #}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_claims_practitioner') }}
+from {{ ref('int_core__practitioner_from_claim') }}
 
 {%- endif %}

@@ -19,7 +19,7 @@ with all_conditions as (
 {% if var('clinical_enabled', False) == true
     and var('claims_enabled', False) == true -%}
 
-    {{ smart_union([ref('int_condition_from_claims'), ref('normalized__condition')]) }}
+    {{ smart_union([ref('int_core__condition_from_claim'), ref('normalized__condition')]) }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -29,7 +29,7 @@ with all_conditions as (
 {% elif var('claims_enabled', False) == true -%}
 
     select *
-    from {{ ref('int_condition_from_claims') }}
+    from {{ ref('int_core__condition_from_claim') }}
 
 {%- endif %}
 )

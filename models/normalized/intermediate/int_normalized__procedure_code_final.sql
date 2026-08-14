@@ -1,0 +1,19 @@
+{{ config(
+     enabled = var('claims_enabled', False)
+ | as_bool
+   )
+}}
+
+{% set procedure_cols = range(1, 26) %}
+
+select
+    claim_id
+    , data_source
+    {% for i in procedure_cols %}
+    , max(case when column_name = 'procedure_code_{{ i }}' then procedure_code else null end) as procedure_code_{{ i }}
+    {% endfor %}
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('int_normalized__procedure_code_intermediate') }}
+group by
+    claim_id
+    , data_source

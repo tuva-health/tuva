@@ -12,7 +12,7 @@ with member_months as (
       person_id
     , year_month
     , data_source
-  from {{ ref('member_month__member_month') }}
+  from {{ ref('enrollment__member_month') }}
   group by
       person_id
     , year_month
@@ -31,7 +31,7 @@ with member_months as (
   select
       data_source
     , max(claim_end_date) as max_claim_end_date
-  from {{ ref('provider_attribution__int_primary_care_claims') }}
+  from {{ ref('int_provider_attribution__primary_care_claim') }}
   group by data_source
 )
 
@@ -129,7 +129,7 @@ with member_months as (
     , c.claim_year_month_int
     , c.claim_end_date
     , c.allowed_amount
-  from {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__primary_care_claim') }} as c
   inner join months_12 as m
     on c.data_source = m.data_source
    and c.claim_year_month_int = m.year_month_int
@@ -151,7 +151,7 @@ with member_months as (
     , c.claim_year_month_int
     , c.claim_end_date
     , c.allowed_amount
-  from {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__primary_care_claim') }} as c
   inner join months_24 as m
     on c.data_source = m.data_source
    and c.claim_year_month_int = m.year_month_int
@@ -173,7 +173,7 @@ with member_months as (
     , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
-  from {{ ref('provider_attribution__stg_medical_claim') }} as mc
+  from {{ ref('int_provider_attribution__medical_claim') }} as mc
   left outer join {{ ref('terminology__calendar') }} as cal
     on cast(mc.claim_start_date as date) = cal.full_date
 )
@@ -204,7 +204,7 @@ with member_months as (
   inner join {{ ref('provider_data__provider') }} as sp
     on cast(e.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})
    and lower(trim(sp.entity_type_description)) = 'individual'
-  left outer join {{ ref('provider_attribution__provider_classification') }} as pc
+  left outer join {{ ref('int_provider_attribution__provider_classification') }} as pc
     on e.provider_id = pc.provider_id
 )
 
@@ -282,8 +282,8 @@ order by s.step) as step_choice_rank
     , 1 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from {{ ref('provider_attribution__int_person_years') }} as py
-  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__person_year') }} as py
+  inner join {{ ref('int_provider_attribution__primary_care_claim') }} as c
     on py.person_id = c.person_id
    and py.data_source = c.data_source
    and c.claim_year = py.performance_year
@@ -302,8 +302,8 @@ order by s.step) as step_choice_rank
     , 2 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from {{ ref('provider_attribution__int_person_years') }} as py
-  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__person_year') }} as py
+  inner join {{ ref('int_provider_attribution__primary_care_claim') }} as c
     on py.person_id = c.person_id
    and py.data_source = c.data_source
    and c.claim_year = py.performance_year
@@ -322,8 +322,8 @@ order by s.step) as step_choice_rank
     , 3 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from {{ ref('provider_attribution__int_person_years') }} as py
-  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__person_year') }} as py
+  inner join {{ ref('int_provider_attribution__primary_care_claim') }} as c
     on py.person_id = c.person_id
    and py.data_source = c.data_source
    and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
@@ -343,8 +343,8 @@ order by s.step) as step_choice_rank
     , 4 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from {{ ref('provider_attribution__int_person_years') }} as py
-  inner join {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  from {{ ref('int_provider_attribution__person_year') }} as py
+  inner join {{ ref('int_provider_attribution__primary_care_claim') }} as c
     on py.person_id = c.person_id
    and py.data_source = c.data_source
    and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
@@ -363,7 +363,7 @@ order by s.step) as step_choice_rank
     , 5 as step
     , sum(arc.allowed_amount) as allowed_amount
     , count(distinct arc.encounter_id) as visits
-  from {{ ref('provider_attribution__int_person_years') }} as py
+  from {{ ref('int_provider_attribution__person_year') }} as py
   inner join all_rendering_claims as arc
     on py.person_id = arc.person_id
    and py.data_source = arc.data_source

@@ -18,7 +18,7 @@
 with all_procedures as (
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
-    {{ smart_union([ref('int_procedure_from_claims'), ref('normalized__procedure')]) }}
+    {{ smart_union([ref('int_core__procedure_from_claim'), ref('normalized__procedure')]) }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -28,7 +28,7 @@ with all_procedures as (
 {% elif var('claims_enabled', False) == true -%}
 
     select *
-    from {{ ref('int_procedure_from_claims') }}
+    from {{ ref('int_core__procedure_from_claim') }}
 
 {%- endif %}
 )

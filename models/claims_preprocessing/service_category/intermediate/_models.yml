@@ -1,0 +1,556 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_intermediate |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate{%- else -%}intermediate{%- endif -%}
+
+models:
+  - name: int_service_category__acute_inpatient_institutional_maternity
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__acute_inpatient_institutional_med_surg
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__acute_inpatient_institutional_other
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__acute_inpatient_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__ambulance_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__ambulance_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__ambulatory_surgery_center_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__ambulatory_surgery_center_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__combined_institutional_header_level
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__combined_institutional_line_level
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__combined_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__dialysis_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__dialysis_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__dme_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__dme_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__emergency_department_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__emergency_department_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__home_health_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__home_health_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_hospice_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_hospice_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_long_term_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_psychiatric_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_psychiatric_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_rehab_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_rehab_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_skilled_nursing_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_skilled_nursing_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__inpatient_substance_use_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__inpatient_substance_use_professional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__lab_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__lab_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__observation_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__observation_professional
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__office_based
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__office_based_other_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__office_based_radiology_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__office_based_surgery_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__office_based_therapy_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__office_based_visit_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_hospice_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_hospice_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_hospital_or_clinic_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_hospital_or_clinic_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_psychiatric_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_psychiatric_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_radiology_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_radiology_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_rehab_institutional
+    description: flagging outpatient claims for outpatient rehab service categories
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  #staging:
+
+  - name: int_service_category__outpatient_rehab_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_skilled_nursing_institutional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__outpatient_substance_use_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_substance_use_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_surgery_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_surgery_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_therapy_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__outpatient_therapy_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__pharmacy_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__pharmacy_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+
+  - name: int_service_category__professional
+    config:
+      schema: *schema_intermediate
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__urgent_care_institutional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: int_service_category__urgent_care_professional
+    description: service categories flagged by corresponding codes and value sets
+    config:
+      schema: *schema_intermediate
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing

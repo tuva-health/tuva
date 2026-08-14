@@ -1,0 +1,109 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_intermediate |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_intermediate{%- else -%}intermediate{%- endif -%}
+
+models:
+  - name: int_data_quality__catalog_logical_test_column
+    description: One row per logical data quality test and related input field used for domain-to-test matching.
+    config:
+      schema: *schema_intermediate
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_catalog
+      materialized: table
+    columns:
+      - name: test_name
+        data_tests:
+          - not_null
+      - name: input_table_name
+        data_tests:
+          - not_null
+      - name: input_column_name
+        data_tests:
+          - not_null
+
+  - name: int_data_quality__structural_actual_column
+    description: One row per actual warehouse column and data source for enabled Input Layer tables, generated through dbt adapter metadata APIs.
+    config:
+      schema: *schema_intermediate
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+      - name: data_source_key
+      - name: table_name
+      - name: model_name
+      - name: column_name
+      - name: actual_data_type
+      - name: actual_type_family
+      - name: table_exists
+      - name: row_count
+
+  - name: int_data_quality__structural_column_comparison
+    description: One row per data source, input-layer table, and expected column with expected-vs-actual column metadata and structural pass/fail results.
+    config:
+      schema: *schema_intermediate
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+      - name: table
+      - name: column
+      - name: expected_data_type
+      - name: actual_data_type
+      - name: is_primary_key
+      - name: table_exists
+      - name: row_count
+      - name: column_exists
+      - name: data_type_correct
+      - name: column_order
+
+  - name: int_data_quality__structural_expected_column
+    description: One row per enabled Input Layer column expected by the Tuva contract, generated from Input Layer YAML metadata.
+    config:
+      schema: *schema_intermediate
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: table_name
+      - name: model_name
+      - name: column_name
+      - name: expected_data_type
+      - name: expected_type_family
+      - name: is_primary_key
+      - name: column_order
+
+  - name: int_data_quality__structural_primary_key_test
+    description: One row per primary-key test result for each data source and input-layer table.
+    config:
+      schema: *schema_intermediate
+      tags:
+        - data_quality
+        - dq
+        - dq1
+        - dq_structural
+      materialized: table
+    columns:
+      - name: data_source
+      - name: table
+      - name: column
+      - name: test
+      - name: test_result

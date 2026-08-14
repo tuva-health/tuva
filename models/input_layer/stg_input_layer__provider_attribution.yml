@@ -1,0 +1,107 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_staging |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_staging{%- else -%}staging{%- endif -%}
+
+models:
+  - name: stg_input_layer__provider_attribution
+    description: |-
+      The provider attribution table stores externally supplied provider attribution assignments at the member-month level. Each record represents the provider, practice, organization, and line of business attributed to a person for a specific member ID, payer, plan, month, and data source.
+
+      This table supports two attribution concepts. Payer-attributed fields should be populated when the attribution assignment comes from a payer, health plan, contract, or other external attribution source. Custom-attributed fields should be populated when the attribution assignment is created by the user or by a custom attribution methodology.
+
+      The table is intended to have one record per person ID, member ID, year month, payer, plan, and data source. These fields make up the primary key. The attribution fields from this table are joined into the core member_month table and are available downstream for financial, quality, and population health analysis.
+    config:
+      schema: *schema_staging
+      tags: input_layer
+      materialized: view
+    columns:
+      - name: person_id
+        description: Globally unique identifier for each person in the dataset.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: member_id
+        description: Identifier that links the person to a specific insurance product or health plan. This should match the member_id used in eligibility and member months data.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: year_month
+        description: Calendar month for the attribution assignment, formatted as YYYY-MM. The value should represent the month during which the person is attributed to the listed provider, practice, organization, or line of business.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer
+        description: Name of the payer or health plan associated with the attribution assignment.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: plan
+        description: Name of the insurance plan or product associated with the attribution assignment.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: payer_attributed_provider
+        description: Provider assigned to the member by the payer, health plan, contract, or other external attribution source. Use a stable provider identifier when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_practice
+        description: Practice assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_organization
+        description: Organization assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer_attributed_provider_lob
+        description: Line of business assigned to the member by the payer or external attribution source.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider
+        description: Provider assigned to the member by a user-defined or custom attribution methodology. Use a stable provider identifier when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_practice
+        description: Practice assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_organization
+        description: Organization assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: custom_attributed_provider_lob
+        description: Line of business assigned to the member by a user-defined or custom attribution methodology.
+        config:
+          meta:
+            data_type: varchar
+      - name: file_name
+        description: Name of the file that supplied the attribution record, when the data is loaded from files. This field is useful for lineage, troubleshooting, and reconciling source submissions.
+        config:
+          meta:
+            data_type: varchar
+      - name: ingest_datetime
+        description: Date and time when the attribution record was loaded into the data warehouse. This field is useful for lineage, auditing, and identifying the most recent file load when attribution data is refreshed over time.
+        config:
+          meta:
+            data_type: timestamp
+      - name: data_source
+        description: User-defined name of the source system or dataset that supplied the attribution record. This field is part of the primary key and should be populated consistently across related input layer tables.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

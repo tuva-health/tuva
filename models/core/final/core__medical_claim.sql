@@ -92,7 +92,7 @@ with all_encounters as (
         , encounter_id
         , encounter_type
         , encounter_group
-    from {{ ref('encounters__combined_claim_line_crosswalk') }}
+    from {{ ref('int_encounter__combined_claim_line_crosswalk') }}
     where claim_line_attribution_number = 1
 
     union all
@@ -103,7 +103,7 @@ with all_encounters as (
         , encounter_id
         , encounter_type
         , encounter_group
-    from {{ ref('encounters__orphaned_claims') }}
+    from {{ ref('int_encounter__orphaned_claim_line') }}
 )
 
 select
@@ -111,14 +111,14 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from {{ ref('normalized__medical_claim') }} as med
-inner join {{ ref('service_category__service_category_grouper') }} as srv_group
+inner join {{ ref('service_category__grouper') }} as srv_group
     on med.claim_id = srv_group.claim_id
     and med.claim_line_number = srv_group.claim_line_number
     and srv_group.duplicate_row_number = 1
 inner join all_encounters as x
     on med.claim_id = x.claim_id
     and med.claim_line_number = x.claim_line_number
-left outer join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} as enroll
+left outer join {{ ref('enrollment__claim_flag') }} as enroll
     on med.claim_id = enroll.claim_id
     and med.claim_line_number = enroll.claim_line_number
     and med.person_id = enroll.person_id

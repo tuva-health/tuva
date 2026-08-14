@@ -1,0 +1,16 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_staging |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_staging{%- else -%}staging{%- endif -%}
+
+models:
+  - name: stg_encounter__eligibility
+    config:
+      schema: *schema_staging
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters

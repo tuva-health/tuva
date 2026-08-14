@@ -1,0 +1,136 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else -%}claims_preprocessing{%- endif -%}
+
+models:
+  - name: enrollment__claim_flag
+    description: This table contains claims with matching enrollment
+    config:
+      schema: *schema
+      tags:
+        - claims_preprocessing
+      materialized: table
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: >
+          Indicates the line number for the particular line of the claim.
+      - name: person_id
+        description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer.
+      - name: plan
+        description: Name of the plan.
+      - name: data_source
+        description: 'User-configured field that indicates the data source.'
+      - name: member_month_id
+        description: 'The unique combination of person_id, member_id, year_month, payer, plan, and data source.'
+      - name: inferred_claim_start_year_month
+        description: |
+          The claim start date year and month.  If claim line start date is missing then the following column will be used, 
+          in the following order if also NULL:  claim start date, admission date
+      - name: inferred_claim_end_year_month
+        description: |
+          The claim end date year and month.  If claim line end date is missing then the following column will be used, 
+          in the following order if also NULL:  claim end date, discharge date
+      - name: inferred_claim_start_column_used
+        description: The name of the column used to populated inferred_claim_start_year_month.
+      - name: inferred_claim_end_column_used
+        description: The name of the column used to populated inferred_claim_start_column_used.
+
+  - name: enrollment__member_month
+    description: |-
+      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the calendar terminology table so that each eligibility span is expanded into one record for each covered year-month. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source, and pulls through eligibility extension columns.
+
+      Table grain: One record per person, member, year month, payer, plan, and data source.
+    config:
+      schema: *schema
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - member_month
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - member_month_id
+    columns:
+      - name: member_month_id
+        description: Synthetic key created from person_id, member_id, year_month, payer, plan, and data_source.
+        data_tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: person_id
+        description: Globally unique identifier for the person covered during the member month.
+        data_tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+      - name: member_id
+        description: Identifier assigned by the payer or health plan for the person's coverage during the member month.
+        config:
+          meta:
+            data_type: varchar
+      - name: year_month
+        description: Calendar month of eligibility represented by the member month, formatted as YYYYMM.
+        config:
+          meta:
+            data_type: varchar
+      - name: payer
+        description: Name of the payer providing coverage during the member month.
+        config:
+          meta:
+            data_type: varchar
+      - name: plan
+        description: Name of the health insurance plan or product associated with the member month.
+        config:
+          meta:
+            data_type: varchar
+      - name: tuva_last_run
+        description: Timestamp for when the model was last run.
+        config:
+          meta:
+            data_type: timestamp
+      - name: data_source
+        description: User-defined name that identifies the source of the eligibility data used to create the member month.
+        data_tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+
+  - name: enrollment__pharmacy_claim_flag
+    description: This table contains pharmacy claims with matching enrollment
+    config:
+      schema: *schema
+      tags:
+        - claims_preprocessing
+      materialized: table
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: >
+          Indicates the line number for the particular line of the claim.
+      - name: person_id
+        description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer.
+      - name: plan
+        description: Name of the plan.
+      - name: data_source
+        description: 'User-configured field that indicates the data source.'
+      - name: member_month_id
+        description: 'The unique combination of person_id, member_id, year_month, payer, plan, and data source.'
+      - name: paid_year_month
+        description: the year and month of the date the pharmacy claim was paid.

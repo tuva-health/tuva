@@ -11,7 +11,7 @@ with member_months as (
     , payer
     , {{ quote_column('plan') }}
     , data_source
-  from {{ ref('member_month__member_month') }}
+  from {{ ref('enrollment__member_month') }}
 )
 
 , external_attribution as (

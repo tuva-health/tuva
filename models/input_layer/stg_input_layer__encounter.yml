@@ -1,0 +1,155 @@
+version: 2
+
+# Schema vocabulary for this file. Every model config points at one of
+# these, so a schema is defined once per file rather than once per model.
+anchors:
+  - &schema_staging |
+    {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_staging{%- else -%}staging{%- endif -%}
+
+models:
+  - name: stg_input_layer__encounter
+    description: |-
+      The encounter table is intended to have one record per encounter ID and data source. This table stores clinical encounters from source systems, including acute inpatient stays, emergency department visits, office visits, skilled nursing facility stays, and other patient visits.
+
+      Encounter records should represent clinical visits from clinical source systems. Claims-derived encounters should be mapped to the medical_claim input layer table. They are added to core.encounter downstream from medical claims, not from this clinical input layer table.
+
+      Primary key: encounter_id, data_source.
+    config:
+      schema: *schema_staging
+      tags: input_layer
+      materialized: view
+    columns:
+      - name: encounter_id
+        description: >-
+          Identifier for an encounter record within a data source. This value should be populated on every record and should uniquely identify the encounter when combined with data_source.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: person_id
+        description: >-
+          Globally unique identifier for the person associated with the encounter. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.
+        config:
+          meta:
+            data_type: varchar
+      - name: patient_id
+        description: >-
+          Identifier that links the person to a particular clinical source system, for example a medical record number or MRN. A single person may have multiple patient IDs.
+        config:
+          meta:
+            data_type: varchar
+      - name: encounter_type
+        description: >-
+          Type of clinical encounter, such as acute inpatient, emergency department, outpatient, office visit, or skilled nursing facility. Values should map to Tuva encounter type terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: encounter_start_date
+        description: >-
+          Date the encounter started, formatted as YYYY-MM-DD. For inpatient and multi-day encounters, this is the admission or first service date.
+        config:
+          meta:
+            data_type: date
+      - name: encounter_end_date
+        description: >-
+          Date the encounter ended, formatted as YYYY-MM-DD. For inpatient and multi-day encounters, this is the discharge or last service date. For same-day encounters, this may be the same as encounter_start_date.
+        config:
+          meta:
+            data_type: date
+      - name: admit_source_code
+        description: >-
+          Source code indicating where the patient was immediately before admission, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: admit_type_code
+        description: >-
+          Source code indicating the type or priority of admission, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: discharge_disposition_code
+        description: >-
+          Source code indicating the patient's disposition at discharge, such as home, expired, or transferred to another care setting. This is most relevant for inpatient and emergency department encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: attending_provider_id
+        description: >-
+          Identifier for the attending provider associated with the encounter, when available. This may be the provider's National Provider Identifier (NPI) or a source-system provider identifier.
+        config:
+          meta:
+            data_type: varchar
+      - name: attending_provider_name
+        description: >-
+          Name of the attending provider associated with the encounter, when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: facility_npi
+        description: >-
+          National Provider Identifier for the facility where the encounter occurred, when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: facility_name
+        description: >-
+          Name of the facility or care site where the encounter occurred, when available.
+        config:
+          meta:
+            data_type: varchar
+      - name: primary_diagnosis_code_type
+        description: >-
+          Code system for primary_diagnosis_code. Accepted values should map to Tuva code type terminology, such as icd-10-cm or icd-9-cm.
+        config:
+          meta:
+            data_type: varchar
+      - name: primary_diagnosis_code
+        description: >-
+          Primary diagnosis code associated with the encounter, when available from the clinical source system. For ICD diagnosis codes, the source may include or omit decimal formatting. The Tuva package derives the corresponding description downstream from Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: drg_code_type
+        description: >-
+          Diagnosis-related group code system for drg_code, when a DRG is assigned to the encounter. Examples include ms-drg and apr-drg.
+        config:
+          meta:
+            data_type: varchar
+      - name: drg_code
+        description: >-
+          Diagnosis-related group code assigned to the encounter, when available. This is most relevant for inpatient encounters. The Tuva package derives the corresponding description downstream from Tuva terminology.
+        config:
+          meta:
+            data_type: varchar
+      - name: paid_amount
+        description: >-
+          Total paid amount associated with the encounter, when available from the clinical source system. Claims-derived payment amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
+        config:
+          meta:
+            data_type: number
+      - name: allowed_amount
+        description: >-
+          Total allowed amount associated with the encounter, when available from the clinical source system. Claims-derived allowed amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
+        config:
+          meta:
+            data_type: number
+      - name: charge_amount
+        description: >-
+          Total charge amount associated with the encounter before adjustments or payments, when available from the clinical source system. Claims-derived charge amounts should be mapped to the medical_claim input layer table rather than this clinical encounter table.
+        config:
+          meta:
+            data_type: number
+      - name: ingest_datetime
+        description: >-
+          Date and time the source encounter record was loaded into the data warehouse. This is useful when multiple versions of the same encounter record are received over time.
+        config:
+          meta:
+            data_type: timestamp
+      - name: data_source
+        description: >-
+          User-defined name that identifies the source of the encounter data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true

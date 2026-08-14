@@ -16,7 +16,7 @@ with member_months as (
     {% else %}
     , cast(left(year_month, 4) as {{ dbt.type_int() }}) as performance_year
     {% endif %}
-  from {{ ref('member_month__member_month') }}
+  from {{ ref('enrollment__member_month') }}
 )
 
 select
@@ -41,7 +41,7 @@ select
   , attr.attribution_key as tuva_attribution_key
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from member_months as mm
-left outer join {{ ref('provider_attribution__assigned_beneficiaries_yearly') }} as attr
+left outer join {{ ref('provider_attribution__assigned_beneficiary_yearly') }} as attr
   on mm.person_id = attr.person_id
   and mm.data_source = attr.data_source
   and mm.performance_year = attr.performance_year

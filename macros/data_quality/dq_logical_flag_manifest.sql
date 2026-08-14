@@ -40,10 +40,10 @@
 {% macro dq_logical_test_manifest() %}
     {% set grouped_definitions = [
         {
-            'source_model_name': 'data_quality__eligibility_span_flags',
-            'input_model_name': 'input_layer__eligibility',
+            'source_model_name': 'data_quality__logical_flag_eligibility_span',
+            'input_model_name': 'stg_input_layer__eligibility',
             'input_table_name': 'eligibility',
-            'flag_table_name': 'eligibility_span_flags',
+            'flag_table_name': 'logical_flag_eligibility_span',
             'table_name': 'eligibility',
             'grain': 'eligibility span',
             'key_columns': ['person_id', 'member_id', 'enrollment_start_date', 'enrollment_end_date', 'data_source'],
@@ -64,10 +64,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__eligibility_person_flags',
-            'input_model_name': 'input_layer__eligibility',
+            'source_model_name': 'data_quality__logical_flag_eligibility_person',
+            'input_model_name': 'stg_input_layer__eligibility',
             'input_table_name': 'eligibility',
-            'flag_table_name': 'eligibility_person_flags',
+            'flag_table_name': 'logical_flag_eligibility_person',
             'table_name': 'eligibility',
             'grain': 'person',
             'key_columns': ['person_id', 'data_source'],
@@ -78,10 +78,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__medical_claim_line_flags',
-            'input_model_name': 'input_layer__medical_claim',
+            'source_model_name': 'data_quality__logical_flag_medical_claim_line',
+            'input_model_name': 'stg_input_layer__medical_claim',
             'input_table_name': 'medical_claim',
-            'flag_table_name': 'medical_claim_line_flags',
+            'flag_table_name': 'logical_flag_medical_claim_line',
             'table_name': 'medical_claim',
             'grain': 'medical claim line',
             'key_columns': ['claim_id', 'claim_line_number', 'data_source'],
@@ -142,10 +142,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__medical_claim_claim_flags',
-            'input_model_name': 'input_layer__medical_claim',
+            'source_model_name': 'data_quality__logical_flag_medical_claim_claim',
+            'input_model_name': 'stg_input_layer__medical_claim',
             'input_table_name': 'medical_claim',
-            'flag_table_name': 'medical_claim_claim_flags',
+            'flag_table_name': 'logical_flag_medical_claim_claim',
             'table_name': 'medical_claim',
             'grain': 'medical claim',
             'key_columns': ['claim_id', 'data_source'],
@@ -162,10 +162,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__pharmacy_claim_line_flags',
-            'input_model_name': 'input_layer__pharmacy_claim',
+            'source_model_name': 'data_quality__logical_flag_pharmacy_claim_line',
+            'input_model_name': 'stg_input_layer__pharmacy_claim',
             'input_table_name': 'pharmacy_claim',
-            'flag_table_name': 'pharmacy_claim_line_flags',
+            'flag_table_name': 'logical_flag_pharmacy_claim_line',
             'table_name': 'pharmacy_claim',
             'grain': 'pharmacy claim line',
             'key_columns': ['claim_id', 'claim_line_number', 'data_source'],
@@ -189,10 +189,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__pharmacy_claim_claim_flags',
-            'input_model_name': 'input_layer__pharmacy_claim',
+            'source_model_name': 'data_quality__logical_flag_pharmacy_claim_claim',
+            'input_model_name': 'stg_input_layer__pharmacy_claim',
             'input_table_name': 'pharmacy_claim',
-            'flag_table_name': 'pharmacy_claim_claim_flags',
+            'flag_table_name': 'logical_flag_pharmacy_claim_claim',
             'table_name': 'pharmacy_claim',
             'grain': 'pharmacy claim',
             'key_columns': ['claim_id', 'data_source'],
@@ -202,10 +202,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__appointment_flags',
-            'input_model_name': 'input_layer__appointment',
+            'source_model_name': 'data_quality__logical_flag_appointment',
+            'input_model_name': 'stg_input_layer__appointment',
             'input_table_name': 'appointment',
-            'flag_table_name': 'appointment_flags',
+            'flag_table_name': 'logical_flag_appointment',
             'table_name': 'appointment',
             'grain': 'appointment record',
             'key_columns': ['appointment_id', 'data_source'],
@@ -217,10 +217,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__condition_flags',
-            'input_model_name': 'input_layer__condition',
+            'source_model_name': 'data_quality__logical_flag_condition',
+            'input_model_name': 'stg_input_layer__condition',
             'input_table_name': 'condition',
-            'flag_table_name': 'condition_flags',
+            'flag_table_name': 'logical_flag_condition',
             'table_name': 'condition',
             'grain': 'condition record',
             'key_columns': ['source_condition_id', 'data_source'],
@@ -238,10 +238,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__encounter_flags',
-            'input_model_name': 'input_layer__encounter',
+            'source_model_name': 'data_quality__logical_flag_encounter',
+            'input_model_name': 'stg_input_layer__encounter',
             'input_table_name': 'encounter',
-            'flag_table_name': 'encounter_flags',
+            'flag_table_name': 'logical_flag_encounter',
             'table_name': 'encounter',
             'grain': 'encounter record',
             'key_columns': ['encounter_id', 'data_source'],
@@ -271,10 +271,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__immunization_flags',
-            'input_model_name': 'input_layer__immunization',
+            'source_model_name': 'data_quality__logical_flag_immunization',
+            'input_model_name': 'stg_input_layer__immunization',
             'input_table_name': 'immunization',
-            'flag_table_name': 'immunization_flags',
+            'flag_table_name': 'logical_flag_immunization',
             'table_name': 'immunization',
             'grain': 'immunization record',
             'key_columns': ['immunization_id', 'data_source'],
@@ -287,10 +287,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__lab_result_flags',
-            'input_model_name': 'input_layer__lab_result',
+            'source_model_name': 'data_quality__logical_flag_lab_result',
+            'input_model_name': 'stg_input_layer__lab_result',
             'input_table_name': 'lab_result',
-            'flag_table_name': 'lab_result_flags',
+            'flag_table_name': 'logical_flag_lab_result',
             'table_name': 'lab_result',
             'grain': 'lab result record',
             'key_columns': ['lab_result_id', 'data_source'],
@@ -307,10 +307,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__location_flags',
-            'input_model_name': 'input_layer__location',
+            'source_model_name': 'data_quality__logical_flag_location',
+            'input_model_name': 'stg_input_layer__location',
             'input_table_name': 'location',
-            'flag_table_name': 'location_flags',
+            'flag_table_name': 'logical_flag_location',
             'table_name': 'location',
             'grain': 'location record',
             'key_columns': ['location_id', 'data_source'],
@@ -321,10 +321,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__medication_flags',
-            'input_model_name': 'input_layer__medication',
+            'source_model_name': 'data_quality__logical_flag_medication',
+            'input_model_name': 'stg_input_layer__medication',
             'input_table_name': 'medication',
-            'flag_table_name': 'medication_flags',
+            'flag_table_name': 'logical_flag_medication',
             'table_name': 'medication',
             'grain': 'medication record',
             'key_columns': ['medication_id', 'data_source'],
@@ -350,10 +350,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__observation_flags',
-            'input_model_name': 'input_layer__observation',
+            'source_model_name': 'data_quality__logical_flag_observation',
+            'input_model_name': 'stg_input_layer__observation',
             'input_table_name': 'observation',
-            'flag_table_name': 'observation_flags',
+            'flag_table_name': 'logical_flag_observation',
             'table_name': 'observation',
             'grain': 'observation record',
             'key_columns': ['observation_id', 'data_source'],
@@ -373,10 +373,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__patient_flags',
-            'input_model_name': 'input_layer__patient',
+            'source_model_name': 'data_quality__logical_flag_patient',
+            'input_model_name': 'stg_input_layer__patient',
             'input_table_name': 'patient',
-            'flag_table_name': 'patient_flags',
+            'flag_table_name': 'logical_flag_patient',
             'table_name': 'patient',
             'grain': 'patient record',
             'key_columns': ['person_id', 'patient_id', 'data_source'],
@@ -399,10 +399,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__practitioner_flags',
-            'input_model_name': 'input_layer__practitioner',
+            'source_model_name': 'data_quality__logical_flag_practitioner',
+            'input_model_name': 'stg_input_layer__practitioner',
             'input_table_name': 'practitioner',
-            'flag_table_name': 'practitioner_flags',
+            'flag_table_name': 'logical_flag_practitioner',
             'table_name': 'practitioner',
             'grain': 'practitioner record',
             'key_columns': ['practitioner_id', 'data_source'],
@@ -412,10 +412,10 @@
             ]
         },
         {
-            'source_model_name': 'data_quality__procedure_flags',
-            'input_model_name': 'input_layer__procedure',
+            'source_model_name': 'data_quality__logical_flag_procedure',
+            'input_model_name': 'stg_input_layer__procedure',
             'input_table_name': 'procedure',
-            'flag_table_name': 'procedure_flags',
+            'flag_table_name': 'logical_flag_procedure',
             'table_name': 'procedure',
             'grain': 'procedure record',
             'key_columns': ['source_procedure_id', 'data_source'],

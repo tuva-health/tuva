@@ -25,7 +25,7 @@ with all_medications as (
 {% if var('clinical_enabled', False) == true
     and var('claims_enabled', False) == true -%}
 
-    {{ smart_union([ref('core__stg_claims_medication'), ref('normalized__medication')]) }}
+    {{ smart_union([ref('int_core__medication_from_claim'), ref('normalized__medication')]) }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -35,7 +35,7 @@ with all_medications as (
 {% elif var('claims_enabled', False) == true -%}
 
     select *
-    from {{ ref('core__stg_claims_medication') }}
+    from {{ ref('int_core__medication_from_claim') }}
 
 {%- endif %}
 ),

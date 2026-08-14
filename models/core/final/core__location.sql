@@ -30,7 +30,7 @@
 {%- endset -%}
 
 with loc as (
-    {{ smart_union([ref('core__stg_claims_location'), ref('normalized__location')], source_index=none) }}
+    {{ smart_union([ref('int_core__location_from_claim'), ref('normalized__location')], source_index=none) }}
 )
 
 select
@@ -54,13 +54,13 @@ from {{ ref('normalized__location') }}
 {% elif var('claims_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-{# No extension columns — input_layer__location is clinical-only #}
+{# No extension columns — stg_input_layer__location is clinical-only #}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_claims_location') }}
+from {{ ref('int_core__location_from_claim') }}
 
 {%- endif %}
