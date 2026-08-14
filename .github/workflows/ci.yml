@@ -71,6 +71,25 @@ permissions:
   pull-requests: read
 
 jobs:
+  model_conventions:
+    name: Model Conventions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Unit test the repo scripts
+        run: python -m unittest discover -s scripts -p "test_*.py" -v
+
+      # Structural check only: no warehouse, no credentials, no dbt install.
+      - name: Check model structure and naming
+        run: python scripts/check_model_conventions.py
+
   resolve_request:
     name: Resolve CI Request
     runs-on: ubuntu-latest
