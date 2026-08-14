@@ -45,4 +45,7 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__patient') }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__patient') }}
+{% endif %}
+from {{ source('source_input', 'patient') }}

@@ -23,7 +23,11 @@
     , practitioner_id
 {%- endset -%}
 
+{# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
+    {# , person_id as x_temp_person_id #}
+    {# , source_code as x_temp_source_code #}
+    {# , source_code_type as zzz_temp_source_code_type #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}
@@ -35,4 +39,7 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__immunization') }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__immunization') }}
+{% endif %}
+from {{ source('source_input', 'immunization') }}

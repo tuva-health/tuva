@@ -3,7 +3,7 @@
    )
 }}
 
-select
+{%- set tuva_columns -%}
       encounter_id
     , person_id
     , patient_id
@@ -24,6 +24,25 @@ select
     , paid_amount
     , allowed_amount
     , charge_amount
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , encounter_type as x_temp_encounter_type #}
+    {# , encounter_start_date as x_temp_encounter_start_date #}
+    {# , facility_name as zzz_temp_facility_name #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
     , ingest_datetime
     , data_source
-from {{ ref('the_tuva_project', 'synthetic_data__encounter') }}
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__encounter') }}
+{% endif %}
+from {{ source('source_input', 'encounter') }}

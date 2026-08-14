@@ -3,7 +3,7 @@
    )
 }}
 
-select
+{%- set tuva_columns -%}
       practitioner_id
     , npi
     , first_name
@@ -11,5 +11,25 @@ select
     , practice_affiliation
     , specialty
     , sub_specialty
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , specialty as x_temp_specialty #}
+    {# , first_name as x_temp_first_name #}
+    {# , last_name as x_temp_last_name #}
+    {# , practice_affiliation as zzz_temp_practice_affiliation #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
     , data_source
-from {{ ref('the_tuva_project', 'synthetic_data__practitioner') }}
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__practitioner') }}
+{% endif %}
+from {{ source('source_input', 'practitioner') }}

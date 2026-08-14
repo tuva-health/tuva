@@ -24,7 +24,10 @@
     , normalized_reference_range_high
 {%- endset -%}
 
+{# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
+    {# , observation_id as x_temp_observation_id #}
+    {# , observation_date as zzz_temp_observation_date #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}
@@ -36,4 +39,7 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__observation') }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__observation') }}
+{% endif %}
+from {{ source('source_input', 'observation') }}

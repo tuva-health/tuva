@@ -3,7 +3,7 @@
    )
 }}
 
-select
+{%- set tuva_columns -%}
       location_id
     , npi
     , name
@@ -15,5 +15,24 @@ select
     , zip_code
     , latitude
     , longitude
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , state as x_temp_state #}
+    {# , parent_organization as x_temp_parent_organization #}
+    {# , facility_type as zzz_temp_facility_type #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
     , data_source
-from {{ ref('the_tuva_project', 'synthetic_data__location') }}
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__location') }}
+{% endif %}
+from {{ source('source_input', 'location') }}

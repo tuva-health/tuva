@@ -32,7 +32,12 @@
     , ordering_practitioner_id
 {%- endset -%}
 
+{# Uncomment the columns below to test extension columns passthrough feature #}
 {%- set tuva_extensions -%}
+    {# , lab_result_id as x_temp_lab_result_id #}
+    {# , person_id as x_temp_person_id #}
+    {# , source_component_type as x_temp_source_component_type #}
+    {# , source_order_type as zzz_temp_source_order_type #}
 {%- endset -%}
 
 {%- set tuva_metadata -%}
@@ -44,4 +49,7 @@ select
     {{ tuva_columns }}
     {{ tuva_extensions }}
     {{ tuva_metadata }}
-from {{ ref('the_tuva_project', 'synthetic_data__lab_result') }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__lab_result') }}
+{% endif %}
+from {{ source('source_input', 'lab_result') }}

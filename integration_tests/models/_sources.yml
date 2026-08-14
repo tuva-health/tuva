@@ -1,0 +1,27 @@
+version: 2
+
+# The Input Layer this project reads. Replace `database` and `schema` to point
+# at your own instead of the Tuva synthetic data.
+sources:
+  - name: source_input
+    description: Input Layer tables that drive the integration tests project.
+    database: "{{ target.database }}"
+    schema: >-
+      {%- set prefix = var('tuva_schema_prefix', none) -%}
+      {{ prefix ~ '_synthetic_data' if prefix is not none and prefix | trim != '' else 'synthetic_data' }}
+    tables:
+      - name: appointment
+      - name: condition
+      - name: eligibility
+      - name: encounter
+      - name: immunization
+      - name: lab_result
+      - name: location
+      - name: medical_claim
+      - name: medication
+      - name: observation
+      - name: patient
+      - name: pharmacy_claim
+      - name: practitioner
+      - name: procedure
+      - name: provider_attribution

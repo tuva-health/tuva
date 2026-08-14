@@ -4,7 +4,7 @@
    )
 }}
 
-select
+{%- set tuva_columns -%}
       appointment_id
     , person_id
     , patient_id
@@ -20,5 +20,24 @@ select
     , status_description
     , reason
     , cancellation_reason
+{%- endset -%}
+
+{# Uncomment the columns below to test extension columns passthrough feature #}
+{%- set tuva_extensions -%}
+    {# , type_code as x_temp_type_code #}
+    {# , start_datetime as x_temp_start_datetime #}
+    {# , reason as zzz_temp_reason #}
+{%- endset -%}
+
+{%- set tuva_metadata -%}
     , data_source
-from {{ ref('the_tuva_project', 'synthetic_data__appointment') }}
+{%- endset -%}
+
+select
+    {{ tuva_columns }}
+    {{ tuva_extensions }}
+    {{ tuva_metadata }}
+{% if the_tuva_project.tuva_synthetic_data_enabled() %}
+-- depends_on: {{ ref('the_tuva_project', 'synthetic_data__appointment') }}
+{% endif %}
+from {{ source('source_input', 'appointment') }}
