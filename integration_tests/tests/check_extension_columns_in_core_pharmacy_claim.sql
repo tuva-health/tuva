@@ -21,7 +21,7 @@
    )
 }}
 
-{%- set source_relation = ref('input_layer__pharmacy_claim') -%}
+{%- set source_relation = ref('stg_input_layer__pharmacy_claim') -%}
 {%- set extension_cols = [] -%}
 {%- set string_type = dbt.type_string() -%}
 {%- for col in adapter.get_columns_in_relation(source_relation) -%}
