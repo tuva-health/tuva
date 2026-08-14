@@ -125,15 +125,7 @@
 
 
 {% macro get_synthetic_data_size() %}
-  {% set synthetic_data_size = var('synthetic_data_size', 'large') | string | trim | lower %}
-
-  {% if synthetic_data_size not in ['small', 'large'] %}
-    {% do exceptions.raise_compiler_error(
-        "Invalid synthetic_data_size '" ~ synthetic_data_size ~ "'. Expected 'small' or 'large'."
-    ) %}
-  {% endif %}
-
-  {{ return(synthetic_data_size) }}
+  {{ return(the_tuva_project.tuva_synthetic_data_size()) }}
 {% endmacro %}
 
 
@@ -215,14 +207,12 @@
 {% macro load_versioned_synthetic_seed(seed_name, version=none, compression=true, headers=true, null_marker=true) %}
 
   {#
-      Do nothing when synthetic data is turned off. Without this, a project that
-      never uses synthetic data still fails to parse if synthetic_data_size is
-      set to something invalid.
+      Do nothing unless `synthetic_data` is set.
 
-      The same check is written out again in synthetic_data_seeds.yml (enabled)
-      and in the integration_tests models. Change one, change the others.
+      Seed YAML renders without macro context, so the same check is written out
+      inline in synthetic_data_seeds.yml (enabled). Change one, change the other.
   #}
-  {% if var('use_synthetic_data', false) | string | trim | lower != 'true' %}
+  {% if not the_tuva_project.tuva_synthetic_data_enabled() %}
     {{ return('') }}
   {% endif %}
 

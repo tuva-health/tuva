@@ -54,7 +54,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         appointment_id: *string
         person_id: *string
@@ -96,7 +96,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         source_condition_id: *string
         person_id: *string
@@ -138,7 +138,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         encounter_id: *string
         person_id: *string
@@ -191,7 +191,7 @@ seeds:
       tags:
         - synthetic_data
         - claims
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         person_id: *string
         member_id: *string
@@ -264,7 +264,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         immunization_id: *string
         person_id: *string
@@ -313,7 +313,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         lab_result_id: *string
         person_id: *string
@@ -369,7 +369,7 @@ seeds:
       schema: *schema
       alias: location
       tags: [synthetic_data, clinical]
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         location_id: *string
         npi: *string
@@ -403,7 +403,7 @@ seeds:
       schema: *schema
       alias: medication
       tags: [synthetic_data, clinical]
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         medication_id: *string
         person_id: *string
@@ -445,7 +445,7 @@ seeds:
       schema: *schema
       alias: practitioner
       tags: [synthetic_data, clinical]
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         practitioner_id: *string
         npi: *string
@@ -475,7 +475,7 @@ seeds:
       schema: *schema
       alias: procedure
       tags: [synthetic_data, clinical]
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         source_procedure_id: *string
         person_id: *string
@@ -519,7 +519,7 @@ seeds:
       tags:
         - synthetic_data
         - claims
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         claim_id: *string
         claim_line_number: *integer
@@ -693,7 +693,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         observation_id: *string
         person_id: *string
@@ -744,7 +744,7 @@ seeds:
       tags:
         - synthetic_data
         - claims
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         claim_id: *string
         claim_line_number: *integer
@@ -796,7 +796,7 @@ seeds:
       tags:
         - synthetic_data
         - clinical
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         person_id: *string
         patient_id: *string
@@ -851,7 +851,7 @@ seeds:
       tags:
         - synthetic_data
         - provider_attribution
-      enabled: "{{ var('use_synthetic_data', false) | string | trim | lower == 'true' }}"
+      enabled: "{{ (var('synthetic_data', '') or '') | string | trim != '' }}"
       column_types:
         person_id: *string
         member_id: *string
