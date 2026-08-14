@@ -45,19 +45,39 @@ and reads profiles from `~/.dbt` unless `DBT_PROFILES_DIR`,
 
 ## Synthetic Data
 
-Synthetic data is controlled through vars in `integration_tests/dbt_project.yml`.
-The defaults are:
+Which Tuva synthetic data this project reads is controlled by the
+`synthetic_data` var in `integration_tests/dbt_project.yml`, which sets
+`synthetic_data: small`.
 
-- `use_synthetic_data: true`
-- `synthetic_data_size: small`
+| `synthetic_data` | reads |
+|---|---|
+| `small` | Tuva synthetic seeds, small |
+| `large` | Tuva synthetic seeds, large |
+| unset | nothing; the synthetic seeds are disabled |
+
+Synthetic data is opt-in. A project that installs Tuva Core and leaves
+`synthetic_data` unset loads none of it.
+
+Run `dbt run-operation show_synthetic_data` to see the current binding.
 
 Use the large synthetic data release for heavier validation:
 
 ```bash
 scripts/dbt-local build --full-refresh \
   --select package:integration_tests package:the_tuva_project \
-  --vars '{synthetic_data_size: large}'
+  --vars '{synthetic_data: large}'
 ```
+
+To read an Input Layer you already have instead, point the source at it in
+`models/_sources.yml`:
+
+```yaml
+    database: healthcare-data-ops
+    schema: small_input_layer
+```
+
+The models select `from {{ source('source_input', '<table>') }}`, so nothing
+else changes.
 
 The current data asset versions and other supported vars are documented in
 `integration_tests/dbt_project.yml`. Treat that file as the canonical commented
@@ -101,5 +121,5 @@ dbt build \
   --threads 1 \
   --cache-selected-only \
   --select package:integration_tests package:the_tuva_project \
-  --vars '{synthetic_data_size: small}'
+  --vars '{synthetic_data: small}'
 ```

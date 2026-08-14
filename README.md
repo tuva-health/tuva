@@ -79,7 +79,7 @@ Common variable groups:
 - Domain enablement: `claims_enabled`, `clinical_enabled`, `provider_attribution_enabled`
 - Data quality: `enable_data_quality`
 - Data assets: `custom_bucket_name`, `tuva_seed_versions`, `tuva_seed_buckets`
-- Synthetic data validation: `use_synthetic_data`, `synthetic_data_size`
+- Synthetic data: `synthetic_data` (unset by default, so no synthetic data is loaded)
 - Runtime metadata and schemas: `tuva_last_run`, `tuva_schema_prefix`
 - Extension columns: `passthrough`
 

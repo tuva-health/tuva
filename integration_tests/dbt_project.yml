@@ -17,10 +17,11 @@ vars:
   # Production projects can leave this false/omitted unless they want to build these queryable result tables.
   enable_data_quality: true            # Enables neutral data_quality structural/logical/analytical result models.
 
-  ## Synthetic data validation
-  # These vars are for this integration_tests project. They are not normal production Tuva Core settings.
-  use_synthetic_data: true             # Maps package synthetic seeds into this project's Input Layer models.
-  synthetic_data_size: small           # Synthetic payload to load: small or large.
+  ## Input Layer
+  # Which Tuva synthetic data this project reads. Unset means none: a project
+  # that installs Tuva Core loads no synthetic data. To read your own Input
+  # Layer, point the source at it in models/_sources.yml.
+  synthetic_data: small                # small | large
 
   ## Data asset releases and buckets
   # These mirror Tuva Core root defaults. Override here when validating a different published asset release.
