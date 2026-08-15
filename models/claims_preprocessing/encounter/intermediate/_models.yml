@@ -607,6 +607,19 @@ models:
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_type
+        description: >-
+          Office visit sub-type for the claim line. Always populated:
+          int_encounter__office_visit_type_priority assigns it as a string
+          literal in every union branch, and this model reaches it through an
+          inner join. int_encounter__combined_claim_line_crosswalk splits this
+          column on encounter_type = 'office visit radiology' and its
+          complement, and a null satisfies neither predicate, so a null here
+          would silently drop those claim lines from the crosswalk. This test
+          keeps that assumption enforced rather than merely implied.
+        data_tests:
+          - not_null
 
   - name: int_encounter__office_visit_detail
     config:
