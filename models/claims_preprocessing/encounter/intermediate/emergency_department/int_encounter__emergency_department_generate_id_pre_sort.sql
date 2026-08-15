@@ -185,7 +185,11 @@ with claim_start_end as (
     , aa.row_num
     , aa.close_flag
     , aa.min_closing_row
-    , bb.claim_id as encounter_id
+    /* The anchor claim: the claim that closes this merge chain. Every claim in
+       the chain resolves to the same one, so its claim_id is what marks them as
+       a single encounter. Named for what it holds — the encounter_id proper is
+       the hash built from it one model downstream. */
+    , bb.claim_id as anchor_claim_id
   from add_min_closing_row_to_every_claim as aa
   left outer join add_min_closing_row_to_every_claim as bb
     on aa.patient_data_source_id = bb.patient_data_source_id

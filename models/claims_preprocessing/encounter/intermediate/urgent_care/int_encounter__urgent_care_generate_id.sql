@@ -14,6 +14,5 @@ inner join {{ ref('int_encounter__urgent_care_anchor_event') }} as u on m.claim_
 select patient_data_source_id
 , start_date
 , claim_id
-, dense_rank() over (
-order by patient_data_source_id, start_date) as old_encounter_id
+, {{ dbt_utils.generate_surrogate_key(['patient_data_source_id', 'start_date']) }} as old_encounter_id
 from anchor

@@ -22,17 +22,15 @@ with cte as (
   where enc.claim_id is null -- missing from encounter mapping table
 )
 
-, max_encounter as (
-  select max(encounter_id) as max_encounter_id
-  from {{ ref('int_encounter__combined_claim_line_crosswalk') }}
-)
-
 select
   claim_id
 , claim_line_number
-, dense_rank() over (
-order by patient_data_source_id, claim_id) + max_encounter.max_encounter_id as encounter_id
+/* Orphan ids no longer need offsetting past max(encounter_id). That offset
+   existed only because sequential integer ids would otherwise collide with the
+   crosswalk's. A surrogate key is derived from the row's own natural key, so it
+   cannot collide with keys built from a different column set. Dropping it also
+   removes a max() over the entire crosswalk and the cross join. */
+, {{ dbt_utils.generate_surrogate_key(['patient_data_source_id', 'claim_id']) }} as encounter_id
 , 'orphaned claim' as encounter_type
 , 'other' as encounter_group
 from cte
-cross join max_encounter

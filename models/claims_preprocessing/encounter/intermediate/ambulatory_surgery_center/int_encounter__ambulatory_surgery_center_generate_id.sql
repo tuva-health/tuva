@@ -60,14 +60,17 @@ with base_data as (
       , encounter_group
 )
 
--- Assign asc encounter_id
+-- Assign encounter_id
+-- unique_encounters holds exactly one row per (patient_data_source_id,
+-- encounter_group), and that pair is what the join below matches on, so it is
+-- the natural key. The previous row_number ordered by encounter_start_date,
+-- which ties whenever one patient has two groups starting the same day and
+-- resolved those ties arbitrarily.
 , numbered_encounters as (
     select
         patient_data_source_id
       , encounter_group
-      , row_number() over (
-            order by patient_data_source_id, encounter_start_date
-        ) as encounter_id
+      , {{ dbt_utils.generate_surrogate_key(['patient_data_source_id', 'encounter_group']) }} as encounter_id
     from unique_encounters
 )
 

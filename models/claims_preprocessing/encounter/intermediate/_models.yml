@@ -300,7 +300,11 @@ models:
         - encounters
 
   - name: int_encounter__emergency_department_generate_id_pre_sort
-    description: generate encounter id and stitch inpatient psych claims together
+    description: >-
+      Stitch emergency department claims into encounters and resolve each merge
+      chain to its anchor claim. Emits anchor_claim_id, not encounter_id — the
+      encounter_id hash is built from it in
+      int_encounter__emergency_department_generate_id.
     config:
       schema: *schema_intermediate
       materialized: table

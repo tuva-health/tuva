@@ -325,8 +325,7 @@ select
   claim_id
 , claim_line_number
 , encounter_id as old_encounter_id
-, dense_rank() over (
-order by encounter_type, encounter_id) as encounter_id
+, {{ dbt_utils.generate_surrogate_key(['encounter_type', 'encounter_id']) }} as encounter_id
 , encounter_type
 , encounter_group
 , priority_number
