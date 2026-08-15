@@ -187,3 +187,28 @@ select
 from {{ table_ref }}
 group by {{ group_by_col }}
 {% endmacro %}
+
+/* athena - NEEDS ATHENA VERIFICATION: relies on Trino json_object/json_format (Athena engine v3) */
+{% macro athena__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+select
+    {{ group_by_col }}
+    , json_format(
+        cast(
+            array_agg(
+                json_object(
+                    {%- for col in object_col_list %}
+                    {% if not loop.first %}, {% endif -%}
+                    '{{ the_tuva_project.snake_to_camel(col) }}' value
+                    {%- if 'list' in col | lower -%}
+                    json_parse({{ col }}) /* embed nested JSON list without escaping */
+                    {%- else -%}
+                    {{ col }}
+                    {%- endif -%}
+                    {%- endfor %}
+                )
+            ) as json
+        )
+    ) as {{ object_col_name }}
+from {{ table_ref }}
+group by {{ group_by_col }}
+{% endmacro %}

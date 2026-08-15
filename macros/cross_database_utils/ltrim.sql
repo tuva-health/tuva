@@ -23,3 +23,12 @@
     ltrim('{{ trimstr }}', {{ column_name }})
 
 {%- endmacro -%}
+
+
+{#- Trino/Athena has no two-argument ltrim(string, chars); strip the leading
+    character set with regexp_replace instead. -#}
+{%- macro athena__ltrim(column_name, trimstr) -%}
+
+    regexp_replace({{ column_name }}, '^[{{ trimstr }}]+', '')
+
+{%- endmacro -%}
