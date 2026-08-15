@@ -11,7 +11,7 @@
 -- depends_on: {{ ref('core__eligibility') }}
 
 {{ config(
-     enabled = var('claims_enabled', false) | as_bool,
+     enabled = (var('claims_enabled', false) | string | lower) == 'true',
      tags = ['extension_columns'],
      severity = 'error'
    )

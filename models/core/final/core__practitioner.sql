@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', False) | as_bool)
-            or (var('clinical_enabled', False) | as_bool)
+     enabled = ((var('claims_enabled', False) | string | lower) == 'true')
+            or ((var('clinical_enabled', False) | string | lower) == 'true')
    )
 }}
 
@@ -19,7 +19,7 @@
     , data_source
 {%- endset -%}
 
-{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
+{% if (var('clinical_enabled', False) | string | lower) == 'true' and (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 {%- set tuva_extension_columns -%}
     {{ select_extension_columns(ref('normalized__practitioner')) }}
@@ -35,7 +35,7 @@ select
     {{ tuva_metadata_columns }}
 from prac
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif (var('clinical_enabled', False) | string | lower) == 'true' -%}
 
 {%- set tuva_extension_columns -%}
     {{ select_extension_columns(ref('normalized__practitioner')) }}
@@ -47,7 +47,7 @@ select
     {{ tuva_metadata_columns }}
 from {{ ref('normalized__practitioner') }}
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 {%- set tuva_extension_columns -%}
 {# No extension columns — stg_input_layer__practitioner is clinical-only #}

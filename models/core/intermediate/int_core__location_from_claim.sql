@@ -1,7 +1,6 @@
 
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = (var('claims_enabled', False) | string | lower) == 'true'
    )
 }}
 

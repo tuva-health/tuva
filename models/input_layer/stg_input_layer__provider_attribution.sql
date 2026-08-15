@@ -1,18 +1,16 @@
 {{ config(
-     enabled = (
-       var('provider_attribution_enabled', False)
-       and var('claims_enabled', False)
-     ) | as_bool
+     enabled = ((var('provider_attribution_enabled', False) | string | lower) == 'true')
+           and ((var('claims_enabled', False) | string | lower) == 'true')
    )
 }}
 
-{% if var('provider_attribution_enabled',False) == true -%}
+{% if (var('provider_attribution_enabled', False) | string | lower) == 'true' -%}
 
 select *
 from {{ ref('provider_attribution') }}
 
 
-{% elif var('provider_attribution_enabled',False) ==  false -%}
+{% elif not ((var('provider_attribution_enabled', False) | string | lower) == 'true') -%}
 
 {% if target.type == 'fabric' %}
 select top 0

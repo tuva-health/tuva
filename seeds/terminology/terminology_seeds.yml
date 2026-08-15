@@ -513,7 +513,7 @@ seeds:
       alias: restructured_betos
       tags:
         - terminology
-      enabled: "{{ var('claims_enabled', False) }}"
+      enabled: "{{ (var('claims_enabled', False) | string | lower) == 'true' }}"
       column_types:
         hcpcs_cd: *string
         rbcs_id: *string

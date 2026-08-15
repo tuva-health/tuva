@@ -1,11 +1,11 @@
 {{ config(
-     enabled = (var('claims_enabled', False) | as_bool)
-            or (var('clinical_enabled', False) | as_bool)
+     enabled = ((var('claims_enabled', False) | string | lower) == 'true')
+            or ((var('clinical_enabled', False) | string | lower) == 'true')
    )
 }}
 
 {%- set tuva_extension_columns_from_all_conditions -%}
-{% if var('clinical_enabled', False) | as_bool %}
+{% if (var('clinical_enabled', False) | string | lower) == 'true' %}
     {{ select_extension_columns(ref('normalized__condition'), alias='all_conditions') }}
 {% endif %}
 {%- endset -%}
@@ -16,17 +16,17 @@
 {%- endset -%}
 
 with all_conditions as (
-{% if var('clinical_enabled', False) == true
-    and var('claims_enabled', False) == true -%}
+{% if (var('clinical_enabled', False) | string | lower) == 'true'
+    and (var('claims_enabled', False) | string | lower) == 'true' -%}
 
     {{ smart_union([ref('int_core__condition_from_claim'), ref('normalized__condition')]) }}
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif (var('clinical_enabled', False) | string | lower) == 'true' -%}
 
     select *
     from {{ ref('normalized__condition') }}
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif (var('claims_enabled', False) | string | lower) == 'true' -%}
 
     select *
     from {{ ref('int_core__condition_from_claim') }}

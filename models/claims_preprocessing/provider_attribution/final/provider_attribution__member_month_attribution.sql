@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = (var('claims_enabled', False) | string | lower) == 'true'
    )
 }}
 
@@ -33,7 +33,7 @@ with member_months as (
   from {{ ref('normalized__provider_attribution') }}
 )
 
-{% if var('provider_attribution_enabled', False) | as_bool -%}
+{% if (var('provider_attribution_enabled', False) | string | lower) == 'true' -%}
 
 , tuva_attribution as (
   select
@@ -72,7 +72,7 @@ select
   , external_attribution.custom_attributed_provider_practice
   , external_attribution.custom_attributed_provider_organization
   , external_attribution.custom_attributed_provider_lob
-  {% if var('provider_attribution_enabled', False) | as_bool -%}
+  {% if (var('provider_attribution_enabled', False) | string | lower) == 'true' -%}
   , tuva_attribution.tuva_attributed_provider
   , tuva_attribution.tuva_attributed_provider_bucket
   , tuva_attribution.tuva_attributed_provider_specialty
@@ -105,7 +105,7 @@ left outer join external_attribution
   and mm.payer = external_attribution.payer
   and mm.{{ quote_column('plan') }} = external_attribution.{{ quote_column('plan') }}
   and mm.data_source = external_attribution.data_source
-{% if var('provider_attribution_enabled', False) | as_bool -%}
+{% if (var('provider_attribution_enabled', False) | string | lower) == 'true' -%}
 left outer join tuva_attribution
   on mm.person_id = tuva_attribution.person_id
   and mm.member_id = tuva_attribution.member_id

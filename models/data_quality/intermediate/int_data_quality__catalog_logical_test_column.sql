@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('enable_data_quality', false) | as_bool)
-       and ((var('claims_enabled', false) | as_bool) or (var('clinical_enabled', false) | as_bool))
+     enabled = ((var('enable_data_quality', false) | string | lower) == 'true')
+       and (((var('claims_enabled', false) | string | lower) == 'true') or ((var('clinical_enabled', false) | string | lower) == 'true'))
    )
 }}
 

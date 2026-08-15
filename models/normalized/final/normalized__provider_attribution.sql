@@ -1,9 +1,9 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = (var('claims_enabled', False) | string | lower) == 'true'
    )
 }}
 
-{% if var('provider_attribution_enabled', False) | as_bool -%}
+{% if (var('provider_attribution_enabled', False) | string | lower) == 'true' -%}
 
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id

@@ -1,7 +1,7 @@
 {% macro dq_enabled_input_layer_model_names() %}
     {% set model_names = [] %}
 
-    {% if var('clinical_enabled', false) | as_bool %}
+    {% if (var('clinical_enabled', false) | string | lower) == 'true' %}
         {% do model_names.extend([
             'stg_input_layer__appointment',
             'stg_input_layer__condition',
@@ -17,7 +17,7 @@
         ]) %}
     {% endif %}
 
-    {% if var('claims_enabled', false) | as_bool %}
+    {% if (var('claims_enabled', false) | string | lower) == 'true' %}
         {% do model_names.extend([
             'stg_input_layer__eligibility',
             'stg_input_layer__medical_claim',
@@ -25,7 +25,7 @@
         ]) %}
     {% endif %}
 
-    {% if (var('provider_attribution_enabled', false) and var('claims_enabled', false)) | as_bool %}
+    {% if ((var('provider_attribution_enabled', false) | string | lower) == 'true') and ((var('claims_enabled', false) | string | lower) == 'true') %}
         {% do model_names.append('stg_input_layer__provider_attribution') %}
     {% endif %}
 

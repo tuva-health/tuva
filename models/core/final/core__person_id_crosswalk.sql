@@ -1,10 +1,10 @@
 {{ config(
-     enabled = var('claims_enabled', var('clinical_enabled', False))
- | as_bool
+     enabled = ((var('claims_enabled', False) | string | lower) == 'true')
+            or ((var('clinical_enabled', False) | string | lower) == 'true')
    )
 }}
 
-{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
+{% if (var('clinical_enabled', False) | string | lower) == 'true' and (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -26,7 +26,7 @@ select distinct
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from {{ ref('normalized__patient') }}
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif (var('clinical_enabled', False) | string | lower) == 'true' -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -38,7 +38,7 @@ select distinct
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from {{ ref('normalized__patient') }}
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id

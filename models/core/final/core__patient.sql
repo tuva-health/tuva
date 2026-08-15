@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', False) | as_bool)
-            or (var('clinical_enabled', False) | as_bool)
+     enabled = ((var('claims_enabled', False) | string | lower) == 'true')
+            or ((var('clinical_enabled', False) | string | lower) == 'true')
    )
 }}
 
@@ -54,8 +54,8 @@ cast(
     , data_source
 {%- endset -%}
 
-{% if var('clinical_enabled', False) == true
-   and var('claims_enabled', False) == true -%}
+{% if (var('clinical_enabled', False) | string | lower) == 'true'
+   and (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 {%- if execute -%}
     {%- set passthrough_config = var('passthrough', {}) -%}
@@ -288,7 +288,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif (var('clinical_enabled', False) | string | lower) == 'true' -%}
 
 {%- set source_extension_columns -%}
     {{ select_extension_columns(ref('int_core__patient_deduplicated'), alias='patient_source', strip_prefix=false) }}
@@ -337,7 +337,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif (var('claims_enabled', False) | string | lower) == 'true' -%}
 
 {%- set source_extension_columns -%}
     {{ select_extension_columns(ref('int_normalized__eligibility_deduplicated'), alias='patient_source', strip_prefix=false) }}

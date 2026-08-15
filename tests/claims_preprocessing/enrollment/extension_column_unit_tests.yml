@@ -29,7 +29,7 @@ unit_tests:
       row per member-month.
     model: enrollment__member_month
     config:
-      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
     overrides:
       vars:
         _extension_columns_override: ['x_temp_person_id', 'x_temp_first_name']

@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', false)
- | as_bool
+     enabled = (var('clinical_enabled', false) | string | lower) == 'true'
    )
 }}
 

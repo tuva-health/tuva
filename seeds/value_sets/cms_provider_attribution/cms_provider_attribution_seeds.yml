@@ -49,7 +49,7 @@ seeds:
       tags:
         - value_sets
         - cms_provider_attribution
-      enabled: "{{ var('provider_attribution_enabled', False) }}"
+      enabled: "{{ (var('provider_attribution_enabled', False) | string | lower) == 'true' }}"
       column_types:
         performance_year: *string
         service_year: *string
@@ -79,7 +79,7 @@ seeds:
       tags:
         - value_sets
         - cms_provider_attribution
-      enabled: "{{ var('provider_attribution_enabled', False) }}"
+      enabled: "{{ (var('provider_attribution_enabled', False) | string | lower) == 'true' }}"
       column_types:
         hcpcs_code: *string
         description: *text
@@ -106,7 +106,7 @@ seeds:
       tags:
         - value_sets
         - cms_provider_attribution
-      enabled: "{{ var('provider_attribution_enabled', False) }}"
+      enabled: "{{ (var('provider_attribution_enabled', False) | string | lower) == 'true' }}"
       column_types:
         specialty_code: *string
         description: *text
