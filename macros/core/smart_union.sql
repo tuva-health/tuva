@@ -29,9 +29,14 @@
     {{ return('') }}
 {%- endif -%}
 
+{#- Introspect each relation once and reuse the result below. Every
+    get_columns_in_relation call is a metadata round-trip to the warehouse, and
+    the second pass needs exactly the same column lists. -#}
+{%- set columns_by_relation = [] -%}
 {%- set all_columns = {} -%}
 {%- for relation in relations -%}
     {%- set cols = adapter.get_columns_in_relation(relation) -%}
+    {%- do columns_by_relation.append(cols) -%}
     {%- for col in cols -%}
         {%- if col.name.lower() not in all_columns -%}
             {%- do all_columns.update({col.name.lower(): col}) -%}
@@ -56,7 +61,7 @@
 {%- set sorted_columns = core_cols + ext_cols -%}
 
 {%- for relation in relations -%}
-    {%- set relation_cols = adapter.get_columns_in_relation(relation) | map(attribute='name') | map('lower') | list -%}
+    {%- set relation_cols = columns_by_relation[loop.index0] | map(attribute='name') | map('lower') | list -%}
 
     select
     {%- if source_index %}
