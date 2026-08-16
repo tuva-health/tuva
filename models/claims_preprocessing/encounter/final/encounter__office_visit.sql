@@ -38,7 +38,7 @@ group by encounter_id
   , diagnosis_code_1
   , diagnosis_code_type
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, diagnosis_code_1) as paid_order
   , sum(paid_amount) as paid_amount
   from {{ ref('int_encounter__office_visit_detail') }}
   where diagnosis_code_1 is not null
@@ -51,7 +51,7 @@ order by sum(paid_amount) desc) as paid_order
   select encounter_id
   , facility_npi
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, facility_npi) as paid_order
   , sum(paid_amount) as paid_amount
   from {{ ref('int_encounter__office_visit_detail') }}
   where facility_npi is not null
@@ -64,7 +64,7 @@ order by sum(paid_amount) desc) as paid_order
   select encounter_id
   , billing_npi
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, billing_npi) as paid_order
   , sum(paid_amount) as paid_amount
   from {{ ref('int_encounter__office_visit_detail') }}
   where billing_npi is not null
@@ -79,7 +79,7 @@ order by sum(paid_amount) desc) as paid_order
   , ccs_category
   , ccs_category_description
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, hcpcs_code) as paid_order
   , sum(paid_amount) as paid_amount
   from {{ ref('int_encounter__office_visit_detail') }}
   where hcpcs_code is not null

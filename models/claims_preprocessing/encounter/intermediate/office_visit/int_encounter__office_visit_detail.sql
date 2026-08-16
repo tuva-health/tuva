@@ -74,7 +74,7 @@ select distinct old_encounter_id
     , cli.encounter_group
     , d.encounter_start_date
     , row_number() over (partition by cli.encounter_id
-order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
+order by stg.claim_type, stg.start_date, stg.claim_id, stg.claim_line_number) as encounter_row_number --institutional then professional
     from {{ ref('int_encounter__claim_line') }} as stg
     inner join {{ ref('int_encounter__combined_claim_line_crosswalk') }} as cli on stg.claim_id = cli.claim_id
     and

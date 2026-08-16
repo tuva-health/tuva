@@ -31,9 +31,9 @@ with detail_values as (
 , first_last_inst_inst_values as (
 select *
 , row_number() over (partition by encounter_id
-order by start_date, claim_id) as first_num
+order by start_date, claim_id, claim_line_number) as first_num
 , row_number() over (partition by encounter_id
-order by end_date desc, claim_id) as last_num
+order by end_date desc, claim_id, claim_line_number) as last_num
 from detail_values
 where claim_type = 'institutional'
 )

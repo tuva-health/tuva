@@ -113,8 +113,11 @@ with service_category_1_mapping as (
         , original_service_cat_2
         , original_service_cat_3
         , source_model_name
+        {#- Two service category models can claim the same line at the same priority,
+            differing only in source_model_name. Order on it so the numbering is the
+            same every build. -#}
         , row_number() over (partition by claim_id, claim_line_number
-order by coalesce(priority, 99999)) as duplicate_row_number
+order by coalesce(priority, 99999), source_model_name) as duplicate_row_number
     from service_category_1_mapping
 )
 

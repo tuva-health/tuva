@@ -331,5 +331,9 @@ select
 , priority_number
 , anchor_claim_id
 , row_number() over (partition by claim_id, claim_line_number
-order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end) as claim_line_attribution_number
+order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end, encounter_type, encounter_id
+  /* A claim line can appear twice for one encounter, identical except that one row
+     carries an anchor_claim_id and the other does not. Prefer the row that names an
+     anchor, then order on it, so attribution_number 1 is the same row every build. */
+, case when anchor_claim_id is null then 1 else 0 end, anchor_claim_id) as claim_line_attribution_number
 from cte

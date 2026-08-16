@@ -14,7 +14,7 @@ with detail_values as (
     , ed.encounter_start_date
     , ed.encounter_end_date
     , row_number() over (partition by cli.encounter_id
-order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
+order by stg.claim_type, stg.start_date, stg.claim_id, stg.claim_line_number) as encounter_row_number --institutional then professional
     from {{ ref('int_encounter__claim_line') }} as stg
     inner join {{ ref('int_encounter__combined_claim_line_crosswalk') }} as cli on stg.claim_id = cli.claim_id
     and
@@ -59,7 +59,7 @@ group by encounter_id
   , diagnosis_code_1
   , diagnosis_code_type
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, diagnosis_code_1) as paid_order
   , sum(paid_amount) as paid_amount
   from detail_values
   where diagnosis_code_1 is not null
@@ -72,7 +72,7 @@ order by sum(paid_amount) desc) as paid_order
   select encounter_id
   , facility_npi
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, facility_npi) as paid_order
   , sum(paid_amount) as paid_amount
   from detail_values
   where facility_npi is not null
@@ -85,7 +85,7 @@ order by sum(paid_amount) desc) as paid_order
   select encounter_id
   , hcpcs_code
   , row_number() over (partition by encounter_id
-order by sum(paid_amount) desc) as paid_order
+order by sum(paid_amount) desc, hcpcs_code) as paid_order
   , sum(paid_amount) as paid_amount
   from detail_values
   where hcpcs_code is not null
