@@ -1004,12 +1004,38 @@ models:
       <<: *normalized_output_config
 
   - name: normalized__patient_data_source_id
+    description: >
+      One row per person per data source, carrying the surrogate key that
+      claims_preprocessing uses to group a patient's claims. Both union branches
+      select distinct, so the (person_id, data_source) pair is unique by
+      construction and the key hashed from it is unique in turn. These are
+      properties of this model's own SQL, not assertions about source data.
     config:
       schema: *schema
       materialized: table
       tags:
         - claims_preprocessing
         - encounters
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - person_id
+              - data_source
+    columns:
+      - name: patient_data_source_id
+        description: Surrogate key identifying one person within one data source.
+        data_tests:
+          - unique
+          - not_null
+      - name: person_id
+        description: Unique identifier for each person in the dataset.
+        data_tests:
+          - not_null
+      - name: data_source
+        description: Indicates the source of the data.
+        data_tests:
+          - not_null
 
   - name: normalized__pharmacy_claim
     description: |
