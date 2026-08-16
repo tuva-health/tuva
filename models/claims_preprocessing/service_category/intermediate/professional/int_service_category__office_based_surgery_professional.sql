@@ -7,11 +7,9 @@
 with numeric_hcpcs as (
     select *
     from {{ ref('stg_service_category__medical_claim') }} as med
-    {% if target.type in ('duckdb', 'databricks') %}
-        where try_cast('hcpcs_code' as integer) is not null
-    {% else %}
-        where {{ safe_cast('hcpcs_code', 'int') }} is not null
-    {% endif %}
+    {# Not plain safe_cast -- dbt's default is a hard cast and errors on an
+       alphanumeric code. #}
+    where {{ try_to_cast_int('med.hcpcs_code') }} is not null
 )
 select distinct
     med.claim_id
