@@ -49,6 +49,8 @@ select distinct encounter_id
 , encounter_end_date
 , claim_id
 , claim_line_number
+{#- Attribute an ambiguous claim line to the encounter that started first.
+    Ordering on encounter_id alone picked an arbitrary winner. -#}
 , row_number() over (partition by claim_id, claim_line_number
-order by encounter_id) as claim_attribution_number
+order by encounter_start_date, encounter_end_date, encounter_id) as claim_attribution_number
 from inst_and_prof

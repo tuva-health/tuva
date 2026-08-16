@@ -33,9 +33,11 @@ select
     , dat.encounter_end_date
     , med.claim_id
     , med.claim_line_number
+    {#- Attribute an ambiguous claim line to the encounter that started first.
+        Ordering on encounter_id alone picked an arbitrary winner. -#}
     , row_number() over (
         partition by med.claim_id, med.claim_line_number, med.data_source
-        order by dat.encounter_id
+        order by dat.encounter_start_date, dat.encounter_end_date, dat.encounter_id
       ) as claim_attribution_number
 from {{ ref('int_encounter__claim_line') }} as med
 inner join {{ ref('int_encounter__professional_and_lower_priority') }} as plp
