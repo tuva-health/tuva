@@ -12,11 +12,7 @@ with member_months as (
     , payer
     , {{ quote_column('plan') }}
     , data_source
-    {% if target.type == 'athena' %}
-    , cast(substr(year_month, 1, 4) as {{ dbt.type_int() }}) as performance_year
-    {% else %}
-    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as performance_year
-    {% endif %}
+    , cast({{ left_chars('year_month', 4) }} as {{ dbt.type_int() }}) as performance_year
   from {{ ref('enrollment__member_month') }}
 )
 

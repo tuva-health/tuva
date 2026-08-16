@@ -8,11 +8,7 @@ select distinct person_id
 , data_source
 from {{ ref('normalized__medical_claim') }}
 
-{% if target.type == 'fabric' %}
-union
-{% else %}
-union distinct
-{% endif %}
+{{ union_distinct() }}
 
 select distinct person_id
 , data_source

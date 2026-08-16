@@ -13,9 +13,5 @@ select
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('stg_normalized__medical_claim') }} as med
 left outer join {{ ref('terminology__place_of_service') }} as pos
-    {% if target.type == 'fabric' %}
-        on RIGHT(REPLICATE('0', 2) + med.place_of_service_code, 2) = pos.place_of_service_code
-    {% else %}
-        on lpad(med.place_of_service_code, 2, '0') = pos.place_of_service_code
-    {% endif %}
+    on {{ zero_pad('med.place_of_service_code', 2) }} = pos.place_of_service_code
 where claim_type = 'professional'

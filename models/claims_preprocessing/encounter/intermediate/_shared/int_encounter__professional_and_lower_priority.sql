@@ -14,11 +14,7 @@ select
 , data_source
 from {{ ref('int_encounter__professional_service_type') }} as a
 
-{% if target.type == 'fabric' %}
-union
-{% else %}
-union distinct
-{% endif %}
+{{ union_distinct() }}
 
 select
   scg.claim_id

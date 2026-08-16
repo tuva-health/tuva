@@ -15,11 +15,7 @@ from {{ ref('stg_service_category__medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('21')
 
-{% if target.type == 'fabric' %}
-union
-{% else %}
-union distinct
-{% endif %}
+{{ union_distinct() }}
 
 select distinct
   claim_id
