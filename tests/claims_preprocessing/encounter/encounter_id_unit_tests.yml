@@ -1,0 +1,110 @@
+version: 2
+
+# Unit tests for encounter id generation.
+#
+# Encounter ids are hashes of each row's own natural key, not dense_rank
+# positions in a global ordering. Two properties follow, and both are pinned
+# below because a build alone demonstrates neither:
+#
+#   grouping   rows sharing a natural key share an id. dense_rank grouped by
+#              its ordering tuple, so the conversion had to preserve exactly
+#              that. A future change that folded claim_id into the key would
+#              silently split one encounter into several.
+#
+#   stability  a row's id depends only on its own key. Under dense_rank an id
+#              was a position, so inserting a row that sorted earlier shifted
+#              every later id. That is what let two upstream models, each
+#              ranking from 1, hand the same id to unrelated encounters.
+#
+# int_encounter__lab_generate_id is the simplest model of this shape; the same
+# generate_surrogate_key call appears in every other *_generate_id model.
+#
+unit_tests:
+
+  - name: test_lab_encounter_id_groups_claims_sharing_a_natural_key
+    description: >
+      Two claim lines for the same patient on the same day are one encounter,
+      so both rows must carry the same id even though their claim_ids differ.
+    model: int_encounter__lab_generate_id
+    config:
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
+    given:
+      - input: ref('int_encounter__claim_line')
+        format: sql
+        rows: |
+          select 'P1' as patient_data_source_id, cast('2020-01-01' as date) as start_date, 'claim_a' as claim_id
+          union all
+          select 'P1' as patient_data_source_id, cast('2020-01-01' as date) as start_date, 'claim_b' as claim_id
+      - input: ref('int_encounter__lab_anchor_event')
+        format: sql
+        rows: |
+          select 'claim_a' as claim_id
+          union all
+          select 'claim_b' as claim_id
+    expect:
+      rows:
+        - patient_data_source_id: 'P1'
+          start_date: '2020-01-01'
+          claim_id: 'claim_a'
+          old_encounter_id: 'c8d5bd9eb88af6998c244c56b174c8f1'
+        - patient_data_source_id: 'P1'
+          start_date: '2020-01-01'
+          claim_id: 'claim_b'
+          old_encounter_id: 'c8d5bd9eb88af6998c244c56b174c8f1'
+
+  - name: test_lab_encounter_id_does_not_depend_on_other_rows
+    description: >
+      P2 keeps the same id whether or not an earlier-sorting patient is present.
+      Under dense_rank P2 was position 1 alone and position 2 alongside P1, so
+      this is the property the hash conversion bought.
+    model: int_encounter__lab_generate_id
+    config:
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
+    given:
+      - input: ref('int_encounter__claim_line')
+        format: sql
+        rows: |
+          select 'P1' as patient_data_source_id, cast('2020-01-01' as date) as start_date, 'claim_a' as claim_id
+          union all
+          select 'P2' as patient_data_source_id, cast('2020-01-02' as date) as start_date, 'claim_b' as claim_id
+      - input: ref('int_encounter__lab_anchor_event')
+        format: sql
+        rows: |
+          select 'claim_a' as claim_id
+          union all
+          select 'claim_b' as claim_id
+    expect:
+      rows:
+        - patient_data_source_id: 'P1'
+          start_date: '2020-01-01'
+          claim_id: 'claim_a'
+          old_encounter_id: 'c8d5bd9eb88af6998c244c56b174c8f1'
+        - patient_data_source_id: 'P2'
+          start_date: '2020-01-02'
+          claim_id: 'claim_b'
+          old_encounter_id: 'ce03fdb0d5da3f6b8e21c5d73853724e'
+
+  - name: test_lab_encounter_id_is_the_same_for_p2_alone
+    description: >
+      The other half of the stability pair. P2 is the only row here and must
+      still receive ce03fdb0..., the id it gets in the test above where P1
+      sorts ahead of it. Under dense_rank P2 would be 1 here and 2 there.
+      Neither test alone proves stability; together they do.
+    model: int_encounter__lab_generate_id
+    config:
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
+    given:
+      - input: ref('int_encounter__claim_line')
+        format: sql
+        rows: |
+          select 'P2' as patient_data_source_id, cast('2020-01-02' as date) as start_date, 'claim_b' as claim_id
+      - input: ref('int_encounter__lab_anchor_event')
+        format: sql
+        rows: |
+          select 'claim_b' as claim_id
+    expect:
+      rows:
+        - patient_data_source_id: 'P2'
+          start_date: '2020-01-02'
+          claim_id: 'claim_b'
+          old_encounter_id: 'ce03fdb0d5da3f6b8e21c5d73853724e'
