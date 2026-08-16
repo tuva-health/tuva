@@ -38,8 +38,10 @@ with base as (
       provider_id
     , prov_specialty
     , provider_bucket
+    {# prov_specialty keeps the rank deterministic when a provider has two
+       rows in the same bucket. #}
     , row_number() over (partition by provider_id
-order by bucket_priority) as bucket_rank
+order by bucket_priority, prov_specialty) as bucket_rank
   from (
     select
         mapped.*
