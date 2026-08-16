@@ -22,10 +22,8 @@ from {{ ref('normalized__eligibility') }}
 select
 person_id
 , data_source
-/* Rank on the columns themselves rather than on a concatenation of them.
-   concat() with no separator loses the boundary between the two values, so
-   ('A','BC') and ('AB','C') both produce the key 'ABC' and dense_rank hands
-   two different patients the same patient_data_source_id. */
-, dense_rank() over (
-order by person_id, data_source) as patient_data_source_id
+/* Hash the key columns rather than ranking them. dbt_utils delimits each value,
+   so the two cannot run together into a colliding key. Dropping dense_rank also
+   removes a global sort over every person in the warehouse. */
+, {{ dbt_utils.generate_surrogate_key(['person_id', 'data_source']) }} as patient_data_source_id
 from multiple_sources
