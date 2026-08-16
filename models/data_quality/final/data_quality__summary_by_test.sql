@@ -3,7 +3,42 @@
    )
 }}
 
-with logical_component_tests as (
+{%- set domains_enabled = ((var('claims_enabled', false) | string | lower) == 'true')
+                       or ((var('clinical_enabled', false) | string | lower) == 'true') -%}
+
+{#- Logical tests read claims and clinical data, so their models switch off when
+    both domains are. Structural tests do not. Drop the logical half in that case
+    and report structural results alone, rather than failing to parse. -#}
+
+with structural_component_tests as (
+
+    select distinct
+          requirements.domain_group_key
+        , requirements.component_key
+        , structural_results.data_source
+        , structural_results.input_table_name
+        , structural_results.test_name
+        , structural_results.display_name
+        , structural_results.description
+        , structural_results.grain
+        , structural_results.test_type
+        , structural_results.check_category
+        , structural_results.severity
+        , structural_results.total_row_count
+        , structural_results.tested_count
+        , structural_results.failed_count
+        , structural_results.passed_count
+        , structural_results.not_applicable_count
+        , 'structural' as test_source
+    from {{ ref('data_quality__catalog_domain_requirement') }} as requirements
+    inner join {{ ref('data_quality__structural_test_result') }} as structural_results
+        on requirements.input_table_name = structural_results.input_table_name
+    where requirements.requirement_level = 'required'
+
+)
+
+{% if domains_enabled %}
+, logical_component_tests as (
 
     select distinct
           requirements.domain_group_key
@@ -39,41 +74,17 @@ with logical_component_tests as (
       )
 
 )
-
-, structural_component_tests as (
-
-    select distinct
-          requirements.domain_group_key
-        , requirements.component_key
-        , structural_results.data_source
-        , structural_results.input_table_name
-        , structural_results.test_name
-        , structural_results.display_name
-        , structural_results.description
-        , structural_results.grain
-        , structural_results.test_type
-        , structural_results.check_category
-        , structural_results.severity
-        , structural_results.total_row_count
-        , structural_results.tested_count
-        , structural_results.failed_count
-        , structural_results.passed_count
-        , structural_results.not_applicable_count
-        , 'structural' as test_source
-    from {{ ref('data_quality__catalog_domain_requirement') }} as requirements
-    inner join {{ ref('data_quality__structural_test_result') }} as structural_results
-        on requirements.input_table_name = structural_results.input_table_name
-    where requirements.requirement_level = 'required'
-
-)
+{% endif %}
 
 , unioned as (
 
-    select * from logical_component_tests
+    select * from structural_component_tests
 
+{% if domains_enabled %}
     union all
 
-    select * from structural_component_tests
+    select * from logical_component_tests
+{% endif %}
 
 )
 
