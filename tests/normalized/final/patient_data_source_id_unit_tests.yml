@@ -1,0 +1,66 @@
+version: 2
+
+# Unit tests for the patient surrogate key.
+#
+# These exercise the one thing the integration dataset cannot: more than one
+# data_source. Both the small and large synthetic payloads carry a single
+# source, so every real build has exactly one data_source value and the
+# collision path below never executes against warehouse data.
+#
+# The original key was dense_rank() over (order by concat(person_id,
+# data_source)). concat with no separator loses the boundary between the two
+# values, so ('A','BC') and ('AB','C') both produce 'ABC' and two different
+# patients were handed the same patient_data_source_id. dbt_utils delimits the
+# values before hashing, which is what makes the collision impossible rather
+# than merely unlikely.
+#
+unit_tests:
+
+  - name: test_patient_data_source_id_distinguishes_colliding_pairs
+    description: >
+      Two person/data_source pairs that concatenate to the same string must
+      still receive different keys. Fails against the pre-428c8de6 concat
+      implementation, which gave both rows one id.
+    model: normalized__patient_data_source_id
+    config:
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          select 'A' as person_id, 'BC' as data_source
+          union all
+          select 'AB' as person_id, 'C' as data_source
+      - input: ref('normalized__eligibility')
+        rows: []
+    expect:
+      rows:
+        - person_id: 'A'
+          data_source: 'BC'
+          patient_data_source_id: 'f2be1a3bccfad1ef0e46a09b5cf3f840'
+        - person_id: 'AB'
+          data_source: 'C'
+          patient_data_source_id: 'd147153cad50fb6a3e288edc8a83f795'
+
+  - name: test_patient_data_source_id_dedupes_across_sources
+    description: >
+      The same person/data_source pair arriving from both medical_claim and
+      eligibility must yield exactly one row and one key, since the union is
+      what guarantees the grain the unique test asserts.
+    model: normalized__patient_data_source_id
+    config:
+      enabled: "{{ (var('claims_enabled', false) | string | lower) == 'true' }}"
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          select '10' as person_id, 'test' as data_source
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          select '10' as person_id, 'test' as data_source
+    expect:
+      rows:
+        - person_id: '10'
+          data_source: 'test'
+          patient_data_source_id: '3e22ee71fd3b9444edf381f24f5e5a65'
