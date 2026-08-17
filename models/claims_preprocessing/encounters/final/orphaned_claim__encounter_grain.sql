@@ -12,6 +12,7 @@ with encounter_date as (
     inner join {{ ref('encounters__orphaned_claims') }} as cli
       on stg.claim_id = cli.claim_id
       and stg.claim_line_number = cli.claim_line_number
+      and stg.data_source = cli.data_source
     group by
         cli.encounter_id
 )

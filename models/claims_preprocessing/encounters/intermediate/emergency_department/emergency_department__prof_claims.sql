@@ -23,6 +23,7 @@ with first_claim as (
 select dat.encounter_id
 , dat.encounter_start_date
 , dat.encounter_end_date
+, dat.original_anchor_claim
 , prof.claim_id
 , prof.claim_line_number
 , prof.data_source
@@ -37,6 +38,7 @@ union all
 select dat.encounter_id
 , dat.encounter_start_date
 , dat.encounter_end_date
+, dat.original_anchor_claim
 , med.claim_id
 , med.claim_line_number
 , med.data_source
@@ -55,5 +57,5 @@ select distinct encounter_id
 , claim_line_number
 , data_source
 , row_number() over (partition by claim_id, claim_line_number, data_source
-order by encounter_id) as claim_attribution_number
+order by original_anchor_claim, encounter_id) as claim_attribution_number
 from inst_and_prof

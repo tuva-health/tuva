@@ -65,6 +65,7 @@ with ccs_release_year as (
     and m.data_source = claim_dx.data_source
   inner join {{ ref('service_category__service_category_grouper') }} as g on m.claim_id = g.claim_id
     and m.claim_line_number = g.claim_line_number
+    and m.data_source = g.data_source
     and g.duplicate_row_number = 1
   inner join {{ ref('encounters__patient_data_source_id') }} as d on m.person_id = d.person_id
     and m.data_source = d.data_source

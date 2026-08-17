@@ -93,13 +93,15 @@ order by end_date, start_date, claim_id) as row_num
 
 , claim_ids_that_merge_with_larger_row_num as (
   select distinct
-      claim_id_a as claim_id
+      patient_data_source_id
+    , claim_id_a as claim_id
   from merges_with_larger_row_num
 )
 
 , claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as (
   select distinct
-      aa.claim_id as claim_id
+      aa.patient_data_source_id
+    , aa.claim_id as claim_id
   from add_row_num as aa
   inner join merges_with_larger_row_num as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
@@ -123,9 +125,11 @@ order by end_date, start_date, claim_id) as row_num
       end as close_flag
   from add_row_num as aa
   left outer join claim_ids_that_merge_with_larger_row_num as bb
-    on aa.claim_id = bb.claim_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
+    and aa.claim_id = bb.claim_id
   left outer join claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as cc
-    on aa.claim_id = cc.claim_id
+    on aa.patient_data_source_id = cc.patient_data_source_id
+    and aa.claim_id = cc.claim_id
 )
 
 , join_every_row_to_later_closes as (
@@ -194,9 +198,9 @@ select
   , end_date
   , discharge_disposition_code
   , facility_npi
-  , row_number() over (partition by encounter_id
+  , row_number() over (partition by patient_data_source_id, encounter_id
 order by start_date, end_date, claim_id) as encounter_claim_number
-  , row_number() over (partition by encounter_id
+  , row_number() over (partition by patient_data_source_id, encounter_id
 order by start_date desc, end_date desc, claim_id desc) as encounter_claim_number_desc
   , close_flag
   , min_closing_row
