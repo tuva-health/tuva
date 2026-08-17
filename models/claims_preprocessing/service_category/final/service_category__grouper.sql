@@ -2,6 +2,7 @@
      enabled = (var('claims_enabled', False) | string | lower) == 'true'
    )
 }}
+{{ tuva_cluster_by(['claim_id', 'claim_line_number']) }}
 
 with service_category_1_mapping as (
     select distinct

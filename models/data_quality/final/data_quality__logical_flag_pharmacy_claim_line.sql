@@ -2,6 +2,7 @@
      enabled = ((var('enable_data_quality', false) | string | lower) == 'true') and ((var('claims_enabled', false) | string | lower) == 'true')
    )
 }}
+{{ tuva_cluster_by(['claim_id', 'claim_line_number']) }}
 
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
@@ -18,6 +19,9 @@ final as (
         , source_rows.claim_line_number
         , source_rows.data_source
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null") }} as person_id_null
+        , {{ dq_logical_int_flag_sql("source_rows.claim_id is not null and trim(cast(source_rows.claim_id as " ~ string_type ~ ")) = ''") }} as claim_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.person_id is not null and trim(cast(source_rows.person_id as " ~ string_type ~ ")) = ''") }} as person_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.data_source is not null and trim(cast(source_rows.data_source as " ~ string_type ~ ")) = ''") }} as data_source_blank
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is null") }} as dispensing_date_null
         , {{ dq_logical_int_flag_sql("source_rows.paid_date is null") }} as paid_date_null
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is not null and (source_rows.dispensing_date < " ~ min_recent_claim_date_sql ~ " or source_rows.dispensing_date > " ~ current_date_sql ~ ")") }} as dispensing_date_out_of_reasonable_range

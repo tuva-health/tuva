@@ -2,6 +2,7 @@
      enabled = (var('claims_enabled', False) | string | lower) == 'true'
    )
 }}
+{{ tuva_cluster_by(['claim_id', 'claim_line_number']) }}
 
 select
       cast(pharmacy_claim_id as {{ dbt.type_string() }}) as medication_id

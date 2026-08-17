@@ -2,6 +2,7 @@
      enabled = ((var('enable_data_quality', false) | string | lower) == 'true') and ((var('claims_enabled', false) | string | lower) == 'true')
    )
 }}
+{{ tuva_cluster_by(['claim_id', 'claim_line_number']) }}
 
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
@@ -162,6 +163,9 @@ final as (
         , source_rows.claim_line_number
         , source_rows.data_source
         , {{ dq_logical_int_flag_sql("source_rows.claim_type is null") }} as claim_type_null
+        , {{ dq_logical_int_flag_sql("source_rows.claim_id is not null and trim(cast(source_rows.claim_id as " ~ string_type ~ ")) = ''") }} as claim_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.person_id is not null and trim(cast(source_rows.person_id as " ~ string_type ~ ")) = ''") }} as person_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.data_source is not null and trim(cast(source_rows.data_source as " ~ string_type ~ ")) = ''") }} as data_source_blank
         , {{ dq_logical_int_flag_sql("source_rows.claim_type is not null and claim_type_lookup.claim_type is null") }} as claim_type_invalid
         , {{ dq_logical_int_flag_sql(professional_claim_where_sql ~ " and " ~ medical_claim_institutional_indicator_where_sql) }} as institutional_indicators_present_for_professional_claim
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null") }} as person_id_null

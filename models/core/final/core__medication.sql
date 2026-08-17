@@ -3,6 +3,7 @@
             or ((var('clinical_enabled', False) | string | lower) == 'true')
    )
 }}
+{{ tuva_cluster_by(['claim_id', 'claim_line_number']) }}
 
 {%- set tuva_extension_columns_from_all_medications -%}
 {% if (var('clinical_enabled', False) | string | lower) == 'true' %}
