@@ -5,10 +5,10 @@
 
 
 select
-      claim_id
+      {{ blank_to_null('claim_id') }}
     , claim_line_number
-    , person_id
-    , member_id
+    , {{ blank_to_null('person_id') }}
+    , {{ blank_to_null('member_id') }}
     , payer
     , {{ quote_column('plan') }}
     , prescribing_provider_npi
@@ -26,7 +26,7 @@ select
     , copayment_amount
     , deductible_amount
     , in_network_flag
-    , data_source
+    , {{ blank_to_null('data_source') }}
     , file_name
     , file_date
     , ingest_datetime

@@ -20,6 +20,9 @@ final as (
         , source_rows.enrollment_end_date
         , source_rows.data_source
         , {{ dq_logical_int_flag_sql("source_rows.sex is null") }} as sex_null
+        , {{ dq_logical_int_flag_sql("source_rows.person_id is not null and trim(cast(source_rows.person_id as " ~ string_type ~ ")) = ''") }} as person_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.member_id is not null and trim(cast(source_rows.member_id as " ~ string_type ~ ")) = ''") }} as member_id_blank
+        , {{ dq_logical_int_flag_sql("source_rows.data_source is not null and trim(cast(source_rows.data_source as " ~ string_type ~ ")) = ''") }} as data_source_blank
         , {{ dq_logical_int_flag_sql("source_rows.sex is not null and lower(cast(source_rows.sex as " ~ string_type ~ ")) not in ('male', 'female', 'unknown')") }} as sex_invalid
         , {{ dq_logical_int_flag_sql("source_rows.race is null") }} as race_null
         , {{ dq_logical_int_flag_sql("source_rows.race is not null and race_lookup.description is null") }} as race_invalid

@@ -1,0 +1,34 @@
+unit_tests:
+
+  # A blank claim_id is a real join key -- '' = '' is true -- so two claim lines
+  # carrying one would match each other and duplicate downstream. This asserts
+  # the blank is turned into NULL, which never matches.
+  - name: stg_normalized_medical_claim_blank_keys_become_null
+    model: stg_normalized__medical_claim
+    config:
+      enabled: "{{ (var('claims_enabled', False) | string | lower) == 'true' }}"
+    given:
+      - input: ref('stg_input_layer__medical_claim')
+        rows:
+          - {claim_id: 'C1', claim_line_number: 1, person_id: 'P1', member_id: 'M1', data_source: 'S1'}
+          - {claim_id: '',   claim_line_number: 1, person_id: '',   member_id: '',   data_source: 'S1'}
+          - {claim_id: '   ', claim_line_number: 1, person_id: 'P3', member_id: 'M3', data_source: 'S1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', person_id: 'P1', member_id: 'M1', data_source: 'S1'}
+        - {claim_id: null, person_id: null, member_id: null, data_source: 'S1'}
+        - {claim_id: null, person_id: 'P3', member_id: 'M3', data_source: 'S1'}
+
+  - name: stg_normalized_pharmacy_claim_blank_keys_become_null
+    model: stg_normalized__pharmacy_claim
+    config:
+      enabled: "{{ (var('claims_enabled', False) | string | lower) == 'true' }}"
+    given:
+      - input: ref('stg_input_layer__pharmacy_claim')
+        rows:
+          - {claim_id: 'C1', person_id: 'P1', member_id: 'M1', data_source: 'S1'}
+          - {claim_id: '',   person_id: '',   member_id: '',   data_source: 'S1'}
+    expect:
+      rows:
+        - {claim_id: 'C1', person_id: 'P1', member_id: 'M1', data_source: 'S1'}
+        - {claim_id: null, person_id: null, member_id: null, data_source: 'S1'}

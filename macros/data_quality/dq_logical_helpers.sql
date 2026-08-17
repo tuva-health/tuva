@@ -490,7 +490,8 @@
         '_present_for_'
     ] %}
     {% set missing_test_patterns = [
-        '_null'
+        '_null',
+        '_blank'
     ] %}
     {% set temporal_test_patterns = [
         '_out_of_range',
@@ -545,6 +546,10 @@
         3 = secondary dimensional or enrichment impact
     #}
     {% set severity_1_patterns = [
+        'claim_id_blank',
+        'person_id_blank',
+        'member_id_blank',
+        'data_source_blank',
         'person_id_null',
         'patient_id_null',
         'person_id_not_in_patient',

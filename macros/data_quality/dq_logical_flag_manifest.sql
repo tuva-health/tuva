@@ -49,6 +49,9 @@
             'key_columns': ['person_id', 'member_id', 'enrollment_start_date', 'enrollment_end_date', 'data_source'],
             'test_names': [
                 'eligibility__sex_null',
+                'eligibility__person_id_blank',
+                'eligibility__member_id_blank',
+                'eligibility__data_source_blank',
                 'eligibility__sex_invalid',
                 'eligibility__race_null',
                 'eligibility__race_invalid',
@@ -87,6 +90,9 @@
             'key_columns': ['claim_id', 'claim_line_number', 'data_source'],
             'test_names': [
                 'medical_claim__claim_type_null',
+                'medical_claim__claim_id_blank',
+                'medical_claim__person_id_blank',
+                'medical_claim__data_source_blank',
                 'medical_claim__claim_type_invalid',
                 'medical_claim__institutional_indicators_present_for_professional_claim',
                 'medical_claim__person_id_null',
@@ -171,6 +177,9 @@
             'key_columns': ['claim_id', 'claim_line_number', 'data_source'],
             'test_names': [
                 'pharmacy_claim__person_id_null',
+                'pharmacy_claim__claim_id_blank',
+                'pharmacy_claim__person_id_blank',
+                'pharmacy_claim__data_source_blank',
                 'pharmacy_claim__dispensing_date_null',
                 'pharmacy_claim__paid_date_null',
                 'pharmacy_claim__dispensing_date_out_of_reasonable_range',

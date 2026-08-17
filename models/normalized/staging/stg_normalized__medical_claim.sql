@@ -4,11 +4,11 @@
 }}
 
 select
-      claim_id
+      {{ blank_to_null('claim_id') }}
     , claim_line_number
     , claim_type
-    , person_id
-    , member_id
+    , {{ blank_to_null('person_id') }}
+    , {{ blank_to_null('member_id') }}
     , payer
     , {{ quote_column('plan') }}
     , claim_start_date
@@ -148,7 +148,7 @@ select
     , procedure_date_24
     , procedure_date_25
     , in_network_flag
-    , data_source
+    , {{ blank_to_null('data_source') }}
     , file_name
     , file_date
     , ingest_datetime
