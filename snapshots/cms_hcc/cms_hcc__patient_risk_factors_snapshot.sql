@@ -6,7 +6,7 @@
 
 {{
   config({
-      "target_schema": schema_var
+      "schema": schema_var
     , "alias": "patient_risk_factors_snapshot"
     , "tags": "cms_hcc"
     , "strategy": "check"

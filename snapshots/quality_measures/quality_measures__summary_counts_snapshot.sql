@@ -6,7 +6,7 @@
 
 {{
   config({
-      "target_schema": schema_var
+      "schema": schema_var
     , "alias": "summary_counts_snapshot"
     , "tags": "quality_measures"
     , "strategy": "check"
