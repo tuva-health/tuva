@@ -17,25 +17,25 @@ models:
     description: Staging view of normalized medical claims, restricted to claim lines that have service category and encounter preprocessing outputs, used for provider attribution.
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
 
   - name: int_provider_attribution__person_year
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
 
   - name: int_provider_attribution__primary_care_claim
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
 
   - name: int_provider_attribution__provider_classification
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags: [ "claims_preprocessing", "provider_attribution", "tuva_provider_attribution" ]
 
   - name: int_provider_attribution__yearly_step

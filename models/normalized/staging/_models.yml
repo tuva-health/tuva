@@ -10,7 +10,7 @@ models:
   - name: stg_normalized__medical_claim
     config:
       schema: *schema_staging
-      materialized: ephemeral
+      materialized: table
       tags:
         - normalized_input
         - claims_preprocessing
@@ -18,7 +18,7 @@ models:
   - name: stg_normalized__pharmacy_claim
     config:
       schema: *schema_staging
-      materialized: ephemeral
+      materialized: table
       tags:
         - normalized_input
         - claims_preprocessing

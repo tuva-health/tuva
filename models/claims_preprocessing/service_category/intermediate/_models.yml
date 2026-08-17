@@ -194,7 +194,7 @@ models:
   - name: int_service_category__inpatient_institutional
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags:
         - service_category_grouper
         - claims_preprocessing
@@ -314,7 +314,7 @@ models:
   - name: int_service_category__office_based
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags:
         - service_category_grouper
         - claims_preprocessing
@@ -399,7 +399,7 @@ models:
   - name: int_service_category__outpatient_institutional
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags:
         - service_category_grouper
         - claims_preprocessing
@@ -532,7 +532,7 @@ models:
   - name: int_service_category__professional
     config:
       schema: *schema_intermediate
-      materialized: view
+      materialized: table
       tags:
         - service_category_grouper
         - claims_preprocessing
