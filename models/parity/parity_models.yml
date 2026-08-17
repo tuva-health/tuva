@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: parity__metrics
+    description: |-
+      Produces the optional Tuva parity metric catalog and its results. The first
+      catalog covers claims-derived population, eligibility, member-month,
+      medical-claim, pharmacy-claim, service-category, encounter, condition,
+      procedure, and Claims Preprocessing metrics.
+
+      Each metric_id is a quoted, zero-padded, immutable identifier. Never
+      renumber, reuse, or redefine an existing ID. Append a new ID when adding
+      a metric or changing a metric definition. Parity comparison is a separate,
+      manually initiated process and is not implemented by this model.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) is not none -%}{{ var('tuva_schema_prefix') }}_parity
+        {%- else -%}parity{%- endif -%}
+      alias: metrics
+      materialized: table
+      tags:
+        - parity
+    columns:
+      - name: metric_id
+        description: Immutable, zero-padded identifier for the metric definition.
+        tests:
+          - unique
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: metric_name
+        description: Stable human-readable name for the metric definition.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+      - name: result
+        description: Numeric result calculated for the metric.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: numeric
