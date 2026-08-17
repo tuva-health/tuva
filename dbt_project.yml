@@ -17,6 +17,10 @@ vars:
     synthetic_data: "1.2.4"
   tuva_seed_buckets: {}
 
+  ## Performance
+  # Clusters the claim-line tables. Verified on BigQuery only, so off by default.
+  tuva_clustering_enabled: false
+
   ## Run metadata
   # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
   # Default timezone is UTC.
