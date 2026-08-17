@@ -46,8 +46,15 @@ from git worktrees.
 
 ## Mandatory Local Rules
 
-- Use local DuckDB for development unless the user explicitly asks for another
-  warehouse.
+- For routine Tuva Core model, test, or YAML validation, use the `snowflake-dev`
+  profile against the existing `dev_aaron` database. Reuse its loaded seed and
+  data-asset relations when seed definitions, versions, schemas, and loading
+  logic are unchanged.
+- Do not run `dbt seed` or select seed nodes during that routine validation.
+  Reload seeds only when seed or data-asset inputs/loading behavior changed, or
+  when the user explicitly requests a seed refresh.
+- Use local DuckDB when specifically validating DuckDB portability or when the
+  task does not require the large published seed assets.
 - Run dbt from `integration_tests` using local profiles from `~/.dbt` or
   `DBT_PROFILES_DIR`.
 - Prefer `scripts/dbt-local` for local dbt commands.
@@ -63,8 +70,9 @@ from git worktrees.
 - For local validation, use the integration test defaults:
   - `use_synthetic_data: true`
   - `synthetic_data_size: small`
-- For model, macro, seed, terminology, or value-set work, validate through
-  `integration_tests` on local DuckDB unless the user asks for another warehouse.
+- For model, macro, test, or YAML work that does not change seeds, validate
+  through `integration_tests` with `TUVA_DBT_PROFILE=snowflake-dev` and reuse
+  the seed relations already loaded in `dev_aaron`.
 - If a change requires new synthetic columns or synthetic data rows, ask for
   explicit generation requirements before editing synthetic data.
 - Top-level `seeds/*` changes are allowed when requested, but must be validated
@@ -99,6 +107,8 @@ Validation expectations by change type:
 - Tuva Core model, macro, seed, test, or YAML changes:
   - Run `scripts/dbt-local deps` when dependencies may have changed.
   - Run the narrowest useful `scripts/dbt-local build --select <selector>`.
+  - When seeds are unchanged, use `TUVA_DBT_PROFILE=snowflake-dev` and exclude
+    seed nodes rather than reloading them.
   - Run `scripts/dbt-local build --full-refresh` before PR when feasible.
 - Data asset publisher or metadata changes:
   - Work in the sibling `tuva-maintenance` checkout and run the relevant script tests there.

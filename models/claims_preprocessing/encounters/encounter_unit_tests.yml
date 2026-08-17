@@ -1,0 +1,58 @@
+version: 2
+
+unit_tests:
+  - name: test_orphaned_claims_scopes_crosswalk_by_data_source
+    description: >
+      When two sources reuse the same claim-line key, a crosswalk match in one
+      source must not prevent the claim line in the other source from becoming
+      an orphaned encounter. Regression coverage for
+      https://github.com/tuva-health/tuva-core/pull/1370.
+    model: encounters__orphaned_claims
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        format: sql
+        rows: |
+          select
+              'shared_claim' as claim_id
+            , 1 as claim_line_number
+            , 'other' as service_category_1
+            , 'other' as service_category_2
+            , 'other' as service_category_3
+            , 'professional' as claim_type
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-01' as date) as claim_end_date
+            , cast('2024-01-01' as date) as start_date
+            , cast('2024-01-01' as date) as end_date
+            , 'person_1|source_a' as patient_data_source_id
+            , 'source_a' as data_source
+          union all
+          select
+              'shared_claim' as claim_id
+            , 1 as claim_line_number
+            , 'other' as service_category_1
+            , 'other' as service_category_2
+            , 'other' as service_category_3
+            , 'professional' as claim_type
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-01' as date) as claim_end_date
+            , cast('2024-01-01' as date) as start_date
+            , cast('2024-01-01' as date) as end_date
+            , 'person_1|source_b' as patient_data_source_id
+            , 'source_b' as data_source
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          select
+              'shared_claim' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+    expect:
+      rows:
+        - claim_id: 'shared_claim'
+          claim_line_number: 1
+          data_source: 'source_b'
+          encounter_id: 'df275fbe54ad3d9527ec49ce64abfafa'
+          encounter_type: 'orphaned claim'
+          encounter_group: 'other'
