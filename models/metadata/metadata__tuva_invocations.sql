@@ -1,11 +1,3 @@
-{{ config(
-     schema = 'metadata',
-     alias = 'tuva_invocations',
-     materialized = 'table',
-     tags = ['metadata']
-   )
-}}
-
 select
     cast('{{ invocation_id }}' as {{ dbt.type_string() }}) as invocation_id
   , cast('the_tuva_project' as {{ dbt.type_string() }}) as package_name

@@ -1,7 +1,7 @@
 # Tuva Core Scripts
 
-Tuva Core keeps only scripts that are directly needed by the dbt package
-development and CI command flow.
+Tuva Core keeps only scripts that are directly needed by local dbt package
+development.
 
 ## Local dbt Development
 
@@ -17,18 +17,6 @@ scripts/dbt-local build --full-refresh
 The helper reads profiles from `~/.dbt` by default and chooses the `default`
 profile when available. Set `DBT_PROFILES_DIR`, `TUVA_DBT_PROFILE`, or
 `DBT_PROFILE` when using a different local profile location or name.
-
-## CI Command Parsing
-
-`parse_ci_command.py` is used by GitHub Actions to parse and authorize `/ci`
-pull request comments. The default `/ci` command runs Snowflake Tuva Core seed
-and run. `/ci build` runs Tuva Core build across active warehouses, and
-`/ci marts` runs Snowflake seed and run across Tuva Core plus external data mart
-packages. Its unit tests live next to it:
-
-```bash
-python -m unittest scripts/test_parse_ci_command.py
-```
 
 ## Maintenance Utilities
 

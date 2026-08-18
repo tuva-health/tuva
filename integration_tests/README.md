@@ -63,18 +63,29 @@ The current data asset versions and other supported vars are documented in
 `integration_tests/dbt_project.yml`. Treat that file as the canonical commented
 example for local Tuva Core development.
 
-## Core-Only vs Full Package Validation
+## Tuva Core Validation
 
-`packages.yml` may include external data mart packages for integration testing.
-To validate Tuva Core only, select the integration test project and local Tuva
-Core package explicitly:
+This integration project installs only the local Tuva Core package. Select the
+integration-test project and Tuva Core explicitly:
 
 ```bash
 scripts/dbt-local build --full-refresh --select package:integration_tests package:the_tuva_project
 ```
 
-A plain `dbt build` can also run installed external data mart packages. Use that
-only when you intentionally want full package integration coverage.
+Standalone packages own their integration tests in their respective
+repositories. Validate those packages against a local Tuva Core checkout when
+testing cross-package compatibility.
+
+## Continuous Integration
+
+In-repository pull requests automatically run the Core build on Snowflake with
+the small synthetic dataset. From GitHub Actions, maintainers can run that same
+fixed build manually on Snowflake, BigQuery, Databricks, Fabric, Redshift, or
+all five warehouses. DuckDB remains available for local portability checks.
+
+Reviewed fork pull requests use the separate `External PR Snowflake CI`
+workflow. Its only input is the pull-request number. CI does not accept
+pull-request comment commands or arbitrary dbt commands.
 
 ## Data Asset Loading
 

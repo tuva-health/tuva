@@ -160,18 +160,22 @@ content is loaded from public object storage.
 
 ## CI Guidance
 
-- Default PR CI runs Snowflake Tuva Core `dbt seed --full-refresh` followed by
-  `dbt run`.
-- Comment commands on PRs:
-  - `/ci` runs Snowflake Tuva Core seed + run.
-  - `/ci run` runs Tuva Core seed + run across active warehouses.
-  - `/ci run-<warehouse>` runs Tuva Core seed + run on one warehouse.
-  - `/ci build` runs Tuva Core `dbt build --full-refresh` across active warehouses.
-  - `/ci build-<warehouse>` runs Tuva Core `dbt build --full-refresh` on one warehouse.
-  - `/ci marts` runs Snowflake seed + run across Tuva Core plus external data mart packages.
-  - `/ci <warehouse> dbt ...` runs an explicit dbt command sequence on one or more warehouses.
-- Active multi-warehouse CI targets are Snowflake, BigQuery, Databricks, Fabric,
-  and DuckDB. Redshift remains explicit-only while its CI warehouse is turned off.
+- In-repository pull requests automatically run one Snowflake
+  `dbt build --full-refresh` against the small synthetic dataset. The build
+  selects Tuva Core plus the integration-test project and runs unit and data
+  tests. Parity remains disabled.
+- Additional warehouse validation is manually initiated from GitHub Actions.
+  Choose Snowflake, BigQuery, Databricks, Fabric, Redshift, or `all`; every
+  target runs the same fixed Core build.
+- DuckDB portability is validated locally as needed rather than in GitHub CI.
+- Pull-request comment commands do not trigger CI and CI does not accept
+  arbitrary dbt commands, selectors, or flags.
+- Automatic secrets-backed CI does not execute fork code. After reviewing an
+  external pull request, a maintainer runs `External PR Snowflake CI` from the
+  Actions tab and supplies only the pull-request number.
+- Standalone packages validate in their own repositories. Routine Tuva Core CI
+  does not install mutable standalone-package branches.
+- Parity comparisons are separate, manually initiated Snowflake validations.
 - Do not edit `.github/workflows/create-release.yml` unless the task explicitly
   targets release automation.
 

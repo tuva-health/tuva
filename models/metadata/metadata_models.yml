@@ -4,7 +4,9 @@ models:
   - name: metadata__tuva_invocations
     description: One-row metadata table for the current Tuva Core dbt invocation. Full-refresh or table builds overwrite this table using normal dbt materialization behavior.
     config:
-      schema: metadata
+      schema: |
+        {%- if var('tuva_schema_prefix', None) is not none -%}{{ var('tuva_schema_prefix') }}_metadata
+        {%- else -%}metadata{%- endif -%}
       alias: tuva_invocations
       tags:
         - metadata
