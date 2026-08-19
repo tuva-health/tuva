@@ -253,7 +253,7 @@ models:
       - name: failed_count
 
   - name: data_quality__component_test_quality_results
-    description: Component-level drilldown at data source, domain group, component, input table, and test grain.
+    description: Output Data Quality drilldown for relevant logical failures at data source, domain group, component, input table, and test grain. Structural findings remain in Input Data Quality and are intentionally excluded.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -273,6 +273,11 @@ models:
       - name: test_name
       - name: severity
       - name: test_source
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - logical
       - name: display_name
       - name: description
       - name: test_type
@@ -280,7 +285,7 @@ models:
       - name: failed_count
 
   - name: data_quality__component_table_quality_results
-    description: Component-level drilldown at data source, domain group, component, and input table grain.
+    description: Output Data Quality rollup of relevant logical failures at data source, domain group, component, and input table grain.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -310,7 +315,7 @@ models:
                   - not_applicable
 
   - name: data_quality__component_quality_results
-    description: Component-level source data quality rollups with pass percentage, severity percentages, counts, and status.
+    description: Output Data Quality component rollups of relevant logical failures with pass percentage, severity percentages, counts, and status.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -339,7 +344,7 @@ models:
                   - not_applicable
 
   - name: data_quality__source_quality_overview
-    description: Highest-level source data quality rollup by data source and domain group.
+    description: Highest-level Output Data Quality rollup of relevant logical failures by data source and domain group.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality

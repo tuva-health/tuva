@@ -14,4 +14,3 @@ left join {{ ref('tuva_condition_grouper') }} as condition_grouper
   on code_map.condition_family = condition_grouper.condition_family
   and code_map.condition = condition_grouper.condition
 where condition_grouper.condition_family is null
-

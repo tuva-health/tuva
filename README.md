@@ -77,7 +77,7 @@ Tuva Core keeps root package defaults focused on explicit data asset family vers
 Common variable groups:
 
 - Domain enablement: `claims_enabled`, `clinical_enabled`, `provider_attribution_enabled`
-- Data quality: `enable_data_quality`
+- Data quality: `data_quality_enabled`
 - Data assets: `custom_bucket_name`, `tuva_seed_versions`, `tuva_seed_buckets`
 - Synthetic data validation: `use_synthetic_data`, `synthetic_data_size`
 - Runtime metadata and schemas: `tuva_last_run`, `tuva_schema_prefix`

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('enable_data_quality', false) | as_bool,
+     enabled = var('data_quality_enabled', false) | as_bool,
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
@@ -48,79 +48,42 @@ with logical_component_tests as (
 
 )
 
-, structural_component_tests as (
-
-    select distinct
-          requirements.domain_group_key
-        , requirements.component_key
-        , structural_results.data_source
-        , structural_results.input_table_name
-        , structural_results.test_name
-        , structural_results.display_name
-        , structural_results.description
-        , structural_results.grain
-        , structural_results.test_type
-        , structural_results.check_category
-        , structural_results.severity
-        , structural_results.total_row_count
-        , structural_results.tested_count
-        , structural_results.failed_count
-        , structural_results.passed_count
-        , structural_results.not_applicable_count
-        , 'structural' as test_source
-    from {{ ref('data_quality__domain_input_requirements') }} as requirements
-    inner join {{ ref('data_quality__structural_test_results') }} as structural_results
-        on requirements.input_table_name = structural_results.input_table_name
-    where requirements.requirement_level = 'required'
-
-)
-
-, unioned as (
-
-    select * from logical_component_tests
-
-    union all
-
-    select * from structural_component_tests
-
-)
-
 select
-      unioned.data_source
+      logical_component_tests.data_source
     , catalog.domain_group_key
     , catalog.domain_group_name
     , catalog.component_key
     , catalog.component_name
-    , unioned.input_table_name
-    , unioned.test_name
-    , unioned.display_name
-    , unioned.description
-    , unioned.grain
-    , unioned.test_type
-    , unioned.check_category
-    , unioned.severity
-    , unioned.test_source
-    , cast(sum(coalesce(unioned.total_row_count, 0)) as {{ dbt.type_int() }}) as total_row_count
-    , cast(sum(coalesce(unioned.tested_count, 0)) as {{ dbt.type_int() }}) as tested_count
-    , cast(sum(coalesce(unioned.passed_count, 0)) as {{ dbt.type_int() }}) as passed_count
-    , cast(sum(coalesce(unioned.failed_count, 0)) as {{ dbt.type_int() }}) as failed_count
-    , cast(sum(coalesce(unioned.not_applicable_count, 0)) as {{ dbt.type_int() }}) as not_applicable_count
-from unioned
+    , logical_component_tests.input_table_name
+    , logical_component_tests.test_name
+    , logical_component_tests.display_name
+    , logical_component_tests.description
+    , logical_component_tests.grain
+    , logical_component_tests.test_type
+    , logical_component_tests.check_category
+    , logical_component_tests.severity
+    , logical_component_tests.test_source
+    , cast(sum(coalesce(logical_component_tests.total_row_count, 0)) as {{ dbt.type_int() }}) as total_row_count
+    , cast(sum(coalesce(logical_component_tests.tested_count, 0)) as {{ dbt.type_int() }}) as tested_count
+    , cast(sum(coalesce(logical_component_tests.passed_count, 0)) as {{ dbt.type_int() }}) as passed_count
+    , cast(sum(coalesce(logical_component_tests.failed_count, 0)) as {{ dbt.type_int() }}) as failed_count
+    , cast(sum(coalesce(logical_component_tests.not_applicable_count, 0)) as {{ dbt.type_int() }}) as not_applicable_count
+from logical_component_tests
 inner join {{ ref('data_quality__domain_catalog') }} as catalog
-    on unioned.domain_group_key = catalog.domain_group_key
-   and unioned.component_key = catalog.component_key
+    on logical_component_tests.domain_group_key = catalog.domain_group_key
+   and logical_component_tests.component_key = catalog.component_key
 group by
-      unioned.data_source
+      logical_component_tests.data_source
     , catalog.domain_group_key
     , catalog.domain_group_name
     , catalog.component_key
     , catalog.component_name
-    , unioned.input_table_name
-    , unioned.test_name
-    , unioned.display_name
-    , unioned.description
-    , unioned.grain
-    , unioned.test_type
-    , unioned.check_category
-    , unioned.severity
-    , unioned.test_source
+    , logical_component_tests.input_table_name
+    , logical_component_tests.test_name
+    , logical_component_tests.display_name
+    , logical_component_tests.description
+    , logical_component_tests.grain
+    , logical_component_tests.test_type
+    , logical_component_tests.check_category
+    , logical_component_tests.severity
+    , logical_component_tests.test_source

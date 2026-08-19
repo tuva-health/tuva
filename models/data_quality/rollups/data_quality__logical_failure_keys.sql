@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('enable_data_quality', false) | as_bool)
+     enabled = (var('data_quality_enabled', false) | as_bool)
        and (var('enable_data_quality_failure_keys', false) | as_bool)
        and ((var('claims_enabled', false) | as_bool) or (var('clinical_enabled', false) | as_bool)),
      schema = (
