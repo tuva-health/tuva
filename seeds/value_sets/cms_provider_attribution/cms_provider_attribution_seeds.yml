@@ -22,7 +22,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___assignment_windows.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__assignment_windows.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _assignment_windows
@@ -57,7 +57,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___primary_care_hcpcs_codes.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__primary_care_hcpcs_codes.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _primary_care_hcpcs_codes
@@ -85,7 +85,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution___provider_specialty_assignment_codes.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__provider_specialty_assignment_codes.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: _provider_specialty_assignment_codes

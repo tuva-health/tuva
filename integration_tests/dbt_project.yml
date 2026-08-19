@@ -24,13 +24,8 @@ vars:
   synthetic_data_size: small           # Synthetic payload to load: small or large.
 
   ## Data asset releases and buckets
-  # These mirror Tuva Core root defaults. Override here when validating a different published asset release.
-  custom_bucket_name: tuva-public-resources  # Default public bucket for versioned seed artifacts.
-  tuva_seed_versions:
-    terminology: "1.2.4"              # Terminology release family, e.g. ICD, HCPCS, LOINC, RxNorm, NDC.
-    value_sets: "1.2.4"               # Value-set release family, e.g. service categories and Tuva groupers.
-    provider_data: "1.0.1"            # Provider data release family.
-    synthetic_data: "1.2.4"           # Synthetic data release family used by integration_tests.
+  # Tuva Core resolves assets from tuva-core/<installed-package-version>/.
+  custom_bucket_name: tuva-public-resources  # Default public bucket for package data assets.
   tuva_seed_buckets: {}                # Optional per-family bucket overrides, keyed by seed family.
 
   ## Schema naming
@@ -61,6 +56,9 @@ vars:
   # tuva_seeds_s3_key_prefix: ""
 
   ## Internal test hooks
+  # Local filesystem root for validating staged package data assets with DuckDB.
+  # The root must contain <bucket>/<package>/<version>/...; omit in normal projects.
+  # tuva_seed_duckdb_storage_root: "/tmp/tuva-data-assets"
   # Internal dbt unit-test hook for extension-column tests; do not set in normal projects.
   # _extension_columns_override: []
 

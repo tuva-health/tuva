@@ -17,7 +17,7 @@ seeds:
           update_frequency: "ad hoc"
           license_url: "https://terminology.hl7.org/license.html"
           notes: "Tuva uses this terminology in the core immunization model to translate immunization body site codes into body site descriptions."
-      post_hook: "{{ load_versioned_seed('terminology','act_site.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__act_site.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: act_site
@@ -49,7 +49,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','admit_source.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__admit_source.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: admit_source
@@ -87,7 +87,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','admit_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__admit_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: admit_type
@@ -119,7 +119,7 @@ seeds:
           source_last_updated: "2026-03-09"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','appointment_cancellation_reason.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_cancellation_reason.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: appointment_cancellation_reason
@@ -150,7 +150,7 @@ seeds:
           source_last_updated: "2025-03-21"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','appointment_status.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_status.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: appointment_status
@@ -176,7 +176,7 @@ seeds:
           source_last_updated: "2026-03-09"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','appointment_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: appointment_type
@@ -208,7 +208,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','apr_drg.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__apr_drg.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: apr_drg
@@ -249,7 +249,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','bill_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__bill_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: bill_type
@@ -289,7 +289,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','claim_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__claim_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: claim_type
@@ -318,7 +318,7 @@ seeds:
           source_last_updated: "2026-04-16"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','cvx.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__cvx.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: cvx
@@ -356,7 +356,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','discharge_disposition.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__discharge_disposition.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: discharge_disposition
@@ -386,7 +386,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','encounter_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__encounter_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: encounter_type
@@ -419,7 +419,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','ethnicity.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ethnicity.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ethnicity
@@ -450,7 +450,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','sex.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__sex.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: sex
@@ -479,7 +479,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "quarterly"
-      post_hook: "{{ load_versioned_seed('terminology','hcpcs_level_2.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__hcpcs_level_2.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: hcpcs_level_2
@@ -523,7 +523,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','restructured_betos.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__restructured_betos.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: restructured_betos
@@ -609,7 +609,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "static"
-      post_hook: "{{ load_versioned_seed('terminology','icd_9_cm.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: icd_9_cm
@@ -649,7 +649,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "static"
-      post_hook: "{{ load_versioned_seed('terminology','icd_9_pcs.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: icd_9_pcs
@@ -691,7 +691,7 @@ seeds:
           source_last_updated: "2025-12-17"
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('terminology','icd_10_cm.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: icd_10_cm
@@ -740,7 +740,7 @@ seeds:
           tuva_last_updated: "2026-05-27"
           update_frequency: "annually"
           notes: "Includes current CMS April 1, 2026 ICD-10-PCS codes plus historical ICD-10-PCS codes retained by AHRQ PRCCSR v2026.1. Deprecated is 1 when the code is no longer active in the current CMS code file."
-      post_hook: "{{ load_versioned_seed('terminology','icd_10_pcs.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: icd_10_pcs
@@ -775,7 +775,7 @@ seeds:
           source_last_updated: "2026-03-09"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','immunization_route_code.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_route_code.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: immunization_route_code
@@ -805,7 +805,7 @@ seeds:
           source_last_updated: "2025-03-21"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','immunization_status_reason.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_status_reason.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: immunization_status_reason
@@ -839,7 +839,7 @@ seeds:
           source_last_updated: "2025-03-21"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','immunization_status.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_status.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: immunization_status
@@ -872,7 +872,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           license_url: "https://loinc.org/license/"
-      post_hook: "{{ load_versioned_seed('terminology','loinc.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__loinc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: loinc
@@ -971,7 +971,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           license_url: "https://loinc.org/license/"
-      post_hook: "{{ load_versioned_seed('terminology','loinc_deprecated_mapping.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__loinc_deprecated_mapping.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: loinc_deprecated_mapping
@@ -1020,7 +1020,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','mdc.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__mdc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: mdc
@@ -1051,7 +1051,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','medicare_dual_eligibility.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_dual_eligibility.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: medicare_dual_eligibility
@@ -1086,7 +1086,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','medicare_orec.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_orec.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: medicare_orec
@@ -1120,7 +1120,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','medicare_status.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_status.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology
         {% else %}terminology{%- endif -%}
@@ -1156,7 +1156,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('terminology','ms_drg_weights_los.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg_weights_los.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ms_drg_weights_los
@@ -1227,7 +1227,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('terminology','ms_drg.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ms_drg
@@ -1278,7 +1278,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
           notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','ndc.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ndc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ndc
@@ -1317,7 +1317,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','observation_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__observation_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       tags:
@@ -1343,7 +1343,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','payer_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__payer_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: payer_type
@@ -1372,7 +1372,7 @@ seeds:
           source_last_updated: "2026-02-17"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','place_of_service.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__place_of_service.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: place_of_service
@@ -1405,7 +1405,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-05-24"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','present_on_admission.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__present_on_admission.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: present_on_admission
@@ -1438,7 +1438,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','race.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__race.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: race
@@ -1471,7 +1471,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','revenue_center.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__revenue_center.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: revenue_center
@@ -1507,7 +1507,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
           notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','rxnorm_to_atc.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__rxnorm_to_atc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: rxnorm_to_atc
@@ -1574,7 +1574,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-      post_hook: "{{ load_versioned_seed('terminology','snomed_icd_10_map.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_icd_10_map.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: snomed_icd_10_map
@@ -1665,7 +1665,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-      post_hook: "{{ load_versioned_seed('terminology','snomed_ct.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: snomed_ct
@@ -1715,7 +1715,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-      post_hook: "{{ load_versioned_seed('terminology','snomed_ct_transitive_closures.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct_transitive_closures.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: snomed_ct_transitive_closures
@@ -1757,7 +1757,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
           notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','rxnorm_brand_generic.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__rxnorm_brand_generic.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
       alias: rxnorm_brand_generic
@@ -1806,7 +1806,7 @@ seeds:
           source_last_updated: "2024-11-12"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','nitos.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__nitos.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
       alias: nitos
@@ -1842,7 +1842,7 @@ seeds:
           source_last_updated: "2025-12-17"
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('terminology','icd10_pcs_cms_ontology.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__icd10_pcs_cms_ontology.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
       alias: icd10_pcs_cms_ontology
@@ -1902,7 +1902,7 @@ seeds:
           source_last_updated: "2024-09-06"
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','ssa_fips_state_county_crosswalk.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ssa_fips_state_county_crosswalk.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ssa_fips_state_county_crosswalk

@@ -13,7 +13,8 @@ those inputs.
   package boundary.
 - `macros/`: integration and CI helper macros.
 - `seeds/`: intentionally empty. Tuva Data Assets are defined by the Tuva Core
-  package and loaded from versioned public object-storage releases.
+  package and loaded from the immutable object-storage snapshot matching the
+  installed Tuva Core version.
 - `profiles/`: CI-only warehouse profiles. Use your local `~/.dbt/profiles.yml`
   for development.
 
@@ -59,9 +60,10 @@ scripts/dbt-local build --full-refresh \
   --vars '{synthetic_data_size: large}'
 ```
 
-The current data asset versions and other supported vars are documented in
-`integration_tests/dbt_project.yml`. Treat that file as the canonical commented
-example for local Tuva Core development.
+Supported data-asset bucket overrides and other vars are documented in
+`integration_tests/dbt_project.yml`. Asset versions are not configured
+separately; they always match the installed Tuva Core package version. Treat
+that file as the canonical commented example for local development.
 
 ## Tuva Core Validation
 
@@ -90,9 +92,10 @@ pull-request comment commands or arbitrary dbt commands.
 ## Data Asset Loading
 
 `dbt seed` and `dbt build` load Tuva Data Assets, including synthetic input data,
-from versioned public object-storage releases. `dbt run` assumes those seed
-relations already exist, so run `dbt seed` or `dbt build` first on a fresh
-database.
+from `tuva-core/<installed-package-version>/`. Synthetic objects are selected
+from the `synthetic-data/small/` or `synthetic-data/large/` subfolder. `dbt run`
+assumes those seed relations already exist, so run `dbt seed` or `dbt build`
+first on a fresh database.
 
 ## Fabric Note
 

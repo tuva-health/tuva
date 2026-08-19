@@ -21,7 +21,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('value_sets','tuva_concepts.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','value_sets__tuva_concepts.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: tuva_concepts
@@ -109,7 +109,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('value_sets','tuva_value_set_members.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','value_sets__tuva_value_set_members.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: tuva_value_set_members
@@ -180,7 +180,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('value_sets','coding_systems.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','value_sets__coding_systems.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: coding_systems

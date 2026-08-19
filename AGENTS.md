@@ -40,8 +40,13 @@ from git worktrees.
 - Data Assets (`seeds/`):
   - Package seed CSVs are primarily definitions or headers.
   - Published terminology, value sets, provider data, and synthetic data are
-    loaded from public object storage through seed hooks and explicit family
-    version vars.
+    loaded from the immutable public object-storage snapshot matching the Tuva
+    Core package version.
+  - `data_assets.yml` declares the exact package-owned object inventory. The
+    publisher-generated `_release.json` is a completion receipt bound to the
+    exact package git commit in `package_commit` and is not read by dbt at
+    runtime. Package tags must not be created until the matching receipt is
+    available from S3, GCS, and Azure and names the current `main` commit.
   - Data asset changes must preserve cross-warehouse loading behavior.
 
 ## Mandatory Local Rules
@@ -77,8 +82,8 @@ from git worktrees.
   explicit generation requirements before editing synthetic data.
 - Top-level `seeds/*` changes are allowed when requested, but must be validated
   through `integration_tests` before PR.
-- Active data asset families must have explicit `tuva_seed_versions`; do not add
-  fallback seed versions.
+- Do not add independent data-asset family versions. Every seed resolves
+  through the installed Tuva Core package version.
 
 ## Generated Artifacts
 

@@ -15,7 +15,7 @@ seeds:
           source_last_updated: "2023-02-13"
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','ansi_fips_state.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ansi_fips_state.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ansi_fips_state
@@ -53,7 +53,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','calendar.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__calendar.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: calendar
@@ -120,7 +120,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','code_type.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__code_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: code_type
@@ -150,7 +150,7 @@ seeds:
           source_last_updated: "2023-02-13"
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','fips_county.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__fips_county.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: fips_county
@@ -187,7 +187,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','ssa_fips_state.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__ssa_fips_state.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ssa_fips_state
@@ -225,7 +225,7 @@ seeds:
           source_last_updated: "2024-11-25"
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','svi_us_county.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__svi_us_county.csv.gz') }}"
       schema: |-
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: svi_us_county
@@ -729,7 +729,7 @@ seeds:
           source_last_updated: "2024-11-25"
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('terminology','svi_us.csv') }}"
+      post_hook: "{{ load_versioned_seed('terminology','terminology__svi_us.csv.gz') }}"
       schema: |-
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: svi_us

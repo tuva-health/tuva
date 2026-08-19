@@ -18,7 +18,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
+      post_hook: "{{ load_versioned_seed('provider_data','provider_data__other_provider_taxonomy.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
@@ -60,7 +60,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "monthly"
-      post_hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
+      post_hook: "{{ load_versioned_seed('provider_data','provider_data__provider.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
@@ -184,7 +184,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
+      post_hook: "{{ load_versioned_seed('provider_data','provider_data__medicare_provider_and_supplier_taxonomy_crosswalk.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: medicare_provider_and_supplier_taxonomy_crosswalk
@@ -215,7 +215,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-04-29"
           update_frequency: "annually"
-      post_hook: "{{ load_versioned_seed('provider_data','electing_teaching_hospital_list.csv') }}"
+      post_hook: "{{ load_versioned_seed('provider_data','provider_data__electing_teaching_hospital_list.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: electing_teaching_hospital_list
@@ -289,7 +289,7 @@ seeds:
       Provider taxonomy unpivot records list one row per NPI and taxonomy relationship so provider specialties
       can be queried directly. They are derived from CMS NPPES provider data.
     config:
-      post_hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
+      post_hook: "{{ load_versioned_seed('provider_data','provider_data__provider_taxonomy_unpivot.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: provider_taxonomy_unpivot

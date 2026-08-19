@@ -33,7 +33,7 @@
 {% endmacro %}
 
 
-{% macro get_seed_bucket(database) %}
+{% macro get_seed_bucket(database, package_slug=none) %}
   {% set bucket_overrides = var('tuva_seed_buckets', {}) %}
   {% set normalized_database = database | string | trim %}
   {% set alternate_database = normalized_database | replace('-', '_') %}
@@ -44,6 +44,16 @@
       {% set bucket = bucket_overrides[normalized_database] %}
     {% elif alternate_database in bucket_overrides %}
       {% set bucket = bucket_overrides[alternate_database] %}
+    {% endif %}
+  {% endif %}
+
+  {% if bucket is none and package_slug is not none and bucket_overrides is mapping %}
+    {% set normalized_slug = package_slug | string | trim %}
+    {% set alternate_slug = normalized_slug | replace('-', '_') %}
+    {% if normalized_slug in bucket_overrides %}
+      {% set bucket = bucket_overrides[normalized_slug] %}
+    {% elif alternate_slug in bucket_overrides %}
+      {% set bucket = bucket_overrides[alternate_slug] %}
     {% endif %}
   {% endif %}
 
@@ -60,66 +70,104 @@
 {% endmacro %}
 
 
-{% macro get_seed_version(version_override=none, database=none) %}
-  {% if version_override is not none %}
-    {% set version = version_override %}
-  {% else %}
-    {% if database is none %}
-      {% do exceptions.raise_compiler_error(
-          "A Tuva seed family must be provided when resolving a version. "
-          ~ "Set vars.tuva_seed_versions for each active data asset family or pass an explicit version override."
-      ) %}
-    {% endif %}
-
-    {% set version_overrides = var('tuva_seed_versions', {}) %}
-    {% if not (version_overrides is mapping) %}
-      {% do exceptions.raise_compiler_error(
-          "Tuva seed versions must be configured as a mapping in vars.tuva_seed_versions."
-      ) %}
-    {% endif %}
-
-    {% set normalized_database = database | string | trim %}
-    {% set alternate_database = normalized_database | replace('-', '_') %}
-    {% set version = none %}
-
-    {% if normalized_database in version_overrides %}
-      {% set version = version_overrides[normalized_database] %}
-    {% elif alternate_database in version_overrides %}
-      {% set version = version_overrides[alternate_database] %}
-    {% endif %}
-
-    {% if version is none %}
-      {% do exceptions.raise_compiler_error(
-          "Missing required Tuva seed version for family '" ~ database ~ "'. "
-          ~ "Add vars.tuva_seed_versions." ~ alternate_database ~ " to your dbt_project.yml."
-      ) %}
-    {% endif %}
+{% macro get_package_seed_uri(package_slug, package_version, object_path='', bucket=none) %}
+  {% set normalized_slug = package_slug | string | trim | trim('/') %}
+  {% if normalized_slug == '' or '/' in normalized_slug %}
+    {% do exceptions.raise_compiler_error(
+        "Tuva package seed slug must be a nonempty path segment. Received '" ~ package_slug ~ "'."
+    ) %}
   {% endif %}
 
-  {% set normalized_version = version | string | trim %}
+  {% set normalized_version = package_version | string | trim %}
   {% if normalized_version.startswith('v') %}
     {% set normalized_version = normalized_version[1:] %}
   {% endif %}
+  {% set normalized_version = normalized_version | trim('/') %}
+  {% if normalized_version == '' or '/' in normalized_version %}
+    {% do exceptions.raise_compiler_error(
+        "Tuva package seed version must be a nonempty path segment. Received '" ~ package_version ~ "'."
+    ) %}
+  {% endif %}
 
-  {{ return(normalized_version) }}
+  {% if bucket is none %}
+    {% set normalized_bucket = the_tuva_project.get_seed_bucket(normalized_slug) %}
+  {% else %}
+    {% set normalized_bucket = bucket | string | trim %}
+    {% if normalized_bucket.startswith('s3://') %}
+      {% set normalized_bucket = normalized_bucket[5:] %}
+    {% endif %}
+    {% set normalized_bucket = normalized_bucket | trim('/') %}
+  {% endif %}
+
+  {% set normalized_object_path = object_path | string | trim | trim('/') %}
+  {% set uri = normalized_bucket ~ '/' ~ normalized_slug ~ '/' ~ normalized_version %}
+  {% if normalized_object_path != '' %}
+    {% set uri = uri ~ '/' ~ normalized_object_path %}
+  {% endif %}
+
+  {{ return(uri) }}
 {% endmacro %}
 
 
-{% macro get_versioned_seed_uri(database, version_override=none) %}
-  {% set bucket = the_tuva_project.get_seed_bucket(database) %}
-  {% set folder = the_tuva_project.get_seed_database_folder(database) %}
-  {% set version = the_tuva_project.get_seed_version(version_override, database=database) %}
-  {{ return(bucket ~ '/' ~ folder ~ '/' ~ version) }}
-{% endmacro %}
+{% macro load_package_seed(package_name, package_slug, object_path, compression=true, headers=true, null_marker=true, bucket=none) %}
+  {% set normalized_object_path = object_path | string | trim | trim('/') %}
+  {% if normalized_object_path == '' %}
+    {% do exceptions.raise_compiler_error("Tuva package seed object_path must not be empty.") %}
+  {% endif %}
 
+  {% set object_parts = normalized_object_path.split('/') %}
+  {% set pattern = object_parts[-1] %}
+  {% set object_folder = object_parts[:-1] | join('/') %}
 
-{% macro load_versioned_seed(database, pattern, version=none, compression=true, headers=true, null_marker=true) %}
   {{ return(the_tuva_project.load_seed(
-      the_tuva_project.get_versioned_seed_uri(database, version),
+      the_tuva_project.get_package_seed_uri(
+          package_slug,
+          the_tuva_project.get_installed_package_version(package_name),
+          object_folder,
+          bucket
+      ),
       pattern,
       compression,
       headers,
       null_marker
+  )) }}
+{% endmacro %}
+
+
+{% macro get_versioned_seed_uri(database, version_override=none) %}
+  {% if version_override is not none %}
+    {% do exceptions.raise_compiler_error(
+        "Per-family Tuva seed version overrides were removed in 1.0. "
+        ~ "Data assets must use the installed Tuva Core package version."
+    ) %}
+  {% endif %}
+
+  {{ return(the_tuva_project.get_package_seed_uri(
+      'tuva-core',
+      the_tuva_project.get_tuva_package_version(),
+      the_tuva_project.get_seed_database_folder(database),
+      the_tuva_project.get_seed_bucket(database, 'tuva-core')
+  )) }}
+{% endmacro %}
+
+
+{% macro load_versioned_seed(database, seed_object_name, version=none, compression=true, headers=true, null_marker=true) %}
+  {% if version is not none %}
+    {% do exceptions.raise_compiler_error(
+        "Per-family Tuva seed version overrides were removed in 1.0. "
+        ~ "Data assets must use the installed Tuva Core package version."
+    ) %}
+  {% endif %}
+
+  {% set object_path = the_tuva_project.get_seed_database_folder(database) ~ '/' ~ seed_object_name %}
+  {{ return(the_tuva_project.load_package_seed(
+      'the_tuva_project',
+      'tuva-core',
+      object_path,
+      compression,
+      headers,
+      null_marker,
+      the_tuva_project.get_seed_bucket(database, 'tuva-core')
   )) }}
 {% endmacro %}
 
@@ -137,88 +185,51 @@
 {% endmacro %}
 
 
-{% macro get_synthetic_seed_pattern(seed_name) %}
-  {% set synthetic_patterns = {
-      'appointment': {
-          'small': 'appointment_small.csv',
-          'large': 'appointment.csv'
-      },
-      'condition': {
-          'small': 'condition.csv',
-          'large': 'condition.csv'
-      },
-      'eligibility': {
-          'small': 'eligibility_small.csv',
-          'large': 'eligibility.csv'
-      },
-      'encounter': {
-          'small': 'encounter.csv',
-          'large': 'encounter.csv'
-      },
-      'immunization': {
-          'small': 'immunization.csv',
-          'large': 'immunization.csv'
-      },
-      'lab_result': {
-          'small': 'lab_result.csv',
-          'large': 'lab_result.csv'
-      },
-      'location': {
-          'small': 'location.csv',
-          'large': 'location.csv'
-      },
-      'medical_claim': {
-          'small': 'medical_claim_small.csv',
-          'large': 'medical_claim.csv'
-      },
-      'medication': {
-          'small': 'medication.csv',
-          'large': 'medication.csv'
-      },
-      'observation': {
-          'small': 'observation.csv',
-          'large': 'observation.csv'
-      },
-      'patient': {
-          'small': 'patient_small.csv',
-          'large': 'patient.csv'
-      },
-      'pharmacy_claim': {
-          'small': 'pharmacy_claim_small.csv',
-          'large': 'pharmacy_claim.csv'
-      },
-      'practitioner': {
-          'small': 'practitioner.csv',
-          'large': 'practitioner.csv'
-      },
-      'procedure': {
-          'small': 'procedure.csv',
-          'large': 'procedure.csv'
-      },
-      'provider_attribution': {
-          'small': 'provider_attribution_small.csv',
-          'large': 'provider_attribution.csv'
-      }
-  } %}
+{% macro get_synthetic_seed_object_path(seed_name) %}
+  {% set synthetic_seeds = [
+      'synthetic_data__appointment',
+      'synthetic_data__condition',
+      'synthetic_data__eligibility',
+      'synthetic_data__encounter',
+      'synthetic_data__immunization',
+      'synthetic_data__lab_result',
+      'synthetic_data__location',
+      'synthetic_data__medical_claim',
+      'synthetic_data__medication',
+      'synthetic_data__observation',
+      'synthetic_data__patient',
+      'synthetic_data__pharmacy_claim',
+      'synthetic_data__practitioner',
+      'synthetic_data__procedure',
+      'synthetic_data__provider_attribution'
+  ] %}
 
-  {% if seed_name not in synthetic_patterns %}
+  {% if seed_name not in synthetic_seeds %}
     {% do exceptions.raise_compiler_error(
         "Unsupported synthetic seed '" ~ seed_name ~ "'."
     ) %}
   {% endif %}
 
   {% set synthetic_data_size = the_tuva_project.get_synthetic_data_size() %}
-  {{ return(synthetic_patterns[seed_name][synthetic_data_size]) }}
+  {{ return('synthetic-data/' ~ synthetic_data_size ~ '/' ~ seed_name ~ '.csv.gz') }}
 {% endmacro %}
 
 
 {% macro load_versioned_synthetic_seed(seed_name, version=none, compression=true, headers=true, null_marker=true) %}
-  {{ return(the_tuva_project.load_versioned_seed(
-      'synthetic_data',
-      the_tuva_project.get_synthetic_seed_pattern(seed_name),
-      version,
+  {% if version is not none %}
+    {% do exceptions.raise_compiler_error(
+        "Synthetic-data version overrides were removed in 1.0. "
+        ~ "Data assets must use the installed Tuva Core package version."
+    ) %}
+  {% endif %}
+
+  {{ return(the_tuva_project.load_package_seed(
+      'the_tuva_project',
+      'tuva-core',
+      the_tuva_project.get_synthetic_seed_object_path(seed_name),
       compression,
       headers,
-      null_marker
+      null_marker,
+      the_tuva_project.get_seed_bucket('synthetic_data', 'tuva-core')
   )) }}
 {% endmacro %}
