@@ -1,0 +1,132 @@
+name: External PR Snowflake CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: External pull request number to validate
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  resolve:
+    name: Resolve external pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      base_sha: ${{ steps.resolve.outputs.base_sha }}
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      merge_sha: ${{ steps.resolve.outputs.merge_sha }}
+      schema_prefix: ${{ steps.resolve.outputs.schema_prefix }}
+      concurrency_key: ${{ steps.resolve.outputs.concurrency_key }}
+    steps:
+      - name: Pin the reviewed pull request revision
+        id: resolve
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            if (context.ref !== "refs/heads/main") {
+              core.setFailed("External PR Snowflake CI must be dispatched from main.");
+              return;
+            }
+
+            const rawPrNumber = process.env.PR_NUMBER.trim();
+            if (!/^\d+$/.test(rawPrNumber)) {
+              core.setFailed(`Invalid pull request number: ${rawPrNumber}`);
+              return;
+            }
+
+            const prNumber = Number(rawPrNumber);
+            let pr;
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+              ({ data: pr } = await github.rest.pulls.get({
+                ...context.repo,
+                pull_number: prNumber
+              }));
+              if (pr.mergeable !== null) {
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 2000));
+            }
+
+            if (pr.state !== "open") {
+              core.setFailed(`PR #${prNumber} is not open.`);
+              return;
+            }
+            if (pr.base.ref !== "main") {
+              core.setFailed(`PR #${prNumber} targets ${pr.base.ref}, not main.`);
+              return;
+            }
+
+            const baseRepository = `${context.repo.owner}/${context.repo.repo}`.toLowerCase();
+            const headRepository = String(pr.head.repo?.full_name || "").toLowerCase();
+            if (!headRepository || headRepository === baseRepository) {
+              core.setFailed(`PR #${prNumber} is not an external fork pull request.`);
+              return;
+            }
+            if (pr.mergeable !== true) {
+              core.setFailed(`PR #${prNumber} is not currently mergeable.`);
+              return;
+            }
+
+            let mergeCommit;
+            try {
+              ({ data: mergeCommit } = await github.rest.repos.getCommit({
+                ...context.repo,
+                ref: `refs/pull/${prNumber}/merge`
+              }));
+            } catch (error) {
+              core.setFailed(`Could not resolve PR #${prNumber}'s test merge: ${error.message}`);
+              return;
+            }
+
+            const parentShas = mergeCommit.parents.map((parent) => parent.sha);
+            if (
+              parentShas.length !== 2 ||
+              parentShas[0] !== pr.base.sha ||
+              parentShas[1] !== pr.head.sha
+            ) {
+              core.setFailed(`PR #${prNumber} changed while its test merge was being resolved.`);
+              return;
+            }
+
+            core.setOutput("pr_number", String(prNumber));
+            core.setOutput("base_sha", pr.base.sha);
+            core.setOutput("head_sha", pr.head.sha);
+            core.setOutput("merge_sha", mergeCommit.sha);
+            core.setOutput("schema_prefix", `ci_pr_${prNumber}_${pr.head.sha.slice(0, 8)}`);
+            core.setOutput("concurrency_key", `pr-${prNumber}`);
+
+  run_snowflake:
+    name: Run reviewed code on Snowflake
+    needs: resolve
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    uses: ./.github/workflows/ci.yml
+    with:
+      checkout_ref: ${{ needs.resolve.outputs.merge_sha }}
+      warehouse: snowflake
+      schema_prefix: ${{ needs.resolve.outputs.schema_prefix }}
+      concurrency_key: ${{ needs.resolve.outputs.concurrency_key }}
+      publish_status: true
+      pr_number: ${{ needs.resolve.outputs.pr_number }}
+      base_sha: ${{ needs.resolve.outputs.base_sha }}
+      head_sha: ${{ needs.resolve.outputs.head_sha }}
+      merge_sha: ${{ needs.resolve.outputs.merge_sha }}
+    secrets:
+      DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
+      DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+      DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
+      DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+      DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+      DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+      DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}

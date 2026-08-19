@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_enabled', False) | as_bool
    )
 }}
 
@@ -20,6 +20,8 @@ order by stg.claim_type, stg.start_date) as encounter_row_number --institutional
     and
     stg.claim_line_number = cli.claim_line_number
     and
+    stg.data_source = cli.data_source
+    and
     cli.encounter_type = 'ambulatory surgery center'
     and
     cli.claim_line_attribution_number = 1
@@ -30,7 +32,7 @@ order by stg.claim_type, stg.start_date) as encounter_row_number --institutional
     select
         patient_data_source_id
         , birth_date
-        , gender
+        , sex
         , race
     from {{ ref('encounters__stg_eligibility') }}
     where patient_row_num = 1
@@ -106,6 +108,8 @@ order by sum(paid_amount) desc) as paid_order
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
     scr.claim_line_number = d.claim_line_number
+    and
+    scr.data_source = d.data_source
     group by d.encounter_id
 )
 
@@ -122,7 +126,7 @@ select d.encounter_id
     then 1
     else {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day") }}
   end as length_of_stay
-, e.gender
+, e.sex
 , e.race
 , hp.diagnosis_code_type as primary_diagnosis_code_type
 , hp.diagnosis_code_1 as primary_diagnosis_code

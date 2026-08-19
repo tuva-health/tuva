@@ -26,11 +26,11 @@
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__location')) }}
+    {{ select_extension_columns(ref('normalized__location')) }}
 {%- endset -%}
 
 with loc as (
-    {{ smart_union([ref('core__stg_claims_location'), ref('core__stg_clinical_location')], source_index=none) }}
+    {{ smart_union([ref('core__stg_claims_location'), ref('normalized__location')], source_index=none) }}
 )
 
 select
@@ -42,14 +42,14 @@ from loc
 {% elif var('clinical_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__location')) }}
+    {{ select_extension_columns(ref('normalized__location')) }}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_clinical_location') }}
+from {{ ref('normalized__location') }}
 
 {% elif var('claims_enabled', False) == true -%}
 

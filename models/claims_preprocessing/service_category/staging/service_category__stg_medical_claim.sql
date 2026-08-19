@@ -1,11 +1,11 @@
 {{ config(
-  enabled = var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+  enabled = var('claims_enabled', False) | as_bool
 ) }}
 
 with ccs_release_year as (
   select
     max(release_year) as max_release_year
-  from {{ ref('terminology__ccs_services_procedures') }}
+  from {{ ref('service_category__ccs_services_procedures') }}
 )
 
 , final as (
@@ -32,7 +32,7 @@ with ccs_release_year as (
     , pos.place_of_service_description
     , m.revenue_center_code
     , r.revenue_center_description
-    , m.diagnosis_code_1
+    , coalesce(claim_dx.diagnosis_code_1, m.diagnosis_code_1) as diagnosis_code_1
     , dx.default_ccsr_category_ip
     , dx.default_ccsr_category_op
     , dx.default_ccsr_category_description_ip
@@ -42,8 +42,12 @@ with ccs_release_year as (
     , rend.primary_specialty_description as rend_primary_specialty_description
     , n.modality
     , m.data_source
-  from {{ ref('normalized_input__medical_claim') }} as m
-  left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as dx on m.diagnosis_code_1 = dx.icd_10_cm_code
+  from {{ ref('normalized__medical_claim') }} as m
+  left outer join {{ ref('int_claim_level_diagnosis') }} as claim_dx
+    on m.claim_id = claim_dx.claim_id
+    and m.data_source = claim_dx.data_source
+  left outer join {{ ref('service_category__dxccsr_v2023_1_cleaned_map') }} as dx
+    on coalesce(claim_dx.diagnosis_code_1, m.diagnosis_code_1) = dx.icd_10_cm_code
   left outer join {{ ref('provider_data__provider') }} as p on m.facility_npi = p.npi
   left outer join {{ ref('terminology__nitos') }} as n on m.hcpcs_code = n.hcpcs_code
   left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
@@ -90,7 +94,7 @@ select
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from final as f
 cross join ccs_release_year as cry
-left outer join {{ ref('terminology__ccs_services_procedures') }} as c
+left outer join {{ ref('service_category__ccs_services_procedures') }} as c
   on f.hcpcs_code = c.hcpcs_code
   and (
     (

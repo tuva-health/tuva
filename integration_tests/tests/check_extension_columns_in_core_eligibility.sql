@@ -11,7 +11,7 @@
 -- depends_on: {{ ref('core__eligibility') }}
 
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool,
+     enabled = var('claims_enabled', false) | as_bool,
      tags = ['extension_columns'],
      severity = 'error'
    )

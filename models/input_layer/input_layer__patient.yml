@@ -6,41 +6,6 @@ models:
 
 
       This table is intended to have one record per person_id, patient_id, and data_source. A person may have multiple records when their source-system identifier changes over time or when the same person has multiple medical record numbers. In that pattern, patient_id should preserve the clinical source-system identifier, such as MRN, while person_id should be the stable globally unique identifier for the person across the dataset.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_1
-              - dqi
-              - dqi_service_categories
-              - dqi_ccsr
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            combination_of_columns:
-              - person_id
-              - patient_id
-              - data_source
-      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
-          config:
-            severity: warn
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_3
-              - dqi
-              - dqi_quality_measures
-          arguments:
-            column_A: death_date
-            column_B: birth_date
-            or_equal: true
-            row_condition: death_date is not null
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -53,621 +18,123 @@ models:
     columns:
       - name: person_id
         description: Globally unique identifier for the person across the dataset. This should remain stable even when the person has multiple patient IDs or medical record numbers.
-        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'hcc_recapture', 'hcc_suspecting', 'quality_measures', 'semantic_layer', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
             is_primary_key: true
       - name: patient_id
         description: Identifier for the person in a specific clinical source system, such as MRN. A single person can have multiple patient IDs.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
             is_primary_key: true
       - name: first_name
         description: Patient first name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: middle_name
         description: Patient middle name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: last_name
         description: Patient last name as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: name_suffix
         description: Patient name suffix, such as Jr., Sr., or III.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: sex
         description: Biological sex of the patient. Accepted values are male, female, or unknown, all lowercase.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-                  - dqi_quality_measures
-          - accepted_values:
-              config:
-                severity: warn
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                values:
-                  - male
-                  - female
-                  - unknown
         config:
           meta:
             data_type: varchar
       - name: race
         description: Patient race. This value should match a Tuva race terminology description.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-              arguments:
-                to: ref('terminology__race')
-                field: description
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: ethnicity
         description: Patient ethnicity. This value should match a Tuva ethnicity terminology code.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: birth_date
         description: Patient date of birth in YYYY-MM-DD format.
-        required_for_data_marts: ['ahrq_measures', 'cms_hccs', 'ed_classification', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                min_value: '''1900-01-01'''
-                max_value: '''2100-01-01'''
-                strictly: false
         config:
           meta:
             data_type: date
       - name: death_date
         description: Patient date of death in YYYY-MM-DD format. Leave null if the patient is not deceased or if no death date is available.
-        required_for_data_marts: ['cms_hccs', 'hcc_suspecting', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                column_type: date
-          - the_tuva_project.expect_column_values_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                min_value: '''1900-01-01'''
-                max_value: '''2100-01-01'''
-                strictly: false
         config:
           meta:
             data_type: date
       - name: death_flag
         description: Indicator that the patient is deceased. Use 1 for deceased and 0 for not known deceased.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ target.type != ''bigquery'' }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                values:
-                  - '0'
-                  - '1'
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ target.type == ''bigquery'' }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              column_name: CAST(death_flag AS STRING)
-              arguments:
-                values:
-                  - '0'
-                  - '1'
-                quote: false
         config:
           meta:
             data_type: number
       - name: social_security_number
         description: Patient Social Security number as a string in XXX-XX-XXXX format, including dashes, when available and permitted.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: address
         description: Street address where the patient lives.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: city
         description: City where the patient lives.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: state
         description: State where the patient lives.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-              arguments:
-                to: ref('reference_data__ansi_fips_state')
-                field: ansi_fips_state_abbreviation
         config:
           meta:
             data_type: varchar
       - name: zip_code
         description: ZIP code where the patient lives.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: county
         description: County where the patient lives.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: latitude
         description: Decimal-degree latitude for the patient's address, when available.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: float
       - name: longitude
         description: Decimal-degree longitude for the patient's address, when available.
-        required_for_data_marts: ['ed_classification', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: float
       - name: phone
         description: Patient phone number as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: email
         description: Patient email address as represented in the source system.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - dbt_expectations.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the patient record was extracted from the source system or ingested into the data warehouse.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - date
-                  - datetime
-                  - time
-                  - timestamp
-                  - timestamp_ntz
-                  - timestampntz
-                  - timestamp_ltz
-                  - timestampltz
-                  - timestamp_tz
-                  - timestamptz
-                  - timestamp with time zone
-                  - timestamp without time zone
-                  - datetime2
-                  - datetimeoffset
         config:
           meta:
             data_type: timestamp
       - name: data_source
         description: User-defined name that identifies the clinical source, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
-        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'hcc_recapture', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar

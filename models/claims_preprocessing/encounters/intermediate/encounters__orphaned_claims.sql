@@ -15,24 +15,21 @@ with cte as (
   , stg.start_date
   , stg.end_date
   , stg.patient_data_source_id
+  , stg.data_source
   from {{ ref('encounters__stg_medical_claim') }} as stg
   left outer join {{ ref('encounters__combined_claim_line_crosswalk') }} as enc on stg.claim_id = enc.claim_id
   and
   stg.claim_line_number = enc.claim_line_number
+  and
+  stg.data_source = enc.data_source
   where enc.claim_id is null -- missing from encounter mapping table
-)
-
-, max_encounter as (
-  select max(encounter_id) as max_encounter_id
-  from {{ ref('encounters__combined_claim_line_crosswalk') }}
 )
 
 select
   claim_id
 , claim_line_number
-, dense_rank() over (
-order by patient_data_source_id, claim_id) + max_encounter.max_encounter_id as encounter_id
+, data_source
+, {{ the_tuva_project.encounter_id_hash(["'orphaned claim'", 'patient_data_source_id', 'claim_id']) }} as encounter_id
 , 'orphaned claim' as encounter_type
 , 'other' as encounter_group
 from cte
-cross join max_encounter

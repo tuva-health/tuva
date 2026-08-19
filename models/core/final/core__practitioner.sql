@@ -22,11 +22,11 @@
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__practitioner')) }}
+    {{ select_extension_columns(ref('normalized__practitioner')) }}
 {%- endset -%}
 
 with prac as (
-    {{ smart_union([ref('core__stg_claims_practitioner'), ref('core__stg_clinical_practitioner')], source_index=none) }}
+    {{ smart_union([ref('core__stg_claims_practitioner'), ref('normalized__practitioner')], source_index=none) }}
 )
 
 select
@@ -38,14 +38,14 @@ from prac
 {% elif var('clinical_enabled', False) == true -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('input_layer__practitioner')) }}
+    {{ select_extension_columns(ref('normalized__practitioner')) }}
 {%- endset -%}
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from {{ ref('core__stg_clinical_practitioner') }}
+from {{ ref('normalized__practitioner') }}
 
 {% elif var('claims_enabled', False) == true -%}
 

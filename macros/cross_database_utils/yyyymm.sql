@@ -1,5 +1,5 @@
 {% macro yyyymm(date) -%}
-    {{ adapter.dispatch('yyyymm') (date) }}
+    {{ adapter.dispatch('yyyymm', 'the_tuva_project') (date) }}
 {%- endmacro %}
 
 {% macro duckdb__yyyymm(date) -%}

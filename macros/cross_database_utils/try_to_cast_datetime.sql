@@ -7,7 +7,7 @@
 
 {%- macro try_to_cast_datetime(column_name) -%}
 
-    {{ return(adapter.dispatch('try_to_cast_datetime')(column_name)) }}
+    {{ return(adapter.dispatch('try_to_cast_datetime', 'the_tuva_project')(column_name)) }}
 
 {%- endmacro -%}
 

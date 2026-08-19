@@ -8,7 +8,7 @@
 
 {%- macro try_to_cast_date(column_name, date_format='YYYY-MM-DD') -%}
 
-    {{ return(adapter.dispatch('try_to_cast_date')(column_name, date_format)) }}
+    {{ return(adapter.dispatch('try_to_cast_date', 'the_tuva_project')(column_name, date_format)) }}
 
 {%- endmacro -%}
 

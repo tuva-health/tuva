@@ -58,7 +58,7 @@ truncate table {{ this }}
       *
     from
         read_csv('s3://{{ uri }}/{{ pattern }}*',
-        {% if null_marker == true %} nullstr = ['', '\N'] {% else %} nullstr = '' {% endif %},
+        {% if null_marker == true %} nullstr = ['', '\N', '\\N'] {% else %} nullstr = '' {% endif %},
          quote = '"', escape = '"',
          header={{headers}},
          columns= { {{ cols }} } )
@@ -193,7 +193,7 @@ copy into {{ this }}
       field_optionally_enclosed_by = '"'
       /* Crucial: also treat quoted empties "" as NULL */
       {% if null_marker == true %}
-      null_if = ('', '""', 'NULL', '\\N')
+      null_if = ('', '""', 'NULL', '\\N', '\\\\N')
       {% else %}
       /* At minimum, handle both empty and quoted-empty */
       null_if = ('', '""')
@@ -232,7 +232,7 @@ from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
-    {% if null_marker == true %} null_markers = ['', '\\N'], {% else %} {% endif %}
+    {% if null_marker == true %} null_markers = ['', '\\N', '\\\\N'], {% else %} {% endif %}
     quote = '"',
     allow_quoted_newlines = True
     )

@@ -1,13 +1,18 @@
 # Compiled files and build outputs
 target/
+build/
+dist/
 
 # DBT specific
 dbt_modules/
 dbt_packages/
 package-lock.yml
+*.duckdb
+*.duckdb.wal
 
 # Logs
 logs/
+*.log
 
 # Documentation
 release_notes/
@@ -24,11 +29,20 @@ dbt_internal_packages/
 .mise.toml
 .venv/
 __pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 .envrc
 .python-version
 .env
 .user.yml
-# profiles.yml
+profiles.yml
 venv/
 
 SQLFLUFF_LINTER_OUTPUT.TXT
+
+# Agent/local scratch
+.codex_tmp/

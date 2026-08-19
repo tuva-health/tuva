@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: metadata__tuva_invocations
+    description: One-row metadata table for the current Tuva Core dbt invocation. Full-refresh or table builds overwrite this table using normal dbt materialization behavior.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) is not none -%}{{ var('tuva_schema_prefix') }}_metadata
+        {%- else -%}metadata{%- endif -%}
+      alias: tuva_invocations
+      tags:
+        - metadata
+      materialized: table
+    columns:
+      - name: invocation_id
+        description: dbt invocation ID for the run that built this table.
+      - name: package_name
+        description: Tuva Core dbt package name.
+      - name: package_version
+        description: Tuva Core package version used for the run.
+      - name: dbt_project_name
+        description: Root dbt project name that invoked Tuva Core.
+      - name: dbt_target_name
+        description: dbt target name used for the run.
+      - name: dbt_target_type
+        description: dbt adapter type used for the run.
+      - name: dbt_command
+        description: dbt command type used for the run.
+      - name: run_started_at
+        description: Timestamp when dbt started the run.
+      - name: tuva_last_run
+        description: Timestamp value from the tuva_last_run dbt variable for the current run.

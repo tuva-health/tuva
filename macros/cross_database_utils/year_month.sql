@@ -8,7 +8,7 @@
 #}
 
 {% macro year_month(date_column) -%}
-    {{ return(adapter.dispatch('year_month')(date_column)) }}
+    {{ return(adapter.dispatch('year_month', 'the_tuva_project')(date_column)) }}
 {%- endmacro %}
 
 {% macro default__year_month(date_column) -%}

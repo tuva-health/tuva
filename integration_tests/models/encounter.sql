@@ -1,38 +1,29 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = var('clinical_enabled', False) | as_bool
    )
 }}
 
-{# Uncomment the synthetic extension columns below to test extension columns passthrough feature #}
-{%- set tuva_synthetic_extensions -%}
-    {# , cast(null as {{ dbt.type_string() }}) as x_temp_encounter_type #}
-    {# , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as x_temp_encounter_start_date #}
-    {# , cast(null as {{ dbt.type_string() }}) as zzz_temp_facility_name #}
-{%- endset -%}
-
-select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
-  cast(null as {{ dbt.type_string() }}) as encounter_id
-, cast(null as {{ dbt.type_string() }}) as person_id
-, cast(null as {{ dbt.type_string() }}) as patient_id
-, cast(null as {{ dbt.type_string() }}) as encounter_type
-, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date
-, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_end_date
-, cast(null as {{ dbt.type_string() }}) as admit_source_code
-, cast(null as {{ dbt.type_string() }}) as admit_type_code
-, cast(null as {{ dbt.type_string() }}) as discharge_disposition_code
-, cast(null as {{ dbt.type_string() }}) as attending_provider_id
-, cast(null as {{ dbt.type_string() }}) as attending_provider_name
-, cast(null as {{ dbt.type_string() }}) as facility_npi
-, cast(null as {{ dbt.type_string() }}) as facility_name
-, cast(null as {{ dbt.type_string() }}) as primary_diagnosis_code_type
-, cast(null as {{ dbt.type_string() }}) as primary_diagnosis_code
-, cast(null as {{ dbt.type_string() }}) as drg_code_type
-, cast(null as {{ dbt.type_string() }}) as drg_code
-, cast(null as {{ dbt.type_float() }}) as paid_amount
-, cast(null as {{ dbt.type_float() }}) as allowed_amount
-, cast(null as {{ dbt.type_float() }}) as charge_amount
-{{ tuva_synthetic_extensions }}
-, cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
-, cast(null as {{ dbt.type_string() }}) as data_source
-{{ limit_zero() }}
+select
+      encounter_id
+    , person_id
+    , patient_id
+    , encounter_type
+    , encounter_start_date
+    , encounter_end_date
+    , admit_source_code
+    , admit_type_code
+    , discharge_disposition_code
+    , attending_provider_id
+    , attending_provider_name
+    , facility_npi
+    , facility_name
+    , primary_diagnosis_code_type
+    , primary_diagnosis_code
+    , drg_code_type
+    , drg_code
+    , paid_amount
+    , allowed_amount
+    , charge_amount
+    , ingest_datetime
+    , data_source
+from {{ ref('the_tuva_project', 'synthetic_data__encounter') }}

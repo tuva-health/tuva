@@ -9,46 +9,6 @@ models:
 
 
       Primary key: claim_id, claim_line_number, data_source.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_1
-              - dqi
-              - dqi_service_categories
-              - dqi_ccsr
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            combination_of_columns:
-              - claim_id
-              - claim_line_number
-              - data_source
-      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
-          config:
-            severity: warn
-            enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_3
-              - dqi
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            column_A: claim_end_date
-            column_B: claim_start_date
-            or_equal: true
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -58,40 +18,6 @@ models:
       - name: claim_id
         description: >-
           Identifier for a medical claim. A claim may contain multiple claim lines, so the same claim_id may appear on multiple rows. This value should be populated on every row and should remain consistent across all lines for the same claim.
-        required_for_data_marts: ['ccsr', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
@@ -99,40 +25,6 @@ models:
       - name: claim_line_number
         description: >-
           Line number for the claim line represented by the row. Values should be positive integers and should uniquely identify each line within a claim_id. If the source does not provide reliable line numbers, create them during mapping.
-        required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: integer
@@ -140,4180 +32,852 @@ models:
       - name: claim_type
         description: >-
           Header-level classification of the medical claim as professional, institutional, or undetermined. This value should be consistent across all lines for the same claim_id. If claim_type is not provided by the source, derive it from claim content: professional claims should have a place_of_service_code and should not have institutional-only fields such as bill_type_code or revenue_center_code; institutional claims should have bill_type_code and revenue_center_code and should not have place_of_service_code. If the source does not clearly support either pattern, use undetermined until the classification can be resolved. Some payers populate institutional claims with place_of_service_code values or create nonstandard place of service codes, so review source-specific behavior carefully before deriving claim_type.
-        required_for_data_marts: ['cms_hccs', 'encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A claim cannot be both professional and institutional within the same claim id.
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A claim cannot be both professional and institutional within the same claim id.
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - claim_id
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_hccs
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_hccs
-              arguments:
-                values:
-                  - professional
-                  - institutional
-                  - undetermined
         config:
           meta:
             data_type: varchar
       - name: person_id
         description: >-
           Globally unique identifier for the person who received care. A person may have multiple member IDs over time or across plans, but person_id should remain stable for the same person.
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'provider_attribution', 'quality_measures', 'readmissions', 'semantic_layer', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A claim should not belong to two different people.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A claim should not belong to two different people.
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - claim_id
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: member_id
         description: >-
           Identifier assigned by the payer or health plan for the person's coverage. This should identify the member associated with the claim and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['claims_enrollment', 'financial_pmpm']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: payer
         description: >-
           Name of the payer responsible for the claim, for example Aetna, Blue Cross Blue Shield, or Medicare FFS. If the source data is scoped to one payer, this value may be hard-coded.
-        required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_financial_pmpm
         config:
           meta:
             data_type: varchar
       - name: plan
         description: >-
           Name of the health insurance plan or product associated with the claim, for example Aetna PPO or Humana HMO. If unavailable in the source, this value may be hard-coded to a stable plan value for the data source.
-        required_for_data_marts: ['claims_enrollment', 'cms_hccs', 'financial_pmpm', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_financial_pmpm
         config:
           meta:
             data_type: varchar
       - name: claim_start_date
         description: >-
           Header-level start date for the claim, formatted as YYYY-MM-DD. This value should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A claim should not have multiple start dates within the same claim id.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A claim should not have multiple start dates within the same claim id.
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - claim_id
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                column_type: date
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: date
       - name: claim_end_date
         description: >-
           Header-level end date for the claim, formatted as YYYY-MM-DD. This value should be consistent across all lines for the same claim_id and should be greater than or equal to claim_start_date.
-        required_for_data_marts: ['cms_hccs', 'encounters', 'financial_pmpm', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A claim should not have multiple end dates within the same claim id.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A claim should not have multiple end dates within the same claim id.
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                min_value: 1
-                max_value: 1
-                group_by:
-                  - claim_id
-                strictly: false
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: claim_line_start_date
         description: >-
           Start date for the service or item represented by the claim line, formatted as YYYY-MM-DD. This may differ across lines within the same claim.
-        required_for_data_marts: ['claims_enrollment', 'encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a reasonable range. '
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_financial_pmpm
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_financial_pmpm
         config:
           meta:
             data_type: date
       - name: claim_line_end_date
         description: >-
           End date for the service or item represented by the claim line, formatted as YYYY-MM-DD. This may differ across lines within the same claim and should be greater than or equal to claim_line_start_date.
-        required_for_data_marts: ['encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_financial_pmpm
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_financial_pmpm
         config:
           meta:
             data_type: date
       - name: admission_date
         description: >-
           Header-level admission date for an inpatient institutional claim, formatted as YYYY-MM-DD. Populate when the claim represents an inpatient facility stay. This value should be consistent across all lines for the same inpatient institutional claim.
-        required_for_data_marts: ['claims_enrollment', 'encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-              arguments:
-                column_type: date
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_tuva_chronic_conditions
         config:
           meta:
             data_type: date
       - name: discharge_date
         description: >-
           Header-level discharge date for an inpatient institutional claim, formatted as YYYY-MM-DD. Populate when the claim represents an inpatient facility stay. This value should be consistent across all lines for the same inpatient institutional claim and should be greater than or equal to admission_date.
-        required_for_data_marts: ['encounters', 'readmissions', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-          - the_tuva_project.expect_column_values_to_be_between:
-              description: This is a test on all dates to see if they are within a reasonable range.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 'This is a test on all dates to see if they are within a reasonable range. '
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-              arguments:
-                min_value: '''1900-01-02'''
-                max_value: '''2050-01-02'''
-                strictly: false
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_tuva_chronic_conditions
-              arguments:
-                column_type: date
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_tuva_chronic_conditions
         config:
           meta:
             data_type: date
       - name: admit_source_code
         description: >-
           Header-level code indicating the source of admission for an inpatient institutional claim. This value should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ahrq_measures', 'encounters', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                value: 1
         config:
           meta:
             data_type: varchar
       - name: admit_type_code
         description: >-
           Header-level code indicating the priority or type of admission for an inpatient institutional claim, such as emergency, urgent, or elective. This value should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['encounters', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                value: 1
-          - the_tuva_project.expect_column_values_to_match_regex:
-              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                regex: ^[0-59]$
-                pattern1: '[0123459]'
         config:
           meta:
             data_type: varchar
       - name: discharge_disposition_code
         description: >-
           Header-level code indicating where the person was discharged after an inpatient institutional stay. This value should be consistent across all lines for the same claim_id. Preserve leading zeroes when present in the standard code set.
-        required_for_data_marts: ['encounters', 'readmissions', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_readmission
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_readmission
-              arguments:
-                to: ref('terminology__discharge_disposition')
-                field: discharge_disposition_code
         config:
           meta:
             data_type: varchar
       - name: place_of_service_code
         description: >-
           Line-level code indicating where a professional service was provided. Professional claim lines should generally have a place_of_service_code; institutional claims should never have a place_of_service_code. Some payers create nonstandard place of service codes or populate institutional claims with place_of_service_code values even though this is not technically allowed, so review source-specific behavior carefully during mapping.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer', 'service_categories']
-        tests:
-          - not_null:
-              description: If a claim is professional, it should have a place of service code via CMS-1500.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: claim_type = 'professional'
-                meta:
-                  dqi_test_description: 'If a claim is professional, it should have a place of service code via CMS-1500. '
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                value: 2
-          - the_tuva_project.expect_column_values_to_match_regex:
-              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_quality_measures
-              arguments:
-                regex: ^[0-9]{2}$
-                pattern1: '[0-9][0-9]'
         config:
           meta:
             data_type: varchar
       - name: bill_type_code
         description: >-
           Header-level bill type code for institutional claims. This identifies the type of facility claim and should be consistent across all lines for the same claim_id. Preserve leading zeroes when present in the standard code set.
-        required_for_data_marts: ['cms_hccs', 'encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: A claim should not have multiple bill type codes within the same claim id.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: A claim should not have multiple bill type codes within the same claim id.
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-              arguments:
-                min_value: 0
-                max_value: 1
-                group_by:
-                  - claim_id
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: claim_type = 'institutional'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-          - the_tuva_project.expect_column_value_lengths_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-              arguments:
-                min_value: 3
-                max_value: 4
-          - the_tuva_project.expect_column_values_to_match_regex:
-              description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-              arguments:
-                regex: ^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$
-                pattern1: '[0-9][0-9][0-9A-Za-z]'
-                pattern2: 0[0-9][0-9][0-9A-Za-z]
         config:
           meta:
             data_type: varchar
       - name: drg_code_type
         description: >-
           DRG coding system for drg_code. Accepted values are ms-drg and apr-drg. Populate when drg_code is populated.
-        required_for_data_marts: ['cms_chronic_conditions', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
-              arguments:
-                values:
-                  - ms-drg
-                  - apr-drg
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: drg_code is not null
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: drg_code
         description: >-
           Diagnosis Related Group code for an inpatient claim. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ahrq_measures', 'cms_chronic_conditions', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
-              arguments:
-                value: 3
-          - not_null:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12')"
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: revenue_center_code
         description: >-
           Line-level revenue center code for institutional claims. This identifies the department or service area associated with the claim line and should preserve leading zeroes when present in the standard code set.
-        required_for_data_marts: ['encounters', 'semantic_layer', 'service_categories']
-        tests:
-          - not_null:
-              description: Missing revenue codes for institutional claims. Severity 5 as triggers if at least on revenue code is missing.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: claim_type = 'institutional'
-                meta:
-                  dqi_test_description: 'Missing revenue codes for institutional claims. Severity 5 as triggers if at least on revenue code is missing. '
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
-                  - dqi_quality_measures
-          - the_tuva_project.expect_column_unique_value_count_to_be_between:
-              description: For institutional claims, should be some distinct count of different revenue codes
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: For institutional claims, should be some distinct count of different revenue codes
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                min_value: 5
-                max_value: 1000
-                group_by:
-                  - data_source
-                row_condition: claim_type = 'institutional'
-                strictly: false
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_value_lengths_to_be_between:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                min_value: 3
-                max_value: 4
-          - the_tuva_project.expect_column_values_to_match_regex:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_financial_pmpm
-              arguments:
-                regex: ^(\\d{3}|0\\d{3})$
-                pattern1: '[0-9][0-9][0-9]'
-                pattern2: '[01239][0-9][0-9][0-9]'
         config:
           meta:
             data_type: varchar
       - name: service_unit_quantity
         description: >-
           Number of service units for the claim line. This may represent units associated with a revenue center, procedure, service, or supply.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: number
       - name: hcpcs_code
         description: >-
           CPT or HCPCS code for the procedure, service, or supply on the claim line. This is line-level information and may vary across lines within the same claim.
-        required_for_data_marts: ['cms_hccs', 'encounters', 'provider_attribution', 'quality_measures', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-          - not_null:
-              description: Procedure code should not be null on professional claims.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                where: claim_type = 'professional'
-                meta:
-                  dqi_test_description: 'Procedure code should not be null on professional claims. '
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-          - dbt_expectations.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ ((target.type != ''fabric'') and var(''enable_input_layer_testing'', true)) | as_bool }}'
-                meta:
-                  dqi_test_description: If not null, procedure code should be five characters in length.
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_cms_chronic_conditions
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-              arguments:
-                value: 5
         config:
           meta:
             data_type: varchar
       - name: hcpcs_modifier_1
         description: >-
           Modifier 1 applied to the claim line hcpcs_code. Modifiers provide additional context about how or where the service was performed. Leave null when not present.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: hcpcs_modifier_2
         description: >-
           Modifier 2 applied to the claim line hcpcs_code. Modifiers provide additional context about how or where the service was performed. Leave null when not present.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: hcpcs_modifier_3
         description: >-
           Modifier 3 applied to the claim line hcpcs_code. Modifiers provide additional context about how or where the service was performed. Leave null when not present.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: hcpcs_modifier_4
         description: >-
           Modifier 4 applied to the claim line hcpcs_code. Modifiers provide additional context about how or where the service was performed. Leave null when not present.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: hcpcs_modifier_5
         description: >-
           Modifier 5 applied to the claim line hcpcs_code. Modifiers provide additional context about how or where the service was performed. Leave null when not present.
-        required_for_data_marts: ['encounters', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_quality_measures
         config:
           meta:
             data_type: varchar
       - name: rendering_npi
         description: >-
           NPI for the practitioner or provider who rendered the service on the claim line. This is generally line-level and may vary across lines. NPIs should be 10-digit identifiers.
-        required_for_data_marts: ['cms_hccs', 'encounters', 'hcc_recapture', 'provider_attribution', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                value: 10
-          - the_tuva_project.expect_column_values_to_match_regex:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-              arguments:
-                regex: ^[0-9]{10}$
-                pattern1: '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: rendering_tin
         description: >-
           Tax Identification Number for the rendering provider associated with the claim line.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: billing_npi
         description: >-
           NPI for the billing provider or organization responsible for submitting the claim. This is generally header-level and should be consistent across lines for the same claim_id. NPIs should be 10-digit identifiers.
-        required_for_data_marts: ['encounters', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                value: 10
-          - the_tuva_project.expect_column_values_to_match_regex:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-              arguments:
-                regex: ^[0-9]{10}$
-                pattern1: '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: billing_tin
         description: >-
           Tax Identification Number for the billing provider or organization.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: facility_npi
         description: >-
           NPI for the facility where services were delivered. This is especially important for institutional claims and encounter grouping. NPIs should be 10-digit identifiers.
-        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'readmissions', 'semantic_layer', 'service_categories']
-        tests:
-          - not_null:
-              description: >
-                The encounter grouper depends on this field and will not work as intended if this is not provided. If you have an NPI field and are unsure if the NPI is a facility NPI (i.e. level 2 org NPI), then  join to terminology.provider and filter to level 2 NPIs only.
-
-                If left as null, then encounters will under-merge since encounter merging depends on the facility NPI field.  There are two primary options if facility NPIs (i.e. level 2 NPIs) are not available: - Leave null: This mean claims will not merge based on encounter grouping logic since all claims are assumed to be in different facilities. - Add a blank string: This will over-merge, but will apply encounter grouping logic and assumes all encounters are at the same facility.
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                where: "claim_type = 'institutional' and substring(bill_type_code, 1, 2) in ('11', '12', '15', '16', '17', '18', '21', '22', '25', '26', '27', '28', '31', '41', '42', '45', '46', '47', '48', '61', '62', '65', '66', '67', '68', '82')"
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_readmission
-          - the_tuva_project.expect_column_value_lengths_to_equal:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-                  - dqi_readmission
-              arguments:
-                value: 10
-          - the_tuva_project.expect_column_values_to_match_regex:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-              arguments:
-                regex: ^[0-9]{10}$
-                pattern1: '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
         config:
           meta:
             data_type: varchar
       - name: paid_date
         description: >-
           Date the claim was paid by the payer, formatted as YYYY-MM-DD. This often occurs after claim_end_date.
-        required_for_data_marts: ['cms_chronic_conditions', 'financial_pmpm', 'quality_measures', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: date
       - name: paid_amount
         description: >-
           Amount paid by the payer for the claim line. This should reflect final adjudicated payment after adjustment, denial, reversal, and replacement logic has been applied.
-        required_for_data_marts: ['ahrq_measures', 'ed_classification', 'encounters', 'financial_pmpm', 'provider_attribution', 'readmissions', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: float
       - name: allowed_amount
         description: >-
           Total allowed amount for the claim line, including payer-paid and patient-responsibility amounts. This is generally expected to equal paid_amount plus coinsurance_amount plus copayment_amount plus deductible_amount when those fields are available.
-        required_for_data_marts: ['ed_classification', 'encounters', 'financial_pmpm', 'provider_attribution', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: charge_amount
         description: >-
           Amount charged or billed by the provider for the claim line before payer adjudication.
-        required_for_data_marts: ['ed_classification', 'encounters', 'semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ed_classification
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ed_classification
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: coinsurance_amount
         description: >-
           Coinsurance amount owed by the member for the claim line. This represents percentage-based member cost sharing.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: copayment_amount
         description: >-
           Copayment amount owed by the member for the claim line. This represents fixed-dollar member cost sharing.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: deductible_amount
         description: >-
           Deductible amount owed by the member for the claim line before payer coverage applies.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: total_cost_amount
         description: >-
           Total cost amount for the claim line. This may equal allowed_amount, but can differ when the source includes additional cost components not captured by the standard payer-paid and patient-responsibility fields.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - number
-                  - decimal
-                  - numeric
-                  - float
-                  - float4
-                  - float8
-                  - double
-                  - double precision
-                  - real
-                  - float64
-                  - bignumeric
         config:
           meta:
             data_type: float
       - name: diagnosis_code_type
         description: >-
           Coding system used for diagnosis codes on the claim. Accepted values are icd-9-cm and icd-10-cm. This is header-level and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_readmission
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_readmission
-              arguments:
-                values:
-                  - icd-10-cm
-                  - icd-9-cm
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_1
         description: >-
           Primary or first-listed ICD diagnosis code on the claim. For institutional claims, this should generally be the principal diagnosis. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'encounters', 'service_categories', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_readmission
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_readmission
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_1 is not null
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Expect there to be a diagnosis code on most claims.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_4
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_2
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 2. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_2 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_3
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 3. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_3 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_4
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 4. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_4 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_5
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 5. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_5 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_6
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 6. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_6 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_7
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 7. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_7 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_8
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 8. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_8 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_9
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 9. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_9 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_10
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 10. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_10 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_11
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 11. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_11 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_12
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 12. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_12 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_13
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 13. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_13 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_14
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 14. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_14 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_15
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 15. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_15 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_16
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 16. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_16 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_17
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 17. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_17 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_18
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 18. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_18 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_19
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 19. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_19 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_20
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 20. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_20 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_21
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 21. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_21 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_22
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 22. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_22 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_23
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 23. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_23 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_24
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 24. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_24 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_code_25
         description: >-
           Additional ICD diagnosis code on the claim in diagnosis position 25. Leave null when that diagnosis position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ccsr', 'cms_chronic_conditions', 'cms_hccs', 'tuva_chronic_conditions']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-          - the_tuva_project.expect_column_values_to_match_regex_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-                  - dqi_ccsr
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-              arguments:
-                regex_list:
-                  - ^[A-Z][0-9A-Z]{2,7}$
-                  - ^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$
-                  - ^[0-9]{3}([.][0-9]{1,2})?$
-                  - ^[0-9]{3,5}$
-                  - ^[VE][0-9]{3}([.][0-9]{1})?$
-                  - ^[VE][0-9]{2,4}$
-                match_on: any
-                row_condition: diagnosis_code_25 is not null
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_1
         description: >-
           Present-on-admission indicator for diagnosis_code_1. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_2
         description: >-
           Present-on-admission indicator for diagnosis_code_2. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_3
         description: >-
           Present-on-admission indicator for diagnosis_code_3. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_4
         description: >-
           Present-on-admission indicator for diagnosis_code_4. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_5
         description: >-
           Present-on-admission indicator for diagnosis_code_5. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_6
         description: >-
           Present-on-admission indicator for diagnosis_code_6. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_7
         description: >-
           Present-on-admission indicator for diagnosis_code_7. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_8
         description: >-
           Present-on-admission indicator for diagnosis_code_8. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_9
         description: >-
           Present-on-admission indicator for diagnosis_code_9. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_10
         description: >-
           Present-on-admission indicator for diagnosis_code_10. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_11
         description: >-
           Present-on-admission indicator for diagnosis_code_11. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_12
         description: >-
           Present-on-admission indicator for diagnosis_code_12. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_13
         description: >-
           Present-on-admission indicator for diagnosis_code_13. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_14
         description: >-
           Present-on-admission indicator for diagnosis_code_14. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_15
         description: >-
           Present-on-admission indicator for diagnosis_code_15. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_16
         description: >-
           Present-on-admission indicator for diagnosis_code_16. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_17
         description: >-
           Present-on-admission indicator for diagnosis_code_17. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_18
         description: >-
           Present-on-admission indicator for diagnosis_code_18. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_19
         description: >-
           Present-on-admission indicator for diagnosis_code_19. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_20
         description: >-
           Present-on-admission indicator for diagnosis_code_20. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_21
         description: >-
           Present-on-admission indicator for diagnosis_code_21. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_22
         description: >-
           Present-on-admission indicator for diagnosis_code_22. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_23
         description: >-
           Present-on-admission indicator for diagnosis_code_23. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_24
         description: >-
           Present-on-admission indicator for diagnosis_code_24. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: diagnosis_poa_25
         description: >-
           Present-on-admission indicator for diagnosis_code_25. Populate for inpatient institutional claims when available. Leave null when unavailable or not applicable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - relationships:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_3
-                  - dqi
-              arguments:
-                to: ref('terminology__present_on_admission')
-                field: present_on_admit_code
         config:
           meta:
             data_type: varchar
       - name: procedure_code_type
         description: >-
           Coding system used for ICD procedure codes on the claim. Accepted values are icd-9-pcs and icd-10-pcs. Populate when ICD procedure codes are present.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - accepted_values:
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                values:
-                  - icd-10-pcs
-                  - icd-9-pcs
         config:
           meta:
             data_type: varchar
       - name: procedure_code_1
         description: >-
           Primary or first-listed ICD procedure code on the claim. This is generally used for inpatient institutional claims and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_2
         description: >-
           Additional ICD procedure code on the claim in procedure position 2. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_3
         description: >-
           Additional ICD procedure code on the claim in procedure position 3. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_4
         description: >-
           Additional ICD procedure code on the claim in procedure position 4. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_5
         description: >-
           Additional ICD procedure code on the claim in procedure position 5. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_6
         description: >-
           Additional ICD procedure code on the claim in procedure position 6. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_7
         description: >-
           Additional ICD procedure code on the claim in procedure position 7. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_8
         description: >-
           Additional ICD procedure code on the claim in procedure position 8. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_9
         description: >-
           Additional ICD procedure code on the claim in procedure position 9. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_10
         description: >-
           Additional ICD procedure code on the claim in procedure position 10. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_11
         description: >-
           Additional ICD procedure code on the claim in procedure position 11. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_12
         description: >-
           Additional ICD procedure code on the claim in procedure position 12. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_13
         description: >-
           Additional ICD procedure code on the claim in procedure position 13. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_14
         description: >-
           Additional ICD procedure code on the claim in procedure position 14. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_15
         description: >-
           Additional ICD procedure code on the claim in procedure position 15. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_16
         description: >-
           Additional ICD procedure code on the claim in procedure position 16. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_17
         description: >-
           Additional ICD procedure code on the claim in procedure position 17. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_18
         description: >-
           Additional ICD procedure code on the claim in procedure position 18. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_19
         description: >-
           Additional ICD procedure code on the claim in procedure position 19. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_20
         description: >-
           Additional ICD procedure code on the claim in procedure position 20. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_21
         description: >-
           Additional ICD procedure code on the claim in procedure position 21. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_22
         description: >-
           Additional ICD procedure code on the claim in procedure position 22. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_23
         description: >-
           Additional ICD procedure code on the claim in procedure position 23. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_24
         description: >-
           Additional ICD procedure code on the claim in procedure position 24. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_code_25
         description: >-
           Additional ICD procedure code on the claim in procedure position 25. Leave null when that procedure position is not present. This is header-level information and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: procedure_date_1
         description: >-
           Date associated with procedure_code_1, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_2
         description: >-
           Date associated with procedure_code_2, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_3
         description: >-
           Date associated with procedure_code_3, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_4
         description: >-
           Date associated with procedure_code_4, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_5
         description: >-
           Date associated with procedure_code_5, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_6
         description: >-
           Date associated with procedure_code_6, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_7
         description: >-
           Date associated with procedure_code_7, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_8
         description: >-
           Date associated with procedure_code_8, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_9
         description: >-
           Date associated with procedure_code_9, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_10
         description: >-
           Date associated with procedure_code_10, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_11
         description: >-
           Date associated with procedure_code_11, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_12
         description: >-
           Date associated with procedure_code_12, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_13
         description: >-
           Date associated with procedure_code_13, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_14
         description: >-
           Date associated with procedure_code_14, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_15
         description: >-
           Date associated with procedure_code_15, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_16
         description: >-
           Date associated with procedure_code_16, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_17
         description: >-
           Date associated with procedure_code_17, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_18
         description: >-
           Date associated with procedure_code_18, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_19
         description: >-
           Date associated with procedure_code_19, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_20
         description: >-
           Date associated with procedure_code_20, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_21
         description: >-
           Date associated with procedure_code_21, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_22
         description: >-
           Date associated with procedure_code_22, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_23
         description: >-
           Date associated with procedure_code_23, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_24
         description: >-
           Date associated with procedure_code_24, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: procedure_date_25
         description: >-
           Date associated with procedure_code_25, formatted as YYYY-MM-DD. Leave null when the corresponding procedure code or date is unavailable.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_of_type:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type: date
         config:
           meta:
             data_type: date
       - name: in_network_flag
         description: >-
           Indicator for whether the claim was in network. Accepted values are 1 for in network, 0 for out of network, and null when unknown.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: boolean
@@ -4321,68 +885,18 @@ models:
       - name: file_name
         description: >-
           Name of the source file from which the claim line originated. This field is useful for tracing source records across file-based claims extracts.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: file_date
         description: >-
           Date associated with the source file, formatted as YYYY-MM-DD. This may represent the delivery date, reporting period, or date embedded in the file name.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
         config:
           meta:
             data_type: date
       - name: ingest_datetime
         description: >-
           Date and time the source claim line or file was loaded into the data warehouse. This is useful when multiple versions of the same claim line are received over time.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.expect_column_values_to_be_in_type_list:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_2
-                  - dqi
-              arguments:
-                column_type_list:
-                  - date
-                  - datetime
-                  - time
-                  - timestamp
-                  - timestamp_ntz
-                  - timestampntz
-                  - timestamp_ltz
-                  - timestampltz
-                  - timestamp_tz
-                  - timestamptz
-                  - timestamp with time zone
-                  - timestamp without time zone
-                  - datetime2
-                  - datetimeoffset
         config:
           meta:
             data_type: timestamp
@@ -4390,23 +904,6 @@ models:
       - name: data_source
         description: >-
           User-defined name that identifies the source of the medical claim data, for example BCBS Tennessee, Medicare FFS, or Medicaid Ohio. This value should be populated on every record and should be consistent across all lines for the same claim_id.
-        required_for_data_marts: ['ahrq_measures', 'ccsr', 'claims_enrollment', 'cms_chronic_conditions', 'cms_hccs', 'ed_classification', 'encounters', 'financial_pmpm', 'hcc_recapture', 'hcc_suspecting', 'provider_attribution', 'readmissions', 'semantic_layer', 'service_categories']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('enable_data_quality', false) | as_bool,
+     enabled = var('data_quality_enabled', false) | as_bool,
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
@@ -11,16 +11,16 @@
    )
 }}
 
-{% set claim_model_names = dq_claims_structural_model_names() %}
+{% set input_layer_model_names = dq_enabled_input_layer_model_names() %}
 
-{% for model_name in claim_model_names %}
+{% for model_name in input_layer_model_names %}
 -- depends_on: {{ ref(model_name) }}
 {% endfor %}
 
 {% if execute %}
     {% set pk_queries = [] %}
 
-    {% for model_name in claim_model_names %}
+    {% for model_name in input_layer_model_names %}
         {% set model_node = dq_find_model_node(model_name) %}
 
         {% if model_node is not none %}

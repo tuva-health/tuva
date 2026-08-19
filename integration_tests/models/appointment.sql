@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+     enabled = var('clinical_enabled', false)
  | as_bool
    )
 }}
@@ -9,35 +9,16 @@ select
     , person_id
     , patient_id
     , encounter_id
-    , source_appointment_type_code
-    , source_appointment_type_description
-    , normalized_appointment_type_code
-    , normalized_appointment_type_description
     , start_datetime
     , end_datetime
     , duration
     , location_id
     , practitioner_id
-    , source_appointment_type_code as type_code
-    , source_appointment_type_description as type_description
-    , source_status as status_code
-    , source_status as status_description
-    , source_status
-    , normalized_status
-    , appointment_specialty
+    , type_code
+    , type_description
+    , status_code
+    , status_description
     , reason
-    , source_reason_code_type
-    , source_reason_code
-    , source_reason_description
-    , normalized_reason_code_type
-    , normalized_reason_code
-    , normalized_reason_description
     , cancellation_reason
-    , source_cancellation_reason_code_type
-    , source_cancellation_reason_code
-    , source_cancellation_reason_description
-    , normalized_cancellation_reason_code_type
-    , normalized_cancellation_reason_code
-    , normalized_cancellation_reason_description
     , data_source
 from {{ ref('the_tuva_project', 'synthetic_data__appointment') }}

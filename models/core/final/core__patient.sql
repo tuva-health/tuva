@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool)
-            or (var('clinical_enabled', var('tuva_marts_enabled', False)) | as_bool)
+     enabled = (var('claims_enabled', False) | as_bool)
+            or (var('clinical_enabled', False) | as_bool)
    )
 }}
 
@@ -54,38 +54,82 @@ cast(
     , data_source
 {%- endset -%}
 
-{% if var('clinical_enabled', var('tuva_marts_enabled', False)) == true
-   and var('claims_enabled', var('tuva_marts_enabled', False)) == true -%}
-
-{%- set claims_patient_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='claims_patient', strip_prefix=false) }}
-{%- endset -%}
-
-{%- set unioned_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='unioned', strip_prefix=false) }}
-{%- endset -%}
-
-{%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_base', strip_prefix=false) }}
-{%- endset -%}
+{% if var('clinical_enabled', False) == true
+   and var('claims_enabled', False) == true -%}
 
 {%- if execute -%}
     {%- set passthrough_config = var('passthrough', {}) -%}
     {%- set passthrough_prefix = passthrough_config.get('prefix', 'x_').lower() -%}
-    {%- set claims_extension_on_clinical_columns = [] -%}
-    {%- set clinical_column_names = adapter.get_columns_in_relation(ref('core__int_patient_remove_duplicates')) | map(attribute='name') | map('lower') | list -%}
+    {%- set patient_extension_column_keys = [] -%}
+    {%- set claims_extension_column_map = {} -%}
+    {%- set clinical_extension_column_map = {} -%}
+
     {%- for col in adapter.get_columns_in_relation(ref('normalized__eligibility_remove_duplicates')) -%}
         {%- if col.name.lower().startswith(passthrough_prefix) -%}
-            {%- if col.name.lower() in clinical_column_names -%}
-                {%- do claims_extension_on_clinical_columns.append("clinical_patient." ~ col.name) -%}
-            {%- else -%}
-                {%- do claims_extension_on_clinical_columns.append("cast(null as " ~ col.data_type ~ ") as " ~ col.name) -%}
+            {%- set column_key = col.name.lower() -%}
+            {%- do claims_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
+            {%- if column_key not in patient_extension_column_keys -%}
+                {%- do patient_extension_column_keys.append(column_key) -%}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+
+    {%- for col in adapter.get_columns_in_relation(ref('core__int_patient_remove_duplicates')) -%}
+        {%- if col.name.lower().startswith(passthrough_prefix) -%}
+            {%- set column_key = col.name.lower() -%}
+            {%- do clinical_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
+            {%- if column_key not in patient_extension_column_keys -%}
+                {%- do patient_extension_column_keys.append(column_key) -%}
             {%- endif -%}
         {%- endif -%}
     {%- endfor -%}
 {%- else -%}
-    {%- set claims_extension_on_clinical_columns = [] -%}
+    {%- set patient_extension_column_keys = [] -%}
+    {%- set claims_extension_column_map = {} -%}
+    {%- set clinical_extension_column_map = {} -%}
 {%- endif -%}
+
+{%- set claims_patient_extension_columns -%}
+    {%- for column_key in patient_extension_column_keys -%}
+        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
+        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
+        {%- if claims_col is not none %}
+        , claims_patient.{{ claims_col["name"] }}
+        {%- elif clinical_col is not none %}
+        , cast(null as {{ clinical_col["data_type"] }}) as {{ clinical_col["name"] }}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endset -%}
+
+{%- set clinical_patient_extension_columns -%}
+    {%- for column_key in patient_extension_column_keys -%}
+        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
+        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
+        {%- if clinical_col is not none %}
+        , clinical_patient.{{ clinical_col["name"] }}
+        {%- elif claims_col is not none %}
+        , cast(null as {{ claims_col["data_type"] }}) as {{ claims_col["name"] }}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endset -%}
+
+{%- set unioned_extension_columns -%}
+    {%- for column_key in patient_extension_column_keys -%}
+        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
+        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
+        {%- set output_col = claims_col if claims_col is not none else clinical_col -%}
+        , unioned.{{ output_col["name"] }}
+    {%- endfor -%}
+{%- endset -%}
+
+{%- set final_extension_columns -%}
+    {%- for column_key in patient_extension_column_keys -%}
+        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
+        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
+        {%- set output_col = claims_col if claims_col is not none else clinical_col -%}
+        , patient_base.{{ output_col["name"] }}
+    {%- endfor -%}
+{%- endset -%}
 
 with claims_patient as (
     select
@@ -161,9 +205,7 @@ with claims_patient as (
         , clinical_patient.phone
         , clinical_patient.email
         , clinical_patient.ethnicity
-        {%- for col_expr in claims_extension_on_clinical_columns %}
-        , {{ col_expr }}
-        {%- endfor %}
+        {{ clinical_patient_extension_columns }}
         , clinical_patient.data_source
         , clinical_patient.ingest_datetime
         , clinical_patient.tuva_last_run
@@ -246,7 +288,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('clinical_enabled', var('tuva_marts_enabled', False)) == true -%}
+{% elif var('clinical_enabled', False) == true -%}
 
 {%- set source_extension_columns -%}
     {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_source', strip_prefix=false) }}
@@ -295,7 +337,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('claims_enabled', var('tuva_marts_enabled', False)) == true -%}
+{% elif var('claims_enabled', False) == true -%}
 
 {%- set source_extension_columns -%}
     {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_source', strip_prefix=false) }}

@@ -5,6 +5,7 @@
 
 select distinct
     ov.patient_data_source_id
+    , ov.data_source
     , ov.start_date
     , ov.claim_id
     , ov.claim_line_number

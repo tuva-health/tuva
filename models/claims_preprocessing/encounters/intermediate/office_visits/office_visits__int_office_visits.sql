@@ -6,6 +6,7 @@
 with anchor as (
     select distinct
         mc.patient_data_source_id
+      , mc.data_source
       , mc.start_date
       , mc.claim_id
       , mc.claim_line_number
@@ -16,17 +17,18 @@ with anchor as (
     inner join {{ ref('service_category__combined_professional') }} as p -- joining in all sc regardless of final priority
       on mc.claim_id = p.claim_id
       and mc.claim_line_number = p.claim_line_number
+      and mc.data_source = p.data_source
     where p.service_category_1 = 'office-based'
 )
 
 select
     patient_data_source_id
+  , data_source
   , start_date
   , claim_id
   , claim_line_number
   , service_category_1
   , service_category_2
   , service_category_3
-  , dense_rank() over (
-order by patient_data_source_id, start_date) as old_encounter_id
+  , {{ the_tuva_project.encounter_id_hash(["'office based'", 'patient_data_source_id', 'start_date']) }} as old_encounter_id
 from anchor

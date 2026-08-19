@@ -2,8 +2,23 @@ version: 2
 
 seeds:
   - name: provider_data__other_provider_taxonomy
-    description: 'Seed containing other provider taxonomy codes and descriptions.'
+    description: |-
+      Other provider taxonomy records capture secondary taxonomy assignments for NPIs beyond the primary
+      taxonomy. They are derived from CMS NPPES provider data and NUCC taxonomy codes.
     config:
+      meta:
+        primary_key_columns:
+          - npi
+          - taxonomy_code
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          maintainer: "CMS NPPES and NUCC"
+          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_seed('provider_data','other_provider_taxonomy.csv') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
@@ -33,8 +48,19 @@ seeds:
         description: 'Indicates if this is the primary taxonomy (1) or not (0).'
 
   - name: provider_data__provider
-    description: 'Seed containing provider information.'
+    description: |-
+      Provider records contain public NPI profile information used for provider enrichment, specialty
+      grouping, and attribution workflows. They are maintained by CMS in NPPES.
     config:
+      meta:
+        data_asset:
+          maintainer: "CMS NPPES"
+          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "monthly"
+      post_hook: "{{ load_versioned_seed('provider_data','provider.csv') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       tags:
@@ -139,10 +165,26 @@ seeds:
         description: 'Flag indicating if the provider is deactivated.'
 
   - name: provider_data__medicare_provider_and_supplier_taxonomy_crosswalk
-    description: |
-      A source for crosswalk CMS provider specialty codes with NPPES taxonomy codes. Source can be found here: 
-      https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
+    description: |-
+      The Medicare provider and supplier taxonomy crosswalk maps Medicare specialty and supplier categories to
+      Healthcare Provider Taxonomy codes. It is maintained by CMS for Medicare enrollment and provider
+      classification.
     config:
+      meta:
+        primary_key_columns:
+          - medicare_specialty_code
+          - medicare_provider_supplier_type_description
+          - provider_taxonomy_code
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Medicare Provider and Supplier Taxonomy Crosswalk"
+          maintainer: "CMS"
+          source_url: "https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk"
+          source_release: "CMS Data Medicare Provider and Supplier Taxonomy Crosswalk"
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "ad hoc"
+      post_hook: "{{ load_versioned_seed('provider_data','medicare_provider_and_supplier_taxonomy_crosswalk.csv') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: medicare_provider_and_supplier_taxonomy_crosswalk
@@ -158,10 +200,96 @@ seeds:
         provider_taxonomy_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
 
-  - name: provider_data__provider_taxonomy_unpivot
-    description: |
-      Provider taxonomy codes from NPPES.
+  - name: provider_data__electing_teaching_hospital_list
+    description: |-
+      The electing teaching hospital list identifies hospitals that are reportable under the CMS Open
+      Payments program. It is maintained by CMS Open Payments. Tuva publishes this asset for user-led CMS
+      Open Payments and teaching-hospital analytics; current Tuva Core models do not join to it directly.
     config:
+      meta:
+        data_asset:
+          display_name: "Electing Teaching Hospital List"
+          maintainer: "CMS Open Payments"
+          source_url: "https://www.cms.gov/files/document/copy-2026-reporting-cycle-teaching-hospital-list-october-2025.xlsx"
+          source_release: "2026 reporting cycle"
+          source_last_updated: ""
+          tuva_last_updated: "2026-04-29"
+          update_frequency: "annually"
+      post_hook: "{{ load_versioned_seed('provider_data','electing_teaching_hospital_list.csv') }}"
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
+      alias: electing_teaching_hospital_list
+      tags:
+        - provider_data
+      column_types:
+        collection_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        ccn: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(6) {%- endif -%}
+        tin: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(9) {%- endif -%}
+        hospital_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        pecos_legal_business_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        po_box: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: collection_year
+        description: CMS Open Payments reporting collection year.
+      - name: ccn
+        description: CMS Certification Number for the teaching hospital.
+      - name: tin
+        description: Tax Identification Number for the teaching hospital.
+      - name: hospital_name
+        description: Teaching hospital name.
+      - name: pecos_legal_business_name
+        description: PECOS legal business name for the teaching hospital.
+      - name: street_address
+        description: Teaching hospital street address.
+      - name: po_box
+        description: Teaching hospital post office box, when available.
+      - name: city
+        description: Teaching hospital city.
+      - name: state
+        description: Teaching hospital state.
+      - name: zip_code
+        description: Teaching hospital ZIP code.
+      - name: street_address_1
+        description: Additional CMS Open Payments address line 1.
+      - name: street_address_2
+        description: Additional CMS Open Payments address line 2.
+      - name: city_2
+        description: Additional CMS Open Payments city.
+      - name: state_2
+        description: Additional CMS Open Payments state.
+      - name: zip_code_2
+        description: Additional CMS Open Payments ZIP code.
+
+  - name: provider_data__provider_taxonomy_unpivot
+    description: |-
+      Provider taxonomy unpivot records list one row per NPI and taxonomy relationship so provider specialties
+      can be queried directly. They are derived from CMS NPPES provider data.
+    config:
+      post_hook: "{{ load_versioned_seed('provider_data','provider_taxonomy_unpivot.csv') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
       alias: provider_taxonomy_unpivot
@@ -179,6 +307,18 @@ seeds:
         taxonomy_switch: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
       meta:
+        primary_key_columns:
+          - npi
+          - taxonomy_col
+        primary_key_strategy: natural_multi_column
+        data_asset:
+          display_name: "Provider Taxonomy Unpivot"
+          maintainer: "CMS NPPES"
+          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
+          source_release: ""
+          source_last_updated: ""
+          tuva_last_updated: "2026-03-30"
+          update_frequency: "ad hoc"
         columns:
           - name: npi
             description: 'The National Provider Identifier (NPI).'

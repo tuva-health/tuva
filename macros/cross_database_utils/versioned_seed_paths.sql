@@ -1,7 +1,5 @@
 {% macro get_seed_database_folders() %}
   {{ return({
-      'concept_library': 'concept-library',
-      'reference_data': 'reference-data',
       'terminology': 'terminology',
       'value_sets': 'value-sets',
       'provider_data': 'provider-data',
@@ -63,28 +61,39 @@
 
 
 {% macro get_seed_version(version_override=none, database=none) %}
-  {% if version_override is none %}
+  {% if version_override is not none %}
+    {% set version = version_override %}
+  {% else %}
+    {% if database is none %}
+      {% do exceptions.raise_compiler_error(
+          "A Tuva seed family must be provided when resolving a version. "
+          ~ "Set vars.tuva_seed_versions for each active data asset family or pass an explicit version override."
+      ) %}
+    {% endif %}
+
     {% set version_overrides = var('tuva_seed_versions', {}) %}
+    {% if not (version_overrides is mapping) %}
+      {% do exceptions.raise_compiler_error(
+          "Tuva seed versions must be configured as a mapping in vars.tuva_seed_versions."
+      ) %}
+    {% endif %}
+
+    {% set normalized_database = database | string | trim %}
+    {% set alternate_database = normalized_database | replace('-', '_') %}
     {% set version = none %}
 
-    {% if version_overrides is mapping %}
-      {% if database is not none %}
-        {% set normalized_database = database | string | trim %}
-        {% set alternate_database = normalized_database | replace('-', '_') %}
-
-        {% if normalized_database in version_overrides %}
-          {% set version = version_overrides[normalized_database] %}
-        {% elif alternate_database in version_overrides %}
-          {% set version = version_overrides[alternate_database] %}
-        {% endif %}
-      {% endif %}
+    {% if normalized_database in version_overrides %}
+      {% set version = version_overrides[normalized_database] %}
+    {% elif alternate_database in version_overrides %}
+      {% set version = version_overrides[alternate_database] %}
     {% endif %}
 
     {% if version is none %}
-      {% set version = var('tuva_seed_version', '1.0.0') %}
+      {% do exceptions.raise_compiler_error(
+          "Missing required Tuva seed version for family '" ~ database ~ "'. "
+          ~ "Add vars.tuva_seed_versions." ~ alternate_database ~ " to your dbt_project.yml."
+      ) %}
     {% endif %}
-  {% else %}
-    {% set version = version_override %}
   {% endif %}
 
   {% set normalized_version = version | string | trim %}
@@ -134,9 +143,17 @@
           'small': 'appointment_small.csv',
           'large': 'appointment.csv'
       },
+      'condition': {
+          'small': 'condition.csv',
+          'large': 'condition.csv'
+      },
       'eligibility': {
           'small': 'eligibility_small.csv',
           'large': 'eligibility.csv'
+      },
+      'encounter': {
+          'small': 'encounter.csv',
+          'large': 'encounter.csv'
       },
       'immunization': {
           'small': 'immunization.csv',
@@ -146,9 +163,17 @@
           'small': 'lab_result.csv',
           'large': 'lab_result.csv'
       },
+      'location': {
+          'small': 'location.csv',
+          'large': 'location.csv'
+      },
       'medical_claim': {
           'small': 'medical_claim_small.csv',
           'large': 'medical_claim.csv'
+      },
+      'medication': {
+          'small': 'medication.csv',
+          'large': 'medication.csv'
       },
       'observation': {
           'small': 'observation.csv',
@@ -162,8 +187,16 @@
           'small': 'pharmacy_claim_small.csv',
           'large': 'pharmacy_claim.csv'
       },
+      'practitioner': {
+          'small': 'practitioner.csv',
+          'large': 'practitioner.csv'
+      },
+      'procedure': {
+          'small': 'procedure.csv',
+          'large': 'procedure.csv'
+      },
       'provider_attribution': {
-          'small': 'provider_attribution.csv',
+          'small': 'provider_attribution_small.csv',
           'large': 'provider_attribution.csv'
       }
   } %}

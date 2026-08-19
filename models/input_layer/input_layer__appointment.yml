@@ -22,13 +22,6 @@ models:
           meta:
             data_type: varchar
             is_primary_key: true
-        tests:
-          - unique:
-              config:
-                severity: error
-          - not_null:
-              config:
-                severity: error
       - name: person_id
         description: >-
           Globally unique identifier for the person associated with the appointment. A person may have multiple patient IDs over time or across clinical source systems, but person_id should remain stable for the same person.

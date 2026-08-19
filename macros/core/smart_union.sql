@@ -64,9 +64,9 @@
     {%- endif %}
     {%- for col in sorted_columns %}
         {%- if col.name.lower() in relation_cols %}
-        {{ col.name }}
+        {{ quote_column(col.name) }}
         {%- else %}
-        cast(null as {{ col.data_type }}) as {{ col.name }}
+        cast(null as {{ col.data_type }}) as {{ quote_column(col.name) }}
         {%- endif %}
         {%- if not loop.last %},{% endif %}
     {%- endfor %}

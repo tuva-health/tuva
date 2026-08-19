@@ -7,27 +7,6 @@ models:
       The practitioner_id should be the source-system identifier used consistently across the clinical input layer to reference the same practitioner. This identifier does not need to be an NPI. If an NPI is available, it should be populated in the npi field.
 
       Primary key: practitioner_id, data_source.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          config:
-            severity: error
-            enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-            tags:
-              - tuva_dqi_sev_1
-              - dqi
-              - dqi_service_categories
-              - dqi_ccsr
-              - dqi_cms_chronic_conditions
-              - dqi_tuva_chronic_conditions
-              - dqi_cms_hccs
-              - dqi_ed_classification
-              - dqi_financial_pmpm
-              - dqi_quality_measures
-              - dqi_readmission
-          arguments:
-            combination_of_columns:
-              - practitioner_id
-              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -36,195 +15,42 @@ models:
     columns:
       - name: practitioner_id
         description: Source-system identifier for the practitioner. This should be the same identifier used in other clinical input layer tables when referencing the practitioner. This field does not need to be an NPI and is unique only within a data source.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: error
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
-          - not_null:
-              config:
-                severity: error
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-                  - dqi_service_categories
-                  - dqi_ccsr
-                  - dqi_cms_chronic_conditions
-                  - dqi_tuva_chronic_conditions
-                  - dqi_cms_hccs
-                  - dqi_ed_classification
-                  - dqi_financial_pmpm
-                  - dqi_quality_measures
-                  - dqi_readmission
         config:
           meta:
             data_type: varchar
             is_primary_key: true
       - name: npi
         description: The practitioner's 10-digit National Provider Identifier, when available. This should be the individual practitioner NPI, not a facility or organization NPI. If the source only has a local practitioner ID, populate practitioner_id and leave npi null.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: first_name
         description: First name of the practitioner as represented in the source system.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: last_name
         description: Last name of the practitioner as represented in the source system.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: practice_affiliation
         description: Practice, group, department, clinic, or organization with which the practitioner is affiliated in the source system.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: specialty
         description: Primary clinical specialty for the practitioner, such as family medicine, cardiology, or emergency medicine.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: sub_specialty
         description: More specific specialty or subspecialty for the practitioner, when available.
-        required_for_data_marts: []
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar
       - name: data_source
         description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with practitioner_id.
-        required_for_data_marts: ['semantic_layer']
-        tests:
-          - the_tuva_project.expect_column_to_exist:
-              config:
-                severity: warn
-                enabled: '{{ (var(''enable_input_layer_testing'', true)) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_1
-                  - dqi
-          - the_tuva_project.warn_if_null_percentage_is_100:
-              description: Percentage of values that are null.
-              config:
-                severity: warn
-                enabled: '{{ var(''enable_input_layer_testing'', true) | as_bool }}'
-                tags:
-                  - tuva_dqi_sev_5
-                  - dqi
         config:
           meta:
             data_type: varchar

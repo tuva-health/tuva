@@ -6,6 +6,7 @@
 with service_category as (
   select distinct
       claim_id
+    , data_source
     , patient_data_source_id
     , start_date
     , end_date
@@ -17,5 +18,6 @@ with service_category as (
 
 select distinct
 claim_id
+, data_source
 , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from service_category

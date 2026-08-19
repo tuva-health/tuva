@@ -1,0 +1,584 @@
+name: Tuva CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      warehouse:
+        description: Warehouse to validate
+        required: true
+        type: choice
+        default: snowflake
+        options:
+          - snowflake
+          - bigquery
+          - databricks
+          - fabric
+          - redshift
+          - all
+  workflow_call:
+    inputs:
+      checkout_ref:
+        description: Exact commit to validate
+        required: true
+        type: string
+      warehouse:
+        description: Warehouse to validate
+        required: true
+        type: string
+      schema_prefix:
+        description: Explicit schema prefix for the build
+        required: true
+        type: string
+      concurrency_key:
+        description: Stable key used to cancel superseded builds
+        required: true
+        type: string
+      publish_status:
+        description: Publish the required Snowflake commit status
+        required: false
+        type: boolean
+        default: false
+      pr_number:
+        description: Pull request number associated with the status
+        required: false
+        type: string
+        default: ""
+      base_sha:
+        description: Exact pull request base commit
+        required: false
+        type: string
+        default: ""
+      head_sha:
+        description: Exact pull request head commit
+        required: false
+        type: string
+        default: ""
+      merge_sha:
+        description: Exact pull request test-merge commit
+        required: false
+        type: string
+        default: ""
+    secrets:
+      DBT_SNOWFLAKE_CI_ACCOUNT:
+        required: false
+      DBT_SNOWFLAKE_CI_WAREHOUSE:
+        required: false
+      DBT_SNOWFLAKE_CI_DATABASE:
+        required: false
+      DBT_SNOWFLAKE_CI_ROLE:
+        required: false
+      DBT_SNOWFLAKE_CI_SCHEMA:
+        required: false
+      DBT_SNOWFLAKE_CI_USER:
+        required: false
+      DBT_SNOWFLAKE_CI_PASSWORD:
+        required: false
+      DBT_BIGQUERY_CI_TOKEN:
+        required: false
+      DBT_BIGQUERY_CI_PROJECT:
+        required: false
+      DBT_DATABRICKS_CI_HOST:
+        required: false
+      DBT_DATABRICKS_CI_HTTP_PATH:
+        required: false
+      DBT_DATABRICKS_CI_TOKEN:
+        required: false
+      DBT_DATABRICKS_CI_CATALOG:
+        required: false
+      DBT_FABRIC_CI_SERVER:
+        required: false
+      DBT_FABRIC_CI_DATABASE:
+        required: false
+      DBT_FABRIC_CI_SCHEMA:
+        required: false
+      DBT_FABRIC_CI_CLIENT_ID:
+        required: false
+      DBT_FABRIC_CI_CLIENT_SECRET:
+        required: false
+      DBT_FABRIC_CI_TENANT_ID:
+        required: false
+      DBT_REDSHIFT_CI_HOST:
+        required: false
+      DBT_REDSHIFT_CI_USER:
+        required: false
+      DBT_REDSHIFT_CI_PASSWORD:
+        required: false
+      DBT_REDSHIFT_CI_DATABASE:
+        required: false
+
+permissions: {}
+
+concurrency:
+  group: >-
+    tuva-ci-${{
+      github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) ||
+      inputs.concurrency_key ||
+      format('manual-{0}', github.run_id)
+    }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.10"
+  DBT_CORE_VERSION: "1.10.15"
+  DBT_SNOWFLAKE_VERSION: "1.10.8"
+  DBT_BIGQUERY_VERSION: "1.10.3"
+  DBT_DATABRICKS_VERSION: "1.10.19"
+  DBT_FABRIC_VERSION: "1.10.0"
+  DBT_REDSHIFT_VERSION: "1.10.2"
+
+jobs:
+  resolve:
+    name: Resolve request
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.resolve.outputs.should_run }}
+      adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
+      checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
+      schema_prefix: ${{ steps.resolve.outputs.schema_prefix }}
+      concurrency_key: ${{ steps.resolve.outputs.concurrency_key }}
+      publish_status: ${{ steps.resolve.outputs.publish_status }}
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      base_sha: ${{ steps.resolve.outputs.base_sha }}
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      merge_sha: ${{ steps.resolve.outputs.merge_sha }}
+    steps:
+      - name: Normalize request
+        id: resolve
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          INPUT_CHECKOUT_REF: ${{ inputs.checkout_ref || '' }}
+          INPUT_WAREHOUSE: ${{ inputs.warehouse || '' }}
+          INPUT_SCHEMA_PREFIX: ${{ inputs.schema_prefix || '' }}
+          INPUT_CONCURRENCY_KEY: ${{ inputs.concurrency_key || '' }}
+          INPUT_PUBLISH_STATUS: ${{ inputs.publish_status && 'true' || 'false' }}
+          INPUT_PR_NUMBER: ${{ inputs.pr_number || '' }}
+          INPUT_BASE_SHA: ${{ inputs.base_sha || '' }}
+          INPUT_HEAD_SHA: ${{ inputs.head_sha || '' }}
+          INPUT_MERGE_SHA: ${{ inputs.merge_sha || '' }}
+        with:
+          script: |
+            const supportedWarehouses = [
+              "snowflake",
+              "bigquery",
+              "databricks",
+              "fabric",
+              "redshift"
+            ];
+
+            const calledCheckoutRef = process.env.INPUT_CHECKOUT_REF.trim();
+            const isReusableCall = calledCheckoutRef !== "";
+
+            let shouldRun = true;
+            let warehouse;
+            let checkoutRef;
+            let schemaPrefix;
+            let concurrencyKey;
+            let publishStatus = false;
+            let prNumber = "";
+            let baseSha = "";
+            let headSha = "";
+            let mergeSha = "";
+
+            if (isReusableCall) {
+              warehouse = process.env.INPUT_WAREHOUSE.trim();
+              checkoutRef = calledCheckoutRef;
+              schemaPrefix = process.env.INPUT_SCHEMA_PREFIX.trim();
+              concurrencyKey = process.env.INPUT_CONCURRENCY_KEY.trim();
+              publishStatus = process.env.INPUT_PUBLISH_STATUS === "true";
+              prNumber = process.env.INPUT_PR_NUMBER.trim();
+              baseSha = process.env.INPUT_BASE_SHA.trim();
+              headSha = process.env.INPUT_HEAD_SHA.trim();
+              mergeSha = process.env.INPUT_MERGE_SHA.trim();
+            } else if (context.eventName === "pull_request") {
+              const pr = context.payload.pull_request;
+              const baseRepository = `${context.repo.owner}/${context.repo.repo}`.toLowerCase();
+              const headRepository = String(pr.head.repo?.full_name || "").toLowerCase();
+
+              if (headRepository !== baseRepository) {
+                shouldRun = false;
+                core.notice(
+                  "Automatic warehouse CI does not execute fork code with repository secrets. " +
+                  "After review, a maintainer can run External PR Snowflake CI from the Actions tab."
+                );
+              }
+
+              warehouse = "snowflake";
+              checkoutRef = context.sha;
+              schemaPrefix = `ci_pr_${pr.number}_${pr.head.sha.slice(0, 8)}`;
+              concurrencyKey = `pr-${pr.number}`;
+              publishStatus = shouldRun;
+              prNumber = String(pr.number);
+              baseSha = pr.base.sha;
+              headSha = pr.head.sha;
+              mergeSha = context.sha;
+            } else {
+              warehouse = String(context.payload.inputs?.warehouse || "snowflake").trim();
+              checkoutRef = context.sha;
+              schemaPrefix = `ci_manual_${process.env.GITHUB_RUN_ID}`;
+              concurrencyKey = `manual-${process.env.GITHUB_RUN_ID}`;
+            }
+
+            if (![...supportedWarehouses, "all"].includes(warehouse)) {
+              core.setFailed(`Unsupported warehouse: ${warehouse}`);
+              return;
+            }
+            if (isReusableCall && warehouse !== "snowflake") {
+              core.setFailed("Reusable CI calls are restricted to Snowflake.");
+              return;
+            }
+            if (shouldRun && !checkoutRef) {
+              core.setFailed("checkout_ref is required.");
+              return;
+            }
+            if (shouldRun && !/^[0-9a-f]{40}$/i.test(checkoutRef)) {
+              core.setFailed("checkout_ref must be an exact 40-character commit SHA.");
+              return;
+            }
+            if (shouldRun && !/^[a-z0-9_]+$/.test(schemaPrefix)) {
+              core.setFailed(`Invalid schema prefix: ${schemaPrefix}`);
+              return;
+            }
+            if (shouldRun && !concurrencyKey) {
+              core.setFailed("concurrency_key is required.");
+              return;
+            }
+            if (publishStatus) {
+              if (warehouse !== "snowflake") {
+                core.setFailed("The required status may be published only by a Snowflake build.");
+                return;
+              }
+              const exactSha = /^[0-9a-f]{40}$/i;
+              if (
+                !/^\d+$/.test(prNumber) ||
+                !exactSha.test(baseSha) ||
+                !exactSha.test(headSha) ||
+                !exactSha.test(mergeSha)
+              ) {
+                core.setFailed("PR number and exact base, head, and merge commits are required.");
+                return;
+              }
+              if (checkoutRef !== mergeSha) {
+                core.setFailed("The required status must describe the exact test-merge commit being built.");
+                return;
+              }
+            }
+
+            const adapterMatrix = warehouse === "all" ? supportedWarehouses : [warehouse];
+            core.setOutput("should_run", String(shouldRun));
+            core.setOutput("adapter_matrix", JSON.stringify(adapterMatrix));
+            core.setOutput("checkout_ref", checkoutRef || "");
+            core.setOutput("schema_prefix", schemaPrefix || "");
+            core.setOutput("concurrency_key", concurrencyKey || "");
+            core.setOutput("publish_status", String(publishStatus));
+            core.setOutput("pr_number", prNumber);
+            core.setOutput("base_sha", baseSha);
+            core.setOutput("head_sha", headSha);
+            core.setOutput("merge_sha", mergeSha);
+
+  mark_pending:
+    name: Publish pending status
+    needs: resolve
+    if: >-
+      needs.resolve.outputs.should_run == 'true' &&
+      needs.resolve.outputs.publish_status == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Mark the tested pull request revision as pending
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+        with:
+          script: |
+            const targetUrl =
+              `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await Promise.all(
+              [process.env.HEAD_SHA, process.env.MERGE_SHA].map((sha) =>
+                github.rest.repos.createCommitStatus({
+                  ...context.repo,
+                  sha,
+                  state: "pending",
+                  context: "Tuva CI / Snowflake",
+                  description: "Snowflake dbt build is running",
+                  target_url: targetUrl
+                })
+              )
+            );
+
+  build:
+    name: Build / ${{ matrix.warehouse }}
+    needs:
+      - resolve
+      - mark_pending
+    if: >-
+      always() &&
+      needs.resolve.outputs.should_run == 'true' &&
+      (needs.mark_pending.result == 'success' || needs.mark_pending.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        warehouse: ${{ fromJson(needs.resolve.outputs.adapter_matrix) }}
+    env:
+      CI_DBT_VARS: >-
+        {"use_synthetic_data": true, "synthetic_data_size": "small",
+        "parity_enabled": false,
+        "tuva_schema_prefix": "${{ needs.resolve.outputs.schema_prefix }}"}
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ needs.resolve.outputs.checkout_ref }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install ODBC Driver 18 for SQL Server
+        if: matrix.warehouse == 'fabric'
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Install dbt adapter
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          case "${{ matrix.warehouse }}" in
+            snowflake)
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-snowflake==${DBT_SNOWFLAKE_VERSION}"
+              ;;
+            bigquery)
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-bigquery==${DBT_BIGQUERY_VERSION}"
+              ;;
+            databricks)
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-databricks==${DBT_DATABRICKS_VERSION}" certifi
+              ;;
+            fabric)
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-fabric==${DBT_FABRIC_VERSION}"
+              ;;
+            redshift)
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-redshift==${DBT_REDSHIFT_VERSION}"
+              ;;
+            *)
+              echo "Unsupported warehouse: ${{ matrix.warehouse }}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Install dbt dependencies
+        run: >-
+          dbt deps
+          --project-dir ./integration_tests
+          --profiles-dir ./integration_tests/profiles/${{ matrix.warehouse }}
+
+      - name: Build on Snowflake
+        if: matrix.warehouse == 'snowflake'
+        env:
+          DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
+          DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+          DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
+          DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+          DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+          DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+          DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
+        run: |
+          dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/snowflake
+          dbt build --full-refresh \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/snowflake \
+            --select package:integration_tests package:the_tuva_project \
+            --vars "$CI_DBT_VARS"
+
+      - name: Build on BigQuery
+        if: matrix.warehouse == 'bigquery'
+        env:
+          DBT_BIGQUERY_CI_TOKEN: ${{ secrets.DBT_BIGQUERY_CI_TOKEN }}
+          DBT_BIGQUERY_CI_PROJECT: ${{ secrets.DBT_BIGQUERY_CI_PROJECT }}
+        run: |
+          trap 'rm -f ./creds.json' EXIT
+          printf '%s' "$DBT_BIGQUERY_CI_TOKEN" | base64 --decode > ./creds.json
+          dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/bigquery
+          dbt build --full-refresh \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/bigquery \
+            --select package:integration_tests package:the_tuva_project \
+            --vars "$CI_DBT_VARS"
+
+      - name: Build on Databricks
+        if: matrix.warehouse == 'databricks'
+        env:
+          DBT_DATABRICKS_CI_HOST: ${{ secrets.DBT_DATABRICKS_CI_HOST }}
+          DBT_DATABRICKS_CI_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_CI_HTTP_PATH }}
+          DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
+          DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
+        run: |
+          dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/databricks
+          dbt build --full-refresh \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/databricks \
+            --select package:integration_tests package:the_tuva_project \
+            --vars "$CI_DBT_VARS"
+
+      - name: Build on Fabric
+        if: matrix.warehouse == 'fabric'
+        env:
+          DBT_FABRIC_CI_SERVER: ${{ secrets.DBT_FABRIC_CI_SERVER }}
+          DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
+          DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
+          DBT_FABRIC_CI_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
+          DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
+          DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
+        run: |
+          dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/fabric
+          dbt build --full-refresh --cache-selected-only \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/fabric \
+            --select package:integration_tests package:the_tuva_project \
+            --vars "$CI_DBT_VARS"
+
+      - name: Build on Redshift
+        if: matrix.warehouse == 'redshift'
+        env:
+          DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+          DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+          DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+          DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}
+          DBT_REDSHIFT_CI_THREADS: "4"
+          DBT_REDSHIFT_CI_SEED_BATCH_SIZE: "2000"
+        run: |
+          dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/redshift
+          dbt build --full-refresh \
+            --project-dir ./integration_tests \
+            --profiles-dir ./integration_tests/profiles/redshift \
+            --select package:integration_tests package:the_tuva_project \
+            --vars "$CI_DBT_VARS"
+
+  finalize_status:
+    name: Publish final status
+    needs:
+      - resolve
+      - mark_pending
+      - build
+    if: >-
+      always() &&
+      needs.resolve.outputs.should_run == 'true' &&
+      needs.resolve.outputs.publish_status == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Publish result for the tested pull request revision
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+          EXPECTED_BASE_SHA: ${{ needs.resolve.outputs.base_sha }}
+          EXPECTED_HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          EXPECTED_MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          PENDING_RESULT: ${{ needs.mark_pending.result }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const expectedBase = process.env.EXPECTED_BASE_SHA;
+            const expectedHead = process.env.EXPECTED_HEAD_SHA;
+            const expectedMerge = process.env.EXPECTED_MERGE_SHA;
+            const buildResult = process.env.BUILD_RESULT;
+            const pendingResult = process.env.PENDING_RESULT;
+            const runUrl =
+              `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            let state = "error";
+            let description = `Snowflake dbt build ended with ${buildResult}`;
+
+            try {
+              const { data: pr } = await github.rest.pulls.get({
+                ...context.repo,
+                pull_number: prNumber
+              });
+              const { data: currentMerge } = await github.rest.repos.getCommit({
+                ...context.repo,
+                ref: `refs/pull/${prNumber}/merge`
+              });
+
+              const requestIsCurrent =
+                pr.state === "open" &&
+                pr.base.ref === "main" &&
+                pr.base.sha === expectedBase &&
+                pr.head.sha === expectedHead &&
+                currentMerge.sha === expectedMerge;
+
+              if (!requestIsCurrent) {
+                description = "PR changed while Snowflake CI was running; rerun required";
+              } else if (pendingResult !== "success") {
+                description = "Snowflake CI could not publish its pending status";
+              } else if (buildResult === "success") {
+                state = "success";
+                description = "Snowflake dbt build passed";
+              } else if (buildResult === "failure") {
+                state = "failure";
+                description = "Snowflake dbt build failed";
+              } else {
+                description = `Snowflake dbt build ended with ${buildResult}`;
+              }
+            } catch (error) {
+              core.warning(`Could not revalidate PR #${prNumber}: ${error.message}`);
+              description = "Snowflake CI could not revalidate the pull request";
+            }
+
+            const statusRefs = [expectedHead, expectedMerge];
+            const latestStatuses = await Promise.all(
+              statusRefs.map(async (ref) => {
+                const { data: statuses } =
+                  await github.rest.repos.listCommitStatusesForRef({
+                    ...context.repo,
+                    ref,
+                    per_page: 100
+                  });
+                return statuses.find(
+                  (status) => status.context === "Tuva CI / Snowflake"
+                );
+              })
+            );
+            if (
+              latestStatuses.some(
+                (status) => status && status.target_url !== runUrl
+              )
+            ) {
+              core.notice(
+                "A newer Snowflake CI run owns the required status; " +
+                "this run will not overwrite it."
+              );
+              return;
+            }
+
+            await Promise.all(
+              statusRefs.map((sha) =>
+                github.rest.repos.createCommitStatus({
+                  ...context.repo,
+                  sha,
+                  state,
+                  context: "Tuva CI / Snowflake",
+                  description,
+                  target_url: runUrl
+                })
+              )
+            );

@@ -1,179 +1,77 @@
 version: 2
 
 models:
-# claim input models
   - name: eligibility
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      meta:
-        dag:
-          node_type: input
-      tags:
-        - claims
-        - input_layer
-      materialized: table
+      tags: [claims, input_layer]
 
   - name: medical_claim
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - claims
-        - input_layer
-      materialized: table
+      tags: [claims, input_layer]
 
   - name: pharmacy_claim
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - claims
-        - input_layer
-      materialized: table
+      tags: [claims, input_layer]
 
   - name: provider_attribution
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - attribution
-        - input_layer
-      materialized: table
+      tags: [attribution, input_layer]
 
-
-# clinical input models
   - name: appointment
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      meta:
-        dag:
-          node_type: input
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: condition
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: encounter
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: immunization
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: lab_result
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: location
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: medication
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: observation
-    description: Created from the synthetic raw_data seed table.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: patient
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      meta:
-        dag:
-          node_type: input
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: practitioner
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]
 
   - name: procedure
-    description: Created as an empty input_layer table for unsupported synthetic input.
+    description: Created from the Tuva synthetic data seed table.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
-        {% else %}input_layer{%- endif -%}
-      tags:
-        - clinical
-        - input_layer
-      materialized: table
+      tags: [clinical, input_layer]

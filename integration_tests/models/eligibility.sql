@@ -26,7 +26,7 @@
     , phone
     , email
     , ethnicity
-    , gender
+    , sex
     , race
     , birth_date
     , death_date
@@ -36,7 +36,7 @@
     , medicare_status_code
     , enrollment_status
     , hospice_flag
-    , cast(case when upper(coalesce(snp_type, '')) = 'I-SNP' then 1 else 0 end as {{ dbt.type_int() }}) as institutional_snp_flag
+    , institutional_snp_flag
     , medicaid_indicator
     , long_term_institutional_flag
     , part_d_raf_type
@@ -50,7 +50,7 @@
     , group_name
 {%- endset -%}
 
-{# Extension columns for testing passthrough to core.member_months #}
+{# Extension columns for testing passthrough to core.member_month #}
 {%- set tuva_extensions -%}
     , {{ dbt.concat([
         "'claims_'",

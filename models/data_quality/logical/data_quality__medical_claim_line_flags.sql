@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('enable_data_quality', false) | as_bool) and (var('claims_enabled', false) | as_bool),
+     enabled = (var('data_quality_enabled', false) | as_bool) and (var('claims_enabled', false) | as_bool),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
@@ -13,7 +13,7 @@
 
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
-{% set min_recent_claim_date_sql = dq_date_literal_sql('2020-01-01') %}
+{% set min_recent_claim_date_sql = dq_date_literal_sql('2000-01-01') %}
 {% set source_sentinel = dq_source_key_sentinel() %}
 
 {% set diagnosis_code_columns = [] %}
@@ -170,13 +170,17 @@ final as (
         , source_rows.claim_line_number
         , source_rows.data_source
         , {{ dq_logical_int_flag_sql("source_rows.claim_type is null") }} as claim_type_null
-        , {{ dq_logical_int_flag_sql("source_rows.claim_type is not null and lower(cast(source_rows.claim_type as " ~ string_type ~ ")) not in ('institutional', 'professional', 'undetermined')") }} as claim_type_invalid
+        , {{ dq_logical_int_flag_sql("source_rows.claim_type is not null and claim_type_lookup.claim_type is null") }} as claim_type_invalid
         , {{ dq_logical_int_flag_sql(professional_claim_where_sql ~ " and " ~ medical_claim_institutional_indicator_where_sql) }} as institutional_indicators_present_for_professional_claim
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null") }} as person_id_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_start_date is null") }} as claim_start_date_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_end_date is null") }} as claim_end_date_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_line_start_date is null") }} as claim_line_start_date_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_line_end_date is null") }} as claim_line_end_date_null
+        , {{ dq_logical_int_flag_sql("source_rows.claim_start_date is not null and (source_rows.claim_start_date < " ~ min_recent_claim_date_sql ~ " or source_rows.claim_start_date > " ~ current_date_sql ~ ")") }} as claim_start_date_out_of_reasonable_range
+        , {{ dq_logical_int_flag_sql("source_rows.claim_end_date is not null and (source_rows.claim_end_date < " ~ min_recent_claim_date_sql ~ " or source_rows.claim_end_date > " ~ current_date_sql ~ ")") }} as claim_end_date_out_of_reasonable_range
+        , {{ dq_logical_int_flag_sql("source_rows.claim_line_start_date is not null and (source_rows.claim_line_start_date < " ~ min_recent_claim_date_sql ~ " or source_rows.claim_line_start_date > " ~ current_date_sql ~ ")") }} as claim_line_start_date_out_of_reasonable_range
+        , {{ dq_logical_int_flag_sql("source_rows.claim_line_end_date is not null and (source_rows.claim_line_end_date < " ~ min_recent_claim_date_sql ~ " or source_rows.claim_line_end_date > " ~ current_date_sql ~ ")") }} as claim_line_end_date_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.claim_start_date is not null and source_rows.claim_end_date is not null and source_rows.claim_start_date > source_rows.claim_end_date") }} as claim_start_after_claim_end
         , {{ dq_logical_int_flag_sql("source_rows.claim_line_start_date is not null and source_rows.claim_line_end_date is not null and source_rows.claim_line_start_date > source_rows.claim_line_end_date") }} as claim_line_start_after_claim_line_end
         , {{ dq_logical_int_flag_sql("source_rows.admission_date is not null and source_rows.discharge_date is not null and source_rows.admission_date > source_rows.discharge_date") }} as admission_date_after_discharge_date
@@ -229,6 +233,8 @@ final as (
        and source_rows._dq_data_source_key = procedure_code_flags._dq_data_source_key
     left join {{ ref('terminology__admit_source') }} as admit_source_lookup
         on cast(source_rows.admit_source_code as {{ string_type }}) = cast(admit_source_lookup.admit_source_code as {{ string_type }})
+    left join {{ ref('terminology__claim_type') }} as claim_type_lookup
+        on lower(cast(source_rows.claim_type as {{ string_type }})) = lower(cast(claim_type_lookup.claim_type as {{ string_type }}))
     left join {{ ref('terminology__admit_type') }} as admit_type_lookup
         on cast(source_rows.admit_type_code as {{ string_type }}) = cast(admit_type_lookup.admit_type_code as {{ string_type }})
     left join {{ ref('terminology__discharge_disposition') }} as discharge_disposition_lookup

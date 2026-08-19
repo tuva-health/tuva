@@ -18,6 +18,7 @@ with first_claim as (
     select
           f.encounter_id
         , f.patient_data_source_id
+        , dat.anchor_claim_id
         , dat.encounter_end_date
         , dat.encounter_start_date
     from first_claim as f
@@ -33,9 +34,10 @@ select
     , dat.encounter_end_date
     , med.claim_id
     , med.claim_line_number
+    , med.data_source
     , row_number() over (
         partition by med.claim_id, med.claim_line_number, med.data_source
-        order by dat.encounter_id
+        order by dat.anchor_claim_id
       ) as claim_attribution_number
 from {{ ref('encounters__stg_medical_claim') }} as med
 inner join {{ ref('encounters__prof_and_lower_priority') }} as plp

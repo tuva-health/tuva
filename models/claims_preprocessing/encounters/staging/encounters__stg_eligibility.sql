@@ -6,7 +6,7 @@
 select
       e.person_id
     , e.birth_date
-    , e.gender
+    , e.sex
     , e.race
     , d.patient_data_source_id
     , row_number() over (partition by d.patient_data_source_id

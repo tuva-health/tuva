@@ -5,12 +5,14 @@
 with base_data as (
     select distinct
         m.patient_data_source_id
+      , m.data_source
       , m.start_date
       , m.end_date
       , m.claim_id
     from {{ ref('encounters__stg_medical_claim') }} as m
     inner join {{ ref('asc__anchor_events') }} as u
       on m.claim_id = u.claim_id
+      and m.data_source = u.data_source
 )
 
 -- Determine Previous Maximum End Date
@@ -65,15 +67,14 @@ with base_data as (
     select
         patient_data_source_id
       , encounter_group
-      , row_number() over (
-            order by patient_data_source_id, encounter_start_date
-        ) as encounter_id
+      , {{ the_tuva_project.encounter_id_hash(["'ambulatory surgery center'", 'patient_data_source_id', 'encounter_start_date']) }} as encounter_id
     from unique_encounters
 )
 
 -- Merge Encounters with Claims
 select
     nd.patient_data_source_id
+  , nd.data_source
   , nd.start_date
   , nd.end_date
   , nd.claim_id

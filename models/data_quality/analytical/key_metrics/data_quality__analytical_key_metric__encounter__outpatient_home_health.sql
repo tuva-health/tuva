@@ -1,3 +1,0 @@
-{{ dq_config_analytical_metric_model('analytical_key_metric__encounter__outpatient_home_health') }}
-
-{{ dq_analytical_metric_model_sql('data_quality__analytical_key_metric__encounter__outpatient_home_health') }}
