@@ -1,5 +1,6 @@
 name: Create Release
-# creates a draft release if there is a push to main/ that changes "version" in /dbt_project.yml
+# creates a draft release after a version-changing push to main; workflow_dispatch
+# retries the current main version after its package-bound data assets are published
 # user must manually publish the release and check the latest release option
 # versions ending in -rc or -RC are marked as prereleases
 
@@ -9,53 +10,322 @@ on:
       - main
     paths:
       - 'dbt_project.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
   create-draft:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
-      - name: Install yq
+      - name: Verify release commit is current main
         run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-          sudo chmod +x /usr/bin/yq
+          set -euo pipefail
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
+          actual=$(git rev-parse HEAD)
+          main=$(git ls-remote origin refs/heads/main | awk '{print $1}')
+          test -n "$main"
+          test "$actual" = "$GITHUB_SHA"
+          test "$actual" = "$main"
 
       - name: Check version change
         id: check_version
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
-          NEW_VERSION=$(yq '.version' dbt_project.yml)
-          OLD_VERSION=$(git show HEAD^:dbt_project.yml | yq '.version')
+          python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
 
-          echo "NEW: $NEW_VERSION"
-          echo "OLD: $OLD_VERSION"
+          VERSION_PATTERN = re.compile(
+              r"^version:\s*(['\"]?)([0-9A-Za-z.+-]+)\1\s*(?:#.*)?$",
+              re.MULTILINE,
+          )
 
-          if [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-            NEW_VERSION_LOWER=$(echo "$NEW_VERSION" | tr '[:upper:]' '[:lower:]')
-            if [[ "$NEW_VERSION_LOWER" == *-rc ]]; then
-              echo "prerelease=true" >> $GITHUB_OUTPUT
-            else
-              echo "prerelease=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
+
+          def project_version(text):
+              matches = VERSION_PATTERN.findall(text)
+              if len(matches) != 1:
+                  raise SystemExit(
+                      f"expected exactly one top-level version; found {len(matches)}"
+                  )
+              return matches[0][1]
+
+
+          new_version = project_version(
+              Path("dbt_project.yml").read_text(encoding="utf-8")
+          )
+          is_recovery = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+          if is_recovery:
+              old_version = None
+              print("RECOVERY: validating the current package version")
+          else:
+              before_sha = os.environ.get("BEFORE_SHA", "")
+              if before_sha and set(before_sha) != {"0"}:
+                  old_version = project_version(
+                      subprocess.check_output(
+                          ["git", "show", f"{before_sha}:dbt_project.yml"],
+                          text=True,
+                      )
+                  )
+              else:
+                  old_version = None
+          print(f"NEW: {new_version}")
+          print(f"OLD: {old_version}")
+
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              if not is_recovery and new_version == old_version:
+                  output.write("changed=false\n")
+              else:
+                  output.write("changed=true\n")
+                  output.write(f"version={new_version}\n")
+                  output.write(
+                      f"prerelease={str(new_version.lower().endswith('-rc')).lower()}\n"
+                  )
+          PY
+
+      - name: Verify data asset release receipts
+        if: steps.check_version.outputs.changed == 'true'
+        env:
+          PACKAGE_VERSION: ${{ steps.check_version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          receipt_path="tuva-core/${PACKAGE_VERSION}/_release.json"
+          receipt_dir=$(mktemp -d)
+          trap 'rm -rf "$receipt_dir"' EXIT
+          receipts=(
+            "s3|https://tuva-public-resources.s3.amazonaws.com/${receipt_path}"
+            "gcs|https://storage.googleapis.com/tuva-public-resources/${receipt_path}"
+            "azure|https://tuvapublicresources.blob.core.windows.net/tuva-public-resources/${receipt_path}"
+          )
+
+          for receipt in "${receipts[@]}"; do
+            provider=${receipt%%|*}
+            url=${receipt#*|}
+            receipt_file="${receipt_dir}/${provider}.json"
+            curl --fail --silent --show-error --location \
+              --proto '=https' --tlsv1.2 \
+              --connect-timeout 15 --max-time 120 \
+              --retry 3 --retry-all-errors \
+              --output "$receipt_file" "$url"
+          done
+
+          python3 - "$receipt_dir" "$PACKAGE_VERSION" "$GITHUB_SHA" data_assets.yml <<'PY'
+          import json
+          import re
+          import sys
+          from pathlib import Path
+
+          SUPPORTED_SCHEMA_VERSIONS = {1}
+          TOP_LEVEL_KEYS = {
+              "schema_version",
+              "package",
+              "package_commit",
+              "version",
+              "files",
+          }
+          FILE_KEYS = {"path", "sha256", "bytes", "rows"}
+          SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+          PACKAGE_COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+
+          receipt_dir = Path(sys.argv[1])
+          package_version = sys.argv[2]
+          package_commit = sys.argv[3]
+          catalog_path = Path(sys.argv[4])
+          providers = ("s3", "gcs", "azure")
+
+          if not PACKAGE_COMMIT_PATTERN.fullmatch(package_commit):
+              raise SystemExit("GITHUB_SHA must be 40 lowercase hex characters")
+
+
+          def fail(provider, message):
+              raise SystemExit(f"{provider} receipt validation failed: {message}")
+
+
+          def reject_duplicate_keys(pairs):
+              value = {}
+              for key, item in pairs:
+                  if key in value:
+                      raise ValueError(f"duplicate JSON key: {key}")
+                  value[key] = item
+              return value
+
+
+          def reject_json_constant(value):
+              raise ValueError(f"unsupported JSON constant: {value}")
+
+
+          catalog_text = catalog_path.read_text(encoding="utf-8")
+          expected_paths = re.findall(r"^    path: (\S+)$", catalog_text, re.MULTILINE)
+          if not expected_paths:
+              raise SystemExit("data_assets.yml does not declare any asset paths")
+          if len(expected_paths) != len(set(expected_paths)):
+              raise SystemExit("data_assets.yml contains duplicate asset paths")
+          expected_paths = sorted(expected_paths)
+
+          receipt_bytes = {}
+          for provider in providers:
+              path = receipt_dir / f"{provider}.json"
+              raw = path.read_bytes()
+              receipt_bytes[provider] = raw
+              try:
+                  receipt = json.loads(
+                      raw.decode("utf-8"),
+                      object_pairs_hook=reject_duplicate_keys,
+                      parse_constant=reject_json_constant,
+                  )
+              except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+                  fail(provider, f"invalid JSON: {exc}")
+
+              if not isinstance(receipt, dict):
+                  fail(provider, "root must be a JSON object")
+              if set(receipt) != TOP_LEVEL_KEYS:
+                  fail(
+                      provider,
+                      f"top-level keys must be exactly {sorted(TOP_LEVEL_KEYS)}",
+                  )
+              schema_version = receipt["schema_version"]
+              if (
+                  isinstance(schema_version, bool)
+                  or not isinstance(schema_version, int)
+                  or schema_version not in SUPPORTED_SCHEMA_VERSIONS
+              ):
+                  fail(
+                      provider,
+                      f"unsupported schema_version {schema_version!r}",
+                  )
+              if receipt["package"] != "tuva-core":
+                  fail(provider, "package must be 'tuva-core'")
+              receipt_commit = receipt["package_commit"]
+              if (
+                  not isinstance(receipt_commit, str)
+                  or not PACKAGE_COMMIT_PATTERN.fullmatch(receipt_commit)
+              ):
+                  fail(
+                      provider,
+                      "package_commit must be 40 lowercase hex characters",
+                  )
+              if receipt_commit != package_commit:
+                  fail(provider, "package_commit must equal GITHUB_SHA")
+              if receipt["version"] != package_version:
+                  fail(
+                      provider,
+                      f"version must be {package_version!r}",
+                  )
+
+              files = receipt["files"]
+              if not isinstance(files, list) or not files:
+                  fail(provider, "files must be a nonempty array")
+
+              paths = []
+              for index, file_record in enumerate(files):
+                  label = f"files[{index}]"
+                  if not isinstance(file_record, dict):
+                      fail(provider, f"{label} must be a JSON object")
+                  if set(file_record) != FILE_KEYS:
+                      fail(
+                          provider,
+                          f"{label} keys must be exactly {sorted(FILE_KEYS)}",
+                      )
+
+                  object_path = file_record["path"]
+                  if not isinstance(object_path, str):
+                      fail(provider, f"{label}.path must be a string")
+                  paths.append(object_path)
+
+                  sha256 = file_record["sha256"]
+                  if not isinstance(sha256, str) or not SHA256_PATTERN.fullmatch(sha256):
+                      fail(provider, f"{label}.sha256 must be 64 lowercase hex characters")
+
+                  byte_count = file_record["bytes"]
+                  if (
+                      isinstance(byte_count, bool)
+                      or not isinstance(byte_count, int)
+                      or byte_count <= 0
+                  ):
+                      fail(provider, f"{label}.bytes must be a positive integer")
+
+                  row_count = file_record["rows"]
+                  if (
+                      isinstance(row_count, bool)
+                      or not isinstance(row_count, int)
+                      or row_count <= 0
+                  ):
+                      fail(provider, f"{label}.rows must be a positive integer")
+
+              if paths != sorted(paths):
+                  fail(provider, "files must be sorted by path")
+              if len(paths) != len(set(paths)):
+                  fail(provider, "file paths must be unique")
+              if paths != expected_paths:
+                  fail(provider, "file paths must exactly match data_assets.yml")
+
+              print(
+                  f"Validated {provider} receipt for "
+                  f"tuva-core@{package_version} at {package_commit}"
+              )
+
+          baseline = receipt_bytes["s3"]
+          for provider in providers[1:]:
+              if receipt_bytes[provider] != baseline:
+                  raise SystemExit(
+                      f"{provider} receipt is not byte-identical to the s3 receipt"
+                  )
+          print("Verified byte-identical release receipts across S3, GCS, and Azure")
+          PY
+
+      - name: Reverify release commit is current main
+        if: steps.check_version.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          actual=$(git rev-parse HEAD)
+          main=$(git ls-remote origin refs/heads/main | awk '{print $1}')
+          test -n "$main"
+          test "$actual" = "$GITHUB_SHA"
+          test "$actual" = "$main"
 
       - name: Create Tag
         if: steps.check_version.outputs.changed == 'true'
+        env:
+          PACKAGE_VERSION: ${{ steps.check_version.outputs.version }}
         run: |
-          git tag v${{ steps.check_version.outputs.version }}
-          git push origin v${{ steps.check_version.outputs.version }}
+          set -euo pipefail
+
+          tag="v${PACKAGE_VERSION}"
+          git fetch --force --tags origin \
+            "refs/heads/main:refs/remotes/origin/main"
+          main_commit=$(git rev-parse refs/remotes/origin/main)
+          if [[ "${GITHUB_SHA}" != "${main_commit}" ]]; then
+            echo "Main advanced to ${main_commit}; refusing to create ${tag}" >&2
+            exit 1
+          fi
+          if git show-ref --verify --quiet "refs/tags/${tag}"; then
+            tagged_commit=$(git rev-list -n 1 "${tag}")
+            if [[ "${tagged_commit}" != "${GITHUB_SHA}" ]]; then
+              echo "Tag ${tag} already points to ${tagged_commit}, not ${GITHUB_SHA}" >&2
+              exit 1
+            fi
+            echo "Tag ${tag} already points to this release commit"
+          else
+            git tag "${tag}"
+          fi
+          git push origin "refs/tags/${tag}"
 
       - name: Create Draft Release
         if: steps.check_version.outputs.changed == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           tag_name: v${{ steps.check_version.outputs.version }}
           name: the_tuva_project v${{ steps.check_version.outputs.version }}

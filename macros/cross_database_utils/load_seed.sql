@@ -1,7 +1,9 @@
 {#
     This macro includes options for compression, headers, and null markers.
-    Default options are set to FALSE. When set to TRUE, the appropriate
-    adapter-specific syntax will be used.
+    Package-aligned assets are canonicalized to bare empty null fields before
+    publication and call this macro with null_marker=true. The null_marker
+    argument remains in the public signature for compatibility; native CSV
+    null behavior means false does not preserve empty strings on every adapter.
 
     Argument examples:
     compression=false
@@ -44,6 +46,14 @@ truncate table {{ this }}
 {% macro duckdb__load_seed(uri,pattern,compression,headers,null_marker) %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
+{%- set local_storage_root = var('tuva_seed_duckdb_storage_root', '') | string | trim -%}
+
+{% if local_storage_root == '' %}
+  {%- set seed_path = 's3://' ~ uri ~ '/' ~ pattern ~ '*' -%}
+{% else %}
+  {%- set root_separator = '' if local_storage_root.endswith('/') else '/' -%}
+  {%- set seed_path = local_storage_root ~ root_separator ~ uri ~ '/' ~ pattern ~ '*' -%}
+{% endif %}
 
 {% for col in columns %}
   {% do collist.append("'" ~col.name~"'" ~ ": " ~ "'"~col.dtype~"'") %}
@@ -57,8 +67,8 @@ truncate table {{ this }}
   select
       *
     from
-        read_csv('s3://{{ uri }}/{{ pattern }}*',
-        {% if null_marker == true %} nullstr = ['', '\N', '\\N'] {% else %} nullstr = '' {% endif %},
+        read_csv('{{ seed_path | replace("'", "''") }}',
+        nullstr = '',
          quote = '"', escape = '"',
          header={{headers}},
          columns= { {{ cols }} } )
@@ -81,7 +91,7 @@ truncate table {{ this }}
 {# debugging { log(sql, True)} #}
 {% set count_result = load_result('count') %}
 {% set row_count = count_result.table.columns[0].values()[0] if count_result.table else 0 %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ row_count,True) }}
+{{ log("Loaded data from external resource\n  loaded to: " ~ this ~ "\n  from: " ~ seed_path ~ "\n  rows: " ~ row_count,True) }}
 {# debugging { log(results, True) } #}
 {% endif %}
 
@@ -92,23 +102,16 @@ truncate table {{ this }}
 {% do the_tuva_project.reset_seed_relation() %}
 {% set sql %}
 
-{% set access_key_part_1 = 'AKIA2EPVN' %}
-{% set access_key_part_2 = 'TV4GFRR5377' %}
-
-{% set secret_key_part_1 = 'refUFvpX0ekY6CKEBEM' %}
-{% set secret_key_part_2 = '7BBfwDm/aUwSmmqX/Updi' %}
-
-{% set full_access_key = access_key_part_1 ~ access_key_part_2 %}
-{% set full_secret_key = secret_key_part_1 ~ secret_key_part_2 %}
-
 copy  {{ this }}
   from 's3://{{ uri }}/{{ pattern }}'
-    access_key_id '{{ full_access_key }}'
-    secret_access_key '{{ full_secret_key }}'
+    iam_role default
   csv
   {% if compression == true %} gzip {% else %} {% endif %}
   {% if headers == true %} ignoreheader 1 {% else %} {% endif %}
   emptyasnull
+  /* Redshift's default NULL AS value is \\N. Override it with the
+     publisher-reserved sentinel so quoted literal \\N remains text. */
+  null as '__TUVA_RESERVED_NULL_MARKER_1_0__'
   region 'us-east-1'
 
 {% endset %}
@@ -130,7 +133,7 @@ copy  {{ this }}
   {% if execute %}
         {%- set columns = adapter.get_columns_in_relation(this) -%}
         {%- set column_definitions = [] -%}
-        {%- set null_char = 'N' if null_marker else '' -%}
+        {%- set null_char = '' -%}
 
         {% for col in columns %}
             {% do column_definitions.append(col.name ~ " string" ) %}
@@ -151,6 +154,13 @@ copy  {{ this }}
         {% set create_tmp_table %}
             CREATE EXTERNAL TABLE `{{ tmp_table }}` ( {{ col_ddl }} )
             ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+            WITH SERDEPROPERTIES (
+                'separatorChar' = ',',
+                'quoteChar' = '"',
+                /* Disable OpenCSV's default backslash escape. Otherwise a
+                   quoted literal \\N loses its backslash before nullif. */
+                'escapeChar' = '\0'
+            )
             STORED AS TEXTFILE
             LOCATION '{{ bucket }}'
             TBLPROPERTIES ('skip.header.line.count'='{{ header_line_count }}', 'compressionType'='GZIP');
@@ -191,13 +201,11 @@ copy into {{ this }}
       {% endif %}
       empty_field_as_null = true
       field_optionally_enclosed_by = '"'
-      /* Crucial: also treat quoted empties "" as NULL */
-      {% if null_marker == true %}
-      null_if = ('', '""', 'NULL', '\\N', '\\\\N')
-      {% else %}
-      /* At minimum, handle both empty and quoted-empty */
-      null_if = ('', '""')
-      {% endif %}
+      escape_unenclosed_field = NONE
+      /* Bare empty fields are handled by empty_field_as_null. This reserved
+         value neutralizes Snowflake's default \\N marker without colliding
+         with a publisher-approved data value. */
+      null_if = ('__TUVA_RESERVED_NULL_MARKER_1_0__')
 )
 pattern = '.*\/{{pattern}}.*';
 {% endset %}
@@ -232,7 +240,7 @@ from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
-    {% if null_marker == true %} null_markers = ['', '\\N', '\\\\N'], {% else %} {% endif %}
+    {% if null_marker == true %} null_markers = [''], {% else %} {% endif %}
     quote = '"',
     allow_quoted_newlines = True
     )
@@ -288,7 +296,7 @@ FILEFORMAT = CSV
 PATTERN = '{{ pattern }}*'
 FORMAT_OPTIONS (
   {% if headers == true %} 'skipRows' = '1', {% else %} 'skipRows' = '0', {% endif %}
-  {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
+  {% if null_marker == true %} 'nullValue' = '', {% else %} {% endif %}
   'enforceSchema' = 'false',
   'inferSchema' = 'false',
   'sep' = ',',
@@ -327,14 +335,6 @@ COPY_OPTIONS (
 
 
 
--- postgres - note this requires some pre-work on your part -  you need to clone
--- the data from the tuva public resource bucket to re-assemble it into a single
--- file per seed with quoted null's unquoted - also ensure you've set the
--- Content-Type system header on each to be gzip
--- (https://stackoverflow.com/a/74439053) otherwise the extension won't know to
--- decompress it.
---
--- TODO: revisit removing column list, I think it'll work fine with '' for cols
 {% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
@@ -345,13 +345,14 @@ COPY_OPTIONS (
 {%- set cols = collist|join(",") -%}
 
 {%- set s3_bucket = var("tuva_seeds_s3_bucket", uri.split("/")[0]) -%}
-{%- set s3_key = uri.split("/")[1:]|join("/") + "/" + pattern + "_0.csv.gz" -%}
+{%- set s3_key = uri.split("/")[1:]|join("/") + "/" + pattern -%}
 {%- if var("tuva_seeds_s3_key_prefix", "") != "" -%}
 {%- set s3_key = var("tuva_seeds_s3_key_prefix") + "/" + s3_key -%}
 {%- endif -%}
 {%- set s3_region = "us-east-1" -%}
 {%- set options = ["(", "format csv", ", encoding ''utf8''"] -%}
-{%- do options.append(", null ''\\N''") if null_marker == true -%}
+{%- do options.append(", header true") if headers == true -%}
+{# PostgreSQL COPY CSV already treats an unquoted empty field as NULL. #}
 {%- do options.append(")") -%}
 {%- set options_s = options | join("") -%}
 
@@ -381,17 +382,15 @@ SELECT aws_s3.table_import_from_s3(
 {% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
 {% set fabric_storage_root = var('tuva_seed_fabric_storage_root', 'https://tuvapublicresources.blob.core.windows.net') | trim('/') %}
-{% set fabric_pattern = pattern %}
-{% if fabric_pattern.endswith('.csv.gz') %}
-  {% set fabric_pattern = fabric_pattern[:-3] %}
-{% endif %}
 {% set sql %}
 COPY INTO {{ this }}
-FROM '{{ fabric_storage_root }}/{{ uri }}/{{ fabric_pattern }}'
+FROM '{{ fabric_storage_root }}/{{ uri }}/{{ pattern }}'
 WITH (
     FILE_TYPE = 'CSV'
     , ENCODING = 'UTF8'
     , FIELDQUOTE = '"'
+    , ROWTERMINATOR = '0x0A'
+    {% if compression == true %}, COMPRESSION = 'GZIP' {% else %} {% endif %}
     {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
 );
 {% endset %}
@@ -403,7 +402,7 @@ WITH (
 {# debugging { log(sql, True)} #}
 {% set results = load_result('fabricsql') %}
 {% set rows_loaded = results['response'].rows_affected|default(0) %}
-{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ fabric_pattern ~ "\n  rows: " ~ rows_loaded, True) }}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
 {# debugging { log(results, True)} #}
 {% endif %}
 

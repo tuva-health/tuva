@@ -18,7 +18,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('appointment') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__appointment') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: appointment
@@ -76,7 +76,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('condition') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__condition') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: condition
@@ -131,7 +131,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('encounter') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__encounter') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: encounter
@@ -205,7 +205,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('eligibility') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__eligibility') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: eligibility
@@ -311,7 +311,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('immunization') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__immunization') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: immunization
@@ -383,7 +383,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('lab_result') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__lab_result') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: lab_result
@@ -476,7 +476,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('location') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__location') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: location
@@ -513,7 +513,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('medication') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__medication') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: medication
@@ -557,7 +557,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('practitioner') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__practitioner') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: practitioner
@@ -588,7 +588,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('procedure') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__procedure') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: procedure
@@ -631,7 +631,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('medical_claim') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__medical_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: medical_claim
@@ -918,7 +918,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('observation') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__observation') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: observation
@@ -992,7 +992,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('pharmacy_claim') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__pharmacy_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: pharmacy_claim
@@ -1062,7 +1062,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('patient') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__patient') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: patient
@@ -1140,7 +1140,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-06-25"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_synthetic_seed('provider_attribution') }}"
+      post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__provider_attribution') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
       alias: provider_attribution

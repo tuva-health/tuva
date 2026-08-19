@@ -23,7 +23,7 @@ seeds:
           tuva_last_updated: "2026-04-29"
           update_frequency: "ad hoc"
           notes: "Used by claims preprocessing for service category and encounter grouping."
-      post_hook: "{{ load_versioned_seed('value_sets','ccs_services_procedures.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','service_category__ccs_services_procedures.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       alias: ccs_services_procedures
@@ -75,7 +75,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('value_sets','ccsr__dxccsr_v2023_1_cleaned_map.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','service_category__dxccsr_v2023_1_cleaned_map.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       column_types:
@@ -168,7 +168,7 @@ seeds:
           source_last_updated: ""
           tuva_last_updated: "2026-03-30"
           update_frequency: "ad hoc"
-      post_hook: "{{ load_versioned_seed('value_sets','service_category__service_categories.csv') }}"
+      post_hook: "{{ load_versioned_seed('value_sets','service_category__service_categories.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
       column_types:
