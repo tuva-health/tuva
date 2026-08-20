@@ -528,7 +528,6 @@ seeds:
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: restructured_betos
       tags: terminology
-      enabled: "{{ var('claims_enabled', False) }}"
       column_types:
         hcpcs_cd: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

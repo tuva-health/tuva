@@ -16,7 +16,9 @@ vars:
   ## Data quality
   # Enables neutral data_quality structural/logical/analytical result models.
   # Production projects can leave this false/omitted unless they want to build these queryable result tables.
-  data_quality_enabled: true            # Enables neutral data_quality structural/logical/analytical result models.
+  data_quality_enabled: false           # Keeps optional data-quality result models out of this compatibility run.
+  enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
+  data_quality_domain_input_requirements: []  # Optional additional component-to-input dependency mappings.
 
   ## Synthetic data validation
   # These vars are for this integration_tests project. They are not normal production Tuva Core settings.
@@ -27,6 +29,43 @@ vars:
   # Tuva Core resolves assets from tuva-core/<installed-package-version>/.
   custom_bucket_name: tuva-public-resources  # Default public bucket for package data assets.
   tuva_seed_buckets: {}                # Optional per-family bucket overrides, keyed by seed family.
+
+  ## Standalone package behavior
+  # Importing a standalone package enables it. These vars change package behavior;
+  # none is a package-level on/off switch or an external-asset version pin.
+  ccsr:
+    wide_condition_enabled: true       # Includes the optional wide condition-category output.
+    wide_procedure_enabled: true       # Includes the optional wide procedure-category output.
+    record_type: ip                    # Category logic: ip (inpatient) or op (outpatient).
+    dxccsr_version: "'2023.1'"         # HCUP diagnosis CCSR version stored in package outputs.
+    prccsr_version: "'2023.1'"         # HCUP procedure CCSR version stored in package outputs.
+
+  cms_chronic_conditions:
+    # Optional package-specific relation overrides. Null uses the corresponding Tuva Core ref.
+    cms_chronic_conditions_pharmacy_claim_override: null
+    cms_chronic_conditions_encounter_override: null
+    cms_chronic_conditions_condition_override: null
+    cms_chronic_conditions_procedure_override: null
+    cms_chronic_conditions_patient_override: null
+    # Backward-compatible Core relation override names used as secondary fallbacks.
+    core_pharmacy_claim_override: null
+    core_encounter_override: null
+    core_condition_override: null
+    core_procedure_override: null
+    core_patient_override: null
+    # Optional output location overrides. Omitted values use target.database and
+    # <tuva_schema_prefix>_chronic_conditions (or chronic_conditions without a prefix).
+    # cms_chronic_conditions_database: analytics
+    # cms_chronic_conditions_schema: chronic_conditions
+    # tuva_database: analytics          # Legacy shared database fallback.
+
+  cms_hcc:
+    cms_hcc_payment_year: 2018         # Matches the shipped small synthetic dataset.
+    hcc_recapture_chronic_hccs: false  # False uses package-owned chronic-HCC definitions; true uses chronic_hccs.
+    hcc_recapture_suspect_list: false  # True additionally requires a user-supplied suspect_hccs relation.
+
+  quality_measures:
+    quality_measures_period_end: "2018-12-31"  # Matches the shipped small synthetic dataset.
 
   ## Schema naming
   # Optional prefix for output schemas, e.g. dev_aaron_core, dev_aaron_input_layer.
