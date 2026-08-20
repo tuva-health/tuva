@@ -189,6 +189,51 @@ copy  {{ this }}
 {% endmacro %}
 
 
+{% macro snowflake_seed_rows_loaded(column_names, data, uri, pattern) %}
+{% set normalized_column_names = [] %}
+{% for column_name in column_names %}
+  {% do normalized_column_names.append(column_name | string | lower) %}
+{% endfor %}
+
+{% if data | length == 0 %}
+  {% do exceptions.raise_compiler_error(
+      "Snowflake seed load returned no result for s3://" ~ uri ~ "/" ~ pattern ~ "."
+  ) %}
+{% endif %}
+
+{% if 'rows_loaded' not in normalized_column_names %}
+  {% set copy_status = data[0][0] if data[0] | length > 0 else 'COPY returned no status' %}
+  {% do exceptions.raise_compiler_error(
+      "Snowflake seed load processed no files from s3://"
+      ~ uri ~ "/" ~ pattern ~ ". Result: " ~ copy_status
+  ) %}
+{% endif %}
+
+{% set rows_loaded_index = normalized_column_names.index('rows_loaded') %}
+{% set loaded = namespace(rows=0) %}
+{% for row in data %}
+  {% set loaded.rows = loaded.rows + (row[rows_loaded_index] | int) %}
+{% endfor %}
+
+{% if loaded.rows == 0 %}
+  {% set statuses = [] %}
+  {% if 'status' in normalized_column_names %}
+    {% set status_index = normalized_column_names.index('status') %}
+    {% for row in data %}
+      {% do statuses.append(row[status_index] | string) %}
+    {% endfor %}
+  {% endif %}
+  {% set copy_status = statuses | join(', ') if statuses | length > 0 else 'COPY loaded zero rows' %}
+  {% do exceptions.raise_compiler_error(
+      "Snowflake seed load loaded zero rows from s3://"
+      ~ uri ~ "/" ~ pattern ~ ". Result: " ~ copy_status
+  ) %}
+{% endif %}
+
+{{ return(loaded.rows) }}
+{% endmacro %}
+
+
 {% macro snowflake__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
 {% set sql %}
@@ -216,7 +261,13 @@ pattern = '.*\/{{pattern}}.*';
 {% if execute %}
 {# debugging { log(sql, True)} #}
 {% set results = load_result('snowsql') %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ results['data']|sum(attribute=2),True) }}
+{% set rows_loaded = the_tuva_project.snowflake_seed_rows_loaded(
+    results['table'].column_names,
+    results['data'],
+    uri,
+    pattern
+) %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ rows_loaded,True) }}
 {# debugging { log(results, True)} #}
 {% endif %}
 
