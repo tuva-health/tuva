@@ -67,7 +67,7 @@ from git worktrees.
 - Treat `integration_tests/profiles/*` as CI-only configuration, not local
   runbooks.
 - Treat `.github/workflows/*` as CI pipeline definitions, not local runbooks.
-- Never merge to `main`; the user reviews and merges PRs.
+- Never merge to `main` without Aaron's explicit approval.
 
 ## Seed And Data Safety
 

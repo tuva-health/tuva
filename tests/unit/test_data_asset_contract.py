@@ -171,6 +171,19 @@ class DataAssetContractTest(unittest.TestCase):
         self.assertNotIn("nullstr = ['',", load_macro)
         self.assertIn("escape_unenclosed_field = NONE", load_macro)
         self.assertIn("null_if = ('__TUVA_RESERVED_NULL_MARKER_1_0__')", load_macro)
+        self.assertIn(
+            "macro snowflake_seed_rows_loaded(column_names, data, uri, pattern)",
+            load_macro,
+        )
+        self.assertIn(
+            "normalized_column_names.index('rows_loaded')",
+            load_macro,
+        )
+        self.assertIn(
+            "Snowflake seed load processed no files from s3://",
+            load_macro,
+        )
+        self.assertNotIn("sum(attribute=2)", load_macro)
         self.assertIn("null_markers = ['']", load_macro)
         self.assertNotIn("null_markers = ['', '\\\\N'", load_macro)
         self.assertIn("set null_char = ''", load_macro)
