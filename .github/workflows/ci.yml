@@ -312,7 +312,8 @@ jobs:
                   projectVersion(baseSha),
                   projectVersion(mergeSha)
                 ]);
-                if (baseVersion !== mergeVersion) {
+                const forceReleaseForLiveTest = true; // TEMPORARY: DO NOT MERGE
+                if (baseVersion !== mergeVersion || forceReleaseForLiveTest) {
                   mode = "release";
                   warehouse = "all";
                   selector = releaseSelector;
