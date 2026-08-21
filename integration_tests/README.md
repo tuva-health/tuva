@@ -80,26 +80,37 @@ testing cross-package compatibility.
 
 ## Continuous Integration
 
-In-repository pull requests automatically run the Core build on Snowflake with
-the small synthetic dataset. If the pull request changes the top-level Tuva Core
-version, that run automatically switches to release validation: the exact pull
-request test-merge commit plus all eight accepted standalone package `main`
-branches run on Snowflake, BigQuery, Databricks, Fabric, and Redshift. Package
-branches are resolved once to exact commits so every warehouse tests the same
-source set. DuckDB remains available for local portability checks.
+`Tuva CI -- Snowflake` runs automatically for every in-repository pull request.
+It tests the exact pull-request merge commit on Snowflake using Tuva Core, the
+integration project, and the small synthetic dataset. A package version change
+does not change this automatic path.
 
-Release CI selects the integration project, Tuva Core, AHRQ Quality Indicators,
-CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing, NYU ED
-Classification, Quality Measures, and Semantic Layer. It keeps the small
-synthetic dataset enabled and parity disabled, and retains each warehouse's dbt
-result summary and resolved source lock for 90 days. Raw logs and warehouse
-connection metadata are not included. There is no general-purpose manual
-warehouse dispatcher; troubleshoot individual warehouses locally.
+For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
+the Actions tab and enter only its pull-request number. The workflow accepts an
+open, mergeable, same-repository pull request into `main` only when its exact
+test merge changes the Tuva Core package version. It resolves all eight
+standalone package `main` branches once to exact commits, then uses that single
+source lock for Snowflake, BigQuery, Databricks, Fabric, and Redshift.
+
+The manual release build selects the integration project, Tuva Core, AHRQ
+Quality Indicators, CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing,
+NYU ED Classification, Quality Measures, and Semantic Layer. Before any
+warehouse job receives credentials, CI verifies that every Core asset declared
+by the release candidate exists under its future version in S3, GCS, and Azure
+and that `_release.json` is absent. The receipt is finalized against the merged
+`main` commit later; candidate payloads alone are sufficient for PR validation.
+
+Both workflows keep the small synthetic dataset enabled and parity disabled.
+The all-warehouse workflow retains each warehouse's sanitized dbt result
+summary and resolved source lock for 90 days; raw logs and warehouse connection
+metadata are not included. There is no individual-warehouse dispatcher.
+Troubleshoot individual warehouses locally, and use DuckDB locally for
+portability checks.
 
 Reviewed fork pull requests use the separate `External PR Snowflake CI`
 workflow. Its only input is the pull-request number. CI does not accept
-pull-request comment commands or arbitrary dbt commands. Version changes must
-come from an internal branch so the secrets-backed release matrix can run.
+pull-request comment commands or arbitrary dbt commands. External version
+changes are rejected because the release matrix requires an internal branch.
 
 ## Data Asset Loading
 

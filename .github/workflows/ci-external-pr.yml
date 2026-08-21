@@ -134,8 +134,8 @@ jobs:
             }
             if (baseVersion !== mergeVersion) {
               core.setFailed(
-                "Version-changing pull requests must use an internal branch so the " +
-                "automatic full release matrix can run safely."
+                "Version-changing pull requests must use an internal branch and " +
+                "Tuva CI -- All Warehouses."
               );
               return;
             }
@@ -145,7 +145,7 @@ jobs:
             core.setOutput("head_sha", pr.head.sha);
             core.setOutput("merge_sha", mergeCommit.sha);
             core.setOutput("schema_prefix", `ci_pr_${prNumber}_${pr.head.sha.slice(0, 8)}`);
-            core.setOutput("concurrency_key", `pr-${prNumber}`);
+            core.setOutput("concurrency_key", `snowflake-external-pr-${prNumber}`);
 
   run_snowflake:
     name: Run reviewed code on Snowflake
@@ -158,6 +158,8 @@ jobs:
     with:
       checkout_ref: ${{ needs.resolve.outputs.merge_sha }}
       warehouse: snowflake
+      scope: core
+      source_lock: ""
       schema_prefix: ${{ needs.resolve.outputs.schema_prefix }}
       concurrency_key: ${{ needs.resolve.outputs.concurrency_key }}
       publish_status: true
