@@ -1,27 +1,24 @@
 {#
-  dbt-bigquery does not create a relation for a header-only seed before it
-  applies table options. Tuva's committed seed files intentionally contain
-  only headers because their rows are loaded from versioned cloud assets in a
-  post-hook. Create the typed empty relation here so the normal materialization
-  can reach that post-hook.
-
-  Keep the nonempty branch aligned with dbt-bigquery's implementation so this
-  override remains safe if the integration project gains an inline seed.
+  dbt-bigquery treats table creation as a no-op and drops an existing table
+  during seed reset. That works when dbt subsequently uploads inline rows, but
+  dbt-core 1.10 skips row loading for Tuva's intentionally header-only seed
+  files. Create the typed empty relation in both paths so the normal Tuva
+  post-hook can replace it with the versioned cloud asset.
 #}
 
-{% macro bigquery__load_csv_rows(model, agate_table) %}
+{% macro bigquery_create_seed_relation(model, agate_table, relation) %}
   {%- set column_override = model['config'].get('column_types', {}) -%}
   {{ log(
-      "TEMP BigQuery seed override selected for " ~ model['name'] ~
+      "TEMP BigQuery seed relation override selected for " ~ model['name'] ~
       " with " ~ (agate_table.rows | length) ~ " inline rows",
       true
   ) }}
+  {%- set quote_seed_column = model['config'].get('quote_columns', none) -%}
+  {%- set missing_columns = [] -%}
+  {%- set extra_columns = [] -%}
+  {%- set column_definitions = [] -%}
 
   {% if agate_table.rows | length == 0 %}
-    {%- set quote_seed_column = model['config'].get('quote_columns', none) -%}
-    {%- set missing_columns = [] -%}
-    {%- set extra_columns = [] -%}
-
     {% for column_name in agate_table.column_names %}
       {% if not column_override.get(column_name) %}
         {% do missing_columns.append(column_name) %}
@@ -42,41 +39,39 @@
           (extra_columns | join(', '))
       ) }}
     {% endif %}
-
-    {% set create_sql %}
-      create or replace table {{ this.render() }} (
-        {% for column_name in agate_table.column_names %}
-          {{ adapter.quote_seed_column(column_name | string, quote_seed_column) }}
-          {{ api.Column.translate_type(column_override[column_name]) }}
-          {%- if not loop.last %}, {% endif %}
-        {% endfor %}
-      )
-    {% endset %}
-
-    {% call statement('create_header_only_seed_relation') %}
-      {{ create_sql }}
-    {% endcall %}
-  {% else %}
-    {% do adapter.load_dataframe(
-        model['database'],
-        model['schema'],
-        model['alias'],
-        agate_table,
-        column_override,
-        model['config']['delimiter']
-    ) %}
   {% endif %}
 
-  {% call statement() %}
-    alter table {{ this.render() }} set {{ bigquery_table_options(config, model) }}
+  {% for column_name in agate_table.column_names %}
+    {%- set configured_type = column_override.get(column_name) -%}
+    {%- set column_type = configured_type
+        if configured_type
+        else adapter.convert_type(agate_table, loop.index0) -%}
+    {% do column_definitions.append(
+        adapter.quote_seed_column(column_name | string, quote_seed_column) ~
+        " " ~ api.Column.translate_type(column_type)
+    ) %}
+  {% endfor %}
+
+  {% set create_sql %}
+    create or replace table {{ relation.render() }} (
+      {{ column_definitions | join(',\n      ') }}
+    )
+  {% endset %}
+
+  {% call statement('create_bigquery_seed_relation') %}
+    {{ create_sql }}
   {% endcall %}
 
-  {% if config.persist_relation_docs() and 'description' in model %}
-    {% do adapter.update_table_description(
-        model['database'],
-        model['schema'],
-        model['alias'],
-        model['description']
-    ) %}
-  {% endif %}
+  {{ return(create_sql) }}
+{% endmacro %}
+
+
+{% macro bigquery__create_csv_table(model, agate_table) %}
+  {{ return(bigquery_create_seed_relation(model, agate_table, this)) }}
+{% endmacro %}
+
+
+{% macro bigquery__reset_csv_table(model, full_refresh, old_relation, agate_table) %}
+  {% do adapter.drop_relation(old_relation) %}
+  {{ return(bigquery_create_seed_relation(model, agate_table, this)) }}
 {% endmacro %}
