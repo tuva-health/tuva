@@ -125,6 +125,17 @@ models:
     +materialized: table
     +schema: |
       {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_input_layer{%- else -%}input_layer{%- endif -%}
+  ccsr:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_ccsr{%- else -%}ccsr{%- endif -%}
+  semantic_layer:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_semantic_layer{%- else -%}semantic_layer{%- endif -%}
+
+seeds:
+  ccsr:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_ccsr{%- else -%}ccsr{%- endif -%}
 flags:
   require_generic_test_arguments_property: true
   require_ref_searches_node_package_before_root: true
