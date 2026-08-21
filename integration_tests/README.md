@@ -81,13 +81,25 @@ testing cross-package compatibility.
 ## Continuous Integration
 
 In-repository pull requests automatically run the Core build on Snowflake with
-the small synthetic dataset. From GitHub Actions, maintainers can run that same
-fixed build manually on Snowflake, BigQuery, Databricks, Fabric, Redshift, or
-all five warehouses. DuckDB remains available for local portability checks.
+the small synthetic dataset. If the pull request changes the top-level Tuva Core
+version, that run automatically switches to release validation: the exact pull
+request test-merge commit plus all eight accepted standalone package `main`
+branches run on Snowflake, BigQuery, Databricks, Fabric, and Redshift. Package
+branches are resolved once to exact commits so every warehouse tests the same
+source set. DuckDB remains available for local portability checks.
+
+Release CI selects the integration project, Tuva Core, AHRQ Quality Indicators,
+CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing, NYU ED
+Classification, Quality Measures, and Semantic Layer. It keeps the small
+synthetic dataset enabled and parity disabled, and retains each warehouse's dbt
+result summary and resolved source lock for 90 days. Raw logs and warehouse
+connection metadata are not included. There is no general-purpose manual
+warehouse dispatcher; troubleshoot individual warehouses locally.
 
 Reviewed fork pull requests use the separate `External PR Snowflake CI`
 workflow. Its only input is the pull-request number. CI does not accept
-pull-request comment commands or arbitrary dbt commands.
+pull-request comment commands or arbitrary dbt commands. Version changes must
+come from an internal branch so the secrets-backed release matrix can run.
 
 ## Data Asset Loading
 

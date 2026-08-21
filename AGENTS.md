@@ -169,17 +169,23 @@ content is loaded from public object storage.
   `dbt build --full-refresh` against the small synthetic dataset. The build
   selects Tuva Core plus the integration-test project and runs unit and data
   tests. Parity remains disabled.
-- Additional warehouse validation is manually initiated from GitHub Actions.
-  Choose Snowflake, BigQuery, Databricks, Fabric, Redshift, or `all`; every
-  target runs the same fixed Core build.
+- A pull request that changes the top-level Tuva Core version automatically
+  switches to release CI. It builds the exact pull-request test-merge commit
+  plus all eight accepted standalone package `main` branches on Snowflake,
+  BigQuery, Databricks, Fabric, and Redshift with the small synthetic dataset.
+  Each package branch is resolved once to an exact commit shared by all jobs.
+- Individual warehouse troubleshooting is local; GitHub CI has no general
+  manual warehouse dispatcher.
 - DuckDB portability is validated locally as needed rather than in GitHub CI.
 - Pull-request comment commands do not trigger CI and CI does not accept
   arbitrary dbt commands, selectors, or flags.
 - Automatic secrets-backed CI does not execute fork code. After reviewing an
   external pull request, a maintainer runs `External PR Snowflake CI` from the
-  Actions tab and supplies only the pull-request number.
+  Actions tab and supplies only the pull-request number. Version-changing pull
+  requests must use an internal branch so release CI can run.
 - Standalone packages validate in their own repositories. Routine Tuva Core CI
-  does not install mutable standalone-package branches.
+  does not install standalone packages; release CI snapshots their `main`
+  branches to exact commits before building.
 - Parity comparisons are separate, manually initiated Snowflake validations.
 - Do not edit `.github/workflows/create-release.yml` unless the task explicitly
   targets release automation.

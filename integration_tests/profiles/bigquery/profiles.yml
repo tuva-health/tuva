@@ -6,7 +6,7 @@ default:
       method: service-account
       keyfile: ./creds.json
       project: "{{ env_var('DBT_BIGQUERY_CI_PROJECT') }}"
-      dataset: connector
+      dataset: "connector_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
       threads: 4
       timeout_seconds: 300
       location: US
