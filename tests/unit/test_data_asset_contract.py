@@ -213,6 +213,9 @@ class DataAssetContractTest(unittest.TestCase):
         macro = (
             ROOT / "integration_tests" / "macros" / "bigquery_seed.sql"
         ).read_text()
+        integration_project = (
+            ROOT / "integration_tests" / "dbt_project.yml"
+        ).read_text()
 
         self.assertIn("macro bigquery__load_csv_rows(model, agate_table)", macro)
         self.assertIn("agate_table.rows | length == 0", macro)
@@ -222,6 +225,8 @@ class DataAssetContractTest(unittest.TestCase):
         self.assertIn("create or replace table {{ this.render() }}", macro)
         self.assertIn("adapter.load_dataframe(", macro)
         self.assertIn("bigquery_table_options(config, model)", macro)
+        self.assertIn("macro_namespace: 'dbt'", integration_project)
+        self.assertIn("search_order: ['integration_tests', 'dbt']", integration_project)
 
     def test_release_requires_all_cloud_receipts_before_tagging(self):
         workflow = (ROOT / ".github" / "workflows" / "create-release.yml").read_text()
