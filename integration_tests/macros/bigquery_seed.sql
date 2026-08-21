@@ -11,6 +11,11 @@
 
 {% macro bigquery__load_csv_rows(model, agate_table) %}
   {%- set column_override = model['config'].get('column_types', {}) -%}
+  {{ log(
+      "TEMP BigQuery seed override selected for " ~ model['name'] ~
+      " with " ~ (agate_table.rows | length) ~ " inline rows",
+      true
+  ) }}
 
   {% if agate_table.rows | length == 0 %}
     {%- set quote_seed_column = model['config'].get('quote_columns', none) -%}
