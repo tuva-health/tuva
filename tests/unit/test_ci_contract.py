@@ -258,7 +258,7 @@ class CiContractTest(unittest.TestCase):
             self.assertRegex(revision, r"^[0-9a-f]{40}$", use)
 
         expected_actions = {
-            "actions/github-script": "f28e40c7f34bde8b3046d885e986cb6290c5673b",
+            "actions/github-script": "3a2844b7e9c422d3c10d287c895573f7108da1b3",
             "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
             "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065",
             "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02",
