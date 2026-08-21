@@ -209,6 +209,20 @@ class DataAssetContractTest(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, load_macro)
 
+    def test_bigquery_header_only_seed_materialization_contract(self):
+        macro = (
+            ROOT / "integration_tests" / "macros" / "bigquery_seed.sql"
+        ).read_text()
+
+        self.assertIn("macro bigquery__load_csv_rows(model, agate_table)", macro)
+        self.assertIn("agate_table.rows | length == 0", macro)
+        self.assertIn("for column_name in agate_table.column_names", macro)
+        self.assertIn("column_types that exactly match its CSV header", macro)
+        self.assertIn("api.Column.translate_type(column_override[column_name])", macro)
+        self.assertIn("create or replace table {{ this.render() }}", macro)
+        self.assertIn("adapter.load_dataframe(", macro)
+        self.assertIn("bigquery_table_options(config, model)", macro)
+
     def test_release_requires_all_cloud_receipts_before_tagging(self):
         workflow = (ROOT / ".github" / "workflows" / "create-release.yml").read_text()
         receipt_step = workflow.index("- name: Verify data asset release receipts")
