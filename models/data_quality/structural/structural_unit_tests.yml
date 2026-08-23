@@ -1,0 +1,728 @@
+version: 2
+
+unit_tests:
+  - name: test_structural_data_sources_builds_independent_domain_rosters
+    description: >
+      Verifies that source discovery is shared within a domain without crossing
+      claims sources into clinical or clinical sources into claims. The same
+      source name can appear independently in both domain rosters.
+    model: data_quality__structural_data_sources
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 10 as row_count
+          union all
+          select 'claims', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 'medical_claim', 'input_layer__medical_claim', 20
+          union all
+          select 'claims', 'Shared Source', '__dq_structural_value__:Shared Source', 'provider_attribution', 'input_layer__provider_attribution', 5
+          union all
+          select 'clinical', 'Epic Clinical', '__dq_structural_value__:Epic Clinical', 'patient', 'input_layer__patient', 7
+          union all
+          select 'clinical', 'Shared Source', '__dq_structural_value__:Shared Source', 'encounter', 'input_layer__encounter', 8
+          union all
+          select 'claims', '__dq_structural_null__', '__dq_structural_value__:__dq_structural_null__', 'pharmacy_claim', 'input_layer__pharmacy_claim', 1
+    expect:
+      rows:
+        - input_layer_domain: claims
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+        - input_layer_domain: claims
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+        - input_layer_domain: claims
+          data_source: Shared Source
+          data_source_key: __dq_structural_value__:Shared Source
+        - input_layer_domain: clinical
+          data_source: Epic Clinical
+          data_source_key: __dq_structural_value__:Epic Clinical
+        - input_layer_domain: clinical
+          data_source: Shared Source
+          data_source_key: __dq_structural_value__:Shared Source
+        - input_layer_domain: claims
+          data_source: __dq_structural_null__
+          data_source_key: __dq_structural_value__:__dq_structural_null__
+
+  - name: test_structural_data_sources_falls_back_for_empty_domain
+    description: >
+      Verifies that a domain with no non-null source receives one null-source
+      fallback without affecting another domain's discovered roster.
+    model: data_quality__structural_data_sources
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, null as data_source, '__dq_structural_null__' as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 0 as row_count
+          union all
+          select 'claims', null, '__dq_structural_null__', 'medical_claim', 'input_layer__medical_claim', 0
+          union all
+          select 'clinical', 'Epic Clinical', '__dq_structural_value__:Epic Clinical', 'patient', 'input_layer__patient', 2
+    expect:
+      rows:
+        - input_layer_domain: claims
+          data_source: null
+          data_source_key: __dq_structural_null__
+        - input_layer_domain: clinical
+          data_source: Epic Clinical
+          data_source_key: __dq_structural_value__:Epic Clinical
+
+  - name: test_structural_evaluation_scope_expands_each_domain_roster
+    description: >
+      Verifies the domain Model-by-source grid. Claims sources expand across
+      claims Models, including provider attribution, but not clinical Models;
+      a clinical source expands only across clinical Models. Missing
+      Model/source populations receive row_count zero, while populated null
+      data_source buckets remain independently visible.
+    model: data_quality__structural_evaluation_scope
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim'
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim'
+          union all
+          select 'claims', 'provider_attribution', 'input_layer__provider_attribution'
+          union all
+          select 'clinical', 'patient', 'input_layer__patient'
+          union all
+          select 'clinical', 'encounter', 'input_layer__encounter'
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key, 10 as row_count
+          union all
+          select 'claims', 'eligibility', 'input_layer__eligibility', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 20
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim', 'Medicare MSSP', '__dq_structural_value__:Medicare MSSP', 30
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 40
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 2
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 50
+          union all
+          select 'claims', 'provider_attribution', 'input_layer__provider_attribution', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 5
+          union all
+          select 'clinical', 'patient', 'input_layer__patient', 'Epic Clinical', '__dq_structural_value__:Epic Clinical', 7
+          union all
+          select 'clinical', 'encounter', 'input_layer__encounter', null, '__dq_structural_null__', 0
+      - input: ref('data_quality__structural_data_sources')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key
+          union all
+          select 'claims', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid'
+          union all
+          select 'clinical', 'Epic Clinical', '__dq_structural_value__:Epic Clinical'
+    expect:
+      rows:
+        - input_layer_domain: claims
+          input_table_name: eligibility
+          model_name: input_layer__eligibility
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 10
+        - input_layer_domain: claims
+          input_table_name: eligibility
+          model_name: input_layer__eligibility
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+          row_count: 20
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 30
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+          row_count: 40
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 2
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+          row_count: 50
+        - input_layer_domain: claims
+          input_table_name: provider_attribution
+          model_name: input_layer__provider_attribution
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: provider_attribution
+          model_name: input_layer__provider_attribution
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+          row_count: 5
+        - input_layer_domain: clinical
+          input_table_name: patient
+          model_name: input_layer__patient
+          data_source: Epic Clinical
+          data_source_key: __dq_structural_value__:Epic Clinical
+          row_count: 7
+        - input_layer_domain: clinical
+          input_table_name: encounter
+          model_name: input_layer__encounter
+          data_source: Epic Clinical
+          data_source_key: __dq_structural_value__:Epic Clinical
+          row_count: 0
+
+  - name: test_structural_evaluation_scope_falls_back_when_domain_is_empty
+    description: >
+      Verifies that a completely empty enabled domain still emits one
+      null-source row with row_count zero for every enabled Model in that
+      domain.
+    model: data_quality__structural_evaluation_scope
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim'
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim'
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 0 as row_count
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 0
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim', null, '__dq_structural_null__', 0
+      - input: ref('data_quality__structural_data_sources')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, null as data_source, '__dq_structural_null__' as data_source_key
+    expect:
+      rows:
+        - input_layer_domain: claims
+          input_table_name: eligibility
+          model_name: input_layer__eligibility
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 0
+
+  - name: test_structural_evaluation_scope_preserves_model_missing_data_source
+    description: >
+      Verifies that a Model without a data_source column still receives the
+      non-null claims-domain source roster with zero counts, plus one observed
+      null-source bucket containing the Model's records.
+    model: data_quality__structural_evaluation_scope
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 10 as row_count
+      - input: ref('data_quality__structural_data_sources')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key
+          union all
+          select 'claims', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid'
+    expect:
+      rows:
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: UHC Medicaid
+          data_source_key: __dq_structural_value__:UHC Medicaid
+          row_count: 0
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 10
+
+  - name: test_structural_evaluation_scope_distinguishes_literal_null_sentinel
+    description: >
+      Verifies that a literal data_source value equal to the logical null
+      sentinel remains distinct from records whose data_source is SQL null.
+    model: data_quality__structural_evaluation_scope
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'medical_claim' as table_name, 'input_layer__medical_claim' as model_name
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'medical_claim' as table_name, 'input_layer__medical_claim' as model_name, '__dq_structural_null__' as data_source, '__dq_structural_value__:__dq_structural_null__' as data_source_key, 4 as row_count
+          union all
+          select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 2
+      - input: ref('data_quality__structural_data_sources')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, '__dq_structural_null__' as data_source, '__dq_structural_value__:__dq_structural_null__' as data_source_key
+    expect:
+      rows:
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: __dq_structural_null__
+          data_source_key: __dq_structural_value__:__dq_structural_null__
+          row_count: 4
+        - input_layer_domain: claims
+          input_table_name: medical_claim
+          model_name: input_layer__medical_claim
+          data_source: null
+          data_source_key: __dq_structural_null__
+          row_count: 2
+
+  - name: test_structural_evaluation_scope_does_not_invent_null_source_for_empty_missing_column_model
+    description: >
+      Verifies that an empty Model without a data_source column receives the
+      domain's named source rows but does not receive an additional null-source
+      row. There are no records from which a null-source population could be
+      observed.
+    model: data_quality__structural_evaluation_scope
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name
+      - input: ref('data_quality__structural_source_populations')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 0 as row_count
+      - input: ref('data_quality__structural_data_sources')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key
+    expect:
+      rows:
+        - input_layer_domain: claims
+          input_table_name: pharmacy_claim
+          model_name: input_layer__pharmacy_claim
+          data_source: Medicare MSSP
+          data_source_key: __dq_structural_value__:Medicare MSSP
+          row_count: 0
+
+  - name: test_structural_column_details_is_source_neutral
+    description: >
+      Verifies that column and type evidence is recorded once per Model and
+      column, independent of source populations, while preserving the physical
+      warehouse identifier used by later scans.
+    model: data_quality__structural_column_details
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_expected_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, 'claim_id' as column_name, 'varchar' as expected_data_type, 'string' as expected_type_family, 'yes' as is_primary_key, 1 as column_order
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim', 'data_source', 'varchar', 'string', 'yes', 2
+      - input: ref('data_quality__structural_actual_columns')
+        format: sql
+        rows: |
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, 'claim_id' as column_name, 'Claim_ID' as actual_column_name, 'VARCHAR' as actual_data_type, 'string' as actual_type_family
+          union all
+          select 'claims', 'pharmacy_claim', 'input_layer__pharmacy_claim', 'data_source', 'Data_Source', 'VARCHAR', 'string'
+    expect:
+      rows:
+        - input_table_name: pharmacy_claim
+          column_name: claim_id
+          expected_data_type: varchar
+          actual_column_name: Claim_ID
+          actual_data_type: VARCHAR
+          is_primary_key: "yes"
+          column_exists: "yes"
+          data_type_correct: "yes"
+          column_order: 1
+        - input_table_name: pharmacy_claim
+          column_name: data_source
+          expected_data_type: varchar
+          actual_column_name: Data_Source
+          actual_data_type: VARCHAR
+          is_primary_key: "yes"
+          column_exists: "yes"
+          data_type_correct: "yes"
+          column_order: 2
+
+  - name: test_structural_missing_columns_is_source_neutral_and_failure_only
+    description: >
+      Verifies that missing-column evidence is emitted once per Model and
+      column, independent of the number of sources evaluated for that Model.
+    model: data_quality__structural_missing_columns
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_column_details')
+        format: sql
+        rows: |
+          select 'medical_claim' as input_table_name, 'bill_type_code' as column_name, 'varchar' as expected_data_type, 'no' as column_exists
+          union all
+          select 'medical_claim', 'claim_id', 'varchar', 'yes'
+    expect:
+      rows:
+        - input_table_name: medical_claim
+          column_name: bill_type_code
+          expected_data_type: varchar
+
+  - name: test_structural_data_type_mismatches_excludes_missing_columns
+    description: >
+      Verifies that actual-versus-expected type failures are emitted once per
+      Model and column, that missing columns remain exclusively in the
+      missing-column detail, and that a known mismatch remains visible when a
+      different required column in the same Model is missing.
+    model: data_quality__structural_data_type_mismatches
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_column_details')
+        format: sql
+        rows: |
+          select 'medical_claim' as input_table_name, 'claim_line_number' as column_name, 'integer' as expected_data_type, 'DATE' as actual_data_type, 'yes' as column_exists, 'no' as data_type_correct
+          union all
+          select 'medical_claim', 'bill_type_code', 'varchar', null, 'no', 'no'
+          union all
+          select 'pharmacy_claim', 'prescribing_provider_npi', 'varchar', null, 'no', 'no'
+          union all
+          select 'medical_claim', 'claim_id', 'varchar', 'VARCHAR', 'yes', 'yes'
+          union all
+          select 'eligibility', 'enrollment_start_date', 'date', 'VARCHAR', 'yes', 'no'
+    expect:
+      rows:
+        - input_table_name: medical_claim
+          column_name: claim_line_number
+          expected_data_type: integer
+          actual_data_type: DATE
+        - input_table_name: eligibility
+          column_name: enrollment_start_date
+          expected_data_type: date
+          actual_data_type: VARCHAR
+
+  - name: test_structural_primary_key_failure_counts_is_failure_only
+    description: >
+      Verifies the public failure vocabulary, positive-count filtering, full
+      composite key declaration for duplicate failures, and exclusion of
+      technical helper rows when primary-key evaluation was blocked.
+    model: data_quality__structural_primary_key_failure_counts
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_primary_key_tests')
+        format: sql
+        rows: |
+          select 'UHC Medicaid' as data_source, 'medical_claim' as input_table_name, 'claim_id' as column_name, 'not null' as test, 3 as test_result
+          union all
+          select 'UHC Medicaid', 'medical_claim', 'claim_line_number', 'not null', 0
+          union all
+          select 'UHC Medicaid', 'medical_claim', 'claim_id, claim_line_number, data_source', 'duplicate value', 5
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 'claim_id', 'not null', null
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 'data_source', 'not null', null
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 'claim_id, data_source', 'duplicate value', null
+          union all
+          select null, 'patient', 'patient_id', 'not null', 2
+      - input: ref('data_quality__structural')
+        format: sql
+        rows: |
+          select 'UHC Medicaid' as data_source, 'medical_claim' as input_table_name, 'fail' as primary_key_correct
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 'not evaluated'
+          union all
+          select null, 'patient', 'fail'
+    expect:
+      rows:
+        - data_source: UHC Medicaid
+          input_table_name: medical_claim
+          failure_type: null_value
+          primary_key_columns: claim_id
+          failed_record_count: 3
+        - data_source: UHC Medicaid
+          input_table_name: medical_claim
+          failure_type: duplicate_value
+          primary_key_columns: claim_id, claim_line_number, data_source
+          failed_record_count: 5
+        - data_source: null
+          input_table_name: patient
+          failure_type: null_value
+          primary_key_columns: patient_id
+          failed_record_count: 2
+
+  - name: test_structural_four_result_dependency_rules
+    description: Verifies the four-result structural readiness contract and prerequisite handling.
+    model: data_quality__structural
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural_column_details')
+        format: sql
+        rows: |
+          select 'eligibility' as input_table_name, 'person_id' as column_name, 'yes' as is_primary_key, 'yes' as column_exists, 'yes' as data_type_correct
+          union all
+          select 'eligibility', 'data_source', 'yes', 'yes', 'yes'
+          union all
+          select 'pharmacy_claim', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'pharmacy_claim', 'data_source', 'yes', 'yes', 'yes'
+          union all
+          select 'missing_non_key_table', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'missing_non_key_table', 'data_source', 'yes', 'yes', 'yes'
+          union all
+          select 'missing_non_key_table', 'bill_type_code', 'no', 'no', 'no'
+          union all
+          select 'missing_key_table', 'claim_id', 'yes', 'no', 'no'
+          union all
+          select 'missing_key_table', 'data_source', 'yes', 'yes', 'yes'
+          union all
+          select 'missing_data_source_table', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'missing_data_source_table', 'data_source', 'yes', 'no', 'no'
+          union all
+          select 'bad_data_source_type_table', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'bad_data_source_type_table', 'data_source', 'yes', 'yes', 'no'
+          union all
+          select 'wrong_non_key_type_table', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'wrong_non_key_type_table', 'data_source', 'yes', 'yes', 'yes'
+          union all
+          select 'wrong_non_key_type_table', 'bill_type_code', 'no', 'yes', 'no'
+          union all
+          select 'bad_key_table', 'claim_id', 'yes', 'yes', 'yes'
+          union all
+          select 'bad_key_table', 'data_source', 'yes', 'yes', 'yes'
+      - input: ref('data_quality__structural_evaluation_scope')
+        format: sql
+        rows: |
+          select 'all_pass' as data_source, 'eligibility' as input_table_name, 2 as row_count
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 0
+          union all
+          select 'UHC Medicaid', 'pharmacy_claim', 2
+          union all
+          select 'missing_non_key', 'missing_non_key_table', 2
+          union all
+          select 'missing_key', 'missing_key_table', 2
+          union all
+          select null, 'missing_data_source_table', 2
+          union all
+          select 'bad_data_source_type', 'bad_data_source_type_table', 2
+          union all
+          select 'wrong_non_key_type', 'wrong_non_key_type_table', 2
+          union all
+          select 'bad_key', 'bad_key_table', 2
+      - input: ref('data_quality__structural_primary_key_tests')
+        format: sql
+        rows: |
+          select 'all_pass' as data_source, 'eligibility' as input_table_name, 0 as test_result
+          union all
+          select 'Medicare MSSP', 'pharmacy_claim', 0
+          union all
+          select 'UHC Medicaid', 'pharmacy_claim', 0
+          union all
+          select 'missing_non_key', 'missing_non_key_table', 0
+          union all
+          select 'missing_key', 'missing_key_table', null
+          union all
+          select null, 'missing_data_source_table', null
+          union all
+          select 'bad_data_source_type', 'bad_data_source_type_table', null
+          union all
+          select 'wrong_non_key_type', 'wrong_non_key_type_table', 0
+          union all
+          select 'bad_key', 'bad_key_table', 1
+    expect:
+      rows:
+        - data_source: all_pass
+          input_table_name: eligibility
+          columns_exist: pass
+          data_types_correct: pass
+          table_populated: pass
+          primary_key_correct: pass
+          row_count: 2
+        - data_source: Medicare MSSP
+          input_table_name: pharmacy_claim
+          columns_exist: pass
+          data_types_correct: pass
+          table_populated: fail
+          primary_key_correct: not evaluated
+          row_count: 0
+        - data_source: UHC Medicaid
+          input_table_name: pharmacy_claim
+          columns_exist: pass
+          data_types_correct: pass
+          table_populated: pass
+          primary_key_correct: pass
+          row_count: 2
+        - data_source: missing_non_key
+          input_table_name: missing_non_key_table
+          columns_exist: fail
+          data_types_correct: not evaluated
+          table_populated: pass
+          primary_key_correct: pass
+          row_count: 2
+        - data_source: missing_key
+          input_table_name: missing_key_table
+          columns_exist: fail
+          data_types_correct: not evaluated
+          table_populated: pass
+          primary_key_correct: not evaluated
+          row_count: 2
+        - data_source: null
+          input_table_name: missing_data_source_table
+          columns_exist: fail
+          data_types_correct: not evaluated
+          table_populated: not evaluated
+          primary_key_correct: not evaluated
+          row_count: 2
+        - data_source: bad_data_source_type
+          input_table_name: bad_data_source_type_table
+          columns_exist: pass
+          data_types_correct: fail
+          table_populated: not evaluated
+          primary_key_correct: not evaluated
+          row_count: 2
+        - data_source: wrong_non_key_type
+          input_table_name: wrong_non_key_type_table
+          columns_exist: pass
+          data_types_correct: fail
+          table_populated: pass
+          primary_key_correct: pass
+          row_count: 2
+        - data_source: bad_key
+          input_table_name: bad_key_table
+          columns_exist: pass
+          data_types_correct: pass
+          table_populated: pass
+          primary_key_correct: fail
+          row_count: 2
+
+  - name: test_structural_test_results_normalizes_exactly_four_checks
+    description: Verifies normalized structural results contain exactly four checks and classify only active failures as S1.
+    model: data_quality__structural_test_results
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    given:
+      - input: ref('data_quality__structural')
+        format: sql
+        rows: |
+          select
+                'test_source' as data_source
+              , 'medical_claim' as input_table_name
+              , 'fail' as columns_exist
+              , 'not evaluated' as data_types_correct
+              , 'pass' as table_populated
+              , 'pass' as primary_key_correct
+              , 3 as row_count
+    expect:
+      rows:
+        - data_source: test_source
+          input_table_name: medical_claim
+          test_name: structural__columns_exist
+          severity: 1
+          tested_count: 1
+          failed_count: 1
+          passed_count: 0
+          not_evaluated_count: 0
+        - data_source: test_source
+          input_table_name: medical_claim
+          test_name: structural__data_types_correct
+          severity: null
+          tested_count: 0
+          failed_count: 0
+          passed_count: 0
+          not_evaluated_count: 1
+        - data_source: test_source
+          input_table_name: medical_claim
+          test_name: structural__table_populated
+          severity: null
+          tested_count: 1
+          failed_count: 0
+          passed_count: 1
+          not_evaluated_count: 0
+        - data_source: test_source
+          input_table_name: medical_claim
+          test_name: structural__primary_key_correct
+          severity: null
+          tested_count: 1
+          failed_count: 0
+          passed_count: 1
+          not_evaluated_count: 0
+
+  - name: test_structural_primary_key_tests_returns_typed_empty_without_enabled_domain
+    description: >
+      Verifies that the primary-key helper returns a valid typed empty result
+      when no Input Layer domain is enabled.
+    model: data_quality__structural_primary_key_tests
+    config:
+      enabled: "{{ var('data_quality_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: false
+        clinical_enabled: false
+        provider_attribution_enabled: false
+    given:
+      - input: ref('data_quality__structural_evaluation_scope')
+        format: sql
+        rows: |
+          select
+                null as data_source
+              , null as data_source_key
+              , null as model_name
+              , null as row_count
+          where 1 = 0
+    expect:
+      rows: []

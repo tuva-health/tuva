@@ -23,6 +23,7 @@
 
     {% for model_node in dq_expected_input_layer_models() %}
         {% set table_name = model_node.name | replace('input_layer__', '') %}
+        {% set input_layer_domain = dq_input_layer_domain_name(model_node.name) %}
 
         {% for expected_column in dq_expected_columns(model_node) %}
             {% set expected_name = expected_column['name'] %}
@@ -34,7 +35,8 @@
 
             {% set query %}
                 select
-                      '{{ table_name }}' as table_name
+                      '{{ input_layer_domain }}' as input_layer_domain
+                    , '{{ table_name }}' as table_name
                     , '{{ model_node.name }}' as model_name
                     , '{{ expected_name }}' as column_name
                     , {% if expected_type is not none %}'{{ expected_type }}'{% else %}cast(null as {{ dbt.type_string() }}){% endif %} as expected_data_type
@@ -60,7 +62,8 @@
         ) as structural_expected_columns
     {% else %}
         select
-              cast(null as {{ dbt.type_string() }}) as table_name
+              cast(null as {{ dbt.type_string() }}) as input_layer_domain
+            , cast(null as {{ dbt.type_string() }}) as table_name
             , cast(null as {{ dbt.type_string() }}) as model_name
             , cast(null as {{ dbt.type_string() }}) as column_name
             , cast(null as {{ dbt.type_string() }}) as expected_data_type
@@ -71,7 +74,8 @@
     {% endif %}
 {% else %}
     select
-          cast(null as {{ dbt.type_string() }}) as table_name
+          cast(null as {{ dbt.type_string() }}) as input_layer_domain
+        , cast(null as {{ dbt.type_string() }}) as table_name
         , cast(null as {{ dbt.type_string() }}) as model_name
         , cast(null as {{ dbt.type_string() }}) as column_name
         , cast(null as {{ dbt.type_string() }}) as expected_data_type
