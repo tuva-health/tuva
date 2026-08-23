@@ -1,35 +1,77 @@
-{% macro dq_enabled_input_layer_model_names() %}
-    {% set model_names = [] %}
+{% macro dq_enabled_input_layer_model_domains() %}
+    {% set domains = [] %}
 
     {% if var('clinical_enabled', false) | as_bool %}
-        {% do model_names.extend([
-            'input_layer__appointment',
-            'input_layer__condition',
-            'input_layer__encounter',
-            'input_layer__immunization',
-            'input_layer__lab_result',
-            'input_layer__location',
-            'input_layer__medication',
-            'input_layer__observation',
-            'input_layer__patient',
-            'input_layer__practitioner',
-            'input_layer__procedure'
-        ]) %}
+        {% do domains.append({
+            'name': 'clinical',
+            'model_names': [
+                'input_layer__appointment',
+                'input_layer__condition',
+                'input_layer__encounter',
+                'input_layer__immunization',
+                'input_layer__lab_result',
+                'input_layer__location',
+                'input_layer__medication',
+                'input_layer__observation',
+                'input_layer__patient',
+                'input_layer__practitioner',
+                'input_layer__procedure'
+            ]
+        }) %}
     {% endif %}
 
     {% if var('claims_enabled', false) | as_bool %}
-        {% do model_names.extend([
+        {% set claims_model_names = [
             'input_layer__eligibility',
             'input_layer__medical_claim',
             'input_layer__pharmacy_claim'
-        ]) %}
+        ] %}
+
+        {% if var('provider_attribution_enabled', false) | as_bool %}
+            {% do claims_model_names.append('input_layer__provider_attribution') %}
+        {% endif %}
+
+        {% do domains.append({
+            'name': 'claims',
+            'model_names': claims_model_names
+        }) %}
     {% endif %}
 
-    {% if (var('provider_attribution_enabled', false) and var('claims_enabled', false)) | as_bool %}
-        {% do model_names.append('input_layer__provider_attribution') %}
-    {% endif %}
+    {{ return(domains) }}
+{% endmacro %}
+
+{% macro dq_enabled_input_layer_model_names() %}
+    {% set model_names = [] %}
+
+    {% for domain in dq_enabled_input_layer_model_domains() %}
+        {% do model_names.extend(domain['model_names']) %}
+    {% endfor %}
 
     {{ return(model_names) }}
+{% endmacro %}
+
+{% macro dq_enabled_input_layer_model_names_for_domain(domain_name) %}
+    {% for domain in dq_enabled_input_layer_model_domains() %}
+        {% if domain['name'] == domain_name %}
+            {{ return(domain['model_names']) }}
+        {% endif %}
+    {% endfor %}
+
+    {{ return([]) }}
+{% endmacro %}
+
+{% macro dq_input_layer_domain_name(model_name) %}
+    {% for domain in dq_enabled_input_layer_model_domains() %}
+        {% if model_name in domain['model_names'] %}
+            {{ return(domain['name']) }}
+        {% endif %}
+    {% endfor %}
+
+    {{ exceptions.raise_compiler_error(
+        "Structural Data Quality could not determine the Input Layer domain for enabled Wrapper '"
+        ~ model_name
+        ~ "'. Add the Wrapper to dq_enabled_input_layer_model_domains()."
+    ) }}
 {% endmacro %}
 
 {% macro dq_expected_input_layer_models() %}
@@ -77,6 +119,20 @@
     ) }}
 {% endmacro %}
 
+{% macro dq_required_actual_relation(node) %}
+    {% set relation = dq_actual_relation(node) %}
+
+    {% if relation is none %}
+        {{ exceptions.raise_compiler_error(
+            "Structural Data Quality could not locate the Warehouse Table or View for Input Layer Wrapper '"
+            ~ node.name
+            ~ "'. Build the enabled Input Layer Models and Input Layer Wrappers before running Structural Data Quality."
+        ) }}
+    {% endif %}
+
+    {{ return(relation) }}
+{% endmacro %}
+
 {% macro dq_actual_columns(relation) %}
     {% if relation is none %}
         {{ return([]) }}
@@ -95,20 +151,106 @@
     {{ return(false) }}
 {% endmacro %}
 
+{% macro dq_actual_column(columns, column_name, relation_name='Warehouse Table or View') %}
+    {% set requested_name = column_name | lower %}
+    {% set matches = [] %}
+
+    {% for column in columns %}
+        {% if column.name | lower == requested_name %}
+            {% do matches.append(column) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if matches | length > 1 %}
+        {{ exceptions.raise_compiler_error(
+            "Structural Data Quality found more than one physical column in "
+            ~ relation_name
+            ~ " that normalizes to '"
+            ~ requested_name
+            ~ "'. Rename the ambiguous columns before running Structural Data Quality."
+        ) }}
+    {% endif %}
+
+    {{ return(matches[0] if matches | length == 1 else none) }}
+{% endmacro %}
+
+{% macro dq_supported_type_families() %}
+    {{ return(['string', 'integer', 'numeric', 'boolean', 'date', 'timestamp']) }}
+{% endmacro %}
+
 {% macro dq_expected_columns(node) %}
     {% set expected_columns = [] %}
+    {% set normalized_names = [] %}
+    {% set duplicate_names = [] %}
+    {% set missing_data_types = [] %}
+    {% set unsupported_data_types = [] %}
+    {% set primary_key_columns = [] %}
+    {% set data_source_count = namespace(value=0) %}
 
     {% for column in node.columns.values() %}
         {% set meta = column.config.meta if column.config is not none and column.config.meta is not none else {} %}
+        {% set normalized_name = column.name | lower %}
+        {% set expected_type = meta.get('data_type') %}
+        {% set is_primary_key = meta.get('is_primary_key', false) | as_bool %}
+
+        {% if normalized_name in normalized_names %}
+            {% do duplicate_names.append(normalized_name) %}
+        {% else %}
+            {% do normalized_names.append(normalized_name) %}
+        {% endif %}
+
+        {% if expected_type is none or expected_type | trim == '' %}
+            {% do missing_data_types.append(normalized_name) %}
+        {% elif dq_type_family(expected_type) not in dq_supported_type_families() %}
+            {% do unsupported_data_types.append(normalized_name ~ '=' ~ expected_type) %}
+        {% endif %}
+
+        {% if is_primary_key %}
+            {% do primary_key_columns.append(normalized_name) %}
+        {% endif %}
+
+        {% if normalized_name == 'data_source' %}
+            {% set data_source_count.value = data_source_count.value + 1 %}
+        {% endif %}
+
         {% do expected_columns.append(
             {
-                'name': column.name | lower,
-                'data_type': meta.get('data_type'),
-                'is_primary_key': meta.get('is_primary_key', false),
+                'name': normalized_name,
+                'data_type': expected_type,
+                'is_primary_key': is_primary_key,
                 'column_order': loop.index
             }
         ) %}
     {% endfor %}
+
+    {% set contract_errors = [] %}
+    {% if duplicate_names | length > 0 %}
+        {% do contract_errors.append('duplicate case-normalized columns: ' ~ (duplicate_names | unique | list | join(', '))) %}
+    {% endif %}
+    {% if missing_data_types | length > 0 %}
+        {% do contract_errors.append('columns missing meta.data_type: ' ~ (missing_data_types | join(', '))) %}
+    {% endif %}
+    {% if unsupported_data_types | length > 0 %}
+        {% do contract_errors.append('unsupported portable data types: ' ~ (unsupported_data_types | join(', '))) %}
+    {% endif %}
+    {% if primary_key_columns | length == 0 %}
+        {% do contract_errors.append('no columns are marked meta.is_primary_key') %}
+    {% endif %}
+    {% if data_source_count.value != 1 %}
+        {% do contract_errors.append('expected exactly one data_source column but found ' ~ data_source_count.value) %}
+    {% elif 'data_source' not in primary_key_columns %}
+        {% do contract_errors.append('data_source is not marked meta.is_primary_key') %}
+    {% endif %}
+
+    {% if contract_errors | length > 0 %}
+        {{ exceptions.raise_compiler_error(
+            "Invalid Structural Data Quality contract for Input Layer Wrapper '"
+            ~ node.name
+            ~ "': "
+            ~ (contract_errors | join('; '))
+            ~ ". Correct Tuva Core's Input Layer YAML metadata."
+        ) }}
+    {% endif %}
 
     {{ return(expected_columns) }}
 {% endmacro %}
@@ -143,6 +285,31 @@
     {{ return('__dq_null__') }}
 {% endmacro %}
 
+{% macro dq_structural_null_source_key() %}
+    {{ return('__dq_structural_null__') }}
+{% endmacro %}
+
+{% macro dq_structural_source_value_prefix() %}
+    {{ return('__dq_structural_value__:') }}
+{% endmacro %}
+
+{% macro dq_structural_source_key_sql(data_source_expression) %}
+    {% set non_null_key = dbt.concat([
+        "'" ~ dq_structural_source_value_prefix() ~ "'",
+        "cast(" ~ data_source_expression ~ " as " ~ dbt.type_string() ~ ")"
+    ]) %}
+
+    {{ return(
+        "case when "
+        ~ data_source_expression
+        ~ " is null then '"
+        ~ dq_structural_null_source_key()
+        ~ "' else "
+        ~ non_null_key
+        ~ " end"
+    ) }}
+{% endmacro %}
+
 {% macro dq_empty_row_sql() %}
     select 1 as _dq_empty_row
 {% endmacro %}
@@ -152,66 +319,6 @@
         {{ dq_empty_row_sql() }}
     ) as dq_empty_row
     where 1 = 0
-{% endmacro %}
-
-{% macro dq_source_row_count_sql(relation) %}
-    {% set actual_columns = dq_actual_columns(relation) %}
-
-    select
-          {% if dq_has_column(actual_columns, 'data_source') %}
-          coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
-          {% else %}
-          '{{ dq_source_key_sentinel() }}'
-          {% endif %} as data_source_key
-        , cast(count(*) as {{ dbt.type_numeric() }}) as row_count
-    from {{ relation }}
-    {% if dq_has_column(actual_columns, 'data_source') %}
-    group by coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}')
-    {% endif %}
-{% endmacro %}
-
-{% macro dq_source_dimension_sql(relation) %}
-    {% set actual_columns = dq_actual_columns(relation) %}
-
-    {% if dq_has_column(actual_columns, 'data_source') %}
-        select distinct
-              coalesce(cast(data_source as {{ dbt.type_string() }}), '{{ dq_source_key_sentinel() }}') as data_source_key
-            , cast(data_source as {{ dbt.type_string() }}) as data_source
-        from {{ relation }}
-
-        union all
-
-        select
-              '{{ dq_source_key_sentinel() }}' as data_source_key
-            , cast(null as {{ dbt.type_string() }}) as data_source
-        from (
-            {{ dq_empty_row_sql() }}
-        ) as dq_empty_source
-        where not exists (
-            select 1
-            from {{ relation }}
-        )
-    {% else %}
-        select
-              '{{ dq_source_key_sentinel() }}' as data_source_key
-            , cast(null as {{ dbt.type_string() }}) as data_source
-    {% endif %}
-{% endmacro %}
-
-{% macro dq_missing_source_dimension_sql() %}
-    select
-          '{{ dq_source_key_sentinel() }}' as data_source_key
-        , cast(null as {{ dbt.type_string() }}) as data_source
-{% endmacro %}
-
-{% macro dq_source_key_expression_sql(relation, relation_alias='source_rows') %}
-    {% set actual_columns = dq_actual_columns(relation) %}
-
-    {% if dq_has_column(actual_columns, 'data_source') %}
-        {{ return("coalesce(cast(" ~ relation_alias ~ ".data_source as " ~ dbt.type_string() ~ "), '" ~ dq_source_key_sentinel() ~ "')") }}
-    {% else %}
-        {{ return("'" ~ dq_source_key_sentinel() ~ "'") }}
-    {% endif %}
 {% endmacro %}
 
 {% macro dq_base_type_family(type_string) %}
@@ -263,7 +370,7 @@
     {% if normalized == 'bool' %}
         {{ return('boolean') }}
     {% elif normalized == 'bytes' %}
-        {{ return('string') }}
+        {{ return('binary') }}
     {% else %}
         {{ return(dq_base_type_family(normalized)) }}
     {% endif %}

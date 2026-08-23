@@ -12,194 +12,224 @@
 }}
 
 {% set input_layer_model_names = dq_enabled_input_layer_model_names() %}
+{% set evaluation_scope = ref('data_quality__structural_evaluation_scope') %}
 
 {% for model_name in input_layer_model_names %}
 -- depends_on: {{ ref(model_name) }}
 {% endfor %}
 
 {% if execute %}
-    {% set pk_queries = [] %}
+    {% set model_queries = [] %}
 
     {% for model_name in input_layer_model_names %}
         {% set model_node = dq_find_model_node(model_name) %}
 
         {% if model_node is not none %}
             {% set table_name = model_name | replace('input_layer__', '') %}
-            {% set relation = dq_actual_relation(model_node) %}
+            {% set relation = dq_required_actual_relation(model_node) %}
+            {% set actual_columns = dq_actual_columns(relation) %}
             {% set pk_columns = dq_expected_pk_columns(model_node) %}
             {% set pk_column_list = pk_columns | join(', ') %}
-            {% set actual_column_types = {} %}
+            {% set pk_metrics = [] %}
             {% set missing_pk_columns = [] %}
+            {% set unsupported_pk_columns = [] %}
+            {% set grouped_value_counter = namespace(value=0) %}
+            {% set actual_data_source = dq_actual_column(actual_columns, 'data_source', relation) %}
 
-            {% if relation is not none %}
-                {% for column in dq_actual_columns(relation) %}
-                    {% do actual_column_types.update({column.name | lower: column.dtype}) %}
-                {% endfor %}
-                {% set source_dimension_sql = dq_source_dimension_sql(relation) %}
-                {% set source_count_sql = dq_source_row_count_sql(relation) %}
-                {% set source_key_expression = dq_source_key_expression_sql(relation, 'source_rows') %}
-
-                {% for pk_column in pk_columns %}
-                    {% if actual_column_types.get(pk_column) is none %}
-                        {% do missing_pk_columns.append(pk_column) %}
-                    {% endif %}
-                {% endfor %}
+            {% if actual_data_source is not none %}
+                {% set source_key_expression = dq_structural_source_key_sql(
+                    'source_rows.' ~ adapter.quote(actual_data_source.name)
+                ) %}
             {% else %}
-                {% set source_dimension_sql = dq_missing_source_dimension_sql() %}
-                {% set source_count_sql %}
-                    select
-                          '{{ dq_source_key_sentinel() }}' as data_source_key
-                        , cast(null as {{ dbt.type_int() }}) as row_count
-                {% endset %}
+                {% set source_key_expression = "'" ~ dq_structural_null_source_key() ~ "'" %}
             {% endif %}
 
             {% for pk_column in pk_columns %}
-                {% if relation is none %}
-                    {% set query %}
-                        select
-                              sources.data_source
-                            , '{{ table_name }}' as {{ adapter.quote('table') }}
-                            , '{{ pk_column }}' as {{ adapter.quote('column') }}
-                            , 'not null' as test
-                            , cast(null as {{ dbt.type_int() }}) as test_result
-                        from (
-                            {{ source_dimension_sql }}
-                        ) as sources
-                    {% endset %}
-                {% elif actual_column_types.get(pk_column) is none %}
-                    {% set query %}
-                        select
-                              sources.data_source
-                            , '{{ table_name }}' as {{ adapter.quote('table') }}
-                            , '{{ pk_column }}' as {{ adapter.quote('column') }}
-                            , 'not null' as test
-                            , cast(coalesce(source_counts.row_count, 0) as {{ dbt.type_int() }}) as test_result
-                        from (
-                            {{ source_dimension_sql }}
-                        ) as sources
-                        left join (
-                            {{ source_count_sql }}
-                        ) as source_counts
-                            on sources.data_source_key = source_counts.data_source_key
-                    {% endset %}
-                {% else %}
-                    {% set query %}
-                        select
-                              sources.data_source
-                            , '{{ table_name }}' as {{ adapter.quote('table') }}
-                            , '{{ pk_column }}' as {{ adapter.quote('column') }}
-                            , 'not null' as test
-                            , cast(coalesce(null_counts.test_result, 0) as {{ dbt.type_int() }}) as test_result
-                        from (
-                            {{ source_dimension_sql }}
-                        ) as sources
-                        left join (
-                            select
-                                  {{ source_key_expression }} as data_source_key
-                                , cast(count(*) as {{ dbt.type_int() }}) as test_result
-                            from {{ relation }} as source_rows
-                            where source_rows.{{ quote_column(pk_column) }} is null
-                            group by {{ source_key_expression }}
-                        ) as null_counts
-                            on sources.data_source_key = null_counts.data_source_key
-                    {% endset %}
+                {% set actual_column = dq_actual_column(actual_columns, pk_column, relation) %}
+                {% set grouped_alias = none %}
+
+                {% if actual_column is none %}
+                    {% do missing_pk_columns.append(pk_column) %}
+                {% elif pk_column == 'data_source' and dq_type_family(actual_column.dtype) != 'string' %}
+                    {% do unsupported_pk_columns.append(pk_column) %}
+                {% elif dq_type_family(actual_column.dtype) not in dq_supported_type_families() %}
+                    {% do unsupported_pk_columns.append(pk_column) %}
+                {% elif pk_column != 'data_source' %}
+                    {% set grouped_value_counter.value = grouped_value_counter.value + 1 %}
+                    {% set grouped_alias = 'pk_value_' ~ grouped_value_counter.value %}
                 {% endif %}
 
-                {% do pk_queries.append(query) %}
+                {% do pk_metrics.append({
+                    'column_name': pk_column,
+                    'actual_column_name': actual_column.name if actual_column is not none else none,
+                    'metric_alias': 'null_count_' ~ loop.index,
+                    'grouped_alias': grouped_alias,
+                    'is_present': actual_column is not none
+                }) %}
             {% endfor %}
 
-            {% if relation is none %}
-                {% set duplicate_query %}
+            {% set definition_queries = [] %}
+            {% for metric in pk_metrics %}
+                {% set definition_query %}
                     select
-                          sources.data_source
-                        , '{{ table_name }}' as {{ adapter.quote('table') }}
-                        , '{{ pk_column_list }}' as {{ adapter.quote('column') }}
-                        , 'duplicate value' as test
-                        , cast(null as {{ dbt.type_int() }}) as test_result
-                    from (
-                        {{ source_dimension_sql }}
-                    ) as sources
+                          'null_{{ loop.index }}' as test_key
+                        , '{{ metric["column_name"] | replace("'", "''") }}' as column_name
+                        , 'not null' as test
+                        , cast({{ 1 if missing_pk_columns | length == 0 and unsupported_pk_columns | length == 0 else 0 }} as {{ dbt.type_int() }}) as is_evaluable
                 {% endset %}
-            {% elif missing_pk_columns | length > 0 %}
-                {% set duplicate_query %}
+                {% do definition_queries.append(definition_query) %}
+            {% endfor %}
+
+            {% set duplicate_definition %}
+                select
+                      'duplicate' as test_key
+                    , '{{ pk_column_list | replace("'", "''") }}' as column_name
+                    , 'duplicate value' as test
+                    , cast({{ 1 if missing_pk_columns | length == 0 and unsupported_pk_columns | length == 0 else 0 }} as {{ dbt.type_int() }}) as is_evaluable
+            {% endset %}
+            {% do definition_queries.append(duplicate_definition) %}
+
+            {% set grouped_key_sql %}
+                select
+                      {{ source_key_expression }} as data_source_key
+                    {% for metric in pk_metrics if metric['grouped_alias'] is not none %}
+                    , source_rows.{{ adapter.quote(metric['actual_column_name']) }} as {{ metric['grouped_alias'] }}
+                    {% endfor %}
+                    , cast(count(*) as {{ dbt.type_bigint() }}) as group_record_count
+                from {{ relation }} as source_rows
+                group by
+                      {{ source_key_expression }}
+                    {% for metric in pk_metrics if metric['grouped_alias'] is not none %}
+                    , source_rows.{{ adapter.quote(metric['actual_column_name']) }}
+                    {% endfor %}
+            {% endset %}
+
+            {% set source_metrics_sql %}
+                select
+                      grouped_keys.data_source_key
+                    {% for metric in pk_metrics %}
+                    , {% if not metric['is_present'] %}
+                        cast(null as {{ dbt.type_bigint() }})
+                      {% elif metric['column_name'] == 'data_source' %}
+                        cast(sum(
+                            case
+                              when grouped_keys.data_source_key = '{{ dq_structural_null_source_key() }}'
+                              then grouped_keys.group_record_count
+                              else 0
+                            end
+                        ) as {{ dbt.type_bigint() }})
+                      {% else %}
+                        cast(sum(
+                            case
+                              when grouped_keys.{{ metric['grouped_alias'] }} is null
+                              then grouped_keys.group_record_count
+                              else 0
+                            end
+                        ) as {{ dbt.type_bigint() }})
+                      {% endif %} as {{ metric['metric_alias'] }}
+                    {% endfor %}
+                    , {% if missing_pk_columns | length > 0 or unsupported_pk_columns | length > 0 %}
+                        cast(null as {{ dbt.type_bigint() }})
+                      {% else %}
+                        cast(sum(
+                            case
+                              when grouped_keys.group_record_count > 1
+                              then grouped_keys.group_record_count
+                              else 0
+                            end
+                        ) as {{ dbt.type_bigint() }})
+                      {% endif %} as duplicate_record_count
+                from (
+                    {{ grouped_key_sql }}
+                ) as grouped_keys
+                group by grouped_keys.data_source_key
+            {% endset %}
+
+            {% set metric_case_clauses = [] %}
+            {% for metric in pk_metrics %}
+                {% do metric_case_clauses.append(
+                    "when 'null_" ~ loop.index ~ "' then source_metrics." ~ metric['metric_alias']
+                ) %}
+            {% endfor %}
+            {% do metric_case_clauses.append("when 'duplicate' then source_metrics.duplicate_record_count") %}
+
+            {% if missing_pk_columns | length > 0 or unsupported_pk_columns | length > 0 %}
+                {% set model_query %}
                     select
                           sources.data_source
-                        , '{{ table_name }}' as {{ adapter.quote('table') }}
-                        , '{{ pk_column_list }}' as {{ adapter.quote('column') }}
-                        , 'duplicate value' as test
-                        , cast(coalesce(source_counts.row_count, 0) as {{ dbt.type_int() }}) as test_result
+                        , '{{ table_name }}' as input_table_name
+                        , test_definitions.column_name
+                        , test_definitions.test
+                        , cast(null as {{ dbt.type_bigint() }}) as test_result
                     from (
-                        {{ source_dimension_sql }}
+                        select
+                              data_source
+                            , data_source_key
+                        from {{ evaluation_scope }}
+                        where model_name = '{{ model_name }}'
                     ) as sources
-                    left join (
-                        {{ source_count_sql }}
-                    ) as source_counts
-                        on sources.data_source_key = source_counts.data_source_key
+                    cross join (
+                        {{ definition_queries | join('\nunion all\n') }}
+                    ) as test_definitions
                 {% endset %}
             {% else %}
-                {% set duplicate_pk_columns = [] %}
-
-                {% for pk_column in pk_columns %}
-                    {% if pk_column != 'data_source' %}
-                        {% do duplicate_pk_columns.append(pk_column) %}
-                    {% endif %}
-                {% endfor %}
-
-                {% if duplicate_pk_columns | length == 0 %}
-                    {% set duplicate_pk_columns = pk_columns %}
-                {% endif %}
-
-                {% set duplicate_query %}
+                {% set model_query %}
+                select
+                      sources.data_source
+                    , '{{ table_name }}' as input_table_name
+                    , test_definitions.column_name
+                    , test_definitions.test
+                    , case
+                        when test_definitions.is_evaluable = 0
+                        then cast(null as {{ dbt.type_bigint() }})
+                        else cast(coalesce(
+                            case test_definitions.test_key
+                              {{ metric_case_clauses | join('\n                              ') }}
+                            end,
+                            0
+                        ) as {{ dbt.type_bigint() }})
+                      end as test_result
+                from (
                     select
-                          sources.data_source
-                        , '{{ table_name }}' as {{ adapter.quote('table') }}
-                        , '{{ pk_column_list }}' as {{ adapter.quote('column') }}
-                        , 'duplicate value' as test
-                        , cast(coalesce(source_counts.row_count, 0) - coalesce(distinct_counts.distinct_row_count, 0) as {{ dbt.type_int() }}) as test_result
-                    from (
-                        {{ source_dimension_sql }}
-                    ) as sources
-                    left join (
-                        {{ source_count_sql }}
-                    ) as source_counts
-                        on sources.data_source_key = source_counts.data_source_key
-                    left join (
-                        select
-                              distinct_rows.data_source_key
-                            , cast(count(*) as {{ dbt.type_int() }}) as distinct_row_count
-                        from (
-                            select
-                                  {{ source_key_expression }} as data_source_key
-                                {% for pk_column in duplicate_pk_columns %}
-                                , source_rows.{{ quote_column(pk_column) }}
-                                {% endfor %}
-                            from {{ relation }} as source_rows
-                            group by
-                                  {{ source_key_expression }}
-                                {% for pk_column in duplicate_pk_columns %}
-                                , source_rows.{{ quote_column(pk_column) }}
-                                {% endfor %}
-                        ) as distinct_rows
-                        group by distinct_rows.data_source_key
-                    ) as distinct_counts
-                        on sources.data_source_key = distinct_counts.data_source_key
+                          data_source
+                        , data_source_key
+                    from {{ evaluation_scope }}
+                    where model_name = '{{ model_name }}'
+                ) as sources
+                cross join (
+                    {{ definition_queries | join('\nunion all\n') }}
+                ) as test_definitions
+                left join (
+                    {{ source_metrics_sql }}
+                ) as source_metrics
+                    on sources.data_source_key = source_metrics.data_source_key
                 {% endset %}
             {% endif %}
 
-            {% do pk_queries.append(duplicate_query) %}
+            {% do model_queries.append(model_query) %}
         {% endif %}
     {% endfor %}
 
-    select *
-    from (
-        {{ pk_queries | join('\nunion all\n') }}
-    ) as structural_primary_key_tests
+    {% if model_queries | length > 0 %}
+        select *
+        from (
+            {{ model_queries | join('\nunion all\n') }}
+        ) as structural_primary_key_tests
+    {% else %}
+        select
+              cast(null as {{ dbt.type_string() }}) as data_source
+            , cast(null as {{ dbt.type_string() }}) as input_table_name
+            , cast(null as {{ dbt.type_string() }}) as column_name
+            , cast(null as {{ dbt.type_string() }}) as test
+            , cast(null as {{ dbt.type_bigint() }}) as test_result
+        {{ dq_empty_result_guard_sql() }}
+    {% endif %}
 {% else %}
     select
           cast(null as {{ dbt.type_string() }}) as data_source
-        , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('table') }}
-        , cast(null as {{ dbt.type_string() }}) as {{ adapter.quote('column') }}
+        , cast(null as {{ dbt.type_string() }}) as input_table_name
+        , cast(null as {{ dbt.type_string() }}) as column_name
         , cast(null as {{ dbt.type_string() }}) as test
-        , cast(null as {{ dbt.type_int() }}) as test_result
+        , cast(null as {{ dbt.type_bigint() }}) as test_result
     {{ dq_empty_result_guard_sql() }}
 {% endif %}

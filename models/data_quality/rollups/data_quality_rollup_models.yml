@@ -231,8 +231,9 @@ models:
       - name: not_applicable_count
 
   - name: data_quality__structural_test_results
-    description: Normalized structural data quality results at data source, input table, and structural test grain.
+    description: Four normalized structural readiness results for each data source and enabled Input Layer Model.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
@@ -240,17 +241,56 @@ models:
       tags:
         - data_quality
         - dq_rollup
+        - dq_structural
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data_source
+              - input_table_name
+              - test_name
     columns:
       - name: data_source
+        description: Source identifier evaluated by the normalized structural check. Null retains the structural matrix's null-source semantics.
       - name: input_table_name
+        description: Connector-owned Input Layer Model evaluated by the check.
+        tests:
+          - not_null
       - name: test_name
+        description: Stable identifier for one of the four structural checks.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - structural__columns_exist
+                  - structural__data_types_correct
+                  - structural__table_populated
+                  - structural__primary_key_correct
       - name: severity
+        description: Integer 1 for an active structural failure and null for pass or not evaluated.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - 1
+                quote: false
       - name: display_name
       - name: description
+      - name: grain
       - name: test_type
+      - name: check_category
+      - name: total_row_count
+        description: Number of Input Layer records represented by this Model and data-source result.
       - name: tested_count
+        description: One when the check was evaluated and zero when it was not evaluated.
       - name: failed_count
+        description: One when the check failed and zero otherwise.
+      - name: passed_count
+        description: One when the check passed and zero otherwise.
+      - name: not_evaluated_count
+        description: One when a prerequisite prevented evaluation and zero otherwise.
 
   - name: data_quality__component_test_quality_results
     description: Output Data Quality drilldown for relevant logical failures at data source, domain group, component, input table, and test grain. Structural findings remain in Input Data Quality and are intentionally excluded.

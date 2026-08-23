@@ -2,8 +2,9 @@ version: 2
 
 models:
   - name: data_quality__structural
-    description: One row per data source and input-layer table with structural pass/fail results for table existence, population, expected columns, data types, and primary keys.
+    description: One row per data source and enabled Input Layer Model with four structural readiness results for required columns, data types, population, and primary keys.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
@@ -11,18 +12,48 @@ models:
       tags:
         - data_quality
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data_source
+              - input_table_name
     columns:
       - name: data_source
-      - name: table_name
-      - name: table_exists
-      - name: table_populated
+        description: Source identifier evaluated independently within its Input Layer domain. Null identifies records whose data_source is null, or the fallback used when an enabled domain has no non-null source values.
+      - name: input_table_name
+        description: Connector-owned Input Layer Model evaluated by this row.
+        tests:
+          - not_null
       - name: columns_exist
-      - name: data_types
-      - name: primary_keys
+        description: Pass when every column required by the Input Layer contract exists, fail when at least one is missing, or not evaluated when the check cannot run.
+        tests: &structural_result_tests
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - pass
+                  - fail
+                  - not evaluated
+      - name: data_types_correct
+        description: Pass when every required column uses a compatible portable data type, fail when at least one present column is incompatible, or not evaluated when a required column is missing.
+        tests: *structural_result_tests
+      - name: table_populated
+        description: Pass when at least one record exists for this Input Layer Model and data source, fail when the count is zero, or not evaluated when data_source cannot be evaluated.
+        tests: *structural_result_tests
+      - name: primary_key_correct
+        description: Pass when the source-scoped composite key is non-null and unique, fail when null or duplicate key records exist, or not evaluated when a prerequisite is missing or the population is empty.
+        tests: *structural_result_tests
       - name: row_count
+        description: Number of records in this Input Layer Model for this data source. Zero is retained for domain-roster sources absent from the Model.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
 
   - name: data_quality__structural_expected_columns
-    description: One row per enabled Input Layer column expected by the Tuva contract, generated from Input Layer YAML metadata.
+    description: Internal implementation relation with one row per enabled Input Layer column expected by the Tuva contract, generated from Input Layer YAML metadata. This is not a stable public consumer contract.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -31,17 +62,45 @@ models:
       tags:
         - data_quality
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - model_name
+              - column_name
     columns:
+      - name: input_layer_domain
+        tests:
+          - not_null
       - name: table_name
+        tests:
+          - not_null
       - name: model_name
+        tests:
+          - not_null
       - name: column_name
+        tests:
+          - not_null
       - name: expected_data_type
+        tests:
+          - not_null
       - name: expected_type_family
+        tests:
+          - not_null
       - name: is_primary_key
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "yes"
+                  - "no"
       - name: column_order
+        tests:
+          - not_null
 
   - name: data_quality__structural_actual_columns
-    description: One row per actual warehouse column and data source for enabled Input Layer tables, generated through dbt adapter metadata APIs.
+    description: Internal implementation relation with one row per actual warehouse column for each enabled Input Layer Model. It preserves the adapter-reported physical identifier and normalized type metadata, and is not a stable public consumer contract.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -50,19 +109,136 @@ models:
       tags:
         - data_quality
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - model_name
+              - column_name
     columns:
+      - name: input_layer_domain
+        tests:
+          - not_null
+      - name: table_name
+        tests:
+          - not_null
+      - name: model_name
+        tests:
+          - not_null
+      - name: column_name
+        tests:
+          - not_null
+      - name: actual_column_name
+        tests:
+          - not_null
+      - name: actual_data_type
+        tests:
+          - not_null
+      - name: actual_type_family
+        tests:
+          - not_null
+
+  - name: data_quality__structural_source_populations
+    description: Internal implementation relation with one row per enabled Input Layer Model and actual or fallback data source, including its record count. This is not a stable public consumer contract.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_source_populations
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - model_name
+              - data_source_key
+    columns:
+      - name: input_layer_domain
+        tests:
+          - not_null
       - name: data_source
       - name: data_source_key
+        tests:
+          - not_null
       - name: table_name
+        tests:
+          - not_null
       - name: model_name
-      - name: column_name
-      - name: actual_data_type
-      - name: actual_type_family
-      - name: table_exists
+        tests:
+          - not_null
       - name: row_count
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+  - name: data_quality__structural_data_sources
+    description: Internal implementation relation with the shared non-null data-source roster for each enabled Input Layer domain, or one null fallback when the domain has no non-null source. This is not a stable public consumer contract.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_data_sources
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - input_layer_domain
+              - data_source_key
+    columns:
+      - name: input_layer_domain
+        tests:
+          - not_null
+      - name: data_source
+      - name: data_source_key
+        tests:
+          - not_null
+
+  - name: data_quality__structural_evaluation_scope
+    description: Internal implementation relation containing the complete domain-scoped set of Input Layer Model and data-source combinations Structural Data Quality evaluates, including zero-count combinations and actual null-source populations. This is not a stable public consumer contract.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_evaluation_scope
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - input_table_name
+              - data_source_key
+    columns:
+      - name: input_layer_domain
+        tests:
+          - not_null
+      - name: input_table_name
+        tests:
+          - not_null
+      - name: model_name
+        tests:
+          - not_null
+      - name: data_source
+      - name: data_source_key
+        tests:
+          - not_null
+      - name: row_count
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
 
   - name: data_quality__structural_column_details
-    description: One row per data source, input-layer table, and expected column with expected-vs-actual column metadata and structural pass/fail results.
+    description: Internal implementation relation with one source-neutral row per enabled Input Layer Model and required column, containing expected-versus-actual metadata used to calculate column-presence and data-type results. This is not a stable public consumer contract.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -71,21 +247,54 @@ models:
       tags:
         - data_quality
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - input_table_name
+              - column_name
     columns:
-      - name: data_source
-      - name: table
-      - name: column
+      - name: input_table_name
+        tests:
+          - not_null
+      - name: column_name
+        tests:
+          - not_null
       - name: expected_data_type
+        tests:
+          - not_null
+      - name: actual_column_name
       - name: actual_data_type
       - name: is_primary_key
-      - name: table_exists
-      - name: row_count
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "yes"
+                  - "no"
       - name: column_exists
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "yes"
+                  - "no"
       - name: data_type_correct
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "yes"
+                  - "no"
       - name: column_order
+        tests:
+          - not_null
 
   - name: data_quality__structural_primary_key_tests
-    description: One row per primary-key test result for each data source and input-layer table.
+    description: Internal implementation relation containing primary-key subcheck counts for each data source and enabled Input Layer Model. Null test_result values identify blocked subchecks; duplicate counts include every record in a non-unique key group rather than only records beyond the first. This is not a stable public consumer contract.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -94,12 +303,148 @@ models:
       tags:
         - data_quality
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data_source
+              - input_table_name
+              - column_name
+              - test
     columns:
       - name: data_source
-      - name: table
-      - name: column
+      - name: input_table_name
+        tests:
+          - not_null
+      - name: column_name
+        tests:
+          - not_null
       - name: test
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - not null
+                  - duplicate value
       - name: test_result
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+  - name: data_quality__structural_missing_columns
+    description: Failure-only detail with one row for each required column missing from an enabled Input Layer Model's Warehouse Table or View. Schema evidence is source-neutral because every data source in a Model shares the same columns.
+    config:
+      access: public
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_missing_columns
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - input_table_name
+              - column_name
+    columns:
+      - name: input_table_name
+        description: Input Layer Model with the missing required column.
+        tests:
+          - not_null
+      - name: column_name
+        description: Required column that is absent from the Warehouse Table or View.
+        tests:
+          - not_null
+      - name: expected_data_type
+        description: Portable data type declared for the missing column in Tuva's Input Layer contract.
+        tests:
+          - not_null
+
+  - name: data_quality__structural_data_type_mismatches
+    description: Failure-only detail with one row for each present required column whose actual warehouse data type does not satisfy Tuva's expected type. Known mismatches remain visible when another required column is missing; missing columns themselves are reported by structural_missing_columns.
+    config:
+      access: public
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_data_type_mismatches
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - input_table_name
+              - column_name
+    columns:
+      - name: input_table_name
+        description: Input Layer Model with the incompatible column type.
+        tests:
+          - not_null
+      - name: column_name
+        description: Required column whose actual warehouse type is incompatible.
+        tests:
+          - not_null
+      - name: expected_data_type
+        description: Portable data type required by Tuva's Input Layer contract.
+        tests:
+          - not_null
+      - name: actual_data_type
+        description: Warehouse-specific data type reported for the physical column.
+        tests:
+          - not_null
+
+  - name: data_quality__structural_primary_key_failure_counts
+    description: Failure-only primary-key detail with null-value counts by key column and duplicate-record counts for the complete source-scoped composite key.
+    config:
+      access: public
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: structural_primary_key_failure_counts
+      tags:
+        - data_quality
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data_source
+              - input_table_name
+              - failure_type
+              - primary_key_columns
+    columns:
+      - name: data_source
+        description: Source identifier for the failed source-scoped primary-key check. Null represents records whose data_source value is null.
+      - name: input_table_name
+        description: Input Layer Model containing the primary-key failure.
+        tests:
+          - not_null
+      - name: failure_type
+        description: null_value for a single primary-key column or duplicate_value for the complete source-scoped composite key.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - null_value
+                  - duplicate_value
+      - name: primary_key_columns
+        description: One key column for a null_value failure, or the full comma-separated composite key in contract order for duplicate_value.
+        tests:
+          - not_null
+      - name: failed_record_count
+        description: Number of records with a null value in the named key column, or number of records belonging to duplicate key groups. Null and duplicate counts can overlap and must not be added together.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
 
   - name: data_quality__logical
     description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.
