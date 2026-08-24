@@ -446,25 +446,8 @@ models:
               arguments:
                 min_value: 1
 
-  - name: data_quality__logical
-    description: Aggregated logical data quality results derived by summing persisted native-grain flag columns from the logical flag tables.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: logical
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: data_source
-      - name: table
-      - name: test_name
-      - name: display_name
-      - name: test_result
-
   - name: data_quality__medical_claim_line_flags
-    description: One row per medical claim line per data source with native-grain keys and 0/1 logical test flags evaluated at the claim-line grain.
+    description: One row per medical claim line per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -479,7 +462,7 @@ models:
       - name: data_source
 
   - name: data_quality__medical_claim_claim_flags
-    description: One row per medical claim per data source with claim-grain keys and 0/1 logical test flags evaluated at the claim header grain.
+    description: One row per medical claim per data source with claim-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -493,7 +476,7 @@ models:
       - name: data_source
 
   - name: data_quality__pharmacy_claim_line_flags
-    description: One row per pharmacy claim line per data source with native-grain keys and 0/1 logical test flags evaluated at the claim-line grain.
+    description: One row per pharmacy claim line per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -508,7 +491,7 @@ models:
       - name: data_source
 
   - name: data_quality__pharmacy_claim_claim_flags
-    description: One row per pharmacy claim per data source with claim-grain keys and 0/1 logical test flags evaluated at the claim header grain.
+    description: One row per pharmacy claim per data source with claim-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -522,7 +505,7 @@ models:
       - name: data_source
 
   - name: data_quality__eligibility_span_flags
-    description: One row per eligibility span per data source with native-grain keys and 0/1 logical test flags evaluated at the eligibility-span grain.
+    description: One row per eligibility span per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -536,10 +519,12 @@ models:
       - name: member_id
       - name: enrollment_start_date
       - name: enrollment_end_date
+      - name: payer
+      - name: plan
       - name: data_source
 
   - name: data_quality__eligibility_person_flags
-    description: One row per person per data source with 0/1 logical test flags evaluated across eligibility spans for the person.
+    description: One row per person per data source with tri-state logical flags evaluated across eligibility spans, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -553,7 +538,7 @@ models:
       - name: data_source
 
   - name: data_quality__appointment_flags
-    description: One row per clinical appointment input record per data source with native-grain keys and 0/1 logical test flags evaluated at the appointment-record grain.
+    description: One row per clinical appointment input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -567,7 +552,7 @@ models:
       - name: data_source
 
   - name: data_quality__condition_flags
-    description: One row per clinical condition input record per data source with native-grain keys and 0/1 logical test flags evaluated at the condition-record grain.
+    description: One row per clinical condition input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -581,7 +566,7 @@ models:
       - name: data_source
 
   - name: data_quality__encounter_flags
-    description: One row per clinical encounter input record per data source with native-grain keys and 0/1 logical test flags evaluated at the encounter-record grain.
+    description: One row per clinical encounter input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -595,7 +580,7 @@ models:
       - name: data_source
 
   - name: data_quality__immunization_flags
-    description: One row per clinical immunization input record per data source with native-grain keys and 0/1 logical test flags evaluated at the immunization-record grain.
+    description: One row per clinical immunization input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -609,7 +594,7 @@ models:
       - name: data_source
 
   - name: data_quality__lab_result_flags
-    description: One row per clinical lab result input record per data source with native-grain keys and 0/1 logical test flags evaluated at the lab-result-record grain.
+    description: One row per clinical lab result input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -623,7 +608,7 @@ models:
       - name: data_source
 
   - name: data_quality__location_flags
-    description: One row per clinical location input record per data source with native-grain keys and 0/1 logical test flags evaluated at the location-record grain.
+    description: One row per clinical location input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -637,7 +622,7 @@ models:
       - name: data_source
 
   - name: data_quality__medication_flags
-    description: One row per clinical medication input record per data source with native-grain keys and 0/1 logical test flags evaluated at the medication-record grain.
+    description: One row per clinical medication input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -651,7 +636,7 @@ models:
       - name: data_source
 
   - name: data_quality__observation_flags
-    description: One row per clinical observation input record per data source with native-grain keys and 0/1 logical test flags evaluated at the observation-record grain.
+    description: One row per clinical observation input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -665,7 +650,7 @@ models:
       - name: data_source
 
   - name: data_quality__patient_flags
-    description: One row per clinical patient input record per data source with native-grain keys and 0/1 logical test flags evaluated at the patient-record grain.
+    description: One row per clinical patient input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -680,7 +665,7 @@ models:
       - name: data_source
 
   - name: data_quality__practitioner_flags
-    description: One row per clinical practitioner input record per data source with native-grain keys and 0/1 logical test flags evaluated at the practitioner-record grain.
+    description: One row per clinical practitioner input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -694,7 +679,7 @@ models:
       - name: data_source
 
   - name: data_quality__procedure_flags
-    description: One row per clinical procedure input record per data source with native-grain keys and 0/1 logical test flags evaluated at the procedure-record grain.
+    description: One row per clinical procedure input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -705,4 +690,22 @@ models:
       materialized: table
     columns:
       - name: source_procedure_id
+      - name: data_source
+
+  - name: data_quality__provider_attribution_flags
+    description: One row per provider-attribution input record per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: provider_attribution_flags
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: person_id
+      - name: member_id
+      - name: year_month
+      - name: payer
+      - name: plan
       - name: data_source

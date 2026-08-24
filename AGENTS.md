@@ -34,8 +34,8 @@ from git worktrees.
   - Treat schema, grain, and semantic changes as breaking unless clearly proven
     otherwise.
 - Data Quality (`models/data_quality`):
-  - Produces neutral structural, logical, and analytical data quality result
-    tables.
+  - Produces neutral Input Data Quality results (Structural and Logical) and
+    Output Data Quality rollups.
   - Do not use `DQI` branding in this package; that belongs to Tuva Enterprise.
 - Data Assets (`seeds/`):
   - Package seed CSVs are primarily definitions or headers.

@@ -10,6 +10,7 @@ models:
       alias: input_layer_catalog
       tags:
         - data_quality
+        - dq_logical
         - dq_rollup
       materialized: table
     tests:
@@ -57,14 +58,16 @@ models:
       - name: row_count
 
   - name: data_quality__logical_test_catalog
-    description: One row per enabled logical data quality test with flag-table metadata, severity, check category, affected grain, keys, and investigation SQL.
+    description: Stable public catalog with one row per enabled Logical Data Quality test and the metadata required to interpret its results.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: logical_test_catalog
       tags:
         - data_quality
+        - dq_logical
         - dq_rollup
       materialized: table
     tests:
@@ -74,22 +77,44 @@ models:
               - test_name
     columns:
       - name: test_name
+        description: Stable identifier for the Logical Data Quality test.
+        data_type: varchar
         tests:
           - not_null
       - name: display_name
+        description: Human-readable test name.
+        data_type: varchar
         tests:
           - not_null
       - name: description
+        description: Complete description of the condition the test evaluates.
+        data_type: varchar
         tests:
           - not_null
       - name: input_model_name
+        description: dbt model name of the Input Layer Wrapper evaluated by the test.
+        data_type: varchar
       - name: input_table_name
+        description: Public Input Layer Model name evaluated by the test.
+        data_type: varchar
       - name: flag_model_name
+        description: Internal dbt model that materializes the test's row-level flag.
+        data_type: varchar
       - name: flag_table_name
+        description: Internal Warehouse Table or View containing the test's row-level flag.
+        data_type: varchar
       - name: flag_column_name
+        description: Column in the internal flag table containing the tri-state test result.
+        data_type: varchar
       - name: grain
+        description: Business grain at which the flag model evaluates the test.
+        data_type: varchar
       - name: key_columns
+        description: Comma-separated Input Layer columns that identify a row at the declared grain, in canonical order.
+        data_type: varchar
       - name: test_type
+        description: Logical test classification used to group related checks.
+        data_type: varchar
         tests:
           - not_null
           - accepted_values:
@@ -100,8 +125,9 @@ models:
                   - temporal
                   - referential
                   - consistency
-      - name: check_category
       - name: severity
+        description: Integer severity assigned to a failure, where 1 is most severe and 3 is least severe.
+        data_type: integer
         tests:
           - not_null
           - accepted_values:
@@ -110,36 +136,42 @@ models:
                   - 1
                   - 2
                   - 3
-      - name: default_severity
-        tests:
-          - not_null
-          - accepted_values:
-              arguments:
-                values:
-                  - 1
-                  - 2
-                  - 3
-      - name: investigation_sql
+                quote: false
 
   - name: data_quality__logical_test_input_columns
-    description: One row per logical data quality test and related input field used for domain-to-test matching.
+    description: Stable public mapping with one row per enabled Logical Data Quality test and affected Input Layer column.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: logical_test_input_columns
       tags:
         - data_quality
+        - dq_logical
         - dq_rollup
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - test_name
+              - input_table_name
+              - input_column_name
     columns:
       - name: test_name
+        description: Stable identifier for the Logical Data Quality test.
+        data_type: varchar
         tests:
           - not_null
       - name: input_table_name
+        description: Public Input Layer Model containing the affected column.
+        data_type: varchar
         tests:
           - not_null
       - name: input_column_name
+        description: Input Layer column whose value or relationship the test evaluates.
+        data_type: varchar
         tests:
           - not_null
 
@@ -208,27 +240,106 @@ models:
   - name: data_quality__logical_test_results
     description: One row per data source, input table, and logical test with tested, passed, failed, and not-applicable counts.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: logical_test_results
       tags:
         - data_quality
+        - dq_logical
         - dq_rollup
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - data_source
+              - input_table_name
+              - test_name
     columns:
       - name: data_source
+        description: Source identifier evaluated independently by the test.
+        data_type: varchar
       - name: input_table_name
+        description: Public Input Layer Model evaluated by the test.
+        data_type: varchar
+        tests:
+          - not_null
       - name: test_name
+        description: Stable identifier for the Logical Data Quality test.
+        data_type: varchar
+        tests:
+          - not_null
       - name: display_name
+        description: Human-readable test name.
+        data_type: varchar
+        tests:
+          - not_null
       - name: description
+        description: Complete description of the condition the test evaluates.
+        data_type: varchar
+        tests:
+          - not_null
+      - name: grain
+        description: Business grain at which the test is evaluated.
+        data_type: varchar
+      - name: flag_table_name
+        description: Internal flag table aggregated to produce this result.
+        data_type: varchar
+      - name: flag_column_name
+        description: Tri-state flag column aggregated to produce this result.
+        data_type: varchar
       - name: test_type
+        description: Logical test classification used to group related checks.
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - missing
+                  - invalid
+                  - temporal
+                  - referential
+                  - consistency
       - name: severity
+        description: Integer severity assigned to a failure, where 1 is most severe and 3 is least severe.
+        data_type: integer
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - 1
+                  - 2
+                  - 3
+                quote: false
       - name: total_row_count
+        description: Number of flag-model rows for the data source before applicability is considered.
+        data_type: bigint
+        tests:
+          - not_null
       - name: tested_count
+        description: Number of rows for which the test returned either pass or fail.
+        data_type: bigint
+        tests:
+          - not_null
       - name: failed_count
+        description: Number of applicable rows for which the test returned fail.
+        data_type: bigint
+        tests:
+          - not_null
       - name: passed_count
+        description: Number of applicable rows for which the test returned pass.
+        data_type: bigint
+        tests:
+          - not_null
       - name: not_applicable_count
+        description: Number of rows for which the test returned null because the test did not apply.
+        data_type: bigint
+        tests:
+          - not_null
 
   - name: data_quality__structural_test_results
     description: Four normalized structural readiness results for each data source and enabled Input Layer Model.
@@ -413,23 +524,43 @@ models:
                   - not_applicable
 
   - name: data_quality__logical_failure_keys
-    description: Optional key-only drilldown table for logical data quality failures. Disabled by default and enabled with enable_data_quality_failure_keys.
+    description: Optional stable public key-only drilldown with one row per failing Logical Data Quality flag row. Disabled by default and enabled with enable_data_quality_failure_keys.
     config:
+      access: public
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: logical_failure_keys
       tags:
         - data_quality
+        - dq_logical
         - dq_rollup
       materialized: table
     columns:
       - name: data_source
+        description: Source identifier of the failing flag row.
+        data_type: varchar
       - name: input_table_name
+        description: Public Input Layer Model evaluated by the test.
+        data_type: varchar
       - name: test_name
-      - name: display_name
-      - name: description
-      - name: test_type
-      - name: severity
+        description: Stable identifier for the failed Logical Data Quality test; join to logical_test_catalog for descriptive metadata.
+        data_type: varchar
+      - name: grain
+        description: Business grain at which the failing row was evaluated.
+        data_type: varchar
       - name: key_columns
+        description: Comma-separated key column names in the same order used by key_values.
+        data_type: varchar
+      - name: key_values_format
+        description: Encoding version for key_values. The current value is percent_escaped_v1.
+        data_type: varchar
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - percent_escaped_v1
       - name: key_values
+        description: >-
+          Reversible ordered tuple encoded as percent_escaped_v1. Each null component is N. Each non-null component is V followed by its string value after percent signs are replaced with %25 and vertical bars are replaced with %7C; an empty string is V. Components follow key_columns order and are joined with a literal vertical bar. Decode %7C before %25.
+        data_type: varchar

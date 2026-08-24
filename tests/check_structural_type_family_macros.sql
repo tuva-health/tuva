@@ -1,6 +1,6 @@
 {{ config(
      enabled = var('data_quality_enabled', false) | as_bool,
-     tags = ['data_quality', 'dq', 'dq1', 'dq_structural']
+     tags = ['data_quality', 'dq_structural']
    )
 }}
 

@@ -34,7 +34,7 @@ models:
             data_type: varchar
       - name: encounter_type
         description: >-
-          Type of clinical encounter, such as acute inpatient, emergency department, outpatient, office visit, or skilled nursing facility. Values should map to Tuva encounter type terminology.
+          Type of clinical encounter, such as acute inpatient, emergency department, outpatient, office visit, or skilled nursing facility. Values must exactly match the lowercase Tuva encounter type terminology.
         config:
           meta:
             data_type: varchar
@@ -94,7 +94,7 @@ models:
             data_type: varchar
       - name: primary_diagnosis_code_type
         description: >-
-          Code system for primary_diagnosis_code. Accepted values should map to Tuva code type terminology, such as icd-10-cm or icd-9-cm.
+          Code system for primary_diagnosis_code. Accepted values are icd-10-cm or icd-9-cm, all lowercase.
         config:
           meta:
             data_type: varchar
@@ -106,7 +106,7 @@ models:
             data_type: varchar
       - name: drg_code_type
         description: >-
-          Diagnosis-related group code system for drg_code, when a DRG is assigned to the encounter. Examples include ms-drg and apr-drg.
+          Diagnosis-related group code system for drg_code, when a DRG is assigned to the encounter. Accepted values are ms-drg or apr-drg, all lowercase.
         config:
           meta:
             data_type: varchar

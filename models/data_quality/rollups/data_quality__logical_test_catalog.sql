@@ -7,7 +7,7 @@
        else 'data_quality'
      ),
      alias = 'logical_test_catalog',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_logical', 'dq_rollup'],
      materialized = 'table'
    )
 }}
@@ -28,10 +28,7 @@
             , {{ dq_string_literal_sql(definition['grain']) }} as grain
             , {{ dq_string_literal_sql(definition['key_columns'] | join(',')) }} as key_columns
             , {{ dq_string_literal_sql(definition['test_type']) }} as test_type
-            , {{ dq_string_literal_sql(definition['test_type']) }} as check_category
             , cast({{ definition['severity'] }} as {{ dbt.type_int() }}) as severity
-            , cast({{ definition['severity'] }} as {{ dbt.type_int() }}) as default_severity
-            , {{ dq_string_literal_sql(definition['investigation_sql']) }} as investigation_sql
     {% endset %}
     {% do catalog_queries.append(query) %}
 {% endfor %}
@@ -54,9 +51,6 @@
         , cast(null as {{ dbt.type_string() }}) as grain
         , cast(null as {{ dbt.type_string() }}) as key_columns
         , cast(null as {{ dbt.type_string() }}) as test_type
-        , cast(null as {{ dbt.type_string() }}) as check_category
         , cast(null as {{ dbt.type_int() }}) as severity
-        , cast(null as {{ dbt.type_int() }}) as default_severity
-        , cast(null as {{ dbt.type_string() }}) as investigation_sql
     {{ dq_empty_result_guard_sql() }}
 {% endif %}

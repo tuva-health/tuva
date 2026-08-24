@@ -1,0 +1,241 @@
+version: 2
+
+unit_tests:
+  - name: test_logical_test_results_aggregates_each_flag_model_once
+    description: >
+      Verifies exact fail, pass, and not-applicable counts for multiple flags,
+      populated and null data sources, and independently aggregated flag
+      models.
+    model: data_quality__logical_test_results
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      macros:
+        dq_enabled_logical_test_manifest:
+          - source_model_name: data_quality__medical_claim_line_flags
+            input_model_name: input_layer__medical_claim
+            input_table_name: medical_claim
+            flag_table_name: medical_claim_line_flags
+            grain: medical claim line
+            key_columns: [claim_id, claim_line_number, data_source]
+            test_name: medical_claim__unit_flag_a
+            flag_column_name: unit_flag_a
+            display_name: Unit flag A
+            description: Unit-test flag A.
+            test_type: consistency
+            severity: 2
+          - source_model_name: data_quality__medical_claim_line_flags
+            input_model_name: input_layer__medical_claim
+            input_table_name: medical_claim
+            flag_table_name: medical_claim_line_flags
+            grain: medical claim line
+            key_columns: [claim_id, claim_line_number, data_source]
+            test_name: medical_claim__unit_flag_b
+            flag_column_name: unit_flag_b
+            display_name: Unit flag B
+            description: Unit-test flag B.
+            test_type: temporal
+            severity: 3
+          - source_model_name: data_quality__pharmacy_claim_line_flags
+            input_model_name: input_layer__pharmacy_claim
+            input_table_name: pharmacy_claim
+            flag_table_name: pharmacy_claim_line_flags
+            grain: pharmacy claim line
+            key_columns: [claim_id, claim_line_number, data_source]
+            test_name: pharmacy_claim__unit_flag_c
+            flag_column_name: unit_flag_c
+            display_name: Unit flag C
+            description: Unit-test flag C.
+            test_type: invalid
+            severity: 1
+    given:
+      - input: ref('data_quality__medical_claim_line_flags')
+        format: sql
+        rows: |
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'integer' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'source_a' as data_source, 0 as unit_flag_a, cast(null as {{ integer_type }}) as unit_flag_b
+          union all
+          select 'source_a', 1, 0
+          union all
+          select 'source_a', cast(null as {{ integer_type }}), 1
+          union all
+          select 'source_b', 0, cast(null as {{ integer_type }})
+          union all
+          select cast(null as {{ string_type }}), 1, 0
+      - input: ref('data_quality__pharmacy_claim_line_flags')
+        format: sql
+        rows: |
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'integer' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'source_a' as data_source, 1 as unit_flag_c
+          union all
+          select 'source_a', cast(null as {{ integer_type }})
+          union all
+          select 'source_c', 0
+          union all
+          select cast(null as {{ string_type }}), cast(null as {{ integer_type }})
+    expect:
+      rows:
+        - data_source: source_a
+          test_name: medical_claim__unit_flag_a
+          total_row_count: 3
+          tested_count: 2
+          failed_count: 1
+          passed_count: 1
+          not_applicable_count: 1
+        - data_source: source_a
+          test_name: medical_claim__unit_flag_b
+          total_row_count: 3
+          tested_count: 2
+          failed_count: 1
+          passed_count: 1
+          not_applicable_count: 1
+        - data_source: source_b
+          test_name: medical_claim__unit_flag_a
+          total_row_count: 1
+          tested_count: 1
+          failed_count: 0
+          passed_count: 1
+          not_applicable_count: 0
+        - data_source: source_b
+          test_name: medical_claim__unit_flag_b
+          total_row_count: 1
+          tested_count: 0
+          failed_count: 0
+          passed_count: 0
+          not_applicable_count: 1
+        - data_source: null
+          test_name: medical_claim__unit_flag_a
+          total_row_count: 1
+          tested_count: 1
+          failed_count: 1
+          passed_count: 0
+          not_applicable_count: 0
+        - data_source: null
+          test_name: medical_claim__unit_flag_b
+          total_row_count: 1
+          tested_count: 1
+          failed_count: 0
+          passed_count: 1
+          not_applicable_count: 0
+        - data_source: source_a
+          test_name: pharmacy_claim__unit_flag_c
+          total_row_count: 2
+          tested_count: 1
+          failed_count: 1
+          passed_count: 0
+          not_applicable_count: 1
+        - data_source: source_c
+          test_name: pharmacy_claim__unit_flag_c
+          total_row_count: 1
+          tested_count: 1
+          failed_count: 0
+          passed_count: 1
+          not_applicable_count: 0
+        - data_source: null
+          test_name: pharmacy_claim__unit_flag_c
+          total_row_count: 1
+          tested_count: 0
+          failed_count: 0
+          passed_count: 0
+          not_applicable_count: 1
+
+  - name: test_logical_failure_keys_preserve_failed_rows_and_escape_key_values
+    description: >
+      Verifies that the optional failure-key detail emits only failed rows from
+      multiple flag models and distinguishes pipes, percent signs, empty
+      strings, and null key components with percent_escaped_v1.
+    model: data_quality__logical_failure_keys
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false) and var('enable_data_quality_failure_keys', false)) | as_bool }}"
+    overrides:
+      macros:
+        dq_enabled_logical_test_manifest:
+          - source_model_name: data_quality__medical_claim_line_flags
+            input_model_name: input_layer__medical_claim
+            input_table_name: medical_claim
+            flag_table_name: medical_claim_line_flags
+            grain: medical claim line
+            key_columns: [claim_id, claim_line_number, data_source]
+            test_name: medical_claim__unit_flag_a
+            flag_column_name: unit_flag_a
+            display_name: Unit flag A
+            description: Unit-test flag A.
+            test_type: consistency
+            severity: 2
+          - source_model_name: data_quality__pharmacy_claim_claim_flags
+            input_model_name: input_layer__pharmacy_claim
+            input_table_name: pharmacy_claim
+            flag_table_name: pharmacy_claim_claim_flags
+            grain: pharmacy claim
+            key_columns: [claim_id, data_source]
+            test_name: pharmacy_claim__unit_flag_b
+            flag_column_name: unit_flag_b
+            display_name: Unit flag B
+            description: Unit-test flag B.
+            test_type: referential
+            severity: 1
+    given:
+      - input: ref('data_quality__medical_claim_line_flags')
+        format: sql
+        rows: |
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'integer' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'claim|100%' as claim_id, 1 as claim_line_number, 'source_a' as data_source, 1 as unit_flag_a
+          union all
+          select '', 2, 'source_b', 1
+          union all
+          select cast(null as {{ string_type }}), 3, 'source_b', 1
+          union all
+          select 'passing', 4, 'source_a', 0
+          union all
+          select 'not_applicable', 5, 'source_a', cast(null as {{ integer_type }})
+          union all
+          select 'null_source', 6, cast(null as {{ string_type }}), 1
+      - input: ref('data_quality__pharmacy_claim_claim_flags')
+        format: sql
+        rows: |
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'integer' %}
+          select 'rx%|1' as claim_id, 'source_c' as data_source, 1 as unit_flag_b
+          union all
+          select 'rx_pass', 'source_c', 0
+          union all
+          select 'rx_na', 'source_c', cast(null as {{ integer_type }})
+    expect:
+      rows:
+        - data_source: source_a
+          input_table_name: medical_claim
+          test_name: medical_claim__unit_flag_a
+          grain: medical claim line
+          key_columns: claim_id,claim_line_number,data_source
+          key_values_format: percent_escaped_v1
+          key_values: Vclaim%7C100%25|V1|Vsource_a
+        - data_source: source_b
+          input_table_name: medical_claim
+          test_name: medical_claim__unit_flag_a
+          grain: medical claim line
+          key_columns: claim_id,claim_line_number,data_source
+          key_values_format: percent_escaped_v1
+          key_values: V|V2|Vsource_b
+        - data_source: source_b
+          input_table_name: medical_claim
+          test_name: medical_claim__unit_flag_a
+          grain: medical claim line
+          key_columns: claim_id,claim_line_number,data_source
+          key_values_format: percent_escaped_v1
+          key_values: N|V3|Vsource_b
+        - data_source: null
+          input_table_name: medical_claim
+          test_name: medical_claim__unit_flag_a
+          grain: medical claim line
+          key_columns: claim_id,claim_line_number,data_source
+          key_values_format: percent_escaped_v1
+          key_values: Vnull_source|V6|N
+        - data_source: source_c
+          input_table_name: pharmacy_claim
+          test_name: pharmacy_claim__unit_flag_b
+          grain: pharmacy claim
+          key_columns: claim_id,data_source
+          key_values_format: percent_escaped_v1
+          key_values: Vrx%25%7C1|Vsource_c

@@ -7,7 +7,7 @@
        else 'data_quality'
      ),
      alias = 'component_quality_results',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_rollup'],
      materialized = 'table'
    )
 }}
@@ -18,14 +18,14 @@ select
     , domain_group_name
     , component_key
     , component_name
-    , cast(sum(coalesce(total_row_count, 0)) as {{ dbt.type_int() }}) as total_row_count
-    , cast(sum(coalesce(tested_count, 0)) as {{ dbt.type_int() }}) as tested_count
-    , cast(sum(coalesce(passed_count, 0)) as {{ dbt.type_int() }}) as passed_count
-    , cast(sum(coalesce(failed_count, 0)) as {{ dbt.type_int() }}) as failed_count
-    , cast(sum(case when severity = 1 then coalesce(failed_count, 0) else 0 end) as {{ dbt.type_int() }}) as severity_1_failed_count
-    , cast(sum(case when severity = 2 then coalesce(failed_count, 0) else 0 end) as {{ dbt.type_int() }}) as severity_2_failed_count
-    , cast(sum(case when severity = 3 then coalesce(failed_count, 0) else 0 end) as {{ dbt.type_int() }}) as severity_3_failed_count
-    , cast(sum(coalesce(not_applicable_count, 0)) as {{ dbt.type_int() }}) as not_applicable_count
+    , cast(sum(cast(coalesce(total_row_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as total_row_count
+    , cast(sum(cast(coalesce(tested_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as tested_count
+    , cast(sum(cast(coalesce(passed_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as passed_count
+    , cast(sum(cast(coalesce(failed_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as failed_count
+    , cast(sum(cast(case when severity = 1 then coalesce(failed_count, 0) else 0 end as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as severity_1_failed_count
+    , cast(sum(cast(case when severity = 2 then coalesce(failed_count, 0) else 0 end as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as severity_2_failed_count
+    , cast(sum(cast(case when severity = 3 then coalesce(failed_count, 0) else 0 end as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as severity_3_failed_count
+    , cast(sum(cast(coalesce(not_applicable_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as not_applicable_count
     , {{ dq_safe_ratio_sql('sum(coalesce(passed_count, 0))', 'sum(coalesce(tested_count, 0))') }} as pct_passed
     , {{ dq_safe_ratio_sql('sum(case when severity = 1 then coalesce(failed_count, 0) else 0 end)', 'sum(coalesce(tested_count, 0))') }} as pct_severity_1
     , {{ dq_safe_ratio_sql('sum(case when severity = 2 then coalesce(failed_count, 0) else 0 end)', 'sum(coalesce(tested_count, 0))') }} as pct_severity_2

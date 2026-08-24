@@ -173,7 +173,7 @@ models:
             is_primary_key: false
       - name: sex
         description: Biological sex of the person. Accepted values are male, female,
-          or unknown.
+          or unknown, all lowercase.
         config:
           meta:
             data_type: varchar
@@ -198,9 +198,9 @@ models:
             data_type: date
             is_primary_key: false
       - name: death_flag
-        description: A flag indicating if the person has died. Allowed values are 1 for
-          yes, 0 for no, or null. If `death_flag` is 1, `death_date` should also
-          be populated.
+        description: A Boolean flag indicating whether the person has died. Allowed
+          values are true, false, or null; warehouses may represent true and false as
+          1 and 0. If `death_flag` is true, `death_date` should also be populated.
         config:
           meta:
             data_type: boolean

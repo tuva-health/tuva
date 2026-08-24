@@ -6,7 +6,7 @@
        else 'data_quality'
      ),
      alias = 'data_source_catalog',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_rollup'],
      materialized = 'table'
    )
 }}
