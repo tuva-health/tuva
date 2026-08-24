@@ -1,0 +1,39 @@
+version: 2
+
+unit_tests:
+  - name: test_medical_claim_dates_pass_through_without_calendar_membership
+    description: Already-typed medical-claim dates are preserved during normalization even when they fall outside the supported range; Logical Data Quality reports those values separately.
+    model: normalized_input__int_medical_claim_date_normalize
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-02-15 00:00:00'
+    given:
+      - input: ref('normalized_input__stg_medical_claim')
+        format: sql
+        rows: |
+          select
+              'claim' as claim_id
+            , 1 as claim_line_number
+            , 'institutional' as claim_type
+            , 'source' as data_source
+            , cast('1899-12-31' as date) as claim_start_date
+            , cast('2101-01-01' as date) as claim_end_date
+            , cast('1899-12-30' as date) as claim_line_start_date
+            , cast('2101-01-02' as date) as claim_line_end_date
+            , cast('1899-12-29' as date) as admission_date
+            , cast('2101-01-03' as date) as discharge_date
+    expect:
+      rows:
+        - claim_id: claim
+          claim_line_number: 1
+          claim_type: institutional
+          data_source: source
+          normalized_claim_start_date: '1899-12-31'
+          normalized_claim_end_date: '2101-01-01'
+          normalized_claim_line_start_date: '1899-12-30'
+          normalized_claim_line_end_date: '2101-01-02'
+          normalized_admission_date: '1899-12-29'
+          normalized_discharge_date: '2101-01-03'
+          tuva_last_run: '2024-02-15 00:00:00'

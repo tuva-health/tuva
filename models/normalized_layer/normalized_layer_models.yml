@@ -145,7 +145,7 @@ models:
 ##    Final
   - name: normalized__eligibility
     description: |-
-      This model assembles normalized eligibility records from the eligibility preprocessing models. It starts from int_eligibility_casting, selects the eligibility, demographic, source, metadata, and extension columns needed downstream, and left joins to int_eligibility_dates_normalized on person_id_key. Birth and death dates are calendar-normalized, while already-typed enrollment dates are preserved so valid values outside the terminology calendar are not lost. It also left joins to int_eligibility_state_normalized on person_id_key to add normalized_state_name, fips_state_code, and fips_state_abbreviation.
+      This model assembles normalized eligibility records from the eligibility preprocessing models. It starts from int_eligibility_casting, selects the eligibility, demographic, source, metadata, and extension columns needed downstream, and left joins to int_eligibility_dates_normalized on person_id_key. Already-typed birth, death, and enrollment dates are preserved without a terminology-calendar membership join; Logical Data Quality reports dates outside Tuva's supported range instead of normalization erasing them. It also left joins to int_eligibility_state_normalized on person_id_key to add normalized_state_name, fips_state_code, and fips_state_abbreviation.
 
       This model creates eligibility_id as a stable synthetic eligibility-span key by concatenating person_id, member_id, enrollment_start_date, payer, plan, and data_source with hyphen delimiters. enrollment_end_date is intentionally excluded because an open span can later receive a closing date without becoming a different span. The model does not deduplicate eligibility records.
     config:
@@ -222,9 +222,9 @@ models:
           meta:
             terminology: https://thetuvaproject.com/terminology/race
       - name: birth_date
-        description: Calendar-normalized birth date from int_eligibility_dates_normalized. This value is null when the source birth_date does not match terminology__calendar.full_date.
+        description: Native birth date preserved from int_eligibility_dates_normalized without a terminology-calendar membership requirement.
       - name: death_date
-        description: Calendar-normalized death date from int_eligibility_dates_normalized. This value is null when the source death_date is null or does not match terminology__calendar.full_date.
+        description: Native death date preserved from int_eligibility_dates_normalized without a terminology-calendar membership requirement.
       - name: death_flag
         description: Integer flag from the eligibility input record indicating whether the member is deceased.
       - name: original_reason_entitlement_code
@@ -1330,7 +1330,7 @@ models:
 
   - name: int_eligibility_dates_normalized
     description: |-
-      This model normalizes eligibility date fields from int_eligibility_casting. Birth and death dates are matched to terminology__calendar. Enrollment start and end dates are already typed DATE values and are passed through directly, preventing valid eligibility dates outside the terminology calendar from being lost.
+      This model projects already-typed eligibility date fields from int_eligibility_casting. Birth, death, and enrollment dates pass through directly without using terminology-calendar membership as validation. Logical Data Quality reports values outside Tuva's supported 1900-through-2100 range while preserving the source value for investigation.
 
       The model keeps one distinct row per person_id and person_id_key.
     config:
@@ -1351,15 +1351,16 @@ models:
       - name: person_id_key
         description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and the canonical enrollment_end_date and is used to join normalized date values back to the eligibility record.
       - name: normalized_birth_date
-        description: Birth date matched to terminology__calendar.full_date. Null when the source birth_date is null or does not match the calendar.
+        description: Birth date passed through as a native DATE without a calendar-membership requirement.
       - name: normalized_death_date
-        description: Death date matched to terminology__calendar.full_date. Null when the source death_date is null or does not match the calendar.
+        description: Death date passed through as a native DATE without a calendar-membership requirement.
       - name: normalized_enrollment_start_date
         description: Enrollment start date passed through from int_eligibility_casting as a native DATE without a calendar-membership requirement.
       - name: normalized_enrollment_end_date
         description: Canonical enrollment end date passed through from int_eligibility_casting as a native DATE without a calendar-membership requirement. Null means the enrollment span remains open.
 
   - name: normalized_input__int_medical_claim_date_normalize
+    description: Preserves already-typed medical-claim start, end, line, admission, and discharge dates without using terminology-calendar membership as validation. Logical Data Quality reports values outside Tuva's supported date range.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -1496,6 +1497,7 @@ models:
 
 
   - name: normalized_input__int_procedure_date_normalize
+    description: Preserves already-typed institutional procedure dates and counts their occurrences by claim, source, and procedure-date field without using terminology-calendar membership as validation.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -1611,9 +1613,9 @@ models:
       - name: race
         description: Race of the member, cast to string from input_layer__eligibility.
       - name: birth_date
-        description: Source birth date cast to date from input_layer__eligibility before calendar normalization.
+        description: Source birth date cast to date from input_layer__eligibility before direct date passthrough.
       - name: death_date
-        description: Source death date cast to date from input_layer__eligibility before calendar normalization.
+        description: Source death date cast to date from input_layer__eligibility before direct date passthrough.
       - name: death_flag
         description: Source death flag cast to integer from input_layer__eligibility.
       - name: original_reason_entitlement_code

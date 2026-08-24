@@ -6,6 +6,25 @@
     {{ return(dbt.cast("'" ~ date_string ~ "'", api.Column.translate_type('date'))) }}
 {% endmacro %}
 
+{% macro dq_supported_date_range_where_sql(column_sql) %}
+    {% set supported_date_min_sql = dq_date_literal_sql('1900-01-01') %}
+    {% set supported_date_max_sql = dq_date_literal_sql('2100-12-31') %}
+
+    {{ return(
+        "(" ~ column_sql ~ " >= " ~ supported_date_min_sql
+        ~ " and " ~ column_sql ~ " <= " ~ supported_date_max_sql ~ ")"
+    ) }}
+{% endmacro %}
+
+{% macro dq_logical_supported_date_range_flag_sql(column_sql, applicability_sql=none) %}
+    {% set effective_applicability_sql = applicability_sql if applicability_sql is not none else column_sql ~ " is not null" %}
+
+    {{ return(dq_logical_int_flag_sql(
+        "not " ~ dq_supported_date_range_where_sql(column_sql),
+        effective_applicability_sql
+    )) }}
+{% endmacro %}
+
 {% macro dq_digits_only_sql(expression) %}
     {% set digits_removed = namespace(expression=expression) %}
 

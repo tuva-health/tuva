@@ -20,18 +20,21 @@ with stg_eligibility as (
 , eligibility_with_effective_end_date as (
   select
     *
-    , coalesce(enrollment_end_date, cast(tuva_last_run as date)) as effective_enrollment_end_date
+    , case
+        when enrollment_end_date is null
+          or enrollment_end_date > cast(tuva_last_run as date)
+          then cast(tuva_last_run as date)
+        else enrollment_end_date
+      end as effective_enrollment_end_date
   from stg_eligibility
 )
 
 , month_start_and_end_dates as (
   select
-    {{ concat_custom(["year",
-                  dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
-    , min(full_date) as month_start_date
-    , max(full_date) as month_end_date
-  from {{ ref('terminology__calendar') }}
-  group by year, month
+      year_month
+    , first_day_of_month as month_start_date
+    , last_day_of_month as month_end_date
+  from {{ ref('member_month__month_spine') }}
 )
 
 , joined as (

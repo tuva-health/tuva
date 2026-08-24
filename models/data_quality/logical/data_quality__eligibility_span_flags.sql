@@ -153,6 +153,22 @@ final as (
             "source_rows.death_date < " ~ min_reasonable_date_sql ~ " or source_rows.death_date > " ~ current_date_sql,
             "source_rows.death_date is not null"
           ) }} as death_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.birth_date"
+          ) }} as birth_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.death_date"
+          ) }} as death_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.enrollment_start_date"
+          ) }} as enrollment_start_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.enrollment_end_date",
+            finite_end_where_sql
+          ) }} as enrollment_end_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.file_date"
+          ) }} as file_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
             death_flag_text_sql ~ " not in ('true', 'false', '1', '0')",
             "source_rows.death_flag is not null"

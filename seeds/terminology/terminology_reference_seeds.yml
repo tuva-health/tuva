@@ -40,10 +40,7 @@ seeds:
 
   - name: terminology__calendar
     description: |-
-      The calendar table provides a date spine and common date attributes used for joins, date
-      normalization, and month-level analytics. It is maintained by Tuva Health. Tuva uses this asset in
-      core member month models, input normalization models, provider attribution models, semantic layer
-      models, CMS-HCC models, and AHRQ quality indicator models.
+      The calendar table is a public daily reference asset with common date attributes maintained by Tuva Health. Tuva Core preserves it for compatible downstream use, including the Semantic Layer, CMS HCC, and AHRQ Quality Indicators. Core normalization, member-month construction, and provider attribution do not use calendar membership to validate or erase already-typed dates; member-month processing uses a separate package-owned monthly spine.
     config:
       meta:
         data_asset:

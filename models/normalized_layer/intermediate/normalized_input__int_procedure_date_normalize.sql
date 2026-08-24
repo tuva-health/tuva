@@ -278,15 +278,13 @@ select
     claim_id
     , data_source
     , procedure_column
-    , cal.full_date as procedure_date
+    , procedure_date
     , count(*) as procedure_date_occurrence_count
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from pivot_procedure as piv
-left outer join {{ ref('terminology__calendar') }} as cal
-    on piv.procedure_date = cal.full_date
 where claim_type = 'institutional'
 group by
     claim_id
     , data_source
     , procedure_column
-    , cal.full_date
+    , procedure_date

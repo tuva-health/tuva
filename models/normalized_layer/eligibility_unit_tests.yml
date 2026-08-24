@@ -71,8 +71,8 @@ unit_tests:
           enrollment_end_date: null
           file_date: '2024-02-01'
 
-  - name: test_eligibility_dates_preserve_typed_enrollment_dates
-    description: Enrollment dates pass through without requiring membership in terminology__calendar.
+  - name: test_eligibility_dates_preserve_typed_dates_without_calendar_membership
+    description: Already-typed birth, death, and enrollment dates pass through normalization without requiring membership in terminology__calendar; Logical Data Quality reports values outside the supported range separately.
     model: int_eligibility_dates_normalized
     config:
       enabled: "{{ var('claims_enabled', false) | as_bool }}"
@@ -83,8 +83,8 @@ unit_tests:
           select
               'finite' as person_id
             , 'finite_key' as person_id_key
-            , cast('1980-01-01' as date) as birth_date
-            , cast(null as date) as death_date
+            , cast('1800-01-01' as date) as birth_date
+            , cast('2200-12-31' as date) as death_date
             , cast('2200-01-01' as date) as enrollment_start_date
             , cast('2200-12-31' as date) as enrollment_end_date
           union all
@@ -95,16 +95,12 @@ unit_tests:
             , cast(null as date) as death_date
             , cast('2024-01-01' as date) as enrollment_start_date
             , cast(null as date) as enrollment_end_date
-      - input: ref('terminology__calendar')
-        format: sql
-        rows: |
-          select cast('1980-01-01' as date) as full_date
     expect:
       rows:
         - person_id: finite
           person_id_key: finite_key
-          normalized_birth_date: '1980-01-01'
-          normalized_death_date: null
+          normalized_birth_date: '1800-01-01'
+          normalized_death_date: '2200-12-31'
           normalized_enrollment_start_date: '2200-01-01'
           normalized_enrollment_end_date: '2200-12-31'
         - person_id: open

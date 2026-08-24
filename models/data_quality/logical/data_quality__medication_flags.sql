@@ -110,6 +110,12 @@ final as (
               "source_rows.prescribing_date is not null and (source_rows.prescribing_date < " ~ min_event_date_sql ~ " or source_rows.prescribing_date > " ~ current_date_sql ~ ")",
               "source_rows.prescribing_date is not null"
           ) }} as prescribing_date_out_of_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.dispensing_date"
+          ) }} as dispensing_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.prescribing_date"
+          ) }} as prescribing_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
               "source_rows.prescribing_date is not null and source_rows.dispensing_date is not null and source_rows.prescribing_date > source_rows.dispensing_date",
               "source_rows.prescribing_date is not null and source_rows.dispensing_date is not null"

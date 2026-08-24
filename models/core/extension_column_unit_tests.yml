@@ -5,7 +5,7 @@ version: 2
 # These tests verify that x_ columns defined in the eligibility input layer flow
 # correctly through each stage:
 #   normalized__eligibility
-#     → member_month__member_month         (calendar join → monthly explosion)
+#     → member_month__member_month         (month-spine join → monthly explosion)
 #     → core__member_month                (final SELECT)
 #
 # How _extension_columns_override works:
@@ -20,11 +20,11 @@ version: 2
 #
 unit_tests:
 
-  # ── Stage 1: calendar join explodes enrollment span into monthly rows ───────
-  - name: test_member_month_extension_columns_flow_through_calendar_join
+  # ── Stage 1: month-spine join explodes enrollment into monthly rows ────
+  - name: test_member_month_extension_columns_flow_through_month_spine_join
     description: >
       Verifies that x_ extension columns from normalized__eligibility are
-      preserved after the calendar join that explodes enrollment spans into one
+      preserved after the month-spine join that explodes enrollment spans into one
       row per member-month.
     model: member_month__member_month
     config:
@@ -50,14 +50,10 @@ unit_tests:
             cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run,
             '10' as x_temp_person_id,
             'John' as x_temp_first_name
-      # Provide first + last day of January so the aggregate yields the correct
-      # month_start_date / month_end_date for the enrollment overlap check.
-      - input: ref('terminology__calendar')
+      - input: ref('member_month__month_spine')
         format: sql
         rows: |
-          select cast('2020-01-01' as date) as full_date, 2020 as year, 1 as month
-          union all
-          select cast('2020-01-31' as date) as full_date, 2020 as year, 1 as month
+          select '202001' as year_month, cast('2020-01-01' as date) as first_day_of_month, cast('2020-01-31' as date) as last_day_of_month
     expect:
       rows:
         # member_month_id = md5('10-10-202001-medicare-medicare-test')

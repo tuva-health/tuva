@@ -103,6 +103,9 @@ final as (
               ~ "and patient_pair.person_id is not null"
           ) }} as encounter_person_patient_pair_not_in_encounter
         , {{ dq_logical_int_flag_sql("source_rows.occurrence_date is null", "1 = 1") }} as occurrence_date_null
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.occurrence_date"
+          ) }} as occurrence_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
               "source_rows.source_code_type is null",
               "source_rows.source_code is not null"

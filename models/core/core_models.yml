@@ -2349,7 +2349,7 @@ models:
             is_primary_key: true
   - name: core__member_month
     description: |-
-      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity. Open eligibility spans with a null enrollment_end_date contribute member months through the calendar month containing the date portion of tuva_last_run.
+      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity. Member months use Tuva's package-owned January 1900 through December 2100 month spine and stop at the calendar month containing the date portion of tuva_last_run for both open and finite spans, so Tuva does not publish future member months.
 
       This model is the final Core projection of the Claims Preprocessing member-month output plus Claims Preprocessing attribution. Member-month construction happens in member_month__member_month, and payer-attributed, custom-attributed, and Tuva-attributed provider fields are supplied by provider_attribution__member_month_attribution. Tuva-assigned attribution is calculated at person, data source, and performance year grain and copied to each member month in the matching year.
 

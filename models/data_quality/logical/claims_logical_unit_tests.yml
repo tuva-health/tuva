@@ -14,6 +14,8 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select fixture_rows.*, cast(null as date) as file_date
+          from (
           select 'overlap' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan_a' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, 0 as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'overlap', 'member', cast('2024-01-15' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
@@ -35,6 +37,7 @@ unit_tests:
           select 'cross_source', 'member', cast('2024-01-02' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_a'
           union all
           select 'cross_source', 'member', cast('2024-01-16' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_b'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -103,6 +106,8 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select fixture_rows.*, cast(null as date) as file_date
+          from (
           select 'single_null' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast(null as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, 0 as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'single_sentinel', 'member', cast('2024-01-01' as date), cast('9999-12-31' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
@@ -116,6 +121,7 @@ unit_tests:
           select 'open_overlap', 'member', cast('2024-01-01' as date), cast(null as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
           union all
           select 'open_overlap', 'member', cast('2024-02-01' as date), cast('2024-02-29' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -162,6 +168,72 @@ unit_tests:
           overlapping_enrollment_spans: 1
           multiple_open_enrollment_spans: null
 
+  - name: test_eligibility_supported_date_range_flags_are_tristate
+    description: >
+      Verifies the fixed supported range for every eligibility DATE field,
+      null not-applicability, and the accepted 9999-12-31 open-end alias.
+    model: data_quality__eligibility_span_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          select 'valid_dates' as person_id, 'member' as member_id
+            , cast('1900-01-01' as date) as enrollment_start_date, cast('2100-12-31' as date) as enrollment_end_date
+            , 'payer' as payer, 'plan' as {{ plan_identifier }}, 'unknown' as sex, 'Unknown' as race
+            , cast('1900-01-01' as date) as birth_date, cast('2100-12-31' as date) as death_date
+            , {{ false_boolean }} as death_flag, 'commercial' as payer_type
+            , cast('1900-01-01' as date) as file_date, 'source' as data_source
+          union all
+          select 'invalid_dates', 'member', cast('1899-12-31' as date), cast('2101-01-01' as date)
+            , 'payer', 'plan', 'unknown', 'Unknown', cast('1899-12-31' as date), cast('2101-01-01' as date)
+            , {{ false_boolean }}, 'commercial', cast('2101-01-01' as date), 'source'
+          union all
+          select 'missing_dates', 'member', cast(null as date), cast(null as date)
+            , 'payer', 'plan', 'unknown', 'Unknown', cast(null as date), cast(null as date)
+            , {{ false_boolean }}, 'commercial', cast(null as date), 'source'
+          union all
+          select 'open_alias', 'member', cast('2024-01-01' as date), cast('9999-12-31' as date)
+            , 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date)
+            , {{ false_boolean }}, 'commercial', cast(null as date), 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'Unknown' as description
+      - input: ref('terminology__payer_type')
+        format: sql
+        rows: |
+          select 'commercial' as payer_type
+    expect:
+      rows:
+        - person_id: valid_dates
+          birth_date_outside_supported_date_range: 0
+          death_date_outside_supported_date_range: 0
+          enrollment_start_date_outside_supported_date_range: 0
+          enrollment_end_date_outside_supported_date_range: 0
+          file_date_outside_supported_date_range: 0
+        - person_id: invalid_dates
+          birth_date_outside_supported_date_range: 1
+          death_date_outside_supported_date_range: 1
+          enrollment_start_date_outside_supported_date_range: 1
+          enrollment_end_date_outside_supported_date_range: 1
+          file_date_outside_supported_date_range: 1
+        - person_id: missing_dates
+          birth_date_outside_supported_date_range: null
+          death_date_outside_supported_date_range: null
+          enrollment_start_date_outside_supported_date_range: null
+          enrollment_end_date_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
+        - person_id: open_alias
+          birth_date_outside_supported_date_range: 0
+          death_date_outside_supported_date_range: null
+          enrollment_start_date_outside_supported_date_range: 0
+          enrollment_end_date_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
+
   - name: test_eligibility_boolean_death_flags_are_portable
     description: >
       Verifies that true and false Boolean values remain valid across adapters
@@ -177,6 +249,8 @@ unit_tests:
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set true_boolean = 'cast(1 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(true as boolean)' %}
           {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          select fixture_rows.*, cast(null as date) as file_date
+          from (
           select 'true_missing_date' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'unknown' as sex, 'Unknown' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ true_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'true_with_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast('2024-01-15' as date), {{ true_boolean }}, 'commercial', 'source'
@@ -184,6 +258,7 @@ unit_tests:
           select 'false_without_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
           union all
           select 'null_flag', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), cast(null as {{ 'bit' if target.type in ['fabric', 'sqlserver'] else 'boolean' }}), 'commercial', 'source'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -220,9 +295,12 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          select fixture_rows.*, cast(null as date) as file_date
+          from (
           select 'lowercase' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ false_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'case_variant', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'Male', 'White', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -341,8 +419,8 @@ unit_tests:
               , 'member' as member_id
               , 'payer' as payer
               , 'plan' as {{ plan_identifier }}
-              , cast('2024-01-01' as date) as dispensing_date
-              , cast('2024-01-15' as date) as paid_date
+              , case when row_ids.claim_id = 'missing_values' then cast(null as date) when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) else cast('2024-01-01' as date) end as dispensing_date
+              , case when row_ids.claim_id = 'missing_values' then cast(null as date) when row_ids.claim_id = 'invalid_values' then cast('2101-01-01' as date) else cast('2024-01-15' as date) end as paid_date
               , 'valid_npi' as prescribing_provider_npi
               , 'valid_npi' as dispensing_provider_npi
               , 'valid_ndc' as ndc_code
@@ -351,6 +429,7 @@ unit_tests:
               , case when row_ids.claim_id = 'missing_values' then null when row_ids.claim_id = 'invalid_values' then -1 else 0 end as refills
               , 1 as paid_amount
               , 2 as allowed_amount
+              , case when row_ids.claim_id = 'missing_values' then cast(null as date) when row_ids.claim_id = 'invalid_values' then cast('2101-01-01' as date) else cast('2024-01-01' as date) end as file_date
               , 'source' as data_source
           from row_ids
       - input: ref('input_layer__eligibility')
@@ -370,6 +449,9 @@ unit_tests:
       rows:
         - claim_id: missing_values
           claim_line_number_not_positive: 0
+          dispensing_date_outside_supported_date_range: null
+          paid_date_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
           quantity_null: 1
           quantity_not_positive: null
           days_supply_null: 1
@@ -377,6 +459,9 @@ unit_tests:
           refills_lt_zero: null
         - claim_id: invalid_values
           claim_line_number_not_positive: 1
+          dispensing_date_outside_supported_date_range: 1
+          paid_date_outside_supported_date_range: 1
+          file_date_outside_supported_date_range: 1
           quantity_null: 0
           quantity_not_positive: 1
           days_supply_null: 0
@@ -384,6 +469,9 @@ unit_tests:
           refills_lt_zero: 1
         - claim_id: valid_values
           claim_line_number_not_positive: 0
+          dispensing_date_outside_supported_date_range: 0
+          paid_date_outside_supported_date_range: 0
+          file_date_outside_supported_date_range: 0
           quantity_null: 0
           quantity_not_positive: 0
           days_supply_null: 0
@@ -395,7 +483,8 @@ unit_tests:
       Verifies that pharmacy eligibility matching uses paid_date month and the
       complete person, member, payer, plan, and data-source identity without
       borrowing an eligibility row from another source. Open spans cover the
-      tuva_last_run month but not later months, while finite ends are uncapped.
+      tuva_last_run month but not later months, and finite future ends are
+      capped at the same run date.
     model: data_quality__pharmacy_claim_line_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
@@ -453,6 +542,7 @@ unit_tests:
               , 0 as refills
               , 1 as paid_amount
               , 2 as allowed_amount
+              , cast(null as date) as file_date
               , cases.data_source
           from cases
       - input: ref('input_layer__eligibility')
@@ -503,10 +593,84 @@ unit_tests:
         - claim_id: open_sentinel_later_month
           no_matching_eligibility_span: 1
         - claim_id: finite_after_run_match
-          no_matching_eligibility_span: 0
+          no_matching_eligibility_span: 1
         - claim_id: paid_date_missing
           no_matching_eligibility_span: null
         - claim_id: literal_null_sentinel
+          no_matching_eligibility_span: 1
+
+  - name: test_pharmacy_claim_eligibility_match_respects_supported_month_spine
+    description: >
+      Verifies that matching eligibility is accepted at the 1900-01 and
+      2100-12 member-month boundaries and rejected immediately outside them.
+    model: data_quality__pharmacy_claim_line_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2200-01-15 00:00:00'
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with cases as (
+              select 'before_lower_bound' as claim_id, cast('1899-12-31' as date) as paid_date, 'source_before' as data_source
+              union all
+              select 'at_lower_bound', cast('1900-01-01' as date), 'source_lower'
+              union all
+              select 'at_upper_bound', cast('2100-12-31' as date), 'source_upper'
+              union all
+              select 'after_upper_bound', cast('2101-01-01' as date), 'source_after'
+          )
+          select
+                cases.claim_id
+              , 1 as claim_line_number
+              , 'person' as person_id
+              , 'member' as member_id
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cases.paid_date as dispensing_date
+              , cases.paid_date
+              , 'valid_npi' as prescribing_provider_npi
+              , 'valid_npi' as dispensing_provider_npi
+              , 'valid_ndc' as ndc_code
+              , 1 as quantity
+              , 1 as days_supply
+              , 0 as refills
+              , 1 as paid_amount
+              , 1 as allowed_amount
+              , cast(null as date) as file_date
+              , cases.data_source
+          from cases
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('1899-12-01' as date) as enrollment_start_date, cast('1899-12-31' as date) as enrollment_end_date, 'source_before' as data_source
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('1900-01-01' as date), cast('1900-01-31' as date), 'source_lower'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2100-12-01' as date), cast('2100-12-31' as date), 'source_upper'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2101-01-01' as date), cast('2101-01-31' as date), 'source_after'
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select 'valid_npi' as npi
+      - input: ref('terminology__ndc')
+        format: sql
+        rows: |
+          select 'valid_ndc' as ndc
+    expect:
+      rows:
+        - claim_id: before_lower_bound
+          no_matching_eligibility_span: 1
+        - claim_id: at_lower_bound
+          no_matching_eligibility_span: 0
+        - claim_id: at_upper_bound
+          no_matching_eligibility_span: 0
+        - claim_id: after_upper_bound
           no_matching_eligibility_span: 1
 
   - name: test_medical_claim_line_new_flags_are_tristate
@@ -542,17 +706,18 @@ unit_tests:
               , 'member' as member_id
               , 'payer' as payer
               , 'plan' as {{ plan_identifier }}
-              , cast('2024-01-01' as date) as claim_start_date
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) else cast('2024-01-01' as date) end as claim_start_date
               , case
+                  when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date)
                   when row_ids.claim_id = 'before_claim_end' then cast('2024-02-01' as date)
                   when row_ids.claim_id = 'same_as_claim_end' then cast('2024-01-15' as date)
                   when row_ids.claim_id = 'missing_claim_end' then cast(null as date)
                   else cast('2024-01-01' as date)
                 end as claim_end_date
-              , cast('2024-01-01' as date) as claim_line_start_date
-              , cast('2024-01-01' as date) as claim_line_end_date
-              , cast(null as date) as admission_date
-              , cast(null as date) as discharge_date
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) else cast('2024-01-01' as date) end as claim_line_start_date
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) else cast('2024-01-01' as date) end as claim_line_end_date
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) when row_ids.claim_id = 'valid_values' then cast('2024-01-01' as date) else cast(null as date) end as admission_date
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) when row_ids.claim_id = 'valid_values' then cast('2024-01-01' as date) else cast(null as date) end as discharge_date
               , null as admit_source_code
               , null as admit_type_code
               , null as discharge_disposition_code
@@ -569,7 +734,7 @@ unit_tests:
               , null as procedure_code_type
               , case
                   when row_ids.claim_id = 'missing_paid_date' then cast(null as date)
-                  when row_ids.claim_id = 'invalid_values' then cast('1999-12-31' as date)
+                  when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date)
                   else cast('2024-01-15' as date)
                 end as paid_date
               , 1 as paid_amount
@@ -580,6 +745,10 @@ unit_tests:
               {% for index in range(1, 26) %}
               , null as procedure_code_{{ index }}
               {% endfor %}
+              {% for index in range(1, 26) %}
+              , case when row_ids.claim_id = 'invalid_values' then cast('1899-12-31' as date) when row_ids.claim_id = 'valid_values' then cast('2024-01-01' as date) else cast(null as date) end as procedure_date_{{ index }}
+              {% endfor %}
+              , case when row_ids.claim_id = 'invalid_values' then cast('2101-01-01' as date) when row_ids.claim_id = 'valid_values' then cast('2024-01-01' as date) else cast(null as date) end as file_date
               , 'source' as data_source
           from row_ids
       - input: ref('input_layer__eligibility')
@@ -645,31 +814,91 @@ unit_tests:
           claim_line_number_not_positive: 0
           paid_date_null: 1
           paid_date_out_of_reasonable_range: null
+          claim_start_date_outside_supported_date_range: 0
+          claim_end_date_outside_supported_date_range: 0
+          claim_line_start_date_outside_supported_date_range: 0
+          claim_line_end_date_outside_supported_date_range: 0
+          paid_date_outside_supported_date_range: null
+          admission_date_outside_supported_date_range: null
+          discharge_date_outside_supported_date_range: null
+          procedure_date_1_outside_supported_date_range: null
+          procedure_date_25_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
           paid_date_before_claim_end_date: null
         - claim_id: invalid_values
           claim_line_number_not_positive: 1
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 1
-          paid_date_before_claim_end_date: 1
+          claim_start_date_outside_supported_date_range: 1
+          claim_end_date_outside_supported_date_range: 1
+          claim_line_start_date_outside_supported_date_range: 1
+          claim_line_end_date_outside_supported_date_range: 1
+          admission_date_outside_supported_date_range: 1
+          discharge_date_outside_supported_date_range: 1
+          paid_date_outside_supported_date_range: 1
+          procedure_date_1_outside_supported_date_range: 1
+          procedure_date_25_outside_supported_date_range: 1
+          file_date_outside_supported_date_range: 1
+          paid_date_before_claim_end_date: 0
         - claim_id: valid_values
           claim_line_number_not_positive: 0
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
+          claim_start_date_outside_supported_date_range: 0
+          claim_end_date_outside_supported_date_range: 0
+          claim_line_start_date_outside_supported_date_range: 0
+          claim_line_end_date_outside_supported_date_range: 0
+          admission_date_outside_supported_date_range: 0
+          discharge_date_outside_supported_date_range: 0
+          paid_date_outside_supported_date_range: 0
+          procedure_date_1_outside_supported_date_range: 0
+          procedure_date_25_outside_supported_date_range: 0
+          file_date_outside_supported_date_range: 0
           paid_date_before_claim_end_date: 0
         - claim_id: before_claim_end
           claim_line_number_not_positive: 0
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
+          claim_start_date_outside_supported_date_range: 0
+          claim_end_date_outside_supported_date_range: 0
+          claim_line_start_date_outside_supported_date_range: 0
+          claim_line_end_date_outside_supported_date_range: 0
+          admission_date_outside_supported_date_range: null
+          discharge_date_outside_supported_date_range: null
+          paid_date_outside_supported_date_range: 0
+          procedure_date_1_outside_supported_date_range: null
+          procedure_date_25_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
           paid_date_before_claim_end_date: 1
         - claim_id: same_as_claim_end
           claim_line_number_not_positive: 0
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
+          claim_start_date_outside_supported_date_range: 0
+          claim_end_date_outside_supported_date_range: 0
+          claim_line_start_date_outside_supported_date_range: 0
+          claim_line_end_date_outside_supported_date_range: 0
+          admission_date_outside_supported_date_range: null
+          discharge_date_outside_supported_date_range: null
+          paid_date_outside_supported_date_range: 0
+          procedure_date_1_outside_supported_date_range: null
+          procedure_date_25_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
           paid_date_before_claim_end_date: 0
         - claim_id: missing_claim_end
           claim_line_number_not_positive: 0
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
+          claim_start_date_outside_supported_date_range: 0
+          claim_end_date_outside_supported_date_range: null
+          claim_line_start_date_outside_supported_date_range: 0
+          claim_line_end_date_outside_supported_date_range: 0
+          admission_date_outside_supported_date_range: null
+          discharge_date_outside_supported_date_range: null
+          paid_date_outside_supported_date_range: 0
+          procedure_date_1_outside_supported_date_range: null
+          procedure_date_25_outside_supported_date_range: null
+          file_date_outside_supported_date_range: null
           paid_date_before_claim_end_date: null
 
   - name: test_medical_claim_contract_values_and_eligibility_identity
@@ -678,7 +907,7 @@ unit_tests:
       professional applicability, and member-month eligibility matching with
       complete identity, date precedence, month overlap, and data-source
       isolation. Open spans cover the tuva_last_run month but not later months,
-      while finite ends are uncapped.
+      while finite future ends are capped at the same run date.
     model: data_quality__medical_claim_line_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
@@ -773,6 +1002,10 @@ unit_tests:
               {% for index in range(1, 26) %}
               , {% if index == 1 %}cases.procedure_code_1{% else %}null{% endif %} as procedure_code_{{ index }}
               {% endfor %}
+              {% for index in range(1, 26) %}
+              , cast(null as date) as procedure_date_{{ index }}
+              {% endfor %}
+              , cast(null as date) as file_date
               , cases.data_source
           from cases
       - input: ref('input_layer__eligibility')
@@ -1007,7 +1240,7 @@ unit_tests:
           procedure_code_type_invalid: null
           diagnosis_code_1_invalid: null
           procedure_code_1_to_25_invalid: null
-          no_matching_eligibility_span: 0
+          no_matching_eligibility_span: 1
         - claim_id: claim_start_fallback
           data_source: source_a
           claim_type_invalid: 0
@@ -1068,6 +1301,147 @@ unit_tests:
           diagnosis_code_1_invalid: 1
           procedure_code_1_to_25_invalid: 1
           no_matching_eligibility_span: null
+
+  - name: test_medical_claim_eligibility_match_respects_supported_month_spine
+    description: >
+      Verifies that matching eligibility is accepted at the 1900-01 and
+      2100-12 member-month boundaries and rejected immediately outside them.
+    model: data_quality__medical_claim_line_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2200-01-15 00:00:00'
+    given:
+      - input: ref('input_layer__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with cases as (
+              select 'before_lower_bound' as claim_id, cast('1899-12-31' as date) as claim_date, 'source_before' as data_source
+              union all
+              select 'at_lower_bound', cast('1900-01-01' as date), 'source_lower'
+              union all
+              select 'at_upper_bound', cast('2100-12-31' as date), 'source_upper'
+              union all
+              select 'after_upper_bound', cast('2101-01-01' as date), 'source_after'
+          )
+          select
+                cases.claim_id
+              , 1 as claim_line_number
+              , 'undetermined' as claim_type
+              , 'person' as person_id
+              , 'member' as member_id
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cases.claim_date as claim_start_date
+              , cases.claim_date as claim_end_date
+              , cases.claim_date as claim_line_start_date
+              , cases.claim_date as claim_line_end_date
+              , cast(null as date) as admission_date
+              , cast(null as date) as discharge_date
+              , null as admit_source_code
+              , null as admit_type_code
+              , null as discharge_disposition_code
+              , null as place_of_service_code
+              , null as bill_type_code
+              , null as revenue_center_code
+              , null as hcpcs_code
+              , null as rendering_npi
+              , null as billing_npi
+              , null as facility_npi
+              , null as drg_code_type
+              , null as drg_code
+              , null as diagnosis_code_type
+              , null as procedure_code_type
+              , cases.claim_date as paid_date
+              , 1 as paid_amount
+              , 1 as allowed_amount
+              {% for index in range(1, 26) %}
+              , null as diagnosis_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , null as procedure_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , cast(null as date) as procedure_date_{{ index }}
+              {% endfor %}
+              , cast(null as date) as file_date
+              , cases.data_source
+          from cases
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('1899-12-01' as date) as enrollment_start_date, cast('1899-12-31' as date) as enrollment_end_date, 'source_before' as data_source
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('1900-01-01' as date), cast('1900-01-31' as date), 'source_lower'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2100-12-01' as date), cast('2100-12-31' as date), 'source_upper'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2101-01-01' as date), cast('2101-01-31' as date), 'source_after'
+      - input: ref('terminology__admit_source')
+        format: sql
+        rows: |
+          select '__unused__' as admit_source_code
+      - input: ref('terminology__admit_type')
+        format: sql
+        rows: |
+          select '__unused__' as admit_type_code
+      - input: ref('terminology__discharge_disposition')
+        format: sql
+        rows: |
+          select '__unused__' as discharge_disposition_code
+      - input: ref('terminology__place_of_service')
+        format: sql
+        rows: |
+          select '__unused__' as place_of_service_code
+      - input: ref('terminology__bill_type')
+        format: sql
+        rows: |
+          select '__unused__' as bill_type_code
+      - input: ref('terminology__revenue_center')
+        format: sql
+        rows: |
+          select '__unused__' as revenue_center_code
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '__unused__' as npi
+      - input: ref('terminology__ms_drg')
+        format: sql
+        rows: |
+          select '__unused__' as ms_drg_code
+      - input: ref('terminology__apr_drg')
+        format: sql
+        rows: |
+          select '__unused__' as apr_drg_code
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_cm
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_cm
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_pcs
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_pcs
+    expect:
+      rows:
+        - claim_id: before_lower_bound
+          no_matching_eligibility_span: 1
+        - claim_id: at_lower_bound
+          no_matching_eligibility_span: 0
+        - claim_id: at_upper_bound
+          no_matching_eligibility_span: 0
+        - claim_id: after_upper_bound
+          no_matching_eligibility_span: 1
 
   - name: test_medical_claim_header_consistency_flags_are_tristate
     description: >

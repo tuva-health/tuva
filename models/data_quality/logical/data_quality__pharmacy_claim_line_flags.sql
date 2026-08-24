@@ -35,6 +35,7 @@ not exists (
       and eligibility_rows.payer = source_rows.payer
       and eligibility_rows.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
       and eligibility_rows.data_source = source_rows.data_source
+      and {{ dq_supported_date_range_where_sql('source_rows.paid_date') }}
       and (
           {{ date_part('year', 'source_rows.paid_date') }} * 100
           + {{ date_part('month', 'source_rows.paid_date') }}
@@ -58,6 +59,7 @@ with eligibility_rows_with_effective_end_date as (
         , case
             when eligibility_rows.enrollment_end_date is null
               or eligibility_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+              or eligibility_rows.enrollment_end_date > cast({{ tuva_last_run_timestamp_sql }} as date)
                 then cast({{ tuva_last_run_timestamp_sql }} as date)
             else eligibility_rows.enrollment_end_date
           end as _dq_effective_enrollment_end_date
@@ -89,6 +91,15 @@ final as (
             "source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql,
             "source_rows.paid_date is not null"
           ) }} as paid_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.dispensing_date"
+          ) }} as dispensing_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.paid_date"
+          ) }} as paid_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.file_date"
+          ) }} as file_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is null", "1 = 1") }} as prescribing_provider_npi_null
         , {{ dq_logical_int_flag_sql(
             "prescribing_provider_lookup.npi is null",

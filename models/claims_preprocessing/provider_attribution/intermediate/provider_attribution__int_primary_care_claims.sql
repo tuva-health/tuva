@@ -25,18 +25,16 @@ with member_months as (
     , cast(mc.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , mc.claim_start_date
     , mc.claim_end_date
-    , cal.year as claim_year
-    , cal.month as claim_month
-    , cal.year_month_int as claim_year_month_int
-    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
+    , cast({{ date_part('year', 'mc.claim_start_date') }} as {{ dbt.type_int() }}) as claim_year
+    , cast({{ date_part('month', 'mc.claim_start_date') }} as {{ dbt.type_int() }}) as claim_month
+    , cast({{ yyyymm('mc.claim_start_date') }} as {{ dbt.type_int() }}) as claim_year_month_int
+    , {{ yyyymm('mc.claim_start_date') }} as claim_year_month
     -- Fallback to paid_amount when allowed_amount is absent; many payers omit allowed values.
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
     , mc.data_source
   from {{ ref('provider_attribution__stg_medical_claim') }} as mc
-  left outer join {{ ref('terminology__calendar') }} as cal
-    on cast(mc.claim_start_date as date) = cal.full_date
 )
 
 , eligible_claims as (

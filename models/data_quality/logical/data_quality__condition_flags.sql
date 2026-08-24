@@ -107,6 +107,15 @@ final as (
               "source_rows.resolved_date < " ~ min_condition_date_sql ~ " or source_rows.resolved_date > " ~ current_date_sql,
               "source_rows.resolved_date is not null"
           ) }} as resolved_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.recorded_date"
+          ) }} as recorded_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.onset_date"
+          ) }} as onset_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+              "source_rows.resolved_date"
+          ) }} as resolved_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
               "source_rows.code_system is not null and lower(cast(source_rows.code_system as " ~ string_type ~ ")) not in ('icd-9-cm', 'icd-10-cm', 'snomed-ct', 'unknown')",
               "source_rows.code_system is not null"

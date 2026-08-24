@@ -84,6 +84,46 @@
             "affected_columns": ["death_date"]
         },
         {
+            "test_name": "eligibility__birth_date_outside_supported_date_range",
+            "display_name": "birth_date is outside the supported date range",
+            "description": "Checks whether a populated birth_date in the eligibility Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["birth_date"]
+        },
+        {
+            "test_name": "eligibility__death_date_outside_supported_date_range",
+            "display_name": "death_date is outside the supported date range",
+            "description": "Checks whether a populated death_date in the eligibility Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["death_date"]
+        },
+        {
+            "test_name": "eligibility__enrollment_start_date_outside_supported_date_range",
+            "display_name": "enrollment_start_date is outside the supported date range",
+            "description": "Checks whether a populated enrollment_start_date in the eligibility Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["enrollment_start_date"]
+        },
+        {
+            "test_name": "eligibility__enrollment_end_date_outside_supported_date_range",
+            "display_name": "enrollment_end_date is outside the supported date range",
+            "description": "Checks whether a populated finite enrollment_end_date in the eligibility Input Layer Model is before 1900-01-01 or after 2100-12-31. Null and the accepted 9999-12-31 open-span alias are not applicable. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["enrollment_end_date"]
+        },
+        {
+            "test_name": "eligibility__file_date_outside_supported_date_range",
+            "display_name": "file_date is outside the supported date range",
+            "description": "Checks whether a populated file_date in the eligibility Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["file_date"]
+        },
+        {
             "test_name": "eligibility__death_flag_invalid",
             "display_name": "death flag is invalid",
             "description": "Checks whether death_flag in the eligibility Input Layer Model is populated with a value other than Boolean true or false. Warehouses may represent those Boolean values as 1 or 0.",
@@ -268,6 +308,38 @@
             "affected_columns": ["claim_line_end_date"]
         },
         {
+            "test_name": "medical_claim__claim_start_date_outside_supported_date_range",
+            "display_name": "claim_start_date is outside the supported date range",
+            "description": "Checks whether a populated claim_start_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["claim_start_date"]
+        },
+        {
+            "test_name": "medical_claim__claim_end_date_outside_supported_date_range",
+            "display_name": "claim_end_date is outside the supported date range",
+            "description": "Checks whether a populated claim_end_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["claim_end_date"]
+        },
+        {
+            "test_name": "medical_claim__claim_line_start_date_outside_supported_date_range",
+            "display_name": "claim_line_start_date is outside the supported date range",
+            "description": "Checks whether a populated claim_line_start_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["claim_line_start_date"]
+        },
+        {
+            "test_name": "medical_claim__claim_line_end_date_outside_supported_date_range",
+            "display_name": "claim_line_end_date is outside the supported date range",
+            "description": "Checks whether a populated claim_line_end_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["claim_line_end_date"]
+        },
+        {
             "test_name": "medical_claim__claim_start_after_claim_end",
             "display_name": "claim_start_date is after claim_end_date",
             "description": "Checks whether claim_start_date is after claim_end_date on a medical claim line.",
@@ -300,6 +372,14 @@
             "affected_columns": ["admission_date"]
         },
         {
+            "test_name": "medical_claim__admission_date_outside_supported_date_range",
+            "display_name": "admission_date is outside the supported date range",
+            "description": "Checks whether a populated admission_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["admission_date"]
+        },
+        {
             "test_name": "medical_claim__admission_date_null_for_inpatient_claim",
             "display_name": "admission_date is null for inpatient claim",
             "description": "Checks whether admission_date is null on an inpatient facility claim line.",
@@ -320,6 +400,14 @@
             "display_name": "discharge_date is out of reasonable range",
             "description": "Checks whether discharge_date on a medical claim line is before 2000-01-01 or after the current date.",
             "test_type": "temporal",
+            "severity": 2,
+            "affected_columns": ["discharge_date"]
+        },
+        {
+            "test_name": "medical_claim__discharge_date_outside_supported_date_range",
+            "display_name": "discharge_date is outside the supported date range",
+            "description": "Checks whether a populated discharge_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["discharge_date"]
         },
@@ -380,12 +468,228 @@
             "affected_columns": ["paid_date"]
         },
         {
+            "test_name": "medical_claim__paid_date_outside_supported_date_range",
+            "display_name": "paid_date is outside the supported date range",
+            "description": "Checks whether a populated paid_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["paid_date"]
+        },
+        {
             "test_name": "medical_claim__paid_date_before_claim_end_date",
             "display_name": "paid_date before claim_end_date",
             "description": "Checks whether a populated paid_date occurs before claim_end_date on a medical claim line.",
             "test_type": "temporal",
             "severity": 2,
             "affected_columns": ["paid_date", "claim_end_date"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_1_outside_supported_date_range",
+            "display_name": "procedure_date_1 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_1 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_1"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_2_outside_supported_date_range",
+            "display_name": "procedure_date_2 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_2 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_2"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_3_outside_supported_date_range",
+            "display_name": "procedure_date_3 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_3 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_3"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_4_outside_supported_date_range",
+            "display_name": "procedure_date_4 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_4 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_4"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_5_outside_supported_date_range",
+            "display_name": "procedure_date_5 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_5 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_5"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_6_outside_supported_date_range",
+            "display_name": "procedure_date_6 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_6 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_6"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_7_outside_supported_date_range",
+            "display_name": "procedure_date_7 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_7 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_7"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_8_outside_supported_date_range",
+            "display_name": "procedure_date_8 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_8 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_8"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_9_outside_supported_date_range",
+            "display_name": "procedure_date_9 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_9 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_9"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_10_outside_supported_date_range",
+            "display_name": "procedure_date_10 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_10 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_10"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_11_outside_supported_date_range",
+            "display_name": "procedure_date_11 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_11 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_11"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_12_outside_supported_date_range",
+            "display_name": "procedure_date_12 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_12 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_12"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_13_outside_supported_date_range",
+            "display_name": "procedure_date_13 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_13 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_13"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_14_outside_supported_date_range",
+            "display_name": "procedure_date_14 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_14 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_14"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_15_outside_supported_date_range",
+            "display_name": "procedure_date_15 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_15 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_15"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_16_outside_supported_date_range",
+            "display_name": "procedure_date_16 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_16 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_16"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_17_outside_supported_date_range",
+            "display_name": "procedure_date_17 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_17 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_17"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_18_outside_supported_date_range",
+            "display_name": "procedure_date_18 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_18 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_18"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_19_outside_supported_date_range",
+            "display_name": "procedure_date_19 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_19 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_19"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_20_outside_supported_date_range",
+            "display_name": "procedure_date_20 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_20 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_20"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_21_outside_supported_date_range",
+            "display_name": "procedure_date_21 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_21 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_21"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_22_outside_supported_date_range",
+            "display_name": "procedure_date_22 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_22 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_22"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_23_outside_supported_date_range",
+            "display_name": "procedure_date_23 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_23 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_23"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_24_outside_supported_date_range",
+            "display_name": "procedure_date_24 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_24 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_24"]
+        },
+        {
+            "test_name": "medical_claim__procedure_date_25_outside_supported_date_range",
+            "display_name": "procedure_date_25 is outside the supported date range",
+            "description": "Checks whether a populated procedure_date_25 in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["procedure_date_25"]
+        },
+        {
+            "test_name": "medical_claim__file_date_outside_supported_date_range",
+            "display_name": "file_date is outside the supported date range",
+            "description": "Checks whether a populated file_date in the medical_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["file_date"]
         },
         {
             "test_name": "medical_claim__admit_source_code_invalid",
@@ -782,7 +1086,7 @@
         {
             "test_name": "medical_claim__no_matching_eligibility_span",
             "display_name": "no matching eligibility span",
-            "description": "Checks whether a medical claim line with a complete person_id, member_id, payer, plan, and data_source identity and a populated inferred claim date has no eligibility span for the same complete identity whose covered calendar months include the inferred claim date month. For a null enrollment_end_date or the legacy 9999-12-31 alias, coverage extends through the calendar month containing tuva_last_run; a finite enrollment_end_date remains authoritative and is not capped. The inferred claim date uses claim_line_start_date, then claim_start_date, then admission_date.",
+            "description": "Checks whether a medical claim line with a complete person_id, member_id, payer, plan, and data_source identity and a populated inferred claim date has no eligibility span for the same complete identity whose covered calendar months include the inferred claim date month. Only claim months on the supported member-month spine from 1900-01 through 2100-12 can match; populated dates outside that range fail. Eligibility coverage is evaluated only through the calendar month containing tuva_last_run: null and the legacy 9999-12-31 alias use that as-of boundary, and a later finite enrollment_end_date is capped to the same boundary. The inferred claim date uses claim_line_start_date, then claim_start_date, then admission_date.",
             "test_type": "referential",
             "severity": 2,
             "affected_columns": ["person_id", "member_id", "payer", "plan", "claim_line_start_date", "claim_start_date", "admission_date", "data_source"]
@@ -834,6 +1138,30 @@
             "test_type": "temporal",
             "severity": 2,
             "affected_columns": ["paid_date"]
+        },
+        {
+            "test_name": "pharmacy_claim__dispensing_date_outside_supported_date_range",
+            "display_name": "dispensing_date is outside the supported date range",
+            "description": "Checks whether a populated dispensing_date in the pharmacy_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["dispensing_date"]
+        },
+        {
+            "test_name": "pharmacy_claim__paid_date_outside_supported_date_range",
+            "display_name": "paid_date is outside the supported date range",
+            "description": "Checks whether a populated paid_date in the pharmacy_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["paid_date"]
+        },
+        {
+            "test_name": "pharmacy_claim__file_date_outside_supported_date_range",
+            "display_name": "file_date is outside the supported date range",
+            "description": "Checks whether a populated file_date in the pharmacy_claim Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["file_date"]
         },
         {
             "test_name": "pharmacy_claim__prescribing_provider_npi_null",
@@ -974,7 +1302,7 @@
         {
             "test_name": "pharmacy_claim__no_matching_eligibility_span",
             "display_name": "no matching eligibility span",
-            "description": "Checks whether a pharmacy claim line with a complete person_id, member_id, payer, plan, and data_source identity and populated paid_date has no eligibility span for the same complete identity whose covered calendar months include the paid_date month. For a null enrollment_end_date or the legacy 9999-12-31 alias, coverage extends through the calendar month containing tuva_last_run; a finite enrollment_end_date remains authoritative and is not capped.",
+            "description": "Checks whether a pharmacy claim line with a complete person_id, member_id, payer, plan, and data_source identity and populated paid_date has no eligibility span for the same complete identity whose covered calendar months include the paid_date month. Only paid months on the supported member-month spine from 1900-01 through 2100-12 can match; populated dates outside that range fail. Eligibility coverage is evaluated only through the calendar month containing tuva_last_run: null and the legacy 9999-12-31 alias use that as-of boundary, and a later finite enrollment_end_date is capped to the same boundary.",
             "test_type": "referential",
             "severity": 2,
             "affected_columns": ["person_id", "member_id", "payer", "plan", "paid_date", "data_source"]
@@ -1196,6 +1524,30 @@
             "affected_columns": ["resolved_date"]
         },
         {
+            "test_name": "condition__recorded_date_outside_supported_date_range",
+            "display_name": "recorded_date is outside the supported date range",
+            "description": "Checks whether a populated recorded_date in the condition Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["recorded_date"]
+        },
+        {
+            "test_name": "condition__onset_date_outside_supported_date_range",
+            "display_name": "onset_date is outside the supported date range",
+            "description": "Checks whether a populated onset_date in the condition Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["onset_date"]
+        },
+        {
+            "test_name": "condition__resolved_date_outside_supported_date_range",
+            "display_name": "resolved_date is outside the supported date range",
+            "description": "Checks whether a populated resolved_date in the condition Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["resolved_date"]
+        },
+        {
             "test_name": "encounter__person_id_null",
             "display_name": "person_id is null",
             "description": "Checks whether person_id is null in the encounter Input Layer Model.",
@@ -1280,6 +1632,22 @@
             "display_name": "encounter_end_date is out of reasonable range",
             "description": "Checks whether encounter_end_date in the encounter Input Layer Model is before 2000-01-01 or after the current date.",
             "test_type": "temporal",
+            "severity": 2,
+            "affected_columns": ["encounter_end_date"]
+        },
+        {
+            "test_name": "encounter__encounter_start_date_outside_supported_date_range",
+            "display_name": "encounter_start_date is outside the supported date range",
+            "description": "Checks whether a populated encounter_start_date in the encounter Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["encounter_start_date"]
+        },
+        {
+            "test_name": "encounter__encounter_end_date_outside_supported_date_range",
+            "display_name": "encounter_end_date is outside the supported date range",
+            "description": "Checks whether a populated encounter_end_date in the encounter Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["encounter_end_date"]
         },
@@ -1440,6 +1808,14 @@
             "display_name": "occurrence date is null",
             "description": "Checks whether occurrence_date is null on an immunization record.",
             "test_type": "missing",
+            "severity": 2,
+            "affected_columns": ["occurrence_date"]
+        },
+        {
+            "test_name": "immunization__occurrence_date_outside_supported_date_range",
+            "display_name": "occurrence_date is outside the supported date range",
+            "description": "Checks whether a populated occurrence_date in the immunization Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["occurrence_date"]
         },
@@ -1708,6 +2084,22 @@
             "affected_columns": ["prescribing_date"]
         },
         {
+            "test_name": "medication__dispensing_date_outside_supported_date_range",
+            "display_name": "dispensing_date is outside the supported date range",
+            "description": "Checks whether a populated dispensing_date in the medication Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["dispensing_date"]
+        },
+        {
+            "test_name": "medication__prescribing_date_outside_supported_date_range",
+            "display_name": "prescribing_date is outside the supported date range",
+            "description": "Checks whether a populated prescribing_date in the medication Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["prescribing_date"]
+        },
+        {
             "test_name": "medication__prescribing_date_after_dispensing_date",
             "display_name": "prescribing_date is after dispensing_date",
             "description": "Checks whether prescribing_date is after dispensing_date in the medication Input Layer Model.",
@@ -1836,6 +2228,14 @@
             "affected_columns": ["observation_date"]
         },
         {
+            "test_name": "observation__observation_date_outside_supported_date_range",
+            "display_name": "observation_date is outside the supported date range",
+            "description": "Checks whether a populated observation_date in the observation Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["observation_date"]
+        },
+        {
             "test_name": "observation__observation_type_invalid",
             "display_name": "observation_type is invalid",
             "description": "Checks whether observation_type is populated in the observation Input Layer Model but not found in Tuva observation type terminology.",
@@ -1920,6 +2320,22 @@
             "display_name": "death_date is out of range",
             "description": "Checks whether death_date in the patient Input Layer Model is before 1900-01-01 or after the current date.",
             "test_type": "temporal",
+            "severity": 2,
+            "affected_columns": ["death_date"]
+        },
+        {
+            "test_name": "patient__birth_date_outside_supported_date_range",
+            "display_name": "birth_date is outside the supported date range",
+            "description": "Checks whether a populated birth_date in the patient Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["birth_date"]
+        },
+        {
+            "test_name": "patient__death_date_outside_supported_date_range",
+            "display_name": "death_date is outside the supported date range",
+            "description": "Checks whether a populated death_date in the patient Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["death_date"]
         },
@@ -2080,6 +2496,14 @@
             "display_name": "procedure_date is out of range",
             "description": "Checks whether procedure_date in the procedure Input Layer Model is before 2000-01-01 or after the current date.",
             "test_type": "temporal",
+            "severity": 2,
+            "affected_columns": ["procedure_date"]
+        },
+        {
+            "test_name": "procedure__procedure_date_outside_supported_date_range",
+            "display_name": "procedure_date is outside the supported date range",
+            "description": "Checks whether a populated procedure_date in the procedure Input Layer Model is before 1900-01-01 or after 2100-12-31. Structural Data Quality validates the native SQL DATE type; this Logical test does not inspect a serialized string format.",
+            "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["procedure_date"]
         },
@@ -2465,6 +2889,11 @@
                 'eligibility__birth_date_after_death_date',
                 'eligibility__birth_date_out_of_reasonable_range',
                 'eligibility__death_date_out_of_reasonable_range',
+                'eligibility__birth_date_outside_supported_date_range',
+                'eligibility__death_date_outside_supported_date_range',
+                'eligibility__enrollment_start_date_outside_supported_date_range',
+                'eligibility__enrollment_end_date_outside_supported_date_range',
+                'eligibility__file_date_outside_supported_date_range',
                 'eligibility__death_flag_invalid',
                 'eligibility__death_flag_without_death_date',
                 'eligibility__enrollment_start_after_end',
@@ -2508,16 +2937,49 @@
                 'medical_claim__claim_end_date_out_of_reasonable_range',
                 'medical_claim__claim_line_start_date_out_of_reasonable_range',
                 'medical_claim__claim_line_end_date_out_of_reasonable_range',
+                'medical_claim__claim_start_date_outside_supported_date_range',
+                'medical_claim__claim_end_date_outside_supported_date_range',
+                'medical_claim__claim_line_start_date_outside_supported_date_range',
+                'medical_claim__claim_line_end_date_outside_supported_date_range',
                 'medical_claim__claim_start_after_claim_end',
                 'medical_claim__claim_line_start_after_claim_line_end',
                 'medical_claim__admission_date_after_discharge_date',
                 'medical_claim__admission_date_out_of_reasonable_range',
+                'medical_claim__admission_date_outside_supported_date_range',
                 'medical_claim__admission_date_null_for_inpatient_claim',
                 'medical_claim__discharge_date_null_for_inpatient_claim',
                 'medical_claim__discharge_date_out_of_reasonable_range',
+                'medical_claim__discharge_date_outside_supported_date_range',
                 'medical_claim__paid_date_null',
                 'medical_claim__paid_date_out_of_reasonable_range',
+                'medical_claim__paid_date_outside_supported_date_range',
                 'medical_claim__paid_date_before_claim_end_date',
+                'medical_claim__procedure_date_1_outside_supported_date_range',
+                'medical_claim__procedure_date_2_outside_supported_date_range',
+                'medical_claim__procedure_date_3_outside_supported_date_range',
+                'medical_claim__procedure_date_4_outside_supported_date_range',
+                'medical_claim__procedure_date_5_outside_supported_date_range',
+                'medical_claim__procedure_date_6_outside_supported_date_range',
+                'medical_claim__procedure_date_7_outside_supported_date_range',
+                'medical_claim__procedure_date_8_outside_supported_date_range',
+                'medical_claim__procedure_date_9_outside_supported_date_range',
+                'medical_claim__procedure_date_10_outside_supported_date_range',
+                'medical_claim__procedure_date_11_outside_supported_date_range',
+                'medical_claim__procedure_date_12_outside_supported_date_range',
+                'medical_claim__procedure_date_13_outside_supported_date_range',
+                'medical_claim__procedure_date_14_outside_supported_date_range',
+                'medical_claim__procedure_date_15_outside_supported_date_range',
+                'medical_claim__procedure_date_16_outside_supported_date_range',
+                'medical_claim__procedure_date_17_outside_supported_date_range',
+                'medical_claim__procedure_date_18_outside_supported_date_range',
+                'medical_claim__procedure_date_19_outside_supported_date_range',
+                'medical_claim__procedure_date_20_outside_supported_date_range',
+                'medical_claim__procedure_date_21_outside_supported_date_range',
+                'medical_claim__procedure_date_22_outside_supported_date_range',
+                'medical_claim__procedure_date_23_outside_supported_date_range',
+                'medical_claim__procedure_date_24_outside_supported_date_range',
+                'medical_claim__procedure_date_25_outside_supported_date_range',
+                'medical_claim__file_date_outside_supported_date_range',
                 'medical_claim__paid_amount_null',
                 'medical_claim__paid_amount_lt_zero',
                 'medical_claim__allowed_amount_null',
@@ -2599,6 +3061,9 @@
                 'pharmacy_claim__paid_date_null',
                 'pharmacy_claim__dispensing_date_out_of_reasonable_range',
                 'pharmacy_claim__paid_date_out_of_reasonable_range',
+                'pharmacy_claim__dispensing_date_outside_supported_date_range',
+                'pharmacy_claim__paid_date_outside_supported_date_range',
+                'pharmacy_claim__file_date_outside_supported_date_range',
                 'pharmacy_claim__prescribing_provider_npi_null',
                 'pharmacy_claim__prescribing_provider_npi_invalid',
                 'pharmacy_claim__dispensing_provider_npi_null',
@@ -2681,6 +3146,9 @@
                 'condition__recorded_date_out_of_reasonable_range',
                 'condition__onset_date_out_of_reasonable_range',
                 'condition__resolved_date_out_of_reasonable_range',
+                'condition__recorded_date_outside_supported_date_range',
+                'condition__onset_date_outside_supported_date_range',
+                'condition__resolved_date_outside_supported_date_range',
                 'condition__code_system_invalid',
                 'condition__source_code_invalid',
                 'condition__present_on_admit_code_invalid'
@@ -2705,6 +3173,8 @@
                 'encounter__encounter_start_date_after_encounter_end_date',
                 'encounter__encounter_start_date_out_of_reasonable_range',
                 'encounter__encounter_end_date_out_of_reasonable_range',
+                'encounter__encounter_start_date_outside_supported_date_range',
+                'encounter__encounter_end_date_outside_supported_date_range',
                 'encounter__admit_source_code_invalid',
                 'encounter__admit_type_code_invalid',
                 'encounter__discharge_disposition_code_invalid',
@@ -2735,6 +3205,7 @@
                 'immunization__encounter_id_not_in_encounter',
                 'immunization__encounter_person_patient_pair_not_in_encounter',
                 'immunization__occurrence_date_null',
+                'immunization__occurrence_date_outside_supported_date_range',
                 'immunization__source_code_type_null_when_source_code_present',
                 'immunization__source_code_null_when_source_code_type_present',
                 'immunization__source_code_invalid',
@@ -2798,6 +3269,8 @@
                 'medication__practitioner_id_not_in_practitioner',
                 'medication__dispensing_date_out_of_range',
                 'medication__prescribing_date_out_of_range',
+                'medication__dispensing_date_outside_supported_date_range',
+                'medication__prescribing_date_outside_supported_date_range',
                 'medication__prescribing_date_after_dispensing_date',
                 'medication__source_code_type_null_when_source_code_present',
                 'medication__source_code_null',
@@ -2824,6 +3297,7 @@
                 'observation__encounter_person_patient_pair_not_in_encounter',
                 'observation__observation_date_null',
                 'observation__observation_date_out_of_range',
+                'observation__observation_date_outside_supported_date_range',
                 'observation__observation_type_invalid',
                 'observation__source_code_type_null_when_source_code_present',
                 'observation__source_code_null',
@@ -2845,6 +3319,8 @@
                 'patient__birth_date_null',
                 'patient__birth_date_out_of_range',
                 'patient__death_date_out_of_range',
+                'patient__birth_date_outside_supported_date_range',
+                'patient__death_date_outside_supported_date_range',
                 'patient__birth_date_after_death_date',
                 'patient__death_flag_invalid',
                 'patient__death_flag_without_death_date',
@@ -2885,6 +3361,7 @@
                 'procedure__practitioner_id_not_in_practitioner',
                 'procedure__procedure_date_null',
                 'procedure__procedure_date_out_of_range',
+                'procedure__procedure_date_outside_supported_date_range',
                 'procedure__code_system_null',
                 'procedure__code_system_invalid',
                 'procedure__source_code_null',

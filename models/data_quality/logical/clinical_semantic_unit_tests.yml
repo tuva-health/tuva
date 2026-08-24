@@ -589,6 +589,59 @@ unit_tests:
           status_reason_invalid: null
           status_reason_present_for_completed_or_error_status: null
 
+  - name: test_immunization_supported_date_range_flag_is_tristate
+    description: >
+      Verifies pass, fail, and null not-applicable behavior for the native DATE
+      supported-range check on immunization occurrence_date.
+    model: data_quality__immunization_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
+    given:
+      - input: ref('input_layer__immunization')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'valid' as immunization_id, 'person' as person_id, 'patient' as patient_id
+            , cast(null as {{ string_type }}) as encounter_id, 'cvx' as source_code_type, '1' as source_code
+            , 'completed' as status, cast(null as {{ string_type }}) as status_reason
+            , cast('2024-01-01' as date) as occurrence_date, 'source' as data_source
+          union all
+          select 'too_early', 'person', 'patient', null, 'cvx', '1', 'completed', null, cast('1899-12-31' as date), 'source'
+          union all
+          select 'too_late', 'person', 'patient', null, 'cvx', '1', 'completed', null, cast('2101-01-01' as date), 'source'
+          union all
+          select 'missing', 'person', 'patient', null, 'cvx', '1', 'completed', null, cast(null as date), 'source'
+      - input: ref('input_layer__patient')
+        format: sql
+        rows: |
+          select 'person' as person_id, 'patient' as patient_id, 'source' as data_source
+      - input: ref('input_layer__encounter')
+        format: sql
+        rows: |
+          select '__unused__' as encounter_id, '__unused__' as person_id, '__unused__' as patient_id, 'source' as data_source
+      - input: ref('terminology__cvx')
+        format: sql
+        rows: |
+          select '1' as cvx
+      - input: ref('terminology__immunization_status')
+        format: sql
+        rows: |
+          select 'completed' as status_code
+      - input: ref('terminology__immunization_status_reason')
+        format: sql
+        rows: |
+          select '__unused__' as reason_code
+    expect:
+      rows:
+        - immunization_id: valid
+          occurrence_date_outside_supported_date_range: 0
+        - immunization_id: too_early
+          occurrence_date_outside_supported_date_range: 1
+        - immunization_id: too_late
+          occurrence_date_outside_supported_date_range: 1
+        - immunization_id: missing
+          occurrence_date_outside_supported_date_range: null
+
   - name: test_lab_result_identity_order_and_date_flags
     description: >
       Verifies source-scoped lab identity, standard and local code-system

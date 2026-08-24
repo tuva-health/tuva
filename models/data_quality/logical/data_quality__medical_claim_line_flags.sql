@@ -75,6 +75,7 @@ not exists (
       and eligibility_rows.payer = source_rows.payer
       and eligibility_rows.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
       and eligibility_rows.data_source = source_rows.data_source
+      and {{ dq_supported_date_range_where_sql(inferred_claim_date_sql) }}
       and (
           {{ date_part('year', inferred_claim_date_sql) }} * 100
           + {{ date_part('month', inferred_claim_date_sql) }}
@@ -132,6 +133,7 @@ with eligibility_rows_with_effective_end_date as (
         , case
             when eligibility_rows.enrollment_end_date is null
               or eligibility_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+              or eligibility_rows.enrollment_end_date > cast({{ tuva_last_run_timestamp_sql }} as date)
                 then cast({{ tuva_last_run_timestamp_sql }} as date)
             else eligibility_rows.enrollment_end_date
           end as _dq_effective_enrollment_end_date
@@ -267,6 +269,18 @@ final as (
             "source_rows.claim_line_end_date < " ~ min_recent_claim_date_sql ~ " or source_rows.claim_line_end_date > " ~ current_date_sql,
             "source_rows.claim_line_end_date is not null"
           ) }} as claim_line_end_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.claim_start_date"
+          ) }} as claim_start_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.claim_end_date"
+          ) }} as claim_end_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.claim_line_start_date"
+          ) }} as claim_line_start_date_outside_supported_date_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.claim_line_end_date"
+          ) }} as claim_line_end_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
             "source_rows.claim_start_date > source_rows.claim_end_date",
             "source_rows.claim_start_date is not null and source_rows.claim_end_date is not null"
@@ -283,6 +297,9 @@ final as (
             "source_rows.admission_date < " ~ min_recent_claim_date_sql ~ " or source_rows.admission_date > " ~ current_date_sql,
             "source_rows.admission_date is not null"
           ) }} as admission_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.admission_date"
+          ) }} as admission_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
             "source_rows.admission_date is null",
             inpatient_facility_claim_where_sql
@@ -295,15 +312,29 @@ final as (
             "source_rows.discharge_date < " ~ min_recent_claim_date_sql ~ " or source_rows.discharge_date > " ~ current_date_sql,
             "source_rows.discharge_date is not null"
           ) }} as discharge_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.discharge_date"
+          ) }} as discharge_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql("source_rows.paid_date is null", "1 = 1") }} as paid_date_null
         , {{ dq_logical_int_flag_sql(
             "source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql,
             "source_rows.paid_date is not null"
           ) }} as paid_date_out_of_reasonable_range
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.paid_date"
+          ) }} as paid_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql(
             "source_rows.paid_date < source_rows.claim_end_date",
             "source_rows.paid_date is not null and source_rows.claim_end_date is not null"
           ) }} as paid_date_before_claim_end_date
+        {% for index in range(1, 26) %}
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.procedure_date_" ~ index
+          ) }} as procedure_date_{{ index }}_outside_supported_date_range
+        {% endfor %}
+        , {{ dq_logical_supported_date_range_flag_sql(
+            "source_rows.file_date"
+          ) }} as file_date_outside_supported_date_range
         , {{ dq_logical_int_flag_sql("source_rows.paid_amount is null", "1 = 1") }} as paid_amount_null
         , {{ dq_logical_int_flag_sql(
             "source_rows.paid_amount < 0",
