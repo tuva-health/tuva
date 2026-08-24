@@ -25,6 +25,9 @@
     ~ " and source_rows." ~ quote_column('plan') ~ " is not null"
     ~ " and source_rows.data_source is not null"
     ~ " and source_rows.paid_date is not null"
+    ~ " and " ~ dq_date_in_range_where_sql('source_rows.paid_date', min_recent_claim_date_sql, current_date_sql)
+    ~ " and " ~ dq_member_month_spine_date_where_sql('source_rows.paid_date')
+    ~ " and source_rows.paid_date <= cast(" ~ tuva_last_run_timestamp_sql ~ " as date)"
 %}
 {% set no_matching_eligibility_where_sql %}
 not exists (
@@ -35,7 +38,6 @@ not exists (
       and eligibility_rows.payer = source_rows.payer
       and eligibility_rows.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
       and eligibility_rows.data_source = source_rows.data_source
-      and {{ dq_supported_date_range_where_sql('source_rows.paid_date') }}
       and (
           {{ date_part('year', 'source_rows.paid_date') }} * 100
           + {{ date_part('month', 'source_rows.paid_date') }}
@@ -91,15 +93,14 @@ final as (
             "source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql,
             "source_rows.paid_date is not null"
           ) }} as paid_date_out_of_reasonable_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.dispensing_date"
-          ) }} as dispensing_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.paid_date"
-          ) }} as paid_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.file_date"
+        , {{ dq_logical_date_range_flag_sql(
+            "source_rows.file_date",
+            min_recent_claim_date_sql,
+            current_date_sql
           ) }} as file_date_outside_supported_date_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+            "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is null", "1 = 1") }} as prescribing_provider_npi_null
         , {{ dq_logical_int_flag_sql(
             "prescribing_provider_lookup.npi is null",

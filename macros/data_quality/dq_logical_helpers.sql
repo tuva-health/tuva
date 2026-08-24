@@ -6,22 +6,39 @@
     {{ return(dbt.cast("'" ~ date_string ~ "'", api.Column.translate_type('date'))) }}
 {% endmacro %}
 
-{% macro dq_supported_date_range_where_sql(column_sql) %}
-    {% set supported_date_min_sql = dq_date_literal_sql('1900-01-01') %}
-    {% set supported_date_max_sql = dq_date_literal_sql('2100-12-31') %}
-
+{% macro dq_date_in_range_where_sql(date_sql, minimum_date_sql, maximum_date_sql) %}
     {{ return(
-        "(" ~ column_sql ~ " >= " ~ supported_date_min_sql
-        ~ " and " ~ column_sql ~ " <= " ~ supported_date_max_sql ~ ")"
+        "(" ~ date_sql ~ " >= " ~ minimum_date_sql
+        ~ " and " ~ date_sql ~ " <= " ~ maximum_date_sql ~ ")"
     ) }}
 {% endmacro %}
 
-{% macro dq_logical_supported_date_range_flag_sql(column_sql, applicability_sql=none) %}
-    {% set effective_applicability_sql = applicability_sql if applicability_sql is not none else column_sql ~ " is not null" %}
+{% macro dq_member_month_spine_date_where_sql(date_sql) %}
+    {{ return(dq_date_in_range_where_sql(
+        date_sql,
+        dq_date_literal_sql('1900-01-01'),
+        dq_date_literal_sql('2100-12-31')
+    )) }}
+{% endmacro %}
+
+{% macro dq_logical_date_range_flag_sql(date_sql, minimum_date_sql, maximum_date_sql, applicability_sql=none) %}
+    {% set effective_applicability_sql = applicability_sql if applicability_sql is not none else date_sql ~ " is not null" %}
 
     {{ return(dq_logical_int_flag_sql(
-        "not " ~ dq_supported_date_range_where_sql(column_sql),
+        "not " ~ dq_date_in_range_where_sql(date_sql, minimum_date_sql, maximum_date_sql),
         effective_applicability_sql
+    )) }}
+{% endmacro %}
+
+{% macro dq_logical_ingest_datetime_range_flag_sql(timestamp_sql) %}
+    {% set date_type = api.Column.translate_type('date') %}
+    {% set ingest_date_sql = "cast(" ~ timestamp_sql ~ " as " ~ date_type ~ ")" %}
+
+    {{ return(dq_logical_date_range_flag_sql(
+        ingest_date_sql,
+        dq_date_literal_sql('2000-01-01'),
+        dq_current_date_sql(),
+        timestamp_sql ~ " is not null"
     )) }}
 {% endmacro %}
 

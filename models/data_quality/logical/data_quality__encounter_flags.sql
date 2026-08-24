@@ -82,12 +82,9 @@ final as (
               "source_rows.encounter_end_date is not null and (source_rows.encounter_end_date < " ~ min_encounter_date_sql ~ " or source_rows.encounter_end_date > " ~ current_date_sql ~ ")",
               "source_rows.encounter_end_date is not null"
           ) }} as encounter_end_date_out_of_reasonable_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-              "source_rows.encounter_start_date"
-          ) }} as encounter_start_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-              "source_rows.encounter_end_date"
-          ) }} as encounter_end_date_outside_supported_date_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.admit_source_code is not null and admit_source_lookup.admit_source_code is null", "source_rows.admit_source_code is not null") }} as admit_source_code_invalid
         , {{ dq_logical_int_flag_sql("source_rows.admit_type_code is not null and admit_type_lookup.admit_type_code is null", "source_rows.admit_type_code is not null") }} as admit_type_code_invalid
         , {{ dq_logical_int_flag_sql("source_rows.discharge_disposition_code is not null and discharge_disposition_lookup.discharge_disposition_code is null", "source_rows.discharge_disposition_code is not null") }} as discharge_disposition_code_invalid

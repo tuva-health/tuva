@@ -15,6 +15,8 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select fixture_rows.*, cast(null as timestamp) as ingest_datetime
+          from (
           select 'valid' as person_id, 'valid' as member_id, '202401' as year_month, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'source' as data_source
           union all
           select 'dashed', 'dashed', '2024-01', 'payer', 'plan', 'source'
@@ -30,6 +32,7 @@ unit_tests:
           select 'trailing_whitespace', 'trailing_whitespace', '202401 ', 'payer', 'plan', 'source'
           union all
           select 'null_value', 'null_value', null, 'payer', 'plan', 'source'
+          ) as fixture_rows
     expect:
       rows:
         - person_id: valid

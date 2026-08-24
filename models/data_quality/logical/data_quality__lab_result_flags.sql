@@ -130,6 +130,9 @@ final as (
               collection_date_sql ~ " < " ~ min_lab_date_sql ~ " or " ~ collection_date_sql ~ " > " ~ current_date_sql,
               "source_rows.collection_datetime is not null"
           ) }} as collection_datetime_out_of_reasonable_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
     from source_rows
     left join patient_person_rows as patient_person
         on source_rows.person_id = patient_person.person_id

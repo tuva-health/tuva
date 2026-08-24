@@ -12,8 +12,15 @@
 }}
 
 {% set string_type = dbt.type_string() %}
+{% set date_type = api.Column.translate_type('date') %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_reasonable_date_sql = dq_date_literal_sql('1900-01-01') %}
+{% set min_file_date_sql = dq_date_literal_sql('2000-01-01') %}
+{% set one_year_after_current_date_sql = "cast(" ~ dbt.dateadd(
+    datepart='month',
+    interval=12,
+    from_date_or_timestamp=current_date_sql
+  ) ~ " as " ~ date_type ~ ")" %}
 {% set legacy_open_end_date_sql = dq_date_literal_sql('9999-12-31') %}
 {% set death_flag_text_sql = "lower(cast(source_rows.death_flag as " ~ string_type ~ "))" %}
 {% set open_end_where_sql =
@@ -153,22 +160,25 @@ final as (
             "source_rows.death_date < " ~ min_reasonable_date_sql ~ " or source_rows.death_date > " ~ current_date_sql,
             "source_rows.death_date is not null"
           ) }} as death_date_out_of_reasonable_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.birth_date"
-          ) }} as birth_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.death_date"
-          ) }} as death_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.enrollment_start_date"
+        , {{ dq_logical_date_range_flag_sql(
+            "source_rows.enrollment_start_date",
+            min_reasonable_date_sql,
+            one_year_after_current_date_sql
           ) }} as enrollment_start_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
+        , {{ dq_logical_date_range_flag_sql(
             "source_rows.enrollment_end_date",
+            min_reasonable_date_sql,
+            one_year_after_current_date_sql,
             finite_end_where_sql
           ) }} as enrollment_end_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-            "source_rows.file_date"
+        , {{ dq_logical_date_range_flag_sql(
+            "source_rows.file_date",
+            min_file_date_sql,
+            current_date_sql
           ) }} as file_date_outside_supported_date_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+            "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql(
             death_flag_text_sql ~ " not in ('true', 'false', '1', '0')",
             "source_rows.death_flag is not null"
@@ -187,7 +197,9 @@ final as (
             ~ " or (source_rows._dq_min_following_enrollment_start_date is not null and ("
             ~ open_end_where_sql
             ~ " or source_rows._dq_min_following_enrollment_start_date <= source_rows.enrollment_end_date))",
-            complete_coverage_identity_where_sql ~ " and " ~ valid_span_where_sql
+            complete_coverage_identity_where_sql
+            ~ " and " ~ valid_span_where_sql
+            ~ " and " ~ finite_end_where_sql
           ) }} as overlapping_enrollment_spans
         , {{ dq_logical_int_flag_sql(
             "source_rows._dq_open_span_count > 1",

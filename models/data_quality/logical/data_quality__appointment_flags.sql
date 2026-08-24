@@ -12,6 +12,16 @@
 }}
 
 {% set string_type = dbt.type_string() %}
+{% set date_type = api.Column.translate_type('date') %}
+{% set current_date_sql = dq_current_date_sql() %}
+{% set min_appointment_date_sql = dq_date_literal_sql('2000-01-01') %}
+{% set max_appointment_date_sql = "cast(" ~ dbt.dateadd(
+    datepart='month',
+    interval=12,
+    from_date_or_timestamp=current_date_sql
+  ) ~ " as " ~ date_type ~ ")" %}
+{% set appointment_start_date_sql = "cast(source_rows.start_datetime as " ~ date_type ~ ")" %}
+{% set appointment_end_date_sql = "cast(source_rows.end_datetime as " ~ date_type ~ ")" %}
 
 with source_rows as (
     select *
@@ -96,6 +106,18 @@ final as (
               ~ "and patient_pair.person_id is not null"
           ) }} as encounter_person_patient_pair_not_in_encounter
         , {{ dq_logical_int_flag_sql("source_rows.start_datetime is null", "1 = 1") }} as start_datetime_null
+        , {{ dq_logical_date_range_flag_sql(
+              appointment_start_date_sql,
+              min_appointment_date_sql,
+              max_appointment_date_sql,
+              "source_rows.start_datetime is not null"
+          ) }} as start_datetime_out_of_reasonable_range
+        , {{ dq_logical_date_range_flag_sql(
+              appointment_end_date_sql,
+              min_appointment_date_sql,
+              max_appointment_date_sql,
+              "source_rows.end_datetime is not null"
+          ) }} as end_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql(
               "source_rows.end_datetime < source_rows.start_datetime",
               "source_rows.start_datetime is not null and source_rows.end_datetime is not null"

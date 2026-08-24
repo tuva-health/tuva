@@ -101,9 +101,9 @@ final as (
               "source_rows.observation_date is not null and (source_rows.observation_date < " ~ min_event_date_sql ~ " or source_rows.observation_date > " ~ current_date_sql ~ ")",
               "source_rows.observation_date is not null"
           ) }} as observation_date_out_of_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-              "source_rows.observation_date"
-          ) }} as observation_date_outside_supported_date_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.observation_type is not null and observation_type_rows.observation_type is null", "source_rows.observation_type is not null") }} as observation_type_invalid
         , {{ dq_logical_int_flag_sql(
               "source_rows.source_code is not null and source_rows.source_code_type is null",

@@ -78,12 +78,9 @@ final as (
               "source_rows.death_date < " ~ min_birth_death_date_sql ~ " or source_rows.death_date > " ~ current_date_sql,
               "source_rows.death_date is not null"
           ) }} as death_date_out_of_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-              "source_rows.birth_date"
-          ) }} as birth_date_outside_supported_date_range
-        , {{ dq_logical_supported_date_range_flag_sql(
-              "source_rows.death_date"
-          ) }} as death_date_outside_supported_date_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql(
               "source_rows.birth_date > source_rows.death_date",
               "source_rows.birth_date is not null and source_rows.death_date is not null"
