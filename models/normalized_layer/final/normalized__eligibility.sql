@@ -11,8 +11,6 @@ select
           "'-'",
           "date_norm.normalized_enrollment_start_date",
           "'-'",
-          "date_norm.normalized_enrollment_end_date",
-          "'-'",
           "elig.payer",
           "'-'",
           "elig." ~ quote_column('plan'),

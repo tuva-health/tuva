@@ -14,6 +14,10 @@
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_recent_claim_date_sql = dq_date_literal_sql('2000-01-01') %}
+{% set legacy_open_end_date_sql = dq_date_literal_sql('9999-12-31') %}
+{% set tuva_last_run_timestamp_sql =
+    "cast('" ~ var('tuva_last_run') ~ "' as " ~ dbt.type_timestamp() ~ ")"
+%}
 {% set eligibility_match_applicable_where_sql =
     "source_rows.person_id is not null"
     ~ " and source_rows.member_id is not null"
@@ -25,7 +29,7 @@
 {% set no_matching_eligibility_where_sql %}
 not exists (
     select 1
-    from {{ ref('input_layer__eligibility') }} as eligibility_rows
+    from eligibility_rows_with_effective_end_date as eligibility_rows
     where eligibility_rows.person_id = source_rows.person_id
       and eligibility_rows.member_id = source_rows.member_id
       and eligibility_rows.payer = source_rows.payer
@@ -34,17 +38,33 @@ not exists (
       and (
           {{ date_part('year', 'source_rows.paid_date') }} * 100
           + {{ date_part('month', 'source_rows.paid_date') }}
-      ) between (
+      ) >= (
           {{ date_part('year', 'eligibility_rows.enrollment_start_date') }} * 100
           + {{ date_part('month', 'eligibility_rows.enrollment_start_date') }}
-      ) and (
-          {{ date_part('year', 'eligibility_rows.enrollment_end_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows.enrollment_end_date') }}
+      )
+      and (
+          {{ date_part('year', 'source_rows.paid_date') }} * 100
+          + {{ date_part('month', 'source_rows.paid_date') }}
+      ) <= (
+          {{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} * 100
+          + {{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }}
       )
 )
 {% endset %}
 
-with source_rows as (
+with eligibility_rows_with_effective_end_date as (
+    select
+          eligibility_rows.*
+        , case
+            when eligibility_rows.enrollment_end_date is null
+              or eligibility_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+                then cast({{ tuva_last_run_timestamp_sql }} as date)
+            else eligibility_rows.enrollment_end_date
+          end as _dq_effective_enrollment_end_date
+    from {{ ref('input_layer__eligibility') }} as eligibility_rows
+),
+
+source_rows as (
     select *
     from {{ ref('input_layer__pharmacy_claim') }}
 ),

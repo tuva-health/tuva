@@ -14,7 +14,28 @@
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_reasonable_date_sql = dq_date_literal_sql('1900-01-01') %}
+{% set legacy_open_end_date_sql = dq_date_literal_sql('9999-12-31') %}
 {% set death_flag_text_sql = "lower(cast(source_rows.death_flag as " ~ string_type ~ "))" %}
+{% set open_end_where_sql =
+    "(source_rows.enrollment_end_date is null"
+    ~ " or source_rows.enrollment_end_date = " ~ legacy_open_end_date_sql ~ ")"
+%}
+{% set finite_end_where_sql =
+    "source_rows.enrollment_end_date is not null"
+    ~ " and source_rows.enrollment_end_date <> " ~ legacy_open_end_date_sql
+%}
+{% set valid_span_where_sql =
+    "source_rows.enrollment_start_date is not null"
+    ~ " and (" ~ open_end_where_sql
+    ~ " or source_rows.enrollment_start_date <= source_rows.enrollment_end_date)"
+%}
+{% set complete_coverage_identity_where_sql =
+    "source_rows.person_id is not null"
+    ~ " and source_rows.member_id is not null"
+    ~ " and source_rows.payer is not null"
+    ~ " and source_rows." ~ quote_column('plan') ~ " is not null"
+    ~ " and source_rows.data_source is not null"
+%}
 
 with source_rows as (
     select *
@@ -27,6 +48,7 @@ coverage_windows as (
         , max(case
             when source_rows.enrollment_start_date is not null
              and source_rows.enrollment_end_date is not null
+             and source_rows.enrollment_end_date <> {{ legacy_open_end_date_sql }}
              and source_rows.enrollment_start_date <= source_rows.enrollment_end_date
                 then source_rows.enrollment_end_date
           end) over (
@@ -41,10 +63,33 @@ coverage_windows as (
                 , source_rows.enrollment_end_date
             rows between unbounded preceding and 1 preceding
           ) as _dq_max_prior_enrollment_end_date
+        , sum(case
+            when source_rows.enrollment_start_date is not null
+             and (
+                    source_rows.enrollment_end_date is null
+                 or source_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+             )
+                then 1
+            else 0
+          end) over (
+            partition by
+                  source_rows.person_id
+                , source_rows.member_id
+                , source_rows.payer
+                , source_rows.{{ quote_column('plan') }}
+                , source_rows.data_source
+            order by
+                  source_rows.enrollment_start_date
+                , source_rows.enrollment_end_date
+            rows between unbounded preceding and 1 preceding
+          ) as _dq_prior_open_span_count
         , min(case
             when source_rows.enrollment_start_date is not null
-             and source_rows.enrollment_end_date is not null
-             and source_rows.enrollment_start_date <= source_rows.enrollment_end_date
+             and (
+                    source_rows.enrollment_end_date is null
+                 or source_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+                 or source_rows.enrollment_start_date <= source_rows.enrollment_end_date
+             )
                 then source_rows.enrollment_start_date
           end) over (
             partition by
@@ -58,6 +103,22 @@ coverage_windows as (
                 , source_rows.enrollment_end_date
             rows between 1 following and unbounded following
           ) as _dq_min_following_enrollment_start_date
+        , sum(case
+            when source_rows.enrollment_start_date is not null
+             and (
+                    source_rows.enrollment_end_date is null
+                 or source_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+             )
+                then 1
+            else 0
+          end) over (
+            partition by
+                  source_rows.person_id
+                , source_rows.member_id
+                , source_rows.payer
+                , source_rows.{{ quote_column('plan') }}
+                , source_rows.data_source
+          ) as _dq_open_span_count
     from source_rows
 ),
 
@@ -66,7 +127,6 @@ final as (
           source_rows.person_id
         , source_rows.member_id
         , source_rows.enrollment_start_date
-        , source_rows.enrollment_end_date
         , source_rows.payer
         , source_rows.{{ quote_column('plan') }}
         , source_rows.data_source
@@ -103,19 +163,22 @@ final as (
           ) }} as death_flag_without_death_date
         , {{ dq_logical_int_flag_sql(
             "source_rows.enrollment_start_date > source_rows.enrollment_end_date",
-            "source_rows.enrollment_start_date is not null and source_rows.enrollment_end_date is not null"
+            "source_rows.enrollment_start_date is not null and " ~ finite_end_where_sql
           ) }} as enrollment_start_after_end
         , {{ dq_logical_int_flag_sql(
-            "source_rows._dq_max_prior_enrollment_end_date >= source_rows.enrollment_start_date or source_rows._dq_min_following_enrollment_start_date <= source_rows.enrollment_end_date",
-            "source_rows.person_id is not null "
-            ~ "and source_rows.member_id is not null "
-            ~ "and source_rows.payer is not null "
-            ~ "and source_rows." ~ quote_column('plan') ~ " is not null "
-            ~ "and source_rows.data_source is not null "
-            ~ "and source_rows.enrollment_start_date is not null "
-            ~ "and source_rows.enrollment_end_date is not null "
-            ~ "and source_rows.enrollment_start_date <= source_rows.enrollment_end_date"
+            "coalesce(source_rows._dq_prior_open_span_count, 0) > 0"
+            ~ " or source_rows._dq_max_prior_enrollment_end_date >= source_rows.enrollment_start_date"
+            ~ " or (source_rows._dq_min_following_enrollment_start_date is not null and ("
+            ~ open_end_where_sql
+            ~ " or source_rows._dq_min_following_enrollment_start_date <= source_rows.enrollment_end_date))",
+            complete_coverage_identity_where_sql ~ " and " ~ valid_span_where_sql
           ) }} as overlapping_enrollment_spans
+        , {{ dq_logical_int_flag_sql(
+            "source_rows._dq_open_span_count > 1",
+            complete_coverage_identity_where_sql
+            ~ " and source_rows.enrollment_start_date is not null"
+            ~ " and " ~ open_end_where_sql
+          ) }} as multiple_open_enrollment_spans
         , {{ dq_logical_int_flag_sql("source_rows.payer_type is null", "1 = 1") }} as payer_type_null
         , {{ dq_logical_int_flag_sql(
             "payer_type_lookup.payer_type is null",

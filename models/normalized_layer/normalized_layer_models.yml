@@ -145,9 +145,9 @@ models:
 ##    Final
   - name: normalized__eligibility
     description: |-
-      This model assembles normalized eligibility records from the eligibility preprocessing models. It starts from int_eligibility_casting, selects the eligibility, demographic, source, metadata, and extension columns needed downstream, and left joins to int_eligibility_dates_normalized on person_id_key to replace birth_date, death_date, enrollment_start_date, and enrollment_end_date with calendar-normalized date values. It also left joins to int_eligibility_state_normalized on person_id_key to add normalized_state_name, fips_state_code, and fips_state_abbreviation.
+      This model assembles normalized eligibility records from the eligibility preprocessing models. It starts from int_eligibility_casting, selects the eligibility, demographic, source, metadata, and extension columns needed downstream, and left joins to int_eligibility_dates_normalized on person_id_key. Birth and death dates are calendar-normalized, while already-typed enrollment dates are preserved so valid values outside the terminology calendar are not lost. It also left joins to int_eligibility_state_normalized on person_id_key to add normalized_state_name, fips_state_code, and fips_state_abbreviation.
 
-      This model creates eligibility_id as a synthetic eligibility record key by concatenating person_id, member_id, normalized enrollment_start_date, normalized enrollment_end_date, payer, plan, and data_source with hyphen delimiters. It does not deduplicate eligibility records.
+      This model creates eligibility_id as a stable synthetic eligibility-span key by concatenating person_id, member_id, enrollment_start_date, payer, plan, and data_source with hyphen delimiters. enrollment_end_date is intentionally excluded because an open span can later receive a closing date without becoming a different span. The model does not deduplicate eligibility records.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalized_layer
@@ -162,7 +162,7 @@ models:
         - normalized_layer
     columns:
       - name: eligibility_id
-        description: Synthetic eligibility record key created by concatenating person_id, member_id, normalized enrollment_start_date, normalized enrollment_end_date, payer, plan, and data_source with hyphen delimiters.
+        description: Stable synthetic eligibility-span key created by concatenating person_id, member_id, enrollment_start_date, payer, plan, and data_source with hyphen delimiters. enrollment_end_date is excluded so the key does not change when an open span closes.
         config:
           meta:
             is_primary_key: true
@@ -175,9 +175,9 @@ models:
       - name: subscriber_relation
         description: Member relationship to the subscriber or policyholder.
       - name: enrollment_start_date
-        description: Calendar-normalized first date of the enrollment span from int_eligibility_dates_normalized. This value is null when the source enrollment_start_date does not match terminology__calendar.full_date.
+        description: First date of the enrollment span, preserved as a native DATE from int_eligibility_dates_normalized.
       - name: enrollment_end_date
-        description: Calendar-normalized last date of the enrollment span from int_eligibility_dates_normalized. This value is null when the source enrollment_end_date does not match terminology__calendar.full_date.
+        description: Last date of the enrollment span, preserved as a native DATE from int_eligibility_dates_normalized. Null means the span is still open; the legacy input alias 9999-12-31 is normalized to null upstream.
       - name: payer
         description: Name of the payer or health insurer providing coverage during the enrollment span.
       - name: payer_type
@@ -314,7 +314,7 @@ models:
         description: User-configured field that identifies the source system, payer feed, or other origin of the eligibility record.
   - name: normalized__eligibility_remove_duplicates
     description: |-
-      This model creates eligibility-derived patient records and removes duplicate records for each person_id and data_source. When multiple eligibility records exist, it keeps the record with the latest enrollment_end_date, treating null enrollment_end_date as 2050-01-01.
+      This model creates eligibility-derived patient records and removes duplicate records for each person_id and data_source. When multiple eligibility records exist, it prioritizes an open span, then the latest enrollment_end_date, enrollment_start_date, and eligibility_id for deterministic selection.
 
       Primary key: person_id, data_source.
     config:
@@ -1330,7 +1330,7 @@ models:
 
   - name: int_eligibility_dates_normalized
     description: |-
-      This model normalizes the eligibility date fields by joining int_eligibility_casting to terminology__calendar once for each source date field: birth_date, death_date, enrollment_start_date, and enrollment_end_date. Each normalized_* date column is populated from terminology__calendar.full_date. If a source date is null or does not match a row in terminology__calendar, the corresponding normalized_* date column is null.
+      This model normalizes eligibility date fields from int_eligibility_casting. Birth and death dates are matched to terminology__calendar. Enrollment start and end dates are already typed DATE values and are passed through directly, preventing valid eligibility dates outside the terminology calendar from being lost.
 
       The model keeps one distinct row per person_id and person_id_key.
     config:
@@ -1349,15 +1349,15 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset from int_eligibility_casting.
       - name: person_id_key
-        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized date values back to the eligibility record.
+        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and the canonical enrollment_end_date and is used to join normalized date values back to the eligibility record.
       - name: normalized_birth_date
         description: Birth date matched to terminology__calendar.full_date. Null when the source birth_date is null or does not match the calendar.
       - name: normalized_death_date
         description: Death date matched to terminology__calendar.full_date. Null when the source death_date is null or does not match the calendar.
       - name: normalized_enrollment_start_date
-        description: Enrollment start date matched to terminology__calendar.full_date. Null when the source enrollment_start_date is null or does not match the calendar.
+        description: Enrollment start date passed through from int_eligibility_casting as a native DATE without a calendar-membership requirement.
       - name: normalized_enrollment_end_date
-        description: Enrollment end date matched to terminology__calendar.full_date. Null when the source enrollment_end_date is null or does not match the calendar.
+        description: Canonical enrollment end date passed through from int_eligibility_casting as a native DATE without a calendar-membership requirement. Null means the enrollment span remains open.
 
   - name: normalized_input__int_medical_claim_date_normalize
     config:
@@ -1546,6 +1546,7 @@ models:
       1. Casts fields to the appropriate data types expected by the input_layer__eligibility table. This is meant to account for data types if they are not cast by the user in the input layer.
       2. Passes through all column extensions that the user has created in the input layer with the x_ extension prefix.
       3. Creates a synthetic join key called person_id_key. The person_id_key is created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+      4. Canonicalizes the backward-compatible open-span alias 9999-12-31 to a null enrollment_end_date.
 
       Primary key: person_id_key.
     config:
@@ -1564,7 +1565,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset, cast to string from input_layer__eligibility.
       - name: person_id_key
-        description: Synthetic join key created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
+        description: Synthetic join key created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and the canonical enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
       - name: member_id
         description: Identifier assigned by the payer or health plan for the covered member, cast to string from input_layer__eligibility.
       - name: subscriber_id
@@ -1572,9 +1573,9 @@ models:
       - name: subscriber_relation
         description: Member relationship to the subscriber or policyholder, cast to string from input_layer__eligibility.
       - name: enrollment_start_date
-        description: Source enrollment start date cast to date from input_layer__eligibility before calendar normalization.
+        description: Source enrollment start date cast to a native DATE from input_layer__eligibility.
       - name: enrollment_end_date
-        description: Source enrollment end date cast to date from input_layer__eligibility before calendar normalization.
+        description: Source enrollment end date cast to a native DATE from input_layer__eligibility. Null means the span remains open; 9999-12-31 is accepted as a backward-compatible input alias and canonicalized to null.
       - name: payer
         description: Name of the payer or health insurer, cast to string from input_layer__eligibility.
       - name: payer_type
@@ -1720,7 +1721,7 @@ models:
       - name: person_id
         description: Unique identifier for each person in the dataset from int_eligibility_casting.
       - name: person_id_key
-        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date and is used to join normalized state values back to the eligibility record.
+        description: Synthetic join key from int_eligibility_casting. It is built from person_id, member_id, data_source, payer, plan, enrollment_start_date, and the canonical enrollment_end_date and is used to join normalized state values back to the eligibility record.
       - name: normalized_state_name
         description: ANSI/FIPS state name from terminology__ansi_fips_state. Null when the source state value does not match state abbreviation, state code, or state name in the reference table.
       - name: fips_state_code

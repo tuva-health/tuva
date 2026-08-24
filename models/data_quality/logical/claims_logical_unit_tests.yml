@@ -90,6 +90,78 @@ unit_tests:
           plan: plan_a
           overlapping_enrollment_spans: 0
 
+  - name: test_eligibility_open_end_date_semantics
+    description: >
+      Verifies that null and 9999-12-31 both represent an open end date, one
+      open span passes, multiple open spans fail, an open span overlaps every
+      later valid span, and start-after-end applies only to finite end dates.
+    model: data_quality__eligibility_span_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'single_null' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast(null as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, 0 as death_flag, 'commercial' as payer_type, 'source' as data_source
+          union all
+          select 'single_sentinel', 'member', cast('2024-01-01' as date), cast('9999-12-31' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'invalid_finite', 'member', cast('2024-02-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'multiple_open', 'member', cast('2024-01-01' as date), cast(null as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'multiple_open', 'member', cast('2024-02-01' as date), cast('9999-12-31' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'open_overlap', 'member', cast('2024-01-01' as date), cast(null as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'open_overlap', 'member', cast('2024-02-01' as date), cast('2024-02-29' as date), 'payer', 'plan', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'White' as description
+      - input: ref('terminology__payer_type')
+        format: sql
+        rows: |
+          select 'commercial' as payer_type
+    expect:
+      rows:
+        - person_id: single_null
+          enrollment_start_date: '2024-01-01'
+          enrollment_start_after_end: null
+          overlapping_enrollment_spans: 0
+          multiple_open_enrollment_spans: 0
+        - person_id: single_sentinel
+          enrollment_start_date: '2024-01-01'
+          enrollment_start_after_end: null
+          overlapping_enrollment_spans: 0
+          multiple_open_enrollment_spans: 0
+        - person_id: invalid_finite
+          enrollment_start_date: '2024-02-01'
+          enrollment_start_after_end: 1
+          overlapping_enrollment_spans: null
+          multiple_open_enrollment_spans: null
+        - person_id: multiple_open
+          enrollment_start_date: '2024-01-01'
+          enrollment_start_after_end: null
+          overlapping_enrollment_spans: 1
+          multiple_open_enrollment_spans: 1
+        - person_id: multiple_open
+          enrollment_start_date: '2024-02-01'
+          enrollment_start_after_end: null
+          overlapping_enrollment_spans: 1
+          multiple_open_enrollment_spans: 1
+        - person_id: open_overlap
+          enrollment_start_date: '2024-01-01'
+          enrollment_start_after_end: null
+          overlapping_enrollment_spans: 1
+          multiple_open_enrollment_spans: 0
+        - person_id: open_overlap
+          enrollment_start_date: '2024-02-01'
+          enrollment_start_after_end: 0
+          overlapping_enrollment_spans: 1
+          multiple_open_enrollment_spans: null
+
   - name: test_eligibility_boolean_death_flags_are_portable
     description: >
       Verifies that true and false Boolean values remain valid across adapters
@@ -322,10 +394,14 @@ unit_tests:
     description: >
       Verifies that pharmacy eligibility matching uses paid_date month and the
       complete person, member, payer, plan, and data-source identity without
-      borrowing an eligibility row from another source.
+      borrowing an eligibility row from another source. Open spans cover the
+      tuva_last_run month but not later months, while finite ends are uncapped.
     model: data_quality__pharmacy_claim_line_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2025-01-15 12:34:56'
     given:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
@@ -345,6 +421,16 @@ unit_tests:
               select 'wrong_payer', 'person', 'member', 'other_payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_a'
               union all
               select 'wrong_plan', 'person', 'member', 'payer', 'other_plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_a'
+              union all
+              select 'open_null_match', 'person', 'member', 'payer', 'plan', cast('2025-01-01' as date), cast('2025-01-01' as date), 'source_open_null'
+              union all
+              select 'open_sentinel_match', 'person', 'member', 'payer', 'plan', cast('2025-01-01' as date), cast('2025-01-01' as date), 'source_open_sentinel'
+              union all
+              select 'open_null_later_month', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), 'source_open_null'
+              union all
+              select 'open_sentinel_later_month', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), 'source_open_sentinel'
+              union all
+              select 'finite_after_run_match', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), 'source_finite_future'
               union all
               select 'paid_date_missing', 'person', 'member', 'payer', 'plan', cast(null as date), cast('2024-01-01' as date), 'source_a'
               union all
@@ -377,6 +463,12 @@ unit_tests:
           union all
           select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), 'source_b'
           union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast(null as date), 'source_open_null'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('9999-12-31' as date), 'source_open_sentinel'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2025-03-31' as date), 'source_finite_future'
+          union all
           select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), null
       - input: ref('provider_data__provider')
         format: sql
@@ -402,6 +494,16 @@ unit_tests:
           no_matching_eligibility_span: 1
         - claim_id: wrong_plan
           no_matching_eligibility_span: 1
+        - claim_id: open_null_match
+          no_matching_eligibility_span: 0
+        - claim_id: open_sentinel_match
+          no_matching_eligibility_span: 0
+        - claim_id: open_null_later_month
+          no_matching_eligibility_span: 1
+        - claim_id: open_sentinel_later_month
+          no_matching_eligibility_span: 1
+        - claim_id: finite_after_run_match
+          no_matching_eligibility_span: 0
         - claim_id: paid_date_missing
           no_matching_eligibility_span: null
         - claim_id: literal_null_sentinel
@@ -575,10 +677,14 @@ unit_tests:
       Verifies exact lowercase medical claim and code-system contracts, exact
       professional applicability, and member-month eligibility matching with
       complete identity, date precedence, month overlap, and data-source
-      isolation.
+      isolation. Open spans cover the tuva_last_run month but not later months,
+      while finite ends are uncapped.
     model: data_quality__medical_claim_line_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2025-01-15 12:34:56'
     given:
       - input: ref('input_layer__medical_claim')
         format: sql
@@ -607,6 +713,16 @@ unit_tests:
               select 'wrong_payer', 'undetermined', 'person', 'member', 'other_payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
               union all
               select 'wrong_plan', 'undetermined', 'person', 'member', 'payer', 'other_plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'open_null_match', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2025-01-01' as date), cast('2025-01-01' as date), cast(null as date), 'source_open_null', null, null, null, null, null, null
+              union all
+              select 'open_sentinel_match', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2025-01-01' as date), cast('2025-01-01' as date), cast(null as date), 'source_open_sentinel', null, null, null, null, null, null
+              union all
+              select 'open_null_later_month', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), cast(null as date), 'source_open_null', null, null, null, null, null, null
+              union all
+              select 'open_sentinel_later_month', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), cast(null as date), 'source_open_sentinel', null, null, null, null, null, null
+              union all
+              select 'finite_after_run_match', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2025-02-01' as date), cast('2025-02-01' as date), cast(null as date), 'source_finite_future', null, null, null, null, null, null
               union all
               select 'claim_start_fallback', 'undetermined', 'person', 'member', 'payer', 'plan', cast(null as date), cast('2024-02-01' as date), cast('2024-03-01' as date), 'source_a', null, null, null, null, null, null
               union all
@@ -670,6 +786,12 @@ unit_tests:
           select 'person', 'member', 'payer', 'plan', cast('2024-03-15' as date), cast('2024-03-15' as date), 'source_a'
           union all
           select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), 'source_b'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast(null as date), 'source_open_null'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('9999-12-31' as date), 'source_open_sentinel'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2025-03-31' as date), 'source_finite_future'
           union all
           select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), null
       - input: ref('terminology__admit_source')
@@ -836,6 +958,56 @@ unit_tests:
           diagnosis_code_1_invalid: null
           procedure_code_1_to_25_invalid: null
           no_matching_eligibility_span: 1
+        - claim_id: open_null_match
+          data_source: source_open_null
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: open_sentinel_match
+          data_source: source_open_sentinel
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: open_null_later_month
+          data_source: source_open_null
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: open_sentinel_later_month
+          data_source: source_open_sentinel
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: finite_after_run_match
+          data_source: source_finite_future
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
         - claim_id: claim_start_fallback
           data_source: source_a
           claim_type_invalid: 0

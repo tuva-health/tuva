@@ -17,6 +17,13 @@ with stg_eligibility as (
   from {{ ref('normalized__eligibility') }} as elig
 )
 
+, eligibility_with_effective_end_date as (
+  select
+    *
+    , coalesce(enrollment_end_date, cast(tuva_last_run as date)) as effective_enrollment_end_date
+  from stg_eligibility
+)
+
 , month_start_and_end_dates as (
   select
     {{ concat_custom(["year",
@@ -37,10 +44,11 @@ select distinct
   , a.tuva_last_run
   {{ select_extension_columns(ref('normalized__eligibility'), alias='a') }}
   , a.data_source
-from stg_eligibility as a
+from eligibility_with_effective_end_date as a
 inner join month_start_and_end_dates as b
   on a.enrollment_start_date <= b.month_end_date
-  and a.enrollment_end_date >= b.month_start_date
+  and a.effective_enrollment_end_date >= b.month_start_date
+  and a.enrollment_start_date <= a.effective_enrollment_end_date
 )
 
 select

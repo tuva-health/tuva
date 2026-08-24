@@ -536,9 +536,9 @@ models:
             data_type: varchar
   - name: core__eligibility
     description: |-
-      This table stores health insurance eligibility and enrollment spans. It is designed to contain one record per person per enrollment span, where an enrollment span is the period during which a person is enrolled in a health plan. That period usually begins on enrollment_start_date and ends on enrollment_end_date. A person may have multiple records in this table when they have multiple enrollment spans with different health plans or multiple enrollment spans with the same health plan.
+      This table stores health insurance eligibility and enrollment spans. It is designed to contain one record per person per enrollment span, where an enrollment span is the period during which a person is enrolled in a health plan. That period begins on enrollment_start_date and ends on enrollment_end_date; a null enrollment_end_date means the span remains open. A person may have multiple records in this table when they have multiple enrollment spans with different health plans or multiple enrollment spans with the same health plan.
 
-      The primary key is eligibility_id, a synthetic key created upstream in normalized__eligibility. The eligibility_id is made from person_id, member_id, enrollment_start_date, enrollment_end_date, payer, plan, and data_source. This key is created because downstream models, including the semantic layer, need a stable record-level identifier for each eligibility span.
+      The primary key is eligibility_id, a synthetic key created upstream in normalized__eligibility. The eligibility_id is made from person_id, member_id, enrollment_start_date, payer, plan, and data_source. enrollment_end_date is intentionally excluded so the identifier remains stable when an open span later receives a closing date. This key is created because downstream models, including the semantic layer, need a stable record-level identifier for each eligibility span.
 
       Each record includes person_id, the globally unique identifier for the person, along with payer, plan, member_id, subscriber_id, enrollment dates, and other health plan enrollment attributes. These attributes include payer type, Medicare entitlement and status fields, dual eligibility status, hospice and institutional enrollment indicators, subscriber relationship, group identifiers, FIPS state fields, source file metadata, and extension columns.
 
@@ -554,8 +554,9 @@ models:
       - name: eligibility_id
         description: Primary key for the eligibility record. This value is created
           upstream in normalized__eligibility by concatenating person_id,
-          member_id, enrollment_start_date, enrollment_end_date, payer, plan,
-          and data_source with hyphen delimiters.
+          member_id, enrollment_start_date, payer, plan, and data_source with
+          hyphen delimiters. enrollment_end_date is excluded so the key remains
+          stable when an open span closes.
         tests:
           - not_null
           - unique
@@ -599,8 +600,9 @@ models:
           meta:
             data_type: date
       - name: enrollment_end_date
-        description: Date the person's enrollment span ends. Open-ended spans are
-          commonly represented as 9999-12-31.
+        description: Date the person's enrollment span ends. Null means the span is
+          still open. The backward-compatible input alias 9999-12-31 is
+          normalized to null before reaching Core.
         config:
           meta:
             data_type: date
@@ -620,7 +622,8 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the specific health insurance product for the enrollment
-          span, for example Aetna PPO or Aetna HMO.
+          span, for example Aetna PPO or Aetna HMO. A given payer may offer
+          multiple plans.
         config:
           meta:
             data_type: varchar
@@ -2344,7 +2347,7 @@ models:
             is_primary_key: true
   - name: core__member_month
     description: |-
-      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity.
+      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity. Open eligibility spans with a null enrollment_end_date contribute member months through the calendar month containing the date portion of tuva_last_run.
 
       This model is the final Core projection of the Claims Preprocessing member-month output plus Claims Preprocessing attribution. Member-month construction happens in member_month__member_month, and payer-attributed, custom-attributed, and Tuva-attributed provider fields are supplied by provider_attribution__member_month_attribution. Tuva-assigned attribution is calculated at person, data source, and performance year grain and copied to each member month in the matching year.
 

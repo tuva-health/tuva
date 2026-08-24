@@ -1,0 +1,93 @@
+version: 2
+
+unit_tests:
+  - name: test_member_month_open_span_uses_run_date_without_capping_finite_span
+    description: Open spans end at tuva_last_run for expansion, while finite future end dates remain authoritative.
+    model: member_month__member_month
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+        tuva_last_run: '2024-02-15 00:00:00'
+    given:
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'open' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast(null as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'finite' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast('2024-03-31' as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+      - input: ref('terminology__calendar')
+        format: sql
+        rows: |
+          select cast('2024-01-01' as date) as full_date, 2024 as year, 1 as month
+          union all
+          select cast('2024-01-31' as date) as full_date, 2024 as year, 1 as month
+          union all
+          select cast('2024-02-01' as date) as full_date, 2024 as year, 2 as month
+          union all
+          select cast('2024-02-29' as date) as full_date, 2024 as year, 2 as month
+          union all
+          select cast('2024-03-01' as date) as full_date, 2024 as year, 3 as month
+          union all
+          select cast('2024-03-31' as date) as full_date, 2024 as year, 3 as month
+    expect:
+      rows:
+        - member_month_id: fe521b0dfedf39852a2669645ac44557
+          person_id: open
+          member_id: member
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 2d85331f944a10bf63b6444b8c5179b8
+          person_id: open
+          member_id: member
+          year_month: '202402'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 84fe05e1b19899a6716ca47454436223
+          person_id: finite
+          member_id: member
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: e1ce2f15d17e6b2b645e5affbfe1b33c
+          person_id: finite
+          member_id: member
+          year_month: '202402'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 79dbabd0c71f59b21428d7f0bdc14f9b
+          person_id: finite
+          member_id: member
+          year_month: '202403'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source

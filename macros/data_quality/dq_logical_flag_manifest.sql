@@ -102,7 +102,7 @@
         {
             "test_name": "eligibility__enrollment_start_after_end",
             "display_name": "enrollment_start_date is after enrollment_end_date",
-            "description": "Checks whether enrollment_start_date is after enrollment_end_date in the eligibility Input Layer Model.",
+            "description": "Checks whether enrollment_start_date is after a populated finite enrollment_end_date in the eligibility Input Layer Model. Null and the legacy 9999-12-31 alias represent an open span and are not applicable.",
             "test_type": "temporal",
             "severity": 1,
             "affected_columns": ["enrollment_start_date", "enrollment_end_date"]
@@ -110,8 +110,16 @@
         {
             "test_name": "eligibility__overlapping_enrollment_spans",
             "display_name": "overlapping enrollment spans",
-            "description": "Checks whether an eligibility span overlaps another valid span for the same person_id, member_id, payer, plan, and data_source. Adjacent non-overlapping spans pass.",
+            "description": "Checks whether an eligibility span overlaps another valid span for the same person_id, member_id, payer, plan, and data_source. Null and the legacy 9999-12-31 alias represent an end date of positive infinity. Adjacent non-overlapping finite spans pass.",
             "test_type": "temporal",
+            "severity": 2,
+            "affected_columns": ["person_id", "member_id", "enrollment_start_date", "enrollment_end_date", "payer", "plan", "data_source"]
+        },
+        {
+            "test_name": "eligibility__multiple_open_enrollment_spans",
+            "display_name": "multiple open enrollment spans",
+            "description": "Checks whether more than one valid open eligibility span exists for the same person_id, member_id, payer, plan, and data_source. Null and the legacy 9999-12-31 alias both represent an open end date. Duplicate stable span identities remain a Structural Data Quality primary-key failure.",
+            "test_type": "consistency",
             "severity": 2,
             "affected_columns": ["person_id", "member_id", "enrollment_start_date", "enrollment_end_date", "payer", "plan", "data_source"]
         },
@@ -774,7 +782,7 @@
         {
             "test_name": "medical_claim__no_matching_eligibility_span",
             "display_name": "no matching eligibility span",
-            "description": "Checks whether a medical claim line with a complete person_id, member_id, payer, plan, and data_source identity and a populated inferred claim date has no eligibility span for the same complete identity whose covered calendar months include the inferred claim date month. The inferred claim date uses claim_line_start_date, then claim_start_date, then admission_date.",
+            "description": "Checks whether a medical claim line with a complete person_id, member_id, payer, plan, and data_source identity and a populated inferred claim date has no eligibility span for the same complete identity whose covered calendar months include the inferred claim date month. For a null enrollment_end_date or the legacy 9999-12-31 alias, coverage extends through the calendar month containing tuva_last_run; a finite enrollment_end_date remains authoritative and is not capped. The inferred claim date uses claim_line_start_date, then claim_start_date, then admission_date.",
             "test_type": "referential",
             "severity": 2,
             "affected_columns": ["person_id", "member_id", "payer", "plan", "claim_line_start_date", "claim_start_date", "admission_date", "data_source"]
@@ -966,7 +974,7 @@
         {
             "test_name": "pharmacy_claim__no_matching_eligibility_span",
             "display_name": "no matching eligibility span",
-            "description": "Checks whether a pharmacy claim line with a complete person_id, member_id, payer, plan, and data_source identity and populated paid_date has no eligibility span for the same complete identity whose covered calendar months include the paid_date month.",
+            "description": "Checks whether a pharmacy claim line with a complete person_id, member_id, payer, plan, and data_source identity and populated paid_date has no eligibility span for the same complete identity whose covered calendar months include the paid_date month. For a null enrollment_end_date or the legacy 9999-12-31 alias, coverage extends through the calendar month containing tuva_last_run; a finite enrollment_end_date remains authoritative and is not capped.",
             "test_type": "referential",
             "severity": 2,
             "affected_columns": ["person_id", "member_id", "payer", "plan", "paid_date", "data_source"]
@@ -2447,7 +2455,7 @@
             'input_table_name': 'eligibility',
             'flag_table_name': 'eligibility_span_flags',
             'grain': 'eligibility span',
-            'key_columns': ['person_id', 'member_id', 'enrollment_start_date', 'enrollment_end_date', 'payer', 'plan', 'data_source'],
+            'key_columns': ['person_id', 'member_id', 'enrollment_start_date', 'payer', 'plan', 'data_source'],
             'test_names': [
                 'eligibility__sex_null',
                 'eligibility__sex_invalid',
@@ -2461,6 +2469,7 @@
                 'eligibility__death_flag_without_death_date',
                 'eligibility__enrollment_start_after_end',
                 'eligibility__overlapping_enrollment_spans',
+                'eligibility__multiple_open_enrollment_spans',
                 'eligibility__payer_type_null',
                 'eligibility__payer_type_invalid'
             ]
