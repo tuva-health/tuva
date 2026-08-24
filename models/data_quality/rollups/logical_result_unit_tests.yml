@@ -8,11 +8,7 @@ unit_tests:
       models.
     model: data_quality__logical_test_results
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     overrides:
       macros:
         dq_enabled_logical_test_manifest:
@@ -152,12 +148,7 @@ unit_tests:
       strings, and null key components with percent_escaped_v1.
     model: data_quality__logical_failure_keys
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-          and (var('enable_data_quality_failure_keys', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false) and var('enable_data_quality_failure_keys', false)) | as_bool }}"
     overrides:
       macros:
         dq_enabled_logical_test_manifest:

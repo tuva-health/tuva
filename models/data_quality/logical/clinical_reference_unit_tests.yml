@@ -7,11 +7,7 @@ unit_tests:
       optional patient terminology, date, and ZIP code checks.
     model: data_quality__patient_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__patient')
         format: sql
@@ -114,11 +110,7 @@ unit_tests:
       and participate in the two death-date consistency checks.
     model: data_quality__patient_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__patient')
         format: sql
@@ -187,11 +179,7 @@ unit_tests:
       person-level value within one data_source.
     model: data_quality__patient_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__patient')
         format: sql
@@ -233,11 +221,7 @@ unit_tests:
       fail for conflicting populated values without combining data sources.
     model: data_quality__patient_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__patient')
         format: sql
@@ -318,11 +302,7 @@ unit_tests:
       passes when found, and fails when populated but unknown.
     model: data_quality__location_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__location')
         format: sql
@@ -351,11 +331,7 @@ unit_tests:
       a valid individual NPI, a valid organization NPI, and an unknown NPI.
     model: data_quality__practitioner_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__practitioner')
         format: sql

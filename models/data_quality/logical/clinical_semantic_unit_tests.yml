@@ -8,11 +8,7 @@ unit_tests:
       multiple patient IDs.
     model: data_quality__appointment_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__appointment')
         format: sql
@@ -139,11 +135,7 @@ unit_tests:
       failures, pass, and not-applicable results.
     model: data_quality__condition_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__condition')
         format: sql
@@ -252,11 +244,7 @@ unit_tests:
       optional primary diagnosis and DRG codes.
     model: data_quality__encounter_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__encounter')
         format: sql
@@ -428,11 +416,7 @@ unit_tests:
       status semantics, and occurrence date flags.
     model: data_quality__immunization_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__immunization')
         format: sql
@@ -611,11 +595,7 @@ unit_tests:
       applicability, temporal ordering, ranges, and tri-state behavior.
     model: data_quality__lab_result_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__lab_result')
         format: sql
@@ -811,11 +791,7 @@ unit_tests:
       non-crosswalk RxNorm and ATC values, and hyphen-normalized NDC validation.
     model: data_quality__medication_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__medication')
         format: sql
@@ -972,11 +948,7 @@ unit_tests:
       case-insensitive standard-system recognition, and HCPCS non-applicability.
     model: data_quality__observation_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__observation')
         format: sql
@@ -1099,11 +1071,7 @@ unit_tests:
       evaluated against the incomplete Level II terminology asset.
     model: data_quality__procedure_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__procedure')
         format: sql
@@ -1287,11 +1255,7 @@ unit_tests:
       NDC lookup comparison, and preservation of raw source fields.
     model: core__medication
     config:
-      enabled: >-
-        {{
-          (var('claims_enabled', false) | as_bool)
-          or (var('clinical_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
     overrides:
       vars:
         claims_enabled: false

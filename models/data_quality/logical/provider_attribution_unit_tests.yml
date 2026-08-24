@@ -9,12 +9,7 @@ unit_tests:
       Quality owns primary-key nulls.
     model: data_quality__provider_attribution_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-          and (var('provider_attribution_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false) and var('provider_attribution_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__provider_attribution')
         format: sql

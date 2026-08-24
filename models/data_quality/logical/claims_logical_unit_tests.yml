@@ -8,11 +8,7 @@ unit_tests:
       not overlap and an incomplete span is not applicable.
     model: data_quality__eligibility_span_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__eligibility')
         format: sql
@@ -101,11 +97,7 @@ unit_tests:
       true value makes the death-date consistency check applicable.
     model: data_quality__eligibility_span_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__eligibility')
         format: sql
@@ -149,11 +141,7 @@ unit_tests:
       values and rejects a letter-case variant that downstream models preserve.
     model: data_quality__eligibility_span_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__eligibility')
         format: sql
@@ -184,11 +172,7 @@ unit_tests:
       person-level consistency result within one data_source.
     model: data_quality__eligibility_person_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__eligibility')
         format: sql
@@ -210,11 +194,7 @@ unit_tests:
       and fails for conflicting values.
     model: data_quality__eligibility_person_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__eligibility')
         format: sql
@@ -269,11 +249,7 @@ unit_tests:
       behavior for the new pharmacy claim-line checks.
     model: data_quality__pharmacy_claim_line_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
@@ -349,11 +325,7 @@ unit_tests:
       borrowing an eligibility row from another source.
     model: data_quality__pharmacy_claim_line_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
@@ -441,11 +413,7 @@ unit_tests:
       number, paid-date range, and paid-date sequencing checks.
     model: data_quality__medical_claim_line_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__medical_claim')
         format: sql
@@ -610,11 +578,7 @@ unit_tests:
       isolation.
     model: data_quality__medical_claim_line_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__medical_claim')
         format: sql
@@ -940,11 +904,7 @@ unit_tests:
       values, and not-applicable behavior for single-line and all-null groups.
     model: data_quality__medical_claim_claim_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__medical_claim')
         format: sql
@@ -1155,11 +1115,7 @@ unit_tests:
       person-identity consistency at pharmacy-claim grain.
     model: data_quality__pharmacy_claim_claim_flags
     config:
-      enabled: >-
-        {{
-          (var('data_quality_enabled', false) | as_bool)
-          and (var('claims_enabled', false) | as_bool)
-        }}
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     given:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
