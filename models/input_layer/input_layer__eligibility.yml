@@ -208,12 +208,12 @@ models:
             data_type: date
             is_primary_key: false
       - name: death_flag
-        description: A Boolean flag indicating whether the person has died. Allowed
-          values are true, false, or null; warehouses may represent true and false as
-          1 and 0. If `death_flag` is true, `death_date` should also be populated.
+        description: Integer indicator for whether the person has died. Use 1 for
+          deceased, 0 for not known deceased, and null when unknown. If
+          `death_flag` is 1, `death_date` should also be populated.
         config:
           meta:
-            data_type: boolean
+            data_type: integer
             is_primary_key: false
       - name: original_reason_entitlement_code
         description: Medicare Original Reason for Entitlement Code, or OREC. This
@@ -254,7 +254,8 @@ models:
             is_primary_key: false
       - name: hospice_flag
         description: Indicator for whether the person is enrolled in hospice during
-          the enrollment span. Accepted values are 0 and 1.
+          the enrollment span. Accepted values are 1 for yes, 0 for no, and null
+          when unknown.
         config:
           meta:
             data_type: integer
@@ -262,7 +263,7 @@ models:
       - name: institutional_snp_flag
         description: Indicator for whether the person is enrolled in an institutional
           Special Needs Plan and requires a nursing-home level of care. Accepted
-          values are 0 and 1.
+          values are 1 for yes, 0 for no, and null when unknown.
         config:
           meta:
             data_type: integer
@@ -276,7 +277,8 @@ models:
             is_primary_key: false
       - name: long_term_institutional_flag
         description: Indicator for whether the person has been in an institutional
-          setting for more than 30 days. Accepted values are 0 and 1.
+          setting for more than 30 days. Accepted values are 1 for yes, 0 for no,
+          and null when unknown.
         config:
           meta:
             data_type: integer

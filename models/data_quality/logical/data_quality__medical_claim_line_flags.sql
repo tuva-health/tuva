@@ -251,6 +251,7 @@ final as (
             professional_claim_where_sql
           ) }} as institutional_indicators_present_for_professional_claim
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null", "1 = 1") }} as person_id_null
+        , {{ dq_logical_binary_value_flag_sql("source_rows.in_network_flag") }} as in_network_flag_invalid
         , {{ dq_logical_int_flag_sql("source_rows.claim_start_date is null", "1 = 1") }} as claim_start_date_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_end_date is null", "1 = 1") }} as claim_end_date_null
         , {{ dq_logical_int_flag_sql("source_rows.claim_line_start_date is null", "1 = 1") }} as claim_line_start_date_null

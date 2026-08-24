@@ -25,8 +25,8 @@
     , cast(source_reference_range_high as {{ dbt.type_string() }}) as source_reference_range_high
     , cast(normalized_reference_range_low as {{ dbt.type_string() }}) as normalized_reference_range_low
     , cast(normalized_reference_range_high as {{ dbt.type_string() }}) as normalized_reference_range_high
-    , cast(source_abnormal_flag as {{ dbt.type_string() }}) as source_abnormal_flag
-    , cast(normalized_abnormal_flag as {{ dbt.type_string() }}) as normalized_abnormal_flag
+    , cast(source_abnormal_code as {{ dbt.type_string() }}) as source_abnormal_code
+    , cast(normalized_abnormal_code as {{ dbt.type_string() }}) as normalized_abnormal_code
     , cast(specimen as {{ dbt.type_string() }}) as specimen
     , cast(ordering_practitioner_id as {{ dbt.type_string() }}) as ordering_practitioner_id
 {%- endset -%}
@@ -118,8 +118,8 @@ select
     , labs.source_reference_range_high
     , labs.normalized_reference_range_low
     , labs.normalized_reference_range_high
-    , labs.source_abnormal_flag
-    , labs.normalized_abnormal_flag
+    , labs.source_abnormal_code
+    , labs.normalized_abnormal_code
     , labs.specimen
     , labs.ordering_practitioner_id
     {{ select_extension_columns(ref('input_layer__lab_result'), alias='labs', strip_prefix=false) }}

@@ -24,6 +24,39 @@ models:
     config:
       <<: *normalized_output_config
       alias: normalized__encounter
+    columns:
+      - name: observation_flag
+        description: Nullable integer indicator; 1 means the encounter was an observation stay, 0 means it was not, and null means unknown or not applicable.
+        config: &normalized_integer_flag_config
+          meta:
+            data_type: integer
+      - name: lab_flag
+        description: Nullable integer indicator; 1 means lab services were used, 0 means they were not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: dme_flag
+        description: Nullable integer indicator; 1 means durable medical equipment was used, 0 means it was not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: ambulance_flag
+        description: Nullable integer indicator; 1 means ambulance services were used, 0 means they were not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: pharmacy_flag
+        description: Nullable integer indicator; 1 means pharmacy services were used, 0 means they were not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: ed_flag
+        description: Nullable integer indicator; 1 means the encounter involved an emergency department visit, 0 means it did not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: delivery_flag
+        description: Nullable integer indicator; 1 means the encounter involved a delivery, 0 means it did not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: newborn_flag
+        description: Nullable integer indicator; 1 means the encounter involved a newborn, 0 means it did not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: nicu_flag
+        description: Nullable integer indicator; 1 means the newborn was admitted to a neonatal intensive care unit, 0 means they were not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
+      - name: snf_part_b_flag
+        description: Nullable integer indicator; 1 means the skilled nursing facility service was covered under Medicare Part B, 0 means it was not, and null means unknown or not applicable.
+        config: *normalized_integer_flag_config
   - name: normalized__immunization
     description: Casts clinical immunization records from input_layer__immunization and applies CVX, immunization status, immunization status reason, ACT site, and immunization route terminology enrichment before core.immunization consumes them.
     config:
@@ -34,6 +67,17 @@ models:
     config:
       <<: *normalized_output_config
       alias: normalized__lab_result
+    columns:
+      - name: source_abnormal_code
+        description: Abnormal or interpretation code from the source system.
+        config:
+          meta:
+            data_type: varchar
+      - name: normalized_abnormal_code
+        description: Standardized abnormal or interpretation code, when available.
+        config:
+          meta:
+            data_type: varchar
   - name: normalized__location
     description: Casts clinical location records from input_layer__location before core.location consumes them.
     config:
@@ -130,6 +174,10 @@ models:
     config:
       <<: *normalized_output_config
       alias: normalized__patient
+    columns:
+      - name: death_flag
+        description: Nullable integer indicator; 1 means deceased, 0 means not known deceased, and null means unknown.
+        config: *normalized_integer_flag_config
   - name: normalized__practitioner
     description: Casts clinical practitioner records from input_layer__practitioner before core.practitioner consumes them.
     config:
@@ -227,6 +275,9 @@ models:
         description: Native death date preserved from int_eligibility_dates_normalized without a terminology-calendar membership requirement.
       - name: death_flag
         description: Integer flag from the eligibility input record indicating whether the member is deceased.
+        config:
+          meta:
+            data_type: integer
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code.
         config:
@@ -247,8 +298,14 @@ models:
         description: Enrollment status value from the eligibility input record.
       - name: hospice_flag
         description: Integer flag indicating whether the member is in hospice during the enrollment span.
+        config:
+          meta:
+            data_type: integer
       - name: institutional_snp_flag
         description: Integer flag indicating whether the enrollment span is associated with an institutional special needs plan.
+        config:
+          meta:
+            data_type: integer
       - name: medicaid_indicator
         description: Integer indicator for Medicaid coverage during the enrollment span. Generally 1 means yes and 0 means no.
         config:
@@ -256,6 +313,9 @@ models:
             data_type: integer
       - name: long_term_institutional_flag
         description: Integer flag indicating whether the member is in a long-term institutional setting during the enrollment span.
+        config:
+          meta:
+            data_type: integer
       - name: part_d_raf_type
         description: Part D risk adjustment factor type for the enrollment span. Null when the record is not related to Part D coverage.
         config:
@@ -1081,6 +1141,11 @@ models:
 #        meta:
 #          terminology: https://thetuvaproject.com/value-sets/service-categories
 #        description: The more specific service category this claim belongs to.
+      - name: in_network_flag
+        description: Nullable integer indicator; 1 means the claim was in network, 0 means it was out of network, and null means unknown.
+        config:
+          meta:
+            data_type: integer
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee")
@@ -1166,6 +1231,11 @@ models:
         description: The total copayment charged on the claim by the provider.
       - name: deductible_amount
         description: The total amount charged on the claim by the provider.
+      - name: in_network_flag
+        description: Nullable integer indicator; 1 means the pharmacy claim was in network, 0 means it was out of network, and null means unknown.
+        config:
+          meta:
+            data_type: integer
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically  named after the payer and state "BCBS Tennessee").

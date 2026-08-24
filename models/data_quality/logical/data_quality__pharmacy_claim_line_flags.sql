@@ -83,6 +83,7 @@ final as (
             "source_rows.claim_line_number is not null"
           ) }} as claim_line_number_not_positive
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null", "1 = 1") }} as person_id_null
+        , {{ dq_logical_binary_value_flag_sql("source_rows.in_network_flag") }} as in_network_flag_invalid
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is null", "1 = 1") }} as dispensing_date_null
         , {{ dq_logical_int_flag_sql("source_rows.paid_date is null", "1 = 1") }} as paid_date_null
         , {{ dq_logical_int_flag_sql(

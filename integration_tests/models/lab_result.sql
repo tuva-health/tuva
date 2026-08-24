@@ -26,8 +26,8 @@
     , source_reference_range_high
     , normalized_reference_range_low
     , normalized_reference_range_high
-    , source_abnormal_flag
-    , normalized_abnormal_flag
+    , source_abnormal_flag as source_abnormal_code
+    , normalized_abnormal_flag as normalized_abnormal_code
     , specimen
     , ordering_practitioner_id
 {%- endset -%}

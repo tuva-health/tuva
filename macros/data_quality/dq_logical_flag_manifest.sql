@@ -16,6 +16,14 @@
     ) }}
 {% endmacro %}
 
+{% macro dq_logical_binary_value_flag_sql(column_sql) %}
+    {% set value_as_text = "trim(cast(" ~ column_sql ~ " as " ~ dbt.type_string() ~ "))" %}
+    {{ return(dq_logical_int_flag_sql(
+        value_as_text ~ " not in ('0', '1')",
+        column_sql ~ " is not null"
+    )) }}
+{% endmacro %}
+
 {% macro dq_logical_test_definitions() %}
     {# BEGIN LOGICAL TEST DEFINITIONS #}
     {% set test_definitions = [
@@ -109,8 +117,8 @@
         },
         {
             "test_name": "eligibility__death_flag_invalid",
-            "display_name": "death flag is invalid",
-            "description": "Checks whether death_flag in the eligibility Input Layer Model is populated with a value other than Boolean true or false. Warehouses may represent those Boolean values as 1 or 0.",
+            "display_name": "death_flag is invalid",
+            "description": "Checks whether death_flag in the eligibility Input Layer Model is populated with a value other than 0 or 1.",
             "test_type": "invalid",
             "severity": 3,
             "affected_columns": ["death_flag"]
@@ -118,10 +126,34 @@
         {
             "test_name": "eligibility__death_flag_without_death_date",
             "display_name": "death_flag indicates death without death_date",
-            "description": "Checks whether death_flag is Boolean true in the eligibility Input Layer Model while death_date is null. Warehouses may represent true as 1.",
+            "description": "Checks whether death_flag is 1 in the eligibility Input Layer Model while death_date is null.",
             "test_type": "consistency",
             "severity": 3,
             "affected_columns": ["death_date", "death_flag"]
+        },
+        {
+            "test_name": "eligibility__hospice_flag_invalid",
+            "display_name": "hospice_flag is invalid",
+            "description": "Checks whether hospice_flag in the eligibility Input Layer Model is populated with a value other than 0 or 1.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["hospice_flag"]
+        },
+        {
+            "test_name": "eligibility__institutional_snp_flag_invalid",
+            "display_name": "institutional_snp_flag is invalid",
+            "description": "Checks whether institutional_snp_flag in the eligibility Input Layer Model is populated with a value other than 0 or 1.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["institutional_snp_flag"]
+        },
+        {
+            "test_name": "eligibility__long_term_institutional_flag_invalid",
+            "display_name": "long_term_institutional_flag is invalid",
+            "description": "Checks whether long_term_institutional_flag in the eligibility Input Layer Model is populated with a value other than 0 or 1.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["long_term_institutional_flag"]
         },
         {
             "test_name": "eligibility__enrollment_start_after_end",
@@ -226,6 +258,14 @@
             "test_type": "missing",
             "severity": 1,
             "affected_columns": ["person_id"]
+        },
+        {
+            "test_name": "medical_claim__in_network_flag_invalid",
+            "display_name": "in_network_flag is invalid",
+            "description": "Checks whether in_network_flag in the medical_claim Input Layer Model is populated with a value other than 0 or 1.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["in_network_flag"]
         },
         {
             "test_name": "medical_claim__claim_start_date_null",
@@ -1034,6 +1074,14 @@
             "test_type": "missing",
             "severity": 1,
             "affected_columns": ["person_id"]
+        },
+        {
+            "test_name": "pharmacy_claim__in_network_flag_invalid",
+            "display_name": "in_network_flag is invalid",
+            "description": "Checks whether in_network_flag in the pharmacy_claim Input Layer Model is populated with a value other than 0 or 1.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["in_network_flag"]
         },
         {
             "test_name": "pharmacy_claim__dispensing_date_null",
@@ -2831,6 +2879,9 @@
                 'eligibility__ingest_datetime_out_of_reasonable_range',
                 'eligibility__death_flag_invalid',
                 'eligibility__death_flag_without_death_date',
+                'eligibility__hospice_flag_invalid',
+                'eligibility__institutional_snp_flag_invalid',
+                'eligibility__long_term_institutional_flag_invalid',
                 'eligibility__enrollment_start_after_end',
                 'eligibility__overlapping_enrollment_spans',
                 'eligibility__multiple_open_enrollment_spans',
@@ -2864,6 +2915,7 @@
                 'medical_claim__claim_type_invalid',
                 'medical_claim__institutional_indicators_present_for_professional_claim',
                 'medical_claim__person_id_null',
+                'medical_claim__in_network_flag_invalid',
                 'medical_claim__claim_start_date_null',
                 'medical_claim__claim_end_date_null',
                 'medical_claim__claim_line_start_date_null',
@@ -2986,6 +3038,7 @@
             'test_names': [
                 'pharmacy_claim__claim_line_number_not_positive',
                 'pharmacy_claim__person_id_null',
+                'pharmacy_claim__in_network_flag_invalid',
                 'pharmacy_claim__dispensing_date_null',
                 'pharmacy_claim__paid_date_null',
                 'pharmacy_claim__dispensing_date_out_of_reasonable_range',

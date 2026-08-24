@@ -80,7 +80,7 @@ select
     , cast(coalesce(px_date.procedure_date_{{ i }}, undetermined.procedure_date_{{ i }}) as date) as procedure_date_{{ i }}
     {% endfor %}
     , cast(med.data_source as {{ dbt.type_string() }}) as data_source
-    , cast(med.in_network_flag as int) as in_network_flag
+    , cast(med.in_network_flag as {{ dbt.type_int() }}) as in_network_flag
     , cast(med.file_date as date) as file_date
     , cast(med.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(med.file_name as {{ dbt.type_string() }}) as file_name

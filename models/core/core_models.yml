@@ -959,43 +959,43 @@ models:
           (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: lab_flag
         description: Indicates whether lab services were utilized during the encounter
           (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: dme_flag
         description: Indicates whether durable medical equipment (DME) was used during
           the encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: ambulance_flag
         description: Indicates whether ambulance services were utilized during the
           encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: pharmacy_flag
         description: Indicates whether pharmacy services were utilized during the
           encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: ed_flag
         description: Indicates whether the encounter involved an emergency department
           visit (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: delivery_flag
         description: Indicates whether the encounter involved a delivery (1 for yes, 0
           for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: delivery_type
         description: Type of delivery that occurred during the encounter, if applicable.
         config:
@@ -1006,19 +1006,19 @@ models:
           no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: nicu_flag
         description: Indicates whether the newborn was admitted to the Neonatal
           Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: snf_part_b_flag
         description: Indicates whether the inpatient medical service for Medicare covers
           under Part B or not. (1 for yes and 0 for no)
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: primary_diagnosis_code_type
         description: Code system for primary_diagnosis_code, such as icd-10-cm or icd-9-cm.
         config:
@@ -1509,13 +1509,13 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_abnormal_flag
-        description: Abnormal or interpretation flag from the source system.
+      - name: source_abnormal_code
+        description: Abnormal or interpretation code from the source system.
         config:
           meta:
             data_type: varchar
-      - name: normalized_abnormal_flag
-        description: Standardized abnormal or interpretation flag, when available. Tuva
+      - name: normalized_abnormal_code
+        description: Standardized abnormal or interpretation code, when available. Tuva
           passes this through from the input layer when it is populated
           upstream.
         config:
@@ -2056,13 +2056,13 @@ models:
           1 for in network, 0 for out of network, and null when unknown.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: enrollment_flag
         description: Indicator for whether the claim line has corresponding eligibility
           during the same period when the service occurred.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: member_month_id
         description: Synthetic key for the member month associated with the claim line
           when matching eligibility is available.
@@ -2774,7 +2774,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: varchar
+            data_type: integer
       - name: name_suffix
         description: Patient name suffix, such as Jr., Sr., or III.
         config:
@@ -3144,13 +3144,13 @@ models:
           unknown.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: enrollment_flag
         description: Indicator for whether the pharmacy claim line has corresponding
           eligibility during the same period when the medication was dispensed.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: member_month_id
         description: Synthetic key for the member month associated with the pharmacy
           claim line when matching eligibility is available.

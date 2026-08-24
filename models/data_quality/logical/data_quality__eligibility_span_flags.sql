@@ -22,7 +22,7 @@
     from_date_or_timestamp=current_date_sql
   ) ~ " as " ~ date_type ~ ")" %}
 {% set legacy_open_end_date_sql = dq_date_literal_sql('9999-12-31') %}
-{% set death_flag_text_sql = "lower(cast(source_rows.death_flag as " ~ string_type ~ "))" %}
+{% set death_flag_text_sql = "trim(cast(source_rows.death_flag as " ~ string_type ~ "))" %}
 {% set open_end_where_sql =
     "(source_rows.enrollment_end_date is null"
     ~ " or source_rows.enrollment_end_date = " ~ legacy_open_end_date_sql ~ ")"
@@ -179,14 +179,14 @@ final as (
         , {{ dq_logical_ingest_datetime_range_flag_sql(
             "source_rows.ingest_datetime"
           ) }} as ingest_datetime_out_of_reasonable_range
-        , {{ dq_logical_int_flag_sql(
-            death_flag_text_sql ~ " not in ('true', 'false', '1', '0')",
-            "source_rows.death_flag is not null"
-          ) }} as death_flag_invalid
+        , {{ dq_logical_binary_value_flag_sql("source_rows.death_flag") }} as death_flag_invalid
         , {{ dq_logical_int_flag_sql(
             "source_rows.death_date is null",
-            "source_rows.death_flag is not null and " ~ death_flag_text_sql ~ " in ('true', '1')"
+            "source_rows.death_flag is not null and " ~ death_flag_text_sql ~ " = '1'"
           ) }} as death_flag_without_death_date
+        , {{ dq_logical_binary_value_flag_sql("source_rows.hospice_flag") }} as hospice_flag_invalid
+        , {{ dq_logical_binary_value_flag_sql("source_rows.institutional_snp_flag") }} as institutional_snp_flag_invalid
+        , {{ dq_logical_binary_value_flag_sql("source_rows.long_term_institutional_flag") }} as long_term_institutional_flag_invalid
         , {{ dq_logical_int_flag_sql(
             "source_rows.enrollment_start_date > source_rows.enrollment_end_date",
             "source_rows.enrollment_start_date is not null and " ~ finite_end_where_sql
