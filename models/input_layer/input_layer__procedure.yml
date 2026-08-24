@@ -35,7 +35,8 @@ models:
           meta:
             data_type: varchar
       - name: procedure_date
-        description: Date the procedure was performed or documented.
+        description: Date the procedure was performed or documented, formatted
+          as YYYY-MM-DD when serialized. Expose this field as a native SQL DATE.
         config:
           meta:
             data_type: date

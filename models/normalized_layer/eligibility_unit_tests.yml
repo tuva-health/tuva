@@ -61,7 +61,7 @@ unit_tests:
             , 'group' as group_id
             , 'Group' as group_name
             , 'eligibility.csv' as file_name
-            , cast('2024-02-01 00:00:00' as {{ timestamp_type }}) as file_date
+            , cast('2024-02-01' as date) as file_date
             , cast('2024-02-02 00:00:00' as {{ timestamp_type }}) as ingest_datetime
             , 'source' as data_source
     expect:
@@ -69,6 +69,7 @@ unit_tests:
         - person_id: person
           enrollment_start_date: '2024-01-01'
           enrollment_end_date: null
+          file_date: '2024-02-01'
 
   - name: test_eligibility_dates_preserve_typed_enrollment_dates
     description: Enrollment dates pass through without requiring membership in terminology__calendar.

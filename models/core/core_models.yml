@@ -766,10 +766,11 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: Date the source file identified by file_name was delivered.
+        description: Date the source file identified by file_name was delivered,
+          formatted as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source eligibility record or file was loaded into
           the data warehouse. This is useful when multiple versions of the same
@@ -2071,9 +2072,10 @@ models:
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
+          Format as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source claim line or file was loaded into the
           data warehouse. This is useful when multiple versions of the same
@@ -2389,7 +2391,8 @@ models:
           meta:
             data_type: varchar
       - name: year_month
-        description: Calendar month of eligibility represented by the member month.
+        description: Calendar month of eligibility represented by the member month,
+          formatted as YYYYMM.
         config:
           meta:
             data_type: varchar
@@ -3157,9 +3160,10 @@ models:
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
+          Format as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source pharmacy claim line or file was loaded
           into the data warehouse. This is useful when multiple versions of the

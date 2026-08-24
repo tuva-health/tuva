@@ -49,7 +49,7 @@ select
     , cast(deductible_amount as {{ dbt.type_numeric() }}) as deductible_amount
     , cast(in_network_flag as int) as in_network_flag
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-    , cast(pharm.file_date as {{ dbt.type_timestamp() }}) as file_date
+    , cast(pharm.file_date as date) as file_date
     , cast(pharm.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(pharm.file_name as {{ dbt.type_string() }}) as file_name
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run

@@ -57,19 +57,22 @@ models:
             data_type: varchar
             is_primary_key: false
       - name: enrollment_start_date
-        description: Date the person's enrollment span begins. Use a native SQL DATE;
-          if the source stores this value as text, parse it to DATE in the
-          connector before exposing the Input Layer model.
+        description: Date the person's enrollment span begins, formatted as
+          YYYY-MM-DD when serialized. Expose this field as a native SQL DATE;
+          if the source stores it as text, parse the YYYY-MM-DD value to DATE in
+          the connector before exposing the Input Layer model.
         config:
           meta:
             data_type: date
             is_primary_key: true
       - name: enrollment_end_date
-        description: Date the person's enrollment span ends. Leave this field null when
-          the enrollment span is still open. For backward compatibility, Tuva
-          accepts 9999-12-31 as an input alias for an open span and normalizes it
-          to null. Use a native SQL DATE; if the source stores this value as text,
-          parse it to DATE in the connector before exposing the Input Layer model.
+        description: Date the person's enrollment span ends, formatted as
+          YYYY-MM-DD when serialized. Leave this field null when the enrollment
+          span is still open. For backward compatibility, Tuva accepts
+          9999-12-31 as an input alias for an open span and normalizes it to
+          null. Expose this field as a native SQL DATE; if the source stores it
+          as text, parse the YYYY-MM-DD value to DATE in the connector before
+          exposing the Input Layer model.
         config:
           meta:
             data_type: date

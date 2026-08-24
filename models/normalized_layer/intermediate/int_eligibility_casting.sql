@@ -69,7 +69,7 @@ select
     , cast(elig.group_name as {{ dbt.type_string() }}) as group_name
     {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig', strip_prefix=false) }}
     , cast(elig.file_name as {{ dbt.type_string() }}) as file_name
-    , cast(elig.file_date as {{ dbt.type_timestamp() }}) as file_date
+    , cast(elig.file_date as date) as file_date
     , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(elig.data_source as {{ dbt.type_string() }}) as data_source

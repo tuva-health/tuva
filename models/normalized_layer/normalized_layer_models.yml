@@ -302,7 +302,7 @@ models:
       - name: fips_state_abbreviation
         description: ANSI/FIPS state abbreviation matched from the source state value in int_eligibility_state_normalized.
       - name: file_date
-        description: Timestamp associated with the source eligibility file, typically reflecting the reporting period for the file.
+        description: Date associated with the source eligibility file, typically reflecting the reporting period for the file.
       - name: file_name
         description: Name of the source file from which the eligibility record was loaded.
       - name: ingest_datetime
@@ -1677,7 +1677,7 @@ models:
       - name: file_name
         description: Source file name cast to string from input_layer__eligibility.
       - name: file_date
-        description: Source file date cast to timestamp from input_layer__eligibility.
+        description: Source file date preserved as a native DATE from input_layer__eligibility.
       - name: ingest_datetime
         description: Source file ingest timestamp cast to timestamp from input_layer__eligibility.
       - name: tuva_last_run

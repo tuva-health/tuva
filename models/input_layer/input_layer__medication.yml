@@ -35,12 +35,18 @@ models:
           meta:
             data_type: varchar
       - name: dispensing_date
-        description: Date the medication was dispensed or administered, when available. For medication orders that were prescribed but not dispensed or administered, leave this field null.
+        description: Date the medication was dispensed or administered, formatted
+          as YYYY-MM-DD when serialized. For medication orders that were
+          prescribed but not dispensed or administered, leave this field null.
+          Expose this field as a native SQL DATE.
         config:
           meta:
             data_type: date
       - name: prescribing_date
-        description: Date the medication was prescribed or ordered, when available. When both prescribing_date and dispensing_date are populated, prescribing_date should generally be on or before dispensing_date.
+        description: Date the medication was prescribed or ordered, formatted as
+          YYYY-MM-DD when serialized. When both prescribing_date and
+          dispensing_date are populated, prescribing_date should generally be
+          on or before dispensing_date. Expose this field as a native SQL DATE.
         config:
           meta:
             data_type: date
