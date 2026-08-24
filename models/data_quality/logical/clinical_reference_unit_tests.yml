@@ -1,0 +1,389 @@
+version: 2
+
+unit_tests:
+  - name: test_patient_optional_reference_and_date_flags_are_tristate
+    description: >
+      Verifies pass, fail, and not-applicable behavior for representative
+      optional patient terminology, date, and ZIP code checks.
+    model: data_quality__patient_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__patient')
+        format: sql
+        rows: |
+          select
+              'valid_person' as person_id
+            , 'valid_patient' as patient_id
+            , 'male' as sex
+            , 'White' as race
+            , 'N' as ethnicity
+            , cast('1980-01-01' as date) as birth_date
+            , cast('2020-01-01' as date) as death_date
+            , 1 as death_flag
+            , 'CO' as state
+            , '80202' as zip_code
+            , 'source' as data_source
+          union all
+          select
+              'invalid_person', 'invalid_patient', 'male', 'Not a race', 'invalid'
+            , cast('1899-01-01' as date), cast('1898-01-01' as date), 1
+            , 'ZZ', '80A02', 'source'
+          union all
+          select
+              'extended_zip_person', 'extended_zip_patient', 'male', 'White', 'N'
+            , cast('1980-01-01' as date), cast('2020-01-01' as date), 1
+            , 'CO', '802021234', 'source'
+          union all
+          select
+              'numeric_syntax_person', 'numeric_syntax_patient', 'male', 'White', 'N'
+            , cast('1980-01-01' as date), cast('2020-01-01' as date), 1
+            , 'CO', '+1234', 'source'
+          union all
+          select
+              'null_person', 'null_patient', 'male', null, null
+            , cast('1980-01-01' as date), null, 0
+            , null, null, 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'White' as description
+      - input: ref('terminology__ethnicity')
+        format: sql
+        rows: |
+          select 'N' as code
+      - input: ref('terminology__ansi_fips_state')
+        format: sql
+        rows: |
+          select '08' as ansi_fips_state_code, 'CO' as ansi_fips_state_abbreviation, 'Colorado' as ansi_fips_state_name
+    expect:
+      rows:
+        - patient_id: valid_patient
+          race_invalid: 0
+          ethnicity_invalid: 0
+          birth_date_out_of_range: 0
+          death_date_out_of_range: 0
+          birth_date_after_death_date: 0
+          death_flag_without_death_date: 0
+          state_invalid: 0
+          zip_code_invalid_format: 0
+        - patient_id: invalid_patient
+          race_invalid: 1
+          ethnicity_invalid: 1
+          birth_date_out_of_range: 1
+          death_date_out_of_range: 1
+          birth_date_after_death_date: 1
+          death_flag_without_death_date: 0
+          state_invalid: 1
+          zip_code_invalid_format: 1
+        - patient_id: extended_zip_patient
+          race_invalid: 0
+          ethnicity_invalid: 0
+          birth_date_out_of_range: 0
+          death_date_out_of_range: 0
+          birth_date_after_death_date: 0
+          death_flag_without_death_date: 0
+          state_invalid: 0
+          zip_code_invalid_format: 0
+        - patient_id: numeric_syntax_patient
+          race_invalid: 0
+          ethnicity_invalid: 0
+          birth_date_out_of_range: 0
+          death_date_out_of_range: 0
+          birth_date_after_death_date: 0
+          death_flag_without_death_date: 0
+          state_invalid: 0
+          zip_code_invalid_format: 1
+        - patient_id: null_patient
+          race_invalid: null
+          ethnicity_invalid: null
+          birth_date_out_of_range: 0
+          death_date_out_of_range: null
+          birth_date_after_death_date: null
+          death_flag_without_death_date: null
+          state_invalid: null
+          zip_code_invalid_format: null
+
+  - name: test_patient_decimal_death_flags_are_compared_numerically
+    description: >
+      Verifies that decimal representations of 0 and 1 are valid death flags
+      and participate in the two death-date consistency checks.
+    model: data_quality__patient_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__patient')
+        format: sql
+        rows: |
+          select
+              'person_1' as person_id
+            , 'decimal_one' as patient_id
+            , 'male' as sex
+            , null as race
+            , null as ethnicity
+            , cast('1980-01-01' as date) as birth_date
+            , cast('2020-01-01' as date) as death_date
+            , cast(1.0 as decimal(18, 2)) as death_flag
+            , null as state
+            , null as zip_code
+            , 'source' as data_source
+          union all
+          select 'person_2', 'decimal_one_missing_date', 'male', null, null
+            , cast('1980-01-01' as date), cast(null as date), cast(1.0 as decimal(18, 2))
+            , null, null, 'source'
+          union all
+          select 'person_3', 'decimal_zero_with_date', 'male', null, null
+            , cast('1980-01-01' as date), cast('2020-01-01' as date), cast(0.0 as decimal(18, 2))
+            , null, null, 'source'
+          union all
+          select 'person_4', 'invalid_decimal', 'male', null, null
+            , cast('1980-01-01' as date), cast(null as date), cast(2.0 as decimal(18, 2))
+            , null, null, 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as description where 1 = 0
+      - input: ref('terminology__ethnicity')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as code where 1 = 0
+      - input: ref('terminology__ansi_fips_state')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as ansi_fips_state_code
+            , '__dq_no_match__' as ansi_fips_state_abbreviation
+            , '__dq_no_match__' as ansi_fips_state_name where 1 = 0
+    expect:
+      rows:
+        - patient_id: decimal_one
+          death_flag_invalid: 0
+          death_flag_without_death_date: 0
+          death_date_without_death_flag: 0
+        - patient_id: decimal_one_missing_date
+          death_flag_invalid: 0
+          death_flag_without_death_date: 1
+          death_date_without_death_flag: null
+        - patient_id: decimal_zero_with_date
+          death_flag_invalid: 0
+          death_flag_without_death_date: null
+          death_date_without_death_flag: 1
+        - patient_id: invalid_decimal
+          death_flag_invalid: 1
+          death_flag_without_death_date: null
+          death_date_without_death_flag: null
+
+  - name: test_patient_sex_values_and_consistency_preserve_case
+    description: >
+      Verifies that the patient sex contract accepts the exact lowercase value,
+      rejects a letter-case variant, and treats that variant as a distinct
+      person-level value within one data_source.
+    model: data_quality__patient_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__patient')
+        format: sql
+        rows: |
+          select 'case_variant_person' as person_id, 'lowercase_patient' as patient_id
+            , 'male' as sex, null as race, null as ethnicity
+            , cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date
+            , 0 as death_flag, null as state, null as zip_code, 'source' as data_source
+          union all
+          select 'case_variant_person', 'uppercase_patient', 'Male', null, null
+            , cast('1980-01-01' as date), cast(null as date), 0, null, null, 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as description where 1 = 0
+      - input: ref('terminology__ethnicity')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as code where 1 = 0
+      - input: ref('terminology__ansi_fips_state')
+        format: sql
+        rows: |
+          select '__dq_no_match__' as ansi_fips_state_code
+            , '__dq_no_match__' as ansi_fips_state_abbreviation
+            , '__dq_no_match__' as ansi_fips_state_name where 1 = 0
+    expect:
+      rows:
+        - patient_id: lowercase_patient
+          sex_invalid: 0
+          multiple_sexes_per_person: 1
+        - patient_id: uppercase_patient
+          sex_invalid: 1
+          multiple_sexes_per_person: 1
+
+  - name: test_patient_person_consistency_flags_are_tristate
+    description: >
+      Verifies that person-level consistency checks are not applicable for one
+      row or multiple all-null rows, pass for repeated consistent values, and
+      fail for conflicting populated values without combining data sources.
+    model: data_quality__patient_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__patient')
+        format: sql
+        rows: |
+          select
+              'single_person' as person_id
+            , 'single_patient' as patient_id
+            , 'male' as sex
+            , 'White' as race
+            , 'N' as ethnicity
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , 'CO' as state
+            , '80202' as zip_code
+            , 'source' as data_source
+          union all
+          select 'all_null_person', 'all_null_patient_1', null, null, null, null, null, null, null, null, 'source'
+          union all
+          select 'all_null_person', 'all_null_patient_2', null, null, null, null, null, null, null, null, 'source'
+          union all
+          select 'consistent_person', 'consistent_patient_1', 'female', null, null, cast('1981-01-01' as date), null, null, null, null, 'source'
+          union all
+          select 'consistent_person', 'consistent_patient_2', 'female', null, null, cast('1981-01-01' as date), null, null, null, null, 'source'
+          union all
+          select 'conflict_person', 'conflict_patient_1', 'male', null, null, cast('1982-01-01' as date), null, null, null, null, 'source'
+          union all
+          select 'conflict_person', 'conflict_patient_2', 'female', null, null, cast('1983-01-01' as date), null, null, null, null, 'source'
+          union all
+          select 'cross_source_person', 'cross_source_patient_a', 'male', null, null, cast('1984-01-01' as date), null, null, null, null, 'source_a'
+          union all
+          select 'cross_source_person', 'cross_source_patient_b', 'female', null, null, cast('1985-01-01' as date), null, null, null, null, 'source_b'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'White' as description
+      - input: ref('terminology__ethnicity')
+        format: sql
+        rows: |
+          select 'N' as code
+      - input: ref('terminology__ansi_fips_state')
+        format: sql
+        rows: |
+          select '08' as ansi_fips_state_code, 'CO' as ansi_fips_state_abbreviation, 'Colorado' as ansi_fips_state_name
+    expect:
+      rows:
+        - patient_id: single_patient
+          multiple_sexes_per_person: null
+          multiple_birth_dates_per_person: null
+        - patient_id: all_null_patient_1
+          multiple_sexes_per_person: null
+          multiple_birth_dates_per_person: null
+        - patient_id: all_null_patient_2
+          multiple_sexes_per_person: null
+          multiple_birth_dates_per_person: null
+        - patient_id: consistent_patient_1
+          multiple_sexes_per_person: 0
+          multiple_birth_dates_per_person: 0
+        - patient_id: consistent_patient_2
+          multiple_sexes_per_person: 0
+          multiple_birth_dates_per_person: 0
+        - patient_id: conflict_patient_1
+          multiple_sexes_per_person: 1
+          multiple_birth_dates_per_person: 1
+        - patient_id: conflict_patient_2
+          multiple_sexes_per_person: 1
+          multiple_birth_dates_per_person: 1
+        - patient_id: cross_source_patient_a
+          multiple_sexes_per_person: null
+          multiple_birth_dates_per_person: null
+        - patient_id: cross_source_patient_b
+          multiple_sexes_per_person: null
+          multiple_birth_dates_per_person: null
+
+  - name: test_location_optional_reference_flags_are_tristate
+    description: >
+      Verifies that the optional location NPI check is not applicable when null,
+      passes when found, and fails when populated but unknown.
+    model: data_quality__location_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__location')
+        format: sql
+        rows: |
+          select 'null_location' as location_id, null as npi, 'source' as data_source
+          union all
+          select 'valid_location', '1111111111', 'source'
+          union all
+          select 'invalid_location', '9999999999', 'source'
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '1111111111' as npi
+    expect:
+      rows:
+        - location_id: null_location
+          npi_invalid: null
+        - location_id: valid_location
+          npi_invalid: 0
+        - location_id: invalid_location
+          npi_invalid: 1
+
+  - name: test_practitioner_optional_npi_flags_are_tristate
+    description: >
+      Verifies that practitioner NPI checks distinguish a missing optional NPI,
+      a valid individual NPI, a valid organization NPI, and an unknown NPI.
+    model: data_quality__practitioner_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('clinical_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__practitioner')
+        format: sql
+        rows: |
+          select 'null_practitioner' as practitioner_id, null as npi, 'source' as data_source
+          union all
+          select 'individual_practitioner', '1111111111', 'source'
+          union all
+          select 'organization_practitioner', '2222222222', 'source'
+          union all
+          select 'unknown_practitioner', '9999999999', 'source'
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '1111111111' as npi, '1' as entity_type_code
+          union all
+          select '2222222222', '2'
+    expect:
+      rows:
+        - practitioner_id: null_practitioner
+          npi_invalid: null
+          npi_not_individual: null
+        - practitioner_id: individual_practitioner
+          npi_invalid: 0
+          npi_not_individual: 0
+        - practitioner_id: organization_practitioner
+          npi_invalid: 0
+          npi_not_individual: 1
+        - practitioner_id: unknown_practitioner
+          npi_invalid: 1
+          npi_not_individual: null

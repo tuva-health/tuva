@@ -95,25 +95,25 @@ select
     , obs.data_source
 from obs
 left join {{ ref('terminology__icd_10_cm') }} as icd10cm
-    on obs.source_code_type = 'icd-10-cm'
+    on lower(obs.source_code_type) = 'icd-10-cm'
         and replace(obs.source_code, '.', '') = icd10cm.icd_10_cm
 left join {{ ref('terminology__icd_9_cm') }} as icd9cm
-    on obs.source_code_type = 'icd-9-cm'
+    on lower(obs.source_code_type) = 'icd-9-cm'
         and replace(obs.source_code, '.', '') = icd9cm.icd_9_cm
 left join {{ ref('terminology__icd_10_pcs') }} as icd10pcs
-    on obs.source_code_type = 'icd-10-pcs'
+    on lower(obs.source_code_type) = 'icd-10-pcs'
         and obs.source_code = icd10pcs.icd_10_pcs
 left join {{ ref('terminology__icd_9_pcs') }} as icd9pcs
-    on obs.source_code_type = 'icd-9-pcs'
+    on lower(obs.source_code_type) = 'icd-9-pcs'
         and replace(obs.source_code, '.', '') = icd9pcs.icd_9_pcs
 left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
-    on obs.source_code_type = 'hcpcs'
+    on lower(obs.source_code_type) = 'hcpcs'
         and obs.source_code = hcpcs.hcpcs
 left join {{ ref('terminology__snomed_ct') }} as snomed_ct
-    on obs.source_code_type = 'snomed-ct'
+    on lower(obs.source_code_type) = 'snomed-ct'
         and obs.source_code = snomed_ct.snomed_ct
 left join {{ ref('terminology__loinc') }} as loinc
-    on obs.source_code_type = 'loinc'
+    on lower(obs.source_code_type) = 'loinc'
         and obs.source_code = loinc.loinc
 left join {{ ref('terminology__observation_type') }} as ot
     on lower(obs.observation_type) = ot.observation_type

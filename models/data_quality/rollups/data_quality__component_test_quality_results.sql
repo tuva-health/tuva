@@ -7,7 +7,7 @@
        else 'data_quality'
      ),
      alias = 'component_test_quality_results',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_rollup'],
      materialized = 'table'
    )
 }}
@@ -24,7 +24,7 @@ with logical_component_tests as (
         , logical_results.description
         , logical_results.grain
         , logical_results.test_type
-        , logical_results.check_category
+        , logical_results.test_type as check_category
         , logical_results.severity
         , logical_results.total_row_count
         , logical_results.tested_count
@@ -64,11 +64,11 @@ select
     , logical_component_tests.check_category
     , logical_component_tests.severity
     , logical_component_tests.test_source
-    , cast(sum(coalesce(logical_component_tests.total_row_count, 0)) as {{ dbt.type_int() }}) as total_row_count
-    , cast(sum(coalesce(logical_component_tests.tested_count, 0)) as {{ dbt.type_int() }}) as tested_count
-    , cast(sum(coalesce(logical_component_tests.passed_count, 0)) as {{ dbt.type_int() }}) as passed_count
-    , cast(sum(coalesce(logical_component_tests.failed_count, 0)) as {{ dbt.type_int() }}) as failed_count
-    , cast(sum(coalesce(logical_component_tests.not_applicable_count, 0)) as {{ dbt.type_int() }}) as not_applicable_count
+    , cast(sum(cast(coalesce(logical_component_tests.total_row_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as total_row_count
+    , cast(sum(cast(coalesce(logical_component_tests.tested_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as tested_count
+    , cast(sum(cast(coalesce(logical_component_tests.passed_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as passed_count
+    , cast(sum(cast(coalesce(logical_component_tests.failed_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as failed_count
+    , cast(sum(cast(coalesce(logical_component_tests.not_applicable_count, 0) as {{ dbt.type_bigint() }})) as {{ dbt.type_bigint() }}) as not_applicable_count
 from logical_component_tests
 inner join {{ ref('data_quality__domain_catalog') }} as catalog
     on logical_component_tests.domain_group_key = catalog.domain_group_key

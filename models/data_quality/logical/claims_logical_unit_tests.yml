@@ -1,0 +1,1199 @@
+version: 2
+
+unit_tests:
+  - name: test_eligibility_overlap_and_optional_flags_are_tristate
+    description: >
+      Verifies that overlapping spans are evaluated within the complete
+      coverage identity, while adjacent, gapped, and different-plan spans do
+      not overlap and an incomplete span is not applicable.
+    model: data_quality__eligibility_span_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'overlap' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan_a' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, 0 as death_flag, 'commercial' as payer_type, 'source' as data_source
+          union all
+          select 'overlap', 'member', cast('2024-01-15' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'adjacent', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'adjacent', 'member', cast('2024-02-01' as date), cast('2024-02-29' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'different_plan', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'different_plan', 'member', cast('2024-01-15' as date), cast('2024-02-15' as date), 'payer', 'plan_b', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'gapped', 'member', cast('2024-01-01' as date), cast('2024-01-10' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'gapped', 'member', cast('2024-01-20' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'incomplete', 'member', cast(null as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
+          union all
+          select 'cross_source', 'member', cast('2024-01-02' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_a'
+          union all
+          select 'cross_source', 'member', cast('2024-01-16' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_b'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'White' as description
+      - input: ref('terminology__payer_type')
+        format: sql
+        rows: |
+          select 'commercial' as payer_type
+    expect:
+      rows:
+        - person_id: overlap
+          enrollment_start_date: '2024-01-01'
+          plan: plan_a
+          overlapping_enrollment_spans: 1
+        - person_id: overlap
+          enrollment_start_date: '2024-01-15'
+          plan: plan_a
+          overlapping_enrollment_spans: 1
+        - person_id: adjacent
+          enrollment_start_date: '2024-01-01'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: adjacent
+          enrollment_start_date: '2024-02-01'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: different_plan
+          enrollment_start_date: '2024-01-01'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: different_plan
+          enrollment_start_date: '2024-01-15'
+          plan: plan_b
+          overlapping_enrollment_spans: 0
+        - person_id: gapped
+          enrollment_start_date: '2024-01-01'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: gapped
+          enrollment_start_date: '2024-01-20'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: incomplete
+          enrollment_start_date: null
+          plan: plan_a
+          overlapping_enrollment_spans: null
+        - person_id: cross_source
+          enrollment_start_date: '2024-01-02'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+        - person_id: cross_source
+          enrollment_start_date: '2024-01-16'
+          plan: plan_a
+          overlapping_enrollment_spans: 0
+
+  - name: test_eligibility_boolean_death_flags_are_portable
+    description: >
+      Verifies that true and false Boolean values remain valid across adapters
+      whose string representation is either true/false or 1/0, and that only a
+      true value makes the death-date consistency check applicable.
+    model: data_quality__eligibility_span_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set true_boolean = 'cast(1 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(true as boolean)' %}
+          {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          select 'true_missing_date' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'unknown' as sex, 'Unknown' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ true_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
+          union all
+          select 'true_with_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast('2024-01-15' as date), {{ true_boolean }}, 'commercial', 'source'
+          union all
+          select 'false_without_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
+          union all
+          select 'null_flag', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), cast(null as {{ 'bit' if target.type in ['fabric', 'sqlserver'] else 'boolean' }}), 'commercial', 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'Unknown' as description
+      - input: ref('terminology__payer_type')
+        format: sql
+        rows: |
+          select 'commercial' as payer_type
+    expect:
+      rows:
+        - person_id: true_missing_date
+          death_flag_invalid: 0
+          death_flag_without_death_date: 1
+        - person_id: true_with_date
+          death_flag_invalid: 0
+          death_flag_without_death_date: 0
+        - person_id: false_without_date
+          death_flag_invalid: 0
+          death_flag_without_death_date: null
+        - person_id: null_flag
+          death_flag_invalid: null
+          death_flag_without_death_date: null
+
+  - name: test_eligibility_sex_values_require_exact_lowercase
+    description: >
+      Verifies that the eligibility sex contract accepts the exact lowercase
+      values and rejects a letter-case variant that downstream models preserve.
+    model: data_quality__eligibility_span_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          select 'lowercase' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ false_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
+          union all
+          select 'case_variant', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'Male', 'White', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
+      - input: ref('terminology__race')
+        format: sql
+        rows: |
+          select 'White' as description
+      - input: ref('terminology__payer_type')
+        format: sql
+        rows: |
+          select 'commercial' as payer_type
+    expect:
+      rows:
+        - person_id: lowercase
+          sex_invalid: 0
+        - person_id: case_variant
+          sex_invalid: 1
+
+  - name: test_eligibility_person_sex_consistency_preserves_case
+    description: >
+      Verifies that distinct letter-case variants remain distinct values in a
+      person-level consistency result within one data_source.
+    model: data_quality__eligibility_person_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          select 'case_variant' as person_id, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, 'source' as data_source
+          union all
+          select 'case_variant', 'Male', 'White', cast('1980-01-01' as date), 'source'
+    expect:
+      rows:
+        - person_id: case_variant
+          multiple_sexes_per_person: 1
+          multiple_races_per_person: 0
+          multiple_birth_dates_per_person: 0
+
+  - name: test_eligibility_person_consistency_flags_are_tristate
+    description: >
+      Verifies that person-level consistency is not applicable for one
+      populated value or an all-null population, passes for repeated values,
+      and fails for conflicting values.
+    model: data_quality__eligibility_person_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          select 'single' as person_id, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, 'source' as data_source
+          union all
+          select 'same', 'female', 'Asian', cast('1981-01-01' as date), 'source'
+          union all
+          select 'same', 'female', 'Asian', cast('1981-01-01' as date), 'source'
+          union all
+          select 'conflict', 'male', 'White', cast('1982-01-01' as date), 'source'
+          union all
+          select 'conflict', 'female', 'Black or African American', cast('1983-01-01' as date), 'source'
+          union all
+          select 'all_null', null, null, cast(null as date), 'source'
+          union all
+          select 'all_null', null, null, cast(null as date), 'source'
+          union all
+          select 'cross_source', 'male', 'White', cast('1984-01-01' as date), 'source_a'
+          union all
+          select 'cross_source', 'female', 'Asian', cast('1985-01-01' as date), 'source_b'
+    expect:
+      rows:
+        - person_id: single
+          multiple_sexes_per_person: null
+          multiple_races_per_person: null
+          multiple_birth_dates_per_person: null
+        - person_id: same
+          multiple_sexes_per_person: 0
+          multiple_races_per_person: 0
+          multiple_birth_dates_per_person: 0
+        - person_id: conflict
+          multiple_sexes_per_person: 1
+          multiple_races_per_person: 1
+          multiple_birth_dates_per_person: 1
+        - person_id: all_null
+          multiple_sexes_per_person: null
+          multiple_races_per_person: null
+          multiple_birth_dates_per_person: null
+        - person_id: cross_source
+          multiple_sexes_per_person: null
+          multiple_races_per_person: null
+          multiple_birth_dates_per_person: null
+        - person_id: cross_source
+          multiple_sexes_per_person: null
+          multiple_races_per_person: null
+          multiple_birth_dates_per_person: null
+
+  - name: test_pharmacy_claim_line_new_flags_are_tristate
+    description: >
+      Verifies missing, non-positive, negative, valid, and not-applicable
+      behavior for the new pharmacy claim-line checks.
+    model: data_quality__pharmacy_claim_line_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with row_ids as (
+              select 'missing_values' as claim_id, 1 as claim_line_number
+              union all
+              select 'invalid_values', 0
+              union all
+              select 'valid_values', 1
+          )
+          select
+                row_ids.claim_id
+              , row_ids.claim_line_number
+              , 'person' as person_id
+              , 'member' as member_id
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cast('2024-01-01' as date) as dispensing_date
+              , cast('2024-01-15' as date) as paid_date
+              , 'valid_npi' as prescribing_provider_npi
+              , 'valid_npi' as dispensing_provider_npi
+              , 'valid_ndc' as ndc_code
+              , case when row_ids.claim_id = 'missing_values' then null when row_ids.claim_id = 'invalid_values' then 0 else 30 end as quantity
+              , case when row_ids.claim_id = 'missing_values' then null when row_ids.claim_id = 'invalid_values' then -1 else 30 end as days_supply
+              , case when row_ids.claim_id = 'missing_values' then null when row_ids.claim_id = 'invalid_values' then -1 else 0 end as refills
+              , 1 as paid_amount
+              , 2 as allowed_amount
+              , 'source' as data_source
+          from row_ids
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('1999-01-01' as date) as enrollment_start_date, cast('2030-12-31' as date) as enrollment_end_date, 'source' as data_source
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select 'valid_npi' as npi
+      - input: ref('terminology__ndc')
+        format: sql
+        rows: |
+          select 'valid_ndc' as ndc
+    expect:
+      rows:
+        - claim_id: missing_values
+          claim_line_number_not_positive: 0
+          quantity_null: 1
+          quantity_not_positive: null
+          days_supply_null: 1
+          days_supply_not_positive: null
+          refills_lt_zero: null
+        - claim_id: invalid_values
+          claim_line_number_not_positive: 1
+          quantity_null: 0
+          quantity_not_positive: 1
+          days_supply_null: 0
+          days_supply_not_positive: 1
+          refills_lt_zero: 1
+        - claim_id: valid_values
+          claim_line_number_not_positive: 0
+          quantity_null: 0
+          quantity_not_positive: 0
+          days_supply_null: 0
+          days_supply_not_positive: 0
+          refills_lt_zero: 0
+
+  - name: test_pharmacy_claim_eligibility_match_uses_member_month_identity
+    description: >
+      Verifies that pharmacy eligibility matching uses paid_date month and the
+      complete person, member, payer, plan, and data-source identity without
+      borrowing an eligibility row from another source.
+    model: data_quality__pharmacy_claim_line_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with cases as (
+              select 'paid_month_match' as claim_id, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as paid_date, cast('2023-12-15' as date) as dispensing_date, 'source_a' as data_source
+              union all
+              select 'dispensing_match_paid_miss', 'person', 'member', 'payer', 'plan', cast('2024-02-01' as date), cast('2024-01-15' as date), 'source_a'
+              union all
+              select 'source_b_match', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_b'
+              union all
+              select 'source_c_no_match', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_c'
+              union all
+              select 'wrong_member', 'person', 'other_member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_a'
+              union all
+              select 'wrong_payer', 'person', 'member', 'other_payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_a'
+              union all
+              select 'wrong_plan', 'person', 'member', 'payer', 'other_plan', cast('2024-01-01' as date), cast('2024-01-01' as date), 'source_a'
+              union all
+              select 'paid_date_missing', 'person', 'member', 'payer', 'plan', cast(null as date), cast('2024-01-01' as date), 'source_a'
+              union all
+              select 'literal_null_sentinel', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), '__dq_null__'
+          )
+          select
+                cases.claim_id
+              , 1 as claim_line_number
+              , cases.person_id
+              , cases.member_id
+              , cases.payer
+              , cases.plan_value as {{ plan_identifier }}
+              , cases.dispensing_date
+              , cases.paid_date
+              , 'valid_npi' as prescribing_provider_npi
+              , 'valid_npi' as dispensing_provider_npi
+              , 'valid_ndc' as ndc_code
+              , 30 as quantity
+              , 30 as days_supply
+              , 0 as refills
+              , 1 as paid_amount
+              , 2 as allowed_amount
+              , cases.data_source
+          from cases
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('2024-01-31' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'source_a' as data_source
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), 'source_b'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), null
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select 'valid_npi' as npi
+      - input: ref('terminology__ndc')
+        format: sql
+        rows: |
+          select 'valid_ndc' as ndc
+    expect:
+      rows:
+        - claim_id: paid_month_match
+          no_matching_eligibility_span: 0
+        - claim_id: dispensing_match_paid_miss
+          no_matching_eligibility_span: 1
+        - claim_id: source_b_match
+          no_matching_eligibility_span: 0
+        - claim_id: source_c_no_match
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_member
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_payer
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_plan
+          no_matching_eligibility_span: 1
+        - claim_id: paid_date_missing
+          no_matching_eligibility_span: null
+        - claim_id: literal_null_sentinel
+          no_matching_eligibility_span: 1
+
+  - name: test_medical_claim_line_new_flags_are_tristate
+    description: >
+      Verifies fail, pass, and not-applicable behavior for medical claim-line
+      number, paid-date range, and paid-date sequencing checks.
+    model: data_quality__medical_claim_line_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with row_ids as (
+              select 'missing_paid_date' as claim_id, 1 as claim_line_number
+              union all
+              select 'invalid_values', 0
+              union all
+              select 'valid_values', 1
+              union all
+              select 'before_claim_end', 1
+              union all
+              select 'same_as_claim_end', 1
+              union all
+              select 'missing_claim_end', 1
+          )
+          select
+                row_ids.claim_id
+              , row_ids.claim_line_number
+              , 'undetermined' as claim_type
+              , 'person' as person_id
+              , 'member' as member_id
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cast('2024-01-01' as date) as claim_start_date
+              , case
+                  when row_ids.claim_id = 'before_claim_end' then cast('2024-02-01' as date)
+                  when row_ids.claim_id = 'same_as_claim_end' then cast('2024-01-15' as date)
+                  when row_ids.claim_id = 'missing_claim_end' then cast(null as date)
+                  else cast('2024-01-01' as date)
+                end as claim_end_date
+              , cast('2024-01-01' as date) as claim_line_start_date
+              , cast('2024-01-01' as date) as claim_line_end_date
+              , cast(null as date) as admission_date
+              , cast(null as date) as discharge_date
+              , null as admit_source_code
+              , null as admit_type_code
+              , null as discharge_disposition_code
+              , null as place_of_service_code
+              , null as bill_type_code
+              , null as revenue_center_code
+              , null as hcpcs_code
+              , null as rendering_npi
+              , null as billing_npi
+              , null as facility_npi
+              , null as drg_code_type
+              , null as drg_code
+              , null as diagnosis_code_type
+              , null as procedure_code_type
+              , case
+                  when row_ids.claim_id = 'missing_paid_date' then cast(null as date)
+                  when row_ids.claim_id = 'invalid_values' then cast('1999-12-31' as date)
+                  else cast('2024-01-15' as date)
+                end as paid_date
+              , 1 as paid_amount
+              , 2 as allowed_amount
+              {% for index in range(1, 26) %}
+              , null as diagnosis_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , null as procedure_code_{{ index }}
+              {% endfor %}
+              , 'source' as data_source
+          from row_ids
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('2000-01-01' as date) as enrollment_start_date, cast('2030-12-31' as date) as enrollment_end_date, 'source' as data_source
+      - input: ref('terminology__admit_source')
+        format: sql
+        rows: |
+          select '__unused__' as admit_source_code
+      - input: ref('terminology__admit_type')
+        format: sql
+        rows: |
+          select '__unused__' as admit_type_code
+      - input: ref('terminology__discharge_disposition')
+        format: sql
+        rows: |
+          select '__unused__' as discharge_disposition_code
+      - input: ref('terminology__place_of_service')
+        format: sql
+        rows: |
+          select '__unused__' as place_of_service_code
+      - input: ref('terminology__bill_type')
+        format: sql
+        rows: |
+          select '__unused__' as bill_type_code
+      - input: ref('terminology__revenue_center')
+        format: sql
+        rows: |
+          select '__unused__' as revenue_center_code
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '__unused__' as npi
+      - input: ref('terminology__ms_drg')
+        format: sql
+        rows: |
+          select '__unused__' as ms_drg_code
+      - input: ref('terminology__apr_drg')
+        format: sql
+        rows: |
+          select '__unused__' as apr_drg_code
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_cm
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_cm
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_pcs
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_pcs
+    expect:
+      rows:
+        - claim_id: missing_paid_date
+          claim_line_number_not_positive: 0
+          paid_date_null: 1
+          paid_date_out_of_reasonable_range: null
+          paid_date_before_claim_end_date: null
+        - claim_id: invalid_values
+          claim_line_number_not_positive: 1
+          paid_date_null: 0
+          paid_date_out_of_reasonable_range: 1
+          paid_date_before_claim_end_date: 1
+        - claim_id: valid_values
+          claim_line_number_not_positive: 0
+          paid_date_null: 0
+          paid_date_out_of_reasonable_range: 0
+          paid_date_before_claim_end_date: 0
+        - claim_id: before_claim_end
+          claim_line_number_not_positive: 0
+          paid_date_null: 0
+          paid_date_out_of_reasonable_range: 0
+          paid_date_before_claim_end_date: 1
+        - claim_id: same_as_claim_end
+          claim_line_number_not_positive: 0
+          paid_date_null: 0
+          paid_date_out_of_reasonable_range: 0
+          paid_date_before_claim_end_date: 0
+        - claim_id: missing_claim_end
+          claim_line_number_not_positive: 0
+          paid_date_null: 0
+          paid_date_out_of_reasonable_range: 0
+          paid_date_before_claim_end_date: null
+
+  - name: test_medical_claim_contract_values_and_eligibility_identity
+    description: >
+      Verifies exact lowercase medical claim and code-system contracts, exact
+      professional applicability, and member-month eligibility matching with
+      complete identity, date precedence, month overlap, and data-source
+      isolation.
+    model: data_quality__medical_claim_line_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          with cases as (
+              select 'exact_professional' as claim_id, 'professional' as claim_type, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as claim_line_start_date, cast('2024-02-01' as date) as claim_start_date, cast('2024-03-01' as date) as admission_date, 'source_a' as data_source, '111' as bill_type_code, cast(null as {{ string_type }}) as drg_code_type, cast(null as {{ string_type }}) as diagnosis_code_type, cast(null as {{ string_type }}) as procedure_code_type, cast(null as {{ string_type }}) as diagnosis_code_1, cast(null as {{ string_type }}) as procedure_code_1
+              union all
+              select 'uppercase_professional', 'PROFESSIONAL', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-02-01' as date), cast('2024-03-01' as date), 'source_a', '111', null, null, null, null, null
+              union all
+              select 'exact_undetermined', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'unsupported_dental', 'dental', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'uppercase_code_types', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', '111', 'MS-DRG', 'ICD-10-CM', 'ICD-10-PCS', 'D001', 'P001'
+              union all
+              select 'exact_code_types', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', '111', 'ms-drg', 'icd-10-cm', 'icd-10-pcs', 'D001', 'P001'
+              union all
+              select 'source_b_match', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_b', null, null, null, null, null, null
+              union all
+              select 'source_c_no_match', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_c', null, null, null, null, null, null
+              union all
+              select 'wrong_member', 'undetermined', 'person', 'other_member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'wrong_payer', 'undetermined', 'person', 'member', 'other_payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'wrong_plan', 'undetermined', 'person', 'member', 'payer', 'other_plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'claim_start_fallback', 'undetermined', 'person', 'member', 'payer', 'plan', cast(null as date), cast('2024-02-01' as date), cast('2024-03-01' as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'admission_fallback', 'undetermined', 'person', 'member', 'payer', 'plan', cast(null as date), cast(null as date), cast('2024-03-01' as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'no_inferred_date', 'undetermined', 'person', 'member', 'payer', 'plan', cast(null as date), cast(null as date), cast(null as date), 'source_a', null, null, null, null, null, null
+              union all
+              select 'literal_null_sentinel', 'undetermined', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), '__dq_null__', null, null, null, null, null, null
+              union all
+              select 'sentinel_code_collision', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), '__dq_null__', '111', null, 'icd-10-cm', 'icd-10-pcs', 'D001', 'P001'
+              union all
+              select 'sentinel_code_collision', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), null, '111', null, 'icd-10-cm', 'icd-10-pcs', 'BAD', 'BAD'
+          )
+          select
+                cases.claim_id
+              , 1 as claim_line_number
+              , cases.claim_type
+              , cases.person_id
+              , cases.member_id
+              , cases.payer
+              , cases.plan_value as {{ plan_identifier }}
+              , cases.claim_start_date
+              , coalesce(cases.claim_start_date, cases.claim_line_start_date, cases.admission_date) as claim_end_date
+              , cases.claim_line_start_date
+              , cases.claim_line_start_date as claim_line_end_date
+              , cases.admission_date
+              , cast(null as date) as discharge_date
+              , null as admit_source_code
+              , null as admit_type_code
+              , null as discharge_disposition_code
+              , null as place_of_service_code
+              , cases.bill_type_code
+              , null as revenue_center_code
+              , null as hcpcs_code
+              , null as rendering_npi
+              , null as billing_npi
+              , null as facility_npi
+              , cases.drg_code_type
+              , case when cases.drg_code_type is not null then '001' end as drg_code
+              , cases.diagnosis_code_type
+              , cases.procedure_code_type
+              , cast('2024-04-01' as date) as paid_date
+              , 1 as paid_amount
+              , 2 as allowed_amount
+              {% for index in range(1, 26) %}
+              , {% if index == 1 %}cases.diagnosis_code_1{% else %}null{% endif %} as diagnosis_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , {% if index == 1 %}cases.procedure_code_1{% else %}null{% endif %} as procedure_code_{{ index }}
+              {% endfor %}
+              , cases.data_source
+          from cases
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('2024-01-31' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'source_a' as data_source
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-02-15' as date), cast('2024-02-15' as date), 'source_a'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-03-15' as date), cast('2024-03-15' as date), 'source_a'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), 'source_b'
+          union all
+          select 'person', 'member', 'payer', 'plan', cast('2024-01-31' as date), cast('2024-01-31' as date), null
+      - input: ref('terminology__admit_source')
+        format: sql
+        rows: |
+          select '__unused__' as admit_source_code
+      - input: ref('terminology__admit_type')
+        format: sql
+        rows: |
+          select '__unused__' as admit_type_code
+      - input: ref('terminology__discharge_disposition')
+        format: sql
+        rows: |
+          select '__unused__' as discharge_disposition_code
+      - input: ref('terminology__place_of_service')
+        format: sql
+        rows: |
+          select '__unused__' as place_of_service_code
+      - input: ref('terminology__bill_type')
+        format: sql
+        rows: |
+          select '111' as bill_type_code
+      - input: ref('terminology__revenue_center')
+        format: sql
+        rows: |
+          select '__unused__' as revenue_center_code
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '__unused__' as npi
+      - input: ref('terminology__ms_drg')
+        format: sql
+        rows: |
+          select '001' as ms_drg_code
+      - input: ref('terminology__apr_drg')
+        format: sql
+        rows: |
+          select '__unused__' as apr_drg_code
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select 'D001' as icd_10_cm
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_cm
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          select 'P001' as icd_10_pcs
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_pcs
+    expect:
+      rows:
+        - claim_id: exact_professional
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: 1
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: uppercase_professional
+          data_source: source_a
+          claim_type_invalid: 1
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: exact_undetermined
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: unsupported_dental
+          data_source: source_a
+          claim_type_invalid: 1
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: uppercase_code_types
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: 1
+          diagnosis_code_type_invalid: 1
+          procedure_code_type_invalid: 1
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: exact_code_types
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: 0
+          diagnosis_code_type_invalid: 0
+          procedure_code_type_invalid: 0
+          diagnosis_code_1_invalid: 0
+          procedure_code_1_to_25_invalid: 0
+          no_matching_eligibility_span: 0
+        - claim_id: source_b_match
+          data_source: source_b
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: source_c_no_match
+          data_source: source_c
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_member
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_payer
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: wrong_plan
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: claim_start_fallback
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: admission_fallback
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 0
+        - claim_id: no_inferred_date
+          data_source: source_a
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: null
+        - claim_id: literal_null_sentinel
+          data_source: __dq_null__
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: null
+          procedure_code_type_invalid: null
+          diagnosis_code_1_invalid: null
+          procedure_code_1_to_25_invalid: null
+          no_matching_eligibility_span: 1
+        - claim_id: sentinel_code_collision
+          data_source: __dq_null__
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: 0
+          procedure_code_type_invalid: 0
+          diagnosis_code_1_invalid: 0
+          procedure_code_1_to_25_invalid: 0
+          no_matching_eligibility_span: 1
+        - claim_id: sentinel_code_collision
+          data_source: null
+          claim_type_invalid: 0
+          institutional_indicators_present_for_professional_claim: null
+          drg_code_type_invalid: null
+          diagnosis_code_type_invalid: 0
+          procedure_code_type_invalid: 0
+          diagnosis_code_1_invalid: 1
+          procedure_code_1_to_25_invalid: 1
+          no_matching_eligibility_span: null
+
+  - name: test_medical_claim_header_consistency_flags_are_tristate
+    description: >
+      Verifies every new header-consistency flag, including fail behavior for
+      conflicting or mixed null/populated values, pass behavior for repeated
+      values, and not-applicable behavior for single-line and all-null groups.
+    model: data_quality__medical_claim_claim_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with row_ids as (
+              select 'single_line' as claim_id, 1 as claim_line_number, 'source' as data_source
+              union all
+              select 'same_values', 1, 'source'
+              union all
+              select 'same_values', 2, 'source'
+              union all
+              select 'mixed_values', 1, 'source'
+              union all
+              select 'mixed_values', 2, 'source'
+              union all
+              select 'all_null', 1, 'source'
+              union all
+              select 'all_null', 2, 'source'
+              union all
+              select 'case_conflict', 1, 'source'
+              union all
+              select 'case_conflict', 2, 'source'
+              union all
+              select 'uppercase_institutional', 1, 'source'
+              union all
+              select 'uppercase_institutional', 2, 'source'
+              union all
+              select 'cross_source', 1, 'source_a'
+              union all
+              select 'cross_source', 1, 'source_b'
+          )
+          select
+                row_ids.claim_id
+              , row_ids.claim_line_number
+              , case when row_ids.claim_id = 'uppercase_institutional' then 'INSTITUTIONAL' else 'institutional' end as claim_type
+              , 'person' as person_id
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then null when row_ids.claim_id = 'cross_source' and row_ids.data_source = 'source_b' then 'member_b' else 'member_a' end as member_id
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'payer_b' else 'payer_a' end as payer
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'plan_b' else 'plan_a' end as {{ plan_identifier }}
+              , case when row_ids.claim_id = 'all_null' then cast(null as date) when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then cast('2024-01-02' as date) else cast('2024-01-01' as date) end as claim_start_date
+              , case when row_ids.claim_id = 'all_null' then cast(null as date) when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then cast(null as date) else cast('2024-01-31' as date) end as claim_end_date
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'billing_b' else 'billing_a' end as billing_npi
+              , 'facility' as facility_npi
+              , cast('2024-01-01' as date) as admission_date
+              , cast('2024-01-31' as date) as discharge_date
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then null else '1' end as admit_source_code
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then '2' else '1' end as admit_type_code
+              , case when row_ids.claim_id = 'all_null' then null when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then '02' else '01' end as discharge_disposition_code
+              , case when row_ids.claim_id = 'uppercase_institutional' and row_ids.claim_line_number = 2 then '112' else '111' end as bill_type_code
+              , case when row_ids.claim_id = 'uppercase_institutional' and row_ids.claim_line_number = 2 then '002' else '001' end as drg_code
+              , case
+                  when row_ids.claim_id = 'all_null' then null
+                  when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then null
+                  when row_ids.claim_id = 'case_conflict' and row_ids.claim_line_number = 2 then 'MS-DRG'
+                  else 'ms-drg'
+                end as drg_code_type
+              , case
+                  when row_ids.claim_id = 'all_null' then null
+                  when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then null
+                  when row_ids.claim_id = 'case_conflict' and row_ids.claim_line_number = 2 then 'ICD-10-CM'
+                  else 'icd-10-cm'
+                end as diagnosis_code_type
+              , case
+                  when row_ids.claim_id = 'all_null' then null
+                  when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'icd-9-pcs'
+                  when row_ids.claim_id = 'case_conflict' and row_ids.claim_line_number = 2 then 'ICD-10-PCS'
+                  else 'icd-10-pcs'
+                end as procedure_code_type
+              {% for index in range(1, 26) %}
+              , {% if index == 1 %}
+                    case
+                      when row_ids.claim_id = 'all_null' then null
+                      when row_ids.claim_id = 'same_values' and row_ids.claim_line_number = 1 then 'D00.1'
+                      else 'D001'
+                    end
+                {% elif index == 25 %}
+                    case
+                      when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 1 then 'Z001'
+                      when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'Z002'
+                      else null
+                    end
+                {% else %}null{% endif %} as diagnosis_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , {% if index == 1 %}'P001'{% else %}null{% endif %} as procedure_code_{{ index }}
+              {% endfor %}
+              , row_ids.data_source
+          from row_ids
+    expect:
+      rows:
+        - claim_id: single_line
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+          admit_source_code_has_multiple_values_per_inpatient_claim: null
+          admit_type_code_has_multiple_values_per_inpatient_claim: null
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: null
+          diagnosis_code_type_has_multiple_values_per_claim: null
+          procedure_code_type_has_multiple_values_per_claim: null
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
+        - claim_id: same_values
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+          admit_source_code_has_multiple_values_per_inpatient_claim: 0
+          admit_type_code_has_multiple_values_per_inpatient_claim: 0
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: 0
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: 0
+          diagnosis_code_type_has_multiple_values_per_claim: 0
+          procedure_code_type_has_multiple_values_per_claim: 0
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: 0
+        - claim_id: mixed_values
+          member_id_has_multiple_values_per_claim: 1
+          payer_has_multiple_values_per_claim: 1
+          plan_has_multiple_values_per_claim: 1
+          claim_start_date_has_multiple_values_per_claim: 1
+          claim_end_date_has_multiple_values_per_claim: 1
+          billing_npi_has_multiple_values_per_claim: 1
+          admit_source_code_has_multiple_values_per_inpatient_claim: 1
+          admit_type_code_has_multiple_values_per_inpatient_claim: 1
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: 1
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: 1
+          diagnosis_code_type_has_multiple_values_per_claim: 1
+          procedure_code_type_has_multiple_values_per_claim: 1
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: 1
+        - claim_id: all_null
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+          admit_source_code_has_multiple_values_per_inpatient_claim: null
+          admit_type_code_has_multiple_values_per_inpatient_claim: null
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: null
+          diagnosis_code_type_has_multiple_values_per_claim: null
+          procedure_code_type_has_multiple_values_per_claim: null
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
+        - claim_id: case_conflict
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+          admit_source_code_has_multiple_values_per_inpatient_claim: 0
+          admit_type_code_has_multiple_values_per_inpatient_claim: 0
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: 0
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: 1
+          diagnosis_code_type_has_multiple_values_per_claim: 1
+          procedure_code_type_has_multiple_values_per_claim: 1
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: 0
+        - claim_id: uppercase_institutional
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+          admit_source_code_has_multiple_values_per_inpatient_claim: null
+          admit_type_code_has_multiple_values_per_inpatient_claim: null
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: null
+          diagnosis_code_type_has_multiple_values_per_claim: 0
+          procedure_code_type_has_multiple_values_per_claim: 0
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
+        - claim_id: cross_source
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+          admit_source_code_has_multiple_values_per_inpatient_claim: null
+          admit_type_code_has_multiple_values_per_inpatient_claim: null
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: null
+          diagnosis_code_type_has_multiple_values_per_claim: null
+          procedure_code_type_has_multiple_values_per_claim: null
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
+        - claim_id: cross_source
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+          admit_source_code_has_multiple_values_per_inpatient_claim: null
+          admit_type_code_has_multiple_values_per_inpatient_claim: null
+          discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
+          drg_code_type_has_multiple_values_per_acute_inpatient_claim: null
+          diagnosis_code_type_has_multiple_values_per_claim: null
+          procedure_code_type_has_multiple_values_per_claim: null
+          diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
+
+  - name: test_pharmacy_claim_aggregate_flags_are_tristate
+    description: >
+      Verifies single-line, repeated, conflicting, and prerequisite-free
+      person-identity consistency at pharmacy-claim grain.
+    model: data_quality__pharmacy_claim_claim_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__pharmacy_claim')
+        format: sql
+        rows: |
+          select 'single' as claim_id, 'person_a' as person_id, cast('2024-01-01' as date) as dispensing_date, cast('2024-01-15' as date) as paid_date, 'source' as data_source
+          union all
+          select 'same', 'person_a', cast('2024-01-01' as date), cast('2024-01-15' as date), 'source'
+          union all
+          select 'same', 'person_a', cast('2024-01-02' as date), cast('2024-01-16' as date), 'source'
+          union all
+          select 'conflict', 'person_a', cast('2024-01-01' as date), cast('2024-01-15' as date), 'source'
+          union all
+          select 'conflict', 'person_b', cast('2024-01-02' as date), cast('2024-01-16' as date), 'source'
+          union all
+          select 'missing_match', 'person_missing', cast('2024-01-01' as date), cast('2024-01-15' as date), 'source'
+          union all
+          select 'no_prerequisites', null, cast(null as date), cast(null as date), 'source'
+          union all
+          select 'cross_source', 'person_a', cast('2024-01-01' as date), cast('2024-01-15' as date), 'source_a'
+          union all
+          select 'cross_source', 'person_b', cast('2024-01-01' as date), cast('2024-01-15' as date), 'source_b'
+    expect:
+      rows:
+        - claim_id: single
+          multiple_person_ids_per_claim: null
+        - claim_id: same
+          multiple_person_ids_per_claim: 0
+        - claim_id: conflict
+          multiple_person_ids_per_claim: 1
+        - claim_id: missing_match
+          multiple_person_ids_per_claim: null
+        - claim_id: no_prerequisites
+          multiple_person_ids_per_claim: null
+        - claim_id: cross_source
+          multiple_person_ids_per_claim: null
+        - claim_id: cross_source
+          multiple_person_ids_per_claim: null

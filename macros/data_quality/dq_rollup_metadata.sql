@@ -25,27 +25,6 @@
     {% endif %}
 {% endmacro %}
 
-{% macro dq_pretty_label(value) %}
-    {% set overrides = {
-        'ahrq_ccsrs': 'AHRQ CCSRs',
-        'ahrq_quality_indicators': 'AHRQ Quality Indicators',
-        'cms_chronic_conditions': 'CMS Chronic Conditions',
-        'cms_hccs': 'CMS HCCs',
-        'nyu_ed_classification': 'NYU ED Classification',
-        'empi': 'EMPI',
-        'hedis_and_stars': 'HEDIS and Stars'
-    } %}
-    {% if overrides.get(value) is not none %}
-        {{ return(overrides.get(value)) }}
-    {% endif %}
-
-    {% set words = [] %}
-    {% for part in value.split('_') %}
-        {% do words.append(part | capitalize) %}
-    {% endfor %}
-    {{ return(words | join(' ')) }}
-{% endmacro %}
-
 {% macro dq_domain_catalog_rows() %}
     {% set rows = [
         {'domain_group_key': 'claims_preprocessing', 'domain_group_name': 'Claims Preprocessing', 'component_key': 'claims_enrollment_flags', 'component_name': 'Claims Enrollment Flags', 'display_order': 101},
@@ -188,54 +167,6 @@
         {% do requirements.append(requirement) %}
     {% endfor %}
     {{ return(requirements) }}
-{% endmacro %}
-
-{% macro dq_logical_test_default_severity(test_name) %}
-    {{ return(dq_logical_test_severity(test_name)) }}
-{% endmacro %}
-
-{% macro dq_logical_test_category(test_name) %}
-    {{ return(dq_logical_test_type(test_name)) }}
-{% endmacro %}
-
-{% macro dq_logical_test_input_columns(test_name) %}
-    {% set suffix = test_name.split('__', 1)[1] if '__' in test_name else test_name %}
-    {% set candidates = [
-        'claim_line_start_date', 'claim_line_end_date', 'discharge_disposition_code',
-        'prescribing_provider_npi', 'dispensing_provider_npi', 'primary_diagnosis_code_type',
-        'primary_diagnosis_code', 'source_component_type', 'source_component_code',
-        'enrollment_start_date', 'enrollment_end_date', 'procedure_code_type',
-        'diagnosis_code_type', 'place_of_service_code', 'revenue_center_code',
-        'admission_date', 'discharge_date', 'bill_type_code', 'admit_source_code',
-        'admit_type_code', 'allowed_amount', 'paid_amount', 'claim_start_date',
-        'claim_end_date', 'encounter_start_date', 'encounter_end_date',
-        'dispensing_date', 'prescribing_date', 'observation_date', 'procedure_date',
-        'start_datetime', 'birth_date', 'death_date', 'death_flag', 'claim_type',
-        'person_id', 'patient_id', 'encounter_id', 'practitioner_id', 'location_id',
-        'appointment_id', 'immunization_id', 'lab_result_id', 'medication_id',
-        'observation_id', 'source_condition_id', 'source_procedure_id',
-        'claim_id', 'claim_line_number', 'member_id', 'payer', 'plan',
-        'diagnosis_code_1', 'diagnosis_code', 'procedure_code', 'drg_code_type',
-        'drg_code', 'hcpcs_code', 'rendering_npi', 'billing_npi', 'facility_npi',
-        'prescribing_provider_npi', 'dispensing_provider_npi', 'ndc_code',
-        'rxnorm_code', 'atc_code', 'quantity', 'days_supply', 'sex', 'race',
-        'ethnicity', 'payer_type', 'state', 'zip_code', 'npi', 'encounter_type',
-        'observation_type', 'code_system', 'source_code', 'present_on_admit_code',
-        'accession_number'
-    ] %}
-    {% set columns = [] %}
-
-    {% for column_name in candidates %}
-        {% if column_name in suffix and column_name not in columns %}
-            {% do columns.append(column_name) %}
-        {% endif %}
-    {% endfor %}
-
-    {% if columns | length == 0 %}
-        {% do columns.append('__record__') %}
-    {% endif %}
-
-    {{ return(columns) }}
 {% endmacro %}
 
 {% macro dq_safe_ratio_sql(numerator_expression, denominator_expression) %}

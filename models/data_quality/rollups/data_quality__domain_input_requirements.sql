@@ -6,7 +6,7 @@
        else 'data_quality'
      ),
      alias = 'domain_input_requirements',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_rollup'],
      materialized = 'table'
    )
 }}

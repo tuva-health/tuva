@@ -50,16 +50,6 @@
     {{ return(model_names) }}
 {% endmacro %}
 
-{% macro dq_enabled_input_layer_model_names_for_domain(domain_name) %}
-    {% for domain in dq_enabled_input_layer_model_domains() %}
-        {% if domain['name'] == domain_name %}
-            {{ return(domain['model_names']) }}
-        {% endif %}
-    {% endfor %}
-
-    {{ return([]) }}
-{% endmacro %}
-
 {% macro dq_input_layer_domain_name(model_name) %}
     {% for domain in dq_enabled_input_layer_model_domains() %}
         {% if model_name in domain['model_names'] %}
@@ -139,16 +129,6 @@
     {% endif %}
 
     {{ return(adapter.get_columns_in_relation(relation)) }}
-{% endmacro %}
-
-{% macro dq_has_column(columns, column_name) %}
-    {% set requested_name = column_name | lower %}
-    {% for column in columns %}
-        {% if column.name | lower == requested_name %}
-            {{ return(true) }}
-        {% endif %}
-    {% endfor %}
-    {{ return(false) }}
 {% endmacro %}
 
 {% macro dq_actual_column(columns, column_name, relation_name='Warehouse Table or View') %}
@@ -281,10 +261,6 @@
     {{ return(pk_columns) }}
 {% endmacro %}
 
-{% macro dq_source_key_sentinel() %}
-    {{ return('__dq_null__') }}
-{% endmacro %}
-
 {% macro dq_structural_null_source_key() %}
     {{ return('__dq_structural_null__') }}
 {% endmacro %}
@@ -387,4 +363,65 @@
     {% else %}
         {{ return(dq_base_type_family(normalized)) }}
     {% endif %}
+{% endmacro %}
+
+{% macro dq_type_has_64_bit_integer_capacity(type_string) %}
+    {{ return(adapter.dispatch('dq_type_has_64_bit_integer_capacity', 'the_tuva_project')(type_string)) }}
+{% endmacro %}
+
+{% macro default__dq_type_has_64_bit_integer_capacity(type_string) %}
+    {% if type_string is none %}
+        {{ return(false) }}
+    {% endif %}
+
+    {% set normalized = type_string | lower | trim %}
+    {% set compact = normalized | replace(' ', '') %}
+    {% set base = compact.split('(')[0] %}
+
+    {% if compact in ['bigint', 'int8', 'int64', 'long', 'hugeint'] %}
+        {{ return(true) }}
+    {% endif %}
+
+    {% if base in ['decimal', 'numeric', 'number']
+          and compact.startswith(base ~ '(')
+          and compact.endswith(')') %}
+        {% set parameters = compact.split('(', 1)[1].split(')', 1)[0].split(',') %}
+        {% if parameters | length == 2
+              and parameters[0].isdigit()
+              and parameters[1].isdigit()
+              and compact == base ~ '(' ~ (parameters | join(',')) ~ ')' %}
+            {% set precision = parameters[0] | int %}
+            {% set scale = parameters[1] | int %}
+            {{ return(scale == 0 and precision >= 19) }}
+        {% endif %}
+    {% endif %}
+
+    {{ return(false) }}
+{% endmacro %}
+
+{% macro snowflake__dq_type_has_64_bit_integer_capacity(type_string) %}
+    {% if type_string is none %}
+        {{ return(false) }}
+    {% endif %}
+
+    {% set normalized = type_string | lower | trim %}
+    {% if normalized in ['byteint', 'tinyint', 'smallint', 'int', 'integer', 'bigint']
+          or normalized == 'number' %}
+        {{ return(true) }}
+    {% endif %}
+
+    {{ return(default__dq_type_has_64_bit_integer_capacity(normalized)) }}
+{% endmacro %}
+
+{% macro bigquery__dq_type_has_64_bit_integer_capacity(type_string) %}
+    {% if type_string is none %}
+        {{ return(false) }}
+    {% endif %}
+
+    {% set normalized = type_string | lower | trim %}
+    {% if normalized in ['byteint', 'tinyint', 'smallint', 'int', 'integer', 'bigint', 'int64'] %}
+        {{ return(true) }}
+    {% endif %}
+
+    {{ return(default__dq_type_has_64_bit_integer_capacity(normalized)) }}
 {% endmacro %}

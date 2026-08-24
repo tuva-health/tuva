@@ -6,7 +6,7 @@
        else 'data_quality'
      ),
      alias = 'practitioner_flags',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_logical'],
+     tags = ['data_quality', 'dq_logical'],
      materialized = 'table'
    )
 }}
@@ -28,10 +28,12 @@ provider_rows as (
 final as (
     select
           source_rows.practitioner_id
-        , source_rows.npi
         , source_rows.data_source
-        , {{ dq_logical_int_flag_sql("source_rows.npi is not null and provider_rows.npi is null") }} as npi_invalid
-        , {{ dq_logical_int_flag_sql("source_rows.npi is not null and provider_rows.npi is not null and provider_rows.entity_type_code is not null and cast(provider_rows.entity_type_code as " ~ string_type ~ ") != '1'") }} as npi_not_individual
+        , {{ dq_logical_int_flag_sql("provider_rows.npi is null", "source_rows.npi is not null") }} as npi_invalid
+        , {{ dq_logical_int_flag_sql(
+              "cast(provider_rows.entity_type_code as " ~ string_type ~ ") != '1'",
+              "source_rows.npi is not null and provider_rows.npi is not null and provider_rows.entity_type_code is not null"
+          ) }} as npi_not_individual
     from source_rows
     left join provider_rows
         on cast(source_rows.npi as {{ string_type }}) = cast(provider_rows.npi as {{ string_type }})

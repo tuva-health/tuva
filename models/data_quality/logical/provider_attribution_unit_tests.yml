@@ -1,0 +1,95 @@
+version: 2
+
+unit_tests:
+  - name: test_provider_attribution_year_month_format_is_tristate
+    description: >
+      Verifies that provider attribution year_month accepts only an exact
+      six-digit YYYYMM value with a valid month, flags malformed populated
+      values, and reports null as not applicable because Structural Data
+      Quality owns primary-key nulls.
+    model: data_quality__provider_attribution_flags
+    config:
+      enabled: >-
+        {{
+          (var('data_quality_enabled', false) | as_bool)
+          and (var('claims_enabled', false) | as_bool)
+          and (var('provider_attribution_enabled', false) | as_bool)
+        }}
+    given:
+      - input: ref('input_layer__provider_attribution')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'valid' as person_id, 'valid' as member_id, '202401' as year_month, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'source' as data_source
+          union all
+          select 'dashed', 'dashed', '2024-01', 'payer', 'plan', 'source'
+          union all
+          select 'non_digit', 'non_digit', '2024A1', 'payer', 'plan', 'source'
+          union all
+          select 'month_00', 'month_00', '202400', 'payer', 'plan', 'source'
+          union all
+          select 'month_13', 'month_13', '202413', 'payer', 'plan', 'source'
+          union all
+          select 'leading_whitespace', 'leading_whitespace', ' 202401', 'payer', 'plan', 'source'
+          union all
+          select 'trailing_whitespace', 'trailing_whitespace', '202401 ', 'payer', 'plan', 'source'
+          union all
+          select 'null_value', 'null_value', null, 'payer', 'plan', 'source'
+    expect:
+      rows:
+        - person_id: valid
+          member_id: valid
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 0
+        - person_id: dashed
+          member_id: dashed
+          year_month: '2024-01'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: non_digit
+          member_id: non_digit
+          year_month: '2024A1'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: month_00
+          member_id: month_00
+          year_month: '202400'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: month_13
+          member_id: month_13
+          year_month: '202413'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: leading_whitespace
+          member_id: leading_whitespace
+          year_month: ' 202401'
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: trailing_whitespace
+          member_id: trailing_whitespace
+          year_month: '202401 '
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: 1
+        - person_id: null_value
+          member_id: null_value
+          year_month: null
+          payer: payer
+          plan: plan
+          data_source: source
+          year_month_invalid_format: null

@@ -7,7 +7,7 @@
        else 'data_quality'
      ),
      alias = 'logical_test_input_columns',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_logical', 'dq_rollup'],
      materialized = 'table'
    )
 }}
@@ -15,7 +15,7 @@
 {% set column_queries = [] %}
 
 {% for definition in dq_enabled_logical_test_manifest() %}
-    {% for input_column_name in dq_logical_test_input_columns(definition['test_name']) %}
+    {% for input_column_name in definition['affected_columns'] %}
         {% set query %}
             select
                   {{ dq_string_literal_sql(definition['test_name']) }} as test_name

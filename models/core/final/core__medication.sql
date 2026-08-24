@@ -87,10 +87,10 @@ source_mapping as (
    {{ tuva_extension_columns_from_all_medications }}
 from all_medications as meds
     left outer join {{ ref('terminology__ndc') }} as ndc
-        on meds.source_code_type = 'ndc'
-        and meds.source_code = ndc.ndc
+        on lower(meds.source_code_type) = 'ndc'
+        and replace(meds.source_code, '-', '') = replace(ndc.ndc, '-', '')
     left outer join {{ ref('terminology__rxnorm_to_atc') }} as rxatc
-        on meds.source_code_type = 'rxnorm'
+        on lower(meds.source_code_type) = 'rxnorm'
         and meds.source_code = rxatc.rxcui
    )
 
@@ -145,6 +145,6 @@ select
    {{ tuva_metadata_columns }}
 from source_mapping as sm
     left outer join {{ ref('terminology__ndc') }} as ndc
-        on sm.ndc_code = ndc.ndc
+        on replace(sm.ndc_code, '-', '') = replace(ndc.ndc, '-', '')
     left outer join {{ ref('terminology__rxnorm_to_atc') }} as rxatc
         on coalesce(sm.rxnorm_code, ndc.rxcui) = rxatc.rxcui

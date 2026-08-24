@@ -6,7 +6,7 @@
        else 'data_quality'
      ),
      alias = 'input_layer_catalog',
-     tags = ['data_quality', 'dq', 'dq1', 'dq_rollup'],
+     tags = ['data_quality', 'dq_logical', 'dq_rollup'],
      materialized = 'table'
    )
 }}
