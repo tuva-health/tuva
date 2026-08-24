@@ -20,6 +20,11 @@ vars:
   enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
   data_quality_domain_input_requirements: []  # Optional additional component-to-input dependency mappings.
 
+  ## Medication terminology
+  # False uses the package's CodeRx Open assets. True requires user-managed
+  # packages, drugs, and classes relations in the target database's coderx schema.
+  use_proprietary_coderx: false
+
   ## Synthetic data validation
   # These vars are for this integration_tests project. They are not normal production Tuva Core settings.
   use_synthetic_data: true             # Maps package synthetic seeds into this project's Input Layer models.

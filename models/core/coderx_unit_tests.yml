@@ -1,0 +1,284 @@
+version: 2
+
+unit_tests:
+  - name: test_coderx_packages_uses_open_asset_by_default
+    description: Verifies the default package router uses CodeRx Open and normalizes literal NULL values.
+    model: core__stg_coderx_packages
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: false
+    given:
+      - input: ref('terminology__coderx_packages')
+        format: sql
+        rows: |
+          select
+              '00011122233' as ndc11
+            , 'NULL' as ndc
+            , '100' as drug_id
+            , 'Open drug' as drug_name
+            , 'false' as is_brand
+            , '100' as clinical_drug_id
+            , 'Open drug' as clinical_drug_name
+            , 'true' as active
+            , 'true' as prescribable
+    expect:
+      rows:
+        - ndc11: '00011122233'
+          ndc: null
+          drug_id: '100'
+          drug_name: Open drug
+
+  - name: test_coderx_packages_uses_user_managed_source_when_enabled
+    description: Verifies the licensed-data switch routes package reads to coderx.packages.
+    model: core__stg_coderx_packages
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: true
+    given:
+      - input: source('coderx', 'packages')
+        format: sql
+        rows: |
+          select
+              '99988877766' as ndc11
+            , '99988-8777-66' as ndc
+            , '900' as drug_id
+            , 'Licensed drug' as drug_name
+            , 'true' as is_brand
+            , '901' as clinical_drug_id
+            , 'Licensed clinical drug' as clinical_drug_name
+            , 'true' as active
+            , 'true' as prescribable
+    expect:
+      rows:
+        - ndc11: '99988877766'
+          ndc: 99988-8777-66
+          drug_id: '900'
+          drug_name: Licensed drug
+
+  - name: test_coderx_drugs_uses_open_asset_by_default
+    description: Verifies the default drug router uses CodeRx Open and normalizes literal NULL values.
+    model: core__stg_coderx_drugs
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: false
+    given:
+      - input: ref('terminology__coderx_drugs')
+        format: sql
+        rows: |
+          select
+              '100' as drug_id
+            , 'Open drug' as drug_name
+            , 'false' as is_brand
+            , 'NULL' as clinical_drug_id
+            , 'NULL' as clinical_drug_name
+            , 'true' as active
+            , 'true' as prescribable
+    expect:
+      rows:
+        - drug_id: '100'
+          drug_name: Open drug
+          clinical_drug_id: null
+          clinical_drug_name: null
+
+  - name: test_coderx_drugs_uses_user_managed_source_when_enabled
+    description: Verifies the licensed-data switch routes drug reads to coderx.drugs.
+    model: core__stg_coderx_drugs
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: true
+    given:
+      - input: source('coderx', 'drugs')
+        format: sql
+        rows: |
+          select
+              '900' as drug_id
+            , 'Licensed drug' as drug_name
+            , 'true' as is_brand
+            , '901' as clinical_drug_id
+            , 'Licensed clinical drug' as clinical_drug_name
+            , 'true' as active
+            , 'true' as prescribable
+    expect:
+      rows:
+        - drug_id: '900'
+          drug_name: Licensed drug
+          clinical_drug_id: '901'
+          clinical_drug_name: Licensed clinical drug
+
+  - name: test_coderx_classes_uses_open_asset_by_default
+    description: Verifies the default class router uses CodeRx Open and normalizes literal NULL values.
+    model: core__stg_coderx_classes
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: false
+    given:
+      - input: ref('terminology__coderx_classes')
+        format: sql
+        rows: |
+          select
+              '100' as drug_id
+            , 'Open drug' as drug_name
+            , 'A' as atc_1_code
+            , 'Alimentary tract and metabolism' as atc_1_name
+            , 'A01' as atc_2_code
+            , 'Stomatological preparations' as atc_2_name
+            , 'A01A' as atc_3_code
+            , 'Stomatological preparations' as atc_3_name
+            , 'NULL' as atc_4_code
+            , 'NULL' as atc_4_name
+    expect:
+      rows:
+        - drug_id: '100'
+          atc_3_code: A01A
+          atc_3_name: Stomatological preparations
+          atc_4_code: null
+          atc_4_name: null
+
+  - name: test_coderx_classes_uses_user_managed_source_when_enabled
+    description: |-
+      Verifies the licensed-data switch routes class reads to coderx.classes and selects one deterministic non-null level 3 class when a drug has multiple class rows.
+    model: core__stg_coderx_classes
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        claims_enabled: false
+        use_proprietary_coderx: true
+    given:
+      - input: source('coderx', 'classes')
+        format: sql
+        rows: |
+          select
+              '900' as drug_id
+            , 'Licensed drug' as drug_name
+            , 'B' as atc_1_code
+            , 'Blood and blood forming organs' as atc_1_name
+            , 'B01' as atc_2_code
+            , 'Antithrombotic agents' as atc_2_name
+            , 'B01A' as atc_3_code
+            , 'Antithrombotic agents' as atc_3_name
+            , 'B01AA' as atc_4_code
+            , 'Vitamin K antagonists' as atc_4_name
+          union all
+          select
+              '900'
+            , 'Licensed drug'
+            , 'B'
+            , 'Blood and blood forming organs'
+            , 'B02'
+            , 'Antihemorrhagics'
+            , 'B02A'
+            , 'Antifibrinolytics'
+            , 'B02AA'
+            , 'Amino acids'
+    expect:
+      rows:
+        - drug_id: '900'
+          atc_3_code: B01A
+          atc_3_name: Antithrombotic agents
+          atc_4_code: B01AA
+          atc_4_name: Vitamin K antagonists
+
+  - name: test_core_medication_does_not_fall_back_to_open_description_in_licensed_mode
+    description: |-
+      Verifies an unmatched licensed package does not leak the CodeRx Open description carried by core.pharmacy_claim into the normalized NDC description.
+    model: core__medication
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: false
+        claims_enabled: true
+        use_proprietary_coderx: true
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('core__stg_claims_medication')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'claim_medication' as medication_id
+            , 'claims' as source_type
+            , 'person' as person_id
+            , 'member' as member_id
+            , null as patient_id
+            , null as encounter_id
+            , 'claim' as claim_id
+            , 1 as claim_line_number
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as dispensing_date
+            , cast(null as date) as prescribing_date
+            , 'ndc' as source_code_type
+            , '99999999999' as source_code
+            , 'Open source description' as source_description
+            , '99999999999' as ndc_code
+            , 'Open normalized description' as ndc_description
+            , null as rxnorm_code
+            , null as atc_code
+            , null as route
+            , null as strength
+            , 30 as quantity
+            , null as quantity_unit
+            , 30 as days_supply
+            , null as practitioner_id
+            , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+      - input: ref('core__stg_coderx_packages')
+        format: sql
+        rows: |
+          select
+              '11111111111' as ndc11
+            , null as ndc
+            , '100' as drug_id
+            , 'Licensed drug' as drug_name
+      - input: ref('core__stg_coderx_drugs')
+        format: sql
+        rows: |
+          select 'no_match' as drug_id, 'No match' as drug_name where 1 = 0
+      - input: ref('core__stg_coderx_classes')
+        format: sql
+        rows: |
+          select
+              'no_match' as drug_id
+            , null as atc_1_code
+            , null as atc_1_name
+            , null as atc_2_code
+            , null as atc_2_name
+            , null as atc_3_code
+            , null as atc_3_name
+            , null as atc_4_code
+            , null as atc_4_name
+          where 1 = 0
+    expect:
+      rows:
+        - medication_id: claim_medication
+          source_description: null
+          ndc_code: '99999999999'
+          ndc_description: null
+          rxnorm_code: null
+          rxnorm_description: null
+          atc_code: null
+          atc_description: null

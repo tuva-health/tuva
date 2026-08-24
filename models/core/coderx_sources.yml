@@ -1,0 +1,45 @@
+version: 2
+
+sources:
+  - name: coderx
+    description: |-
+      Optional user-managed licensed CodeRx data marts. These relations are read
+      only when `use_proprietary_coderx` is true; Tuva does not install, load, or
+      distribute them.
+    schema: coderx
+    tables:
+      - name: packages
+        description: NDC package records and their associated RxNorm drug concepts.
+        columns:
+          - name: ndc11
+          - name: ndc
+          - name: drug_id
+          - name: drug_name
+          - name: is_brand
+          - name: clinical_drug_id
+          - name: clinical_drug_name
+          - name: active
+          - name: prescribable
+      - name: drugs
+        description: RxNorm drug concepts and normalized drug names.
+        columns:
+          - name: drug_id
+          - name: drug_name
+          - name: is_brand
+          - name: clinical_drug_id
+          - name: clinical_drug_name
+          - name: active
+          - name: prescribable
+      - name: classes
+        description: RxNorm drug concepts mapped to ATC classification levels.
+        columns:
+          - name: drug_id
+          - name: drug_name
+          - name: atc_1_code
+          - name: atc_1_name
+          - name: atc_2_code
+          - name: atc_2_name
+          - name: atc_3_code
+          - name: atc_3_name
+          - name: atc_4_code
+          - name: atc_4_name

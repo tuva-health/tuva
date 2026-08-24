@@ -824,6 +824,10 @@ unit_tests:
             , 'ndc', '99999-9999-99', '99999-9999-99', null, null
             , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
           union all
+          select 'ndc_literal_null', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
+            , 'ndc', 'NULL', 'NULL', null, null
+            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+          union all
           select 'cross_source_patient_pair', 'cross_person_patient', 'cross_patient_patient', null
             , null, cast(null as date), cast(null as date), null, null, null, null, null
             , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source_b'
@@ -855,10 +859,12 @@ unit_tests:
         format: sql
         rows: |
           select 'cross_practitioner' as practitioner_id, 'source' as data_source
-      - input: ref('terminology__ndc')
+      - input: ref('terminology__coderx_packages')
         format: sql
         rows: |
-          select '12345678901' as ndc
+          select '12345678901' as ndc11, '12345-6789-01' as ndc
+          union all
+          select '00000000000', 'NULL'
     expect:
       rows:
         - medication_id: pair_fail
@@ -910,6 +916,14 @@ unit_tests:
           source_code_invalid: 0
           ndc_code_invalid: 0
         - medication_id: ndc_invalid
+          person_patient_pair_not_in_patient: 0
+          encounter_person_patient_pair_not_in_encounter: null
+          practitioner_id_not_in_practitioner: null
+          source_code_type_null_when_source_code_present: 0
+          source_code_null: 0
+          source_code_invalid: 1
+          ndc_code_invalid: 1
+        - medication_id: ndc_literal_null
           person_patient_pair_not_in_patient: 0
           encounter_person_patient_pair_not_in_encounter: null
           practitioner_id_not_in_practitioner: null
@@ -1252,7 +1266,8 @@ unit_tests:
   - name: test_core_medication_matches_code_types_and_ndc_format_consistently
     description: >
       Verifies case-insensitive NDC and RxNorm source-type matching, hyphen-free
-      NDC lookup comparison, and preservation of raw source fields.
+      NDC lookup comparison, CodeRx enrichment through ATC level 3, and
+      preservation of raw source fields.
     model: core__medication
     config:
       enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
@@ -1302,23 +1317,55 @@ unit_tests:
             , 'RXNORM', 'R1', 'Raw RxNorm description', null, null, null, null
             , null, null, cast(null as integer), null, cast(null as integer), null
             , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
-      - input: ref('terminology__ndc')
+          union all
+          select 'explicit_atc', 'clinical', 'p1', null, 'a1', null, null
+            , cast(null as integer), null, null, cast(null as date), cast(null as date)
+            , 'RXNORM', 'R3', 'Raw explicit ATC description', null, null, null, 'C01AA'
+            , null, null, cast(null as integer), null, cast(null as integer), null
+            , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
+          union all
+          select 'conflicting_explicit_rxnorm', 'clinical', 'p1', null, 'a1', null, null
+            , cast(null as integer), null, null, cast(null as date), cast(null as date)
+            , 'NDC', '12345-6789-01', 'Raw conflicting RxNorm description', null, null, 'R404', null
+            , null, null, cast(null as integer), null, cast(null as integer), null
+            , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
+      - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
           select
-              '12345678901' as ndc
-            , 'NDC description' as fda_description
-            , null as rxnorm_description
-            , null as rxcui
-      - input: ref('terminology__rxnorm_to_atc')
+              '12345678901' as ndc11
+            , '12345-6789-01' as ndc
+            , 'R2' as drug_id
+            , 'NDC drug description' as drug_name
+      - input: ref('core__stg_coderx_drugs')
         format: sql
         rows: |
           select
-              'R1' as rxcui
-            , 'RxNorm description' as rxnorm_description
+              'R1' as drug_id
+            , 'RxNorm description' as drug_name
+          union all
+          select 'R2', 'NDC drug description'
+          union all
+          select 'R3', 'Explicit ATC drug description'
+      - input: ref('core__stg_coderx_classes')
+        format: sql
+        rows: |
+          select
+              'R1' as drug_id
+            , 'A' as atc_1_code
+            , 'Alimentary tract and metabolism' as atc_1_name
+            , 'A01' as atc_2_code
+            , 'Stomatological preparations' as atc_2_name
             , 'A3' as atc_3_code
-            , 'ATC level 4' as atc_4_name
             , 'ATC level 3' as atc_3_name
+            , 'A3A' as atc_4_code
+            , 'ATC level 4' as atc_4_name
+          union all
+          select 'R2', 'B', 'Blood and blood forming organs', 'B01', 'Antithrombotic agents'
+            , 'B3', 'NDC ATC level 3', 'B3A', 'NDC ATC level 4'
+          union all
+          select 'R3', 'C', 'Cardiovascular system', 'C01', 'Cardiac therapy'
+            , 'C01A', 'Cardiac glycosides', 'C01AA', 'Digitalis glycosides'
     expect:
       rows:
         - medication_id: ndc_case
@@ -1326,10 +1373,11 @@ unit_tests:
           source_code: 12345-6789-01
           source_description: Raw NDC description
           ndc_code: '12345678901'
-          ndc_description: NDC description
-          rxnorm_code: null
-          rxnorm_description: null
-          atc_code: null
+          ndc_description: NDC drug description
+          rxnorm_code: R2
+          rxnorm_description: NDC drug description
+          atc_code: B3
+          atc_description: NDC ATC level 3
         - medication_id: rxnorm_case
           source_code_type: RXNORM
           source_code: R1
@@ -1339,3 +1387,24 @@ unit_tests:
           rxnorm_code: R1
           rxnorm_description: RxNorm description
           atc_code: A3
+          atc_description: ATC level 3
+        - medication_id: explicit_atc
+          source_code_type: RXNORM
+          source_code: R3
+          source_description: Raw explicit ATC description
+          ndc_code: null
+          ndc_description: null
+          rxnorm_code: R3
+          rxnorm_description: Explicit ATC drug description
+          atc_code: C01AA
+          atc_description: Digitalis glycosides
+        - medication_id: conflicting_explicit_rxnorm
+          source_code_type: NDC
+          source_code: 12345-6789-01
+          source_description: Raw conflicting RxNorm description
+          ndc_code: '12345678901'
+          ndc_description: NDC drug description
+          rxnorm_code: R404
+          rxnorm_description: null
+          atc_code: null
+          atc_description: null

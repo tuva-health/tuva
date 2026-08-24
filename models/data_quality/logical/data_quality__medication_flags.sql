@@ -66,8 +66,15 @@ practitioner_rows as (
 
 ndc_rows as (
     select distinct
-          ndc
-    from {{ ref('terminology__ndc') }}
+          ndc11 as ndc_lookup_code
+    from {{ ref('terminology__coderx_packages') }}
+
+    union
+
+    select distinct
+          replace(nullif(ndc, 'NULL'), '-', '') as ndc_lookup_code
+    from {{ ref('terminology__coderx_packages') }}
+    where nullif(ndc, 'NULL') is not null
 ),
 
 final as (
@@ -125,11 +132,11 @@ final as (
         , {{ dq_logical_int_flag_sql(
               "source_rows.source_code is not null "
               ~ "and lower(cast(source_rows.source_code_type as " ~ string_type ~ ")) = 'ndc' "
-              ~ "and source_ndc_rows.ndc is null",
+              ~ "and source_ndc_rows.ndc_lookup_code is null",
               "source_rows.source_code is not null "
               ~ "and lower(cast(source_rows.source_code_type as " ~ string_type ~ ")) = 'ndc'"
           ) }} as source_code_invalid
-        , {{ dq_logical_int_flag_sql("source_rows.ndc_code is not null and ndc_rows.ndc is null", "source_rows.ndc_code is not null") }} as ndc_code_invalid
+        , {{ dq_logical_int_flag_sql("source_rows.ndc_code is not null and ndc_rows.ndc_lookup_code is null", "source_rows.ndc_code is not null") }} as ndc_code_invalid
         , {{ dq_logical_int_flag_sql("source_rows.quantity is not null and source_rows.quantity < 0", "source_rows.quantity is not null") }} as quantity_negative
         , {{ dq_logical_int_flag_sql("source_rows.days_supply is not null and source_rows.days_supply < 0", "source_rows.days_supply is not null") }} as days_supply_negative
     from source_rows
@@ -155,10 +162,12 @@ final as (
         on source_rows.practitioner_id = practitioner_rows.practitioner_id
        and source_rows.data_source = practitioner_rows.data_source
     left join ndc_rows as source_ndc_rows
-        on replace(cast(source_rows.source_code as {{ string_type }}), '-', '') = replace(cast(source_ndc_rows.ndc as {{ string_type }}), '-', '')
+        on replace(cast(source_rows.source_code as {{ string_type }}), '-', '')
+           = cast(source_ndc_rows.ndc_lookup_code as {{ string_type }})
        and lower(cast(source_rows.source_code_type as {{ string_type }})) = 'ndc'
     left join ndc_rows
-        on replace(cast(source_rows.ndc_code as {{ string_type }}), '-', '') = replace(cast(ndc_rows.ndc as {{ string_type }}), '-', '')
+        on replace(cast(source_rows.ndc_code as {{ string_type }}), '-', '')
+           = cast(ndc_rows.ndc_lookup_code as {{ string_type }})
 )
 
 select *

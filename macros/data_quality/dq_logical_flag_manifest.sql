@@ -870,7 +870,7 @@
         {
             "test_name": "pharmacy_claim__ndc_code_invalid",
             "display_name": "ndc_code is invalid",
-            "description": "Checks whether ndc_code is populated but not found in Tuva NDC terminology.",
+            "description": "Checks whether ndc_code is populated but not found in the bundled CodeRx Open packages terminology.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["ndc_code"]
@@ -1726,7 +1726,7 @@
         {
             "test_name": "medication__source_code_invalid",
             "display_name": "source_code is invalid",
-            "description": "Checks whether a populated source_code is absent from Tuva NDC terminology when source_code_type identifies NDC without regard to letter case. Tuva removes hyphens from both values before comparison. Every other source_code_type, including RxNorm, ATC, and a source-system-specific name, is not applicable to this code-validity test.",
+            "description": "Checks whether a populated source_code is absent from the bundled CodeRx Open packages terminology when source_code_type identifies NDC without regard to letter case. Tuva removes hyphens from both values before comparison. Every other source_code_type, including RxNorm, ATC, and a source-system-specific name, is not applicable to this code-validity test.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["source_code_type", "source_code"]
@@ -1734,7 +1734,7 @@
         {
             "test_name": "medication__ndc_code_invalid",
             "display_name": "ndc_code is invalid",
-            "description": "Checks whether a populated ndc_code is absent from Tuva NDC terminology after Tuva removes hyphens from both values before comparison.",
+            "description": "Checks whether a populated ndc_code is absent from the bundled CodeRx Open packages terminology after Tuva removes hyphens from both values before comparison.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["ndc_code"]

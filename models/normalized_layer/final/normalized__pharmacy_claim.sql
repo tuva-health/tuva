@@ -4,6 +4,7 @@
    )
 }}
 
+{%- set coderx_name_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(3000)' -%}
 
 select
       cast(claim_id as {{ dbt.type_string() }}) as claim_id
@@ -36,7 +37,7 @@ select
     end as dispensing_provider_name
     , cast(dispensing_date as date) as dispensing_date
     , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code
-    , cast(ndc.fda_description as {{ dbt.type_string() }}) as ndc_description
+    , cast(coderx_packages.drug_name as {{ coderx_name_type }}) as ndc_description
     , cast(quantity as int) as quantity
     , cast(days_supply as int) as days_supply
     , cast(refills as int) as refills
@@ -59,5 +60,5 @@ left outer join {{ ref('provider_data__provider') }} as pres
       on pharm.prescribing_provider_npi = pres.npi
 left outer join {{ ref('provider_data__provider') }} as disp
       on pharm.dispensing_provider_npi = disp.npi
-left outer join {{ ref('terminology__ndc') }} as ndc
-      on pharm.ndc_code = ndc.ndc
+left outer join {{ ref('terminology__coderx_packages') }} as coderx_packages
+      on cast(pharm.ndc_code as {{ dbt.type_string() }}) = coderx_packages.ndc11

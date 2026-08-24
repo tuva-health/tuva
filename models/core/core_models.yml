@@ -2104,7 +2104,7 @@ models:
     description: |-
       The medication table contains medication records from clinical source systems and pharmacy claims. Clinical rows represent medication orders, administrations, and dispense records documented in an EHR or other clinical system. Claims rows represent adjudicated pharmacy claim lines from core.pharmacy_claim.
 
-      When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC descriptions from terminology when standard medication codes are available. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
+      When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC codes and descriptions from the package's CodeRx Open data assets when standard medication codes are available. When `use_proprietary_coderx` is true, the enrichment instead uses user-managed `packages`, `drugs`, and `classes` relations in the target database's `coderx` schema. If CodeRx supplies multiple class rows for a drug, Tuva selects the lexicographically first non-null level 3 ATC code to preserve the medication grain. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
 
       Primary key: medication_id, data_source.
     tests:
@@ -2233,51 +2233,56 @@ models:
       - name: source_description
         description: Medication name or description from the source system. Clinical
           rows are populated from input_layer__medication.source_description.
-          Claims rows are populated from core.pharmacy_claim.ndc_description.
+          Because pharmacy claims do not carry a raw medication description,
+          claims rows are populated from the CodeRx package selected by
+          use_proprietary_coderx when that NDC matches.
         config:
           meta:
             data_type: varchar
       - name: ndc_code
         description: National Drug Code for the medication. Clinical rows may be
           populated from input_layer__medication.ndc_code or derived from
-          terminology. Claims rows are populated from core.pharmacy_claim.ndc_code.
+          CodeRx packages. Claims rows are populated from core.pharmacy_claim.ndc_code.
         config:
           meta:
             terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
             data_type: varchar
       - name: ndc_description
         description: Medication description associated with ndc_code. This is derived
-          from Tuva NDC terminology when available and may also come from
-          core.pharmacy_claim.ndc_description for claims rows.
+          from the matched CodeRx package when available. The original clinical
+          description remains available in source_description; claims
+          source_description also uses the selected CodeRx package because claims
+          do not supply a raw medication description.
         config:
           meta:
             data_type: varchar
       - name: rxnorm_code
         description: RxNorm RxCUI for the medication. Clinical rows may be populated
-          from input_layer__medication.rxnorm_code or derived from terminology.
-          Claims rows are derived from NDC terminology when available.
+          from input_layer__medication.rxnorm_code or derived from CodeRx drugs.
+          Claims rows are derived through the matched CodeRx package when available.
         config:
           meta:
             terminology: https://www.nlm.nih.gov/research/umls/rxnorm/index.html
             data_type: varchar
       - name: rxnorm_description
         description: Medication description associated with rxnorm_code, derived from
-          RxNorm terminology when available.
+          the matched CodeRx drug when available.
         config:
           meta:
             data_type: varchar
       - name: atc_code
         description: WHO Anatomical Therapeutic Chemical classification code for the
           medication. Clinical rows may be populated from
-          input_layer__medication.atc_code or derived from terminology. Claims rows
-          are derived through NDC/RxNorm terminology when available.
+          input_layer__medication.atc_code or derived from the level 3 CodeRx class.
+          Claims rows are derived through the matched NDC and RxNorm concepts when available.
         config:
           meta:
             terminology: https://www.who.int/tools/atc-ddd-toolkit/atc-classification
             data_type: varchar
       - name: atc_description
         description: Medication classification description associated with atc_code,
-          derived from terminology when available.
+          derived from the matching CodeRx class hierarchy level when an ATC code
+          is supplied, or from the selected level 3 class when Tuva derives the code.
         config:
           meta:
             data_type: varchar
@@ -3068,8 +3073,8 @@ models:
             terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
             data_type: varchar
       - name: ndc_description
-        description: Description of ndc_code, derived from Tuva NDC terminology when
-          available.
+        description: Description of ndc_code, derived from the bundled CodeRx Open
+          packages terminology when available.
         config:
           meta:
             data_type: varchar
@@ -3510,6 +3515,70 @@ models:
         - core
         - core_stage_claims
       materialized: table
+  - name: core__stg_coderx_classes
+    description: |-
+      Canonical CodeRx drug-class interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.classes source when use_proprietary_coderx is true. Selects the lexicographically first non-null level 3 ATC code when a drug has multiple class rows, preserving one row per drug_id.
+    columns:
+      - name: drug_id
+        description: RxNorm RxCUI for the classified drug.
+      - name: drug_name
+        description: RxNorm name for the classified drug.
+      - name: atc_1_code
+        description: ATC level 1 code from the selected class hierarchy.
+      - name: atc_1_name
+        description: ATC level 1 name from the selected class hierarchy.
+      - name: atc_2_code
+        description: ATC level 2 code from the selected class hierarchy.
+      - name: atc_2_name
+        description: ATC level 2 name from the selected class hierarchy.
+      - name: atc_3_code
+        description: ATC level 3 code from the selected class hierarchy.
+      - name: atc_3_name
+        description: ATC level 3 name from the selected class hierarchy.
+      - name: atc_4_code
+        description: ATC level 4 code from the selected class hierarchy.
+      - name: atc_4_name
+        description: ATC level 4 name from the selected class hierarchy.
+  - name: core__stg_coderx_drugs
+    description: |-
+      Canonical CodeRx drug interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.drugs source when use_proprietary_coderx is true.
+    columns:
+      - name: drug_id
+        description: RxNorm RxCUI for the drug concept.
+      - name: drug_name
+        description: RxNorm name for the drug concept.
+      - name: is_brand
+        description: Indicates whether the drug concept is branded.
+      - name: clinical_drug_id
+        description: RxNorm RxCUI for the corresponding unbranded clinical drug.
+      - name: clinical_drug_name
+        description: RxNorm name for the corresponding unbranded clinical drug.
+      - name: active
+        description: Indicates whether the CodeRx record is active.
+      - name: prescribable
+        description: Indicates whether the CodeRx record is prescribable.
+  - name: core__stg_coderx_packages
+    description: |-
+      Canonical CodeRx package interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.packages source when use_proprietary_coderx is true.
+    columns:
+      - name: ndc11
+        description: Eleven-digit National Drug Code for the package.
+      - name: ndc
+        description: Hyphenated ten-digit National Drug Code when supplied by CodeRx.
+      - name: drug_id
+        description: RxNorm RxCUI for the drug associated with the package.
+      - name: drug_name
+        description: RxNorm name for the drug associated with the package.
+      - name: is_brand
+        description: Indicates whether the drug concept is branded.
+      - name: clinical_drug_id
+        description: RxNorm RxCUI for the corresponding unbranded clinical drug.
+      - name: clinical_drug_name
+        description: RxNorm name for the corresponding unbranded clinical drug.
+      - name: active
+        description: Indicates whether the CodeRx record is active.
+      - name: prescribable
+        description: Indicates whether the CodeRx record is prescribable.
   - name: core__stg_claims_medication
     description: |-
       This model maps core pharmacy claim rows into the medication structure so pharmacy claims can contribute claims-derived rows to core.medication.
