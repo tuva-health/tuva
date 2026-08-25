@@ -37,6 +37,7 @@ models:
         config:
           meta:
             data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the
           appointment. A person may have multiple patient IDs over time or
@@ -817,12 +818,6 @@ models:
         - encounters
       materialized: table
     columns:
-      - name: _dbt_source_relation
-        description: dbt utils metadata column to indicate the source table from
-          unioning tables together.
-        config:
-          meta:
-            data_type: varchar
       - name: encounter_id
         description: Identifier for an encounter within a data source.
         tests:
@@ -836,12 +831,6 @@ models:
           encounter.
         tests:
           - not_null
-        config:
-          meta:
-            data_type: varchar
-      - name: patient_data_source_id
-        description: Identifier for the source system from which the patient or
-          encounter source identifier originated.
         config:
           meta:
             data_type: varchar
@@ -2062,7 +2051,7 @@ models:
           when matching eligibility is available.
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
@@ -3150,7 +3139,7 @@ models:
           claim line when matching eligibility is available.
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
