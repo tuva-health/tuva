@@ -290,10 +290,10 @@ unit_tests:
         format: sql
         rows: |
           select 'valid_npi' as npi
-      - input: ref('terminology__ndc')
+      - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
-          select 'valid_ndc' as ndc
+          select 'valid_ndc' as ndc11, null as ndc
     expect:
       rows:
         - claim_id: missing_values
@@ -382,10 +382,10 @@ unit_tests:
         format: sql
         rows: |
           select 'valid_npi' as npi
-      - input: ref('terminology__ndc')
+      - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
-          select 'valid_ndc' as ndc
+          select 'valid_ndc' as ndc11, null as ndc
     expect:
       rows:
         - claim_id: paid_month_match

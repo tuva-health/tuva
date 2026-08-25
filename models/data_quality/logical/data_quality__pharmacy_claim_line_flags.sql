@@ -81,7 +81,7 @@ final as (
           ) }} as dispensing_provider_npi_invalid
         , {{ dq_logical_int_flag_sql("source_rows.ndc_code is null", "1 = 1") }} as ndc_code_null
         , {{ dq_logical_int_flag_sql(
-            "ndc_lookup.ndc is null",
+            "ndc_lookup.ndc11 is null",
             "source_rows.ndc_code is not null"
           ) }} as ndc_code_invalid
         , {{ dq_logical_int_flag_sql("source_rows.quantity is null", "1 = 1") }} as quantity_null
@@ -121,8 +121,9 @@ final as (
         on cast(source_rows.prescribing_provider_npi as {{ string_type }}) = cast(prescribing_provider_lookup.npi as {{ string_type }})
     left join {{ ref('provider_data__provider') }} as dispensing_provider_lookup
         on cast(source_rows.dispensing_provider_npi as {{ string_type }}) = cast(dispensing_provider_lookup.npi as {{ string_type }})
-    left join {{ ref('terminology__ndc') }} as ndc_lookup
-        on cast(source_rows.ndc_code as {{ string_type }}) = cast(ndc_lookup.ndc as {{ string_type }})
+    left join {{ ref('core__stg_coderx_packages') }} as ndc_lookup
+        on cast(source_rows.ndc_code as {{ string_type }})
+           = cast(ndc_lookup.ndc11 as {{ string_type }})
 )
 
 select *
