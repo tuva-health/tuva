@@ -75,7 +75,13 @@ models:
           meta:
             data_type: varchar
   - name: normalized__encounter
-    description: Casts clinical encounter records from input_layer__encounter and applies clinical encounter terminology enrichment before core.encounter consumes them.
+    description: >-
+      Casts clinical encounter records from input_layer__encounter, derives
+      encounter_group from the canonical encounter_type terminology, and
+      applies clinical encounter terminology enrichment before core.encounter
+      consumes them. Clinical encounter groups use the same inpatient,
+      outpatient, office based, and other contract as claims-derived
+      encounters.
     config:
       <<: *normalized_output_config
       alias: normalized__encounter
