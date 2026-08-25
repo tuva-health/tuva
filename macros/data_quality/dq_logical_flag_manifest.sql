@@ -1428,9 +1428,17 @@
             "affected_columns": ["encounter_id", "person_id", "patient_id", "data_source"]
         },
         {
+            "test_name": "condition__condition_rank_not_positive",
+            "display_name": "condition rank is not positive",
+            "description": "Checks whether a populated condition_rank in the condition Input Layer Model is zero or negative.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["condition_rank"]
+        },
+        {
             "test_name": "condition__code_system_invalid",
             "display_name": "code_system is invalid",
-            "description": "Checks whether code_system in the condition Input Layer Model is populated with a value other than icd-9-cm, icd-10-cm, snomed-ct, or unknown.",
+            "description": "Checks whether code_system in the condition Input Layer Model is populated with a value other than the exact lowercase values icd-9-cm, icd-10-cm, snomed-ct, or unknown.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["code_system"]
@@ -1438,7 +1446,7 @@
         {
             "test_name": "condition__source_code_invalid",
             "display_name": "source_code is invalid",
-            "description": "Checks whether source_code in the condition Input Layer Model is populated for a supported standard code system but not found in the corresponding terminology table.",
+            "description": "Checks whether source_code in the condition Input Layer Model is populated and code_system is one of the exact lowercase supported standard values, but source_code is not found in the corresponding terminology table.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["code_system", "source_code"]
@@ -3113,6 +3121,7 @@
                 'condition__onset_date_out_of_reasonable_range',
                 'condition__resolved_date_out_of_reasonable_range',
                 'condition__ingest_datetime_out_of_reasonable_range',
+                'condition__condition_rank_not_positive',
                 'condition__code_system_invalid',
                 'condition__source_code_invalid',
                 'condition__present_on_admit_code_invalid'

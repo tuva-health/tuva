@@ -15,10 +15,65 @@ models:
         - normalized_layer
       materialized: table
   - name: normalized__condition
-    description: Casts clinical condition records from input_layer__condition and applies clinical condition terminology enrichment before core.condition consumes them.
+    description: >-
+      Casts clinical condition records from input_layer__condition, preserves
+      source_condition_id, creates the collision-safe deterministic
+      condition_id, and applies clinical condition terminology enrichment
+      before core.condition consumes the rows. ICD-10-CM and ICD-9-CM matches
+      use the terminology long description for normalized_description.
     config:
       <<: *normalized_output_config
       alias: normalized__condition
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - condition_id
+    columns:
+      - name: condition_id
+        description: >-
+          Deterministic Tuva identifier created by hashing an unambiguous
+          encoding of the clinical-condition domain marker, data_source, and
+          source_condition_id.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: source_condition_id
+        description: >-
+          Condition-record identifier from the source clinical system,
+          preserved without transformation from input_layer__condition.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
+      - name: normalized_description
+        description: >-
+          Terminology description for normalized_code. ICD-10-CM and ICD-9-CM
+          matches use the terminology long description; SNOMED-CT matches use
+          the terminology description.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition_rank
+        description: >-
+          Integer diagnosis order from input_layer__condition. A value of 1
+          generally represents the primary diagnosis and values greater than 1
+          represent secondary diagnoses; null means the source did not rank the
+          condition.
+        config:
+          meta:
+            data_type: integer
+      - name: data_source
+        description: Source system that supplied the clinical condition.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
   - name: normalized__encounter
     description: Casts clinical encounter records from input_layer__encounter and applies clinical encounter terminology enrichment before core.encounter consumes them.
     config:

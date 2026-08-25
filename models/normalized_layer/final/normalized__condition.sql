@@ -4,15 +4,12 @@
 }}
 
 {%- set tuva_core_columns -%}
-      {{ dbt.safe_cast(
-          concat_custom([
-              "'clinical'",
-              "'_'",
-              "cast(cond.data_source as " ~ dbt.type_string() ~ ")",
-              "'_'",
-              "cast(cond.source_condition_id as " ~ dbt.type_string() ~ ")"
-          ]), api.Column.translate_type("string"))
-      }} as condition_id
+      {{ the_tuva_project.stable_id_hash([
+          "'clinical condition'",
+          'cond.data_source',
+          'cond.source_condition_id'
+      ]) }} as condition_id
+    , cast(cond.source_condition_id as {{ dbt.type_string() }}) as source_condition_id
     , cast(null as {{ dbt.type_string() }}) as payer
     , cast(cond.person_id as {{ dbt.type_string() }}) as person_id
     , cast(null as {{ dbt.type_string() }}) as member_id
@@ -40,8 +37,8 @@
         , snomed_ct.snomed_ct
       ) as {{ dbt.type_string() }}) as normalized_code
     , cast(coalesce(
-          icd10.short_description
-        , icd9.short_description
+          icd10.long_description
+        , icd9.long_description
         , snomed_ct.description
       ) as {{ dbt.type_string() }}) as normalized_description
     , cast(cond.condition_rank as {{ dbt.type_int() }}) as condition_rank

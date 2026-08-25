@@ -142,7 +142,7 @@ models:
             is_primary_key: true
   - name: int_condition_from_claims
     description: |
-      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the Tuva synthetic condition_id used by core.condition.
+      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the collision-safe deterministic Tuva condition_id used by core.condition. Claims-derived rows have no source_condition_id, do not infer a clinical status, and use billing_diagnosis as condition_type.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -157,13 +157,24 @@ models:
       materialized: table
     columns:
       - name: condition_id
-        description: Tuva synthetic identifier for the claims-derived condition row.
+        description: >-
+          Deterministic Tuva identifier created by hashing an unambiguous
+          encoding of the claims-condition domain marker, data_source,
+          claim_id, encounter_id, condition_rank, code_system, and source_code.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
+      - name: source_condition_id
+        description: >-
+          Source clinical condition identifier. This is always null for
+          claims-derived rows because medical claims do not supply a source
+          condition-record identifier.
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_id
         description: Encounter identifier assigned to the source claim line by the claims preprocessing encounter grouper.
         config:
@@ -191,6 +202,26 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: status
+        description: >-
+          Clinical condition status. This is null for claims-derived rows
+          because a billed diagnosis does not establish whether a condition is
+          clinically active, resolved, or otherwise current.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition_type
+        description: >-
+          Category of condition record. Claims-derived rows use
+          billing_diagnosis.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition_rank
+        description: Integer diagnosis position from the source medical claim.
+        config:
+          meta:
+            data_type: integer
       - name: data_source
         description: Data source associated with the claim line.
         tests:
@@ -277,13 +308,26 @@ models:
       materialized: table
     columns:
       - name: condition_id
-        description: Tuva synthetic record-level identifier for the condition. Clinical IDs are created in normalized__condition from source_condition_id and data_source. Claims-derived IDs are created in int_condition_from_claims from source data, claim, encounter, diagnosis rank, code system, and diagnosis code.
+        description: >-
+          Collision-safe deterministic Tuva record-level identifier. Clinical
+          IDs hash an unambiguous encoding of the clinical-condition domain
+          marker, data_source, and source_condition_id. Claims-derived IDs hash
+          the claims-condition domain marker, data_source, claim_id,
+          encounter_id, diagnosis rank, code system, and diagnosis code.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
+      - name: source_condition_id
+        description: >-
+          Condition-record identifier from the source clinical system. This is
+          preserved from input_layer__condition for clinical rows and is null
+          for claims-derived rows.
+        config:
+          meta:
+            data_type: varchar
       - name: person_id
         description: Globally unique identifier for the person associated with this
           condition. For claims-derived rows, this comes from the medical claim
@@ -356,16 +400,17 @@ models:
           meta:
             data_type: date
       - name: status
-        description: Status of the condition record. For claims-derived rows, Tuva sets
-          this to active. For clinical rows, this comes from
-          input_layer__condition and may include values such as active,
-          resolved, inactive, historical, suspected, or entered-in-error.
+        description: Status of the condition record. For claims-derived rows, this is
+          null because a billed diagnosis does not establish clinical status.
+          For clinical rows, this comes from input_layer__condition and may
+          include values such as active, resolved, inactive, historical,
+          suspected, or entered-in-error.
         config:
           meta:
             data_type: varchar
       - name: condition_type
         description: Category of condition record. For claims-derived rows, Tuva sets
-          this to discharge_diagnosis after unpivoting medical claim diagnosis
+          this to billing_diagnosis after unpivoting medical claim diagnosis
           fields. For clinical rows, this comes from input_layer__condition and
           may include values such as problem, encounter diagnosis, admitting
           diagnosis, discharge diagnosis, or billing diagnosis.
@@ -415,10 +460,12 @@ models:
               adapters.'
             data_type: varchar
       - name: normalized_description
-        description: Human-readable description for normalized_code. Tuva populates
-          this by preserving an upstream normalized_description when present,
-          otherwise by matching code_system and source_code to supported
-          condition terminology tables in the Normalized Layer.
+        description: Human-readable terminology description for normalized_code.
+          Tuva populates this by matching code_system and source_code to
+          supported condition terminology tables in the Normalized Layer.
+          Clinical and claims-derived ICD-10-CM and ICD-9-CM rows use the
+          terminology long description so the same normalized code has the
+          same description across source paths.
         config:
           meta:
             data_type: varchar
@@ -449,10 +496,9 @@ models:
           from the mapped input value. A condition_rank of 1 indicates a primary
           diagnosis code, and any condition_rank greater than 1 indicates a
           secondary diagnosis code.
-        data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: present_on_admit_code
         description: Present-on-admission indicator for the condition, when applicable.
           This is most relevant for inpatient facility diagnoses.
