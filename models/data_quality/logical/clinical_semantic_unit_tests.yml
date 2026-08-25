@@ -4,8 +4,8 @@ unit_tests:
   - name: test_appointment_identity_semantic_and_fanout_flags
     description: >
       Verifies source-scoped patient and encounter identity, appointment
-      semantics, tri-state applicability, and one output row when a person has
-      multiple patient IDs.
+      temporal semantics, tri-state applicability, and one output row when a
+      person has multiple patient IDs.
     model: data_quality__appointment_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
@@ -16,7 +16,7 @@ unit_tests:
           select 'valid' as appointment_id, 'p1' as person_id, 'a1' as patient_id, 'e1' as encounter_id
             , cast('2020-01-01' as date) as start_datetime
             , cast('2020-01-02' as date) as end_datetime
-            , 30 as duration, 'office' as type_code, 'booked' as status_code, 'source' as data_source
+            , 30 as duration, 'office' as type, 'booked' as status, 'source' as data_source
           union all
           select 'pair_fail', 'p1', 'b2', null
             , cast('2020-01-01' as date), cast('2020-01-02' as date)
@@ -62,14 +62,6 @@ unit_tests:
           union all select 'e2', 'p2', 'b2', 'source'
           union all select 'cross_encounter', 'cross_person_encounter', 'cross_patient_encounter', 'source'
           union all select 'cross_encounter', 'same_source_other_person', 'same_source_other_patient', 'source_b'
-      - input: ref('terminology__appointment_type')
-        format: sql
-        rows: |
-          select 'office' as code
-      - input: ref('terminology__appointment_status')
-        format: sql
-        rows: |
-          select 'booked' as code
     expect:
       rows:
         - appointment_id: valid
@@ -77,57 +69,41 @@ unit_tests:
           encounter_person_patient_pair_not_in_encounter: 0
           end_datetime_before_start_datetime: 0
           duration_negative: 0
-          type_code_invalid: 0
-          status_code_invalid: 0
         - appointment_id: pair_fail
           person_patient_pair_not_in_patient: 1
           encounter_person_patient_pair_not_in_encounter: null
           end_datetime_before_start_datetime: 0
           duration_negative: 0
-          type_code_invalid: 0
-          status_code_invalid: 0
         - appointment_id: encounter_fail
           person_patient_pair_not_in_patient: 0
           encounter_person_patient_pair_not_in_encounter: 1
           end_datetime_before_start_datetime: 0
           duration_negative: 0
-          type_code_invalid: 0
-          status_code_invalid: 0
         - appointment_id: semantic_fail
           person_patient_pair_not_in_patient: 0
           encounter_person_patient_pair_not_in_encounter: 0
           end_datetime_before_start_datetime: 1
           duration_negative: 1
-          type_code_invalid: 1
-          status_code_invalid: 1
         - appointment_id: optional_null
           person_patient_pair_not_in_patient: 0
           encounter_person_patient_pair_not_in_encounter: null
           end_datetime_before_start_datetime: null
           duration_negative: null
-          type_code_invalid: null
-          status_code_invalid: null
         - appointment_id: identity_null
           person_patient_pair_not_in_patient: null
           encounter_person_patient_pair_not_in_encounter: null
           end_datetime_before_start_datetime: null
           duration_negative: null
-          type_code_invalid: null
-          status_code_invalid: null
         - appointment_id: cross_source_patient_pair
           person_patient_pair_not_in_patient: 1
           encounter_person_patient_pair_not_in_encounter: null
           end_datetime_before_start_datetime: 0
           duration_negative: 0
-          type_code_invalid: 0
-          status_code_invalid: 0
         - appointment_id: cross_source_encounter_pair
           person_patient_pair_not_in_patient: 0
           encounter_person_patient_pair_not_in_encounter: 1
           end_datetime_before_start_datetime: 0
           duration_negative: 0
-          type_code_invalid: 0
-          status_code_invalid: 0
 
   - name: test_appointment_date_range_flags_are_tristate
     description: >
@@ -145,7 +121,7 @@ unit_tests:
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select 'at_minimum' as appointment_id, 'person' as person_id, 'patient' as patient_id, cast(null as {{ string_type }}) as encounter_id
             , cast('2000-01-01' as timestamp) as start_datetime, cast('2000-01-01' as timestamp) as end_datetime
-            , 30 as duration, 'office' as type_code, 'booked' as status_code, 'source' as data_source
+            , 30 as duration, 'office' as type, 'booked' as status, 'source' as data_source
           union all
           select 'before_minimum', 'person', 'patient', null
             , cast('1999-12-31' as timestamp), cast('1999-12-31' as timestamp)
@@ -170,14 +146,6 @@ unit_tests:
         format: sql
         rows: |
           select '__unused__' as encounter_id, 'person' as person_id, 'patient' as patient_id, 'source' as data_source
-      - input: ref('terminology__appointment_type')
-        format: sql
-        rows: |
-          select 'office' as code
-      - input: ref('terminology__appointment_status')
-        format: sql
-        rows: |
-          select 'booked' as code
     expect:
       rows:
         - appointment_id: at_minimum

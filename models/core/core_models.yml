@@ -6,7 +6,7 @@ models:
 
       This model transforms the input layer by:
       1. Casting every appointment field to its core data type
-      2. Left joining appointment type, appointment status, and appointment cancellation reason terminology tables to populate the _norm columns
+      2. Preserving source-EHR appointment type, status, reason, and cancellation reason descriptions without terminology normalization
       3. Pulling through extension columns from input_layer__appointment
 
       Table grain: One record per appointment per patient per data source.
@@ -80,7 +80,7 @@ models:
           end_datetime.
         config:
           meta:
-            data_type: varchar
+            data_type: integer
       - name: location_id
         description: Identifier for the location where the appointment is scheduled,
           such as a clinic, department, facility, or site in the source system.
@@ -95,86 +95,34 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: type_code
-        description: Source appointment type code. This field preserves the appointment
-          type value from the source system and is used to normalize appointment
-          type.
+      - name: type
+        description: Description of the appointment type as represented in the source
+          EHR. The source value is preserved without mapping it to a
+          Tuva-controlled vocabulary.
         config:
           meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
             data_type: varchar
-      - name: type_description
-        description: Human-readable description of the source appointment type.
+      - name: status
+        description: Description of the appointment status as represented in the
+          source EHR, such as scheduled, completed, canceled, or no-show. The
+          source value is preserved without mapping it to a Tuva-controlled
+          vocabulary.
         config:
           meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: type_code_norm
-        description: Normalized appointment type code derived downstream from the source
-          appointment type.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: type_description_norm
-        description: Normalized appointment type description derived downstream from the
-          source appointment type.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: status_code
-        description: Source appointment status code, such as scheduled, completed,
-          canceled, or no-show. This field is used to normalize appointment
-          status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_description
-        description: Human-readable description of the source appointment status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_code_norm
-        description: Normalized status code derived downstream from the source status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_description_norm
-        description: Normalized appointment status description derived downstream from
-          the source status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
       - name: reason
-        description: Free-text reason for the appointment. This may represent the
-          patient-stated reason, scheduling reason, visit reason, or chief
-          complaint depending on the source system.
+        description: Description of the appointment reason as represented in the
+          source EHR. This may represent the patient-stated reason, scheduling
+          reason, visit reason, or chief complaint depending on the source system.
         config:
           meta:
             data_type: varchar
       - name: cancellation_reason
-        description: Source cancellation reason for canceled appointments. Populated
-          only when the appointment was canceled and the source provides a
-          cancellation reason.
+        description: Description of the cancellation reason as represented in the
+          source EHR. Populated only when the appointment was canceled and the
+          source provides a cancellation reason.
         config:
           meta:
-            data_type: varchar
-      - name: cancellation_reason_code_norm
-        description: Normalized code for the appointment cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: cancellation_reason_description_norm
-        description: Normalized description of the code for the cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
             data_type: varchar
       - name: tuva_last_run
         description: The last time the data was refreshed. Generated by

@@ -1356,22 +1356,6 @@
             "affected_columns": ["duration"]
         },
         {
-            "test_name": "appointment__type_code_invalid",
-            "display_name": "type code is invalid",
-            "description": "Checks whether a populated appointment type_code is absent from Tuva appointment-type terminology.",
-            "test_type": "invalid",
-            "severity": 2,
-            "affected_columns": ["type_code"]
-        },
-        {
-            "test_name": "appointment__status_code_invalid",
-            "display_name": "status code is invalid",
-            "description": "Checks whether a populated appointment status_code is absent from Tuva appointment-status terminology.",
-            "test_type": "invalid",
-            "severity": 2,
-            "affected_columns": ["status_code"]
-        },
-        {
             "test_name": "condition__person_id_null",
             "display_name": "person_id is null",
             "description": "Checks whether person_id is null in the condition Input Layer Model.",
@@ -3104,9 +3088,7 @@
                 'appointment__start_datetime_out_of_reasonable_range',
                 'appointment__end_datetime_out_of_reasonable_range',
                 'appointment__end_datetime_before_start_datetime',
-                'appointment__duration_negative',
-                'appointment__type_code_invalid',
-                'appointment__status_code_invalid'
+                'appointment__duration_negative'
             ]
         },
         {

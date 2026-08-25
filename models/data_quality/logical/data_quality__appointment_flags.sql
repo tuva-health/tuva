@@ -11,7 +11,6 @@
    )
 }}
 
-{% set string_type = dbt.type_string() %}
 {% set date_type = api.Column.translate_type('date') %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_appointment_date_sql = dq_date_literal_sql('2000-01-01') %}
@@ -66,16 +65,6 @@ encounter_id_rows as (
     from encounter_rows
 ),
 
-appointment_type_rows as (
-    select distinct code
-    from {{ ref('terminology__appointment_type') }}
-),
-
-appointment_status_rows as (
-    select distinct code
-    from {{ ref('terminology__appointment_status') }}
-),
-
 final as (
     select
           source_rows.appointment_id
@@ -126,14 +115,6 @@ final as (
               "source_rows.duration < 0",
               "source_rows.duration is not null"
           ) }} as duration_negative
-        , {{ dq_logical_int_flag_sql(
-              "appointment_type_rows.code is null",
-              "source_rows.type_code is not null"
-          ) }} as type_code_invalid
-        , {{ dq_logical_int_flag_sql(
-              "appointment_status_rows.code is null",
-              "source_rows.status_code is not null"
-          ) }} as status_code_invalid
     from source_rows
     left join patient_person_rows as patient_person
         on source_rows.person_id = patient_person.person_id
@@ -153,10 +134,6 @@ final as (
        and source_rows.person_id = encounter_pair.person_id
        and source_rows.patient_id = encounter_pair.patient_id
        and source_rows.data_source = encounter_pair.data_source
-    left join appointment_type_rows
-        on lower(trim(cast(source_rows.type_code as {{ string_type }}))) = lower(trim(cast(appointment_type_rows.code as {{ string_type }})))
-    left join appointment_status_rows
-        on lower(trim(cast(source_rows.status_code as {{ string_type }}))) = lower(trim(cast(appointment_status_rows.code as {{ string_type }})))
 )
 
 select *

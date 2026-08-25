@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: normalized__appointment
-    description: Casts and normalizes clinical appointment records from input_layer__appointment before core.appointment consumes them.
+    description: Casts clinical appointment records from input_layer__appointment before core.appointment consumes them. Source-EHR appointment type, status, reason, and cancellation reason descriptions are preserved without terminology normalization.
     config: &normalized_output_config
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalized_layer
