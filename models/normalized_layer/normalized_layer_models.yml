@@ -140,7 +140,7 @@ models:
       alias: normalized__location
   - name: normalized__medical_claim_diagnoses
     description: |
-      Creates line-level normalized diagnosis rows from normalized medical claim diagnosis fields. The model unpivots diagnosis_code_1 through diagnosis_code_25, preserves the source claim line and diagnosis rank, and joins diagnosis and present-on-admission terminology. It does not attach encounter_id or create the core condition_id; those core-specific steps happen in int_condition_from_claims.
+      Creates line-level normalized diagnosis rows from normalized medical claim diagnosis fields. The model unpivots every populated diagnosis_code_1 through diagnosis_code_25 value regardless of claim_type, preserves the source claim line and diagnosis rank, and joins diagnosis and present-on-admission terminology. Claim classification findings remain visible through Logical Data Quality without deleting otherwise usable diagnosis facts. This model does not attach encounter_id or create the core condition_id; those core-specific steps happen in int_condition_from_claims.
     config:
       <<: *normalized_output_config
       alias: normalized__medical_claim_diagnoses

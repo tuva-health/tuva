@@ -1,0 +1,80 @@
+version: 2
+
+unit_tests:
+  - name: test_claim_level_diagnosis_excludes_unclassified_claims
+    description: >-
+      Protects the classification boundary for the legacy claim-level
+      diagnosis array. Professional and institutional diagnosis rows aggregate
+      by claim and source, while undetermined and null claim types remain
+      available in the canonical diagnosis relation but do not enter this
+      downstream max-based representation.
+    model: int_claim_level_diagnosis
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized__medical_claim_diagnoses')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          select
+              'claim-professional' as claim_id
+            , 'source-a' as data_source
+            , 'icd-10-cm' as raw_code_system
+            , 1 as condition_rank
+            , 'A001' as source_code
+            , 'professional' as claim_type
+          union all
+          select
+              'claim-professional'
+            , 'source-a'
+            , 'icd-10-cm'
+            , 2
+            , 'B001'
+            , 'professional'
+          union all
+          select
+              'claim-institutional'
+            , 'source-a'
+            , 'icd-9-cm'
+            , 1
+            , '25000'
+            , 'institutional'
+          union all
+          select
+              'claim-institutional'
+            , 'source-a'
+            , 'icd-9-cm'
+            , 2
+            , '40190'
+            , 'institutional'
+          union all
+          select
+              'claim-undetermined'
+            , 'source-a'
+            , 'icd-10-cm'
+            , 1
+            , 'U001'
+            , 'undetermined'
+          union all
+          select
+              'claim-null-type'
+            , 'source-a'
+            , 'icd-10-cm'
+            , 1
+            , 'N001'
+            , cast(null as {{ string_type }})
+    expect:
+      rows:
+        - claim_id: claim-professional
+          data_source: source-a
+          diagnosis_code_type: icd-10-cm
+          diagnosis_code_1: A001
+          diagnosis_code_2: B001
+        - claim_id: claim-institutional
+          data_source: source-a
+          diagnosis_code_type: icd-9-cm
+          diagnosis_code_1: '25000'
+          diagnosis_code_2: '40190'

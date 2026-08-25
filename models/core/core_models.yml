@@ -143,7 +143,7 @@ models:
             is_primary_key: true
   - name: int_condition_from_claims
     description: |
-      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the collision-safe deterministic Tuva condition_id used by core.condition. Claims-derived rows have no source_condition_id, do not infer a clinical status, and use billing_diagnosis as condition_type.
+      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model left joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id when available, then creates the collision-safe deterministic Tuva condition_id used by core.condition. Diagnoses remain available when claim_type is undetermined or no encounter is assigned; those rows have a null encounter_id. Claims-derived rows have no source_condition_id, do not infer a clinical status, and use billing_diagnosis as condition_type.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -292,7 +292,7 @@ models:
     description: |
       The condition table stores diagnoses, problem list records, encounter diagnoses, admitting diagnoses, discharge diagnoses, and other condition records from claims and clinical sources. Claims-derived rows come from int_condition_from_claims. Clinical rows come from normalized__condition.
 
-      The Normalized Layer unpivots claims diagnosis fields and normalizes supported diagnosis code systems. The int_condition_from_claims model attaches claim-line encounter_id for claims-derived rows and creates the Tuva synthetic condition_id. Core condition unions normalized clinical and claims condition rows, then joins normalized ICD-10-CM and SNOMED CT diagnosis codes to the Tuva Condition Grouper to populate condition_family and condition.
+      The Normalized Layer unpivots every populated claims diagnosis field regardless of claim_type and normalizes supported diagnosis code systems. The int_condition_from_claims model attaches claim-line encounter_id when available and creates the Tuva synthetic condition_id; diagnoses without an encounter assignment remain present with a null encounter_id. Core condition unions normalized clinical and claims condition rows, then joins normalized ICD-10-CM and SNOMED CT diagnosis codes to the Tuva Condition Grouper to populate condition_family and condition.
 
       Primary key: condition_id.
     tests:

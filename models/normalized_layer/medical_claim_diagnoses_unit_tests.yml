@@ -1,0 +1,171 @@
+version: 2
+
+unit_tests:
+  - name: test_normalized_medical_claim_diagnoses_retains_undetermined_claims
+    description: >-
+      Proves that claim classification does not delete otherwise usable
+      diagnosis facts. Every populated diagnosis position from an undetermined
+      claim remains at its source claim-line grain, receives terminology and
+      present-on-admission enrichment, and does not alter diagnoses from
+      classified claims.
+    model: normalized__medical_claim_diagnoses
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          select
+              'mc-undetermined-1' as medical_claim_id
+            , 'claim-undetermined' as claim_id
+            , 1 as claim_line_number
+            , 'undetermined' as claim_type
+            , 'person-1' as person_id
+            , 'member-1' as member_id
+            , 'payer-1' as payer
+            , 'plan-1' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-02' as date) as claim_end_date
+            , cast('2024-01-01' as date) as claim_line_start_date
+            , cast('2024-01-01' as date) as claim_line_end_date
+            , cast(null as date) as admission_date
+            , cast(null as date) as discharge_date
+            , 'icd-10-cm' as diagnosis_code_type
+            {% for i in range(1, 26) %}
+            , {% if i == 1 %}'A00.1'{% elif i == 2 %}'250.00'{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ i }}
+            {% endfor %}
+            {% for i in range(1, 26) %}
+            , {% if i == 1 %}'Y'{% elif i == 2 %}'N'{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_poa_{{ i }}
+            {% endfor %}
+            , 'source-a' as data_source
+          union all
+          select
+              'mc-undetermined-2' as medical_claim_id
+            , 'claim-undetermined' as claim_id
+            , 2 as claim_line_number
+            , 'undetermined' as claim_type
+            , 'person-1' as person_id
+            , 'member-1' as member_id
+            , 'payer-1' as payer
+            , 'plan-1' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-02' as date) as claim_end_date
+            , cast('2024-01-02' as date) as claim_line_start_date
+            , cast('2024-01-02' as date) as claim_line_end_date
+            , cast(null as date) as admission_date
+            , cast(null as date) as discharge_date
+            , 'icd-10-cm' as diagnosis_code_type
+            {% for i in range(1, 26) %}
+            , {% if i == 1 %}'B00.1'{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ i }}
+            {% endfor %}
+            {% for i in range(1, 26) %}
+            , {% if i == 1 %}'U'{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_poa_{{ i }}
+            {% endfor %}
+            , 'source-a' as data_source
+          union all
+          select
+              'mc-professional-1' as medical_claim_id
+            , 'claim-professional' as claim_id
+            , 1 as claim_line_number
+            , 'professional' as claim_type
+            , 'person-2' as person_id
+            , 'member-2' as member_id
+            , 'payer-2' as payer
+            , 'plan-2' as {{ plan_identifier }}
+            , cast('2024-02-01' as date) as claim_start_date
+            , cast('2024-02-01' as date) as claim_end_date
+            , cast('2024-02-01' as date) as claim_line_start_date
+            , cast('2024-02-01' as date) as claim_line_end_date
+            , cast(null as date) as admission_date
+            , cast(null as date) as discharge_date
+            , 'icd-10-cm' as diagnosis_code_type
+            {% for i in range(1, 26) %}
+            , {% if i == 1 %}'C00.1'{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ i }}
+            {% endfor %}
+            {% for i in range(1, 26) %}
+            , cast(null as {{ string_type }}) as diagnosis_poa_{{ i }}
+            {% endfor %}
+            , 'source-b' as data_source
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select 'A001' as icd_10_cm, 'ICD-10 A001' as long_description
+          union all
+          select 'B001', 'ICD-10 B001'
+          union all
+          select 'C001', 'ICD-10 C001'
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          select '25000' as icd_9_cm, 'ICD-9 25000' as long_description
+      - input: ref('terminology__present_on_admission')
+        format: sql
+        rows: |
+          select 'Y' as present_on_admit_code, 'Present at admission' as present_on_admit_description
+          union all
+          select 'N', 'Not present at admission'
+          union all
+          select 'U', 'Documentation insufficient'
+    expect:
+      rows:
+        - medical_claim_id: mc-undetermined-1
+          claim_id: claim-undetermined
+          claim_line_number: 1
+          claim_type: undetermined
+          raw_code_system: icd-10-cm
+          condition_rank: 1
+          diagnosis_column: diagnosis_code_1
+          code_system: icd-10-cm
+          source_code: A001
+          normalized_code: A001
+          normalized_description: ICD-10 A001
+          present_on_admit_code: Y
+          present_on_admit_description: Present at admission
+          data_source: source-a
+        - medical_claim_id: mc-undetermined-1
+          claim_id: claim-undetermined
+          claim_line_number: 1
+          claim_type: undetermined
+          raw_code_system: icd-10-cm
+          condition_rank: 2
+          diagnosis_column: diagnosis_code_2
+          code_system: icd-9-cm
+          source_code: '25000'
+          normalized_code: '25000'
+          normalized_description: ICD-9 25000
+          present_on_admit_code: N
+          present_on_admit_description: Not present at admission
+          data_source: source-a
+        - medical_claim_id: mc-undetermined-2
+          claim_id: claim-undetermined
+          claim_line_number: 2
+          claim_type: undetermined
+          raw_code_system: icd-10-cm
+          condition_rank: 1
+          diagnosis_column: diagnosis_code_1
+          code_system: icd-10-cm
+          source_code: B001
+          normalized_code: B001
+          normalized_description: ICD-10 B001
+          present_on_admit_code: U
+          present_on_admit_description: Documentation insufficient
+          data_source: source-a
+        - medical_claim_id: mc-professional-1
+          claim_id: claim-professional
+          claim_line_number: 1
+          claim_type: professional
+          raw_code_system: icd-10-cm
+          condition_rank: 1
+          diagnosis_column: diagnosis_code_1
+          code_system: icd-10-cm
+          source_code: C001
+          normalized_code: C001
+          normalized_description: ICD-10 C001
+          present_on_admit_code: null
+          present_on_admit_description: null
+          data_source: source-b

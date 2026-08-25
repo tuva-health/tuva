@@ -6,7 +6,8 @@ unit_tests:
       Proves that claims condition IDs preserve ordered parent values across
       underscore, pipe, percent, null, empty-string, and literal-sentinel
       boundaries. Claims rows must publish a null source_condition_id and
-      status and use billing_diagnosis as condition_type.
+      status and use billing_diagnosis as condition_type. Diagnoses from an
+      undetermined claim must survive without an encounter assignment.
     model: int_condition_from_claims
     config:
       enabled: "{{ var('claims_enabled', false) | as_bool }}"
@@ -37,6 +38,8 @@ unit_tests:
           select 'mc-8', 'claim-sentinel', 1, 'professional', 'person-8', 'member-8', 'payer', 'plan', cast('2024-01-01' as date), 1, 'icd-10-cm', 'A001', 'A001', 'Long description', null, null, cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'source'
           union all
           select 'mc-9', 'c', 1, 'professional', 'person-9', 'member-9', 'payer', 'plan', cast('2024-01-01' as date), 1, 'icd-10-cm', 'A001', 'A001', 'Long description', null, null, cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'a%7Cb'
+          union all
+          select 'mc-10', 'claim-undetermined', 1, 'undetermined', 'person-10', 'member-10', 'payer', 'plan', cast('2024-01-01' as date), 1, 'icd-10-cm', 'A001', 'A001', 'Long description', null, null, cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'source'
       - input: ref('encounters__combined_claim_line_crosswalk')
         format: sql
         rows: |
@@ -129,3 +132,11 @@ unit_tests:
           status: null
           condition_type: billing_diagnosis
           data_source: a%7Cb
+        - condition_id: 5c72213e34dd68ff47e649dff032e27a
+          source_condition_id: null
+          claim_id: claim-undetermined
+          encounter_id: null
+          condition_rank: 1
+          status: null
+          condition_type: billing_diagnosis
+          data_source: source
