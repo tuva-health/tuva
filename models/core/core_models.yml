@@ -2104,7 +2104,7 @@ models:
     description: |-
       The medication table contains medication records from clinical source systems and pharmacy claims. Clinical rows represent medication orders, administrations, and dispense records documented in an EHR or other clinical system. Claims rows represent adjudicated pharmacy claim lines from core.pharmacy_claim.
 
-      When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC codes and descriptions from the package's CodeRx Open data assets when standard medication codes are available. When `use_proprietary_coderx` is true, the enrichment instead uses user-managed `packages`, `drugs`, and `classes` relations in the target database's `coderx` schema. If CodeRx supplies multiple class rows for a drug, Tuva selects the lexicographically first non-null level 3 ATC code to preserve the medication grain. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
+      When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC codes and descriptions from the package's CodeRx Open data assets when standard medication codes are available. When `use_coderx_enterprise` is true, Tuva's shared CodeRx interfaces instead use user-managed `packages`, `drugs`, and `classes` relations in the target database's `coderx` schema throughout pharmacy normalization, medication enrichment, data quality, and dependent packages. If CodeRx supplies multiple class rows for a drug, Tuva selects the lexicographically first non-null level 3 ATC code to preserve the medication grain. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
 
       Primary key: medication_id, data_source.
     tests:
@@ -2235,7 +2235,7 @@ models:
           rows are populated from input_layer__medication.source_description.
           Because pharmacy claims do not carry a raw medication description,
           claims rows are populated from the CodeRx package selected by
-          use_proprietary_coderx when that NDC matches.
+          use_coderx_enterprise when that NDC matches.
         config:
           meta:
             data_type: varchar
@@ -3517,7 +3517,7 @@ models:
       materialized: table
   - name: core__stg_coderx_classes
     description: |-
-      Canonical CodeRx drug-class interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.classes source when use_proprietary_coderx is true. Selects the lexicographically first non-null level 3 ATC code when a drug has multiple class rows, preserving one row per drug_id.
+      Canonical CodeRx drug-class interface used throughout Tuva Core and by dependent packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.classes source when use_coderx_enterprise is true. Selects the lexicographically first non-null level 3 ATC code when a drug has multiple class rows, preserving one row per drug_id.
     columns:
       - name: drug_id
         description: RxNorm RxCUI for the classified drug.
@@ -3541,7 +3541,7 @@ models:
         description: ATC level 4 name from the selected class hierarchy.
   - name: core__stg_coderx_drugs
     description: |-
-      Canonical CodeRx drug interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.drugs source when use_proprietary_coderx is true.
+      Canonical CodeRx drug interface used throughout Tuva Core and by dependent packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.drugs source when use_coderx_enterprise is true.
     columns:
       - name: drug_id
         description: RxNorm RxCUI for the drug concept.
@@ -3559,7 +3559,7 @@ models:
         description: Indicates whether the CodeRx record is prescribable.
   - name: core__stg_coderx_packages
     description: |-
-      Canonical CodeRx package interface used by core.medication and dependent Tuva packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.packages source when use_proprietary_coderx is true.
+      Canonical CodeRx package interface used throughout Tuva Core and by dependent packages. Reads the bundled CodeRx Open asset by default and the user-managed coderx.packages source when use_coderx_enterprise is true.
     columns:
       - name: ndc11
         description: Eleven-digit National Drug Code for the package.

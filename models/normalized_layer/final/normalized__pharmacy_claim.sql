@@ -60,5 +60,5 @@ left outer join {{ ref('provider_data__provider') }} as pres
       on pharm.prescribing_provider_npi = pres.npi
 left outer join {{ ref('provider_data__provider') }} as disp
       on pharm.dispensing_provider_npi = disp.npi
-left outer join {{ ref('terminology__coderx_packages') }} as coderx_packages
+left outer join {{ ref('core__stg_coderx_packages') }} as coderx_packages
       on cast(pharm.ndc_code as {{ dbt.type_string() }}) = coderx_packages.ndc11

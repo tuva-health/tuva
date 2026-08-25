@@ -290,7 +290,7 @@ unit_tests:
         format: sql
         rows: |
           select 'valid_npi' as npi
-      - input: ref('terminology__coderx_packages')
+      - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
           select 'valid_ndc' as ndc11, null as ndc
@@ -382,7 +382,7 @@ unit_tests:
         format: sql
         rows: |
           select 'valid_npi' as npi
-      - input: ref('terminology__coderx_packages')
+      - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
           select 'valid_ndc' as ndc11, null as ndc

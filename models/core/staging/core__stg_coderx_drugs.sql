@@ -15,7 +15,7 @@ select
     , nullif(cast(clinical_drug_name as {{ coderx_name_type }}), 'NULL') as clinical_drug_name
     , nullif(cast(active as {{ dbt.type_string() }}), 'NULL') as active
     , nullif(cast(prescribable as {{ dbt.type_string() }}), 'NULL') as prescribable
-{% if var('use_proprietary_coderx', false) | as_bool %}
+{% if var('use_coderx_enterprise', false) | as_bool %}
 from {{ source('coderx', 'drugs') }}
 {% else %}
 from {{ ref('terminology__coderx_drugs') }}

@@ -19,7 +19,7 @@ with source_rows as (
         , nullif(cast(atc_3_name as {{ dbt.type_string() }}), 'NULL') as atc_3_name
         , nullif(cast(atc_4_code as {{ dbt.type_string() }}), 'NULL') as atc_4_code
         , nullif(cast(atc_4_name as {{ dbt.type_string() }}), 'NULL') as atc_4_name
-    {% if var('use_proprietary_coderx', false) | as_bool %}
+    {% if var('use_coderx_enterprise', false) | as_bool %}
     from {{ source('coderx', 'classes') }}
     {% else %}
     from {{ ref('terminology__coderx_classes') }}

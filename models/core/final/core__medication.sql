@@ -21,7 +21,7 @@
    , data_source
 {%- endset -%}
 
-{%- set use_proprietary_coderx = var('use_proprietary_coderx', false) | as_bool -%}
+{%- set use_coderx_enterprise = var('use_coderx_enterprise', false) | as_bool -%}
 
 with coderx_package_keys as (
     select
@@ -128,7 +128,7 @@ select
             when coalesce(lower(sm.source_type), '') <> 'claims' then sm.ndc_description
           end
         , ndc_package.drug_name
-        {% if not use_proprietary_coderx %}
+        {% if not use_coderx_enterprise %}
         , sm.ndc_description
         {% endif %}
       ) as ndc_description

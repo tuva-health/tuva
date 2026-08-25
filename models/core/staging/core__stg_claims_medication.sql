@@ -3,6 +3,8 @@
    )
 }}
 
+{%- set coderx_name_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(3000)' -%}
+
 select
       cast(pharmacy_claim_id as {{ dbt.type_string() }}) as medication_id
     , cast('claims' as {{ dbt.type_string() }}) as source_type
@@ -18,9 +20,9 @@ select
     , cast(null as date) as prescribing_date
     , cast('ndc' as {{ dbt.type_string() }}) as source_code_type
     , cast(ndc_code as {{ dbt.type_string() }}) as source_code
-    , cast(ndc_description as {{ dbt.type_string() }}) as source_description
+    , cast(ndc_description as {{ coderx_name_type }}) as source_description
     , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code
-    , cast(ndc_description as {{ dbt.type_string() }}) as ndc_description
+    , cast(ndc_description as {{ coderx_name_type }}) as ndc_description
     , cast(null as {{ dbt.type_string() }}) as rxnorm_code
     , cast(null as {{ dbt.type_string() }}) as atc_code
     , cast(null as {{ dbt.type_string() }}) as route
