@@ -866,7 +866,7 @@ models:
           assigned a length of stay of 1.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: admit_source_code
         description: Code indicating where the patient was immediately before admission,
           when available. This is most relevant for inpatient encounters.
@@ -1070,17 +1070,17 @@ models:
           populated for claims-derived encounters.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: inst_claim_count
         description: Number of institutional claims generated from the encounter.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: prof_claim_count
         description: Number of professional claims generated from the encounter.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: source_model
         description: dbt model or relation from which the encounter row was derived.
         config:
@@ -1680,7 +1680,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: encounter_id
         description: Identifier for the encounter associated with the claim line,
           created by claims preprocessing when the claim line is grouped into an
@@ -2172,7 +2172,7 @@ models:
           clinical rows.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: payer
         description: Name of the payer responsible for the pharmacy claim. This is
           populated from core.pharmacy_claim.payer for claims rows and is null
@@ -2289,7 +2289,7 @@ models:
           Claims rows are populated from core.pharmacy_claim.quantity.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: quantity_unit
         description: Unit of measure for quantity. This is populated from
           input_layer__medication.quantity_unit for clinical rows and is null for
@@ -2303,7 +2303,7 @@ models:
           are populated from core.pharmacy_claim.days_supply.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication
           record. Clinical rows are populated from
@@ -2839,7 +2839,7 @@ models:
         description: Patient age calculated from birth_date and tuva_last_run.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: age_group
         description: Decade age group derived from age.
         config:
@@ -2981,7 +2981,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: person_id
         description: Globally unique identifier for the person who received the
           dispensed medication.
@@ -3067,20 +3067,20 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: days_supply
         description: Number of days the dispensed medication is expected to last.
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: refills
         description: Refill number or refill count associated with the dispensed
           prescription, as represented by the source.
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: paid_date
         description: Date the pharmacy claim was paid or processed for payment by the payer.
         config:
