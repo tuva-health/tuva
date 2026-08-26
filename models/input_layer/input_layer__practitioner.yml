@@ -49,6 +49,11 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: ingest_datetime
+        description: Date and time the source practitioner record was extracted from the source system or loaded into the data warehouse. This is useful when multiple versions of the same practitioner record are received over time.
+        config:
+          meta:
+            data_type: timestamp
       - name: data_source
         description: User-configured source system identifier, such as Epic, Athena Health, or Cerner. This field is part of the primary key with practitioner_id.
         config:

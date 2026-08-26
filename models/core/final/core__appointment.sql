@@ -27,6 +27,7 @@ select
     , appts.cancellation_reason_code_norm
     , appts.cancellation_reason_description_norm
     {{ select_extension_columns(ref('normalized__appointment'), alias='appts', strip_prefix=false) }}
+    , appts.ingest_datetime
     , appts.tuva_last_run
     , appts.data_source
 from {{ ref('normalized__appointment') }} as appts

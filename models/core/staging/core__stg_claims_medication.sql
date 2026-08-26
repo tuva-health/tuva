@@ -31,6 +31,7 @@ select
     , cast(null as {{ dbt.type_string() }}) as quantity_unit
     , cast(days_supply as {{ dbt.type_int() }}) as days_supply
     , cast(prescribing_provider_id as {{ dbt.type_string() }}) as practitioner_id
+    , ingest_datetime
     , tuva_last_run
     , data_source
 from {{ ref('core__pharmacy_claim') }}

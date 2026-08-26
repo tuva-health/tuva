@@ -112,6 +112,9 @@ final as (
               "appointment_status_rows.code is null",
               "source_rows.status_code is not null"
           ) }} as status_code_invalid
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
     from source_rows
     left join patient_person_rows as patient_person
         on source_rows.person_id = patient_person.person_id

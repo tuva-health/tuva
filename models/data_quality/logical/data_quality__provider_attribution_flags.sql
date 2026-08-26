@@ -57,6 +57,9 @@ final as (
               "not " ~ valid_year_month_expression,
               "source_rows.year_month is not null"
           ) }} as year_month_invalid_format
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
     from source_rows
 )
 

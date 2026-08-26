@@ -50,6 +50,7 @@ cast(
 {%- endset -%}
 
 {%- set final_metadata_columns -%}
+    , ingest_datetime
     , tuva_last_run
     , data_source
 {%- endset -%}
@@ -176,7 +177,7 @@ with claims_patient as (
         , claims_patient.ethnicity
         {{ claims_patient_extension_columns }}
         , claims_patient.data_source
-        , claims_patient.ingest_datetime
+        , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
         , claims_patient.tuva_last_run
     from claims_patient
 
@@ -372,7 +373,7 @@ with patient_base as (
         , patient_source.ethnicity
         {{ source_extension_columns }}
         , patient_source.data_source
-        , patient_source.ingest_datetime
+        , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
         , patient_source.tuva_last_run
         , cast(substring(cast(patient_source.tuva_last_run as {{ dbt.type_string() }}), 1, 10) as date) as tuva_last_run_date
     from {{ ref('normalized__eligibility_remove_duplicates') }} as patient_source

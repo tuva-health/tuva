@@ -6,6 +6,18 @@
     {{ return(dbt.cast("'" ~ date_string ~ "'", api.Column.translate_type('date'))) }}
 {% endmacro %}
 
+{% macro dq_logical_ingest_datetime_range_flag_sql(timestamp_sql) %}
+    {% set date_type = api.Column.translate_type('date') %}
+    {% set ingest_date_sql = "cast(" ~ timestamp_sql ~ " as " ~ date_type ~ ")" %}
+    {% set minimum_date_sql = dq_date_literal_sql('2000-01-01') %}
+    {% set maximum_date_sql = dq_current_date_sql() %}
+
+    {{ return(dq_logical_int_flag_sql(
+        ingest_date_sql ~ " < " ~ minimum_date_sql ~ " or " ~ ingest_date_sql ~ " > " ~ maximum_date_sql,
+        timestamp_sql ~ " is not null"
+    )) }}
+{% endmacro %}
+
 {% macro dq_digits_only_sql(expression) %}
     {% set digits_removed = namespace(expression=expression) %}
 

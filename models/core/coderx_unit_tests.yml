@@ -244,6 +244,7 @@ unit_tests:
             , null as quantity_unit
             , 30 as days_supply
             , null as practitioner_id
+            , cast('2024-01-02 03:04:05' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source' as data_source
       - input: ref('core__stg_coderx_packages')
@@ -282,6 +283,7 @@ unit_tests:
           rxnorm_description: null
           atc_code: null
           atc_description: null
+          ingest_datetime: '2024-01-02 03:04:05'
 
   - name: test_core_medication_enriches_matched_coderx_enterprise_package
     description: |-
@@ -327,6 +329,7 @@ unit_tests:
             , null as quantity_unit
             , 30 as days_supply
             , null as practitioner_id
+            , cast('2024-02-03 04:05:06' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source' as data_source
       - input: ref('core__stg_coderx_packages')
@@ -366,6 +369,7 @@ unit_tests:
           rxnorm_description: CodeRx Enterprise RxNorm drug
           atc_code: B01A
           atc_description: Antithrombotic agents
+          ingest_datetime: '2024-02-03 04:05:06'
 
   - name: test_normalized_pharmacy_claim_uses_coderx_enterprise_package_description
     description: |-

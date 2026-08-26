@@ -1,0 +1,217 @@
+version: 2
+
+unit_tests:
+  - name: test_core_patient_ingest_datetime_matches_selected_source
+    description: >
+      Verifies that eligibility-derived patient rows expose null ingest_datetime,
+      including when they take precedence over a clinical row, while a selected
+      clinical patient record preserves its source ingest timestamp.
+    model: core__patient
+    config:
+      enabled: "{{ (var('claims_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+        _extension_columns_override: []
+        tuva_last_run: '2024-04-01 00:00:00'
+    given:
+      - input: ref('normalized__eligibility_remove_duplicates')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'claims_precedence' as person_id
+            , 'Sr' as name_suffix
+            , 'Claims' as first_name
+            , 'Eligibility' as middle_name
+            , 'Patient' as last_name
+            , 'unknown' as sex
+            , 'Unknown' as race
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , '000-00-0000' as social_security_number
+            , '1 Claims Way' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , 'Denver' as county
+            , cast(39.7 as decimal(18, 4)) as latitude
+            , cast(-104.9 as decimal(18, 4)) as longitude
+            , '555-0100' as phone
+            , 'claims@example.com' as email
+            , 'N' as ethnicity
+            , cast('2024-01-02 03:04:05' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+      - input: ref('core__int_patient_remove_duplicates')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'claims_precedence' as person_id
+            , 'Jr' as name_suffix
+            , 'Excluded' as first_name
+            , 'Clinical' as middle_name
+            , 'Patient' as last_name
+            , 'male' as sex
+            , 'White' as race
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , '111-11-1111' as social_security_number
+            , '2 Clinical Way' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , 'Denver' as county
+            , cast(39.7 as decimal(18, 4)) as latitude
+            , cast(-104.9 as decimal(18, 4)) as longitude
+            , '555-0101' as phone
+            , 'excluded@example.com' as email
+            , 'N' as ethnicity
+            , cast('2024-02-03 04:05:06' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'clinical_only', 'III', 'ClinicalOnly', 'Source', 'Patient', 'female', 'Asian'
+            , cast('1990-01-01' as date), cast(null as date), 0, '222-22-2222'
+            , '3 Clinical Way', 'Denver', 'CO', '80202', 'Denver'
+            , cast(39.7 as decimal(18, 4)), cast(-104.9 as decimal(18, 4))
+            , '555-0102', 'clinical@example.com', 'N'
+            , cast('2024-03-04 05:06:07' as {{ timestamp_type }})
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source'
+    expect:
+      rows:
+        - person_id: claims_precedence
+          first_name: Claims
+          ingest_datetime: null
+        - person_id: clinical_only
+          first_name: ClinicalOnly
+          ingest_datetime: '2024-03-04 05:06:07'
+
+  - name: test_claims_condition_ingest_datetime_is_null_at_core_grain
+    description: >
+      Verifies that repeated claim-line diagnoses collapsed to one Core condition
+      do not retain either source line's ingest timestamp.
+    model: int_condition_from_claims
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-04-01 00:00:00'
+    given:
+      - input: ref('normalized__medical_claim_diagnoses')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'medical_line_1' as medical_claim_id
+            , 'claim_1' as claim_id
+            , 1 as claim_line_number
+            , 'institutional' as claim_type
+            , 'person' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as recorded_date
+            , 1 as condition_rank
+            , 'icd-10-cm' as code_system
+            , 'A001' as source_code
+            , 'A001' as normalized_code
+            , 'Diagnosis' as normalized_description
+            , 'Y' as present_on_admit_code
+            , 'Yes' as present_on_admit_description
+            , cast('2024-01-02 03:04:05' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'medical_line_2', 'claim_1', 2, 'institutional', 'person', 'member', 'payer', 'plan'
+            , cast('2024-01-01' as date), 1, 'icd-10-cm', 'A001', 'A001', 'Diagnosis', 'Y', 'Yes'
+            , cast('2024-02-03 04:05:06' as {{ timestamp_type }})
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source'
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          select 'claim_1' as claim_id, 1 as claim_line_number, 'source' as data_source, 'encounter_1' as encounter_id, 1 as claim_line_attribution_number
+          union all
+          select 'claim_1', 2, 'source', 'encounter_1', 1
+    expect:
+      rows:
+        - claim_id: claim_1
+          ingest_datetime: null
+
+  - name: test_normalized_claim_procedure_ingest_datetime_requires_line_provenance
+    description: >
+      Verifies that a line-level HCPCS procedure preserves medical-claim ingest
+      time while a claim-header procedure from the same claim remains null.
+    model: normalized__medical_claim_procedures
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-04-01 00:00:00'
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'claim_1' as claim_id
+            , 1 as claim_line_number
+            , 'person' as person_id
+            , 'member' as member_id
+            , cast('2024-01-01' as date) as claim_line_start_date
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast(null as date) as admission_date
+            , cast(null as date) as discharge_date
+            , cast('2024-01-01' as date) as claim_end_date
+            , 'H001' as hcpcs_code
+            , '1234567890' as rendering_npi
+            , cast(null as {{ string_type }}) as hcpcs_modifier_1
+            , cast(null as {{ string_type }}) as hcpcs_modifier_2
+            , cast(null as {{ string_type }}) as hcpcs_modifier_3
+            , cast(null as {{ string_type }}) as hcpcs_modifier_4
+            , cast(null as {{ string_type }}) as hcpcs_modifier_5
+            , 'icd-10-pcs' as procedure_code_type
+            {% for index in range(1, 26) %}
+            , {% if index == 1 %}'P001'{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
+            , {% if index == 1 %}cast('2024-01-02' as date){% else %}cast(null as date){% endif %} as procedure_date_{{ index }}
+            {% endfor %}
+            , cast('2024-01-03 04:05:06' as {{ timestamp_type }}) as ingest_datetime
+            , 'source' as data_source
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_pcs, '__unused__' as description where 1 = 0
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_pcs, '__unused__' as short_description where 1 = 0
+      - input: ref('terminology__hcpcs_level_2')
+        format: sql
+        rows: |
+          select '__unused__' as hcpcs, '__unused__' as short_description where 1 = 0
+      - input: ref('terminology__snomed_ct')
+        format: sql
+        rows: |
+          select '__unused__' as snomed_ct, '__unused__' as description where 1 = 0
+    expect:
+      rows:
+        - claim_id: claim_1
+          claim_line_number: 1
+          procedure_sequence_id: 1
+          source_code: H001
+          ingest_datetime: '2024-01-03 04:05:06'
+        - claim_id: claim_1
+          claim_line_number: null
+          procedure_sequence_id: 1
+          source_code: P001
+          ingest_datetime: null

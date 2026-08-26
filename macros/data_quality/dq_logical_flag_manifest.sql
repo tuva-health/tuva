@@ -2106,6 +2106,126 @@
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["code_system", "source_code"]
+        },
+        {
+            "test_name": "appointment__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the appointment Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "condition__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the condition Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "eligibility__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the eligibility Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "encounter__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the encounter Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "immunization__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the immunization Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "lab_result__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the lab_result Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "location__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the location Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "medical_claim__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the medical_claim Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "medication__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the medication Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "observation__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the observation Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "patient__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the patient Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "pharmacy_claim__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the pharmacy_claim Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "practitioner__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the practitioner Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "procedure__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the procedure Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "provider_attribution__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the provider_attribution Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
         }
     ] %}
     {# END LOGICAL TEST DEFINITIONS #}
@@ -2457,6 +2577,7 @@
                 'eligibility__birth_date_after_death_date',
                 'eligibility__birth_date_out_of_reasonable_range',
                 'eligibility__death_date_out_of_reasonable_range',
+                'eligibility__ingest_datetime_out_of_reasonable_range',
                 'eligibility__death_flag_invalid',
                 'eligibility__death_flag_without_death_date',
                 'eligibility__enrollment_start_after_end',
@@ -2509,6 +2630,7 @@
                 'medical_claim__paid_date_null',
                 'medical_claim__paid_date_out_of_reasonable_range',
                 'medical_claim__paid_date_before_claim_end_date',
+                'medical_claim__ingest_datetime_out_of_reasonable_range',
                 'medical_claim__paid_amount_null',
                 'medical_claim__paid_amount_lt_zero',
                 'medical_claim__allowed_amount_null',
@@ -2590,6 +2712,7 @@
                 'pharmacy_claim__paid_date_null',
                 'pharmacy_claim__dispensing_date_out_of_reasonable_range',
                 'pharmacy_claim__paid_date_out_of_reasonable_range',
+                'pharmacy_claim__ingest_datetime_out_of_reasonable_range',
                 'pharmacy_claim__prescribing_provider_npi_null',
                 'pharmacy_claim__prescribing_provider_npi_invalid',
                 'pharmacy_claim__dispensing_provider_npi_null',
@@ -2628,7 +2751,8 @@
             'grain': 'provider attribution record',
             'key_columns': ['person_id', 'member_id', 'year_month', 'payer', 'plan', 'data_source'],
             'test_names': [
-                'provider_attribution__year_month_invalid_format'
+                'provider_attribution__year_month_invalid_format',
+                'provider_attribution__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -2648,7 +2772,8 @@
                 'appointment__end_datetime_before_start_datetime',
                 'appointment__duration_negative',
                 'appointment__type_code_invalid',
-                'appointment__status_code_invalid'
+                'appointment__status_code_invalid',
+                'appointment__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -2672,6 +2797,7 @@
                 'condition__recorded_date_out_of_reasonable_range',
                 'condition__onset_date_out_of_reasonable_range',
                 'condition__resolved_date_out_of_reasonable_range',
+                'condition__ingest_datetime_out_of_reasonable_range',
                 'condition__code_system_invalid',
                 'condition__source_code_invalid',
                 'condition__present_on_admit_code_invalid'
@@ -2696,6 +2822,7 @@
                 'encounter__encounter_start_date_after_encounter_end_date',
                 'encounter__encounter_start_date_out_of_reasonable_range',
                 'encounter__encounter_end_date_out_of_reasonable_range',
+                'encounter__ingest_datetime_out_of_reasonable_range',
                 'encounter__admit_source_code_invalid',
                 'encounter__admit_type_code_invalid',
                 'encounter__discharge_disposition_code_invalid',
@@ -2726,6 +2853,7 @@
                 'immunization__encounter_id_not_in_encounter',
                 'immunization__encounter_person_patient_pair_not_in_encounter',
                 'immunization__occurrence_date_null',
+                'immunization__ingest_datetime_out_of_reasonable_range',
                 'immunization__source_code_type_null_when_source_code_present',
                 'immunization__source_code_null_when_source_code_type_present',
                 'immunization__source_code_invalid',
@@ -2757,7 +2885,8 @@
                 'lab_result__source_order_code_invalid',
                 'lab_result__collection_datetime_after_result_datetime',
                 'lab_result__result_datetime_out_of_reasonable_range',
-                'lab_result__collection_datetime_out_of_reasonable_range'
+                'lab_result__collection_datetime_out_of_reasonable_range',
+                'lab_result__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -2768,7 +2897,8 @@
             'grain': 'location record',
             'key_columns': ['location_id', 'data_source'],
             'test_names': [
-                'location__npi_invalid'
+                'location__npi_invalid',
+                'location__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -2789,6 +2919,7 @@
                 'medication__practitioner_id_not_in_practitioner',
                 'medication__dispensing_date_out_of_range',
                 'medication__prescribing_date_out_of_range',
+                'medication__ingest_datetime_out_of_reasonable_range',
                 'medication__prescribing_date_after_dispensing_date',
                 'medication__source_code_type_null_when_source_code_present',
                 'medication__source_code_null',
@@ -2815,6 +2946,7 @@
                 'observation__encounter_person_patient_pair_not_in_encounter',
                 'observation__observation_date_null',
                 'observation__observation_date_out_of_range',
+                'observation__ingest_datetime_out_of_reasonable_range',
                 'observation__observation_type_invalid',
                 'observation__source_code_type_null_when_source_code_present',
                 'observation__source_code_null',
@@ -2836,6 +2968,7 @@
                 'patient__birth_date_null',
                 'patient__birth_date_out_of_range',
                 'patient__death_date_out_of_range',
+                'patient__ingest_datetime_out_of_reasonable_range',
                 'patient__birth_date_after_death_date',
                 'patient__death_flag_invalid',
                 'patient__death_flag_without_death_date',
@@ -2855,7 +2988,8 @@
             'key_columns': ['practitioner_id', 'data_source'],
             'test_names': [
                 'practitioner__npi_invalid',
-                'practitioner__npi_not_individual'
+                'practitioner__npi_not_individual',
+                'practitioner__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -2876,6 +3010,7 @@
                 'procedure__practitioner_id_not_in_practitioner',
                 'procedure__procedure_date_null',
                 'procedure__procedure_date_out_of_range',
+                'procedure__ingest_datetime_out_of_reasonable_range',
                 'procedure__code_system_null',
                 'procedure__code_system_invalid',
                 'procedure__source_code_null',
