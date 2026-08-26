@@ -3,7 +3,7 @@
    )
 }}
 
-{% set procedure_cols = range(1, 26) %}
+{% set procedure_cols = var('_medical_claim_procedure_cols_override', range(1, 26)) %}
 
 with hcpcs_procedures as (
     select

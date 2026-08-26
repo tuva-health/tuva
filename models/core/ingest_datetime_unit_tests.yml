@@ -156,6 +156,7 @@ unit_tests:
     overrides:
       vars:
         claims_enabled: true
+        _medical_claim_procedure_cols_override: [1]
         tuva_last_run: '2024-04-01 00:00:00'
     given:
       - input: ref('normalized__medical_claim')
@@ -181,10 +182,8 @@ unit_tests:
             , cast(null as {{ string_type }}) as hcpcs_modifier_4
             , cast(null as {{ string_type }}) as hcpcs_modifier_5
             , 'icd-10-pcs' as procedure_code_type
-            {% for index in range(1, 26) %}
-            , {% if index == 1 %}'P001'{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
-            , {% if index == 1 %}cast('2024-01-02' as date){% else %}cast(null as date){% endif %} as procedure_date_{{ index }}
-            {% endfor %}
+            , 'P001' as procedure_code_1
+            , cast('2024-01-02' as date) as procedure_date_1
             , cast('2024-01-03 04:05:06' as {{ timestamp_type }}) as ingest_datetime
             , 'source' as data_source
       - input: ref('terminology__icd_10_pcs')
