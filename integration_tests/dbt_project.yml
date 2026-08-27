@@ -20,6 +20,11 @@ vars:
   enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
   data_quality_domain_input_requirements: []  # Optional additional component-to-input dependency mappings.
 
+  ## Medication terminology
+  # False uses the package's CodeRx Open assets. True requires user-managed
+  # packages, drugs, and classes relations in the target database's coderx schema.
+  use_coderx_enterprise: false
+
   ## Synthetic data validation
   # These vars are for this integration_tests project. They are not normal production Tuva Core settings.
   use_synthetic_data: true             # Maps package synthetic seeds into this project's Input Layer models.
@@ -77,7 +82,8 @@ vars:
   # tuva_last_run: "2026-01-01 00:00:00"
 
   ## Extension columns
-  # Allows custom input columns with a prefix to flow through selected Tuva Core outputs.
+  # Allows prefixed custom columns to flow from a supported Input Layer model
+  # to the same-named Core table. Derived outputs such as member_month are excluded.
   # passthrough:
   #   prefix: 'x_'                     # Prefix used to identify extension columns.
   #   strip: false                     # Whether to strip the prefix in final output aliases.
@@ -112,8 +118,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+on-run-start:
+  - "{{ ensure_target_schema_for_unit_tests() }}"
+
 
 dispatch:
+  - macro_namespace: 'dbt'
+    search_order: ['integration_tests', 'dbt']
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests', 'the_tuva_project']
   - macro_namespace: 'dbt_utils'
@@ -125,6 +136,17 @@ models:
     +materialized: table
     +schema: |
       {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_input_layer{%- else -%}input_layer{%- endif -%}
+  ccsr:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_ccsr{%- else -%}ccsr{%- endif -%}
+  semantic_layer:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_semantic_layer{%- else -%}semantic_layer{%- endif -%}
+
+seeds:
+  ccsr:
+    +schema: |
+      {%- if var('tuva_schema_prefix', none) is not none and var('tuva_schema_prefix', none) | trim != '' -%}{{ var('tuva_schema_prefix') }}_ccsr{%- else -%}ccsr{%- endif -%}
 flags:
   require_generic_test_arguments_property: true
   require_ref_searches_node_package_before_root: true

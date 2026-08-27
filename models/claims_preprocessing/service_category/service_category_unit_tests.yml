@@ -1,0 +1,66 @@
+version: 2
+
+unit_tests:
+  - name: test_office_based_surgery_requires_numeric_hcpcs_in_surgery_range
+    description: >
+      Verifies that office-based surgery includes numeric HCPCS codes in the
+      surgery range while safely excluding alphanumeric and out-of-range codes.
+      Regression coverage for https://github.com/tuva-health/tuva-core/issues/1387.
+    model: service_category__office_based_surgery_professional
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        format: sql
+        rows: |
+          select
+              'numeric_in_range' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+            , 'numeric_in_range|1|source_a' as claim_line_id
+            , '47562' as hcpcs_code
+          union all
+          select
+              'alphanumeric' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+            , 'alphanumeric|1|source_a' as claim_line_id
+            , 'A0425' as hcpcs_code
+          union all
+          select
+              'numeric_out_of_range' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+            , 'numeric_out_of_range|1|source_a' as claim_line_id
+            , '99213' as hcpcs_code
+      - input: ref('service_category__stg_office_based')
+        format: sql
+        rows: |
+          select
+              'numeric_in_range' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+          union all
+          select
+              'alphanumeric' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+          union all
+          select
+              'numeric_out_of_range' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+    expect:
+      rows:
+        - claim_id: numeric_in_range
+          claim_line_number: 1
+          data_source: source_a
+          claim_line_id: numeric_in_range|1|source_a
+          service_category_1: office-based
+          service_category_2: office-based surgery
+          service_category_3: office-based surgery
+          tuva_last_run: '2024-01-01 00:00:00'

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('provider_attribution_enabled', False) and var('claims_enabled', False))
+     enabled = (the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) and the_tuva_project.tuva_boolean_var('claims_enabled', false))
    )
 }}
 

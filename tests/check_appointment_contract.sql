@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', false) | as_bool,
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false),
      severity = 'error',
      tags = ['contract', 'appointment_contract']
    )

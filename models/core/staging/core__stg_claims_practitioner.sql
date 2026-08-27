@@ -1,6 +1,6 @@
 
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -71,6 +71,7 @@ select
     , cast(parent_organization_name as {{ dbt.type_string() }}) as practice_affiliation
     , cast(primary_specialty_description as {{ dbt.type_string() }}) as specialty
     , cast(null as {{ dbt.type_string() }}) as sub_specialty
+    , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(null as {{ dbt.type_string() }}) as data_source
 from provider

@@ -216,6 +216,8 @@ models:
         description: Procedure code from the source claim.
       - name: normalized_code
         description: Procedure code after matching to Tuva terminology.
+      - name: ingest_datetime
+        description: Date and time the originating medical claim line was loaded into the data warehouse for line-level HCPCS rows. This is null for claim-header procedures that cannot be tied reliably to one source claim line.
       - name: data_source
         description: Data source associated with the claim.
         tests:
@@ -1677,7 +1679,7 @@ models:
     description: |-
       This model performs the following data transformations:
       1. Casts fields to the appropriate data types expected by the input_layer__eligibility table. This is meant to account for data types if they are not cast by the user in the input layer.
-      2. Passes through all column extensions that the user has created in the input layer with the x_ extension prefix.
+      2. Passes through column extensions whose names begin with the configured extension prefix.
       3. Creates a synthetic join key called person_id_key. The person_id_key is created by concatenating person_id, member_id, data_source, payer, plan, enrollment_start_date, and enrollment_end_date. All key components except person_id are coalesced to an empty string before concatenation.
       4. Canonicalizes the backward-compatible open-span alias 9999-12-31 to a null enrollment_end_date.
 

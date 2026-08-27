@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('data_quality_enabled', false) | as_bool) and (var('clinical_enabled', false) | as_bool),
+     enabled = (the_tuva_project.tuva_boolean_var('data_quality_enabled', false)) and (the_tuva_project.tuva_boolean_var('clinical_enabled', false)),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none
@@ -115,6 +115,9 @@ final as (
               "source_rows.duration < 0",
               "source_rows.duration is not null"
           ) }} as duration_negative
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
     from source_rows
     left join patient_person_rows as patient_person
         on source_rows.person_id = patient_person.person_id

@@ -12,6 +12,7 @@ unit_tests:
       - input: ref('input_layer__patient')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'valid_person' as person_id
             , 'valid_patient' as patient_id
@@ -23,28 +24,28 @@ unit_tests:
             , 1 as death_flag
             , 'CO' as state
             , '80202' as zip_code
-            , cast('2000-01-01' as timestamp) as ingest_datetime
+            , cast('2000-01-01' as {{ timestamp_type }}) as ingest_datetime
             , 'source' as data_source
           union all
           select
               'invalid_person', 'invalid_patient', 'male', 'Not a race', 'invalid'
             , cast('1899-01-01' as date), cast('1898-01-01' as date), 1
-            , 'ZZ', '80A02', cast('1999-12-31' as timestamp), 'source'
+            , 'ZZ', '80A02', cast('1999-12-31' as {{ timestamp_type }}), 'source'
           union all
           select
               'extended_zip_person', 'extended_zip_patient', 'male', 'White', 'N'
             , cast('1980-01-01' as date), cast('2020-01-01' as date), 1
-            , 'CO', '802021234', cast(null as timestamp), 'source'
+            , 'CO', '802021234', cast(null as {{ timestamp_type }}), 'source'
           union all
           select
               'numeric_syntax_person', 'numeric_syntax_patient', 'male', 'White', 'N'
             , cast('1980-01-01' as date), cast('2020-01-01' as date), 1
-            , 'CO', '+1234', cast(null as timestamp), 'source'
+            , 'CO', '+1234', cast(null as {{ timestamp_type }}), 'source'
           union all
           select
               'null_person', 'null_patient', 'male', null, null
             , cast('1980-01-01' as date), null, 0
-            , null, null, cast(null as timestamp), 'source'
+            , null, null, cast(null as {{ timestamp_type }}), 'source'
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -121,7 +122,8 @@ unit_tests:
       - input: ref('input_layer__patient')
         format: sql
         rows: |
-          select fixture_rows.*, cast(null as timestamp) as ingest_datetime
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
           select
               'person_1' as person_id
@@ -193,7 +195,8 @@ unit_tests:
       - input: ref('input_layer__patient')
         format: sql
         rows: |
-          select fixture_rows.*, cast(null as timestamp) as ingest_datetime
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
           select 'case_variant_person' as person_id, 'lowercase_patient' as patient_id
             , 'male' as sex, null as race, null as ethnicity
@@ -238,7 +241,8 @@ unit_tests:
       - input: ref('input_layer__patient')
         format: sql
         rows: |
-          select fixture_rows.*, cast(null as timestamp) as ingest_datetime
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
           select
               'single_person' as person_id
@@ -322,11 +326,12 @@ unit_tests:
       - input: ref('input_layer__location')
         format: sql
         rows: |
-          select 'null_location' as location_id, null as npi, 'source' as data_source
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select 'null_location' as location_id, null as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
           union all
-          select 'valid_location', '1111111111', 'source'
+          select 'valid_location', '1111111111', cast('2000-01-01' as {{ timestamp_type }}), 'source'
           union all
-          select 'invalid_location', '9999999999', 'source'
+          select 'invalid_location', '9999999999', cast('1999-12-31' as {{ timestamp_type }}), 'source'
       - input: ref('provider_data__provider')
         format: sql
         rows: |
@@ -335,10 +340,13 @@ unit_tests:
       rows:
         - location_id: null_location
           npi_invalid: null
+          ingest_datetime_out_of_reasonable_range: null
         - location_id: valid_location
           npi_invalid: 0
+          ingest_datetime_out_of_reasonable_range: 0
         - location_id: invalid_location
           npi_invalid: 1
+          ingest_datetime_out_of_reasonable_range: 1
 
   - name: test_practitioner_optional_npi_flags_are_tristate
     description: >
@@ -351,13 +359,14 @@ unit_tests:
       - input: ref('input_layer__practitioner')
         format: sql
         rows: |
-          select 'null_practitioner' as practitioner_id, null as npi, 'source' as data_source
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select 'null_practitioner' as practitioner_id, null as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
           union all
-          select 'individual_practitioner', '1111111111', 'source'
+          select 'individual_practitioner', '1111111111', cast('2000-01-01' as {{ timestamp_type }}), 'source'
           union all
-          select 'organization_practitioner', '2222222222', 'source'
+          select 'organization_practitioner', '2222222222', cast(null as {{ timestamp_type }}), 'source'
           union all
-          select 'unknown_practitioner', '9999999999', 'source'
+          select 'unknown_practitioner', '9999999999', cast('2101-01-01' as {{ timestamp_type }}), 'source'
       - input: ref('provider_data__provider')
         format: sql
         rows: |
@@ -369,12 +378,16 @@ unit_tests:
         - practitioner_id: null_practitioner
           npi_invalid: null
           npi_not_individual: null
+          ingest_datetime_out_of_reasonable_range: null
         - practitioner_id: individual_practitioner
           npi_invalid: 0
           npi_not_individual: 0
+          ingest_datetime_out_of_reasonable_range: 0
         - practitioner_id: organization_practitioner
           npi_invalid: 0
           npi_not_individual: 1
+          ingest_datetime_out_of_reasonable_range: null
         - practitioner_id: unknown_practitioner
           npi_invalid: 1
           npi_not_individual: null
+          ingest_datetime_out_of_reasonable_range: 1

@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -25,6 +24,8 @@
 {%- endset -%}
 
 {%- set tuva_extensions -%}
+    , 'observation' as x_tuva_test_extension
+    , 'observation' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

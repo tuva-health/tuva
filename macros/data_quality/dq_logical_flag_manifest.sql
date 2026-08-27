@@ -1166,7 +1166,7 @@
         {
             "test_name": "pharmacy_claim__ndc_code_invalid",
             "display_name": "ndc_code is invalid",
-            "description": "Checks whether ndc_code is populated but not found in Tuva NDC terminology.",
+            "description": "Checks whether ndc_code is populated but not found in the selected CodeRx packages terminology.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["ndc_code"]
@@ -2038,7 +2038,7 @@
         {
             "test_name": "medication__source_code_invalid",
             "display_name": "source_code is invalid",
-            "description": "Checks whether a populated source_code is absent from Tuva NDC terminology when source_code_type identifies NDC without regard to letter case. Tuva removes hyphens from both values before comparison. Every other source_code_type, including RxNorm, ATC, and a source-system-specific name, is not applicable to this code-validity test.",
+            "description": "Checks whether a populated source_code is absent from the selected CodeRx packages terminology when source_code_type identifies NDC without regard to letter case. Tuva removes hyphens from both values before comparison. Every other source_code_type, including RxNorm, ATC, and a source-system-specific name, is not applicable to this code-validity test.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["source_code_type", "source_code"]
@@ -2046,7 +2046,7 @@
         {
             "test_name": "medication__ndc_code_invalid",
             "display_name": "ndc_code is invalid",
-            "description": "Checks whether a populated ndc_code is absent from Tuva NDC terminology after Tuva removes hyphens from both values before comparison.",
+            "description": "Checks whether a populated ndc_code is absent from the selected CodeRx packages terminology after Tuva removes hyphens from both values before comparison.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["ndc_code"]
@@ -2420,6 +2420,14 @@
             "affected_columns": ["code_system", "source_code"]
         },
         {
+            "test_name": "appointment__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the appointment Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
             "test_name": "condition__ingest_datetime_out_of_reasonable_range",
             "display_name": "ingest_datetime is out of reasonable range",
             "description": "Checks whether a populated ingest_datetime in the condition Input Layer Model is before 2000-01-01 or after the current date.",
@@ -2460,6 +2468,14 @@
             "affected_columns": ["ingest_datetime"]
         },
         {
+            "test_name": "location__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the location Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
             "test_name": "medical_claim__ingest_datetime_out_of_reasonable_range",
             "display_name": "ingest_datetime is out of reasonable range",
             "description": "Checks whether a populated ingest_datetime in the medical_claim Input Layer Model is before 2000-01-01 or after the current date.",
@@ -2495,6 +2511,14 @@
             "test_name": "pharmacy_claim__ingest_datetime_out_of_reasonable_range",
             "display_name": "ingest_datetime is out of reasonable range",
             "description": "Checks whether a populated ingest_datetime in the pharmacy_claim Input Layer Model is before 2000-01-01 or after the current date.",
+            "test_type": "invalid",
+            "severity": 2,
+            "affected_columns": ["ingest_datetime"]
+        },
+        {
+            "test_name": "practitioner__ingest_datetime_out_of_reasonable_range",
+            "display_name": "ingest_datetime is out of reasonable range",
+            "description": "Checks whether a populated ingest_datetime in the practitioner Input Layer Model is before 2000-01-01 or after the current date.",
             "test_type": "invalid",
             "severity": 2,
             "affected_columns": ["ingest_datetime"]
@@ -3096,7 +3120,8 @@
                 'appointment__start_datetime_out_of_reasonable_range',
                 'appointment__end_datetime_out_of_reasonable_range',
                 'appointment__end_datetime_before_start_datetime',
-                'appointment__duration_negative'
+                'appointment__duration_negative',
+                'appointment__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -3222,7 +3247,8 @@
             'grain': 'location record',
             'key_columns': ['location_id', 'data_source'],
             'test_names': [
-                'location__npi_invalid'
+                'location__npi_invalid',
+                'location__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {
@@ -3312,7 +3338,8 @@
             'key_columns': ['practitioner_id', 'data_source'],
             'test_names': [
                 'practitioner__npi_invalid',
-                'practitioner__npi_not_individual'
+                'practitioner__npi_not_individual',
+                'practitioner__ingest_datetime_out_of_reasonable_range'
             ]
         },
         {

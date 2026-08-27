@@ -15,7 +15,8 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          select fixture_rows.*, cast(null as timestamp) as ingest_datetime
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
           select 'valid' as person_id, 'valid' as member_id, '202401' as year_month, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'source' as data_source
           union all

@@ -27,7 +27,7 @@ models:
 
   - name: member_month__member_month
     description: |-
-      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the package-owned 1900-through-2100 month spine so that each span is expanded into one record for each covered year-month. Expansion always stops at the date portion of tuva_last_run, including when a finite enrollment end date is later, so Tuva never creates future member months. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source, and pulls through eligibility extension columns.
+      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the package-owned 1900-through-2100 month spine so that each span is expanded into one record for each covered year-month. Expansion always stops at the date portion of tuva_last_run, including when a finite enrollment end date is later, so Tuva never creates future member months. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source.
 
       Table grain: One record per person, member, year month, payer, plan, and data source.
     config:

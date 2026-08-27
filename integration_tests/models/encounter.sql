@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -24,6 +24,8 @@ select
     , paid_amount
     , allowed_amount
     , charge_amount
+    , 'encounter' as x_tuva_test_extension
+    , 'encounter' as ext_tuva_test_extension
     , ingest_datetime
     , data_source
 from {{ ref('the_tuva_project', 'synthetic_data__encounter') }}

@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', false) | as_bool)
-       or (var('clinical_enabled', false) | as_bool),
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+       or (the_tuva_project.tuva_boolean_var('clinical_enabled', false)),
      severity = 'error',
      tags = ['contract', 'public_flag_contract']
    )
@@ -13,8 +13,8 @@
   Asset or terminology attributes are intentionally out of scope.
 #}
 
-{% set claims_enabled = var('claims_enabled', false) | as_bool %}
-{% set clinical_enabled = var('clinical_enabled', false) | as_bool %}
+{% set claims_enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false) %}
+{% set clinical_enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false) %}
 {% set contract_relations = [] %}
 
 {% if claims_enabled %}

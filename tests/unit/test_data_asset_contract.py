@@ -209,6 +209,33 @@ class DataAssetContractTest(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, load_macro)
 
+    def test_bigquery_header_only_seed_materialization_contract(self):
+        macro = (
+            ROOT / "integration_tests" / "macros" / "bigquery_seed.sql"
+        ).read_text()
+        integration_project = (
+            ROOT / "integration_tests" / "dbt_project.yml"
+        ).read_text()
+
+        self.assertIn(
+            "macro bigquery_create_seed_relation(model, agate_table, relation)",
+            macro,
+        )
+        self.assertIn("macro bigquery__create_csv_table(model, agate_table)", macro)
+        self.assertIn(
+            "macro bigquery__reset_csv_table(model, full_refresh, old_relation, agate_table)",
+            macro,
+        )
+        self.assertIn("agate_table.rows | length == 0", macro)
+        self.assertIn("for column_name in agate_table.column_names", macro)
+        self.assertIn("column_types that exactly match its CSV header", macro)
+        self.assertIn("api.Column.translate_type(column_type)", macro)
+        self.assertIn("create or replace table {{ relation.render() }}", macro)
+        self.assertIn("adapter.drop_relation(old_relation)", macro)
+        self.assertNotIn("macro bigquery__load_csv_rows", macro)
+        self.assertIn("macro_namespace: 'dbt'", integration_project)
+        self.assertIn("search_order: ['integration_tests', 'dbt']", integration_project)
+
     def test_release_requires_all_cloud_receipts_before_tagging(self):
         workflow = (ROOT / ".github" / "workflows" / "create-release.yml").read_text()
         receipt_step = workflow.index("- name: Verify data asset release receipts")

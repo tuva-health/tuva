@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -12,7 +12,6 @@ with stg_eligibility as (
     , enrollment_start_date
     , enrollment_end_date
     , tuva_last_run
-    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig') }}
     , data_source
   from {{ ref('normalized__eligibility') }} as elig
 )
@@ -45,7 +44,6 @@ select distinct
   , a.payer
   , a.{{ quote_column('plan') }}
   , a.tuva_last_run
-  {{ select_extension_columns(ref('normalized__eligibility'), alias='a') }}
   , a.data_source
 from eligibility_with_effective_end_date as a
 inner join month_start_and_end_dates as b

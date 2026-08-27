@@ -80,14 +80,38 @@ testing cross-package compatibility.
 
 ## Continuous Integration
 
-In-repository pull requests automatically run the Core build on Snowflake with
-the small synthetic dataset. From GitHub Actions, maintainers can run that same
-fixed build manually on Snowflake, BigQuery, Databricks, Fabric, Redshift, or
-all five warehouses. DuckDB remains available for local portability checks.
+`Tuva CI -- Snowflake` runs automatically for every in-repository pull request.
+It tests the exact pull-request merge commit on Snowflake using Tuva Core, the
+integration project, and the small synthetic dataset. Data Quality and its
+optional failure-key relation are enabled so the complete Core test surface
+runs. A package version change does not change this automatic path.
+
+For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
+the Actions tab and enter only its pull-request number. The workflow accepts an
+open, mergeable, same-repository pull request into `main` only when its exact
+test merge changes the Tuva Core package version. It resolves all eight
+standalone package `main` branches once to exact commits, then uses that single
+source lock for Snowflake, BigQuery, Databricks, Fabric, and Redshift.
+
+The manual release build selects the integration project, Tuva Core, AHRQ
+Quality Indicators, CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing,
+NYU ED Classification, Quality Measures, and Semantic Layer. Before any
+warehouse job receives credentials, CI verifies that every Core asset declared
+by the release candidate exists under its future version in S3, GCS, and Azure
+and that `_release.json` is absent. The receipt is finalized against the merged
+`main` commit later; candidate payloads alone are sufficient for PR validation.
+
+Both workflows keep the small synthetic dataset and Data Quality failure-key
+coverage enabled while parity remains disabled. The all-warehouse workflow
+retains each warehouse's sanitized dbt result summary and resolved source lock
+for 90 days; raw logs and warehouse connection metadata are not included. There
+is no individual-warehouse dispatcher. Troubleshoot individual warehouses
+locally, and use DuckDB locally for portability checks.
 
 Reviewed fork pull requests use the separate `External PR Snowflake CI`
 workflow. Its only input is the pull-request number. CI does not accept
-pull-request comment commands or arbitrary dbt commands.
+pull-request comment commands or arbitrary dbt commands. External version
+changes are rejected because the release matrix requires an internal branch.
 
 ## Data Asset Loading
 

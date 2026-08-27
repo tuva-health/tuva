@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -47,8 +47,9 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
+    , cast(cond.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-      , cast(cond.data_source as {{ dbt.type_string() }}) as data_source
+    , cast(cond.data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}

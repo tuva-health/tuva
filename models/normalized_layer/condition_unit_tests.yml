@@ -18,6 +18,7 @@ unit_tests:
         format: sql
         rows: |
           {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'c' as source_condition_id
             , 'person-1' as person_id
@@ -33,6 +34,7 @@ unit_tests:
             , 'Source description' as source_description
             , 1 as condition_rank
             , cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
             , 'a_b' as data_source
           union all
           select
@@ -50,6 +52,7 @@ unit_tests:
             , 'Another source description' as source_description
             , 2 as condition_rank
             , cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
             , 'a' as data_source
       - input: ref('terminology__icd_10_cm')
         format: sql

@@ -1,5 +1,5 @@
 {{ config(
-    enabled = var('claims_enabled', false) | as_bool,
+    enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false),
     tags = ['claims_preprocessing', 'member_month']
 ) }}
 

@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -155,6 +154,8 @@
 {%- set tuva_extensions -%}
     , claim_id as x_temp_claim_id
     , payer as x_temp_payer
+    , 'medical_claim' as x_tuva_test_extension
+    , 'medical_claim' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

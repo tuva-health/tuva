@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -74,7 +73,7 @@
 {%- endset -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__medical_claim'), alias='med', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__medical_claim'), alias='med') }}
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}

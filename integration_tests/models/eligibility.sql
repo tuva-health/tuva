@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -50,7 +49,7 @@
     , group_name
 {%- endset -%}
 
-{# Extension columns for testing passthrough to core.member_month #}
+{# Extension columns for testing passthrough to core.eligibility. #}
 {%- set tuva_extensions -%}
     , {{ dbt.concat([
         "'claims_'",
@@ -58,6 +57,10 @@
     ]) }} as x_temp_record_origin
     , person_id as x_temp_person_id
     , first_name as x_temp_first_name
+    , 'eligibility' as x_tuva_test_extension
+    , 'eligibility' as ext_tuva_test_extension
+    , 'extension-first-name' as x_first_name
+    , 'extension-first-name' as ext_first_name
 {%- endset -%}
 
 {%- set tuva_metadata -%}

@@ -1260,47 +1260,68 @@ seeds:
       - name: deprecated_date
         description: 'The date when the MS-DRG code was deprecated.'
 
-  - name: terminology__ndc
+  - name: terminology__coderx_packages
     description: |-
-      National Drug Codes identify drug products, labelers, strengths, dosage forms, and package sizes in
-      drug claims and pharmacy data. Tuva sources this proprietary asset from CodeRx through an annual
-      update agreement. Tuva uses this asset in the core medication model, input normalization models,
-      data quality checks, semantic layer models, and total cost of care pharmacy models.
+      CodeRx Open package records map National Drug Codes to RxNorm drug concepts. Tuva distributes this
+      annual open snapshot for medication enrichment, pharmacy normalization, and data quality checks.
     config:
       meta:
         data_asset:
-          display_name: "NDC"
+          display_name: "CodeRx Packages"
           maintainer: "CodeRx"
-          source_url: "https://coderx.io/source-data"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_url: "https://coderx.io/coderx-open"
+          source_release: "CodeRx Open snapshot 2026-07-08"
+          source_last_updated: "2026-07-08"
+          tuva_last_updated: "2026-08-24"
           update_frequency: "annually"
-          notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','terminology__ndc.csv.gz') }}"
+          notes: "CodeRx Open package data distributed with Tuva Core."
+      post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_packages.csv.gz') }}"
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: ndc
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
+      alias: coderx_packages
       tags:
         - terminology
       column_types:
+        ndc11: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(11) {%- endif -%}
         ndc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(20) {%- endif -%}
+        drug_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        rxcui: |
+        drug_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        is_brand: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+        clinical_drug_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        rxnorm_description: |
+        clinical_drug_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        fda_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        active: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+        prescribable: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
     columns:
+      - name: ndc11
+        description: Eleven-digit National Drug Code for the package.
+        tests:
+          - not_null
+          - unique
       - name: ndc
-        description: 'The National Drug Code (NDC).'
-      - name: rxcui
-        description: 'The RxCUI identifier associated with the NDC.'
-      - name: rxnorm_description
-        description: 'The description of the RxNorm concept.'
-      - name: fda_description
-        description: 'The FDA description of the drug.'
+        description: Hyphenated ten-digit National Drug Code when CodeRx supplies one.
+      - name: drug_id
+        description: RxNorm RxCUI for the drug associated with the package.
+      - name: drug_name
+        description: RxNorm name for the drug associated with the package.
+      - name: is_brand
+        description: Indicates whether the drug concept is branded.
+      - name: clinical_drug_id
+        description: RxNorm RxCUI for the corresponding unbranded clinical drug.
+      - name: clinical_drug_name
+        description: RxNorm name for the corresponding unbranded clinical drug.
+      - name: active
+        description: Indicates whether the CodeRx record is active.
+      - name: prescribable
+        description: Indicates whether the CodeRx record is prescribable.
 
   - name: terminology__observation_type
     description: |-
@@ -1489,33 +1510,31 @@ seeds:
       - name: revenue_center_description
         description: 'A description of the revenue center.'
 
-  - name: terminology__rxnorm_to_atc
+  - name: terminology__coderx_classes
     description: |-
-      The RxNorm to ATC crosswalk maps drug concepts to Anatomical Therapeutic Chemical classes for
-      medication grouping and pharmacy analytics. Tuva sources this proprietary asset from CodeRx through
-      an annual update agreement. Tuva uses this asset in the core medication model and semantic layer
-      models.
+      CodeRx Open class records map RxNorm drug concepts to Anatomical Therapeutic Chemical classification
+      levels. Tuva distributes this annual open snapshot for medication enrichment and analytics.
     config:
       meta:
         data_asset:
-          display_name: "RxNorm to ATC"
+          display_name: "CodeRx Classes"
           maintainer: "CodeRx"
-          source_url: "https://coderx.io/source-data"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_url: "https://coderx.io/coderx-open"
+          source_release: "CodeRx Open snapshot 2026-07-08"
+          source_last_updated: "2026-07-08"
+          tuva_last_updated: "2026-08-24"
           update_frequency: "annually"
-          notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','terminology__rxnorm_to_atc.csv.gz') }}"
+          notes: "CodeRx Open drug class data distributed with Tuva Core."
+      post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_classes.csv.gz') }}"
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: rxnorm_to_atc
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
+      alias: coderx_classes
       tags:
         - terminology
       column_types:
-        rxcui: |
+        drug_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        rxnorm_description: |
+        drug_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         atc_1_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -1534,26 +1553,28 @@ seeds:
         atc_4_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
     columns:
-      - name: rxcui
-        description: 'The RxNorm code.'
-      - name: rxnorm_description
-        description: 'Description of the RxNorm concept.'
+      - name: drug_id
+        description: RxNorm RxCUI for the classified drug.
+        tests:
+          - not_null
+      - name: drug_name
+        description: RxNorm name for the classified drug.
       - name: atc_1_code
-        description: 'The ATC level 1 code.'
+        description: The ATC level 1 code.
       - name: atc_1_name
-        description: 'The name of the ATC level 1 code.'
+        description: The name of the ATC level 1 code.
       - name: atc_2_code
-        description: 'The ATC level 2 code.'
+        description: The ATC level 2 code.
       - name: atc_2_name
-        description: 'The name of the ATC level 2 code.'
+        description: The name of the ATC level 2 code.
       - name: atc_3_code
-        description: 'The ATC level 3 code.'
+        description: The ATC level 3 code.
       - name: atc_3_name
-        description: 'The name of the ATC level 3 code.'
+        description: The name of the ATC level 3 code.
       - name: atc_4_code
-        description: 'The ATC level 4 code.'
+        description: The ATC level 4 code.
       - name: atc_4_name
-        description: 'The name of the ATC level 4 code.'
+        description: The name of the ATC level 4 code.
 
 
   - name: terminology__snomed_icd_10_map
@@ -1740,55 +1761,60 @@ seeds:
         description: 'The description of the child SNOMED concept.'
 
 
-  - name: terminology__rxnorm_brand_generic
+  - name: terminology__coderx_drugs
     description: |-
-      RxNorm brand and generic mappings identify whether drug concepts represent branded or generic
-      products. Tuva sources this proprietary asset from CodeRx through an annual update agreement. Tuva
-      uses this asset in semantic layer models and total cost of care pharmacy models.
+      CodeRx Open drug records describe active, prescribable RxNorm concepts and their corresponding
+      unbranded clinical drug concepts. Tuva distributes this annual open snapshot for medication enrichment.
     config:
       meta:
         data_asset:
-          display_name: "RxNorm Brand Generic"
+          display_name: "CodeRx Drugs"
           maintainer: "CodeRx"
-          source_url: "https://coderx.io/source-data"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_url: "https://coderx.io/coderx-open"
+          source_release: "CodeRx Open snapshot 2026-07-08"
+          source_last_updated: "2026-07-08"
+          tuva_last_updated: "2026-08-24"
           update_frequency: "annually"
-          notes: "Proprietary CodeRx asset updated annually under Tuva's CodeRx agreement."
-      post_hook: "{{ load_versioned_seed('terminology','terminology__rxnorm_brand_generic.csv.gz') }}"
+          notes: "CodeRx Open drug data distributed with Tuva Core."
+      post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_drugs.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: rxnorm_brand_generic
+      alias: coderx_drugs
       tags:
         - terminology
       column_types:
-        product_rxcui: |
+        drug_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        product_name: |
+        drug_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        product_tty: |
+        is_brand: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+        clinical_drug_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        prescribable_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        brand_vs_generic: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        brand_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
-        clinical_product_rxcui: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        clinical_product_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        clinical_product_tty: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ingredient_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        dose_form_name: |
+        clinical_drug_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         active: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
         prescribable: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+    columns:
+      - name: drug_id
+        description: RxNorm RxCUI for the drug concept.
+        tests:
+          - not_null
+          - unique
+      - name: drug_name
+        description: RxNorm name for the drug concept.
+      - name: is_brand
+        description: Indicates whether the drug concept is branded.
+      - name: clinical_drug_id
+        description: RxNorm RxCUI for the corresponding unbranded clinical drug.
+      - name: clinical_drug_name
+        description: RxNorm name for the corresponding unbranded clinical drug.
+      - name: active
+        description: Indicates whether the CodeRx record is active.
+      - name: prescribable
+        description: Indicates whether the CodeRx record is prescribable.
 
   - name: terminology__nitos
     description: |-

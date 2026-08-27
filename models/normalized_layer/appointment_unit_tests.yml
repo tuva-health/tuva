@@ -32,6 +32,7 @@ unit_tests:
             , 'SCHEDULED-PENDING' as status
             , 'Patient requested follow-up' as reason
             , 'Source-specific cancellation value' as cancellation_reason
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
             , 'source-ehr' as data_source
     expect:
       rows:
@@ -71,6 +72,7 @@ unit_tests:
             , 'SCHEDULED-PENDING' as status
             , 'Patient requested follow-up' as reason
             , 'Source-specific cancellation value' as cancellation_reason
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source-ehr' as data_source
     expect:

@@ -94,6 +94,12 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: ingest_datetime
+        description: >-
+          Date and time the source appointment record was extracted from the source system or loaded into the data warehouse. This is useful when multiple versions of the same appointment record are received over time.
+        config:
+          meta:
+            data_type: timestamp
       - name: data_source
         description: >-
           User-defined name that identifies the source of the appointment data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.

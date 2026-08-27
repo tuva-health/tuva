@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -21,7 +21,6 @@ select
     , attr.tuva_attributed_provider
     , attr.tuva_attributed_provider_bucket
     , attr.tuva_attributed_provider_specialty
-    {{ select_extension_columns(ref('member_month__member_month'), alias='mm') }}
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , mm.data_source
 from {{ ref('member_month__member_month') }} as mm

@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -24,6 +23,7 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
+    , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset -%}
@@ -62,6 +62,7 @@ select
     , immune.location_id
     , immune.practitioner_id
     {{ select_extension_columns(ref('input_layer__immunization'), alias='immune', strip_prefix=false) }}
+    , immune.ingest_datetime
     , immune.tuva_last_run
     , immune.data_source
 from immune

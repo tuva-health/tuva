@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -31,6 +30,8 @@
 {# Extension columns for testing passthrough to core.pharmacy_claim #}
 {%- set tuva_extensions -%}
     , ndc_code as x_temp_ndc_code
+    , 'pharmacy_claim' as x_tuva_test_extension
+    , 'pharmacy_claim' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

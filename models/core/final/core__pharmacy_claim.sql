@@ -1,7 +1,9 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
+
+{%- set coderx_name_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(3000)' -%}
 
 {%- set tuva_core_columns -%}
        {{ concat_custom([
@@ -23,7 +25,7 @@
        , cast(pharm.dispensing_provider_name as {{ dbt.type_string() }}) as dispensing_provider_name
        , {{ try_to_cast_date('pharm.dispensing_date') }} as dispensing_date
        , cast(pharm.ndc_code as {{ dbt.type_string() }}) as ndc_code
-       , cast(pharm.ndc_description as {{ dbt.type_string() }}) as ndc_description
+       , cast(pharm.ndc_description as {{ coderx_name_type }}) as ndc_description
        , cast(pharm.quantity as {{ dbt.type_int() }}) as quantity
        , cast(pharm.days_supply as {{ dbt.type_int() }}) as days_supply
        , cast(pharm.refills as {{ dbt.type_int() }}) as refills
@@ -52,7 +54,7 @@
 {%- endset %}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__pharmacy_claim'), alias='pharm', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__pharmacy_claim'), alias='pharm') }}
 {%- endset %}
 
 select

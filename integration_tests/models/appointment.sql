@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', false)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -18,5 +17,8 @@ select
     , coalesce(status_description, status_code) as status
     , reason
     , cancellation_reason
+    , 'appointment' as x_tuva_test_extension
+    , 'appointment' as ext_tuva_test_extension
+    , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
     , data_source
 from {{ ref('the_tuva_project', 'synthetic_data__appointment') }}

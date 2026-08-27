@@ -1,8 +1,8 @@
 {{ config(
      enabled = (
-         var('provider_attribution_enabled', False) == True and
-         var('claims_enabled', False)
-     ) | as_bool
+         the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) == True and
+         the_tuva_project.tuva_boolean_var('claims_enabled', false)
+     )
    )
 }}
 

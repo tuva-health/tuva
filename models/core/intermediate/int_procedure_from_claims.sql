@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -41,6 +41,7 @@ with encounter_crosswalk as (
         , procedure_source.modifier_3
         , procedure_source.modifier_4
         , procedure_source.modifier_5
+        , procedure_source.ingest_datetime
         , procedure_source.tuva_last_run
         , procedure_source.data_source
     from {{ ref('normalized__medical_claim_procedures') }} as procedure_source
@@ -71,6 +72,7 @@ with encounter_crosswalk as (
         , procedure_source.modifier_3
         , procedure_source.modifier_4
         , procedure_source.modifier_5
+        , procedure_source.ingest_datetime
         , procedure_source.tuva_last_run
         , procedure_source.data_source
     from {{ ref('normalized__medical_claim_procedures') }} as procedure_source
@@ -128,6 +130,7 @@ select distinct
     , cast(modifier_3 as {{ dbt.type_string() }}) as modifier_3
     , cast(modifier_4 as {{ dbt.type_string() }}) as modifier_4
     , cast(modifier_5 as {{ dbt.type_string() }}) as modifier_5
+    , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(tuva_last_run as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from all_claim_procedures

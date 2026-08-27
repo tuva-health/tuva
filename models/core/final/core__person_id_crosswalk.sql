@@ -1,10 +1,12 @@
 {{ config(
-     enabled = var('claims_enabled', var('clinical_enabled', False))
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var(
+       'claims_enabled',
+       the_tuva_project.tuva_boolean_var('clinical_enabled', false)
+     )
    )
 }}
 
-{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true and the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -26,7 +28,7 @@ select distinct
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from {{ ref('normalized__patient') }}
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id
@@ -38,7 +40,7 @@ select distinct
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from {{ ref('normalized__patient') }}
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 select distinct
       cast(person_id as {{ dbt.type_string() }}) as person_id

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('data_quality_enabled', false) | as_bool,
+     enabled = the_tuva_project.tuva_boolean_var('data_quality_enabled', false),
      severity = 'error',
      tags = ['data_quality', 'dq_logical']
    )

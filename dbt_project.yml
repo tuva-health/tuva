@@ -1,7 +1,7 @@
 name: 'the_tuva_project'
 version: '1.0.0'
 config-version: 2
-require-dbt-version: ">=1.10.0"
+require-dbt-version: ">=1.10.5"
 
 profile: default
 
@@ -10,6 +10,11 @@ flags:
 vars:
   ## Optional model families
   parity_enabled: false
+
+  ## Medication terminology
+  # When true, every CodeRx consumer reads user-managed CodeRx Enterprise
+  # tables from the coderx schema instead of the package's CodeRx Open assets.
+  use_coderx_enterprise: false
 
   ## Seed storage configuration
   custom_bucket_name: tuva-public-resources

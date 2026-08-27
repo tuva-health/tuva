@@ -7,7 +7,7 @@
         warehouse: "{{ env_var('DBT_SNOWFLAKE_CI_WAREHOUSE') }}"
         database: "{{ env_var('DBT_SNOWFLAKE_CI_DATABASE') }}"
         role: "{{ env_var('DBT_SNOWFLAKE_CI_ROLE') }}"
-        schema: "{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA') }}"
+        schema: "{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA') }}_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
         user: "{{ env_var('DBT_SNOWFLAKE_CI_USER') }}"
         password: "{{ env_var('DBT_SNOWFLAKE_CI_PASSWORD') }}"
         threads: 5

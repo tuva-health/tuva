@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', false)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -34,6 +33,8 @@
         "'clinical_'",
         "cast(person_id as " ~ dbt.type_string() ~ ")"
     ]) }} as x_temp_record_origin
+    , 'patient' as x_tuva_test_extension
+    , 'patient' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

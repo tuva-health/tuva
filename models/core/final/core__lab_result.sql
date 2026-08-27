@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -36,7 +35,8 @@ select
     , labs.normalized_abnormal_code
     , labs.specimen
     , labs.ordering_practitioner_id
-    {{ select_extension_columns(ref('normalized__lab_result'), alias='labs', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__lab_result'), alias='labs') }}
+    , labs.ingest_datetime
     , labs.tuva_last_run
     , labs.data_source
 from {{ ref('normalized__lab_result') }} as labs

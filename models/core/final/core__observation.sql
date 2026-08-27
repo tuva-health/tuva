@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -25,7 +24,8 @@ select
     , obs.source_reference_range_high
     , obs.normalized_reference_range_low
     , obs.normalized_reference_range_high
-    {{ select_extension_columns(ref('normalized__observation'), alias='obs', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__observation'), alias='obs') }}
+    , obs.ingest_datetime
     , obs.tuva_last_run
     , obs.data_source
 from {{ ref('normalized__observation') }} as obs

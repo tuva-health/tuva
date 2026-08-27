@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('clinical_enabled', False)
- | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('clinical_enabled', false)
    )
 }}
 
@@ -18,7 +17,8 @@ select
     , appts.status
     , appts.reason
     , appts.cancellation_reason
-    {{ select_extension_columns(ref('normalized__appointment'), alias='appts', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__appointment'), alias='appts') }}
+    , appts.ingest_datetime
     , appts.tuva_last_run
     , appts.data_source
 from {{ ref('normalized__appointment') }} as appts

@@ -17,11 +17,12 @@ seeds:
         data_asset:
           display_name: "CMS Provider Attribution: Assignment Windows"
           maintainer: "CMS Shared Savings Program"
-          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
-          source_release: "Shared Savings and Losses and Assignment Methodology v7"
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
+          source_url: "https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-losses-assignment-methodology-specifications-version.pdf-0"
+          source_release: "Shared Savings and Losses, Assignment and Quality Performance Standard Methodology Specifications Version 14"
+          source_last_updated: "2026-04-27"
+          tuva_last_updated: "2026-08-26"
           update_frequency: "annually"
+          notes: "Assignment windows are transcribed from Appendix B, Table 9, pages 88-89."
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__assignment_windows.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -40,6 +41,41 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
         window_end: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+    columns:
+      - name: performance_year
+        description: Calendar year for which CMS performs beneficiary assignment.
+        tests:
+          - not_null
+      - name: service_year
+        description: Calendar year of claims included in the assignment window.
+        tests:
+          - not_null
+      - name: assignment_methodology
+        description: CMS beneficiary assignment methodology associated with the window.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['prospective', 'retrospective']
+      - name: expanded_window_start
+        description: Start date of the expanded assignment window.
+        tests:
+          - not_null
+      - name: window_start
+        description: Start date of the standard assignment window.
+        tests:
+          - not_null
+      - name: window_end
+        description: End date of the standard assignment window.
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - performance_year
+              - service_year
+              - assignment_methodology
 
   - name: cms_provider_attribution__primary_care_hcpcs_codes
     description: |-

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
@@ -7,11 +7,7 @@
 with numeric_hcpcs as (
     select *
     from {{ ref('service_category__stg_medical_claim') }} as med
-    {% if target.type in ('duckdb', 'databricks') %}
-        where try_cast('hcpcs_code' as integer) is not null
-    {% else %}
-        where {{ safe_cast('hcpcs_code', 'int') }} is not null
-    {% endif %}
+    where {{ the_tuva_project.try_to_cast_int('med.hcpcs_code') }} is not null
 )
 select distinct
     med.claim_id
