@@ -403,7 +403,7 @@ jobs:
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/snowflake \
-            --select package:integration_tests package:the_tuva_project \
+            --select package:integration_tests package:the_tuva_project package:cms_hcc \
             --vars "$CI_DBT_VARS"
 
       - name: Build on BigQuery
