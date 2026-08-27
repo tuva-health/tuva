@@ -16,13 +16,18 @@
     ('bigquery_bytes', bigquery__dq_type_family('BYTES'), 'binary')
 ] %}
 
-{% for case in type_family_cases %}
-select
-      '{{ case[0] }}' as test_case
-    , '{{ case[1] }}' as actual_type_family
-    , '{{ case[2] }}' as expected_type_family
-where '{{ case[1] }}' <> '{{ case[2] }}'
-{% if not loop.last %}
-union all
-{% endif %}
-{% endfor %}
+with type_family_results as (
+    {% for case in type_family_cases %}
+    select
+          '{{ case[0] }}' as test_case
+        , '{{ case[1] }}' as actual_type_family
+        , '{{ case[2] }}' as expected_type_family
+    {% if not loop.last %}
+    union all
+    {% endif %}
+    {% endfor %}
+)
+
+select *
+from type_family_results
+where actual_type_family <> expected_type_family
