@@ -1,6 +1,162 @@
 version: 2
 
 unit_tests:
+  - name: test_combined_encounter_crosswalk_excludes_undetermined_candidates
+    description: >
+      Broad same-day matchers can produce an encounter candidate for an
+      undetermined claim. The final combined crosswalk must exclude that
+      candidate while preserving the same classified candidate, so the
+      undetermined line flows through the orphan fallback. Regression coverage
+      for https://github.com/tuva-health/tuva-core/issues/1388.
+    model: encounters__combined_claim_line_crosswalk
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+    given:
+      - input: ref('acute_inpatient__prof_claims')
+        rows: []
+      - input: ref('emergency_department__prof_claims')
+        rows: []
+      - input: ref('inpatient_psych__prof_claims')
+        rows: []
+      - input: ref('inpatient_rehab__prof_claims')
+        rows: []
+      - input: ref('inpatient_long_term__prof_claims')
+        rows: []
+      - input: ref('inpatient_snf__prof_claims')
+        rows: []
+      - input: ref('inpatient_substance_use__prof_claims')
+        rows: []
+      - input: ref('office_visits__int_office_visits_claim_line')
+        rows: []
+      - input: ref('urgent_care__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_psych__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_rehab__match_claims_to_anchor')
+        rows: []
+      - input: ref('asc__match_claims_to_anchor')
+        rows: []
+      - input: ref('dialysis__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospice__match_claims_to_anchor')
+        rows: []
+      - input: ref('home_health__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_surgery__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_injections__match_claims_to_anchor')
+        rows:
+          - claim_id: undetermined_claim
+            claim_line_number: 1
+            data_source: source-a
+            old_encounter_id: anchor-1
+          - claim_id: professional_claim
+            claim_line_number: 1
+            data_source: source-a
+            old_encounter_id: anchor-1
+      - input: ref('outpatient_ptotst__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_substance_use__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_radiology__match_claims_to_anchor')
+        rows: []
+      - input: ref('outpatient_hospital_or_clinic__match_claims_to_anchor')
+        rows: []
+      - input: ref('encounters__int_institutional_claim_lines')
+        rows: []
+      - input: ref('lab__match_claims_to_anchor')
+        rows: []
+      - input: ref('dme__match_claims_to_anchor')
+        rows: []
+      - input: ref('ambulance__match_claims_to_anchor')
+        rows: []
+      - input: ref('encounters__stg_medical_claim')
+        rows:
+          - claim_id: undetermined_claim
+            claim_line_number: 1
+            data_source: source-a
+            claim_type: undetermined
+          - claim_id: professional_claim
+            claim_line_number: 1
+            data_source: source-a
+            claim_type: professional
+    expect:
+      rows:
+        - claim_id: professional_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: anchor-1
+          encounter_id: 599f9d17ecf5bc86e964968be6fea2cf
+          encounter_type: outpatient injections
+          encounter_group: outpatient
+          priority_number: 17
+          anchor_claim_id: null
+          claim_line_attribution_number: 1
+
+  - name: test_undetermined_claim_lines_receive_source_scoped_orphan_encounters
+    description: >
+      Every line of an undetermined claim receives an orphan encounter. Lines
+      from the same claim and source share an encounter ID, while reused claim
+      keys in another source remain isolated. Regression coverage for
+      https://github.com/tuva-health/tuva-core/issues/1388.
+    model: encounters__orphaned_claims
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    given:
+      - input: ref('encounters__stg_medical_claim')
+        format: sql
+        rows: |
+          select
+              'shared-undetermined' as claim_id
+            , 1 as claim_line_number
+            , 'other' as service_category_1
+            , 'other' as service_category_2
+            , 'other' as service_category_3
+            , 'undetermined' as claim_type
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-02' as date) as claim_end_date
+            , cast('2024-01-01' as date) as start_date
+            , cast('2024-01-01' as date) as end_date
+            , 'person-1|source-a' as patient_data_source_id
+            , 'source-a' as data_source
+          union all
+          select 'shared-undetermined', 2, 'other', 'other', 'other', 'undetermined', cast('2024-01-01' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), 'person-1|source-a', 'source-a'
+          union all
+          select 'shared-undetermined', 1, 'other', 'other', 'other', 'undetermined', cast('2024-02-01' as date), cast('2024-02-01' as date), cast('2024-02-01' as date), cast('2024-02-01' as date), 'person-1|source-b', 'source-b'
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          select
+              cast(null as {{ string_type }}) as claim_id
+            , cast(null as {{ integer_type }}) as claim_line_number
+            , cast(null as {{ string_type }}) as data_source
+          where 1 = 0
+    expect:
+      rows:
+        - claim_id: shared-undetermined
+          claim_line_number: 1
+          data_source: source-a
+          encounter_id: 02288fa2b6c8335e69225d63811d6187
+          encounter_type: orphaned claim
+          encounter_group: other
+        - claim_id: shared-undetermined
+          claim_line_number: 2
+          data_source: source-a
+          encounter_id: 02288fa2b6c8335e69225d63811d6187
+          encounter_type: orphaned claim
+          encounter_group: other
+        - claim_id: shared-undetermined
+          claim_line_number: 1
+          data_source: source-b
+          encounter_id: 4e85975bd2bdd2e25e0558d72ac95af7
+          encounter_type: orphaned claim
+          encounter_group: other
+
   - name: test_orphaned_claims_scopes_crosswalk_by_data_source
     description: >
       When two sources reuse the same claim-line key, a crosswalk match in one

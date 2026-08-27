@@ -1,6 +1,167 @@
 version: 2
 
 unit_tests:
+  - name: test_service_category_grouper_only_falls_back_for_undetermined
+    description: >
+      Contract-valid undetermined claim lines must be retained as
+      other/other/other without routing null or invalid claim types into the
+      claims algorithms. Regression coverage for
+      https://github.com/tuva-health/tuva-core/issues/1388.
+    model: service_category__service_category_grouper
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('service_category__stg_medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+              'undetermined_claim' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+            , 'undetermined' as claim_type
+            , 'ccs_1' as ccs_category
+            , 'CCS one' as ccs_category_description
+            , cast(null as {{ string_type }}) as drg_code
+            , cast(null as {{ string_type }}) as drg_description
+            , '11' as place_of_service_code
+            , 'Office' as place_of_service_description
+            , cast(null as {{ string_type }}) as revenue_center_code
+            , cast(null as {{ string_type }}) as revenue_center_description
+            , '99213' as hcpcs_code
+            , cast(null as {{ string_type }}) as default_ccsr_category_ip
+            , cast(null as {{ string_type }}) as default_ccsr_category_op
+            , cast(null as {{ string_type }}) as default_ccsr_category_description_ip
+            , cast(null as {{ string_type }}) as default_ccsr_category_description_op
+            , cast(null as {{ string_type }}) as primary_taxonomy_code
+            , cast(null as {{ string_type }}) as primary_specialty_description
+            , cast(null as {{ string_type }}) as modality
+            , cast(null as {{ string_type }}) as bill_type_code
+            , cast(null as {{ string_type }}) as bill_type_description
+          union all
+          select 'undetermined_claim', 2, 'source_a', 'undetermined', null, null, null, null, null, null, '0450', 'Emergency room', 'A0425', null, null, null, null, null, null, null, null, null
+          union all
+          select 'undetermined_claim', 1, 'source_b', 'undetermined', null, null, null, null, null, null, null, null, '87070', null, null, null, null, null, null, null, null, null
+          union all
+          select 'professional_claim', 1, 'source_a', 'professional', null, null, null, null, '11', 'Office', null, null, '99213', null, null, null, null, null, null, null, null, null
+          union all
+          select 'institutional_claim', 1, 'source_a', 'institutional', null, null, null, null, null, null, '0450', 'Emergency room', null, null, null, null, null, null, null, null, '131', 'Hospital outpatient'
+          union all
+          select 'null_claim_type', 1, 'source_a', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+          union all
+          select 'invalid_claim_type', 1, 'source_a', 'dental', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+      - input: ref('service_category__combined_professional')
+        format: sql
+        rows: |
+          select
+              'professional_claim' as claim_id
+            , 1 as claim_line_number
+            , 'source_a' as data_source
+            , 'office-based' as service_category_1
+            , 'office-based evaluation and management' as service_category_2
+            , 'office-based evaluation and management' as service_category_3
+            , 'service_category__office_based_visit_professional' as source_model_name
+      - input: ref('service_category__combined_institutional_header_level')
+        format: sql
+        rows: |
+          select
+              'institutional_claim' as claim_id
+            , 'source_a' as data_source
+            , 'outpatient' as service_category_1
+            , 'emergency department' as service_category_2
+            , 'emergency department' as service_category_3
+            , 'service_category__emergency_department_institutional' as source_model_name
+      - input: ref('service_category__combined_institutional_line_level')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          select
+              cast(null as {{ string_type }}) as claim_id
+            , cast(null as {{ integer_type }}) as claim_line_number
+            , cast(null as {{ string_type }}) as data_source
+            , cast(null as {{ string_type }}) as service_category_1
+            , cast(null as {{ string_type }}) as service_category_2
+            , cast(null as {{ string_type }}) as service_category_3
+            , cast(null as {{ string_type }}) as source_model_name
+          where 1 = 0
+      - input: ref('service_category__service_categories')
+        format: sql
+        rows: |
+          select
+              'office-based' as service_category_1
+            , 'office-based evaluation and management' as service_category_2
+            , 'office-based evaluation and management' as service_category_3
+            , 1 as priority
+          union all
+          select 'outpatient', 'emergency department', 'emergency department', 1
+    expect:
+      rows:
+        - claim_id: undetermined_claim
+          claim_line_number: 1
+          data_source: source_a
+          claim_type: undetermined
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          duplicate_row_number: 1
+          hcpcs_code: '99213'
+          source_model_name: null
+        - claim_id: undetermined_claim
+          claim_line_number: 2
+          data_source: source_a
+          claim_type: undetermined
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          duplicate_row_number: 1
+          hcpcs_code: A0425
+          source_model_name: null
+        - claim_id: undetermined_claim
+          claim_line_number: 1
+          data_source: source_b
+          claim_type: undetermined
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          duplicate_row_number: 1
+          hcpcs_code: '87070'
+          source_model_name: null
+        - claim_id: professional_claim
+          claim_line_number: 1
+          data_source: source_a
+          claim_type: professional
+          service_category_1: office-based
+          service_category_2: office-based evaluation and management
+          service_category_3: office-based evaluation and management
+          duplicate_row_number: 1
+          hcpcs_code: '99213'
+          source_model_name: service_category__office_based_visit_professional
+        - claim_id: institutional_claim
+          claim_line_number: 1
+          data_source: source_a
+          claim_type: institutional
+          service_category_1: outpatient
+          service_category_2: emergency department
+          service_category_3: emergency department
+          duplicate_row_number: 1
+          hcpcs_code: null
+          source_model_name: service_category__emergency_department_institutional
+        - claim_id: institutional_claim
+          claim_line_number: 1
+          data_source: source_a
+          claim_type: institutional
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          duplicate_row_number: 2
+          hcpcs_code: null
+          source_model_name: null
+
   - name: test_office_based_surgery_requires_numeric_hcpcs_in_surgery_range
     description: >
       Verifies that office-based surgery includes numeric HCPCS codes in the

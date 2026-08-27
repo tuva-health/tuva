@@ -1,0 +1,177 @@
+version: 2
+
+unit_tests:
+  - name: test_core_medical_claim_retains_undetermined_lines
+    description: >
+      Core retains every undetermined claim line with its source values,
+      other/other/other service categories, and the source-scoped orphan
+      encounter produced by claims preprocessing. A classified claim is kept
+      as a negative control. Regression coverage for
+      https://github.com/tuva-health/tuva-core/issues/1388.
+    model: core__medical_claim
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-01-01 00:00:00'
+        _extension_columns_override: []
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set numeric_type = 'numeric' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          with base as (
+              select
+                  'mc-u-1' as medical_claim_id
+                , 'undetermined_claim' as claim_id
+                , 1 as claim_line_number
+                , 'undetermined' as claim_type
+                , 'person-1' as person_id
+                , 'member-1' as member_id
+                , 'payer-a' as payer
+                , 'plan-a' as {{ plan_identifier }}
+                , cast('2024-01-01' as date) as claim_start_date
+                , cast('2024-01-02' as date) as claim_end_date
+                , cast('2024-01-01' as date) as claim_line_start_date
+                , cast('2024-01-01' as date) as claim_line_end_date
+                , cast(1 as {{ numeric_type }}) as service_unit_quantity
+                , '99213' as hcpcs_code
+                , '1111111111' as rendering_npi
+                , cast('2024-01-10' as date) as paid_date
+                , cast(10 as {{ numeric_type }}) as paid_amount
+                , cast(12 as {{ numeric_type }}) as allowed_amount
+                , cast(15 as {{ numeric_type }}) as charge_amount
+                , cast(1 as {{ numeric_type }}) as coinsurance_amount
+                , cast(2 as {{ numeric_type }}) as copayment_amount
+                , cast(3 as {{ numeric_type }}) as deductible_amount
+                , cast(16 as {{ numeric_type }}) as total_cost_amount
+                , 1 as in_network_flag
+                , cast('2024-01-31' as date) as file_date
+                , cast('2024-02-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+                , 'medical_claim.csv' as file_name
+                , 'source-a' as data_source
+              union all
+              select 'mc-u-2', 'undetermined_claim', 2, 'undetermined', 'person-1', 'member-1', 'payer-a', 'plan-a', cast('2024-01-01' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), cast(2 as {{ numeric_type }}), 'A0425', '1111111111', cast('2024-01-10' as date), cast(20 as {{ numeric_type }}), cast(22 as {{ numeric_type }}), cast(25 as {{ numeric_type }}), cast(2 as {{ numeric_type }}), cast(3 as {{ numeric_type }}), cast(4 as {{ numeric_type }}), cast(31 as {{ numeric_type }}), 0, cast('2024-01-31' as date), cast('2024-02-01 00:00:00' as {{ timestamp_type }}), 'medical_claim.csv', 'source-a'
+              union all
+              select 'mc-p-1', 'professional_claim', 1, 'professional', 'person-2', 'member-2', 'payer-b', 'plan-b', cast('2024-03-01' as date), cast('2024-03-01' as date), cast('2024-03-01' as date), cast('2024-03-01' as date), cast(1 as {{ numeric_type }}), '99214', '2222222222', cast('2024-03-10' as date), cast(30 as {{ numeric_type }}), cast(32 as {{ numeric_type }}), cast(35 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(32 as {{ numeric_type }}), 1, cast('2024-03-31' as date), cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'medical_claim.csv', 'source-b'
+          )
+          select
+              base.*
+            , cast(null as date) as admission_date
+            , cast(null as date) as discharge_date
+            , cast(null as {{ string_type }}) as admit_source_code
+            , cast(null as {{ string_type }}) as admit_source_description
+            , cast(null as {{ string_type }}) as admit_type_code
+            , cast(null as {{ string_type }}) as admit_type_description
+            , cast(null as {{ string_type }}) as discharge_disposition_code
+            , cast(null as {{ string_type }}) as discharge_disposition_description
+            , cast(null as {{ string_type }}) as place_of_service_code
+            , cast(null as {{ string_type }}) as place_of_service_description
+            , cast(null as {{ string_type }}) as bill_type_code
+            , cast(null as {{ string_type }}) as bill_type_description
+            , cast(null as {{ string_type }}) as drg_code_type
+            , cast(null as {{ string_type }}) as drg_code
+            , cast(null as {{ string_type }}) as drg_description
+            , cast(null as {{ string_type }}) as revenue_center_code
+            , cast(null as {{ string_type }}) as revenue_center_description
+            , cast(null as {{ string_type }}) as hcpcs_modifier_1
+            , cast(null as {{ string_type }}) as hcpcs_modifier_2
+            , cast(null as {{ string_type }}) as hcpcs_modifier_3
+            , cast(null as {{ string_type }}) as hcpcs_modifier_4
+            , cast(null as {{ string_type }}) as hcpcs_modifier_5
+            , cast(null as {{ string_type }}) as rendering_tin
+            , cast(null as {{ string_type }}) as rendering_name
+            , cast(null as {{ string_type }}) as billing_npi
+            , cast(null as {{ string_type }}) as billing_tin
+            , cast(null as {{ string_type }}) as billing_name
+            , cast(null as {{ string_type }}) as facility_npi
+            , cast(null as {{ string_type }}) as facility_name
+          from base
+      - input: ref('service_category__service_category_grouper')
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'other' as service_category_1, 'other' as service_category_2, 'other' as service_category_3, 1 as duplicate_row_number
+          union all
+          select 'undetermined_claim', 2, 'source-a', 'other', 'other', 'other', 1
+          union all
+          select 'professional_claim', 1, 'source-b', 'office-based', 'office-based evaluation and management', 'office-based evaluation and management', 1
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          select
+              'professional_claim' as claim_id
+            , 1 as claim_line_number
+            , 'source-b' as data_source
+            , 'enc-professional' as encounter_id
+            , 'office visit' as encounter_type
+            , 'outpatient' as encounter_group
+            , 1 as claim_line_attribution_number
+      - input: ref('encounters__orphaned_claims')
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'enc-undetermined' as encounter_id, 'orphaned claim' as encounter_type, 'other' as encounter_group
+          union all
+          select 'undetermined_claim', 2, 'source-a', 'enc-undetermined', 'orphaned claim', 'other'
+      - input: ref('claims_enrollment__flag_claims_with_enrollment')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+              cast(null as {{ string_type }}) as claim_id
+            , cast(null as {{ integer_type }}) as claim_line_number
+            , cast(null as {{ string_type }}) as person_id
+            , cast(null as {{ string_type }}) as payer
+            , cast(null as {{ string_type }}) as {{ plan_identifier }}
+            , cast(null as {{ string_type }}) as data_source
+            , cast(null as {{ string_type }}) as member_month_id
+          where 1 = 0
+    expect:
+      rows:
+        - medical_claim_id: mc-u-1
+          claim_id: undetermined_claim
+          claim_line_number: 1
+          claim_type: undetermined
+          encounter_id: enc-undetermined
+          encounter_type: orphaned claim
+          encounter_group: other
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          paid_amount: 10
+          allowed_amount: 12
+          charge_amount: 15
+          data_source: source-a
+        - medical_claim_id: mc-u-2
+          claim_id: undetermined_claim
+          claim_line_number: 2
+          claim_type: undetermined
+          encounter_id: enc-undetermined
+          encounter_type: orphaned claim
+          encounter_group: other
+          service_category_1: other
+          service_category_2: other
+          service_category_3: other
+          paid_amount: 20
+          allowed_amount: 22
+          charge_amount: 25
+          data_source: source-a
+        - medical_claim_id: mc-p-1
+          claim_id: professional_claim
+          claim_line_number: 1
+          claim_type: professional
+          encounter_id: enc-professional
+          encounter_type: office visit
+          encounter_group: outpatient
+          service_category_1: office-based
+          service_category_2: office-based evaluation and management
+          service_category_3: office-based evaluation and management
+          paid_amount: 30
+          allowed_amount: 32
+          charge_amount: 35
+          data_source: source-b

@@ -349,16 +349,24 @@ from {{ ref('ambulance__match_claims_to_anchor') }}
 
 
 select
-  claim_id
-, claim_line_number
-, data_source
-, encounter_id as old_encounter_id
-, {{ the_tuva_project.encounter_id_hash(['encounter_type', 'encounter_id']) }} as encounter_id
-, encounter_type
-, encounter_group
-, priority_number
-, anchor_claim_id
-, row_number() over (partition by claim_id, claim_line_number, data_source
-order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end
-       , encounter_type, encounter_id) as claim_line_attribution_number
-from cte
+  candidate.claim_id
+, candidate.claim_line_number
+, candidate.data_source
+, candidate.encounter_id as old_encounter_id
+, {{ the_tuva_project.encounter_id_hash(['candidate.encounter_type', 'candidate.encounter_id']) }} as encounter_id
+, candidate.encounter_type
+, candidate.encounter_group
+, candidate.priority_number
+, candidate.anchor_claim_id
+, row_number() over (partition by candidate.claim_id, candidate.claim_line_number, candidate.data_source
+order by candidate.priority_number, case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
+       , candidate.encounter_type, candidate.encounter_id) as claim_line_attribution_number
+from cte as candidate
+where not exists (
+    select 1
+    from {{ ref('encounters__stg_medical_claim') }} as staged_claim
+    where staged_claim.claim_id = candidate.claim_id
+      and staged_claim.claim_line_number = candidate.claim_line_number
+      and staged_claim.data_source = candidate.data_source
+      and staged_claim.claim_type = 'undetermined'
+)

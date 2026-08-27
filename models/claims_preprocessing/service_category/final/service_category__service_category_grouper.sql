@@ -99,6 +99,24 @@ with service_category_1_mapping as (
       and b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
+
+    union all
+
+    select distinct
+        a.claim_id
+        , a.claim_line_number
+        , a.data_source
+        , a.claim_type
+        , cast(null as {{ dbt.type_string() }}) as service_category_1
+        , cast(null as {{ dbt.type_string() }}) as service_category_2
+        , cast(null as {{ dbt.type_string() }}) as service_category_3
+        , cast(null as {{ dbt.type_string() }}) as original_service_cat_2
+        , cast(null as {{ dbt.type_string() }}) as original_service_cat_3
+        , cast(null as {{ dbt.type_int() }}) as priority
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+        , cast(null as {{ dbt.type_string() }}) as source_model_name
+    from {{ ref('service_category__stg_medical_claim') }} as a
+    where a.claim_type = 'undetermined'
 )
 
 , service_category_2_deduplication as (

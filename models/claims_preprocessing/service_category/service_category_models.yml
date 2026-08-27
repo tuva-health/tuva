@@ -1,7 +1,13 @@
 models:
   #final
   - name: service_category__service_category_grouper
-    description: Assigns every claim line into a unique service category.
+    description: |-
+      Assigns each contract-valid medical claim line to a service category.
+      Professional and institutional claims use the service-category
+      algorithms. Claims whose claim_type is undetermined are retained with
+      other/other/other because their billing form cannot be classified
+      reliably. Null and invalid claim_type values remain outside this model
+      and are reported by input data quality checks.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
