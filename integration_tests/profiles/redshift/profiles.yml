@@ -7,6 +7,6 @@ default:
       user: "{{ env_var('DBT_REDSHIFT_CI_USER') }}"
       password: "{{ env_var('DBT_REDSHIFT_CI_PASSWORD') }}"
       dbname: "{{ env_var('DBT_REDSHIFT_CI_DATABASE') }}"
-      schema: public
+      schema: "public_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
       port: 5439
       threads: "{{ env_var('DBT_REDSHIFT_CI_THREADS', '4') | int }}"

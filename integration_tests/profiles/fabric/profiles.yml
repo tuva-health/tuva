@@ -7,7 +7,7 @@ default:
       authentication: ActiveDirectoryServicePrincipal
       server: "{{ env_var('DBT_FABRIC_CI_SERVER') }}"
       database: "{{ env_var('DBT_FABRIC_CI_DATABASE') }}"
-      schema: "{{ env_var('DBT_FABRIC_CI_SCHEMA') }}"
+      schema: "{{ env_var('DBT_FABRIC_CI_SCHEMA') }}_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
       client_id: "{{ env_var('DBT_FABRIC_CI_CLIENT_ID') }}"
       client_secret: "{{ env_var('DBT_FABRIC_CI_CLIENT_SECRET') }}"
       tenant_id: "{{ env_var('DBT_FABRIC_CI_TENANT_ID') }}"

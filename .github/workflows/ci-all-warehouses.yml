@@ -1,0 +1,368 @@
+name: Tuva CI -- All Warehouses
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Internal version-changing pull request number to validate
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: tuva-ci-all-dispatch-pr-${{ inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  resolve:
+    name: Resolve release pull request and package sources
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      base_sha: ${{ steps.resolve.outputs.base_sha }}
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      merge_sha: ${{ steps.resolve.outputs.merge_sha }}
+      schema_prefix: ${{ steps.resolve.outputs.schema_prefix }}
+      concurrency_key: ${{ steps.resolve.outputs.concurrency_key }}
+      source_lock: ${{ steps.resolve.outputs.source_lock }}
+    steps:
+      - name: Pin the release candidate and package mains
+        id: resolve
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            if (context.ref !== "refs/heads/main") {
+              core.setFailed("Tuva CI -- All Warehouses must be dispatched from main.");
+              return;
+            }
+
+            const rawPrNumber = process.env.PR_NUMBER.trim();
+            if (!/^\d+$/.test(rawPrNumber)) {
+              core.setFailed(`Invalid pull request number: ${rawPrNumber}`);
+              return;
+            }
+
+            const prNumber = Number(rawPrNumber);
+            const baseRepository =
+              `${context.repo.owner}/${context.repo.repo}`.toLowerCase();
+            const exactSha = /^[0-9a-f]{40}$/i;
+            const releasePackages = [
+              {
+                repository: "ahrq_quality_indicators",
+                dbtPackage: "ahrq_quality_indicators",
+                envVar: "TUVA_CI_AHRQ_QUALITY_INDICATORS_SHA"
+              },
+              {
+                repository: "ccsr",
+                dbtPackage: "ccsr",
+                envVar: "TUVA_CI_CCSR_SHA"
+              },
+              {
+                repository: "cms_chronic_conditions",
+                dbtPackage: "cms_chronic_conditions",
+                envVar: "TUVA_CI_CMS_CHRONIC_CONDITIONS_SHA"
+              },
+              {
+                repository: "cms_hcc",
+                dbtPackage: "cms_hcc",
+                envVar: "TUVA_CI_CMS_HCC_SHA"
+              },
+              {
+                repository: "fhir_preprocessing",
+                dbtPackage: "fhir_preprocessing",
+                envVar: "TUVA_CI_FHIR_PREPROCESSING_SHA"
+              },
+              {
+                repository: "nyu_ed_classification",
+                dbtPackage: "nyu_ed_classification",
+                envVar: "TUVA_CI_NYU_ED_CLASSIFICATION_SHA"
+              },
+              {
+                repository: "quality_measures",
+                dbtPackage: "quality_measures",
+                envVar: "TUVA_CI_QUALITY_MEASURES_SHA"
+              },
+              {
+                repository: "semantic-layer",
+                dbtPackage: "semantic_layer",
+                envVar: "TUVA_CI_SEMANTIC_LAYER_SHA"
+              }
+            ];
+
+            async function getPullRequest() {
+              let pr;
+              for (let attempt = 0; attempt < 5; attempt += 1) {
+                ({ data: pr } = await github.rest.pulls.get({
+                  ...context.repo,
+                  pull_number: prNumber
+                }));
+                if (pr.mergeable !== null) {
+                  break;
+                }
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+              }
+              return pr;
+            }
+
+            function validatePullRequest(pr) {
+              if (pr.state !== "open") {
+                throw new Error(`PR #${prNumber} is not open.`);
+              }
+              if (pr.base.ref !== "main") {
+                throw new Error(
+                  `PR #${prNumber} targets ${pr.base.ref}, not main.`
+                );
+              }
+              const headRepository =
+                String(pr.head.repo?.full_name || "").toLowerCase();
+              if (headRepository !== baseRepository) {
+                throw new Error(
+                  `PR #${prNumber} must use a branch in ${baseRepository}.`
+                );
+              }
+              if (pr.mergeable !== true) {
+                throw new Error(`PR #${prNumber} is not currently mergeable.`);
+              }
+            }
+
+            async function getTestMerge(pr) {
+              const { data: mergeCommit } = await github.rest.repos.getCommit({
+                ...context.repo,
+                ref: `refs/pull/${prNumber}/merge`
+              });
+              const parentShas = mergeCommit.parents.map((parent) => parent.sha);
+              if (
+                parentShas.length !== 2 ||
+                parentShas[0] !== pr.base.sha ||
+                parentShas[1] !== pr.head.sha
+              ) {
+                throw new Error(
+                  `PR #${prNumber} changed while its test merge was being resolved.`
+                );
+              }
+              return mergeCommit;
+            }
+
+            async function projectVersion(ref) {
+              const { data } = await github.rest.repos.getContent({
+                ...context.repo,
+                path: "dbt_project.yml",
+                ref
+              });
+              if (Array.isArray(data) || data.type !== "file" || !data.content) {
+                throw new Error(`dbt_project.yml is not a readable file at ${ref}`);
+              }
+              const text = Buffer.from(
+                data.content.replace(/\n/g, ""),
+                data.encoding || "base64"
+              ).toString("utf8");
+              const versionPattern =
+                /^version:\s*(['"]?)([0-9A-Za-z.+-]+)\1\s*(?:#.*)?$/gm;
+              const matches = [...text.matchAll(versionPattern)];
+              if (matches.length !== 1) {
+                throw new Error(
+                  `expected exactly one top-level version at ${ref}; found ${matches.length}`
+                );
+              }
+              return matches[0][2];
+            }
+
+            function parseSemver(version) {
+              const numeric = "(?:0|[1-9][0-9]*)";
+              const nonNumeric = "(?:[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)";
+              const prereleaseIdentifier = `(?:${numeric}|${nonNumeric})`;
+              const prerelease =
+                `(${prereleaseIdentifier}(?:\\.${prereleaseIdentifier})*)`;
+              const buildIdentifier = "[0-9A-Za-z-]+";
+              const pattern = new RegExp(
+                `^(${numeric})\\.(${numeric})\\.(${numeric})` +
+                `(?:-${prerelease})?` +
+                `(?:\\+(${buildIdentifier}(?:\\.${buildIdentifier})*))?$`
+              );
+              const match = version.match(pattern);
+              if (!match) {
+                throw new Error(`invalid SemVer version: ${version}`);
+              }
+              return {
+                core: match.slice(1, 4).map((item) => BigInt(item)),
+                prerelease: match[4] ? match[4].split(".") : null
+              };
+            }
+
+            function compareSemverPrecedence(leftVersion, rightVersion) {
+              const left = parseSemver(leftVersion);
+              const right = parseSemver(rightVersion);
+              for (let index = 0; index < 3; index += 1) {
+                if (left.core[index] !== right.core[index]) {
+                  return left.core[index] > right.core[index] ? 1 : -1;
+                }
+              }
+              if (left.prerelease === null && right.prerelease === null) {
+                return 0;
+              }
+              if (left.prerelease === null) {
+                return 1;
+              }
+              if (right.prerelease === null) {
+                return -1;
+              }
+              const length = Math.max(
+                left.prerelease.length,
+                right.prerelease.length
+              );
+              for (let index = 0; index < length; index += 1) {
+                const leftPart = left.prerelease[index];
+                const rightPart = right.prerelease[index];
+                if (leftPart === undefined) {
+                  return -1;
+                }
+                if (rightPart === undefined) {
+                  return 1;
+                }
+                if (leftPart === rightPart) {
+                  continue;
+                }
+                const leftIsNumeric = /^[0-9]+$/.test(leftPart);
+                const rightIsNumeric = /^[0-9]+$/.test(rightPart);
+                if (leftIsNumeric && rightIsNumeric) {
+                  return BigInt(leftPart) > BigInt(rightPart) ? 1 : -1;
+                }
+                if (leftIsNumeric !== rightIsNumeric) {
+                  return leftIsNumeric ? -1 : 1;
+                }
+                return leftPart > rightPart ? 1 : -1;
+              }
+              return 0;
+            }
+
+            try {
+              const pr = await getPullRequest();
+              validatePullRequest(pr);
+              const mergeCommit = await getTestMerge(pr);
+
+              const [baseVersion, releaseVersion, standalonePackages] =
+                await Promise.all([
+                  projectVersion(pr.base.sha),
+                  projectVersion(mergeCommit.sha),
+                  Promise.all(
+                    releasePackages.map(async (item) => {
+                      const { data: commit } = await github.rest.repos.getCommit({
+                        owner: context.repo.owner,
+                        repo: item.repository,
+                        ref: "main"
+                      });
+                      if (!exactSha.test(commit.sha)) {
+                        throw new Error(
+                          `Could not resolve ${item.repository} main to an exact commit.`
+                        );
+                      }
+                      return {
+                        repository: `${context.repo.owner}/${item.repository}`,
+                        dbt_package: item.dbtPackage,
+                        branch: "main",
+                        revision: commit.sha.toLowerCase(),
+                        env_var: item.envVar
+                      };
+                    })
+                  )
+                ]);
+
+              if (compareSemverPrecedence(releaseVersion, baseVersion) <= 0) {
+                throw new Error(
+                  `PR #${prNumber} must increase the Tuva Core package version ` +
+                  `with greater SemVer precedence (${baseVersion} -> ${releaseVersion}).`
+                );
+              }
+
+              const currentPr = await getPullRequest();
+              validatePullRequest(currentPr);
+              const currentMerge = await getTestMerge(currentPr);
+              if (
+                currentPr.base.sha !== pr.base.sha ||
+                currentPr.head.sha !== pr.head.sha ||
+                currentMerge.sha !== mergeCommit.sha
+              ) {
+                throw new Error(
+                  `PR #${prNumber} changed while package sources were being resolved.`
+                );
+              }
+
+              const sourceLock = {
+                core: {
+                  repository: `${context.repo.owner}/${context.repo.repo}`,
+                  source: "pull_request_test_merge",
+                  revision: mergeCommit.sha.toLowerCase()
+                },
+                base_version: baseVersion,
+                release_version: releaseVersion,
+                standalone_packages: standalonePackages
+              };
+
+              core.setOutput("pr_number", String(prNumber));
+              core.setOutput("base_sha", pr.base.sha);
+              core.setOutput("head_sha", pr.head.sha);
+              core.setOutput("merge_sha", mergeCommit.sha);
+              core.setOutput(
+                "schema_prefix",
+                `ci_all_pr_${prNumber}_${pr.head.sha.slice(0, 8)}`
+              );
+              core.setOutput("concurrency_key", `all-worker-pr-${prNumber}`);
+              core.setOutput("source_lock", JSON.stringify(sourceLock));
+              core.notice(
+                `Pinned release CI ${baseVersion} -> ${releaseVersion} at ` +
+                `${mergeCommit.sha} with eight standalone package mains.`
+              );
+            } catch (error) {
+              core.setFailed(`Could not resolve release CI: ${error.message}`);
+            }
+
+  run_all_warehouses:
+    name: Run release candidate on all warehouses
+    needs: resolve
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    uses: ./.github/workflows/ci.yml
+    with:
+      checkout_ref: ${{ needs.resolve.outputs.merge_sha }}
+      warehouse: all
+      scope: all-packages
+      source_lock: ${{ needs.resolve.outputs.source_lock }}
+      schema_prefix: ${{ needs.resolve.outputs.schema_prefix }}
+      concurrency_key: ${{ needs.resolve.outputs.concurrency_key }}
+      publish_status: true
+      pr_number: ${{ needs.resolve.outputs.pr_number }}
+      base_sha: ${{ needs.resolve.outputs.base_sha }}
+      head_sha: ${{ needs.resolve.outputs.head_sha }}
+      merge_sha: ${{ needs.resolve.outputs.merge_sha }}
+    secrets:
+      DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
+      DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+      DBT_SNOWFLAKE_CI_DATABASE: ${{ secrets.DBT_SNOWFLAKE_CI_DATABASE }}
+      DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+      DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+      DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+      DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
+      DBT_BIGQUERY_CI_TOKEN: ${{ secrets.DBT_BIGQUERY_CI_TOKEN }}
+      DBT_BIGQUERY_CI_PROJECT: ${{ secrets.DBT_BIGQUERY_CI_PROJECT }}
+      DBT_DATABRICKS_CI_HOST: ${{ secrets.DBT_DATABRICKS_CI_HOST }}
+      DBT_DATABRICKS_CI_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_CI_HTTP_PATH }}
+      DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
+      DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
+      DBT_FABRIC_CI_SERVER: ${{ secrets.DBT_FABRIC_CI_SERVER }}
+      DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
+      DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
+      DBT_FABRIC_CI_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
+      DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
+      DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
+      DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+      DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+      DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+      DBT_REDSHIFT_CI_DATABASE: ${{ secrets.DBT_REDSHIFT_CI_DATABASE }}

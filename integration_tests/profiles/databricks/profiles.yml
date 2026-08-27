@@ -7,7 +7,7 @@ default:
         http_path: "{{ env_var('DBT_DATABRICKS_CI_HTTP_PATH') }}"
         token: "{{ env_var('DBT_DATABRICKS_CI_TOKEN') }}"
         catalog: "{{ env_var('DBT_DATABRICKS_CI_CATALOG') }}"
-        schema: default
+        schema: "default_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
         threads: 8
         connect_timeout: 60
         connect_retries: 3

@@ -433,7 +433,7 @@ unit_tests:
   - name: test_medical_claim_line_new_flags_are_tristate
     description: >
       Verifies fail, pass, and not-applicable behavior for medical claim-line
-      number, paid-date range, and paid-date sequencing checks.
+      number, ingest datetime, and paid-date presence and range checks.
     model: data_quality__medical_claim_line_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
@@ -449,12 +449,6 @@ unit_tests:
               select 'invalid_values', 0
               union all
               select 'valid_values', 1
-              union all
-              select 'before_claim_end', 1
-              union all
-              select 'same_as_claim_end', 1
-              union all
-              select 'missing_claim_end', 1
           )
           select
                 row_ids.claim_id
@@ -465,12 +459,7 @@ unit_tests:
               , 'payer' as payer
               , 'plan' as {{ plan_identifier }}
               , cast('2024-01-01' as date) as claim_start_date
-              , case
-                  when row_ids.claim_id = 'before_claim_end' then cast('2024-02-01' as date)
-                  when row_ids.claim_id = 'same_as_claim_end' then cast('2024-01-15' as date)
-                  when row_ids.claim_id = 'missing_claim_end' then cast(null as date)
-                  else cast('2024-01-01' as date)
-                end as claim_end_date
+              , cast('2024-01-01' as date) as claim_end_date
               , cast('2024-01-01' as date) as claim_line_start_date
               , cast('2024-01-01' as date) as claim_line_end_date
               , cast(null as date) as admission_date
@@ -586,6 +575,126 @@ unit_tests:
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
           paid_date_before_claim_end_date: 0
+
+  - name: test_medical_claim_line_paid_date_sequence_is_tristate
+    description: >
+      Verifies fail, pass, and not-applicable behavior when the paid date is
+      before, equal to, or cannot be compared with the claim end date.
+    model: data_quality__medical_claim_line_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    given:
+      - input: ref('input_layer__medical_claim')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          with row_ids as (
+              select 'before_claim_end' as claim_id, cast('2024-02-01' as date) as claim_end_date
+              union all
+              select 'same_as_claim_end', cast('2024-01-15' as date)
+              union all
+              select 'missing_claim_end', cast(null as date)
+          )
+          select
+                row_ids.claim_id
+              , 1 as claim_line_number
+              , 'undetermined' as claim_type
+              , 'person' as person_id
+              , 'member' as member_id
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cast('2024-01-01' as date) as claim_start_date
+              , row_ids.claim_end_date
+              , cast('2024-01-01' as date) as claim_line_start_date
+              , cast('2024-01-01' as date) as claim_line_end_date
+              , cast(null as date) as admission_date
+              , cast(null as date) as discharge_date
+              , null as admit_source_code
+              , null as admit_type_code
+              , null as discharge_disposition_code
+              , null as place_of_service_code
+              , null as bill_type_code
+              , null as revenue_center_code
+              , null as hcpcs_code
+              , null as rendering_npi
+              , null as billing_npi
+              , null as facility_npi
+              , null as drg_code_type
+              , null as drg_code
+              , null as diagnosis_code_type
+              , null as procedure_code_type
+              , cast('2024-01-15' as date) as paid_date
+              , 1 as paid_amount
+              , 2 as allowed_amount
+              {% for index in range(1, 26) %}
+              , null as diagnosis_code_{{ index }}
+              {% endfor %}
+              {% for index in range(1, 26) %}
+              , null as procedure_code_{{ index }}
+              {% endfor %}
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
+              , 'source' as data_source
+          from row_ids
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('2000-01-01' as date) as enrollment_start_date, cast('2030-12-31' as date) as enrollment_end_date, 'source' as data_source
+      - input: ref('terminology__admit_source')
+        format: sql
+        rows: |
+          select '__unused__' as admit_source_code
+      - input: ref('terminology__admit_type')
+        format: sql
+        rows: |
+          select '__unused__' as admit_type_code
+      - input: ref('terminology__discharge_disposition')
+        format: sql
+        rows: |
+          select '__unused__' as discharge_disposition_code
+      - input: ref('terminology__place_of_service')
+        format: sql
+        rows: |
+          select '__unused__' as place_of_service_code
+      - input: ref('terminology__bill_type')
+        format: sql
+        rows: |
+          select '__unused__' as bill_type_code
+      - input: ref('terminology__revenue_center')
+        format: sql
+        rows: |
+          select '__unused__' as revenue_center_code
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select '__unused__' as npi
+      - input: ref('terminology__ms_drg')
+        format: sql
+        rows: |
+          select '__unused__' as ms_drg_code
+      - input: ref('terminology__apr_drg')
+        format: sql
+        rows: |
+          select '__unused__' as apr_drg_code
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_cm
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_cm
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_10_pcs
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          select '__unused__' as icd_9_pcs
+    expect:
+      rows:
         - claim_id: before_claim_end
           claim_line_number_not_positive: 0
           ingest_datetime_out_of_reasonable_range: null
@@ -936,13 +1045,12 @@ unit_tests:
 
   - name: test_medical_claim_header_consistency_flags_are_tristate
     description: >
-      Verifies every new header-consistency flag, including fail behavior for
-      conflicting or mixed null/populated values, pass behavior for repeated
-      values, and not-applicable behavior for single-line and all-null groups.
+      Verifies claim identity and date header-consistency flags for conflicting,
+      repeated, single-line, all-null, case-sensitive, and cross-source groups.
     model: data_quality__medical_claim_claim_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
-    given:
+    given: &medical_claim_header_consistency_given
       - input: ref('input_layer__medical_claim')
         format: sql
         rows: |
@@ -1040,6 +1148,67 @@ unit_tests:
           claim_start_date_has_multiple_values_per_claim: null
           claim_end_date_has_multiple_values_per_claim: null
           billing_npi_has_multiple_values_per_claim: null
+        - claim_id: same_values
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+        - claim_id: mixed_values
+          member_id_has_multiple_values_per_claim: 1
+          payer_has_multiple_values_per_claim: 1
+          plan_has_multiple_values_per_claim: 1
+          claim_start_date_has_multiple_values_per_claim: 1
+          claim_end_date_has_multiple_values_per_claim: 1
+          billing_npi_has_multiple_values_per_claim: 1
+        - claim_id: all_null
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+        - claim_id: case_conflict
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+        - claim_id: uppercase_institutional
+          member_id_has_multiple_values_per_claim: 0
+          payer_has_multiple_values_per_claim: 0
+          plan_has_multiple_values_per_claim: 0
+          claim_start_date_has_multiple_values_per_claim: 0
+          claim_end_date_has_multiple_values_per_claim: 0
+          billing_npi_has_multiple_values_per_claim: 0
+        - claim_id: cross_source
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+        - claim_id: cross_source
+          member_id_has_multiple_values_per_claim: null
+          payer_has_multiple_values_per_claim: null
+          plan_has_multiple_values_per_claim: null
+          claim_start_date_has_multiple_values_per_claim: null
+          claim_end_date_has_multiple_values_per_claim: null
+          billing_npi_has_multiple_values_per_claim: null
+
+  - name: test_medical_claim_header_code_consistency_flags_are_tristate
+    description: >
+      Verifies inpatient and code header-consistency flags for conflicting,
+      repeated, single-line, all-null, case-sensitive, and cross-source groups.
+    model: data_quality__medical_claim_claim_flags
+    config:
+      enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    given: *medical_claim_header_consistency_given
+    expect:
+      rows:
+        - claim_id: single_line
           admit_source_code_has_multiple_values_per_inpatient_claim: null
           admit_type_code_has_multiple_values_per_inpatient_claim: null
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
@@ -1048,12 +1217,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: null
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
         - claim_id: same_values
-          member_id_has_multiple_values_per_claim: 0
-          payer_has_multiple_values_per_claim: 0
-          plan_has_multiple_values_per_claim: 0
-          claim_start_date_has_multiple_values_per_claim: 0
-          claim_end_date_has_multiple_values_per_claim: 0
-          billing_npi_has_multiple_values_per_claim: 0
           admit_source_code_has_multiple_values_per_inpatient_claim: 0
           admit_type_code_has_multiple_values_per_inpatient_claim: 0
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: 0
@@ -1062,12 +1225,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: 0
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: 0
         - claim_id: mixed_values
-          member_id_has_multiple_values_per_claim: 1
-          payer_has_multiple_values_per_claim: 1
-          plan_has_multiple_values_per_claim: 1
-          claim_start_date_has_multiple_values_per_claim: 1
-          claim_end_date_has_multiple_values_per_claim: 1
-          billing_npi_has_multiple_values_per_claim: 1
           admit_source_code_has_multiple_values_per_inpatient_claim: 1
           admit_type_code_has_multiple_values_per_inpatient_claim: 1
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: 1
@@ -1076,12 +1233,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: 1
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: 1
         - claim_id: all_null
-          member_id_has_multiple_values_per_claim: null
-          payer_has_multiple_values_per_claim: null
-          plan_has_multiple_values_per_claim: null
-          claim_start_date_has_multiple_values_per_claim: null
-          claim_end_date_has_multiple_values_per_claim: null
-          billing_npi_has_multiple_values_per_claim: null
           admit_source_code_has_multiple_values_per_inpatient_claim: null
           admit_type_code_has_multiple_values_per_inpatient_claim: null
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
@@ -1090,12 +1241,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: null
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
         - claim_id: case_conflict
-          member_id_has_multiple_values_per_claim: 0
-          payer_has_multiple_values_per_claim: 0
-          plan_has_multiple_values_per_claim: 0
-          claim_start_date_has_multiple_values_per_claim: 0
-          claim_end_date_has_multiple_values_per_claim: 0
-          billing_npi_has_multiple_values_per_claim: 0
           admit_source_code_has_multiple_values_per_inpatient_claim: 0
           admit_type_code_has_multiple_values_per_inpatient_claim: 0
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: 0
@@ -1104,12 +1249,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: 1
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: 0
         - claim_id: uppercase_institutional
-          member_id_has_multiple_values_per_claim: 0
-          payer_has_multiple_values_per_claim: 0
-          plan_has_multiple_values_per_claim: 0
-          claim_start_date_has_multiple_values_per_claim: 0
-          claim_end_date_has_multiple_values_per_claim: 0
-          billing_npi_has_multiple_values_per_claim: 0
           admit_source_code_has_multiple_values_per_inpatient_claim: null
           admit_type_code_has_multiple_values_per_inpatient_claim: null
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
@@ -1118,12 +1257,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: 0
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
         - claim_id: cross_source
-          member_id_has_multiple_values_per_claim: null
-          payer_has_multiple_values_per_claim: null
-          plan_has_multiple_values_per_claim: null
-          claim_start_date_has_multiple_values_per_claim: null
-          claim_end_date_has_multiple_values_per_claim: null
-          billing_npi_has_multiple_values_per_claim: null
           admit_source_code_has_multiple_values_per_inpatient_claim: null
           admit_type_code_has_multiple_values_per_inpatient_claim: null
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: null
@@ -1132,12 +1265,6 @@ unit_tests:
           procedure_code_type_has_multiple_values_per_claim: null
           diagnosis_code_count_gt_one_per_position_for_institutional_claim: null
         - claim_id: cross_source
-          member_id_has_multiple_values_per_claim: null
-          payer_has_multiple_values_per_claim: null
-          plan_has_multiple_values_per_claim: null
-          claim_start_date_has_multiple_values_per_claim: null
-          claim_end_date_has_multiple_values_per_claim: null
-          billing_npi_has_multiple_values_per_claim: null
           admit_source_code_has_multiple_values_per_inpatient_claim: null
           admit_type_code_has_multiple_values_per_inpatient_claim: null
           discharge_disposition_code_has_multiple_values_per_inpatient_claim: null

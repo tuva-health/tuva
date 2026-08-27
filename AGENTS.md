@@ -45,8 +45,11 @@ from git worktrees.
   - `data_assets.yml` declares the exact package-owned object inventory. The
     publisher-generated `_release.json` is a completion receipt bound to the
     exact package git commit in `package_commit` and is not read by dbt at
-    runtime. Package tags must not be created until the matching receipt is
-    available from S3, GCS, and Azure and names the current `main` commit.
+    runtime. Future-version payload folders may be created before the matching
+    version change reaches `main`, but they are candidates rather than completed
+    snapshots and must not contain `_release.json`. Package tags must not be
+    created until the post-merge receipt is available from S3, GCS, and Azure
+    and names the current `main` commit.
   - Data asset changes must preserve cross-warehouse loading behavior.
 
 ## Mandatory Local Rules
@@ -165,21 +168,35 @@ content is loaded from public object storage.
 
 ## CI Guidance
 
-- In-repository pull requests automatically run one Snowflake
-  `dbt build --full-refresh` against the small synthetic dataset. The build
-  selects Tuva Core plus the integration-test project and runs unit and data
-  tests. Parity remains disabled.
-- Additional warehouse validation is manually initiated from GitHub Actions.
-  Choose Snowflake, BigQuery, Databricks, Fabric, Redshift, or `all`; every
-  target runs the same fixed Core build.
+- In-repository pull requests automatically run `Tuva CI -- Snowflake`: one
+  Snowflake `dbt build --full-refresh` against the small synthetic dataset. The
+  build selects Tuva Core plus the integration-test project and runs unit and
+  data tests. Data Quality, including its optional failure-key relation, is
+  enabled so the complete Core test surface executes. Version changes do not
+  alter this automatic path. Parity remains disabled.
+- Run `Tuva CI -- All Warehouses` manually from the Actions tab for the final
+  release pull request. Its only input is the pull-request number. It accepts
+  only an open, mergeable, same-repository pull request into `main` that changes
+  the Tuva Core package version.
+- The all-warehouse workflow resolves the pull request test-merge and all eight
+  standalone package `main` branches once to exact commits. It then runs Tuva
+  Core, the integration-test project, and all eight packages on Snowflake,
+  BigQuery, Databricks, Fabric, and Redshift against synthetic small with Data
+  Quality and its optional failure-key relation enabled. Before warehouse
+  credentials are used, it verifies that every Core candidate asset exists in
+  S3, GCS, and Azure and that no `_release.json` has been finalized.
+- CI does not expose individual warehouse dispatches. Troubleshoot a single
+  warehouse locally when needed.
 - DuckDB portability is validated locally as needed rather than in GitHub CI.
 - Pull-request comment commands do not trigger CI and CI does not accept
   arbitrary dbt commands, selectors, or flags.
 - Automatic secrets-backed CI does not execute fork code. After reviewing an
   external pull request, a maintainer runs `External PR Snowflake CI` from the
-  Actions tab and supplies only the pull-request number.
-- Standalone packages validate in their own repositories. Routine Tuva Core CI
-  does not install mutable standalone-package branches.
+  Actions tab and supplies only the pull-request number. External version
+  changes are rejected because release CI requires a same-repository branch.
+- Standalone packages validate in their own repositories. Routine Snowflake CI
+  does not install standalone packages; only manual release CI snapshots their
+  `main` branches to exact commits before building.
 - Parity comparisons are separate, manually initiated Snowflake validations.
 - Do not edit `.github/workflows/create-release.yml` unless the task explicitly
   targets release automation.

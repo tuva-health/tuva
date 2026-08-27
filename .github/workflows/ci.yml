@@ -1,4 +1,4 @@
-name: Tuva CI
+name: Tuva CI -- Snowflake
 
 on:
   pull_request:
@@ -9,20 +9,6 @@ on:
       - reopened
       - synchronize
       - ready_for_review
-  workflow_dispatch:
-    inputs:
-      warehouse:
-        description: Warehouse to validate
-        required: true
-        type: choice
-        default: snowflake
-        options:
-          - snowflake
-          - bigquery
-          - databricks
-          - fabric
-          - redshift
-          - all
   workflow_call:
     inputs:
       checkout_ref:
@@ -30,11 +16,20 @@ on:
         required: true
         type: string
       warehouse:
-        description: Warehouse to validate
+        description: Fixed warehouse set to validate (snowflake or all)
         required: true
         type: string
+      scope:
+        description: Package scope to validate (core or all-packages)
+        required: true
+        type: string
+      source_lock:
+        description: Exact package source lock for all-packages scope
+        required: false
+        type: string
+        default: ""
       schema_prefix:
-        description: Explicit schema prefix for the build
+        description: Base schema prefix for the build
         required: true
         type: string
       concurrency_key:
@@ -42,7 +37,7 @@ on:
         required: true
         type: string
       publish_status:
-        description: Publish the required Snowflake commit status
+        description: Publish a commit status for the tested pull request
         required: false
         type: boolean
         default: false
@@ -119,32 +114,40 @@ permissions: {}
 concurrency:
   group: >-
     tuva-ci-${{
-      github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) ||
+      github.event_name == 'pull_request' && format('snowflake-pr-{0}', github.event.pull_request.number) ||
       inputs.concurrency_key ||
-      format('manual-{0}', github.run_id)
+      format('run-{0}', github.run_id)
     }}
   cancel-in-progress: true
 
 env:
   PYTHON_VERSION: "3.10"
-  DBT_CORE_VERSION: "1.10.15"
-  DBT_SNOWFLAKE_VERSION: "1.10.8"
-  DBT_BIGQUERY_VERSION: "1.10.3"
-  DBT_DATABRICKS_VERSION: "1.10.19"
-  DBT_FABRIC_VERSION: "1.10.0"
-  DBT_REDSHIFT_VERSION: "1.10.2"
+  DBT_CORE_VERSION: "1.11.14"
+  DBT_SNOWFLAKE_VERSION: "1.11.6"
+  DBT_BIGQUERY_VERSION: "1.11.3"
+  DBT_DATABRICKS_VERSION: "1.12.4"
+  DBT_FABRIC_VERSION: "1.11.1"
+  DBT_REDSHIFT_VERSION: "1.11.1"
+  SQLPARSE_VERSION: "0.6.0"
+  DBT_SQLPARSE_OPTIONS: >-
+    {"MAX_GROUPING_DEPTH": 100, "MAX_GROUPING_TOKENS": 100000}
 
 jobs:
   resolve:
     name: Resolve request
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       should_run: ${{ steps.resolve.outputs.should_run }}
       adapter_matrix: ${{ steps.resolve.outputs.adapter_matrix }}
       checkout_ref: ${{ steps.resolve.outputs.checkout_ref }}
       schema_prefix: ${{ steps.resolve.outputs.schema_prefix }}
-      concurrency_key: ${{ steps.resolve.outputs.concurrency_key }}
       publish_status: ${{ steps.resolve.outputs.publish_status }}
+      scope: ${{ steps.resolve.outputs.scope }}
+      selector: ${{ steps.resolve.outputs.selector }}
+      source_lock: ${{ steps.resolve.outputs.source_lock }}
+      status_context: ${{ steps.resolve.outputs.status_context }}
       pr_number: ${{ steps.resolve.outputs.pr_number }}
       base_sha: ${{ steps.resolve.outputs.base_sha }}
       head_sha: ${{ steps.resolve.outputs.head_sha }}
@@ -152,10 +155,12 @@ jobs:
     steps:
       - name: Normalize request
         id: resolve
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           INPUT_CHECKOUT_REF: ${{ inputs.checkout_ref || '' }}
           INPUT_WAREHOUSE: ${{ inputs.warehouse || '' }}
+          INPUT_SCOPE: ${{ inputs.scope || '' }}
+          INPUT_SOURCE_LOCK: ${{ inputs.source_lock || '' }}
           INPUT_SCHEMA_PREFIX: ${{ inputs.schema_prefix || '' }}
           INPUT_CONCURRENCY_KEY: ${{ inputs.concurrency_key || '' }}
           INPUT_PUBLISH_STATUS: ${{ inputs.publish_status && 'true' || 'false' }}
@@ -172,25 +177,93 @@ jobs:
               "fabric",
               "redshift"
             ];
+            const coreSelector =
+              "package:integration_tests package:the_tuva_project";
+            const allPackagesSelector = [
+              "package:integration_tests",
+              "package:the_tuva_project",
+              "package:ahrq_quality_indicators",
+              "package:ccsr",
+              "package:cms_chronic_conditions",
+              "package:cms_hcc",
+              "package:fhir_preprocessing",
+              "package:nyu_ed_classification",
+              "package:quality_measures",
+              "package:semantic_layer"
+            ].join(" ");
+            const expectedStandalonePackages = [
+              [
+                `${context.repo.owner}/ahrq_quality_indicators`,
+                "ahrq_quality_indicators",
+                "TUVA_CI_AHRQ_QUALITY_INDICATORS_SHA"
+              ],
+              [
+                `${context.repo.owner}/ccsr`,
+                "ccsr",
+                "TUVA_CI_CCSR_SHA"
+              ],
+              [
+                `${context.repo.owner}/cms_chronic_conditions`,
+                "cms_chronic_conditions",
+                "TUVA_CI_CMS_CHRONIC_CONDITIONS_SHA"
+              ],
+              [
+                `${context.repo.owner}/cms_hcc`,
+                "cms_hcc",
+                "TUVA_CI_CMS_HCC_SHA"
+              ],
+              [
+                `${context.repo.owner}/fhir_preprocessing`,
+                "fhir_preprocessing",
+                "TUVA_CI_FHIR_PREPROCESSING_SHA"
+              ],
+              [
+                `${context.repo.owner}/nyu_ed_classification`,
+                "nyu_ed_classification",
+                "TUVA_CI_NYU_ED_CLASSIFICATION_SHA"
+              ],
+              [
+                `${context.repo.owner}/quality_measures`,
+                "quality_measures",
+                "TUVA_CI_QUALITY_MEASURES_SHA"
+              ],
+              [
+                `${context.repo.owner}/semantic-layer`,
+                "semantic_layer",
+                "TUVA_CI_SEMANTIC_LAYER_SHA"
+              ]
+            ];
+            const exactSha = /^[0-9a-f]{40}$/i;
 
             const calledCheckoutRef = process.env.INPUT_CHECKOUT_REF.trim();
             const isReusableCall = calledCheckoutRef !== "";
 
             let shouldRun = true;
-            let warehouse;
-            let checkoutRef;
-            let schemaPrefix;
-            let concurrencyKey;
+            let warehouse = "snowflake";
+            let scope = "core";
+            let sourceLock = "";
+            let checkoutRef = "";
+            let schemaBase = "";
+            let concurrencyKey = "";
             let publishStatus = false;
             let prNumber = "";
             let baseSha = "";
             let headSha = "";
             let mergeSha = "";
+            let resolutionError = "";
+
+            function fail(message) {
+              if (!resolutionError) {
+                resolutionError = message;
+              }
+            }
 
             if (isReusableCall) {
               warehouse = process.env.INPUT_WAREHOUSE.trim();
+              scope = process.env.INPUT_SCOPE.trim();
+              sourceLock = process.env.INPUT_SOURCE_LOCK.trim();
               checkoutRef = calledCheckoutRef;
-              schemaPrefix = process.env.INPUT_SCHEMA_PREFIX.trim();
+              schemaBase = process.env.INPUT_SCHEMA_PREFIX.trim();
               concurrencyKey = process.env.INPUT_CONCURRENCY_KEY.trim();
               publishStatus = process.env.INPUT_PUBLISH_STATUS === "true";
               prNumber = process.env.INPUT_PR_NUMBER.trim();
@@ -211,119 +284,400 @@ jobs:
               }
 
               warehouse = "snowflake";
+              scope = "core";
               checkoutRef = context.sha;
-              schemaPrefix = `ci_pr_${pr.number}_${pr.head.sha.slice(0, 8)}`;
-              concurrencyKey = `pr-${pr.number}`;
+              schemaBase = `ci_pr_${pr.number}_${pr.head.sha.slice(0, 8)}`;
+              concurrencyKey = `snowflake-pr-${pr.number}`;
               publishStatus = shouldRun;
               prNumber = String(pr.number);
               baseSha = pr.base.sha;
               headSha = pr.head.sha;
               mergeSha = context.sha;
             } else {
-              warehouse = String(context.payload.inputs?.warehouse || "snowflake").trim();
-              checkoutRef = context.sha;
-              schemaPrefix = `ci_manual_${process.env.GITHUB_RUN_ID}`;
-              concurrencyKey = `manual-${process.env.GITHUB_RUN_ID}`;
+              shouldRun = false;
+              fail(`Unsupported event: ${context.eventName}`);
             }
 
-            if (![...supportedWarehouses, "all"].includes(warehouse)) {
-              core.setFailed(`Unsupported warehouse: ${warehouse}`);
-              return;
+            const supportedRequests = new Set([
+              "snowflake:core",
+              "all:all-packages"
+            ]);
+            if (!supportedRequests.has(`${warehouse}:${scope}`)) {
+              fail(`Unsupported CI request: ${warehouse}:${scope}`);
             }
-            if (isReusableCall && warehouse !== "snowflake") {
-              core.setFailed("Reusable CI calls are restricted to Snowflake.");
-              return;
+            if (scope === "core" && sourceLock) {
+              fail("Core-only CI must not receive a standalone package source lock.");
             }
             if (shouldRun && !checkoutRef) {
-              core.setFailed("checkout_ref is required.");
-              return;
+              fail("checkout_ref is required.");
             }
-            if (shouldRun && !/^[0-9a-f]{40}$/i.test(checkoutRef)) {
-              core.setFailed("checkout_ref must be an exact 40-character commit SHA.");
-              return;
+            if (shouldRun && !exactSha.test(checkoutRef)) {
+              fail("checkout_ref must be an exact 40-character commit SHA.");
             }
-            if (shouldRun && !/^[a-z0-9_]+$/.test(schemaPrefix)) {
-              core.setFailed(`Invalid schema prefix: ${schemaPrefix}`);
-              return;
+            if (scope === "all-packages") {
+              try {
+                const parsedLock = JSON.parse(sourceLock);
+                const packages = parsedLock?.standalone_packages;
+                const expectedTriples = new Set(
+                  expectedStandalonePackages.map((item) => item.join("|"))
+                );
+                const actualTriples = new Set(
+                  Array.isArray(packages)
+                    ? packages.map((item) => [
+                        item.repository,
+                        item.dbt_package,
+                        item.env_var
+                      ].join("|"))
+                    : []
+                );
+                if (
+                  parsedLock?.core?.repository !==
+                    `${context.repo.owner}/${context.repo.repo}` ||
+                  parsedLock?.core?.source !== "pull_request_test_merge" ||
+                  parsedLock?.core?.revision !== checkoutRef.toLowerCase() ||
+                  typeof parsedLock?.base_version !== "string" ||
+                  typeof parsedLock?.release_version !== "string" ||
+                  parsedLock.base_version === parsedLock.release_version ||
+                  !Array.isArray(packages) ||
+                  packages.length !== expectedStandalonePackages.length ||
+                  actualTriples.size !== expectedTriples.size ||
+                  [...actualTriples].some((item) => !expectedTriples.has(item)) ||
+                  packages.some(
+                    (item) => item.branch !== "main" || !exactSha.test(item.revision)
+                  )
+                ) {
+                  throw new Error(
+                    "source lock must describe the checked-out Core revision and " +
+                    "the exact eight-package main-branch inventory"
+                  );
+                }
+              } catch (error) {
+                fail(`Invalid all-packages source lock: ${error.message}`);
+              }
+            }
+            if (shouldRun && !/^[a-z0-9_]+$/.test(schemaBase)) {
+              fail(`Invalid schema prefix base: ${schemaBase}`);
             }
             if (shouldRun && !concurrencyKey) {
-              core.setFailed("concurrency_key is required.");
-              return;
+              fail("concurrency_key is required.");
             }
             if (publishStatus) {
-              if (warehouse !== "snowflake") {
-                core.setFailed("The required status may be published only by a Snowflake build.");
-                return;
-              }
-              const exactSha = /^[0-9a-f]{40}$/i;
               if (
                 !/^\d+$/.test(prNumber) ||
                 !exactSha.test(baseSha) ||
                 !exactSha.test(headSha) ||
                 !exactSha.test(mergeSha)
               ) {
-                core.setFailed("PR number and exact base, head, and merge commits are required.");
-                return;
+                fail("PR number and exact base, head, and merge commits are required.");
               }
               if (checkoutRef !== mergeSha) {
-                core.setFailed("The required status must describe the exact test-merge commit being built.");
-                return;
+                fail("The required status must describe the exact test-merge commit being built.");
               }
             }
 
+            const runId = process.env.GITHUB_RUN_ID || "";
+            const runAttempt = process.env.GITHUB_RUN_ATTEMPT || "";
+            if (shouldRun && (!/^\d+$/.test(runId) || !/^\d+$/.test(runAttempt))) {
+              fail("GitHub run ID and attempt must be numeric.");
+            }
+            const schemaPrefix = schemaBase
+              ? `${schemaBase}_r${runId}_a${runAttempt}`
+              : "";
             const adapterMatrix = warehouse === "all" ? supportedWarehouses : [warehouse];
+            const selector = scope === "all-packages"
+              ? allPackagesSelector
+              : coreSelector;
+            const statusContext = scope === "all-packages"
+              ? "Tuva CI / All Warehouses"
+              : "Tuva CI / Snowflake";
+
             core.setOutput("should_run", String(shouldRun));
             core.setOutput("adapter_matrix", JSON.stringify(adapterMatrix));
             core.setOutput("checkout_ref", checkoutRef || "");
             core.setOutput("schema_prefix", schemaPrefix || "");
-            core.setOutput("concurrency_key", concurrencyKey || "");
             core.setOutput("publish_status", String(publishStatus));
+            core.setOutput("scope", scope);
+            core.setOutput("selector", selector);
+            core.setOutput("source_lock", sourceLock);
+            core.setOutput("status_context", statusContext);
             core.setOutput("pr_number", prNumber);
             core.setOutput("base_sha", baseSha);
             core.setOutput("head_sha", headSha);
             core.setOutput("merge_sha", mergeSha);
 
+            if (resolutionError) {
+              core.setFailed(resolutionError);
+            }
+
   mark_pending:
     name: Publish pending status
     needs: resolve
     if: >-
+      always() &&
       needs.resolve.outputs.should_run == 'true' &&
       needs.resolve.outputs.publish_status == 'true'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      pull-requests: read
       statuses: write
     steps:
       - name: Mark the tested pull request revision as pending
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+          EXPECTED_BASE_SHA: ${{ needs.resolve.outputs.base_sha }}
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+          CI_SCOPE: ${{ needs.resolve.outputs.scope }}
+          STATUS_CONTEXT: ${{ needs.resolve.outputs.status_context }}
         with:
           script: |
             const targetUrl =
               `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const prNumber = Number(process.env.PR_NUMBER);
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: prNumber
+            });
+            const { data: currentMerge } = await github.rest.repos.getCommit({
+              ...context.repo,
+              ref: `refs/pull/${prNumber}/merge`
+            });
+            const requestIsCurrent =
+              pr.state === "open" &&
+              pr.base.ref === "main" &&
+              pr.base.sha === process.env.EXPECTED_BASE_SHA &&
+              pr.head.sha === process.env.HEAD_SHA &&
+              currentMerge.sha === process.env.MERGE_SHA;
+            if (!requestIsCurrent) {
+              core.setFailed(
+                `PR #${prNumber} changed before CI could publish pending status.`
+              );
+              return;
+            }
+
+            const statusRefs = [process.env.HEAD_SHA, process.env.MERGE_SHA];
+            const latestStatuses = await Promise.all(
+              statusRefs.map(async (ref) => {
+                const { data: statuses } =
+                  await github.rest.repos.listCommitStatusesForRef({
+                    ...context.repo,
+                    ref,
+                    per_page: 100
+                  });
+                return statuses.find(
+                  (status) => status.context === process.env.STATUS_CONTEXT
+                );
+              })
+            );
+            const newerRunOwnsStatus = latestStatuses.some((status) => {
+              if (!status || status.target_url === targetUrl) {
+                return false;
+              }
+              const match = status.target_url?.match(/\/actions\/runs\/(\d+)/);
+              return match && BigInt(match[1]) > BigInt(context.runId);
+            });
+            if (newerRunOwnsStatus) {
+              core.setFailed("A newer CI run already owns this status context.");
+              return;
+            }
+
+            const description = process.env.CI_SCOPE === "all-packages"
+              ? "All-warehouse release CI is running"
+              : "Snowflake Core CI is running";
             await Promise.all(
-              [process.env.HEAD_SHA, process.env.MERGE_SHA].map((sha) =>
+              statusRefs.map((sha) =>
                 github.rest.repos.createCommitStatus({
                   ...context.repo,
                   sha,
                   state: "pending",
-                  context: "Tuva CI / Snowflake",
-                  description: "Snowflake dbt build is running",
+                  context: process.env.STATUS_CONTEXT,
+                  description,
                   target_url: targetUrl
                 })
               )
             );
+
+  preflight_assets:
+    name: Verify future-version data assets
+    needs: resolve
+    if: >-
+      needs.resolve.result == 'success' &&
+      needs.resolve.outputs.should_run == 'true' &&
+      needs.resolve.outputs.scope == 'all-packages'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact release candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ needs.resolve.outputs.checkout_ref }}
+          persist-credentials: false
+
+      - name: Verify every declared asset exists in all public clouds
+        env:
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures
+          import json
+          import os
+          import re
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          version_pattern = re.compile(
+              r"^version:\s*(['\"]?)([0-9A-Za-z.+-]+)\1\s*(?:#.*)?$",
+              re.MULTILINE,
+          )
+          project_text = Path("dbt_project.yml").read_text(encoding="utf-8")
+          versions = version_pattern.findall(project_text)
+          if len(versions) != 1:
+              raise SystemExit(
+                  f"expected exactly one top-level version; found {len(versions)}"
+              )
+          package_version = versions[0][1]
+
+          source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
+          if source_lock.get("release_version") != package_version:
+              raise SystemExit(
+                  "source lock release version does not match dbt_project.yml"
+              )
+
+          catalog_text = Path("data_assets.yml").read_text(encoding="utf-8")
+          catalog_code = "\n".join(
+              line.split("#", 1)[0] for line in catalog_text.splitlines()
+          )
+          asset_paths = re.findall(r"^    path: (\S+)$", catalog_code, re.MULTILINE)
+          canonical_seeds = re.findall(
+              r"^  - seed: (\S+)$", catalog_code, re.MULTILINE
+          )
+          declared_path_keys = len(
+              re.findall(r"(?<![A-Za-z0-9_-])path\s*:", catalog_code)
+          )
+          declared_seed_keys = len(
+              re.findall(r"(?<![A-Za-z0-9_-])seed\s*:", catalog_code)
+          )
+          if not asset_paths:
+              raise SystemExit("data_assets.yml does not declare any asset paths")
+          if (
+              declared_path_keys != len(asset_paths)
+              or declared_seed_keys != len(canonical_seeds)
+              or len(canonical_seeds) != len(asset_paths)
+          ):
+              raise SystemExit(
+                  "data_assets.yml must use one canonical seed/path mapping per asset; "
+                  "release preflight refuses to skip unrecognized YAML declarations"
+              )
+          if len(asset_paths) != len(set(asset_paths)):
+              raise SystemExit("data_assets.yml contains duplicate asset paths")
+
+          providers = {
+              "s3": "https://tuva-public-resources.s3.amazonaws.com",
+              "gcs": "https://storage.googleapis.com/tuva-public-resources",
+              "azure": (
+                  "https://tuvapublicresources.blob.core.windows.net/"
+                  "tuva-public-resources"
+              ),
+          }
+          version_component = urllib.parse.quote(package_version, safe="")
+
+          def head_status(url):
+              last_error = None
+              for attempt in range(3):
+                  request = urllib.request.Request(
+                      url,
+                      method="HEAD",
+                      headers={"User-Agent": "tuva-core-release-ci"},
+                  )
+                  try:
+                      with urllib.request.urlopen(request, timeout=30) as response:
+                          return response.status, None
+                  except urllib.error.HTTPError as exc:
+                      return exc.code, None
+                  except (urllib.error.URLError, TimeoutError) as exc:
+                      last_error = str(exc)
+                  if attempt < 2:
+                      time.sleep(1 + attempt)
+              return None, last_error
+
+          def probe_payload(item):
+              provider, asset_path = item
+              encoded_path = urllib.parse.quote(asset_path, safe="/")
+              url = (
+                  f"{providers[provider]}/tuva-core/{version_component}/"
+                  f"{encoded_path}"
+              )
+              status, error = head_status(url)
+              if status is not None and 200 <= status < 300:
+                  return None
+              detail = f"HTTP {status}" if status is not None else error
+              return f"{provider}: {asset_path}: {detail}"
+
+          probes = [
+              (provider, asset_path)
+              for provider in providers
+              for asset_path in asset_paths
+          ]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+              failures = [
+                  failure for failure in executor.map(probe_payload, probes) if failure
+              ]
+
+          if failures:
+              preview = "\n".join(failures[:50])
+              remainder = len(failures) - min(len(failures), 50)
+              if remainder:
+                  preview += f"\n... and {remainder} more missing objects"
+              raise SystemExit(
+                  f"future-version data asset preflight failed:\n{preview}"
+              )
+
+          receipt_failures = []
+          for provider, base_url in providers.items():
+              receipt_url = (
+                  f"{base_url}/tuva-core/{version_component}/_release.json"
+              )
+              status, error = head_status(receipt_url)
+              if status != 404:
+                  detail = f"HTTP {status}" if status is not None else error
+                  receipt_failures.append(f"{provider}: {detail}")
+          if receipt_failures:
+              raise SystemExit(
+                  "future-version snapshots must not have _release.json before merge:\n"
+                  + "\n".join(receipt_failures)
+              )
+
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          with summary.open("a", encoding="utf-8") as output:
+              output.write("## Data asset preflight\n\n")
+              output.write(f"- Version: `{package_version}`\n")
+              output.write(f"- Declared objects per cloud: {len(asset_paths)}\n")
+              output.write(f"- Verified object paths: {len(probes)}\n")
+              output.write("- `_release.json` absent from all clouds: yes\n")
+          print(
+              f"Verified {len(asset_paths)} future-version assets across "
+              f"{len(providers)} clouds"
+          )
+          PY
 
   build:
     name: Build / ${{ matrix.warehouse }}
     needs:
       - resolve
       - mark_pending
+      - preflight_assets
     if: >-
       always() &&
+      needs.resolve.result == 'success' &&
       needs.resolve.outputs.should_run == 'true' &&
-      (needs.mark_pending.result == 'success' || needs.mark_pending.result == 'skipped')
+      (needs.mark_pending.result == 'success' || needs.mark_pending.result == 'skipped') &&
+      (needs.preflight_assets.result == 'success' || needs.preflight_assets.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -332,9 +686,13 @@ jobs:
       matrix:
         warehouse: ${{ fromJson(needs.resolve.outputs.adapter_matrix) }}
     env:
+      CI_SCOPE: ${{ needs.resolve.outputs.scope }}
+      CI_DBT_SELECTOR: ${{ needs.resolve.outputs.selector }}
+      TUVA_CI_SCHEMA_PREFIX: ${{ needs.resolve.outputs.schema_prefix }}
       CI_DBT_VARS: >-
         {"use_synthetic_data": true, "synthetic_data_size": "small",
-        "parity_enabled": false,
+        "parity_enabled": false, "data_quality_enabled": true,
+        "enable_data_quality_failure_keys": true,
         "tuva_schema_prefix": "${{ needs.resolve.outputs.schema_prefix }}"}
     steps:
       - name: Checkout exact commit
@@ -362,29 +720,154 @@ jobs:
           python -m pip install --upgrade pip
           case "${{ matrix.warehouse }}" in
             snowflake)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-snowflake==${DBT_SNOWFLAKE_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-snowflake==${DBT_SNOWFLAKE_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             bigquery)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-bigquery==${DBT_BIGQUERY_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-bigquery==${DBT_BIGQUERY_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             databricks)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-databricks==${DBT_DATABRICKS_VERSION}" certifi
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-databricks==${DBT_DATABRICKS_VERSION}" "sqlparse==${SQLPARSE_VERSION}" certifi
               ;;
             fabric)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-fabric==${DBT_FABRIC_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-fabric==${DBT_FABRIC_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             redshift)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-redshift==${DBT_REDSHIFT_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-redshift==${DBT_REDSHIFT_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             *)
               echo "Unsupported warehouse: ${{ matrix.warehouse }}" >&2
               exit 1
               ;;
           esac
+          python -m pip check
+          dbt --version
+          python -c 'import sqlparse; print(f"sqlparse={sqlparse.__version__}")'
+
+      - name: Configure all-package sources
+        if: env.CI_SCOPE == 'all-packages'
+        env:
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
+          packages = source_lock.get("standalone_packages")
+          if not isinstance(packages, list) or len(packages) != 8:
+              raise SystemExit("source lock must contain eight standalone packages")
+
+          exact_sha = re.compile(r"^[0-9a-f]{40}$")
+          owner = os.environ["GITHUB_REPOSITORY_OWNER"]
+          expected_packages = {
+              (
+                  f"{owner}/ahrq_quality_indicators",
+                  "ahrq_quality_indicators",
+                  "TUVA_CI_AHRQ_QUALITY_INDICATORS_SHA",
+              ),
+              (f"{owner}/ccsr", "ccsr", "TUVA_CI_CCSR_SHA"),
+              (
+                  f"{owner}/cms_chronic_conditions",
+                  "cms_chronic_conditions",
+                  "TUVA_CI_CMS_CHRONIC_CONDITIONS_SHA",
+              ),
+              (f"{owner}/cms_hcc", "cms_hcc", "TUVA_CI_CMS_HCC_SHA"),
+              (
+                  f"{owner}/fhir_preprocessing",
+                  "fhir_preprocessing",
+                  "TUVA_CI_FHIR_PREPROCESSING_SHA",
+              ),
+              (
+                  f"{owner}/nyu_ed_classification",
+                  "nyu_ed_classification",
+                  "TUVA_CI_NYU_ED_CLASSIFICATION_SHA",
+              ),
+              (
+                  f"{owner}/quality_measures",
+                  "quality_measures",
+                  "TUVA_CI_QUALITY_MEASURES_SHA",
+              ),
+              (
+                  f"{owner}/semantic-layer",
+                  "semantic_layer",
+                  "TUVA_CI_SEMANTIC_LAYER_SHA",
+              ),
+          }
+          actual_packages = {
+              (
+                  item.get("repository"),
+                  item.get("dbt_package"),
+                  item.get("env_var"),
+              )
+              for item in packages
+          }
+          if actual_packages != expected_packages:
+              raise SystemExit("source lock package inventory is invalid")
+
+          env_path = Path(os.environ["GITHUB_ENV"])
+          with env_path.open("a", encoding="utf-8") as env_file:
+              for item in packages:
+                  revision = item.get("revision", "")
+                  if item.get("branch") != "main" or not exact_sha.fullmatch(revision):
+                      raise SystemExit(
+                          f"invalid revision for {item.get('repository', 'unknown')}"
+                      )
+                  env_file.write(f"{item['env_var']}={revision}\n")
+
+          integration_dir = Path("integration_tests")
+          release_manifest = ["packages:", "  - local: ../"]
+          for item in packages:
+              release_manifest.extend(
+                  [
+                      f"  - git: https://github.com/{item['repository']}.git",
+                      (
+                          "    revision: \"{{ env_var('"
+                          + item["env_var"]
+                          + "') }}\""
+                      ),
+                  ]
+              )
+          (integration_dir / "packages.yml").write_text(
+              "\n".join(release_manifest) + "\n",
+              encoding="utf-8",
+          )
+          (integration_dir / "ci-source-lock.json").write_text(
+              json.dumps(source_lock, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Summarize all-package sources
+        if: env.CI_SCOPE == 'all-packages'
+        env:
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
+          lines = [
+              "## All-warehouse CI source lock",
+              "",
+              f"- Tuva Core test merge: `{source_lock['core']['revision']}`",
+          ]
+          for package in source_lock["standalone_packages"]:
+              lines.append(
+                  f"- {package['repository']} `main`: `{package['revision']}`"
+              )
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open(
+              "a", encoding="utf-8"
+          ) as summary:
+              summary.write("\n".join(lines) + "\n")
+          PY
 
       - name: Install dbt dependencies
         run: >-
-          dbt deps
+          dbt deps --upgrade
           --project-dir ./integration_tests
           --profiles-dir ./integration_tests/profiles/${{ matrix.warehouse }}
 
@@ -399,11 +882,13 @@ jobs:
           DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
           DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
         run: |
+          read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/snowflake
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/snowflake \
-            --select package:integration_tests package:the_tuva_project \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
+            --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
       - name: Build on BigQuery
@@ -414,11 +899,13 @@ jobs:
         run: |
           trap 'rm -f ./creds.json' EXIT
           printf '%s' "$DBT_BIGQUERY_CI_TOKEN" | base64 --decode > ./creds.json
+          read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/bigquery
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/bigquery \
-            --select package:integration_tests package:the_tuva_project \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
+            --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
       - name: Build on Databricks
@@ -429,11 +916,13 @@ jobs:
           DBT_DATABRICKS_CI_TOKEN: ${{ secrets.DBT_DATABRICKS_CI_TOKEN }}
           DBT_DATABRICKS_CI_CATALOG: ${{ secrets.DBT_DATABRICKS_CI_CATALOG }}
         run: |
+          read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/databricks
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/databricks \
-            --select package:integration_tests package:the_tuva_project \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
+            --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
       - name: Build on Fabric
@@ -446,11 +935,13 @@ jobs:
           DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
           DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
         run: |
+          read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/fabric
           dbt build --full-refresh --cache-selected-only \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/fabric \
-            --select package:integration_tests package:the_tuva_project \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
+            --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
       - name: Build on Redshift
@@ -463,18 +954,120 @@ jobs:
           DBT_REDSHIFT_CI_THREADS: "4"
           DBT_REDSHIFT_CI_SEED_BATCH_SIZE: "2000"
         run: |
+          read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/redshift
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/redshift \
-            --select package:integration_tests package:the_tuva_project \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
+            --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
+
+      - name: Prepare all-warehouse evidence
+        if: always() && env.CI_SCOPE == 'all-packages'
+        env:
+          CI_WAREHOUSE: ${{ matrix.warehouse }}
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from collections import Counter
+          from pathlib import Path
+
+          integration_dir = Path("integration_tests")
+          target_dir = integration_dir / "target"
+          evidence = {
+              "warehouse": os.environ["CI_WAREHOUSE"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "scope": "all-packages",
+              "source_lock": json.loads(os.environ["CI_SOURCE_LOCK"]),
+              "manifest": None,
+              "run_results": None,
+          }
+          expected_dbt_packages = {
+              "integration_tests",
+              "the_tuva_project",
+              "ahrq_quality_indicators",
+              "ccsr",
+              "cms_chronic_conditions",
+              "cms_hcc",
+              "fhir_preprocessing",
+              "nyu_ed_classification",
+              "quality_measures",
+              "semantic_layer",
+          }
+          coverage_error = None
+
+          manifest_path = target_dir / "manifest.json"
+          if manifest_path.exists():
+              manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+              nodes = manifest.get("nodes", {})
+              nodes_by_package = Counter(
+                  node.get("package_name", "unknown")
+                  for node in nodes.values()
+              )
+              missing_packages = sorted(
+                  expected_dbt_packages - nodes_by_package.keys()
+              )
+              if missing_packages:
+                  coverage_error = (
+                      "all-package build manifest has no enabled nodes for: "
+                      + ", ".join(missing_packages)
+                  )
+              evidence["manifest"] = {
+                  "dbt_version": manifest.get("metadata", {}).get("dbt_version"),
+                  "node_count": len(nodes),
+                  "nodes_by_package": dict(sorted(nodes_by_package.items())),
+                  "required_packages_present": not missing_packages,
+              }
+          else:
+              coverage_error = "all-package build did not produce a dbt manifest"
+
+          results_path = target_dir / "run_results.json"
+          if results_path.exists():
+              run_results = json.loads(results_path.read_text(encoding="utf-8"))
+              evidence["run_results"] = {
+                  "elapsed_time": run_results.get("elapsed_time"),
+                  "results": [
+                      {
+                          "unique_id": result.get("unique_id"),
+                          "status": result.get("status"),
+                          "execution_time": result.get("execution_time"),
+                          "failures": result.get("failures"),
+                      }
+                      for result in run_results.get("results", [])
+                  ],
+              }
+
+          (integration_dir / "ci-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          if coverage_error:
+              raise SystemExit(coverage_error)
+          PY
+
+      - name: Upload all-warehouse evidence
+        if: always() && env.CI_SCOPE == 'all-packages'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tuva-all-warehouses-ci-${{ matrix.warehouse }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            integration_tests/ci-evidence.json
+            integration_tests/package-lock.yml
+            integration_tests/packages.yml
+            integration_tests/ci-source-lock.json
+          if-no-files-found: warn
+          retention-days: 90
 
   finalize_status:
     name: Publish final status
     needs:
       - resolve
       - mark_pending
+      - preflight_assets
       - build
     if: >-
       always() &&
@@ -487,12 +1080,17 @@ jobs:
       statuses: write
     steps:
       - name: Publish result for the tested pull request revision
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
           EXPECTED_BASE_SHA: ${{ needs.resolve.outputs.base_sha }}
           EXPECTED_HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           EXPECTED_MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+          CI_SCOPE: ${{ needs.resolve.outputs.scope }}
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+          STATUS_CONTEXT: ${{ needs.resolve.outputs.status_context }}
+          RESOLVE_RESULT: ${{ needs.resolve.result }}
+          PREFLIGHT_RESULT: ${{ needs.preflight_assets.result }}
           BUILD_RESULT: ${{ needs.build.result }}
           PENDING_RESULT: ${{ needs.mark_pending.result }}
         with:
@@ -501,13 +1099,18 @@ jobs:
             const expectedBase = process.env.EXPECTED_BASE_SHA;
             const expectedHead = process.env.EXPECTED_HEAD_SHA;
             const expectedMerge = process.env.EXPECTED_MERGE_SHA;
+            const scope = process.env.CI_SCOPE;
+            const sourceLock = process.env.CI_SOURCE_LOCK;
+            const statusContext = process.env.STATUS_CONTEXT;
+            const resolveResult = process.env.RESOLVE_RESULT;
+            const preflightResult = process.env.PREFLIGHT_RESULT;
             const buildResult = process.env.BUILD_RESULT;
             const pendingResult = process.env.PENDING_RESULT;
             const runUrl =
               `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
             let state = "error";
-            let description = `Snowflake dbt build ended with ${buildResult}`;
+            let description = `CI ended with ${buildResult}`;
 
             try {
               const { data: pr } = await github.rest.pulls.get({
@@ -526,22 +1129,67 @@ jobs:
                 pr.head.sha === expectedHead &&
                 currentMerge.sha === expectedMerge;
 
+              let packageSourcesAreCurrent = true;
+              if (scope === "all-packages") {
+                const lockedPackages =
+                  JSON.parse(sourceLock).standalone_packages;
+                const currentPackages = await Promise.all(
+                  lockedPackages.map(async (packageSource) => {
+                    const [, repository] = packageSource.repository.split("/");
+                    const { data: commit } = await github.rest.repos.getCommit({
+                      owner: context.repo.owner,
+                      repo: repository,
+                      ref: "main"
+                    });
+                    return {
+                      repository: packageSource.repository,
+                      expected: packageSource.revision,
+                      current: commit.sha.toLowerCase()
+                    };
+                  })
+                );
+                packageSourcesAreCurrent = currentPackages.every(
+                  (item) => item.current === item.expected
+                );
+                if (!packageSourcesAreCurrent) {
+                  for (const item of currentPackages) {
+                    if (item.current !== item.expected) {
+                      core.warning(
+                        `${item.repository} main moved from ${item.expected} ` +
+                        `to ${item.current}.`
+                      );
+                    }
+                  }
+                }
+              }
+
               if (!requestIsCurrent) {
-                description = "PR changed while Snowflake CI was running; rerun required";
+                description = "PR changed while CI was running; rerun required";
+              } else if (!packageSourcesAreCurrent) {
+                description = "A standalone package main changed; rerun required";
               } else if (pendingResult !== "success") {
-                description = "Snowflake CI could not publish its pending status";
+                description = "CI could not publish its pending status";
+              } else if (resolveResult !== "success") {
+                description = "CI request resolution failed";
+              } else if (preflightResult === "failure") {
+                state = "failure";
+                description = "Future-version data asset preflight failed";
               } else if (buildResult === "success") {
                 state = "success";
-                description = "Snowflake dbt build passed";
+                description = scope === "all-packages"
+                  ? "All-warehouse release CI passed"
+                  : "Snowflake Core build passed";
               } else if (buildResult === "failure") {
                 state = "failure";
-                description = "Snowflake dbt build failed";
+                description = scope === "all-packages"
+                  ? "All-warehouse release CI failed"
+                  : "Snowflake Core build failed";
               } else {
-                description = `Snowflake dbt build ended with ${buildResult}`;
+                description = `CI ended with ${buildResult}`;
               }
             } catch (error) {
               core.warning(`Could not revalidate PR #${prNumber}: ${error.message}`);
-              description = "Snowflake CI could not revalidate the pull request";
+              description = "CI could not revalidate the pull request";
             }
 
             const statusRefs = [expectedHead, expectedMerge];
@@ -554,7 +1202,7 @@ jobs:
                     per_page: 100
                   });
                 return statuses.find(
-                  (status) => status.context === "Tuva CI / Snowflake"
+                  (status) => status.context === statusContext
                 );
               })
             );
@@ -564,7 +1212,7 @@ jobs:
               )
             ) {
               core.notice(
-                "A newer Snowflake CI run owns the required status; " +
+                "A newer CI run owns the required status; " +
                 "this run will not overwrite it."
               );
               return;
@@ -576,9 +1224,12 @@ jobs:
                   ...context.repo,
                   sha,
                   state,
-                  context: "Tuva CI / Snowflake",
+                  context: statusContext,
                   description,
                   target_url: runUrl
                 })
               )
             );
+            if (state === "error") {
+              core.setFailed(description);
+            }
