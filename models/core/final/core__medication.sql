@@ -17,6 +17,7 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
+   , ingest_datetime
    , tuva_last_run
    , data_source
 {%- endset -%}
@@ -94,6 +95,7 @@ source_mapping as (
         , meds.days_supply
         , meds.practitioner_id
         , meds.data_source
+        , meds.ingest_datetime
         , meds.tuva_last_run
         {{ tuva_extension_columns_from_all_medications }}
     from all_medications as meds

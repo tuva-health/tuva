@@ -15,6 +15,7 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
+    , ingest_datetime
     , tuva_last_run
     , data_source
 {%- endset -%}

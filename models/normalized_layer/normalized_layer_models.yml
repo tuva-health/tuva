@@ -111,6 +111,8 @@ models:
         description: Procedure code from the source claim.
       - name: normalized_code
         description: Procedure code after matching to Tuva terminology.
+      - name: ingest_datetime
+        description: Date and time the originating medical claim line was loaded into the data warehouse for line-level HCPCS rows. This is null for claim-header procedures that cannot be tied reliably to one source claim line.
       - name: data_source
         description: Data source associated with the claim.
         tests:

@@ -69,6 +69,9 @@ final as (
             "source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql,
             "source_rows.paid_date is not null"
           ) }} as paid_date_out_of_reasonable_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is null", "1 = 1") }} as prescribing_provider_npi_null
         , {{ dq_logical_int_flag_sql(
             "prescribing_provider_lookup.npi is null",

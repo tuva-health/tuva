@@ -284,6 +284,9 @@ final as (
             "source_rows.paid_date < source_rows.claim_end_date",
             "source_rows.paid_date is not null and source_rows.claim_end_date is not null"
           ) }} as paid_date_before_claim_end_date
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.paid_amount is null", "1 = 1") }} as paid_amount_null
         , {{ dq_logical_int_flag_sql(
             "source_rows.paid_amount < 0",

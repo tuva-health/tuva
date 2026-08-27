@@ -24,8 +24,9 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}
+    , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-      , cast(data_source as {{ dbt.type_string() }}) as data_source
+    , cast(data_source as {{ dbt.type_string() }}) as data_source
 {%- endset %}
 
 {%- set tuva_extension_columns -%}
@@ -91,6 +92,7 @@ select
     , obs.normalized_reference_range_low
     , obs.normalized_reference_range_high
     {{ select_extension_columns(ref('input_layer__observation'), alias='obs', strip_prefix=false) }}
+    , obs.ingest_datetime
     , obs.tuva_last_run
     , obs.data_source
 from obs

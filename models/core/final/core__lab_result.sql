@@ -37,6 +37,7 @@ select
     , labs.specimen
     , labs.ordering_practitioner_id
     {{ select_extension_columns(ref('normalized__lab_result'), alias='labs', strip_prefix=false) }}
+    , labs.ingest_datetime
     , labs.tuva_last_run
     , labs.data_source
 from {{ ref('normalized__lab_result') }} as labs

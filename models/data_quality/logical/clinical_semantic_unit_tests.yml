@@ -13,6 +13,9 @@ unit_tests:
       - input: ref('input_layer__appointment')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'valid' as appointment_id, 'p1' as person_id, 'a1' as patient_id, 'e1' as encounter_id
             , cast('2020-01-01' as date) as start_datetime
             , cast('2020-01-02' as date) as end_datetime
@@ -45,6 +48,7 @@ unit_tests:
           select 'cross_source_encounter_pair', 'cross_person_encounter', 'cross_patient_encounter', 'cross_encounter'
             , cast('2020-01-01' as date), cast('2020-01-02' as date)
             , 30, 'office', 'booked', 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -140,6 +144,9 @@ unit_tests:
       - input: ref('input_layer__condition')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'valid' as source_condition_id, 'p1' as person_id, 'a1' as patient_id, 'e1' as encounter_id
             , cast('2020-01-01' as date) as recorded_date, cast('2010-01-01' as date) as onset_date
             , cast('2020-01-01' as date) as resolved_date, null as code_system, null as source_code
@@ -160,6 +167,7 @@ unit_tests:
           union all
           select 'cross_source_encounter_pair', 'cross_person_encounter', 'cross_patient_encounter', 'cross_encounter'
             , cast(null as date), cast(null as date), cast(null as date), null, null, null, 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -249,6 +257,9 @@ unit_tests:
       - input: ref('input_layer__encounter')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'pair_fail' as encounter_id, 'p1' as person_id, 'b2' as patient_id
             , null as encounter_type, cast(null as date) as encounter_start_date, cast(null as date) as encounter_end_date
             , null as admit_source_code, null as admit_type_code, null as discharge_disposition_code
@@ -275,6 +286,7 @@ unit_tests:
           union all
           select 'case_variant', 'p1', 'a1', 'Office Visit', cast(null as date), cast(null as date)
             , null, null, null, null, 'ICD-10-CM', 'D1', 'MS-DRG', '001', 'source'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -421,6 +433,9 @@ unit_tests:
       - input: ref('input_layer__immunization')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'valid' as immunization_id, 'p1' as person_id, 'a1' as patient_id, 'e1' as encounter_id
             , 'cvx' as source_code_type, '1' as source_code, 'not-done' as status, 'reason1' as status_reason
             , cast('2020-01-01' as date) as occurrence_date, 'source' as data_source
@@ -446,6 +461,7 @@ unit_tests:
           union all
           select 'cross_source_encounter_pair', 'cross_person_encounter', 'cross_patient_encounter', 'cross_encounter'
             , 'cvx', '1', 'completed', null, cast('2020-01-01' as date), 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -600,6 +616,9 @@ unit_tests:
       - input: ref('input_layer__lab_result')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'valid' as lab_result_id, 'p1' as person_id, 'a1' as patient_id, 'e1' as encounter_id
             , 'acc' as accession_number, 'loinc' as source_order_type, 'L1' as source_order_code
             , null as source_component_type, null as source_component_code
@@ -636,6 +655,7 @@ unit_tests:
           union all
           select 'cross_source_encounter_pair', 'cross_person_encounter', 'cross_patient_encounter', 'cross_encounter'
             , 'acc', null, null, null, null, cast(null as date), cast(null as date), 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -796,6 +816,9 @@ unit_tests:
       - input: ref('input_layer__medication')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'pair_fail' as medication_id, 'p1' as person_id, 'b2' as patient_id, null as encounter_id
             , null as practitioner_id, cast(null as date) as dispensing_date, cast(null as date) as prescribing_date
             , null as source_code_type, null as source_code, null as ndc_code, null as rxnorm_code, null as atc_code
@@ -839,6 +862,7 @@ unit_tests:
           select 'cross_source_practitioner', 'cross_person_encounter', 'cross_patient_encounter', null
             , 'cross_practitioner', cast(null as date), cast(null as date), null, null, null, null, null
             , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -967,6 +991,9 @@ unit_tests:
       - input: ref('input_layer__observation')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'pair_fail' as observation_id, 'p1' as person_id, 'b2' as patient_id, null as encounter_id
             , cast('2020-01-01' as date) as observation_date, null as observation_type
             , null as source_code_type, null as source_code, 'source' as data_source
@@ -987,6 +1014,7 @@ unit_tests:
           union all
           select 'cross_source_encounter', 'p1', 'a1', 'shared_encounter', cast('2020-01-01' as date), null
             , null, null, 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -1090,6 +1118,9 @@ unit_tests:
       - input: ref('input_layer__procedure')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'pair_fail' as source_procedure_id, 'p1' as person_id, 'b2' as patient_id, null as encounter_id
             , null as practitioner_id, cast('2020-01-01' as date) as procedure_date
             , null as code_system, null as source_code, 'source' as data_source
@@ -1108,6 +1139,7 @@ unit_tests:
           union all
           select 'cross_source_practitioner', 'cross_person_encounter', 'cross_patient_encounter', null
             , 'cross_practitioner', cast('2020-01-01' as date), null, null, 'source_b'
+          ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
         rows: |
@@ -1202,6 +1234,7 @@ unit_tests:
       - input: ref('input_layer__observation')
         format: sql
         rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'case_match' as observation_id
             , 'p1' as person_id
@@ -1220,6 +1253,7 @@ unit_tests:
             , null as source_reference_range_high
             , null as normalized_reference_range_low
             , null as normalized_reference_range_high
+            , cast('2024-03-04 05:06:07' as {{ timestamp_type }}) as ingest_datetime
             , 'source' as data_source
       - input: ref('terminology__icd_10_cm')
         format: sql
@@ -1262,6 +1296,7 @@ unit_tests:
           normalized_code_type: loinc
           normalized_code: L1
           normalized_description: LOINC description
+          ingest_datetime: '2024-03-04 05:06:07'
 
   - name: test_core_medication_matches_code_types_and_ndc_format_consistently
     description: >
@@ -1310,25 +1345,26 @@ unit_tests:
             , cast(null as integer) as days_supply
             , null as practitioner_id
             , 'source' as data_source
+            , cast('2024-03-04 05:06:07' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
           union all
           select 'rxnorm_case', 'clinical', 'p1', null, 'a1', null, null
             , cast(null as integer), null, null, cast(null as date), cast(null as date)
             , 'RXNORM', 'R1', 'Raw RxNorm description', null, null, null, null
             , null, null, cast(null as integer), null, cast(null as integer), null
-            , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
+            , 'source', cast(null as {{ timestamp_type }}), cast('2024-01-01 00:00:00' as {{ timestamp_type }})
           union all
           select 'explicit_atc', 'clinical', 'p1', null, 'a1', null, null
             , cast(null as integer), null, null, cast(null as date), cast(null as date)
             , 'RXNORM', 'R3', 'Raw explicit ATC description', null, null, null, 'C01AA'
             , null, null, cast(null as integer), null, cast(null as integer), null
-            , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
+            , 'source', cast(null as {{ timestamp_type }}), cast('2024-01-01 00:00:00' as {{ timestamp_type }})
           union all
           select 'conflicting_explicit_rxnorm', 'clinical', 'p1', null, 'a1', null, null
             , cast(null as integer), null, null, cast(null as date), cast(null as date)
             , 'NDC', '12345-6789-01', 'Raw conflicting RxNorm description', null, null, 'R404', null
             , null, null, cast(null as integer), null, cast(null as integer), null
-            , 'source', cast('2024-01-01 00:00:00' as {{ timestamp_type }})
+            , 'source', cast(null as {{ timestamp_type }}), cast('2024-01-01 00:00:00' as {{ timestamp_type }})
       - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
@@ -1378,6 +1414,7 @@ unit_tests:
           rxnorm_description: NDC drug description
           atc_code: B3
           atc_description: NDC ATC level 3
+          ingest_datetime: '2024-03-04 05:06:07'
         - medication_id: rxnorm_case
           source_code_type: RXNORM
           source_code: R1
@@ -1388,6 +1425,7 @@ unit_tests:
           rxnorm_description: RxNorm description
           atc_code: A3
           atc_description: ATC level 3
+          ingest_datetime: null
         - medication_id: explicit_atc
           source_code_type: RXNORM
           source_code: R3
@@ -1398,6 +1436,7 @@ unit_tests:
           rxnorm_description: Explicit ATC drug description
           atc_code: C01AA
           atc_description: Digitalis glycosides
+          ingest_datetime: null
         - medication_id: conflicting_explicit_rxnorm
           source_code_type: NDC
           source_code: 12345-6789-01
@@ -1408,3 +1447,4 @@ unit_tests:
           rxnorm_description: null
           atc_code: null
           atc_description: null
+          ingest_datetime: null

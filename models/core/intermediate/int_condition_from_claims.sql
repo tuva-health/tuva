@@ -78,6 +78,7 @@ select distinct
     , cast(condition_rank as {{ dbt.type_int() }}) as condition_rank
     , cast(present_on_admit_code as {{ dbt.type_string() }}) as present_on_admit_code
     , cast(present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
+    , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast(tuva_last_run as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from claims_diagnoses

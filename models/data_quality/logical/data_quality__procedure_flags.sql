@@ -104,6 +104,9 @@ final as (
               "source_rows.procedure_date is not null and (source_rows.procedure_date < " ~ min_event_date_sql ~ " or source_rows.procedure_date > " ~ current_date_sql ~ ")",
               "source_rows.procedure_date is not null"
           ) }} as procedure_date_out_of_range
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.code_system is null", "1 = 1") }} as code_system_null
         , {{ dq_logical_int_flag_sql("source_rows.code_system is not null and not (" ~ code_system_valid_where ~ ")", "source_rows.code_system is not null") }} as code_system_invalid
         , {{ dq_logical_int_flag_sql("source_rows.source_code is null", "1 = 1") }} as source_code_null

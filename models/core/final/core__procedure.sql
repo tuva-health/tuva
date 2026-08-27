@@ -11,6 +11,7 @@
 {%- endset -%}
 
 {%- set tuva_metadata_columns_from_all_procedures -%}
+    , all_procedures.ingest_datetime
     , all_procedures.tuva_last_run
     , all_procedures.data_source
 {%- endset -%}

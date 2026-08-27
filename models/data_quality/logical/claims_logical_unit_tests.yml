@@ -14,6 +14,9 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'overlap' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan_a' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, 0 as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'overlap', 'member', cast('2024-01-15' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source'
@@ -35,6 +38,7 @@ unit_tests:
           select 'cross_source', 'member', cast('2024-01-02' as date), cast('2024-01-31' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_a'
           union all
           select 'cross_source', 'member', cast('2024-01-16' as date), cast('2024-02-15' as date), 'payer', 'plan_a', 'male', 'White', cast('1980-01-01' as date), cast(null as date), 0, 'commercial', 'source_b'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -105,6 +109,9 @@ unit_tests:
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set true_boolean = 'cast(1 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(true as boolean)' %}
           {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'true_missing_date' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'unknown' as sex, 'Unknown' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ true_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'true_with_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast('2024-01-15' as date), {{ true_boolean }}, 'commercial', 'source'
@@ -112,6 +119,7 @@ unit_tests:
           select 'false_without_date', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
           union all
           select 'null_flag', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'unknown', 'Unknown', cast('1980-01-01' as date), cast(null as date), cast(null as {{ 'bit' if target.type in ['fabric', 'sqlserver'] else 'boolean' }}), 'commercial', 'source'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -148,9 +156,13 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set false_boolean = 'cast(0 as bit)' if target.type in ['fabric', 'sqlserver'] else 'cast(false as boolean)' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
+          from (
           select 'lowercase' as person_id, 'member' as member_id, cast('2024-01-01' as date) as enrollment_start_date, cast('2024-01-31' as date) as enrollment_end_date, 'payer' as payer, 'plan' as {{ plan_identifier }}, 'male' as sex, 'White' as race, cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date, {{ false_boolean }} as death_flag, 'commercial' as payer_type, 'source' as data_source
           union all
           select 'case_variant', 'member', cast('2024-01-01' as date), cast('2024-01-31' as date), 'payer', 'plan', 'Male', 'White', cast('1980-01-01' as date), cast(null as date), {{ false_boolean }}, 'commercial', 'source'
+          ) as fixture_rows
       - input: ref('terminology__race')
         format: sql
         rows: |
@@ -255,6 +267,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with row_ids as (
               select 'missing_values' as claim_id, 1 as claim_line_number
               union all
@@ -279,6 +292,11 @@ unit_tests:
               , case when row_ids.claim_id = 'missing_values' then null when row_ids.claim_id = 'invalid_values' then -1 else 0 end as refills
               , 1 as paid_amount
               , 2 as allowed_amount
+              , case
+                  when row_ids.claim_id = 'missing_values' then cast(null as {{ timestamp_type }})
+                  when row_ids.claim_id = 'invalid_values' then cast('1999-12-31' as {{ timestamp_type }})
+                  else cast('2000-01-01' as {{ timestamp_type }})
+                end as ingest_datetime
               , 'source' as data_source
           from row_ids
       - input: ref('input_layer__eligibility')
@@ -298,6 +316,7 @@ unit_tests:
       rows:
         - claim_id: missing_values
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: null
           quantity_null: 1
           quantity_not_positive: null
           days_supply_null: 1
@@ -305,6 +324,7 @@ unit_tests:
           refills_lt_zero: null
         - claim_id: invalid_values
           claim_line_number_not_positive: 1
+          ingest_datetime_out_of_reasonable_range: 1
           quantity_null: 0
           quantity_not_positive: 1
           days_supply_null: 0
@@ -312,6 +332,7 @@ unit_tests:
           refills_lt_zero: 1
         - claim_id: valid_values
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: 0
           quantity_null: 0
           quantity_not_positive: 0
           days_supply_null: 0
@@ -331,6 +352,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with cases as (
               select 'paid_month_match' as claim_id, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as paid_date, cast('2023-12-15' as date) as dispensing_date, 'source_a' as data_source
               union all
@@ -367,6 +389,7 @@ unit_tests:
               , 0 as refills
               , 1 as paid_amount
               , 2 as allowed_amount
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cases.data_source
           from cases
       - input: ref('input_layer__eligibility')
@@ -419,6 +442,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with row_ids as (
               select 'missing_paid_date' as claim_id, 1 as claim_line_number
               union all
@@ -478,6 +502,11 @@ unit_tests:
               {% for index in range(1, 26) %}
               , null as procedure_code_{{ index }}
               {% endfor %}
+              , case
+                  when row_ids.claim_id = 'invalid_values' then cast('1999-12-31' as {{ timestamp_type }})
+                  when row_ids.claim_id = 'valid_values' then cast('2000-01-01' as {{ timestamp_type }})
+                  else cast(null as {{ timestamp_type }})
+                end as ingest_datetime
               , 'source' as data_source
           from row_ids
       - input: ref('input_layer__eligibility')
@@ -541,31 +570,37 @@ unit_tests:
       rows:
         - claim_id: missing_paid_date
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: null
           paid_date_null: 1
           paid_date_out_of_reasonable_range: null
           paid_date_before_claim_end_date: null
         - claim_id: invalid_values
           claim_line_number_not_positive: 1
+          ingest_datetime_out_of_reasonable_range: 1
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 1
           paid_date_before_claim_end_date: 1
         - claim_id: valid_values
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: 0
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
           paid_date_before_claim_end_date: 0
         - claim_id: before_claim_end
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: null
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
           paid_date_before_claim_end_date: 1
         - claim_id: same_as_claim_end
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: null
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
           paid_date_before_claim_end_date: 0
         - claim_id: missing_claim_end
           claim_line_number_not_positive: 0
+          ingest_datetime_out_of_reasonable_range: null
           paid_date_null: 0
           paid_date_out_of_reasonable_range: 0
           paid_date_before_claim_end_date: null
@@ -585,6 +620,7 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with cases as (
               select 'exact_professional' as claim_id, 'professional' as claim_type, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as claim_line_start_date, cast('2024-02-01' as date) as claim_start_date, cast('2024-03-01' as date) as admission_date, 'source_a' as data_source, '111' as bill_type_code, cast(null as {{ string_type }}) as drg_code_type, cast(null as {{ string_type }}) as diagnosis_code_type, cast(null as {{ string_type }}) as procedure_code_type, cast(null as {{ string_type }}) as diagnosis_code_1, cast(null as {{ string_type }}) as procedure_code_1
               union all
@@ -657,6 +693,7 @@ unit_tests:
               {% for index in range(1, 26) %}
               , {% if index == 1 %}cases.procedure_code_1{% else %}null{% endif %} as procedure_code_{{ index }}
               {% endfor %}
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cases.data_source
           from cases
       - input: ref('input_layer__eligibility')

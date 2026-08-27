@@ -69,6 +69,11 @@ models:
         config:
           meta:
             data_type: float
+      - name: ingest_datetime
+        description: Date and time the source location record was extracted from the source system or loaded into the data warehouse. This is useful when multiple versions of the same location record are received over time.
+        config:
+          meta:
+            data_type: timestamp
       - name: data_source
         description: User-defined name that identifies the source system for the location data, for example Epic, Athena Health, or Cerner. This value should be populated on every record.
         config:

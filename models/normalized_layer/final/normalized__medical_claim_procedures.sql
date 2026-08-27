@@ -3,7 +3,7 @@
    )
 }}
 
-{% set procedure_cols = range(1, 26) %}
+{% set procedure_cols = var('_medical_claim_procedure_cols_override', range(1, 26)) %}
 
 with hcpcs_procedures as (
     select
@@ -27,6 +27,7 @@ with hcpcs_procedures as (
         , med.hcpcs_modifier_3 as modifier_3
         , med.hcpcs_modifier_4 as modifier_4
         , med.hcpcs_modifier_5 as modifier_5
+        , med.ingest_datetime
         , med.data_source
     from {{ ref('normalized__medical_claim') }} as med
     where med.hcpcs_code is not null
@@ -49,6 +50,7 @@ with hcpcs_procedures as (
         , cast(null as {{ dbt.type_string() }}) as modifier_3
         , cast(null as {{ dbt.type_string() }}) as modifier_4
         , cast(null as {{ dbt.type_string() }}) as modifier_5
+        , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
         , med.data_source
     from {{ ref('normalized__medical_claim') }} as med
     where med.procedure_code_{{ i }} is not null
@@ -78,6 +80,7 @@ with hcpcs_procedures as (
         , procedure_source.modifier_3
         , procedure_source.modifier_4
         , procedure_source.modifier_5
+        , procedure_source.ingest_datetime
         , case
             when icd10.icd_10_pcs is not null then 'icd-10-pcs'
             when icd9.icd_9_pcs is not null then 'icd-9-pcs'
@@ -131,6 +134,7 @@ select distinct
     , cast(modifier_3 as {{ dbt.type_string() }}) as modifier_3
     , cast(modifier_4 as {{ dbt.type_string() }}) as modifier_4
     , cast(modifier_5 as {{ dbt.type_string() }}) as modifier_5
+    , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(data_source as {{ dbt.type_string() }}) as data_source
 from normalized_procedures

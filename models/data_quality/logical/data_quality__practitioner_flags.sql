@@ -34,6 +34,9 @@ final as (
               "cast(provider_rows.entity_type_code as " ~ string_type ~ ") != '1'",
               "source_rows.npi is not null and provider_rows.npi is not null and provider_rows.entity_type_code is not null"
           ) }} as npi_not_individual
+        , {{ dq_logical_ingest_datetime_range_flag_sql(
+              "source_rows.ingest_datetime"
+          ) }} as ingest_datetime_out_of_reasonable_range
     from source_rows
     left join provider_rows
         on cast(source_rows.npi as {{ string_type }}) = cast(provider_rows.npi as {{ string_type }})
