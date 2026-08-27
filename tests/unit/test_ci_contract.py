@@ -21,6 +21,12 @@ EXTERNAL_CI_PATH = ROOT / ".github" / "workflows" / "ci-external-pr.yml"
 PACKAGES_PATH = ROOT / "integration_tests" / "packages.yml"
 RELEASE_PACKAGES_PATH = ROOT / "integration_tests" / "packages.release.yml"
 INTEGRATION_PROJECT_PATH = ROOT / "integration_tests" / "dbt_project.yml"
+TARGET_SCHEMA_MACRO_PATH = (
+    ROOT
+    / "integration_tests"
+    / "macros"
+    / "ensure_target_schema_for_unit_tests.sql"
+)
 PROFILE_PATHS = {
     warehouse: ROOT / "integration_tests" / "profiles" / warehouse / "profiles.yml"
     for warehouse in (
@@ -118,6 +124,9 @@ class CiContractTest(unittest.TestCase):
         cls.packages = PACKAGES_PATH.read_text(encoding="utf-8")
         cls.release_packages = RELEASE_PACKAGES_PATH.read_text(encoding="utf-8")
         cls.integration_project = INTEGRATION_PROJECT_PATH.read_text(
+            encoding="utf-8"
+        )
+        cls.target_schema_macro = TARGET_SCHEMA_MACRO_PATH.read_text(
             encoding="utf-8"
         )
         cls.profiles = {
@@ -704,6 +713,18 @@ class CiContractTest(unittest.TestCase):
                 profile = self.profiles[warehouse]
                 self.assertIn(target_location, profile)
                 self.assertEqual(profile.count("TUVA_CI_SCHEMA_PREFIX"), 1)
+
+    def test_isolated_target_schema_is_created_for_dbt_unit_tests(self):
+        self.assertIn(
+            'on-run-start:\n  - "{{ ensure_target_schema_for_unit_tests() }}"',
+            self.integration_project,
+        )
+        self.assertIn("database=target.database", self.target_schema_macro)
+        self.assertIn("schema=target.schema", self.target_schema_macro)
+        self.assertIn(
+            "adapter.create_schema(target_schema_relation)",
+            self.target_schema_macro,
+        )
 
     def test_external_dispatch_is_core_snowflake_and_rejects_version_changes(self):
         self.assertRegex(self.external_workflow, r"(?m)^  workflow_dispatch:$")

@@ -118,6 +118,9 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+on-run-start:
+  - "{{ ensure_target_schema_for_unit_tests() }}"
+
 
 dispatch:
   - macro_namespace: 'dbt'
