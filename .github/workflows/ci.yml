@@ -495,6 +495,9 @@ jobs:
                 })
               )
             );
+            if (state === "error") {
+              core.setFailed(description);
+            }
 
   preflight_assets:
     name: Verify future-version data assets
@@ -688,7 +691,8 @@ jobs:
       TUVA_CI_SCHEMA_PREFIX: ${{ needs.resolve.outputs.schema_prefix }}
       CI_DBT_VARS: >-
         {"use_synthetic_data": true, "synthetic_data_size": "small",
-        "parity_enabled": false,
+        "parity_enabled": false, "data_quality_enabled": true,
+        "enable_data_quality_failure_keys": true,
         "tuva_schema_prefix": "${{ needs.resolve.outputs.schema_prefix }}"}
     steps:
       - name: Checkout exact commit
@@ -745,7 +749,6 @@ jobs:
           import json
           import os
           import re
-          import shutil
           from pathlib import Path
 
           source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
@@ -811,9 +814,21 @@ jobs:
                   env_file.write(f"{item['env_var']}={revision}\n")
 
           integration_dir = Path("integration_tests")
-          shutil.copyfile(
-              integration_dir / "packages.release.yml",
-              integration_dir / "packages.yml",
+          release_manifest = ["packages:", "  - local: ../"]
+          for item in packages:
+              release_manifest.extend(
+                  [
+                      f"  - git: https://github.com/{item['repository']}.git",
+                      (
+                          "    revision: \"{{ env_var('"
+                          + item["env_var"]
+                          + "') }}\""
+                      ),
+                  ]
+              )
+          (integration_dir / "packages.yml").write_text(
+              "\n".join(release_manifest) + "\n",
+              encoding="utf-8",
           )
           (integration_dir / "ci-source-lock.json").write_text(
               json.dumps(source_lock, indent=2, sort_keys=True) + "\n",
@@ -963,23 +978,44 @@ jobs:
               "manifest": None,
               "run_results": None,
           }
+          expected_dbt_packages = {
+              "integration_tests",
+              "the_tuva_project",
+              "ahrq_quality_indicators",
+              "ccsr",
+              "cms_chronic_conditions",
+              "cms_hcc",
+              "fhir_preprocessing",
+              "nyu_ed_classification",
+              "quality_measures",
+              "semantic_layer",
+          }
+          coverage_error = None
 
           manifest_path = target_dir / "manifest.json"
           if manifest_path.exists():
               manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
               nodes = manifest.get("nodes", {})
+              nodes_by_package = Counter(
+                  node.get("package_name", "unknown")
+                  for node in nodes.values()
+              )
+              missing_packages = sorted(
+                  expected_dbt_packages - nodes_by_package.keys()
+              )
+              if missing_packages:
+                  coverage_error = (
+                      "all-package build manifest has no enabled nodes for: "
+                      + ", ".join(missing_packages)
+                  )
               evidence["manifest"] = {
                   "dbt_version": manifest.get("metadata", {}).get("dbt_version"),
                   "node_count": len(nodes),
-                  "nodes_by_package": dict(
-                      sorted(
-                          Counter(
-                              node.get("package_name", "unknown")
-                              for node in nodes.values()
-                          ).items()
-                      )
-                  ),
+                  "nodes_by_package": dict(sorted(nodes_by_package.items())),
+                  "required_packages_present": not missing_packages,
               }
+          else:
+              coverage_error = "all-package build did not produce a dbt manifest"
 
           results_path = target_dir / "run_results.json"
           if results_path.exists():
@@ -1001,6 +1037,8 @@ jobs:
               json.dumps(evidence, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
+          if coverage_error:
+              raise SystemExit(coverage_error)
           PY
 
       - name: Upload all-warehouse evidence

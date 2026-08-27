@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
+import json
+import os
 import re
+import subprocess
+import sys
+import tempfile
+import textwrap
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -87,6 +93,18 @@ def extract_javascript_array(text, name, terminator):
 
 def extract_action_uses(text):
     return re.findall(r"(?m)^\s*uses:\s+([^\s#]+)", text)
+
+
+def extract_embedded_python(text, step_name):
+    step_marker = f"      - name: {step_name}\n"
+    if step_marker not in text:
+        raise AssertionError(f"Could not find workflow step {step_name}")
+    step = text.split(step_marker, 1)[1].split("\n      - name:", 1)[0]
+    script_marker = "          python3 - <<'PY'\n"
+    if script_marker not in step or "\n          PY" not in step:
+        raise AssertionError(f"Could not find embedded Python in {step_name}")
+    script = step.split(script_marker, 1)[1].rsplit("\n          PY", 1)[0]
+    return textwrap.dedent(script)
 
 
 class CiContractTest(unittest.TestCase):
@@ -266,7 +284,16 @@ class CiContractTest(unittest.TestCase):
         )
         self.assertIn('exact_sha = re.compile(r"^[0-9a-f]{40}$")', build)
         self.assertIn('env_path = Path(os.environ["GITHUB_ENV"])', build)
-        self.assertIn('integration_dir / "packages.release.yml"', build)
+        self.assertIn(
+            'release_manifest = ["packages:", "  - local: ../"]', build
+        )
+        self.assertIn(
+            'f"  - git: https://github.com/{item[\'repository\']}.git"',
+            build,
+        )
+        self.assertIn('(integration_dir / "packages.yml").write_text(', build)
+        self.assertNotIn("shutil.copyfile", build)
+        self.assertNotIn('integration_dir / "packages.release.yml"', build)
         self.assertIn('integration_dir / "ci-source-lock.json"', build)
 
         self.assertIn("const expectedStandalonePackages = [", self.workflow)
@@ -280,6 +307,147 @@ class CiContractTest(unittest.TestCase):
                 self.assertIn(f'/{repository}"', build)
                 self.assertIn(f'"{dbt_package}"', build)
                 self.assertIn(f'"{env_var}"', build)
+
+    def test_locked_sources_generate_the_runtime_release_manifest(self):
+        packages = [
+            {
+                "repository": f"tuva-health/{repository}",
+                "dbt_package": dbt_package,
+                "branch": "main",
+                "revision": f"{index:x}" * 40,
+                "env_var": env_var,
+            }
+            for index, (repository, dbt_package, env_var) in enumerate(
+                RELEASE_PACKAGES,
+                start=1,
+            )
+        ]
+        source_lock = {"standalone_packages": packages}
+        script = extract_embedded_python(
+            self.workflow,
+            "Configure all-package sources",
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            integration_dir = root / "integration_tests"
+            integration_dir.mkdir()
+            env_path = root / "github-env"
+            env_path.touch()
+            env = os.environ.copy()
+            env.update(
+                {
+                    "CI_SOURCE_LOCK": json.dumps(source_lock),
+                    "GITHUB_ENV": str(env_path),
+                    "GITHUB_REPOSITORY_OWNER": "tuva-health",
+                }
+            )
+            subprocess.run(
+                [sys.executable, "-c", script],
+                cwd=root,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            expected_manifest = ["packages:", "  - local: ../"]
+            for package in packages:
+                expected_manifest.extend(
+                    [
+                        (
+                            "  - git: https://github.com/"
+                            f"{package['repository']}.git"
+                        ),
+                        (
+                            "    revision: \"{{ env_var('"
+                            f"{package['env_var']}"
+                            "') }}\""
+                        ),
+                    ]
+                )
+            self.assertEqual(
+                (integration_dir / "packages.yml").read_text(),
+                "\n".join(expected_manifest) + "\n",
+            )
+            self.assertEqual(
+                env_path.read_text().splitlines(),
+                [
+                    f"{package['env_var']}={package['revision']}"
+                    for package in packages
+                ],
+            )
+
+    def test_release_evidence_rejects_missing_required_package_nodes(self):
+        script = extract_embedded_python(
+            self.workflow,
+            "Prepare all-warehouse evidence",
+        )
+        required_packages = {
+            "integration_tests",
+            "the_tuva_project",
+            *(dbt_package for _, dbt_package, _ in RELEASE_PACKAGES),
+        }
+
+        for missing_package in (None, "semantic_layer"):
+            with self.subTest(missing_package=missing_package):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    root = Path(temp_dir)
+                    target_dir = root / "integration_tests" / "target"
+                    target_dir.mkdir(parents=True)
+                    manifest_packages = required_packages - {missing_package}
+                    manifest = {
+                        "metadata": {"dbt_version": "test"},
+                        "nodes": {
+                            f"model.{package}.fixture": {
+                                "package_name": package
+                            }
+                            for package in manifest_packages
+                        },
+                    }
+                    (target_dir / "manifest.json").write_text(
+                        json.dumps(manifest),
+                        encoding="utf-8",
+                    )
+                    (target_dir / "run_results.json").write_text(
+                        json.dumps({"elapsed_time": 1, "results": []}),
+                        encoding="utf-8",
+                    )
+                    env = os.environ.copy()
+                    env.update(
+                        {
+                            "CI_SOURCE_LOCK": json.dumps(
+                                {"standalone_packages": []}
+                            ),
+                            "CI_WAREHOUSE": "snowflake",
+                            "GITHUB_RUN_ID": "1",
+                            "GITHUB_RUN_ATTEMPT": "1",
+                        }
+                    )
+                    completed = subprocess.run(
+                        [sys.executable, "-c", script],
+                        cwd=root,
+                        env=env,
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+                    evidence = json.loads(
+                        (
+                            root / "integration_tests" / "ci-evidence.json"
+                        ).read_text()
+                    )
+                    if missing_package is None:
+                        self.assertEqual(completed.returncode, 0)
+                        self.assertTrue(
+                            evidence["manifest"]["required_packages_present"]
+                        )
+                    else:
+                        self.assertNotEqual(completed.returncode, 0)
+                        self.assertIn(missing_package, completed.stderr)
+                        self.assertFalse(
+                            evidence["manifest"]["required_packages_present"]
+                        )
 
     def test_release_preflight_requires_payloads_but_no_receipt(self):
         preflight = self.workflow[
@@ -316,10 +484,20 @@ class CiContractTest(unittest.TestCase):
             self.workflow,
         )
 
-    def test_both_paths_use_small_synthetic_data_without_parity(self):
+    def test_both_paths_exercise_data_quality_with_small_data_without_parity(self):
         self.assertEqual(self.workflow.count('"use_synthetic_data": true'), 1)
         self.assertEqual(self.workflow.count('"synthetic_data_size": "small"'), 1)
         self.assertEqual(self.workflow.count('"parity_enabled": false'), 1)
+        self.assertEqual(self.workflow.count('"data_quality_enabled": true'), 1)
+        self.assertEqual(
+            self.workflow.count('"enable_data_quality_failure_keys": true'), 1
+        )
+        self.assertEqual(self.workflow.count('--vars "$CI_DBT_VARS"'), 5)
+        self.assertIn("data_quality_enabled: false", self.integration_project)
+        self.assertIn(
+            "enable_data_quality_failure_keys: false",
+            self.integration_project,
+        )
         self.assertIn("strategy:\n      fail-fast: false", self.workflow)
         self.assertEqual(self.workflow.count("dbt build --full-refresh"), 5)
         self.assertNotIn('"synthetic_data_size": "large"', self.workflow)
@@ -418,6 +596,13 @@ class CiContractTest(unittest.TestCase):
                 f'"{result_field}": result.get("{result_field}")',
                 prepare_block,
             )
+        self.assertIn(
+            '"required_packages_present": not missing_packages',
+            prepare_block,
+        )
+        self.assertIn("expected_dbt_packages = {", prepare_block)
+        self.assertIn("if coverage_error:", prepare_block)
+        self.assertIn("raise SystemExit(coverage_error)", prepare_block)
 
     def test_status_contexts_are_distinct_and_stale_safe(self):
         self.assertIn('"Tuva CI / Snowflake"', self.workflow)
@@ -446,6 +631,8 @@ class CiContractTest(unittest.TestCase):
         self.assertIn(
             "A standalone package main changed; rerun required", self.workflow
         )
+        self.assertIn('if (state === "error") {', self.workflow)
+        self.assertIn("core.setFailed(description);", self.workflow)
         self.assertIn("All-warehouse release CI passed", self.workflow)
         self.assertIn("Snowflake Core build passed", self.workflow)
 

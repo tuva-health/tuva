@@ -82,8 +82,9 @@ testing cross-package compatibility.
 
 `Tuva CI -- Snowflake` runs automatically for every in-repository pull request.
 It tests the exact pull-request merge commit on Snowflake using Tuva Core, the
-integration project, and the small synthetic dataset. A package version change
-does not change this automatic path.
+integration project, and the small synthetic dataset. Data Quality and its
+optional failure-key relation are enabled so the complete Core test surface
+runs. A package version change does not change this automatic path.
 
 For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
 the Actions tab and enter only its pull-request number. The workflow accepts an
@@ -100,12 +101,12 @@ by the release candidate exists under its future version in S3, GCS, and Azure
 and that `_release.json` is absent. The receipt is finalized against the merged
 `main` commit later; candidate payloads alone are sufficient for PR validation.
 
-Both workflows keep the small synthetic dataset enabled and parity disabled.
-The all-warehouse workflow retains each warehouse's sanitized dbt result
-summary and resolved source lock for 90 days; raw logs and warehouse connection
-metadata are not included. There is no individual-warehouse dispatcher.
-Troubleshoot individual warehouses locally, and use DuckDB locally for
-portability checks.
+Both workflows keep the small synthetic dataset and Data Quality failure-key
+coverage enabled while parity remains disabled. The all-warehouse workflow
+retains each warehouse's sanitized dbt result summary and resolved source lock
+for 90 days; raw logs and warehouse connection metadata are not included. There
+is no individual-warehouse dispatcher. Troubleshoot individual warehouses
+locally, and use DuckDB locally for portability checks.
 
 Reviewed fork pull requests use the separate `External PR Snowflake CI`
 workflow. Its only input is the pull-request number. CI does not accept

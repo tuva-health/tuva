@@ -171,8 +171,9 @@ content is loaded from public object storage.
 - In-repository pull requests automatically run `Tuva CI -- Snowflake`: one
   Snowflake `dbt build --full-refresh` against the small synthetic dataset. The
   build selects Tuva Core plus the integration-test project and runs unit and
-  data tests. Version changes do not alter this automatic path. Parity remains
-  disabled.
+  data tests. Data Quality, including its optional failure-key relation, is
+  enabled so the complete Core test surface executes. Version changes do not
+  alter this automatic path. Parity remains disabled.
 - Run `Tuva CI -- All Warehouses` manually from the Actions tab for the final
   release pull request. Its only input is the pull-request number. It accepts
   only an open, mergeable, same-repository pull request into `main` that changes
@@ -180,9 +181,10 @@ content is loaded from public object storage.
 - The all-warehouse workflow resolves the pull request test-merge and all eight
   standalone package `main` branches once to exact commits. It then runs Tuva
   Core, the integration-test project, and all eight packages on Snowflake,
-  BigQuery, Databricks, Fabric, and Redshift against synthetic small. Before
-  warehouse credentials are used, it verifies that every Core candidate asset
-  exists in S3, GCS, and Azure and that no `_release.json` has been finalized.
+  BigQuery, Databricks, Fabric, and Redshift against synthetic small with Data
+  Quality and its optional failure-key relation enabled. Before warehouse
+  credentials are used, it verifies that every Core candidate asset exists in
+  S3, GCS, and Azure and that no `_release.json` has been finalized.
 - CI does not expose individual warehouse dispatches. Troubleshoot a single
   warehouse locally when needed.
 - DuckDB portability is validated locally as needed rather than in GitHub CI.
