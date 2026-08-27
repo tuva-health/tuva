@@ -46,6 +46,16 @@ WAREHOUSES = (
     "redshift",
 )
 
+CI_DEPENDENCY_VERSIONS = {
+    "DBT_CORE_VERSION": "1.11.14",
+    "DBT_SNOWFLAKE_VERSION": "1.11.6",
+    "DBT_BIGQUERY_VERSION": "1.11.3",
+    "DBT_DATABRICKS_VERSION": "1.12.4",
+    "DBT_FABRIC_VERSION": "1.11.1",
+    "DBT_REDSHIFT_VERSION": "1.11.1",
+    "SQLPARSE_VERSION": "0.6.0",
+}
+
 RELEASE_PACKAGES = (
     (
         "ahrq_quality_indicators",
@@ -194,6 +204,34 @@ class CiContractTest(unittest.TestCase):
             {"snowflake:core", "all:all-packages"},
         )
         self.assertEqual(self.packages.strip(), "packages:\n  - local: ../")
+
+    def test_ci_dependency_set_is_pinned_and_verified(self):
+        env_block = self.workflow.split("\nenv:\n", 1)[1].split(
+            "\njobs:\n", 1
+        )[0]
+        for name, version in CI_DEPENDENCY_VERSIONS.items():
+            with self.subTest(name=name):
+                self.assertIn(f'{name}: "{version}"', env_block)
+
+        install_step = self.workflow.split(
+            "      - name: Install dbt adapter\n", 1
+        )[1].split("\n      - name:", 1)[0]
+        self.assertEqual(
+            install_step.count('"sqlparse==${SQLPARSE_VERSION}"'),
+            len(WAREHOUSES),
+        )
+        self.assertIn("python -m pip check", install_step)
+        self.assertIn("dbt --version", install_step)
+        self.assertIn("sqlparse.__version__", install_step)
+
+        self.assertIn(
+            '{"MAX_GROUPING_DEPTH": 100, "MAX_GROUPING_TOKENS": 100000}',
+            env_block,
+        )
+        self.assertEqual(
+            self.workflow.count('--sqlparse "$DBT_SQLPARSE_OPTIONS"'),
+            len(WAREHOUSES),
+        )
 
     def test_manual_release_dispatch_validates_an_internal_version_pr(self):
         resolver = self.all_warehouses_workflow

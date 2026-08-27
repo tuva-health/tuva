@@ -122,12 +122,15 @@ concurrency:
 
 env:
   PYTHON_VERSION: "3.10"
-  DBT_CORE_VERSION: "1.10.15"
-  DBT_SNOWFLAKE_VERSION: "1.10.8"
-  DBT_BIGQUERY_VERSION: "1.10.3"
-  DBT_DATABRICKS_VERSION: "1.10.19"
-  DBT_FABRIC_VERSION: "1.10.0"
-  DBT_REDSHIFT_VERSION: "1.10.2"
+  DBT_CORE_VERSION: "1.11.14"
+  DBT_SNOWFLAKE_VERSION: "1.11.6"
+  DBT_BIGQUERY_VERSION: "1.11.3"
+  DBT_DATABRICKS_VERSION: "1.12.4"
+  DBT_FABRIC_VERSION: "1.11.1"
+  DBT_REDSHIFT_VERSION: "1.11.1"
+  SQLPARSE_VERSION: "0.6.0"
+  DBT_SQLPARSE_OPTIONS: >-
+    {"MAX_GROUPING_DEPTH": 100, "MAX_GROUPING_TOKENS": 100000}
 
 jobs:
   resolve:
@@ -717,25 +720,28 @@ jobs:
           python -m pip install --upgrade pip
           case "${{ matrix.warehouse }}" in
             snowflake)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-snowflake==${DBT_SNOWFLAKE_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-snowflake==${DBT_SNOWFLAKE_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             bigquery)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-bigquery==${DBT_BIGQUERY_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-bigquery==${DBT_BIGQUERY_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             databricks)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-databricks==${DBT_DATABRICKS_VERSION}" certifi
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-databricks==${DBT_DATABRICKS_VERSION}" "sqlparse==${SQLPARSE_VERSION}" certifi
               ;;
             fabric)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-fabric==${DBT_FABRIC_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-fabric==${DBT_FABRIC_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             redshift)
-              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-redshift==${DBT_REDSHIFT_VERSION}"
+              pip install "dbt-core==${DBT_CORE_VERSION}" "dbt-redshift==${DBT_REDSHIFT_VERSION}" "sqlparse==${SQLPARSE_VERSION}"
               ;;
             *)
               echo "Unsupported warehouse: ${{ matrix.warehouse }}" >&2
               exit 1
               ;;
           esac
+          python -m pip check
+          dbt --version
+          python -c 'import sqlparse; print(f"sqlparse={sqlparse.__version__}")'
 
       - name: Configure all-package sources
         if: env.CI_SCOPE == 'all-packages'
@@ -881,6 +887,7 @@ jobs:
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/snowflake \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
@@ -897,6 +904,7 @@ jobs:
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/bigquery \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
@@ -913,6 +921,7 @@ jobs:
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/databricks \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
@@ -931,6 +940,7 @@ jobs:
           dbt build --full-refresh --cache-selected-only \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/fabric \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
@@ -949,6 +959,7 @@ jobs:
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/redshift \
+            --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
 
