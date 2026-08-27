@@ -1325,7 +1325,10 @@ models:
 
   - name: encounters__combined_claim_line_crosswalk
     description: |-
-      all claim lines that belong to an encounter
+      Claim lines assigned to a classified encounter algorithm. Contract-valid
+      undetermined claims remain outside this crosswalk and flow through
+      encounters__orphaned_claims instead, even if a broad same-day anchor
+      matcher produced a candidate assignment.
 
       Primary key: claim_id, claim_line_number, data_source, encounter_type.
       claim_id is only unique within a data_source, so consumers must include
@@ -5250,6 +5253,11 @@ models:
         - ambulance
 
   - name: encounters__orphaned_claims
+    description: |-
+      Assigns a source-scoped orphaned claim encounter to each medical claim
+      line that was not mapped by an encounter algorithm. This includes
+      contract-valid undetermined claims, whose billing form cannot be routed
+      through the professional or institutional algorithms.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

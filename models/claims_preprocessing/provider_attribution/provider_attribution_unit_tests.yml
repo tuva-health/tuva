@@ -1,0 +1,73 @@
+version: 2
+
+unit_tests:
+  - name: test_provider_attribution_staging_includes_undetermined_orphan_claims
+    description: >
+      Undetermined claims restored to the canonical medical-claim path remain
+      eligible for the existing provider-attribution rules when they have the
+      required claim content; classification is not a separate attribution
+      prerequisite. Regression coverage for
+      https://github.com/tuva-health/tuva-core/issues/1388.
+    model: provider_attribution__stg_medical_claim
+    config:
+      enabled: "{{ (var('provider_attribution_enabled', false) and var('claims_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        provider_attribution_enabled: true
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          {% set numeric_type = 'numeric' %}
+          select
+              'undetermined_claim' as claim_id
+            , 1 as claim_line_number
+            , 'person-1' as person_id
+            , cast('2024-01-01' as date) as claim_start_date
+            , cast('2024-01-02' as date) as claim_end_date
+            , cast(12 as {{ numeric_type }}) as allowed_amount
+            , cast(10 as {{ numeric_type }}) as paid_amount
+            , '1111111111' as rendering_npi
+            , '99213' as hcpcs_code
+            , 'source-a' as data_source
+          union all
+          select 'professional_claim', 1, 'person-2', cast('2024-02-01' as date), cast('2024-02-01' as date), cast(22 as {{ numeric_type }}), cast(20 as {{ numeric_type }}), '2222222222', '99214', 'source-b'
+      - input: ref('service_category__service_category_grouper')
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 1 as duplicate_row_number
+          union all
+          select 'professional_claim', 1, 'source-b', 1
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          select 'professional_claim' as claim_id, 1 as claim_line_number, 'source-b' as data_source, 'enc-professional' as encounter_id, 1 as claim_line_attribution_number
+      - input: ref('encounters__orphaned_claims')
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'enc-undetermined' as encounter_id
+    expect:
+      rows:
+        - claim_id: undetermined_claim
+          claim_line_number: 1
+          person_id: person-1
+          claim_start_date: '2024-01-01'
+          claim_end_date: '2024-01-02'
+          allowed_amount: 12
+          paid_amount: 10
+          rendering_npi: '1111111111'
+          hcpcs_code: '99213'
+          data_source: source-a
+          encounter_id: enc-undetermined
+        - claim_id: professional_claim
+          claim_line_number: 1
+          person_id: person-2
+          claim_start_date: '2024-02-01'
+          claim_end_date: '2024-02-01'
+          allowed_amount: 22
+          paid_amount: 20
+          rendering_npi: '2222222222'
+          hcpcs_code: '99214'
+          data_source: source-b
+          encounter_id: enc-professional

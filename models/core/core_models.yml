@@ -1680,6 +1680,8 @@ models:
 
       This model pulls from claims preprocessing, enriches claim lines with encounter grouping, service categories, terminology descriptions, and enrollment matching, and passes through claim extension columns and file metadata. Header-level fields, such as claim_type, person_id, payer, plan, claim_start_date, claim_end_date, admission_date, and discharge_date, should be consistent across all lines for the same claim_id. Line-level fields, such as claim_line_start_date, claim_line_end_date, revenue_center_code, hcpcs_code, service_unit_quantity, and payment amounts, may vary across claim lines.
 
+      Contract-valid claims with claim_type = undetermined are retained. They receive other/other/other service categories and an orphaned claim encounter until their billing form classification can be resolved.
+
       Table grain: One record per medical claim line per data source.
 
       Primary key: medical_claim_id.
