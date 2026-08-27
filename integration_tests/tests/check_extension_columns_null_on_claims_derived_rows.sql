@@ -2,8 +2,8 @@
 -- seven hybrid Core tables.
 
 {{ config(
-     enabled = (var('claims_enabled', false) | as_bool)
-            and (var('clinical_enabled', false) | as_bool),
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            and (the_tuva_project.tuva_boolean_var('clinical_enabled', false)),
      tags = ['extension_columns'],
      severity = 'error'
    )

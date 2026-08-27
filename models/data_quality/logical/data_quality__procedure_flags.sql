@@ -1,5 +1,5 @@
 {{ config(
-     enabled = (var('data_quality_enabled', false) | as_bool) and (var('clinical_enabled', false) | as_bool),
+     enabled = (the_tuva_project.tuva_boolean_var('data_quality_enabled', false)) and (the_tuva_project.tuva_boolean_var('clinical_enabled', false)),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'
        if var('tuva_schema_prefix', None) is not none

@@ -92,6 +92,22 @@ Common variable groups:
 - Runtime metadata and schemas: `tuva_last_run`, `tuva_schema_prefix`
 - Extension columns: `passthrough`
 
+Tuva Core's boolean feature variables (`claims_enabled`, `clinical_enabled`,
+`provider_attribution_enabled`, `parity_enabled`, `data_quality_enabled`,
+`enable_data_quality_failure_keys`, and `use_coderx_enterprise`) must be
+unquoted YAML booleans. For example:
+
+```yaml
+vars:
+  claims_enabled: true
+  clinical_enabled: false
+```
+
+Quoted values such as `"true"` and `"false"` are strings and are rejected. Direct
+`env_var()` expressions are also strings and cannot be assigned to these vars.
+Environment-driven workflows must generate typed YAML or JSON, such as a
+`--vars` mapping containing native booleans, before invoking dbt.
+
 ## Data Asset Releases
 
 Every Tuva Core release with external data assets has one complete immutable

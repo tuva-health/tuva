@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', false) | as_bool)
-            or (var('clinical_enabled', false) | as_bool),
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            or (the_tuva_project.tuva_boolean_var('clinical_enabled', false)),
      materialized = 'ephemeral'
    )
 }}
@@ -17,7 +17,7 @@ select
     , nullif(cast(clinical_drug_name as {{ coderx_name_type }}), 'NULL') as clinical_drug_name
     , nullif(cast(active as {{ dbt.type_string() }}), 'NULL') as active
     , nullif(cast(prescribable as {{ dbt.type_string() }}), 'NULL') as prescribable
-{% if var('use_coderx_enterprise', false) | as_bool %}
+{% if the_tuva_project.tuva_boolean_var('use_coderx_enterprise', false) %}
 from {{ source('coderx', 'packages') }}
 {% else %}
 from {{ ref('terminology__coderx_packages') }}

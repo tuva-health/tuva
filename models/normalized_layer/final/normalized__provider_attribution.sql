@@ -1,9 +1,9 @@
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 
-{% if var('provider_attribution_enabled', False) | as_bool -%}
+{% if the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) -%}
 
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id

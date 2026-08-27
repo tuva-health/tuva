@@ -1,17 +1,17 @@
 {{ config(
-     enabled = (var('claims_enabled', false) | as_bool)
-            or (var('clinical_enabled', false) | as_bool)
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            or (the_tuva_project.tuva_boolean_var('clinical_enabled', false))
    )
 }}
 
 {%- set tuva_extension_columns_from_all_medications -%}
-{% if var('clinical_enabled', false) | as_bool %}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) %}
     {{ select_extension_columns(ref('normalized__medication'), alias='meds', strip_prefix=false) }}
 {% endif %}
 {%- endset -%}
 
 {%- set tuva_extension_columns_from_source_mapping -%}
-{% if var('clinical_enabled', false) | as_bool %}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) %}
     {{ select_extension_columns(ref('normalized__medication'), alias='sm') }}
 {% endif %}
 {%- endset -%}
@@ -22,7 +22,7 @@
    , data_source
 {%- endset -%}
 
-{%- set use_coderx_enterprise = var('use_coderx_enterprise', false) | as_bool -%}
+{%- set use_coderx_enterprise = the_tuva_project.tuva_boolean_var('use_coderx_enterprise', false) -%}
 
 with coderx_package_keys as (
     select
@@ -45,17 +45,17 @@ with coderx_package_keys as (
 ),
 
 all_medications as (
-{% if var('clinical_enabled', false) | as_bool
-    and var('claims_enabled', false) | as_bool -%}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false)
+    and the_tuva_project.tuva_boolean_var('claims_enabled', false) -%}
 
     {{ smart_union([ref('core__stg_claims_medication'), ref('normalized__medication')]) }}
 
-{% elif var('clinical_enabled', false) | as_bool -%}
+{% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) -%}
 
     select *
     from {{ ref('normalized__medication') }}
 
-{% elif var('claims_enabled', false) | as_bool -%}
+{% elif the_tuva_project.tuva_boolean_var('claims_enabled', false) -%}
 
     select *
     from {{ ref('core__stg_claims_medication') }}

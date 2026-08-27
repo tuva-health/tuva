@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', False) | as_bool)
-            or (var('clinical_enabled', False) | as_bool)
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            or (the_tuva_project.tuva_boolean_var('clinical_enabled', false))
    )
 }}
 
@@ -55,8 +55,8 @@ cast(
     , data_source
 {%- endset -%}
 
-{% if var('clinical_enabled', False) == true
-   and var('claims_enabled', False) == true -%}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true
+   and the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 {%- if execute -%}
     {%- set passthrough_config = get_extension_passthrough_config() -%}
@@ -251,7 +251,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true -%}
 
 {%- set source_extension_columns -%}
     {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_source', strip_prefix=false) }}
@@ -300,7 +300,7 @@ select
     {{ final_metadata_columns }}
 from patient_base
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 with patient_base as (
     select

@@ -3,7 +3,7 @@ and should be part of a higher priority encounter where one exists. We are union
 here to access downstream from one place */
 
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 

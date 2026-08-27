@@ -1,6 +1,6 @@
 {{ config(
-     enabled = (var('claims_enabled', False) | as_bool)
-            or (var('clinical_enabled', False) | as_bool)
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            or (the_tuva_project.tuva_boolean_var('clinical_enabled', false))
    )
 }}
 
@@ -24,7 +24,7 @@
     , data_source
 {%- endset -%}
 
-{% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
+{% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true and the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 {%- set tuva_extension_columns -%}
     {{ select_extension_columns(ref('normalized__location')) }}
@@ -40,7 +40,7 @@ select
     {{ tuva_metadata_columns }}
 from loc
 
-{% elif var('clinical_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true -%}
 
 {%- set tuva_extension_columns -%}
     {{ select_extension_columns(ref('normalized__location')) }}
@@ -52,7 +52,7 @@ select
     {{ tuva_metadata_columns }}
 from {{ ref('normalized__location') }}
 
-{% elif var('claims_enabled', False) == true -%}
+{% elif the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
 {%- set tuva_extension_columns -%}
 {# No extension columns — input_layer__location is clinical-only #}
