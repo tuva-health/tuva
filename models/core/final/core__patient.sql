@@ -59,77 +59,39 @@ cast(
    and var('claims_enabled', False) == true -%}
 
 {%- if execute -%}
-    {%- set passthrough_config = var('passthrough', {}) -%}
-    {%- set passthrough_prefix = passthrough_config.get('prefix', 'x_').lower() -%}
-    {%- set patient_extension_column_keys = [] -%}
-    {%- set claims_extension_column_map = {} -%}
-    {%- set clinical_extension_column_map = {} -%}
-
-    {%- for col in adapter.get_columns_in_relation(ref('normalized__eligibility_remove_duplicates')) -%}
-        {%- if col.name.lower().startswith(passthrough_prefix) -%}
-            {%- set column_key = col.name.lower() -%}
-            {%- do claims_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
-            {%- if column_key not in patient_extension_column_keys -%}
-                {%- do patient_extension_column_keys.append(column_key) -%}
-            {%- endif -%}
-        {%- endif -%}
-    {%- endfor -%}
+    {%- set passthrough_config = get_extension_passthrough_config() -%}
+    {%- set passthrough_prefix = passthrough_config['prefix'] | lower -%}
+    {%- set clinical_extension_columns = [] -%}
 
     {%- for col in adapter.get_columns_in_relation(ref('core__int_patient_remove_duplicates')) -%}
         {%- if col.name.lower().startswith(passthrough_prefix) -%}
-            {%- set column_key = col.name.lower() -%}
-            {%- do clinical_extension_column_map.update({column_key: {"name": col.name, "data_type": col.data_type}}) -%}
-            {%- if column_key not in patient_extension_column_keys -%}
-                {%- do patient_extension_column_keys.append(column_key) -%}
-            {%- endif -%}
+            {%- do clinical_extension_columns.append({"name": col.name, "data_type": col.data_type}) -%}
         {%- endif -%}
     {%- endfor -%}
 {%- else -%}
-    {%- set patient_extension_column_keys = [] -%}
-    {%- set claims_extension_column_map = {} -%}
-    {%- set clinical_extension_column_map = {} -%}
+    {%- set clinical_extension_columns = [] -%}
 {%- endif -%}
 
 {%- set claims_patient_extension_columns -%}
-    {%- for column_key in patient_extension_column_keys -%}
-        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
-        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
-        {%- if claims_col is not none %}
-        , claims_patient.{{ claims_col["name"] }}
-        {%- elif clinical_col is not none %}
-        , cast(null as {{ clinical_col["data_type"] }}) as {{ clinical_col["name"] }}
-        {%- endif -%}
+    {%- for clinical_col in clinical_extension_columns %}
+        , cast(null as {{ clinical_col["data_type"] }}) as {{ adapter.quote(clinical_col["name"]) }}
     {%- endfor -%}
 {%- endset -%}
 
 {%- set clinical_patient_extension_columns -%}
-    {%- for column_key in patient_extension_column_keys -%}
-        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
-        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
-        {%- if clinical_col is not none %}
-        , clinical_patient.{{ clinical_col["name"] }}
-        {%- elif claims_col is not none %}
-        , cast(null as {{ claims_col["data_type"] }}) as {{ claims_col["name"] }}
-        {%- endif -%}
+    {%- for clinical_col in clinical_extension_columns %}
+        , clinical_patient.{{ adapter.quote(clinical_col["name"]) }}
     {%- endfor -%}
 {%- endset -%}
 
 {%- set unioned_extension_columns -%}
-    {%- for column_key in patient_extension_column_keys -%}
-        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
-        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
-        {%- set output_col = claims_col if claims_col is not none else clinical_col -%}
-        , unioned.{{ output_col["name"] }}
+    {%- for clinical_col in clinical_extension_columns %}
+        , unioned.{{ adapter.quote(clinical_col["name"]) }}
     {%- endfor -%}
 {%- endset -%}
 
 {%- set final_extension_columns -%}
-    {%- for column_key in patient_extension_column_keys -%}
-        {%- set claims_col = claims_extension_column_map.get(column_key) -%}
-        {%- set clinical_col = clinical_extension_column_map.get(column_key) -%}
-        {%- set output_col = claims_col if claims_col is not none else clinical_col -%}
-        , patient_base.{{ output_col["name"] }}
-    {%- endfor -%}
+    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_base') }}
 {%- endset -%}
 
 with claims_patient as (
@@ -296,7 +258,7 @@ from patient_base
 {%- endset -%}
 
 {%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_base', strip_prefix=false) }}
+    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_base') }}
 {%- endset -%}
 
 with patient_base as (
@@ -340,14 +302,6 @@ from patient_base
 
 {% elif var('claims_enabled', False) == true -%}
 
-{%- set source_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_source', strip_prefix=false) }}
-{%- endset -%}
-
-{%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility_remove_duplicates'), alias='patient_base', strip_prefix=false) }}
-{%- endset -%}
-
 with patient_base as (
     select
           patient_source.person_id
@@ -371,7 +325,6 @@ with patient_base as (
         , patient_source.phone
         , patient_source.email
         , patient_source.ethnicity
-        {{ source_extension_columns }}
         , patient_source.data_source
         , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
         , patient_source.tuva_last_run
@@ -383,7 +336,6 @@ select
     {{ final_core_columns }}
     , {{ age_expression }} as age
     , {{ age_group_expression }} as age_group
-    {{ final_extension_columns }}
     {{ final_metadata_columns }}
 from patient_base
 

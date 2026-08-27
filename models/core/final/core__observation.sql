@@ -25,7 +25,7 @@ select
     , obs.source_reference_range_high
     , obs.normalized_reference_range_low
     , obs.normalized_reference_range_high
-    {{ select_extension_columns(ref('normalized__observation'), alias='obs', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__observation'), alias='obs') }}
     , obs.ingest_datetime
     , obs.tuva_last_run
     , obs.data_source

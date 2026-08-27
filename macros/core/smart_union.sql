@@ -25,6 +25,9 @@
         {{ smart_union([ref('stg_claims'), ref('stg_clinical')], source_index=none) }}
 #}
 
+{%- set passthrough_config = get_extension_passthrough_config() -%}
+{%- set passthrough_prefix = passthrough_config['prefix'] | lower -%}
+
 {%- if not execute -%}
     {{ return('') }}
 {%- endif -%}
@@ -38,10 +41,6 @@
         {%- endif -%}
     {%- endfor -%}
 {%- endfor -%}
-
-{#- Get passthrough prefix for column detection -#}
-{%- set passthrough_config = var('passthrough', {}) -%}
-{%- set passthrough_prefix = passthrough_config.get('prefix', 'x_').lower() -%}
 
 {%- set core_cols = [] -%}
 {%- set ext_cols = [] -%}
@@ -64,9 +63,9 @@
     {%- endif %}
     {%- for col in sorted_columns %}
         {%- if col.name.lower() in relation_cols %}
-        {{ quote_column(col.name) }}
+        {{ adapter.quote(col.name) }}
         {%- else %}
-        cast(null as {{ col.data_type }}) as {{ quote_column(col.name) }}
+        cast(null as {{ col.data_type }}) as {{ adapter.quote(col.name) }}
         {%- endif %}
         {%- if not loop.last %},{% endif %}
     {%- endfor %}

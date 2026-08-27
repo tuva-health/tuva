@@ -25,6 +25,8 @@
 {%- endset -%}
 
 {%- set tuva_extensions -%}
+    , 'observation' as x_tuva_test_extension
+    , 'observation' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

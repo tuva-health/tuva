@@ -24,6 +24,8 @@
 {%- endset -%}
 
 {%- set tuva_extensions -%}
+    , 'immunization' as x_tuva_test_extension
+    , 'immunization' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

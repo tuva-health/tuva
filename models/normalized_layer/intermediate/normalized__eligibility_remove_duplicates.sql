@@ -3,14 +3,6 @@
    )
 }}
 
-{%- set eligibility_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility'), alias='elig', strip_prefix=false) }}
-{%- endset -%}
-
-{%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__eligibility'), alias='eligibility_source', strip_prefix=false) }}
-{%- endset -%}
-
 with eligibility_source as (
     select
           cast(elig.person_id as {{ dbt.type_string() }}) as person_id
@@ -34,7 +26,6 @@ with eligibility_source as (
         , cast(elig.phone as {{ dbt.type_string() }}) as phone
         , cast(elig.email as {{ dbt.type_string() }}) as email
         , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity
-        {{ eligibility_extension_columns }}
         , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
         , cast(elig.file_name as {{ dbt.type_string() }}) as file_name
         , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
@@ -71,7 +62,6 @@ select
     , eligibility_source.phone
     , eligibility_source.email
     , eligibility_source.ethnicity
-    {{ final_extension_columns }}
     , eligibility_source.data_source
     , eligibility_source.file_name
     , eligibility_source.ingest_datetime

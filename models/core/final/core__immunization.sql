@@ -25,7 +25,7 @@ select
     , immune.route
     , immune.location_id
     , immune.practitioner_id
-    {{ select_extension_columns(ref('normalized__immunization'), alias='immune', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__immunization'), alias='immune') }}
     , immune.ingest_datetime
     , immune.tuva_last_run
     , immune.data_source

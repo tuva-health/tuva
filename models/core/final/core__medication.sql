@@ -12,7 +12,7 @@
 
 {%- set tuva_extension_columns_from_source_mapping -%}
 {% if var('clinical_enabled', false) | as_bool %}
-    {{ select_extension_columns(ref('normalized__medication'), alias='sm', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__medication'), alias='sm') }}
 {% endif %}
 {%- endset -%}
 
