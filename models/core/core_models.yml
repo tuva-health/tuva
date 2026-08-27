@@ -2763,8 +2763,9 @@ models:
       unions the two sources together and applies an additional deduplication
       step that gives eligibility-derived records precedence over clinical
       patient records. The model also calculates age and age_group from
-      birth_date and tuva_last_run, then pulls through extension columns and
-      final metadata columns. The table is intended to have one record per
+      birth_date and tuva_last_run. Extension columns from input_layer__patient
+      are populated only on clinical-derived rows; eligibility-derived rows do
+      not receive extension values. The table is intended to have one record per
       unique person within each data source. Primary key: person_id,
       data_source.
     config:

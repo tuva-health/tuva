@@ -54,7 +54,7 @@
 {%- endset %}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__pharmacy_claim'), alias='pharm', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__pharmacy_claim'), alias='pharm') }}
 {%- endset %}
 
 select

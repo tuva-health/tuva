@@ -33,6 +33,8 @@
 {%- endset -%}
 
 {%- set tuva_extensions -%}
+    , 'lab_result' as x_tuva_test_extension
+    , 'lab_result' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

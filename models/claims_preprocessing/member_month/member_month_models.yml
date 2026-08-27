@@ -3,7 +3,7 @@ version: 2
 models:
   - name: member_month__member_month
     description: |-
-      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the calendar terminology table so that each eligibility span is expanded into one record for each covered year-month. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source, and pulls through eligibility extension columns.
+      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the calendar terminology table so that each eligibility span is expanded into one record for each covered year-month. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source.
 
       Table grain: One record per person, member, year month, payer, plan, and data source.
     config:

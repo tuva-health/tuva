@@ -155,6 +155,8 @@
 {%- set tuva_extensions -%}
     , claim_id as x_temp_claim_id
     , payer as x_temp_payer
+    , 'medical_claim' as x_tuva_test_extension
+    , 'medical_claim' as ext_tuva_test_extension
 {%- endset -%}
 
 {%- set tuva_metadata -%}

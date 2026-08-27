@@ -18,6 +18,8 @@ select
     , source_description
     , condition_rank
     , present_on_admit_code
+    , 'condition' as x_tuva_test_extension
+    , 'condition' as ext_tuva_test_extension
     , ingest_datetime
     , data_source
 from {{ ref('the_tuva_project', 'synthetic_data__condition') }}

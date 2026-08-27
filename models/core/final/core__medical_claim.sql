@@ -74,7 +74,7 @@
 {%- endset -%}
 
 {%- set tuva_extension_columns -%}
-    {{ select_extension_columns(ref('normalized__medical_claim'), alias='med', strip_prefix=false) }}
+    {{ select_extension_columns(ref('normalized__medical_claim'), alias='med') }}
 {%- endset -%}
 
 {%- set tuva_metadata_columns -%}

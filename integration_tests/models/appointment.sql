@@ -20,6 +20,8 @@ select
     , status_description
     , reason
     , cancellation_reason
+    , 'appointment' as x_tuva_test_extension
+    , 'appointment' as ext_tuva_test_extension
     , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
     , data_source
 from {{ ref('the_tuva_project', 'synthetic_data__appointment') }}
