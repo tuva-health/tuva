@@ -605,6 +605,14 @@ class CiContractTest(unittest.TestCase):
         self.assertIn("raise SystemExit(coverage_error)", prepare_block)
 
     def test_status_contexts_are_distinct_and_stale_safe(self):
+        pending_status = self.workflow[
+            self.workflow.index("\n  mark_pending:") : self.workflow.index(
+                "\n  preflight_assets:"
+            )
+        ]
+        final_status = self.workflow[
+            self.workflow.index("\n  finalize_status:") :
+        ]
         self.assertIn('"Tuva CI / Snowflake"', self.workflow)
         self.assertIn('"Tuva CI / All Warehouses"', self.workflow)
         self.assertNotIn("Tuva CI / Required", self.workflow)
@@ -631,8 +639,10 @@ class CiContractTest(unittest.TestCase):
         self.assertIn(
             "A standalone package main changed; rerun required", self.workflow
         )
-        self.assertIn('if (state === "error") {', self.workflow)
-        self.assertIn("core.setFailed(description);", self.workflow)
+        self.assertNotIn('if (state === "error") {', pending_status)
+        self.assertNotIn("core.setFailed(description);", pending_status)
+        self.assertIn('if (state === "error") {', final_status)
+        self.assertIn("core.setFailed(description);", final_status)
         self.assertIn("All-warehouse release CI passed", self.workflow)
         self.assertIn("Snowflake Core build passed", self.workflow)
 

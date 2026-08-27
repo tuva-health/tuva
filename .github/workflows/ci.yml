@@ -495,9 +495,6 @@ jobs:
                 })
               )
             );
-            if (state === "error") {
-              core.setFailed(description);
-            }
 
   preflight_assets:
     name: Verify future-version data assets
@@ -1222,3 +1219,6 @@ jobs:
                 })
               )
             );
+            if (state === "error") {
+              core.setFailed(description);
+            }
