@@ -1,0 +1,175 @@
+version: 2
+
+unit_tests:
+  - name: test_member_month_caps_all_spans_at_run_date
+    description: Open and finite spans generate covered months only through tuva_last_run, and a span beginning after the run date generates no future member month.
+    model: member_month__member_month
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+        tuva_last_run: '2024-02-15 00:00:00'
+    given:
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'open' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast(null as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'finite' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast('2024-03-31' as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'closed' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast('2024-01-15' as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'future' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2024-02-20' as date) as enrollment_start_date
+            , cast('2024-12-31' as date) as enrollment_end_date
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+      - input: ref('member_month__month_spine')
+        format: sql
+        rows: |
+          select '202401' as year_month, cast('2024-01-01' as date) as first_day_of_month, cast('2024-01-31' as date) as last_day_of_month
+          union all
+          select '202402' as year_month, cast('2024-02-01' as date) as first_day_of_month, cast('2024-02-29' as date) as last_day_of_month
+          union all
+          select '202403' as year_month, cast('2024-03-01' as date) as first_day_of_month, cast('2024-03-31' as date) as last_day_of_month
+    expect:
+      rows:
+        - member_month_id: fe521b0dfedf39852a2669645ac44557
+          person_id: open
+          member_id: member
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 2d85331f944a10bf63b6444b8c5179b8
+          person_id: open
+          member_id: member
+          year_month: '202402'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 84fe05e1b19899a6716ca47454436223
+          person_id: finite
+          member_id: member
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: e1ce2f15d17e6b2b645e5affbfe1b33c
+          person_id: finite
+          member_id: member
+          year_month: '202402'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+        - member_month_id: 6ef76b25bbc6cc84eb0ed99d7b7257b5
+          person_id: closed
+          member_id: member
+          year_month: '202401'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-02-15 00:00:00'
+          data_source: source
+
+  - name: test_member_month_respects_supported_spine_boundaries
+    description: Coverage overlapping January 1900 and December 2100 produces those complete boundary months, while coverage wholly after 2100 produces no row.
+    model: member_month__member_month
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+    given:
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'lower' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('1899-12-15' as date) as enrollment_start_date
+            , cast('1900-01-15' as date) as enrollment_end_date
+            , cast('2024-01-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'upper' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2100-12-15' as date) as enrollment_start_date
+            , cast('2100-12-31' as date) as enrollment_end_date
+            , cast('2101-01-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          union all
+          select
+              'outside' as person_id
+            , 'member' as member_id
+            , 'payer' as payer
+            , 'plan' as {{ plan_identifier }}
+            , cast('2101-01-01' as date) as enrollment_start_date
+            , cast('2101-12-31' as date) as enrollment_end_date
+            , cast('2102-01-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+      - input: ref('member_month__month_spine')
+        format: sql
+        rows: |
+          select '190001' as year_month, cast('1900-01-01' as date) as first_day_of_month, cast('1900-01-31' as date) as last_day_of_month
+          union all
+          select '210012' as year_month, cast('2100-12-01' as date) as first_day_of_month, cast('2100-12-31' as date) as last_day_of_month
+    expect:
+      rows:
+        - member_month_id: a5912dae466a69af6f790bb95827af3c
+          person_id: lower
+          member_id: member
+          year_month: '190001'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2024-01-15 00:00:00'
+          data_source: source
+        - member_month_id: 48cab87f35214950901a86458cffface
+          person_id: upper
+          member_id: member
+          year_month: '210012'
+          payer: payer
+          plan: plan
+          tuva_last_run: '2101-01-15 00:00:00'
+          data_source: source

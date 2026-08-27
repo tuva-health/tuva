@@ -32,10 +32,11 @@ with eligibility_source as (
         , elig.tuva_last_run as tuva_last_run
         , row_number() over (
             partition by elig.person_id, elig.data_source
-            order by case
-                when elig.enrollment_end_date is null then cast('2050-01-01' as date)
-                else elig.enrollment_end_date
-            end desc
+            order by
+                case when elig.enrollment_end_date is null then 1 else 0 end desc
+                , elig.enrollment_end_date desc
+                , elig.enrollment_start_date desc
+                , elig.eligibility_id
         ) as row_sequence
     from {{ ref('normalized__eligibility') }} as elig
 )

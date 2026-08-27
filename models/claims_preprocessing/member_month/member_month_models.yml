@@ -1,9 +1,33 @@
 version: 2
 
 models:
+  - name: member_month__month_spine
+    description: |-
+      Internal package-owned sequence of complete calendar months from January 1900 through December 2100. Claims Preprocessing uses this spine for month-grain expansion and provider-attribution windows without requiring dates to exist in the published daily terminology calendar.
+
+      Table grain: One record per calendar month.
+    config:
+      materialized: ephemeral
+      tags:
+        - claims_preprocessing
+        - member_month
+    columns:
+      - name: year_month
+        description: Six-character calendar period key in YYYYMM format.
+      - name: year_month_int
+        description: Integer calendar period key in YYYYMM format.
+      - name: year
+        description: Four-digit calendar year.
+      - name: month
+        description: Calendar month number from 1 through 12.
+      - name: first_day_of_month
+        description: First day of the calendar month.
+      - name: last_day_of_month
+        description: Last day of the calendar month.
+
   - name: member_month__member_month
     description: |-
-      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the calendar terminology table so that each eligibility span is expanded into one record for each covered year-month. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source.
+      This model creates claims preprocessing member-month records from normalized eligibility spans. It joins normalized eligibility records to the package-owned 1900-through-2100 month spine so that each span is expanded into one record for each covered year-month. Expansion always stops at the date portion of tuva_last_run, including when a finite enrollment end date is later, so Tuva never creates future member months. It then creates member_month_id as a synthetic key from person_id, member_id, year_month, payer, plan, and data_source.
 
       Table grain: One record per person, member, year month, payer, plan, and data source.
     config:

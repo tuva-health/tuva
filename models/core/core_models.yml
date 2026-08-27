@@ -6,7 +6,7 @@ models:
 
       This model transforms the input layer by:
       1. Casting every appointment field to its core data type
-      2. Left joining appointment type, appointment status, and appointment cancellation reason terminology tables to populate the _norm columns
+      2. Preserving source-EHR appointment type, status, reason, and cancellation reason descriptions without terminology normalization
       3. Pulling through extension columns from input_layer__appointment
 
       Table grain: One record per appointment per patient per data source.
@@ -37,6 +37,7 @@ models:
         config:
           meta:
             data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the
           appointment. A person may have multiple patient IDs over time or
@@ -80,7 +81,7 @@ models:
           end_datetime.
         config:
           meta:
-            data_type: varchar
+            data_type: integer
       - name: location_id
         description: Identifier for the location where the appointment is scheduled,
           such as a clinic, department, facility, or site in the source system.
@@ -95,86 +96,34 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: type_code
-        description: Source appointment type code. This field preserves the appointment
-          type value from the source system and is used to normalize appointment
-          type.
+      - name: type
+        description: Description of the appointment type as represented in the source
+          EHR. The source value is preserved without mapping it to a
+          Tuva-controlled vocabulary.
         config:
           meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
             data_type: varchar
-      - name: type_description
-        description: Human-readable description of the source appointment type.
+      - name: status
+        description: Description of the appointment status as represented in the
+          source EHR, such as scheduled, completed, canceled, or no-show. The
+          source value is preserved without mapping it to a Tuva-controlled
+          vocabulary.
         config:
           meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: type_code_norm
-        description: Normalized appointment type code derived downstream from the source
-          appointment type.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: type_description_norm
-        description: Normalized appointment type description derived downstream from the
-          source appointment type.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-type
-            data_type: varchar
-      - name: status_code
-        description: Source appointment status code, such as scheduled, completed,
-          canceled, or no-show. This field is used to normalize appointment
-          status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_description
-        description: Human-readable description of the source appointment status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_code_norm
-        description: Normalized status code derived downstream from the source status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
-            data_type: varchar
-      - name: status_description_norm
-        description: Normalized appointment status description derived downstream from
-          the source status.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-status
             data_type: varchar
       - name: reason
-        description: Free-text reason for the appointment. This may represent the
-          patient-stated reason, scheduling reason, visit reason, or chief
-          complaint depending on the source system.
+        description: Description of the appointment reason as represented in the
+          source EHR. This may represent the patient-stated reason, scheduling
+          reason, visit reason, or chief complaint depending on the source system.
         config:
           meta:
             data_type: varchar
       - name: cancellation_reason
-        description: Source cancellation reason for canceled appointments. Populated
-          only when the appointment was canceled and the source provides a
-          cancellation reason.
+        description: Description of the cancellation reason as represented in the
+          source EHR. Populated only when the appointment was canceled and the
+          source provides a cancellation reason.
         config:
           meta:
-            data_type: varchar
-      - name: cancellation_reason_code_norm
-        description: Normalized code for the appointment cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
-            data_type: varchar
-      - name: cancellation_reason_description_norm
-        description: Normalized description of the code for the cancellation reason.
-        config:
-          meta:
-            terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
             data_type: varchar
       - name: ingest_datetime
         description: Date and time the source appointment record was extracted from the source system or loaded into the data warehouse.
@@ -199,7 +148,7 @@ models:
             is_primary_key: true
   - name: int_condition_from_claims
     description: |
-      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the Tuva synthetic condition_id used by core.condition.
+      Creates core-ready claims-derived condition rows from normalized__medical_claim_diagnoses. This model left joins the normalized diagnosis rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id when available, then creates the collision-safe deterministic Tuva condition_id used by core.condition. Diagnoses remain available when claim_type is undetermined or no encounter is assigned; those rows have a null encounter_id. Claims-derived rows have no source_condition_id, do not infer a clinical status, and use billing_diagnosis as condition_type.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -214,13 +163,24 @@ models:
       materialized: table
     columns:
       - name: condition_id
-        description: Tuva synthetic identifier for the claims-derived condition row.
+        description: >-
+          Deterministic Tuva identifier created by hashing an unambiguous
+          encoding of the claims-condition domain marker, data_source,
+          claim_id, encounter_id, condition_rank, code_system, and source_code.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
+      - name: source_condition_id
+        description: >-
+          Source clinical condition identifier. This is always null for
+          claims-derived rows because medical claims do not supply a source
+          condition-record identifier.
+        config:
+          meta:
+            data_type: varchar
       - name: encounter_id
         description: Encounter identifier assigned to the source claim line by the claims preprocessing encounter grouper.
         config:
@@ -248,6 +208,26 @@ models:
         config:
           meta:
             data_type: varchar
+      - name: status
+        description: >-
+          Clinical condition status. This is null for claims-derived rows
+          because a billed diagnosis does not establish whether a condition is
+          clinically active, resolved, or otherwise current.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition_type
+        description: >-
+          Category of condition record. Claims-derived rows use
+          billing_diagnosis.
+        config:
+          meta:
+            data_type: varchar
+      - name: condition_rank
+        description: Integer diagnosis position from the source medical claim.
+        config:
+          meta:
+            data_type: integer
       - name: ingest_datetime
         description: Null for claims-derived condition rows because a Core condition can consolidate diagnoses from multiple claim lines without retaining one source record.
         config:
@@ -327,7 +307,7 @@ models:
     description: |
       The condition table stores diagnoses, problem list records, encounter diagnoses, admitting diagnoses, discharge diagnoses, and other condition records from claims and clinical sources. Claims-derived rows come from int_condition_from_claims. Clinical rows come from normalized__condition.
 
-      The Normalized Layer unpivots claims diagnosis fields and normalizes supported diagnosis code systems. The int_condition_from_claims model attaches claim-line encounter_id for claims-derived rows and creates the Tuva synthetic condition_id. Core condition unions normalized clinical and claims condition rows, then joins normalized ICD-10-CM and SNOMED CT diagnosis codes to the Tuva Condition Grouper to populate condition_family and condition.
+      The Normalized Layer unpivots every populated claims diagnosis field regardless of claim_type and normalizes supported diagnosis code systems. The int_condition_from_claims model attaches claim-line encounter_id when available and creates the Tuva synthetic condition_id; diagnoses without an encounter assignment remain present with a null encounter_id. Core condition unions normalized clinical and claims condition rows, then joins normalized ICD-10-CM and SNOMED CT diagnosis codes to the Tuva Condition Grouper to populate condition_family and condition.
 
       Primary key: condition_id.
     tests:
@@ -344,13 +324,26 @@ models:
       materialized: table
     columns:
       - name: condition_id
-        description: Tuva synthetic record-level identifier for the condition. Clinical IDs are created in normalized__condition from source_condition_id and data_source. Claims-derived IDs are created in int_condition_from_claims from source data, claim, encounter, diagnosis rank, code system, and diagnosis code.
+        description: >-
+          Collision-safe deterministic Tuva record-level identifier. Clinical
+          IDs hash an unambiguous encoding of the clinical-condition domain
+          marker, data_source, and source_condition_id. Claims-derived IDs hash
+          the claims-condition domain marker, data_source, claim_id,
+          encounter_id, diagnosis rank, code system, and diagnosis code.
         tests:
           - not_null
         config:
           meta:
             data_type: varchar
             is_primary_key: true
+      - name: source_condition_id
+        description: >-
+          Condition-record identifier from the source clinical system. This is
+          preserved from input_layer__condition for clinical rows and is null
+          for claims-derived rows.
+        config:
+          meta:
+            data_type: varchar
       - name: person_id
         description: Globally unique identifier for the person associated with this
           condition. For claims-derived rows, this comes from the medical claim
@@ -423,16 +416,17 @@ models:
           meta:
             data_type: date
       - name: status
-        description: Status of the condition record. For claims-derived rows, Tuva sets
-          this to active. For clinical rows, this comes from
-          input_layer__condition and may include values such as active,
-          resolved, inactive, historical, suspected, or entered-in-error.
+        description: Status of the condition record. For claims-derived rows, this is
+          null because a billed diagnosis does not establish clinical status.
+          For clinical rows, this comes from input_layer__condition and may
+          include values such as active, resolved, inactive, historical,
+          suspected, or entered-in-error.
         config:
           meta:
             data_type: varchar
       - name: condition_type
         description: Category of condition record. For claims-derived rows, Tuva sets
-          this to discharge_diagnosis after unpivoting medical claim diagnosis
+          this to billing_diagnosis after unpivoting medical claim diagnosis
           fields. For clinical rows, this comes from input_layer__condition and
           may include values such as problem, encounter diagnosis, admitting
           diagnosis, discharge diagnosis, or billing diagnosis.
@@ -482,10 +476,12 @@ models:
               adapters.'
             data_type: varchar
       - name: normalized_description
-        description: Human-readable description for normalized_code. Tuva populates
-          this by preserving an upstream normalized_description when present,
-          otherwise by matching code_system and source_code to supported
-          condition terminology tables in the Normalized Layer.
+        description: Human-readable terminology description for normalized_code.
+          Tuva populates this by matching code_system and source_code to
+          supported condition terminology tables in the Normalized Layer.
+          Clinical and claims-derived ICD-10-CM and ICD-9-CM rows use the
+          terminology long description so the same normalized code has the
+          same description across source paths.
         config:
           meta:
             data_type: varchar
@@ -516,10 +512,9 @@ models:
           from the mapped input value. A condition_rank of 1 indicates a primary
           diagnosis code, and any condition_rank greater than 1 indicates a
           secondary diagnosis code.
-        data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: present_on_admit_code
         description: Present-on-admission indicator for the condition, when applicable.
           This is most relevant for inpatient facility diagnoses.
@@ -556,9 +551,9 @@ models:
             data_type: varchar
   - name: core__eligibility
     description: |-
-      This table stores health insurance eligibility and enrollment spans. It is designed to contain one record per person per enrollment span, where an enrollment span is the period during which a person is enrolled in a health plan. That period usually begins on enrollment_start_date and ends on enrollment_end_date. A person may have multiple records in this table when they have multiple enrollment spans with different health plans or multiple enrollment spans with the same health plan.
+      This table stores health insurance eligibility and enrollment spans. It is designed to contain one record per person per enrollment span, where an enrollment span is the period during which a person is enrolled in a health plan. That period begins on enrollment_start_date and ends on enrollment_end_date; a null enrollment_end_date means the span remains open. A person may have multiple records in this table when they have multiple enrollment spans with different health plans or multiple enrollment spans with the same health plan.
 
-      The primary key is eligibility_id, a synthetic key created upstream in normalized__eligibility. The eligibility_id is made from person_id, member_id, enrollment_start_date, enrollment_end_date, payer, plan, and data_source. This key is created because downstream models, including the semantic layer, need a stable record-level identifier for each eligibility span.
+      The primary key is eligibility_id, a synthetic key created upstream in normalized__eligibility. The eligibility_id is made from person_id, member_id, enrollment_start_date, payer, plan, and data_source. enrollment_end_date is intentionally excluded so the identifier remains stable when an open span later receives a closing date. This key is created because downstream models, including the semantic layer, need a stable record-level identifier for each eligibility span.
 
       Each record includes person_id, the globally unique identifier for the person, along with payer, plan, member_id, subscriber_id, enrollment dates, and other health plan enrollment attributes. These attributes include payer type, Medicare entitlement and status fields, dual eligibility status, hospice and institutional enrollment indicators, subscriber relationship, group identifiers, FIPS state fields, source file metadata, and extension columns.
 
@@ -574,8 +569,9 @@ models:
       - name: eligibility_id
         description: Primary key for the eligibility record. This value is created
           upstream in normalized__eligibility by concatenating person_id,
-          member_id, enrollment_start_date, enrollment_end_date, payer, plan,
-          and data_source with hyphen delimiters.
+          member_id, enrollment_start_date, payer, plan, and data_source with
+          hyphen delimiters. enrollment_end_date is excluded so the key remains
+          stable when an open span closes.
         tests:
           - not_null
           - unique
@@ -619,8 +615,9 @@ models:
           meta:
             data_type: date
       - name: enrollment_end_date
-        description: Date the person's enrollment span ends. Open-ended spans are
-          commonly represented as 9999-12-31.
+        description: Date the person's enrollment span ends. Null means the span is
+          still open. The backward-compatible input alias 9999-12-31 is
+          normalized to null before reaching Core.
         config:
           meta:
             data_type: date
@@ -640,7 +637,8 @@ models:
             data_type: varchar
       - name: plan
         description: Name of the specific health insurance product for the enrollment
-          span, for example Aetna PPO or Aetna HMO.
+          span, for example Aetna PPO or Aetna HMO. A given payer may offer
+          multiple plans.
         config:
           meta:
             data_type: varchar
@@ -783,10 +781,11 @@ models:
           meta:
             data_type: varchar
       - name: file_date
-        description: Date the source file identified by file_name was delivered.
+        description: Date the source file identified by file_name was delivered,
+          formatted as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source eligibility record or file was loaded into
           the data warehouse. This is useful when multiple versions of the same
@@ -839,12 +838,6 @@ models:
         - encounters
       materialized: table
     columns:
-      - name: _dbt_source_relation
-        description: dbt utils metadata column to indicate the source table from
-          unioning tables together.
-        config:
-          meta:
-            data_type: varchar
       - name: encounter_id
         description: Identifier for an encounter within a data source.
         tests:
@@ -858,12 +851,6 @@ models:
           encounter.
         tests:
           - not_null
-        config:
-          meta:
-            data_type: varchar
-      - name: patient_data_source_id
-        description: Identifier for the source system from which the patient or
-          encounter source identifier originated.
         config:
           meta:
             data_type: varchar
@@ -899,7 +886,7 @@ models:
           assigned a length of stay of 1.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: admit_source_code
         description: Code indicating where the patient was immediately before admission,
           when available. This is most relevant for inpatient encounters.
@@ -975,43 +962,43 @@ models:
           (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: lab_flag
         description: Indicates whether lab services were utilized during the encounter
           (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: dme_flag
         description: Indicates whether durable medical equipment (DME) was used during
           the encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: ambulance_flag
         description: Indicates whether ambulance services were utilized during the
           encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: pharmacy_flag
         description: Indicates whether pharmacy services were utilized during the
           encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: ed_flag
         description: Indicates whether the encounter involved an emergency department
           visit (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: delivery_flag
         description: Indicates whether the encounter involved a delivery (1 for yes, 0
           for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: delivery_type
         description: Type of delivery that occurred during the encounter, if applicable.
         config:
@@ -1022,19 +1009,19 @@ models:
           no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: nicu_flag
         description: Indicates whether the newborn was admitted to the Neonatal
           Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: snf_part_b_flag
         description: Indicates whether the inpatient medical service for Medicare covers
           under Part B or not. (1 for yes and 0 for no)
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: primary_diagnosis_code_type
         description: Code system for primary_diagnosis_code, such as icd-10-cm or icd-9-cm.
         config:
@@ -1103,17 +1090,17 @@ models:
           populated for claims-derived encounters.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: inst_claim_count
         description: Number of institutional claims generated from the encounter.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: prof_claim_count
         description: Number of professional claims generated from the encounter.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: source_model
         description: dbt model or relation from which the encounter row was derived.
         config:
@@ -1535,13 +1522,13 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: source_abnormal_flag
-        description: Abnormal or interpretation flag from the source system.
+      - name: source_abnormal_code
+        description: Abnormal or interpretation code from the source system.
         config:
           meta:
             data_type: varchar
-      - name: normalized_abnormal_flag
-        description: Standardized abnormal or interpretation flag, when available. Tuva
+      - name: normalized_abnormal_code
+        description: Standardized abnormal or interpretation code, when available. Tuva
           passes this through from the input layer when it is populated
           upstream.
         config:
@@ -1733,7 +1720,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: encounter_id
         description: Identifier for the encounter associated with the claim line,
           created by claims preprocessing when the claim line is grouped into an
@@ -2092,25 +2079,26 @@ models:
           1 for in network, 0 for out of network, and null when unknown.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: enrollment_flag
         description: Indicator for whether the claim line has corresponding eligibility
           during the same period when the service occurred.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: member_month_id
         description: Synthetic key for the member month associated with the claim line
           when matching eligibility is available.
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
+          Format as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source claim line or file was loaded into the
           data warehouse. This is useful when multiple versions of the same
@@ -2224,7 +2212,7 @@ models:
           clinical rows.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: payer
         description: Name of the payer responsible for the pharmacy claim. This is
           populated from core.pharmacy_claim.payer for claims rows and is null
@@ -2346,7 +2334,7 @@ models:
           Claims rows are populated from core.pharmacy_claim.quantity.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: quantity_unit
         description: Unit of measure for quantity. This is populated from
           input_layer__medication.quantity_unit for clinical rows and is null for
@@ -2360,7 +2348,7 @@ models:
           are populated from core.pharmacy_claim.days_supply.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: practitioner_id
         description: Identifier for the practitioner associated with the medication
           record. Clinical rows are populated from
@@ -2394,7 +2382,7 @@ models:
             is_primary_key: true
   - name: core__member_month
     description: |-
-      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity.
+      The member_month table stores one record per person, member, year month, payer, plan, and data source from eligibility spans. Members without claims are included because this table is derived from eligibility, not claim activity. Member months use Tuva's package-owned January 1900 through December 2100 month spine and stop at the calendar month containing the date portion of tuva_last_run for both open and finite spans, so Tuva does not publish future member months.
 
       This model is the final Core projection of the Claims Preprocessing member-month output plus Claims Preprocessing attribution. Member-month construction happens in member_month__member_month, and payer-attributed, custom-attributed, and Tuva-attributed provider fields are supplied by provider_attribution__member_month_attribution. Tuva-assigned attribution is calculated at person, data source, and performance year grain and copied to each member month in the matching year.
 
@@ -2436,7 +2424,8 @@ models:
           meta:
             data_type: varchar
       - name: year_month
-        description: Calendar month of eligibility represented by the member month.
+        description: Calendar month of eligibility represented by the member month,
+          formatted as YYYYMM.
         config:
           meta:
             data_type: varchar
@@ -2824,7 +2813,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: varchar
+            data_type: integer
       - name: name_suffix
         description: Patient name suffix, such as Jr., Sr., or III.
         config:
@@ -2906,7 +2895,7 @@ models:
         description: Patient age calculated from birth_date and tuva_last_run.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: age_group
         description: Decade age group derived from age.
         config:
@@ -3053,7 +3042,7 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: person_id
         description: Globally unique identifier for the person who received the
           dispensed medication.
@@ -3139,20 +3128,20 @@ models:
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: days_supply
         description: Number of days the dispensed medication is expected to last.
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: refills
         description: Refill number or refill count associated with the dispensed
           prescription, as represented by the source.
         data_type: integer
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: paid_date
         description: Date the pharmacy claim was paid or processed for payment by the payer.
         config:
@@ -3199,25 +3188,26 @@ models:
           unknown.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: enrollment_flag
         description: Indicator for whether the pharmacy claim line has corresponding
           eligibility during the same period when the medication was dispensed.
         config:
           meta:
-            data_type: number
+            data_type: integer
       - name: member_month_id
         description: Synthetic key for the member month associated with the pharmacy
           claim line when matching eligibility is available.
         config:
           meta:
-            data_type: number
+            data_type: varchar
       - name: file_date
         description: Date associated with the source file. This may represent the
           delivery date, reporting period, or date embedded in the file name.
+          Format as YYYY-MM-DD when serialized.
         config:
           meta:
-            data_type: timestamp
+            data_type: date
       - name: ingest_datetime
         description: Date and time the source pharmacy claim line or file was loaded
           into the data warehouse. This is useful when multiple versions of the

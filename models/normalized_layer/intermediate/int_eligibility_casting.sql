@@ -3,6 +3,17 @@
    )
 }}
 
+with eligibility_source as (
+    select
+        elig.*
+        , case
+            when cast(elig.enrollment_end_date as date) = cast('9999-12-31' as date)
+                then cast(null as date)
+            else cast(elig.enrollment_end_date as date)
+          end as _canonical_enrollment_end_date
+    from {{ ref('input_layer__eligibility') }} as elig
+)
+
 select
       cast(elig.person_id as {{ dbt.type_string() }}) as person_id
     , {{ concat_custom([
@@ -12,13 +23,13 @@ select
         "coalesce(elig.payer,'')",
         "coalesce(elig." ~ quote_column('plan') ~ ",'')",
         "coalesce(cast(elig.enrollment_start_date as " ~ dbt.type_string() ~ "),'')",
-        "coalesce(cast(elig.enrollment_end_date as " ~ dbt.type_string() ~ "),'')"
+        "coalesce(cast(elig._canonical_enrollment_end_date as " ~ dbt.type_string() ~ "),'')"
     ]) }} as person_id_key
     , cast(elig.member_id as {{ dbt.type_string() }}) as member_id
     , cast(elig.subscriber_id as {{ dbt.type_string() }}) as subscriber_id
     , cast(elig.subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
     , cast(elig.enrollment_start_date as date) as enrollment_start_date
-    , cast(elig.enrollment_end_date as date) as enrollment_end_date
+    , elig._canonical_enrollment_end_date as enrollment_end_date
     , cast(elig.payer as {{ dbt.type_string() }}) as payer
     , cast(elig.payer_type as {{ dbt.type_string() }}) as payer_type
     , cast(elig.{{ quote_column('plan') }} as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
@@ -58,8 +69,8 @@ select
     , cast(elig.group_name as {{ dbt.type_string() }}) as group_name
     {{ select_extension_columns(ref('input_layer__eligibility'), alias='elig', strip_prefix=false) }}
     , cast(elig.file_name as {{ dbt.type_string() }}) as file_name
-    , cast(elig.file_date as {{ dbt.type_timestamp() }}) as file_date
+    , cast(elig.file_date as date) as file_date
     , cast(elig.ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
-from {{ ref('input_layer__eligibility') }} as elig
+from eligibility_source as elig

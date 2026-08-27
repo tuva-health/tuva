@@ -12,6 +12,8 @@
 }}
 
 {% set string_type = dbt.type_string() %}
+{% set current_date_sql = dq_current_date_sql() %}
+{% set min_immunization_date_sql = dq_date_literal_sql('1900-01-01') %}
 
 with source_rows as (
     select *
@@ -103,6 +105,11 @@ final as (
               ~ "and patient_pair.person_id is not null"
           ) }} as encounter_person_patient_pair_not_in_encounter
         , {{ dq_logical_int_flag_sql("source_rows.occurrence_date is null", "1 = 1") }} as occurrence_date_null
+        , {{ dq_logical_date_range_flag_sql(
+              "source_rows.occurrence_date",
+              min_immunization_date_sql,
+              current_date_sql
+          ) }} as occurrence_date_outside_supported_date_range
         , {{ dq_logical_ingest_datetime_range_flag_sql(
               "source_rows.ingest_datetime"
           ) }} as ingest_datetime_out_of_reasonable_range

@@ -42,23 +42,16 @@ with encounter_crosswalk as (
 )
 
 select distinct
-    {{ dbt.safe_cast(
-        concat_custom([
-            "'claims'",
-            "'_'",
-            "cast(data_source as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(claim_id as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "coalesce(cast(encounter_id as " ~ dbt.type_string() ~ "), 'no_encounter')",
-            "'_'",
-            "cast(condition_rank as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(coalesce(code_system, 'unknown') as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(source_code as " ~ dbt.type_string() ~ ")"
-        ]), api.Column.translate_type("string"))
-    }} as condition_id
+    {{ the_tuva_project.stable_id_hash([
+        "'claims condition'",
+        'data_source',
+        'claim_id',
+        'encounter_id',
+        'condition_rank',
+        'code_system',
+        'source_code'
+    ]) }} as condition_id
+    , cast(null as {{ dbt.type_string() }}) as source_condition_id
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(member_id as {{ dbt.type_string() }}) as member_id
     , cast(null as {{ dbt.type_string() }}) as patient_id
@@ -68,8 +61,8 @@ select distinct
     , {{ try_to_cast_date('recorded_date', 'YYYY-MM-DD') }} as recorded_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as onset_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as resolved_date
-    , cast('active' as {{ dbt.type_string() }}) as status
-    , cast('discharge_diagnosis' as {{ dbt.type_string() }}) as condition_type
+    , cast(null as {{ dbt.type_string() }}) as status
+    , cast('billing_diagnosis' as {{ dbt.type_string() }}) as condition_type
     , cast(code_system as {{ dbt.type_string() }}) as code_system
     , cast(source_code as {{ dbt.type_string() }}) as source_code
     , cast(null as {{ dbt.type_string() }}) as source_description

@@ -140,6 +140,12 @@ content is loaded from public object storage.
 ## SQL Portability Rules
 
 - Write SQL in general-purpose, cross-warehouse style.
+- Public Input Layer, Normalized, Claims Preprocessing, and Core fields ending
+  in `_flag` are nullable binary integers: `1` means true, `0` means false, and
+  null means unknown or not applicable. Reserve `_flag` for binary fields; use
+  `_code` or `_status` for categorical values, and cast flags with
+  `{{ dbt.type_int() }}`. Internal working flags and data-asset attributes are
+  outside this public contract.
 - Tuva Core must run on:
   - Snowflake
   - Databricks

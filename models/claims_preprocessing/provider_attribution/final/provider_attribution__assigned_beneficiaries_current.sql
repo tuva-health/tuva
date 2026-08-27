@@ -29,6 +29,14 @@ with claim_bounds as (
   from claim_bounds
 )
 
+, calendar_months as (
+  select
+      year_month_int
+    , first_day_of_month
+    , last_day_of_month
+  from {{ ref('member_month__month_spine') }}
+)
+
 , months_12 as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
   select distinct
@@ -36,10 +44,10 @@ with claim_bounds as (
     , c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('terminology__calendar') }} as c
+  from calendar_months as c
   cross join params as p
-  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
-    and c.full_date <= p.as_of_date
+  where c.last_day_of_month >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.first_day_of_month <= p.as_of_date
 )
 
 , months_24 as (
@@ -49,10 +57,10 @@ with claim_bounds as (
     , c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('terminology__calendar') }} as c
+  from calendar_months as c
   cross join params as p
-  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
-    and c.full_date <= p.as_of_date
+  where c.last_day_of_month >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.first_day_of_month <= p.as_of_date
 )
 
 , lookback_24 as (

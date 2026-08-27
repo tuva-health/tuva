@@ -1,0 +1,85 @@
+version: 2
+
+unit_tests:
+  - name: test_normalized_appointment_preserves_source_descriptions
+    description: >
+      Verifies that arbitrary source-EHR appointment type, status, reason, and
+      cancellation reason descriptions pass through without terminology
+      normalization or value rewriting.
+    model: normalized__appointment
+    config:
+      enabled: "{{ var('clinical_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__appointment')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'appointment-1' as appointment_id
+            , 'person-1' as person_id
+            , 'patient-1' as patient_id
+            , 'encounter-1' as encounter_id
+            , cast('2024-03-01 09:00:00' as {{ timestamp_type }}) as start_datetime
+            , cast('2024-03-01 09:30:00' as {{ timestamp_type }}) as end_datetime
+            , 30 as duration
+            , 'location-1' as location_id
+            , 'practitioner-1' as practitioner_id
+            , 'EHR Custom Type / 47' as type
+            , 'SCHEDULED-PENDING' as status
+            , 'Patient requested follow-up' as reason
+            , 'Source-specific cancellation value' as cancellation_reason
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , 'source-ehr' as data_source
+    expect:
+      rows:
+        - appointment_id: appointment-1
+          type: EHR Custom Type / 47
+          status: SCHEDULED-PENDING
+          reason: Patient requested follow-up
+          cancellation_reason: Source-specific cancellation value
+          data_source: source-ehr
+
+  - name: test_core_appointment_preserves_source_descriptions
+    description: >
+      Verifies that Core publishes the four source-EHR appointment description
+      fields unchanged.
+    model: core__appointment
+    config:
+      enabled: "{{ var('clinical_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+    given:
+      - input: ref('normalized__appointment')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'appointment-1' as appointment_id
+            , 'person-1' as person_id
+            , 'patient-1' as patient_id
+            , 'encounter-1' as encounter_id
+            , cast('2024-03-01 09:00:00' as {{ timestamp_type }}) as start_datetime
+            , cast('2024-03-01 09:30:00' as {{ timestamp_type }}) as end_datetime
+            , 30 as duration
+            , 'location-1' as location_id
+            , 'practitioner-1' as practitioner_id
+            , 'EHR Custom Type / 47' as type
+            , 'SCHEDULED-PENDING' as status
+            , 'Patient requested follow-up' as reason
+            , 'Source-specific cancellation value' as cancellation_reason
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source-ehr' as data_source
+    expect:
+      rows:
+        - appointment_id: appointment-1
+          type: EHR Custom Type / 47
+          status: SCHEDULED-PENDING
+          reason: Patient requested follow-up
+          cancellation_reason: Source-specific cancellation value
+          data_source: source-ehr

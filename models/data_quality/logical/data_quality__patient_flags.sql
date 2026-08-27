@@ -14,6 +14,7 @@
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_birth_death_date_sql = dq_date_literal_sql('1900-01-01') %}
+{% set death_flag_text_sql = "trim(cast(source_rows.death_flag as " ~ string_type ~ "))" %}
 {% set zip_raw_expression = "trim(cast(source_rows.zip_code as " ~ string_type ~ "))" %}
 {% set zip_compact_expression = "replace(" ~ zip_raw_expression ~ ", '-', '')" %}
 {% set zip_raw_is_digits_expression = dq_digits_only_sql(zip_raw_expression) %}
@@ -85,17 +86,14 @@ final as (
               "source_rows.birth_date > source_rows.death_date",
               "source_rows.birth_date is not null and source_rows.death_date is not null"
           ) }} as birth_date_after_death_date
-        , {{ dq_logical_int_flag_sql(
-              "source_rows.death_flag not in (0, 1)",
-              "source_rows.death_flag is not null"
-          ) }} as death_flag_invalid
+        , {{ dq_logical_binary_value_flag_sql("source_rows.death_flag") }} as death_flag_invalid
         , {{ dq_logical_int_flag_sql(
               "source_rows.death_date is null",
-              "source_rows.death_flag = 1"
+              death_flag_text_sql ~ " = '1'"
           ) }} as death_flag_without_death_date
         , {{ dq_logical_int_flag_sql(
-              "source_rows.death_flag is null or source_rows.death_flag = 0",
-              "source_rows.death_date is not null and (source_rows.death_flag is null or source_rows.death_flag in (0, 1))"
+              "source_rows.death_flag is null or " ~ death_flag_text_sql ~ " = '0'",
+              "source_rows.death_date is not null and (source_rows.death_flag is null or " ~ death_flag_text_sql ~ " in ('0', '1'))"
           ) }} as death_date_without_death_flag
         , {{ dq_logical_int_flag_sql(
               "source_rows.state is not null "

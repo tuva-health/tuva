@@ -1,0 +1,101 @@
+version: 2
+
+unit_tests:
+  - name: test_normalized_condition_uses_stable_id_and_long_icd_description
+    description: >-
+      Proves that clinical condition IDs do not collide when underscores move
+      across source-key boundaries, source_condition_id remains unchanged, and
+      ICD normalization uses the terminology long description.
+    model: normalized__condition
+    config:
+      enabled: "{{ var('clinical_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__condition')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'c' as source_condition_id
+            , 'person-1' as person_id
+            , 'patient-1' as patient_id
+            , cast(null as {{ string_type }}) as encounter_id
+            , cast('2024-01-01' as date) as recorded_date
+            , cast('2024-01-01' as date) as onset_date
+            , cast(null as date) as resolved_date
+            , 'active' as status
+            , 'problem' as condition_type
+            , 'icd-10-cm' as code_system
+            , 'A00.1' as source_code
+            , 'Source description' as source_description
+            , 1 as condition_rank
+            , cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , 'a_b' as data_source
+          union all
+          select
+              'b_c' as source_condition_id
+            , 'person-2' as person_id
+            , 'patient-2' as patient_id
+            , cast(null as {{ string_type }}) as encounter_id
+            , cast('2024-01-02' as date) as recorded_date
+            , cast('2024-01-02' as date) as onset_date
+            , cast(null as date) as resolved_date
+            , 'resolved' as status
+            , 'problem' as condition_type
+            , 'icd-10-cm' as code_system
+            , 'A00.1' as source_code
+            , 'Another source description' as source_description
+            , 2 as condition_rank
+            , cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , 'a' as data_source
+      - input: ref('terminology__icd_10_cm')
+        format: sql
+        rows: |
+          select
+              'A001' as icd_10_cm
+            , 'Short ICD-10 description' as short_description
+            , 'Canonical long ICD-10 description' as long_description
+      - input: ref('terminology__icd_9_cm')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          select
+              cast(null as {{ string_type }}) as icd_9_cm
+            , cast(null as {{ string_type }}) as long_description
+          where 1 = 0
+      - input: ref('terminology__snomed_ct')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          select
+              cast(null as {{ string_type }}) as snomed_ct
+            , cast(null as {{ string_type }}) as description
+          where 1 = 0
+      - input: ref('terminology__present_on_admission')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          select
+              cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ string_type }}) as present_on_admit_description
+          where 1 = 0
+    expect:
+      rows:
+        - condition_id: b4ace79d04a310770199a0a86a51a2e3
+          source_condition_id: c
+          data_source: a_b
+          normalized_code: A001
+          normalized_description: Canonical long ICD-10 description
+          condition_rank: 1
+        - condition_id: ca0164fec970547072856a2e4f9c1c6a
+          source_condition_id: b_c
+          data_source: a
+          normalized_code: A001
+          normalized_description: Canonical long ICD-10 description
+          condition_rank: 2

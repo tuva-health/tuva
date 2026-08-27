@@ -6,7 +6,8 @@ models:
       coverage and demographics. When a person has health insurance coverage,
       they are eligible for benefits during a period of time.  This is generally
       referred to as an eligibility or enrollment span (we use these words
-      interchangeably) with a specific enrollment start and end date. This table
+      interchangeably) with a specific enrollment start date and an end date
+      once coverage closes. This table
       stores information about a person's eligibility spans, including coverage
       dates, payer and plan details, eligibility status indicators, and
       demographics. A person may have many eligibility spans with the same
@@ -56,18 +57,26 @@ models:
             data_type: varchar
             is_primary_key: false
       - name: enrollment_start_date
-        description: Date the person's enrollment span begins, formatted as YYYY-MM-DD.
+        description: Date the person's enrollment span begins, formatted as
+          YYYY-MM-DD when serialized. Expose this field as a native SQL DATE;
+          if the source stores it as text, parse the YYYY-MM-DD value to DATE in
+          the connector before exposing the Input Layer model.
         config:
           meta:
             data_type: date
             is_primary_key: true
       - name: enrollment_end_date
-        description: Date the person's enrollment span ends, formatted as YYYY-MM-DD.
-          Use 9999-12-31 when the enrollment span has not ended.
+        description: Date the person's enrollment span ends, formatted as
+          YYYY-MM-DD when serialized. Leave this field null when the enrollment
+          span is still open. For backward compatibility, Tuva accepts
+          9999-12-31 as an input alias for an open span and normalizes it to
+          null. Expose this field as a native SQL DATE; if the source stores it
+          as text, parse the YYYY-MM-DD value to DATE in the connector before
+          exposing the Input Layer model.
         config:
           meta:
             data_type: date
-            is_primary_key: true
+            is_primary_key: false
       - name: payer
         description: Name of the payer providing coverage for the enrollment span,
           for example Aetna or Blue Cross Blue Shield. If the source data is
@@ -86,8 +95,9 @@ models:
             is_primary_key: false
       - name: plan
         description: Name of the specific health insurance product for the enrollment
-          span, for example Aetna PPO or Aetna HMO. This enables analysis at
-          the plan level rather than only at the payer level.
+          span, for example Aetna PPO or Aetna HMO. A given payer may offer
+          multiple plans, so this enables analysis at the plan level rather
+          than only at the payer level.
         config:
           meta:
             data_type: varchar
@@ -198,12 +208,12 @@ models:
             data_type: date
             is_primary_key: false
       - name: death_flag
-        description: A Boolean flag indicating whether the person has died. Allowed
-          values are true, false, or null; warehouses may represent true and false as
-          1 and 0. If `death_flag` is true, `death_date` should also be populated.
+        description: Integer indicator for whether the person has died. Use 1 for
+          deceased, 0 for not known deceased, and null when unknown. If
+          `death_flag` is 1, `death_date` should also be populated.
         config:
           meta:
-            data_type: boolean
+            data_type: integer
             is_primary_key: false
       - name: original_reason_entitlement_code
         description: Medicare Original Reason for Entitlement Code, or OREC. This
@@ -244,7 +254,8 @@ models:
             is_primary_key: false
       - name: hospice_flag
         description: Indicator for whether the person is enrolled in hospice during
-          the enrollment span. Accepted values are 0 and 1.
+          the enrollment span. Accepted values are 1 for yes, 0 for no, and null
+          when unknown.
         config:
           meta:
             data_type: integer
@@ -252,7 +263,7 @@ models:
       - name: institutional_snp_flag
         description: Indicator for whether the person is enrolled in an institutional
           Special Needs Plan and requires a nursing-home level of care. Accepted
-          values are 0 and 1.
+          values are 1 for yes, 0 for no, and null when unknown.
         config:
           meta:
             data_type: integer
@@ -266,7 +277,8 @@ models:
             is_primary_key: false
       - name: long_term_institutional_flag
         description: Indicator for whether the person has been in an institutional
-          setting for more than 30 days. Accepted values are 0 and 1.
+          setting for more than 30 days. Accepted values are 1 for yes, 0 for no,
+          and null when unknown.
         config:
           meta:
             data_type: integer

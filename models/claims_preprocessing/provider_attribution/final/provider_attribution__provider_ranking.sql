@@ -24,7 +24,7 @@ with member_months as (
       year_month_int
     , first_day_of_month
     , last_day_of_month
-  from {{ ref('terminology__calendar') }}
+  from {{ ref('member_month__month_spine') }}
 )
 
 , claim_bounds as (
@@ -60,10 +60,10 @@ with member_months as (
     , c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('terminology__calendar') }} as c
+  from calendar_months as c
   cross join params as p
-  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
-    and c.full_date <= p.as_of_date
+  where c.last_day_of_month >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.first_day_of_month <= p.as_of_date
 )
 
 , months_24 as (
@@ -72,10 +72,10 @@ with member_months as (
     , c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('terminology__calendar') }} as c
+  from calendar_months as c
   cross join params as p
-  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
-    and c.full_date <= p.as_of_date
+  where c.last_day_of_month >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.first_day_of_month <= p.as_of_date
 )
 
 , lookback_12 as (
@@ -169,13 +169,11 @@ with member_months as (
     , cast(mc.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , mc.claim_start_date
     , mc.claim_end_date
-    , cal.year_month_int as claim_year_month_int
-    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
+    , cast({{ yyyymm('mc.claim_start_date') }} as {{ dbt.type_int() }}) as claim_year_month_int
+    , {{ yyyymm('mc.claim_start_date') }} as claim_year_month
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
   from {{ ref('provider_attribution__stg_medical_claim') }} as mc
-  left outer join {{ ref('terminology__calendar') }} as cal
-    on cast(mc.claim_start_date as date) = cal.full_date
 )
 
 , eligible_all_claims as (

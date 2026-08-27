@@ -111,10 +111,10 @@ unit_tests:
           zip_code_invalid_format: null
           ingest_datetime_out_of_reasonable_range: null
 
-  - name: test_patient_decimal_death_flags_are_compared_numerically
+  - name: test_patient_integer_death_flags_are_validated
     description: >
-      Verifies that decimal representations of 0 and 1 are valid death flags
-      and participate in the two death-date consistency checks.
+      Verifies that integer 0 and 1 are valid death flags, invalid integers
+      fail, and valid values participate in the death-date consistency checks.
     model: data_quality__patient_flags
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
@@ -127,27 +127,27 @@ unit_tests:
           from (
           select
               'person_1' as person_id
-            , 'decimal_one' as patient_id
+            , 'integer_one' as patient_id
             , 'male' as sex
             , null as race
             , null as ethnicity
             , cast('1980-01-01' as date) as birth_date
             , cast('2020-01-01' as date) as death_date
-            , cast(1.0 as decimal(18, 2)) as death_flag
+            , 1 as death_flag
             , null as state
             , null as zip_code
             , 'source' as data_source
           union all
-          select 'person_2', 'decimal_one_missing_date', 'male', null, null
-            , cast('1980-01-01' as date), cast(null as date), cast(1.0 as decimal(18, 2))
+          select 'person_2', 'integer_one_missing_date', 'male', null, null
+            , cast('1980-01-01' as date), cast(null as date), 1
             , null, null, 'source'
           union all
-          select 'person_3', 'decimal_zero_with_date', 'male', null, null
-            , cast('1980-01-01' as date), cast('2020-01-01' as date), cast(0.0 as decimal(18, 2))
+          select 'person_3', 'integer_zero_with_date', 'male', null, null
+            , cast('1980-01-01' as date), cast('2020-01-01' as date), 0
             , null, null, 'source'
           union all
-          select 'person_4', 'invalid_decimal', 'male', null, null
-            , cast('1980-01-01' as date), cast(null as date), cast(2.0 as decimal(18, 2))
+          select 'person_4', 'invalid_integer', 'male', null, null
+            , cast('1980-01-01' as date), cast(null as date), 2
             , null, null, 'source'
           ) as fixture_rows
       - input: ref('terminology__race')
@@ -166,19 +166,19 @@ unit_tests:
             , '__dq_no_match__' as ansi_fips_state_name where 1 = 0
     expect:
       rows:
-        - patient_id: decimal_one
+        - patient_id: integer_one
           death_flag_invalid: 0
           death_flag_without_death_date: 0
           death_date_without_death_flag: 0
-        - patient_id: decimal_one_missing_date
+        - patient_id: integer_one_missing_date
           death_flag_invalid: 0
           death_flag_without_death_date: 1
           death_date_without_death_flag: null
-        - patient_id: decimal_zero_with_date
+        - patient_id: integer_zero_with_date
           death_flag_invalid: 0
           death_flag_without_death_date: null
           death_date_without_death_flag: 1
-        - patient_id: invalid_decimal
+        - patient_id: invalid_integer
           death_flag_invalid: 1
           death_flag_without_death_date: null
           death_date_without_death_flag: null

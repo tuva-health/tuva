@@ -505,7 +505,7 @@ models:
       - name: data_source
 
   - name: data_quality__eligibility_span_flags
-    description: One row per eligibility span per data source with native-grain keys and tri-state logical flags, where 1 means fail, 0 means pass, and null means not applicable.
+    description: One row per stable eligibility span identity, keyed by person, member, enrollment start date, payer, plan, and data source, with tri-state logical flags where 1 means fail, 0 means pass, and null means not applicable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -518,7 +518,6 @@ models:
       - name: person_id
       - name: member_id
       - name: enrollment_start_date
-      - name: enrollment_end_date
       - name: payer
       - name: plan
       - name: data_source

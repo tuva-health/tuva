@@ -93,7 +93,6 @@ with line_level_diagnoses as (
         on replace(diag.source_code, '.', '') = icd9.icd_9_cm
     left join {{ ref('terminology__present_on_admission') }} as poa
         on diag.present_on_admit_code = poa.present_on_admit_code
-    where diag.claim_type <> 'undetermined'
 )
 
 select distinct

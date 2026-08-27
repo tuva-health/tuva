@@ -31,8 +31,8 @@ select
     , labs.source_reference_range_high
     , labs.normalized_reference_range_low
     , labs.normalized_reference_range_high
-    , labs.source_abnormal_flag
-    , labs.normalized_abnormal_flag
+    , labs.source_abnormal_code
+    , labs.normalized_abnormal_code
     , labs.specimen
     , labs.ordering_practitioner_id
     {{ select_extension_columns(ref('normalized__lab_result'), alias='labs') }}

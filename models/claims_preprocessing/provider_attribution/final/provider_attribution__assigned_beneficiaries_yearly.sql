@@ -16,7 +16,7 @@ with eligible as (
       year_month_int
     , first_day_of_month
     , last_day_of_month
-  from {{ ref('terminology__calendar') }}
+  from {{ ref('member_month__month_spine') }}
 )
 
 , assigned as (

@@ -14,6 +14,10 @@
 {% set string_type = dbt.type_string() %}
 {% set current_date_sql = dq_current_date_sql() %}
 {% set min_recent_claim_date_sql = dq_date_literal_sql('2000-01-01') %}
+{% set legacy_open_end_date_sql = dq_date_literal_sql('9999-12-31') %}
+{% set tuva_last_run_timestamp_sql =
+    "cast('" ~ var('tuva_last_run') ~ "' as " ~ dbt.type_timestamp() ~ ")"
+%}
 {% set eligibility_match_applicable_where_sql =
     "source_rows.person_id is not null"
     ~ " and source_rows.member_id is not null"
@@ -21,11 +25,14 @@
     ~ " and source_rows." ~ quote_column('plan') ~ " is not null"
     ~ " and source_rows.data_source is not null"
     ~ " and source_rows.paid_date is not null"
+    ~ " and " ~ dq_date_in_range_where_sql('source_rows.paid_date', min_recent_claim_date_sql, current_date_sql)
+    ~ " and " ~ dq_member_month_spine_date_where_sql('source_rows.paid_date')
+    ~ " and source_rows.paid_date <= cast(" ~ tuva_last_run_timestamp_sql ~ " as date)"
 %}
 {% set no_matching_eligibility_where_sql %}
 not exists (
     select 1
-    from {{ ref('input_layer__eligibility') }} as eligibility_rows
+    from eligibility_rows_with_effective_end_date as eligibility_rows
     where eligibility_rows.person_id = source_rows.person_id
       and eligibility_rows.member_id = source_rows.member_id
       and eligibility_rows.payer = source_rows.payer
@@ -34,17 +41,34 @@ not exists (
       and (
           {{ date_part('year', 'source_rows.paid_date') }} * 100
           + {{ date_part('month', 'source_rows.paid_date') }}
-      ) between (
+      ) >= (
           {{ date_part('year', 'eligibility_rows.enrollment_start_date') }} * 100
           + {{ date_part('month', 'eligibility_rows.enrollment_start_date') }}
-      ) and (
-          {{ date_part('year', 'eligibility_rows.enrollment_end_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows.enrollment_end_date') }}
+      )
+      and (
+          {{ date_part('year', 'source_rows.paid_date') }} * 100
+          + {{ date_part('month', 'source_rows.paid_date') }}
+      ) <= (
+          {{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} * 100
+          + {{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }}
       )
 )
 {% endset %}
 
-with source_rows as (
+with eligibility_rows_with_effective_end_date as (
+    select
+          eligibility_rows.*
+        , case
+            when eligibility_rows.enrollment_end_date is null
+              or eligibility_rows.enrollment_end_date = {{ legacy_open_end_date_sql }}
+              or eligibility_rows.enrollment_end_date > cast({{ tuva_last_run_timestamp_sql }} as date)
+                then cast({{ tuva_last_run_timestamp_sql }} as date)
+            else eligibility_rows.enrollment_end_date
+          end as _dq_effective_enrollment_end_date
+    from {{ ref('input_layer__eligibility') }} as eligibility_rows
+),
+
+source_rows as (
     select *
     from {{ ref('input_layer__pharmacy_claim') }}
 ),
@@ -59,6 +83,7 @@ final as (
             "source_rows.claim_line_number is not null"
           ) }} as claim_line_number_not_positive
         , {{ dq_logical_int_flag_sql("source_rows.person_id is null", "1 = 1") }} as person_id_null
+        , {{ dq_logical_binary_value_flag_sql("source_rows.in_network_flag") }} as in_network_flag_invalid
         , {{ dq_logical_int_flag_sql("source_rows.dispensing_date is null", "1 = 1") }} as dispensing_date_null
         , {{ dq_logical_int_flag_sql("source_rows.paid_date is null", "1 = 1") }} as paid_date_null
         , {{ dq_logical_int_flag_sql(
@@ -69,8 +94,13 @@ final as (
             "source_rows.paid_date < " ~ min_recent_claim_date_sql ~ " or source_rows.paid_date > " ~ current_date_sql,
             "source_rows.paid_date is not null"
           ) }} as paid_date_out_of_reasonable_range
+        , {{ dq_logical_date_range_flag_sql(
+            "source_rows.file_date",
+            min_recent_claim_date_sql,
+            current_date_sql
+          ) }} as file_date_outside_supported_date_range
         , {{ dq_logical_ingest_datetime_range_flag_sql(
-              "source_rows.ingest_datetime"
+            "source_rows.ingest_datetime"
           ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql("source_rows.prescribing_provider_npi is null", "1 = 1") }} as prescribing_provider_npi_null
         , {{ dq_logical_int_flag_sql(

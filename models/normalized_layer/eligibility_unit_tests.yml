@@ -1,0 +1,184 @@
+version: 2
+
+unit_tests:
+  - name: test_eligibility_casting_normalizes_open_span_alias
+    description: The legacy 9999-12-31 open-span alias is canonicalized to a null enrollment_end_date.
+    model: int_eligibility_casting
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+        tuva_last_run: '2024-02-15 00:00:00'
+    given:
+      - input: ref('input_layer__eligibility')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'person' as person_id
+            , 'member' as member_id
+            , 'subscriber' as subscriber_id
+            , 'self' as subscriber_relation
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast('9999-12-31' as date) as enrollment_end_date
+            , 'payer' as payer
+            , 'commercial' as payer_type
+            , 'plan' as {{ plan_identifier }}
+            , 'First' as first_name
+            , 'Middle' as middle_name
+            , 'Last' as last_name
+            , 'Jr' as name_suffix
+            , '000-00-0000' as social_security_number
+            , '1 Main St' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , '555-555-5555' as phone
+            , 'person@example.com' as email
+            , 'not_hispanic' as ethnicity
+            , 'male' as sex
+            , 'White' as race
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , '0' as original_reason_entitlement_code
+            , '00' as dual_status_code
+            , '00' as medicare_status_code
+            , 'active' as enrollment_status
+            , 0 as hospice_flag
+            , 0 as institutional_snp_flag
+            , 0 as medicaid_indicator
+            , 0 as long_term_institutional_flag
+            , 'D' as part_d_raf_type
+            , 0 as low_income_subsidy_indicator
+            , 'gold' as metal_level
+            , 0 as csr_indicator
+            , 1 as enrollment_duration_months
+            , 0 as esrd_status
+            , 0 as transplant_duration_months
+            , 'group' as group_id
+            , 'Group' as group_name
+            , 'eligibility.csv' as file_name
+            , cast('2024-02-01' as date) as file_date
+            , cast('2024-02-02 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+            , 'source' as data_source
+    expect:
+      rows:
+        - person_id: person
+          enrollment_start_date: '2024-01-01'
+          enrollment_end_date: null
+          file_date: '2024-02-01'
+
+  - name: test_eligibility_dates_preserve_typed_dates_without_calendar_membership
+    description: Already-typed birth, death, and enrollment dates pass through normalization without requiring membership in terminology__calendar; Logical Data Quality reports values outside the supported range separately.
+    model: int_eligibility_dates_normalized
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    given:
+      - input: ref('int_eligibility_casting')
+        format: sql
+        rows: |
+          select
+              'finite' as person_id
+            , 'finite_key' as person_id_key
+            , cast('1800-01-01' as date) as birth_date
+            , cast('2200-12-31' as date) as death_date
+            , cast('2200-01-01' as date) as enrollment_start_date
+            , cast('2200-12-31' as date) as enrollment_end_date
+          union all
+          select
+              'open' as person_id
+            , 'open_key' as person_id_key
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast(null as date) as enrollment_end_date
+    expect:
+      rows:
+        - person_id: finite
+          person_id_key: finite_key
+          normalized_birth_date: '1800-01-01'
+          normalized_death_date: '2200-12-31'
+          normalized_enrollment_start_date: '2200-01-01'
+          normalized_enrollment_end_date: '2200-12-31'
+        - person_id: open
+          person_id_key: open_key
+          normalized_birth_date: '1980-01-01'
+          normalized_death_date: null
+          normalized_enrollment_start_date: '2024-01-01'
+          normalized_enrollment_end_date: null
+
+  - name: test_eligibility_patient_dedup_prioritizes_open_span
+    description: Patient demographics come from an open span even when another span has a far-future finite end date.
+    model: normalized__eligibility_remove_duplicates
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        _extension_columns_override: []
+    given:
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'open_id' as eligibility_id
+            , 'person' as person_id
+            , 'Open' as first_name
+            , 'Middle' as middle_name
+            , 'Member' as last_name
+            , 'Jr' as name_suffix
+            , 'male' as sex
+            , 'White' as race
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , '000-00-0000' as social_security_number
+            , '1 Main St' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , '555-555-5555' as phone
+            , 'person@example.com' as email
+            , 'not_hispanic' as ethnicity
+            , cast('2024-01-01' as date) as enrollment_start_date
+            , cast(null as date) as enrollment_end_date
+            , 'source' as data_source
+            , 'eligibility.csv' as file_name
+            , cast('2024-02-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+          union all
+          select
+              'closed_id' as eligibility_id
+            , 'person' as person_id
+            , 'Closed' as first_name
+            , 'Middle' as middle_name
+            , 'Member' as last_name
+            , 'Jr' as name_suffix
+            , 'male' as sex
+            , 'White' as race
+            , cast('1980-01-01' as date) as birth_date
+            , cast(null as date) as death_date
+            , 0 as death_flag
+            , '000-00-0000' as social_security_number
+            , '1 Main St' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , '555-555-5555' as phone
+            , 'person@example.com' as email
+            , 'not_hispanic' as ethnicity
+            , cast('2023-01-01' as date) as enrollment_start_date
+            , cast('2099-12-31' as date) as enrollment_end_date
+            , 'source' as data_source
+            , 'eligibility.csv' as file_name
+            , cast('2024-02-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-02-15 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+    expect:
+      rows:
+        - person_id: person
+          first_name: Open
+          last_name: Member
+          data_source: source

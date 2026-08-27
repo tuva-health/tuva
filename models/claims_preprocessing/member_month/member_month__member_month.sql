@@ -16,14 +16,24 @@ with stg_eligibility as (
   from {{ ref('normalized__eligibility') }} as elig
 )
 
+, eligibility_with_effective_end_date as (
+  select
+    *
+    , case
+        when enrollment_end_date is null
+          or enrollment_end_date > cast(tuva_last_run as date)
+          then cast(tuva_last_run as date)
+        else enrollment_end_date
+      end as effective_enrollment_end_date
+  from stg_eligibility
+)
+
 , month_start_and_end_dates as (
   select
-    {{ concat_custom(["year",
-                  dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
-    , min(full_date) as month_start_date
-    , max(full_date) as month_end_date
-  from {{ ref('terminology__calendar') }}
-  group by year, month
+      year_month
+    , first_day_of_month as month_start_date
+    , last_day_of_month as month_end_date
+  from {{ ref('member_month__month_spine') }}
 )
 
 , joined as (
@@ -35,10 +45,11 @@ select distinct
   , a.{{ quote_column('plan') }}
   , a.tuva_last_run
   , a.data_source
-from stg_eligibility as a
+from eligibility_with_effective_end_date as a
 inner join month_start_and_end_dates as b
   on a.enrollment_start_date <= b.month_end_date
-  and a.enrollment_end_date >= b.month_start_date
+  and a.effective_enrollment_end_date >= b.month_start_date
+  and a.enrollment_start_date <= a.effective_enrollment_end_date
 )
 
 select

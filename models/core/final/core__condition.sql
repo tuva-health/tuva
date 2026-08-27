@@ -37,6 +37,7 @@ with all_conditions as (
 
 select
     all_conditions.condition_id
+  , all_conditions.source_condition_id
   , all_conditions.person_id
   , all_conditions.member_id
   , all_conditions.patient_id

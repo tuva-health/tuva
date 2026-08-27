@@ -70,39 +70,27 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: type_code
+      - name: type
         description: >-
-          Source appointment type code. This field should preserve the appointment type value from the source system and is used downstream to normalize appointment type.
+          Description of the appointment type as represented in the source EHR. Preserve the source value without mapping it to a Tuva-controlled vocabulary.
         config:
           meta:
             data_type: varchar
-      - name: type_description
+      - name: status
         description: >-
-          Human-readable description of the source appointment type. Populate this when the source provides a display name or description for type_code.
-        config:
-          meta:
-            data_type: varchar
-      - name: status_code
-        description: >-
-          Source appointment status code, such as scheduled, completed, canceled, or no-show. This field is used downstream to normalize appointment status.
-        config:
-          meta:
-            data_type: varchar
-      - name: status_description
-        description: >-
-          Human-readable description of the source appointment status. Populate this when the source provides a display name or description for status_code.
+          Description of the appointment status as represented in the source EHR, such as scheduled, completed, canceled, or no-show. Preserve the source value without mapping it to a Tuva-controlled vocabulary.
         config:
           meta:
             data_type: varchar
       - name: reason
         description: >-
-          Free-text reason for the appointment. This may represent the patient-stated reason, scheduling reason, visit reason, or chief complaint depending on the source system.
+          Description of the appointment reason as represented in the source EHR. This may represent the patient-stated reason, scheduling reason, visit reason, or chief complaint depending on the source system.
         config:
           meta:
             data_type: varchar
       - name: cancellation_reason
         description: >-
-          Source cancellation reason for canceled appointments. Populate this only when the appointment was canceled and the source provides a cancellation reason.
+          Description of the cancellation reason as represented in the source EHR. Populate this only when the appointment was canceled and the source provides a cancellation reason.
         config:
           meta:
             data_type: varchar

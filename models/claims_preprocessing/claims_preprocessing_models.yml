@@ -5,7 +5,7 @@ models:
 #### Claims Enrollment Flags
 ## Final
   - name: claims_enrollment__flag_claims_with_enrollment
-    description: This table contains claims with matching enrollment
+    description: This table contains medical claims with matching member-month enrollment. Eligibility matching stops at the calendar month containing the date portion of tuva_last_run for both open and finite spans, so future member months are not created.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -44,7 +44,7 @@ models:
         description: The name of the column used to populated inferred_claim_start_column_used.
 
   - name: claims_enrollment__flag_rx_claims_with_enrollment
-    description: This table contains pharmacy claims with matching enrollment
+    description: This table contains pharmacy claims with matching member-month enrollment. Eligibility matching stops at the calendar month containing the date portion of tuva_last_run for both open and finite spans, so future member months are not created.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

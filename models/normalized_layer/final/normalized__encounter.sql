@@ -7,7 +7,7 @@
       cast(enc.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , cast(enc.person_id as {{ dbt.type_string() }}) as person_id
     , cast(enc.encounter_type as {{ dbt.type_string() }}) as encounter_type
-    , cast('clinical' as {{ dbt.type_string() }}) as encounter_group
+    , cast(encounter_type_lookup.encounter_group as {{ dbt.type_string() }}) as encounter_group
     , enc.normalized_encounter_start_date as encounter_start_date
     , enc.normalized_encounter_end_date as encounter_end_date
     , cast(
@@ -81,6 +81,9 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from enc
+left outer join {{ ref('terminology__encounter_type') }} as encounter_type_lookup
+    on cast(enc.encounter_type as {{ dbt.type_string() }})
+        = cast(encounter_type_lookup.encounter_type as {{ dbt.type_string() }})
 left outer join {{ ref('terminology__admit_source') }} as admit_source
     on cast(enc.admit_source_code as {{ dbt.type_string() }}) = admit_source.admit_source_code
 left outer join {{ ref('terminology__admit_type') }} as admit_type

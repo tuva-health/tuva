@@ -111,17 +111,21 @@ final as (
               "source_rows.ingest_datetime"
           ) }} as ingest_datetime_out_of_reasonable_range
         , {{ dq_logical_int_flag_sql(
-              "source_rows.code_system is not null and lower(cast(source_rows.code_system as " ~ string_type ~ ")) not in ('icd-9-cm', 'icd-10-cm', 'snomed-ct', 'unknown')",
+              "source_rows.condition_rank < 1",
+              "source_rows.condition_rank is not null"
+          ) }} as condition_rank_not_positive
+        , {{ dq_logical_int_flag_sql(
+              "source_rows.code_system is not null and cast(source_rows.code_system as " ~ string_type ~ ") not in ('icd-9-cm', 'icd-10-cm', 'snomed-ct', 'unknown')",
               "source_rows.code_system is not null"
           ) }} as code_system_invalid
         , {{ dq_logical_int_flag_sql(
               "source_rows.source_code is not null "
-              ~ "and lower(cast(source_rows.code_system as " ~ string_type ~ ")) in ('icd-10-cm', 'icd-9-cm', 'snomed-ct') "
+              ~ "and cast(source_rows.code_system as " ~ string_type ~ ") in ('icd-10-cm', 'icd-9-cm', 'snomed-ct') "
               ~ "and icd_10_cm_lookup.icd_10_cm is null "
               ~ "and icd_9_cm_lookup.icd_9_cm is null "
               ~ "and snomed_ct_lookup.snomed_ct is null",
               "source_rows.source_code is not null "
-              ~ "and lower(cast(source_rows.code_system as " ~ string_type ~ ")) in ('icd-10-cm', 'icd-9-cm', 'snomed-ct')"
+              ~ "and cast(source_rows.code_system as " ~ string_type ~ ") in ('icd-10-cm', 'icd-9-cm', 'snomed-ct')"
           ) }} as source_code_invalid
         , {{ dq_logical_int_flag_sql(
               "source_rows.present_on_admit_code is not null and present_on_admit_lookup.present_on_admit_code is null",
