@@ -2,7 +2,7 @@
 (This can happen a few ways - professional claims assigned to anchor event overlap and assigned to multiple  )
 */
 {{ config(
-     enabled = var('claims_enabled', False) | as_bool
+     enabled = the_tuva_project.tuva_boolean_var('claims_enabled', false)
    )
 }}
 

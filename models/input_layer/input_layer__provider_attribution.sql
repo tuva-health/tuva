@@ -1,18 +1,18 @@
 {{ config(
      enabled = (
-       var('provider_attribution_enabled', False)
-       and var('claims_enabled', False)
-     ) | as_bool
+       the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false)
+       and the_tuva_project.tuva_boolean_var('claims_enabled', false)
+     )
    )
 }}
 
-{% if var('provider_attribution_enabled',False) == true -%}
+{% if the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) == true -%}
 
 select *
 from {{ ref('provider_attribution') }}
 
 
-{% elif var('provider_attribution_enabled',False) ==  false -%}
+{% elif the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) ==  false -%}
 
 {% if target.type == 'fabric' %}
 select top 0

@@ -1,7 +1,7 @@
 {% macro dq_enabled_input_layer_model_domains() %}
     {% set domains = [] %}
 
-    {% if var('clinical_enabled', false) | as_bool %}
+    {% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) %}
         {% do domains.append({
             'name': 'clinical',
             'model_names': [
@@ -20,14 +20,14 @@
         }) %}
     {% endif %}
 
-    {% if var('claims_enabled', false) | as_bool %}
+    {% if the_tuva_project.tuva_boolean_var('claims_enabled', false) %}
         {% set claims_model_names = [
             'input_layer__eligibility',
             'input_layer__medical_claim',
             'input_layer__pharmacy_claim'
         ] %}
 
-        {% if var('provider_attribution_enabled', false) | as_bool %}
+        {% if the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) %}
             {% do claims_model_names.append('input_layer__provider_attribution') %}
         {% endif %}
 

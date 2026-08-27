@@ -1,8 +1,8 @@
 {{ config(
      enabled = (
-       (var('data_quality_enabled', false) | as_bool)
-       and (var('claims_enabled', false) | as_bool)
-       and (var('provider_attribution_enabled', false) | as_bool)
+       (the_tuva_project.tuva_boolean_var('data_quality_enabled', false))
+       and (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+       and (the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false))
      ),
      schema = (
        var('tuva_schema_prefix', None) ~ '_data_quality'

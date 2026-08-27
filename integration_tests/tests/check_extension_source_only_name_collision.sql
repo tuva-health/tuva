@@ -7,7 +7,7 @@
 {% set strip_prefix = passthrough_config.get('strip', false) %}
 
 {{ config(
-     enabled = (var('claims_enabled', false) | as_bool)
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
             and strip_prefix
             and (extension_prefix | lower) in ['x_', 'ext_'],
      tags = ['extension_columns'],
