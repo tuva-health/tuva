@@ -1,7 +1,7 @@
 # Tuva Core
 
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![dbt 1.10.5+](https://img.shields.io/static/v1?logo=dbt&label=dbt&message=1.10.5%2B&color=orange)
+![dbt 1.10.5 through 2.x](https://img.shields.io/static/v1?logo=dbt&label=dbt&message=1.10.5%20to%202.x&color=orange)
 
 Tuva Core is the dbt package that transforms claims, clinical, and other
 healthcare data into a common analytics- and AI-ready data model inside your
@@ -13,9 +13,9 @@ declares the Tuva Core 1.0.0 contract, but a version on `main` is not a formal
 release. Production projects should use an immutable version published in
 [GitHub Releases](https://github.com/tuva-health/tuva-core/releases).
 
-Tuva Core requires dbt Core 1.10.5 or newer and supports Snowflake, Databricks,
-BigQuery, Microsoft Fabric, Redshift, and DuckDB. dbt Core 2.0 and Fusion are
-not claimed as supported until they have been explicitly validated.
+Tuva Core requires dbt 1.10.5 through 2.x and supports Snowflake, Databricks,
+BigQuery, Microsoft Fabric, Redshift, and DuckDB. The 1.0 package ecosystem is
+validated against both dbt Core 2.0 and dbt Fusion on DuckDB.
 
 ## What Tuva Core Includes
 

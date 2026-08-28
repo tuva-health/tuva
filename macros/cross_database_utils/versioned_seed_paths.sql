@@ -109,7 +109,7 @@
 {% endmacro %}
 
 
-{% macro load_package_seed(package_name, package_slug, object_path, compression=true, headers=true, null_marker=true, bucket=none) %}
+{% macro load_package_seed(package_slug, package_version, object_path, compression=true, headers=true, null_marker=true, bucket=none) %}
   {% set normalized_object_path = object_path | string | trim | trim('/') %}
   {% if normalized_object_path == '' %}
     {% do exceptions.raise_compiler_error("Tuva package seed object_path must not be empty.") %}
@@ -122,7 +122,7 @@
   {{ return(the_tuva_project.load_seed(
       the_tuva_project.get_package_seed_uri(
           package_slug,
-          the_tuva_project.get_installed_package_version(package_name),
+          package_version,
           object_folder,
           bucket
       ),
@@ -161,8 +161,8 @@
 
   {% set object_path = the_tuva_project.get_seed_database_folder(database) ~ '/' ~ seed_object_name %}
   {{ return(the_tuva_project.load_package_seed(
-      'the_tuva_project',
       'tuva-core',
+      the_tuva_project.get_tuva_package_version(),
       object_path,
       compression,
       headers,
@@ -224,8 +224,8 @@
   {% endif %}
 
   {{ return(the_tuva_project.load_package_seed(
-      'the_tuva_project',
       'tuva-core',
+      the_tuva_project.get_tuva_package_version(),
       the_tuva_project.get_synthetic_seed_object_path(seed_name),
       compression,
       headers,

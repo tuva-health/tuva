@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify package version contract
+        run: python3 tests/unit/test_data_asset_contract.py
+
       - name: Verify release commit is current main
         run: |
           set -euo pipefail

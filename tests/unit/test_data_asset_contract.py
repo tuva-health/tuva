@@ -112,8 +112,59 @@ class DataAssetContractTest(unittest.TestCase):
 
     def test_package_version_is_the_only_asset_version(self):
         project_text = (ROOT / "dbt_project.yml").read_text()
+        version_macro_path = (
+            ROOT / "macros" / "system_utils" / "get_tuva_package_version.sql"
+        )
+        version_macro = version_macro_path.read_text()
         obsolete_version_var = "tuva_seed_" + "versions"
-        self.assertRegex(project_text, r"(?m)^version: '[1-9][0-9]*\.[0-9]+\.[0-9]+'$")
+        project_version_match = re.search(
+            r"(?m)^version: '([1-9][0-9]*\.[0-9]+\.[0-9]+"
+            r"(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?)'$",
+            project_text,
+        )
+        macro_version_match = re.search(
+            r"return\('([1-9][0-9]*\.[0-9]+\.[0-9]+"
+            r"(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?)'\)",
+            version_macro,
+        )
+        self.assertIsNotNone(project_version_match)
+        self.assertIsNotNone(macro_version_match)
+        self.assertEqual(project_version_match.group(1), macro_version_match.group(1))
+        self.assertIn(
+            'require-dbt-version: ">=1.10.5,<3.0.0"',
+            project_text,
+        )
+        self.assertIn(
+            'version: "1.2.1"',
+            (ROOT / "packages.yml").read_text(),
+        )
+        runtime_config_path = (
+            ROOT / "macros" / "system_utils" / ("get_runtime_" + "config.sql")
+        )
+        self.assertFalse(runtime_config_path.exists())
+        macro_text = "\n".join(
+            path.read_text() for path in sorted((ROOT / "macros").rglob("*.sql"))
+        )
+        for forbidden_runtime_access in (
+            "builtins." + "ref.config",
+            "config." + "dependencies",
+            "get_installed_" + "package_version",
+        ):
+            self.assertNotIn(forbidden_runtime_access, macro_text)
+
+        release_workflow = (
+            ROOT / ".github" / "workflows" / "create-release.yml"
+        ).read_text()
+        contract_command = "run: python3 tests/unit/test_data_asset_contract.py"
+        self.assertEqual(release_workflow.count(contract_command), 1)
+        self.assertLess(
+            release_workflow.index("uses: actions/checkout@"),
+            release_workflow.index(contract_command),
+        )
+        self.assertLess(
+            release_workflow.index(contract_command),
+            release_workflow.index("- name: Verify release commit is current main"),
+        )
 
         searchable_files = [
             ROOT / "dbt_project.yml",
@@ -137,9 +188,10 @@ class DataAssetContractTest(unittest.TestCase):
             ROOT / "macros" / "cross_database_utils" / "load_seed.sql"
         ).read_text()
 
-        self.assertIn("macro get_installed_package_version(package_name)", version_macro)
+        self.assertIn("macro get_tuva_package_version()", version_macro)
+        self.assertNotIn("get_installed_" + "package_version", version_macro)
         self.assertIn(
-            "macro load_package_seed(package_name, package_slug, object_path",
+            "macro load_package_seed(package_slug, package_version, object_path",
             path_macro,
         )
         self.assertIn(
@@ -156,7 +208,10 @@ class DataAssetContractTest(unittest.TestCase):
         )
         self.assertIn("version overrides were removed in 1.0", path_macro)
         self.assertIn("macro get_seed_bucket(database, package_slug=none)", path_macro)
-        self.assertIn("'the_tuva_project',\n      'tuva-core'", path_macro)
+        self.assertIn(
+            "'tuva-core',\n      the_tuva_project.get_tuva_package_version()",
+            path_macro,
+        )
         self.assertIn("var('custom_bucket_name', 'tuva-public-resources')", path_macro)
         self.assertIn("var('tuva_seed_buckets', {})", path_macro)
 

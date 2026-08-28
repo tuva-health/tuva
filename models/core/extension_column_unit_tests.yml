@@ -23,7 +23,7 @@ unit_tests:
         passthrough:
           prefix: 'x_'
           strip: false
-        _extension_columns_override: ['X_CONNECTOR_FIELD']
+        _extension_columns_override: ['X_TUVA_TEST_EXTENSION']
     given:
       - input: ref('normalized__appointment')
         format: sql
@@ -43,16 +43,14 @@ unit_tests:
             , 'Completed' as status
             , 'Follow-up' as reason
             , 'Not cancelled' as cancellation_reason
-            , 'default-prefix-value' as X_CONNECTOR_FIELD
-            , 'custom-prefix-value' as custom__connector_field
-            , 'stripped-value' as branded_connector_field
+            , 'default-prefix-value' as X_TUVA_TEST_EXTENSION
             , cast('2024-01-01 10:00:00' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-02 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'clinical_source' as data_source
     expect:
       rows:
         - appointment_id: appointment_1
-          X_CONNECTOR_FIELD: default-prefix-value
+          X_TUVA_TEST_EXTENSION: default-prefix-value
 
   - name: test_core_appointment_extension_custom_prefix_without_stripping
     description: >
@@ -65,9 +63,9 @@ unit_tests:
       vars:
         clinical_enabled: true
         passthrough:
-          prefix: 'custom__'
+          prefix: 'x_tuva_'
           strip: false
-        _extension_columns_override: ['custom__connector_field']
+        _extension_columns_override: ['x_tuva_test_extension']
     given:
       - input: ref('normalized__appointment')
         format: sql
@@ -87,16 +85,14 @@ unit_tests:
             , 'Completed' as status
             , 'Follow-up' as reason
             , 'Not cancelled' as cancellation_reason
-            , 'default-prefix-value' as X_CONNECTOR_FIELD
-            , 'custom-prefix-value' as custom__connector_field
-            , 'stripped-value' as branded_connector_field
+            , 'custom-prefix-value' as x_tuva_test_extension
             , cast('2024-01-01 10:00:00' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-02 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'clinical_source' as data_source
     expect:
       rows:
         - appointment_id: appointment_1
-          custom__connector_field: custom-prefix-value
+          x_tuva_test_extension: custom-prefix-value
 
   - name: test_core_appointment_extension_custom_prefix_with_stripping
     description: >
@@ -109,9 +105,9 @@ unit_tests:
       vars:
         clinical_enabled: true
         passthrough:
-          prefix: 'BRANDED_'
+          prefix: 'X_TUVA_'
           strip: true
-        _extension_columns_override: ['branded_connector_field']
+        _extension_columns_override: ['x_tuva_test_extension']
     given:
       - input: ref('normalized__appointment')
         format: sql
@@ -131,13 +127,11 @@ unit_tests:
             , 'Completed' as status
             , 'Follow-up' as reason
             , 'Not cancelled' as cancellation_reason
-            , 'default-prefix-value' as X_CONNECTOR_FIELD
-            , 'custom-prefix-value' as custom__connector_field
-            , 'stripped-value' as branded_connector_field
+            , 'stripped-value' as x_tuva_test_extension
             , cast('2024-01-01 10:00:00' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-01-02 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'clinical_source' as data_source
     expect:
       rows:
         - appointment_id: appointment_1
-          connector_field: stripped-value
+          test_extension: stripped-value

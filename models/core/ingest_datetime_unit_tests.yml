@@ -71,6 +71,8 @@ unit_tests:
             , '555-0101' as phone
             , 'excluded@example.com' as email
             , 'N' as ethnicity
+            , 'clinical_claims_precedence' as x_temp_record_origin
+            , 'patient' as x_tuva_test_extension
             , cast('2024-02-03 04:05:06' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source' as data_source
@@ -80,7 +82,7 @@ unit_tests:
             , cast('1990-01-01' as date), cast(null as date), 0, '222-22-2222'
             , '3 Clinical Way', 'Denver', 'CO', '80202', 'Denver'
             , cast(39.7 as decimal(18, 4)), cast(-104.9 as decimal(18, 4))
-            , '555-0102', 'clinical@example.com', 'N'
+            , '555-0102', 'clinical@example.com', 'N', 'clinical_only', 'patient'
             , cast('2024-03-04 05:06:07' as {{ timestamp_type }})
             , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source'
     expect:

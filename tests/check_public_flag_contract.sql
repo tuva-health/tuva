@@ -79,7 +79,12 @@
 
         {% for flag_name in contract_relation['flags'] %}
             {% set documented_column = model_node.columns.get(flag_name) if model_node is not none else none %}
-            {% set declared_type = documented_column.meta.get('data_type') if documented_column is not none else none %}
+            {% set column_meta = documented_column.config.meta
+                if documented_column is not none
+                and documented_column.config is not none
+                and documented_column.config.meta is not none
+                else {} %}
+            {% set declared_type = column_meta.get('data_type') %}
 
             {% if declared_type != 'integer' %}
                 {% set metadata_query %}

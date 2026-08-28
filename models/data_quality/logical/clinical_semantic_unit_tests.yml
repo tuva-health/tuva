@@ -1430,27 +1430,33 @@ unit_tests:
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_cm, null as short_description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as icd_10_cm, cast(null as {{ string_type }}) as short_description where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_cm, null as short_description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as icd_9_cm, cast(null as {{ string_type }}) as short_description where 1 = 0
       - input: ref('terminology__icd_10_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_pcs, null as description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as icd_10_pcs, cast(null as {{ string_type }}) as description where 1 = 0
       - input: ref('terminology__icd_9_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_pcs, null as short_description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as icd_9_pcs, cast(null as {{ string_type }}) as short_description where 1 = 0
       - input: ref('terminology__hcpcs_level_2')
         format: sql
         rows: |
-          select '__dq_no_match__' as hcpcs, null as short_description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as hcpcs, cast(null as {{ string_type }}) as short_description where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct, null as description where 1 = 0
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select '__dq_no_match__' as snomed_ct, cast(null as {{ string_type }}) as description where 1 = 0
       - input: ref('terminology__loinc')
         format: sql
         rows: |
@@ -1489,6 +1495,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'ndc_case' as medication_id
@@ -1506,8 +1513,8 @@ unit_tests:
             , 'NDC' as source_code_type
             , '12345-6789-01' as source_code
             , 'Raw NDC description' as source_description
-            , null as ndc_code
-            , null as ndc_description
+            , cast(null as {{ string_type }}) as ndc_code
+            , cast(null as {{ string_type }}) as ndc_description
             , null as rxnorm_code
             , null as atc_code
             , null as route
