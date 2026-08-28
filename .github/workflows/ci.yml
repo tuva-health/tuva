@@ -133,6 +133,29 @@ env:
     {"MAX_GROUPING_DEPTH": 100, "MAX_GROUPING_TOKENS": 100000}
 
 jobs:
+  portability_lint:
+    name: Portability lint
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Test the portability linter
+        run: python3 scripts/test_portability_lint.py
+
+      - name: Lint models for non-portable SQL
+        run: python3 scripts/portability_lint.py
+
   resolve:
     name: Resolve request
     runs-on: ubuntu-latest

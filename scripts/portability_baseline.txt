@@ -1,0 +1,40 @@
+# Known non-portable SQL, written by scripts/portability_lint.py
+# --update-baseline. Format: <relpath>:<rule>:<count>. A file and
+# rule pair at or under its count passes; anything above fails.
+# This file only shrinks -- never raise a count to land a change.
+models/claims_preprocessing/member_month/member_month__member_month.sql:dbt_utils:1
+models/claims_preprocessing/member_month/member_month_models.yml:dbt_utils:1
+models/claims_preprocessing/provider_attribution/final/provider_attribution__provider_ranking.sql:trim:1
+models/claims_preprocessing/provider_attribution/final/provider_attribution__tuva_member_month_attribution.sql:left:1
+models/claims_preprocessing/provider_attribution/final/provider_attribution__tuva_member_month_attribution.sql:substr:1
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__int_person_years.sql:left:2
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__int_person_years.sql:substr:2
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__int_primary_care_claims.sql:trim:1
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__provider_classification.sql:right:2
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__provider_classification.sql:substr:2
+models/claims_preprocessing/provider_attribution/intermediate/provider_attribution__provider_classification.sql:trim:7
+models/claims_preprocessing/provider_attribution/provider_attribution_models.yml:dbt_utils:5
+models/claims_preprocessing/service_category/intermediate/service_category__combined_institutional_header_level.sql:dbt_utils:1
+models/claims_preprocessing/service_category/intermediate/service_category__combined_institutional_line_level.sql:dbt_utils:1
+models/claims_preprocessing/service_category/intermediate/service_category__combined_professional.sql:dbt_utils:1
+models/claims_preprocessing/service_category/service_category_models.yml:dbt_utils:1
+models/core/core_models.yml:dbt_utils:17
+models/core/intermediate/int_cost_service_category_1_allowed_pivot.sql:dbt_utils:1
+models/core/intermediate/int_cost_service_category_1_paid_pivot.sql:dbt_utils:1
+models/core/intermediate/int_cost_service_category_2_allowed_pivot.sql:dbt_utils:1
+models/core/intermediate/int_cost_service_category_2_paid_pivot.sql:dbt_utils:1
+models/core/staging/core__stg_claims_encounter.sql:dbt_utils:1
+models/data_quality/data_quality_models.yml:dbt_utils:16
+models/data_quality/rollups/data_quality_rollup_models.yml:dbt_utils:7
+models/normalized_layer/intermediate/int_eligibility_state_normalized.sql:trim:6
+models/normalized_layer/intermediate/normalized_input__int_place_of_service_normalize.sql:right:1
+models/normalized_layer/intermediate/normalized_input__int_revenue_center_normalize.sql:right:1
+models/normalized_layer/normalized_layer_models.yml:dbt_utils:4
+models/parity/parity__metrics.sql:trim:6
+seeds/value_sets/cms_provider_attribution/cms_provider_attribution_seeds.yml:dbt_utils:1
+seeds/value_sets/condition_grouper/condition_grouper_seeds.yml:dbt_utils:2
+seeds/value_sets/procedure_grouper/procedure_grouper_seeds.yml:dbt_utils:2
+tests/claims_preprocessing/provider_attribution/test_tuva_attribution_member_month_traceability.sql:left:1
+tests/claims_preprocessing/provider_attribution/test_tuva_attribution_member_month_traceability.sql:substr:1
+tests/claims_preprocessing/provider_attribution/test_tuva_attribution_member_month_year_consistency.sql:left:2
+tests/claims_preprocessing/provider_attribution/test_tuva_attribution_member_month_year_consistency.sql:substr:2
