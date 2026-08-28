@@ -1,0 +1,63 @@
+# Rules for scripts/portability_lint.py.
+#
+# `forbidden` names SQL functions that must never appear as raw SQL in a model,
+# because at least one warehouse Tuva supports spells them differently or does
+# not have them at all. The value is the suggestion printed with the violation.
+#
+# `forbidden_keywords` is the same idea for bare words rather than calls.
+#
+# `forbidden_syntax` names non-portable operators. The patterns themselves live
+# in the linter, keyed by these names, so the rules file stays readable.
+#
+# `forbidden_references` names macro namespaces that must not be called. These
+# are matched inside Jinja and in schema files, which is where a namespaced
+# macro or generic test actually appears.
+#
+# `wrap_required` names functions whose one true spelling is asserted by a macro
+# in macros/cross_database_utils/. They are allowed inside that directory and
+# nowhere else, so every call site goes through the wrapper.
+
+forbidden:            # fn: suggestion
+  iff: "use case when ... end"
+  decode: "use case when ... end"
+  nvl: "use coalesce()"
+  isnull: "use coalesce()"
+  ifnull: "use coalesce()"
+  charindex: "use {{ dbt.position() }}"
+  position: "use {{ dbt.position() }}"
+  getdate: "use {{ dbt.current_timestamp() }}"
+  datediff: "use {{ dbt.datediff() }}"
+  dateadd: "use {{ dbt.dateadd() }}"
+  date_trunc: "use {{ dbt.date_trunc() }}"
+  extract: "use the_tuva_project.date_part(datepart, date)"
+  to_char: "use a cast through {{ dbt.type_string() }}"
+  to_date: "use the_tuva_project.try_to_cast_date()"
+  try_cast: "use the_tuva_project.try_to_cast_*"
+  safe_cast: "use the_tuva_project.try_to_cast_*"
+  listagg: "use the_tuva_project.string_agg()"
+  string_agg: "use the_tuva_project.string_agg()"
+  group_concat: "use the_tuva_project.string_agg()"
+  array_agg: "no portable equivalent on Fabric; restructure the query"
+  substr: "use the_tuva_project.substring()"
+  len: "use the_tuva_project.length()"
+  regexp_replace: "use the_tuva_project.apply_regex()"
+  regexp_substr: "use the_tuva_project.apply_regex()"
+  regexp_like: "use the_tuva_project.apply_regex()"
+  regexp_count: "use the_tuva_project.apply_regex()"
+  regexp_extract: "use the_tuva_project.apply_regex()"
+
+forbidden_keywords:   # bare word: suggestion
+  qualify: "not in Redshift, Postgres or Fabric; use a row_number() subquery"
+  ilike: "not in BigQuery or Fabric; use lower() with like"
+  current_date: "not in Fabric; cast {{ dbt.current_timestamp() }} to date"
+  current_timestamp: "use {{ dbt.current_timestamp() }}"
+
+forbidden_syntax:     # named pattern: suggestion
+  double_colon_cast: "not in BigQuery or Fabric; use cast(x as <type>)"
+  pipe_concat: "not in Fabric; use the_tuva_project.concat_custom()"
+
+forbidden_references: # namespace: suggestion
+  dbt_utils: "use the vendored the_tuva_project equivalent"
+
+wrap_required:        # allowed only inside macros/cross_database_utils/
+  [trim, left, right, greatest, least, round]
