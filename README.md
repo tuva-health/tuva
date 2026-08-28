@@ -1,117 +1,159 @@
 # Tuva Core
 
-[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.10%2B&color=orange)
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![dbt 1.10.5+](https://img.shields.io/static/v1?logo=dbt&label=dbt&message=1.10.5%2B&color=orange)
 
-Tuva Core is the dbt package that aggregates and transforms payer claims, EHR, and other healthcare data into a common analytics- and AI-ready data model inside your cloud data warehouse.
+Tuva Core is the dbt package that transforms claims, clinical, and other
+healthcare data into a common analytics- and AI-ready data model inside your
+cloud data warehouse.
 
-The package includes:
+The repository is `tuva-health/tuva-core`, while the dbt project name remains
+`the_tuva_project` for package compatibility. The `main` branch currently
+declares the Tuva Core 1.0.0 contract, but a version on `main` is not a formal
+release. Production projects should use an immutable version published in
+[GitHub Releases](https://github.com/tuva-health/tuva-core/releases).
 
-- Input Layer contracts for payer and provider source data
-- Normalized Layer models
-- Claims Preprocessing models
-- Core Data Model tables
-- Neutral data quality result tables
-- Tuva Data Assets, including terminology, value sets, provider data, and synthetic data
+Tuva Core requires dbt Core 1.10.5 or newer and supports Snowflake, Databricks,
+BigQuery, Microsoft Fabric, Redshift, and DuckDB. dbt Core 2.0 and Fusion are
+not claimed as supported until they have been explicitly validated.
 
-## Documentation
+## What Tuva Core Includes
 
-- [Getting Started](https://www.thetuvaproject.com/getting-started)
-- [dbt Variables](https://www.thetuvaproject.com/dbt-variables)
-- [Full Documentation](https://www.thetuvaproject.com/)
+| Area | Responsibility |
+| --- | --- |
+| Input Layer | Contracts that connector and parent projects map source data into |
+| Normalized Layer | Portable type casting, reshaping, standardization, and terminology normalization |
+| Claims Preprocessing | Service categories, encounters, member months, claims enrollment, and provider attribution |
+| Core Data Model | Common claims, clinical, cost, utilization, and medication outputs |
+| Data Quality | Opt-in Structural and Logical Input Data Quality plus Output Data Quality rollups |
+| Metadata and parity | Package metadata and an opt-in metric producer for release comparison |
+| Data Assets | Version-aligned terminology, value sets, provider data, and synthetic data |
 
-The docs site and DAG Viewer live in separate sibling repositories. During local development they read dbt, YAML, and SQL metadata from this Tuva Core checkout through `TUVA_CORE_PATH`.
+## Tuva 1.0 Package Ecosystem
 
-Example local validation:
+Tuva 1.0 keeps the common transformation path in Core and distributes optional
+marts and extensions as independently installable dbt packages. Installing a
+standalone package enables that package; there is no umbrella package-enable
+variable.
 
-```bash
-cd ../docs
-TUVA_CORE_PATH=../tuva-core npm run build
+| Package | Scope |
+| --- | --- |
+| [AHRQ Quality Indicators](https://github.com/tuva-health/ahrq_quality_indicators) | AHRQ quality indicators and PQIs |
+| [CCSR](https://github.com/tuva-health/ccsr) | Diagnosis and procedure CCSR groupers |
+| [CMS Chronic Conditions](https://github.com/tuva-health/cms_chronic_conditions) | CMS-defined chronic conditions |
+| [CMS HCC](https://github.com/tuva-health/cms_hcc) | CMS HCC scoring, recapture, and suspecting |
+| [FHIR Preprocessing](https://github.com/tuva-health/fhir_preprocessing) | FHIR preprocessing extension |
+| [NYU ED Classification](https://github.com/tuva-health/nyu_ed_classification) | Emergency-department classification |
+| [Quality Measures](https://github.com/tuva-health/quality_measures) | Quality measures and retained readmissions scope |
+| [Semantic Layer](https://github.com/tuva-health/semantic-layer) | Dimensions and facts over Core and selected packages |
 
-cd ../dag-viewer
-TUVA_CORE_PATH=../tuva-core npm run build:local
-```
+Each package owns its models, tests, data assets, documentation,
+compatibility, and release lifecycle.
 
-## Local Development
+## Install Tuva Core
 
-Recommended local setup:
-
-- Python 3.10 or later
-- DuckDB
-- `dbt-core` and `dbt-duckdb`
-
-Use `integration_tests` as the local development project. It maps Tuva synthetic data into the Input Layer, imports the local package, and exercises the Tuva Core path.
-
-Create or update `~/.dbt/profiles.yml` with a local DuckDB profile. For DuckDB seed stability, use one thread:
-
-```yaml
-default:
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: /tmp/tuva_core.duckdb
-      threads: 1
-```
-
-Run dbt from the repo root with the helper script:
-
-```bash
-./scripts/dbt-local deps
-./scripts/dbt-local build --full-refresh
-```
-
-`dbt seed` and `dbt build` load Tuva Data Assets from the immutable public
-object-storage snapshot that matches the installed Tuva Core version. For
-example, Tuva Core `1.0.0` loads from `tuva-core/1.0.0/`. `dbt run` assumes
-those relations already exist, so on a fresh database run `seed` or `build`
-first.
-
-Once the data assets are loaded, iterate with:
-
-```bash
-./scripts/dbt-local run
-```
-
-## dbt Variables
-
-Set Tuva vars under the `vars:` key in your dbt project's `dbt_project.yml`.
-
-Tuva Core derives its data-asset version from the installed package version,
-so projects do not maintain separate terminology, value-set, provider-data, or
-synthetic-data version pins. The most complete commented example for
-development lives in `integration_tests/dbt_project.yml`; the public docs
-reference is maintained at
-[thetuvaproject.com/dbt-variables](https://www.thetuvaproject.com/dbt-variables).
-
-Common variable groups:
-
-- Domain enablement: `claims_enabled`, `clinical_enabled`, `provider_attribution_enabled`
-- Data quality: `data_quality_enabled`
-- Data assets: `custom_bucket_name`, `tuva_seed_buckets`
-- Synthetic data validation: `use_synthetic_data`, `synthetic_data_size`
-- Runtime metadata and schemas: `tuva_last_run`, `tuva_schema_prefix`
-- Extension columns: `passthrough`
-
-Tuva Core's boolean feature variables (`claims_enabled`, `clinical_enabled`,
-`provider_attribution_enabled`, `parity_enabled`, `data_quality_enabled`,
-`enable_data_quality_failure_keys`, and `use_coderx_enterprise`) must be
-unquoted YAML booleans. For example:
+Add a published version to the parent project's `packages.yml`:
 
 ```yaml
+packages:
+  - package: tuva-health/the_tuva_project
+    version: "<published-version>"
+```
+
+For development against an explicitly reviewed Git ref:
+
+```yaml
+packages:
+  - git: "https://github.com/tuva-health/tuva-core.git"
+    revision: "<immutable-tag-or-commit>"
+```
+
+Install dependencies with `dbt deps`. The parent project must expose the Tuva
+Input Layer models and enable the domains it maps:
+
+```yaml
+flags:
+  require_ref_searches_node_package_before_root: true
+
 vars:
   claims_enabled: true
   clinical_enabled: false
+  provider_attribution_enabled: false
+  data_quality_enabled: false
+  use_coderx_enterprise: false
 ```
 
-Quoted values such as `"true"` and `"false"` are strings and are rejected. Direct
-`env_var()` expressions are also strings and cannot be assigned to these vars.
-Environment-driven workflows must generate typed YAML or JSON, such as a
-`--vars` mapping containing native booleans, before invoking dbt.
+Feature variables must be native, unquoted YAML booleans. Quoted values and
+direct `env_var()` expressions are strings and are rejected. Environment-driven
+workflows should generate typed YAML or JSON before invoking dbt.
 
-## Data Asset Releases
+CodeRx Open is the default medication terminology. Setting
+`use_coderx_enterprise: true` switches every CodeRx consumer to user-managed
+`packages`, `drugs`, and `classes` relations in the target database's `coderx`
+schema.
 
-Every Tuva Core release with external data assets has one complete immutable
-snapshot at:
+Build the package with dbt's test-aware command:
+
+```bash
+dbt build --select package:the_tuva_project
+```
+
+See [Getting Started](https://www.thetuvaproject.com/getting-started) and the
+[dbt Variables reference](https://www.thetuvaproject.com/dbt-variables) for
+connector, Input Layer, warehouse, and configuration details.
+
+## Important 1.0 Contracts
+
+- Public fields ending in `_flag` are nullable binary integers: `1` means true,
+  `0` means false, and null means unknown or not applicable. Categorical values
+  use `_code` or `_status` instead.
+- Core `location` and `practitioner` are source-native. Their public keys are
+  `(location_id, data_source)` and `(practitioner_id, data_source)`.
+- Extension columns flow only between the 14 same-named Input Layer and Core
+  tables: appointment, condition, eligibility, encounter, immunization,
+  lab_result, location, medical_claim, medication, observation, patient,
+  pharmacy_claim, practitioner, and procedure. They do not flow into derived
+  outputs such as cost, member month, person ID crosswalk, or utilization.
+- Open eligibility spans keep a null end date rather than being capped at the
+  current run date.
+
+The complete breaking-change catalog and upgrade guidance live in the
+[Tuva documentation](https://www.thetuvaproject.com/).
+
+## Local Development and Testing
+
+Use `integration_tests` as the local parent dbt project. It imports this
+checkout, maps versioned synthetic data into the Input Layer, and exercises
+Tuva Core without installing the standalone packages.
+
+Configure a supported adapter in `~/.dbt/profiles.yml`, then run from the
+repository root:
+
+```bash
+scripts/dbt-local deps
+scripts/dbt-local build --full-refresh \
+  --select package:integration_tests package:the_tuva_project
+```
+
+For local DuckDB development, use one thread while loading data assets. See
+[integration_tests/README.md](integration_tests/README.md) for the full local
+profile example, variables, and CI contract.
+
+Tuva Core uses dbt-native tests:
+
+- YAML unit tests live next to the models they protect.
+- Generic data tests live in model YAML, and singular data tests live under
+  `tests/`.
+- Opt-in parity models under `models/parity` produce cross-version release
+  metrics.
+
+Use `dbt build` for normal validation because `dbt run` does not execute unit
+or data tests.
+
+## Data Assets
+
+Every asset-bearing 1.0 package resolves one complete snapshot from its
+installed package version. Core assets use this layout:
 
 ```text
 tuva-core/<package-version>/
@@ -123,66 +165,44 @@ tuva-core/<package-version>/
 └── value-sets/
 ```
 
-Physical object names exactly match their dbt seed resource names and end in
-`.csv.gz`. `data_assets.yml` is the package-owned inventory used by the release
-publisher. Each storage location receives `_release.json` only after all of its
-payload objects verify. The receipt binds that snapshot to the exact
-40-character lowercase git SHA in `package_commit`; dbt loaders do not read the
-receipt. The release workflow will not create the package tag unless
-`package_commit` equals the current `main` commit and byte-identical receipts
-are publicly available from S3, GCS, and Azure. If the automatic version-bump
-run reaches the gate before assets are published, maintainers can recover with
-the main-only manual dispatch after publication.
+Checked-in seed CSVs are header-only loader contracts. `data_assets.yml`
+declares the exact Core payload inventory; users do not configure independent
+terminology, value-set, provider-data, or synthetic-data versions.
 
-Published CSVs use one cross-warehouse null contract: all empty values and
-unquoted `\N`/`\\N` markers become bare empty fields (loaded as null), while
-quoted marker strings remain literal text. The publisher rejects the reserved
-loader sentinel `__TUVA_RESERVED_NULL_MARKER_1_0__` and the NUL control
-character. NUL is reserved so Athena can disable OpenCSV's backslash escape and
-preserve quoted marker strings.
-
-Standalone packages can use the shared loader while deriving the installed
-version from dbt rather than duplicating it in configuration:
-
-```jinja
-{{ the_tuva_project.load_package_seed(
-    'cms_hcc',
-    'cms-hcc',
-    'cms_hcc__sample.csv.gz'
-) }}
-```
-
-The first argument is the dbt package name, the second is its stable storage
-slug, and the third is the object path within that package-version snapshot.
-`custom_bucket_name` overrides the default public bucket. The
-`tuva_seed_buckets` mapping can override an individual Core family or package
-slug while preserving the package/version/object path contract.
-
-Tuva Core 1.0 removes independent family-version configuration and the
-`get_seed_version` macro. The deprecated positional version arguments on
-`get_versioned_seed_uri`, `load_versioned_seed`, and
-`load_versioned_synthetic_seed` now raise a compiler error instead of selecting
-a release that can drift from the installed package.
+Future-version payloads can be prepared before a version change reaches
+`main`, but that payload-only prefix is a release candidate and must not contain
+`_release.json`. After merge, the publisher writes the receipt only when the
+complete snapshot verifies. The receipt binds the snapshot to the exact package
+commit and must match across S3, GCS, and Azure before the package tag can be
+created. dbt loaders do not read the receipt at runtime.
 
 Redshift loading uses `IAM_ROLE default`; configure the cluster or serverless
 namespace with a default IAM role that can read the selected data-asset bucket.
-RDS PostgreSQL loading likewise requires its database IAM role to read that S3
-bucket. Released gzip objects carry `Content-Encoding: gzip` so the RDS
-`aws_s3` extension can decompress them.
+Released gzip objects carry `Content-Encoding: gzip` for compatible
+object-store loading.
 
-## Maintainer Scripts
+Release, publication, synthetic-data generation, and repository-maintenance
+tooling lives in the separate `tuva-maintenance` repository. The Core-specific
+`scripts/dbt-local` helper remains here because it runs this checkout through
+the local integration project.
 
-General local development should use `scripts/dbt-local`. The package-owned
-asset inventory is declared in `data_assets.yml`. Release, data-asset
-publishing, synthetic-data generation, and repository-maintenance helper
-scripts live in the sibling `tuva-maintenance` checkout. The generated
-`_release.json` receipt is written to object storage by the publisher and is
-not read by dbt at runtime.
+## Related Repositories
 
-## Agentic Workflow
+- [Documentation](https://www.thetuvaproject.com/)
+- [DAG Viewer](https://github.com/tuva-health/dag-viewer)
+- Tuva Maintenance (`tuva-health/tuva-maintenance`)
 
-If you are using coding agents in this repo, the local workflow guidance lives in [AGENTS.md](AGENTS.md).
+During local development, the docs site and DAG Viewer read this checkout
+through `TUVA_CORE_PATH`.
+
+## Contributing
+
+- Report reproducible Core issues in
+  [GitHub Issues](https://github.com/tuva-health/tuva-core/issues).
+- Keep changes portable across every supported warehouse.
+- Use the integration project and `dbt build` before opening a pull request.
+- Coding agents must read [AGENTS.md](AGENTS.md) before changing the repository.
 
 ## License
 
-Tuva Core is released under the [Apache 2.0 License](license/license-2.0.txt).
+Tuva Core is released under the [Apache 2.0 License](LICENSE).

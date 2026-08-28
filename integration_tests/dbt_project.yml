@@ -14,7 +14,8 @@ vars:
   parity_enabled: false                # Keeps optional parity metric models out of normal development and CI builds.
 
   ## Data quality
-  # Enables neutral data_quality structural/logical/analytical result models.
+  # Enables neutral Structural and Logical Input Data Quality models plus
+  # Output Data Quality rollups.
   # Production projects can leave this false/omitted unless they want to build these queryable result tables.
   data_quality_enabled: false           # Keeps optional data-quality result models out of this compatibility run.
   enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
@@ -109,11 +110,8 @@ vars:
 
 
 model-paths: ["models"]
-analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
 macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
 clean-targets:
   - "target"
   - "dbt_packages"

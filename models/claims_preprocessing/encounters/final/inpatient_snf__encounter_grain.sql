@@ -12,7 +12,7 @@ with detail_values as (
       , cli.encounter_type
     , cli.encounter_group
     from {{ ref('encounters__stg_medical_claim') }} as stg
-    inner join {{ ref('encounters__combined_claim_line_crosswalk') }} as cli on stg.claim_id = cli.claim_id  --replace this ref with the deduped version when complete
+    inner join {{ ref('encounters__combined_claim_line_crosswalk') }} as cli on stg.claim_id = cli.claim_id
     and
     stg.claim_line_number = cli.claim_line_number
     and
