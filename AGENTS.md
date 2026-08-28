@@ -8,9 +8,9 @@ validation, CI, and release rules.
 
 - The repository is `tuva-health/tuva-core`.
 - The dbt project name remains `the_tuva_project` for package compatibility.
-- `dbt_project.yml` declares version `1.0.0` and requires dbt Core 1.10.5 or
-  newer. Do not claim dbt Core 2.0 or Fusion support until those runtimes have
-  been explicitly validated.
+- `dbt_project.yml` declares version `1.0.0` and requires dbt 1.10.5 through
+  2.x. The complete 1.0 package ecosystem is validated against dbt Core 2.0
+  and dbt Fusion on DuckDB.
 - Repository `main` is the active integration line. A version on `main` is not
   a formal release by itself. A release also requires an immutable `v<version>`
   tag, a GitHub release, and any required package data-asset receipt.
@@ -277,7 +277,10 @@ Standard commands from the repository root:
 ```bash
 scripts/dbt-local deps
 scripts/dbt-local debug
+# dbt Core v1
 scripts/dbt-local parse --no-partial-parse
+# dbt Core v2 or dbt Fusion
+scripts/dbt-local parse
 TUVA_DBT_PROFILE=snowflake-dev scripts/dbt-local build \
   --select <selector> \
   --exclude resource_type:seed
@@ -298,7 +301,8 @@ package data assets load from public object storage.
 
 - Core model, macro, test, or YAML changes:
   - Run `scripts/dbt-local deps` when dependencies may have changed.
-  - Run `scripts/dbt-local parse --no-partial-parse`.
+  - Run `scripts/dbt-local parse --no-partial-parse` with dbt Core v1, or
+    `scripts/dbt-local parse` with dbt Core v2 or dbt Fusion.
   - Run the narrowest useful Snowflake `dbt build`, excluding unchanged seeds.
   - Run the broader full-refresh build before a PR when feasible.
 - Core asset manifest, seed header, or loader changes:

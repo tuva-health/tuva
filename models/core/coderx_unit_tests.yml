@@ -217,6 +217,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'claim_medication' as medication_id
@@ -236,8 +237,8 @@ unit_tests:
             , 'Stale CodeRx Open source description' as source_description
             , '99999999999' as ndc_code
             , 'Stale CodeRx Open normalized description' as ndc_description
-            , null as rxnorm_code
-            , null as atc_code
+            , cast(null as {{ string_type }}) as rxnorm_code
+            , cast(null as {{ string_type }}) as atc_code
             , null as route
             , null as strength
             , 30 as quantity
@@ -250,9 +251,10 @@ unit_tests:
       - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               '11111111111' as ndc11
-            , null as ndc
+            , cast(null as {{ string_type }}) as ndc
             , '100' as drug_id
             , 'CodeRx Enterprise drug' as drug_name
       - input: ref('core__stg_coderx_drugs')
@@ -262,16 +264,17 @@ unit_tests:
       - input: ref('core__stg_coderx_classes')
         format: sql
         rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               'no_match' as drug_id
-            , null as atc_1_code
-            , null as atc_1_name
-            , null as atc_2_code
-            , null as atc_2_name
-            , null as atc_3_code
-            , null as atc_3_name
-            , null as atc_4_code
-            , null as atc_4_name
+            , cast(null as {{ string_type }}) as atc_1_code
+            , cast(null as {{ string_type }}) as atc_1_name
+            , cast(null as {{ string_type }}) as atc_2_code
+            , cast(null as {{ string_type }}) as atc_2_name
+            , cast(null as {{ string_type }}) as atc_3_code
+            , cast(null as {{ string_type }}) as atc_3_name
+            , cast(null as {{ string_type }}) as atc_4_code
+            , cast(null as {{ string_type }}) as atc_4_name
           where 1 = 0
     expect:
       rows:
@@ -302,6 +305,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'enterprise_claim_medication' as medication_id
@@ -321,8 +325,8 @@ unit_tests:
             , 'CodeRx Enterprise package drug' as source_description
             , '99988877766' as ndc_code
             , 'CodeRx Enterprise package drug' as ndc_description
-            , null as rxnorm_code
-            , null as atc_code
+            , cast(null as {{ string_type }}) as rxnorm_code
+            , cast(null as {{ string_type }}) as atc_code
             , null as route
             , null as strength
             , 30 as quantity

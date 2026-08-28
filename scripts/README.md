@@ -10,7 +10,10 @@ Use `scripts/dbt-local` from the Tuva Core repo root to run dbt against the
 
 ```bash
 scripts/dbt-local deps
+# dbt Core v1
 scripts/dbt-local parse --no-partial-parse
+# dbt Core v2 or dbt Fusion
+scripts/dbt-local parse
 scripts/dbt-local build --full-refresh
 ```
 
