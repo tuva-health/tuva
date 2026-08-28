@@ -5,7 +5,9 @@
 }}
 
 with all_providers_in_claims_dataset as (
-select distinct facility_npi as npi
+select distinct
+    facility_npi as npi
+    , data_source
 from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -14,7 +16,9 @@ union
 union distinct
 {% endif %}
 
-select distinct rendering_npi as npi
+select distinct
+    rendering_npi as npi
+    , data_source
 from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -23,7 +27,9 @@ union
 union distinct
 {% endif %}
 
-select distinct billing_npi as npi
+select distinct
+    billing_npi as npi
+    , data_source
 from {{ ref('core__medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -32,7 +38,9 @@ union
 union distinct
 {% endif %}
 
-select distinct prescribing_provider_id as npi
+select distinct
+    prescribing_provider_id as npi
+    , data_source
 from {{ ref('core__pharmacy_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -41,16 +49,20 @@ union
 union distinct
 {% endif %}
 
-select distinct dispensing_provider_id as npi
+select distinct
+    dispensing_provider_id as npi
+    , data_source
 from {{ ref('core__pharmacy_claim') }}
 )
 
 
 , provider as (
-select aa.*
+select
+    aa.*
+    , bb.data_source
 from {{ ref('provider_data__provider') }} as aa
 inner join all_providers_in_claims_dataset as bb
-on aa.npi = bb.npi
+    on aa.npi = bb.npi
 where lower(aa.entity_type_description) = 'organization'
 )
 
@@ -70,5 +82,5 @@ select
     , cast(null as {{ dbt.type_numeric() }}) as longitude
     , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-    , cast(null as {{ dbt.type_string() }}) as data_source
+    , cast(data_source as {{ dbt.type_string() }}) as data_source
 from provider

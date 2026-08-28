@@ -31,7 +31,7 @@
 {%- endset -%}
 
 with loc as (
-    {{ smart_union([ref('core__stg_claims_location'), ref('normalized__location')], source_index=none) }}
+    {{ smart_union([ref('core__stg_claims_location'), ref('normalized__location')], source_index='_record_source') }}
 )
 
 select
@@ -39,6 +39,14 @@ select
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
 from loc
+where loc._record_source = 2
+   or not exists (
+        select 1
+        from loc as clinical_location
+        where clinical_location._record_source = 2
+          and clinical_location.location_id = loc.location_id
+          and clinical_location.data_source = loc.data_source
+   )
 
 {% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true -%}
 
