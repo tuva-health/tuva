@@ -1,8 +1,6 @@
 {{ config(
-     enabled = the_tuva_project.tuva_boolean_var(
-       'claims_enabled',
-       the_tuva_project.tuva_boolean_var('clinical_enabled', false)
-     )
+     enabled = (the_tuva_project.tuva_boolean_var('claims_enabled', false))
+            or (the_tuva_project.tuva_boolean_var('clinical_enabled', false))
    )
 }}
 

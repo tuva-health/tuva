@@ -884,6 +884,18 @@ jobs:
         run: |
           read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/snowflake
+          if [[ "$CI_SCOPE" == "core" ]]; then
+            # Regression for #1392: explicit claims=false must not mask clinical=true.
+            dbt --quiet ls \
+              --project-dir ./integration_tests \
+              --profiles-dir ./integration_tests/profiles/snowflake \
+              --no-partial-parse \
+              --resource-type model \
+              --select core__person_id_crosswalk \
+              --output name \
+              --vars '{"claims_enabled": false, "clinical_enabled": true, "provider_attribution_enabled": false, "data_quality_enabled": false, "parity_enabled": false, "use_coderx_enterprise": false}' \
+              | grep -Fxq core__person_id_crosswalk
+          fi
           dbt build --full-refresh \
             --project-dir ./integration_tests \
             --profiles-dir ./integration_tests/profiles/snowflake \
