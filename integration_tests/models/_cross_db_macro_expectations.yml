@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: cross_db_macro_expectations
+    description: >
+      One row holding the rendered result of every macro in the Tuva Core
+      cross-database function layer applied to literal inputs. Each column is
+      asserted against the value the macro is documented to return, so a build
+      on any adapter fails loudly when that adapter's spelling drifts.
+    config:
+      tags: [cross_database_utils]
+    tests:
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_trim_strips_surrounding_whitespace
+          arguments:
+            expression: "trim_result = 'padded'"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_left_takes_leading_characters
+          arguments:
+            expression: "left_result = 'abc'"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_greatest_returns_larger_value
+          arguments:
+            expression: "greatest_result = 7"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_greatest_ignores_null_argument
+          arguments:
+            expression: "greatest_null_result = 3"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_safe_divide_returns_quotient
+          arguments:
+            expression: "safe_divide_result = 2.5"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_safe_divide_by_zero_is_null
+          arguments:
+            expression: "safe_divide_by_zero_result is null"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_round_honors_precision
+          arguments:
+            expression: "round_result = 3.14"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_round_defaults_to_whole_numbers
+          arguments:
+            expression: "round_default_precision_result = 4"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_bool_and_agg_is_false_when_any_row_is_false
+          arguments:
+            expression: "bool_and_agg_result = 0"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_bool_or_agg_is_true_when_any_row_is_true
+          arguments:
+            expression: "bool_or_agg_result = 1"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_string_agg_joins_in_order
+          arguments:
+            expression: "string_agg_result = 'a,b,c'"
+    columns:
+      - name: trim_result
+        description: "the_tuva_project.trim('  padded  ')"
+      - name: left_result
+        description: "the_tuva_project.left('abcdef', 3)"
+      - name: greatest_result
+        description: "the_tuva_project.greatest(7, 3)"
+      - name: greatest_null_result
+        description: "the_tuva_project.greatest(null, 3)"
+      - name: safe_divide_result
+        description: "the_tuva_project.safe_divide(10, 4)"
+      - name: safe_divide_by_zero_result
+        description: "the_tuva_project.safe_divide(10, 0)"
+      - name: round_result
+        description: "the_tuva_project.round(3.14159, 2)"
+      - name: round_default_precision_result
+        description: "the_tuva_project.round(3.6)"
+      - name: bool_and_agg_result
+        description: "the_tuva_project.bool_and_agg over (true, false, true), cast to int"
+      - name: bool_or_agg_result
+        description: "the_tuva_project.bool_or_agg over (true, false, true), cast to int"
+      - name: string_agg_result
+        description: "the_tuva_project.string_agg over ('a', 'b', 'c') ordered by ordinal"
