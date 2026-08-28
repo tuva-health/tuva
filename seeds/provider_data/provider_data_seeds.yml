@@ -14,9 +14,9 @@ seeds:
         data_asset:
           maintainer: "CMS NPPES and NUCC"
           source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
+          source_release: "CMS NPPES 2026-07-13; NUCC Healthcare Provider Taxonomy Code Set v26.0 (effective 2026-07-01)"
+          source_last_updated: "2026-07-13"
+          tuva_last_updated: "2026-07-16"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__other_provider_taxonomy.csv.gz') }}"
       schema: |
@@ -56,9 +56,9 @@ seeds:
         data_asset:
           maintainer: "CMS NPPES"
           source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
+          source_release: "CMS NPPES 2026-07-13"
+          source_last_updated: "2026-07-13"
+          tuva_last_updated: "2026-07-16"
           update_frequency: "monthly"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__provider.csv.gz') }}"
       schema: |
@@ -180,9 +180,9 @@ seeds:
           display_name: "Medicare Provider and Supplier Taxonomy Crosswalk"
           maintainer: "CMS"
           source_url: "https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk"
-          source_release: "CMS Data Medicare Provider and Supplier Taxonomy Crosswalk"
+          source_release: "CMS Data Medicare Provider and Supplier Taxonomy Crosswalk, November 2025"
           source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
+          tuva_last_updated: "2026-07-16"
           update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__medicare_provider_and_supplier_taxonomy_crosswalk.csv.gz') }}"
       schema: |
@@ -315,9 +315,9 @@ seeds:
           display_name: "Provider Taxonomy Unpivot"
           maintainer: "CMS NPPES"
           source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
+          source_release: "CMS NPPES 2026-07-13"
+          source_last_updated: "2026-07-13"
+          tuva_last_updated: "2026-07-16"
           update_frequency: "ad hoc"
         columns:
           - name: npi
