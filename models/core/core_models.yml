@@ -1575,9 +1575,15 @@ models:
     description: |-
       The location table contains information about physical locations where clinical care is delivered, documented, or managed. A location may represent a facility, clinic, department, practice site, laboratory, imaging center, or other service location.
 
-      When clinical data is enabled, this table pulls location records from input_layer__location. When claims data is enabled, Tuva derives organization locations from provider data for organization NPIs that appear on medical or pharmacy claims. Clinical extension columns are pulled through when clinical data is enabled.
+      When clinical data is enabled, this table pulls location records from input_layer__location. When claims data is enabled, Tuva derives one organization location per NPI and claims data source from provider data for organization NPIs that appear on medical or pharmacy claims. When both paths produce the same location_id and data_source, the clinical record takes precedence. Clinical extension columns are pulled through when clinical data is enabled.
 
-      Primary key: location_id.
+      Primary key: location_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - location_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1591,7 +1597,7 @@ models:
           source system location identifier. For claims-derived organization
           locations, this is the organization NPI.
         tests:
-          - unique
+          - not_null
         config:
           meta:
             data_type: varchar
@@ -1668,12 +1674,15 @@ models:
           meta:
             data_type: timestamp
       - name: data_source
-        description: User-defined name that identifies the clinical source system for
-          the location data, when populated. Claims-derived organization
-          locations may have a null data_source.
+        description: User-defined name that identifies the clinical or claims source
+          system from which the location was derived. Claims-derived organization
+          locations retain the data source of the medical or pharmacy claim.
+        tests:
+          - not_null
         config:
           meta:
             data_type: varchar
+            is_primary_key: true
   - name: core__medical_claim
     description: |-
       The medical claim table stores final adjudicated medical claim lines for healthcare services or supplies billed by a provider and adjudicated by a payer. A single claim may have multiple claim lines, so claim_id identifies the claim and claim_line_number identifies the specific line within that claim.
@@ -3243,9 +3252,15 @@ models:
     description: |-
       The practitioner table stores provider records from clinical and claims sources, including source-system practitioner identifiers, NPIs when available, provider names, practice affiliation, specialty, and sub-specialty.
 
-      When clinical data is enabled, this table pulls practitioner records from input_layer__practitioner. When claims data is enabled, Tuva derives practitioner records from provider identifiers that appear on medical and pharmacy claims. Clinical practitioner records should use practitioner_id to preserve the source-system provider identifier; claims-derived records generally use provider identifiers from claims and provider terminology.
+      When clinical data is enabled, this table pulls practitioner records from input_layer__practitioner. When claims data is enabled, Tuva derives one practitioner record per provider identifier and claims data source from medical and pharmacy claims. Clinical practitioner records should use practitioner_id to preserve the source-system provider identifier; claims-derived records generally use provider identifiers from claims and provider terminology. When both paths produce the same practitioner_id and data_source, the clinical record takes precedence.
 
-      Primary key: practitioner_id.
+      Primary key: practitioner_id, data_source.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - practitioner_id
+              - data_source
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -3260,7 +3275,7 @@ models:
           clinical tables. For claims-derived rows, this is generally derived
           from the provider identifier on the claim.
         tests:
-          - unique
+          - not_null
         config:
           meta:
             data_type: varchar
@@ -3323,9 +3338,12 @@ models:
         description: User-defined name that identifies the source of the practitioner
           data, for example a claims payer data source or a clinical system such
           as Epic, Athena Health, or Cerner.
+        tests:
+          - not_null
         config:
           meta:
             data_type: varchar
+            is_primary_key: true
   - name: core__procedure
     description: |-
       The procedure table stores procedures performed for patients from claims and clinical sources.

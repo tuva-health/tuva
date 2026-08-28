@@ -1,0 +1,288 @@
+version: 2
+
+unit_tests:
+  - name: test_claims_location_preserves_source_grain
+    description: >-
+      Verifies that one organization NPI used in two claim sources produces one
+      claims-derived location per source while repeated roles in one source
+      collapse to a single row.
+    model: core__stg_claims_location
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-04-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+              '1111111111' as facility_npi
+            , cast(null as {{ string_type }}) as rendering_npi
+            , '1111111111' as billing_npi
+            , 'source_a' as data_source
+          union all
+          select '1111111111', null, '1111111111', 'source_b'
+      - input: ref('core__pharmacy_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+              cast(null as {{ string_type }}) as prescribing_provider_id
+            , '1111111111' as dispensing_provider_id
+            , 'source_a' as data_source
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select
+              '1111111111' as npi
+            , 'Organization' as entity_type_description
+            , 'Source Health' as provider_organization_name
+            , 'Parent Health' as parent_organization_name
+            , '1 Main Street' as practice_address_line_1
+            , 'Denver' as practice_city
+            , 'CO' as practice_state
+            , '80202' as practice_zip_code
+    expect:
+      rows:
+        - location_id: '1111111111'
+          data_source: source_a
+        - location_id: '1111111111'
+          data_source: source_b
+
+  - name: test_claims_practitioner_preserves_source_grain
+    description: >-
+      Verifies that one individual NPI used in two claim sources produces one
+      claims-derived practitioner per source while repeated roles in one source
+      collapse to a single row.
+    model: core__stg_claims_practitioner
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-04-01 00:00:00'
+    given:
+      - input: ref('core__medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+              cast(null as {{ string_type }}) as facility_npi
+            , '2222222222' as rendering_npi
+            , '2222222222' as billing_npi
+            , 'source_a' as data_source
+          union all
+          select null, '2222222222', '2222222222', 'source_b'
+      - input: ref('core__pharmacy_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+              '2222222222' as prescribing_provider_id
+            , cast(null as {{ string_type }}) as dispensing_provider_id
+            , 'source_a' as data_source
+      - input: ref('provider_data__provider')
+        format: sql
+        rows: |
+          select
+              '2222222222' as npi
+            , 'Individual' as entity_type_description
+            , 'Pat' as provider_first_name
+            , 'Practitioner' as provider_last_name
+            , 'Source Medical Group' as parent_organization_name
+            , 'Family Medicine' as primary_specialty_description
+    expect:
+      rows:
+        - practitioner_id: '2222222222'
+          data_source: source_a
+        - practitioner_id: '2222222222'
+          data_source: source_b
+
+  - name: test_core_location_prefers_clinical_on_source_key_overlap
+    description: >-
+      Verifies that hybrid execution preserves source-native claims and clinical
+      rows while selecting the clinical record when both paths produce the same
+      location_id and data_source.
+    model: core__location
+    config:
+      enabled: "{{ (var('claims_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+        _extension_columns_override: []
+        _smart_union_columns_override:
+          - location_id
+          - npi
+          - name
+          - facility_type
+          - parent_organization
+          - address
+          - city
+          - state
+          - zip_code
+          - latitude
+          - longitude
+          - ingest_datetime
+          - tuva_last_run
+          - data_source
+    given:
+      - input: ref('core__stg_claims_location')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'shared_location' as location_id
+            , '1111111111' as npi
+            , 'Claims location' as name
+            , cast(null as {{ string_type }}) as facility_type
+            , 'Claims parent' as parent_organization
+            , '1 Claims Way' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , cast(null as decimal(18, 4)) as latitude
+            , cast(null as decimal(18, 4)) as longitude
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source_a' as data_source
+          union all
+          select
+              'shared_location', '3333333333', 'Claims source B', null, null, null
+            , null, null, null, null, null, null
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_b'
+          union all
+          select
+              'claims_only', '5555555555', 'Claims only', null, null, null
+            , null, null, null, null, null, null
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_a'
+      - input: ref('normalized__location')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'shared_location' as location_id
+            , '1111111111' as npi
+            , 'Clinical location' as name
+            , 'Clinic' as facility_type
+            , 'Clinical parent' as parent_organization
+            , '1 Clinical Way' as address
+            , 'Denver' as city
+            , 'CO' as state
+            , '80202' as zip_code
+            , cast(39.7 as decimal(18, 4)) as latitude
+            , cast(-104.9 as decimal(18, 4)) as longitude
+            , cast('2024-03-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source_a' as data_source
+          union all
+          select
+              'clinical_only', null, 'Clinical only', 'Clinic', null, null
+            , null, null, null, null, null
+            , cast('2024-03-01 00:00:00' as {{ timestamp_type }})
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_c'
+    expect:
+      rows:
+        - location_id: shared_location
+          name: Clinical location
+          data_source: source_a
+        - location_id: shared_location
+          name: Claims source B
+          data_source: source_b
+        - location_id: claims_only
+          name: Claims only
+          data_source: source_a
+        - location_id: clinical_only
+          name: Clinical only
+          data_source: source_c
+
+  - name: test_core_practitioner_prefers_clinical_on_source_key_overlap
+    description: >-
+      Verifies that hybrid execution preserves source-native claims and clinical
+      rows while selecting the clinical record when both paths produce the same
+      practitioner_id and data_source.
+    model: core__practitioner
+    config:
+      enabled: "{{ (var('claims_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+        _extension_columns_override: []
+        _smart_union_columns_override:
+          - practitioner_id
+          - npi
+          - first_name
+          - last_name
+          - practice_affiliation
+          - specialty
+          - sub_specialty
+          - ingest_datetime
+          - tuva_last_run
+          - data_source
+    given:
+      - input: ref('core__stg_claims_practitioner')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'shared_practitioner' as practitioner_id
+            , '2222222222' as npi
+            , 'Claims' as first_name
+            , 'Practitioner' as last_name
+            , 'Claims group' as practice_affiliation
+            , 'Claims specialty' as specialty
+            , cast(null as {{ string_type }}) as sub_specialty
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source_a' as data_source
+          union all
+          select
+              'shared_practitioner', '4444444444', 'ClaimsSourceB', 'Practitioner'
+            , null, null, null, null
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_b'
+          union all
+          select
+              'claims_only', '5555555555', 'ClaimsOnly', 'Practitioner'
+            , null, null, null, null
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_a'
+      - input: ref('normalized__practitioner')
+        format: sql
+        rows: |
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+              'shared_practitioner' as practitioner_id
+            , '2222222222' as npi
+            , 'Clinical' as first_name
+            , 'Practitioner' as last_name
+            , 'Clinical group' as practice_affiliation
+            , 'Clinical specialty' as specialty
+            , 'Clinical sub-specialty' as sub_specialty
+            , cast('2024-03-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+            , 'source_a' as data_source
+          union all
+          select
+              'clinical_only', null, 'ClinicalOnly', 'Practitioner'
+            , null, null, null
+            , cast('2024-03-01 00:00:00' as {{ timestamp_type }})
+            , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source_c'
+    expect:
+      rows:
+        - practitioner_id: shared_practitioner
+          first_name: Clinical
+          data_source: source_a
+        - practitioner_id: shared_practitioner
+          first_name: ClaimsSourceB
+          data_source: source_b
+        - practitioner_id: claims_only
+          first_name: ClaimsOnly
+          data_source: source_a
+        - practitioner_id: clinical_only
+          first_name: ClinicalOnly
+          data_source: source_c
