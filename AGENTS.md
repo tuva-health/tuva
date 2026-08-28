@@ -1,96 +1,337 @@
 # Tuva Core Agent Operating Manual
 
-This file is the canonical agent context for the Tuva Core dbt package. Agents
-must read and follow it before making Tuva Core changes, including work performed
-from git worktrees.
+Read and follow this file before changing Tuva Core, including from a linked
+worktree. It is the repository-local source of truth for ownership, safety,
+validation, CI, and release rules.
 
-## Project Context
+## Tuva Core 1.0 Contract
 
-- Tuva Core is the dbt package that transforms payer claims, clinical, and other
-  healthcare data into the Tuva common data model.
-- The dbt project name remains `the_tuva_project` for dbt package compatibility,
-  even though the repository is `tuva-core`.
-- Docs live in the separate sibling `docs` repository. During local development,
-  docs read this checkout through `TUVA_CORE_PATH`.
-- The DAG Viewer lives in the separate sibling `dag-viewer` repository. During
-  local development, it reads this checkout through `TUVA_CORE_PATH`.
-- Advanced data marts live in separate dbt package repositories that depend on
-  Tuva Core. Tuva Core should not own those mart models, seeds, tests, or docs.
+- The repository is `tuva-health/tuva-core`.
+- The dbt project name remains `the_tuva_project` for package compatibility.
+- `dbt_project.yml` declares version `1.0.0` and requires dbt Core 1.10.5 or
+  newer. Do not claim dbt Core 2.0 or Fusion support until those runtimes have
+  been explicitly validated.
+- Repository `main` is the active integration line. A version on `main` is not
+  a formal release by itself. A release also requires an immutable `v<version>`
+  tag, a GitHub release, and any required package data-asset receipt.
+- Treat published model schemas, grains, identifiers, variables, selectors,
+  and stable Data Quality interfaces as public contracts. Assume a change is
+  breaking unless compatibility is demonstrated.
+- Use `v0.18.0` only as the frozen pre-1.0 parity baseline. Never use a mutable
+  branch as a release comparison baseline.
 
-## Architecture Context
+## Repository Boundaries
 
-- Input Layer (`models/input_layer`):
-  - Defines the contract users map source data into before running Tuva Core.
-  - Input Layer models are refs supplied by the parent project.
-- Normalized Layer (`models/normalized_layer`):
-  - Casts and standardizes Input Layer records.
-  - Applies terminology normalization and creates normalized outputs used by
-    Claims Preprocessing and Core.
-- Claims Preprocessing (`models/claims_preprocessing`):
-  - Builds reusable claims-derived intermediate products such as member month,
-    claims enrollment flags, service categories, encounters, and attribution.
-- Core Data Model (`models/core`):
-  - Produces the public Tuva Core tables expected to remain relatively stable.
-  - Treat schema, grain, and semantic changes as breaking unless clearly proven
-    otherwise.
-- Data Quality (`models/data_quality`):
-  - Produces neutral Input Data Quality results (Structural and Logical) and
-    Output Data Quality rollups.
-  - Do not use `DQI` branding in this package; that belongs to Tuva Enterprise.
-- Data Assets (`seeds/`):
-  - Package seed CSVs are primarily definitions or headers.
-  - Published terminology, value sets, provider data, and synthetic data are
-    loaded from the immutable public object-storage snapshot matching the Tuva
-    Core package version.
-  - `data_assets.yml` declares the exact package-owned object inventory. The
-    publisher-generated `_release.json` is a completion receipt bound to the
-    exact package git commit in `package_commit` and is not read by dbt at
-    runtime. Future-version payload folders may be created before the matching
-    version change reaches `main`, but they are candidates rather than completed
-    snapshots and must not contain `_release.json`. Package tags must not be
-    created until the post-merge receipt is available from S3, GCS, and Azure
-    and names the current `main` commit.
-  - Data asset changes must preserve cross-warehouse loading behavior.
+Tuva Core owns the common transformation path:
 
-## Mandatory Local Rules
+- Input Layer contracts in `models/input_layer`.
+- Standardization and terminology normalization in `models/normalized_layer`.
+- Service categories, encounters, member months, claims enrollment, and
+  provider attribution in `models/claims_preprocessing`.
+- Public common-model outputs in `models/core`.
+- Opt-in Input Data Quality and Output Data Quality models in
+  `models/data_quality`.
+- Package metadata in `models/metadata`.
+- The opt-in parity metric producer in `models/parity`.
+- Core-owned seed headers, loader macros, and the exact asset inventory in
+  `seeds`, `macros`, and `data_assets.yml`.
 
-- For routine Tuva Core model, test, or YAML validation, use the `snowflake-dev`
-  profile against the existing `dev_aaron` database. Reuse its loaded seed and
-  data-asset relations when seed definitions, versions, schemas, and loading
-  logic are unchanged.
-- Do not run `dbt seed` or select seed nodes during that routine validation.
-  Reload seeds only when seed or data-asset inputs/loading behavior changed, or
-  when the user explicitly requests a seed refresh.
-- Use local DuckDB when specifically validating DuckDB portability or when the
-  task does not require the large published seed assets.
-- Run dbt from `integration_tests` using local profiles from `~/.dbt` or
-  `DBT_PROFILES_DIR`.
-- Prefer `scripts/dbt-local` for local dbt commands.
-- Keep `integration_tests/dbt_project.yml` on `profile: default` before pushing.
-- Treat `integration_tests/profiles/*` as CI-only configuration, not local
-  runbooks.
-- Treat `.github/workflows/*` as CI pipeline definitions, not local runbooks.
-- Never merge to `main` without Aaron's explicit approval.
+Tuva Core does not own optional marts or extensions. The accepted 1.0
+standalone packages are:
 
-## Seed And Data Safety
+- `ahrq_quality_indicators`
+- `ccsr`
+- `cms_chronic_conditions`
+- `cms_hcc`
+- `fhir_preprocessing`
+- `nyu_ed_classification`
+- `quality_measures`
+- `semantic_layer` in repository `semantic-layer`
 
+Installing a standalone package is its package-level enablement. Each package
+owns its models, tests, data assets, documentation, compatibility, and release
+lifecycle. Do not move optional-package code back into Core.
+
+Related repositories have distinct ownership:
+
+- `docs` owns the public documentation site, data dictionaries, and migration
+  guidance. During local development it reads this checkout through
+  `TUVA_CORE_PATH`.
+- `dag-viewer` owns the lineage application and also reads the selected Core
+  checkout through `TUVA_CORE_PATH`.
+- `tuva-maintenance` owns data-asset source recipes, deterministic staging,
+  publication, mirroring, verification, synthetic-data generation, and other
+  maintainer-only utilities.
+- Each connector owns its source-to-Input-Layer mappings.
+
+Core still owns `data_assets.yml`, checked-in seed headers, runtime loader
+macros, and changes to those package contracts. Route publisher, recipe,
+mirror, and maintenance-tool changes to `tuva-maintenance`; do not route every
+data-asset change there.
+
+## Architecture And Public-Contract Rules
+
+- Input Layer models are refs supplied by the parent connector project. The
+  package-owned wrappers carry the Tuva contract metadata.
+- The Normalized Layer is the standardization boundary before Claims
+  Preprocessing and Core. Do not duplicate normalization downstream without a
+  demonstrated need.
+- Claims are source-scoped. Preserve `data_source` in claim-line identities,
+  joins, partitions, grouping, attribution, and deduplication.
+- Retain populated medical-claim diagnoses independently of claim
+  classification. Put classification-dependent filters at the grouping
+  algorithm that requires them, not in the canonical diagnosis relation.
+- Claims-derived encounter IDs and public condition IDs use the established
+  deterministic, collision-safe 32-character lowercase hash contracts. Do not
+  reintroduce dataset-relative, delimiter-ambiguous, or literal-null-ambiguous
+  identifiers.
+- Clinical encounter groups come from the canonical encounter-type
+  terminology. Do not restore a separate hard-coded `clinical` group.
+- Open eligibility spans use a nullable `enrollment_end_date`; do not cap them
+  at `tuva_last_run`.
+- Appointment `type`, `status`, `reason`, and `cancellation_reason` remain
+  source-native descriptive fields. Do not recreate unsupported normalized
+  appointment vocabularies.
+- Core `location` has public grain `(location_id, data_source)`, and Core
+  `practitioner` has public grain `(practitioner_id, data_source)`. Claims rows
+  retain their source. Clinical rows win only when the exact composite key
+  matches; never collapse provider identifiers globally across sources.
+
+Public Input Layer, Normalized Layer, Claims Preprocessing, Core, and
+standalone-package fields ending in `_flag` are nullable binary integers:
+
+- `1` means true or present.
+- `0` means false or absent.
+- null means unknown or not applicable according to the field description.
+
+Reserve `_flag` for binary fields and use `_code` or `_status` for categorical
+values. Cast public flags with `{{ dbt.type_int() }}`. Internal working flags,
+Logical Data Quality result flags, and data-asset attributes are outside this
+public-model contract.
+
+## Extension Columns
+
+Use **extension column** as the public term. Extension columns flow only
+between these same-named Input Layer and Core table pairs:
+
+- appointment
+- condition
+- eligibility
+- encounter
+- immunization
+- lab_result
+- location
+- medical_claim
+- medication
+- observation
+- patient
+- pharmacy_claim
+- practitioner
+- procedure
+
+For Core tables that combine clinical and claims-derived rows, only matching
+clinical Input Layer extensions flow through. Those columns are null on
+claims-derived rows. Core patient receives extensions only from
+`input_layer__patient`; never copy eligibility extensions into patient.
+
+Do not propagate extension columns into derived outputs without a same-named
+Input Layer table. This excludes `cost`, `member_month`,
+`person_id_crosswalk`, and `utilization`. Input Layer
+`provider_attribution` is also outside the contract because it has no
+same-named Core output.
+
+Preserve the configured `passthrough.prefix` through intermediate and
+Normalized relations. The final supported Core output strips it exactly once
+when `passthrough.strip: true` and preserves it when false. Invalid
+configuration, empty output names, and output-name collisions must fail
+clearly.
+
+## Feature Variables And CodeRx
+
+The boolean variables below must be native, unquoted YAML booleans:
+
+- `claims_enabled`
+- `clinical_enabled`
+- `provider_attribution_enabled`
+- `parity_enabled`
+- `data_quality_enabled`
+- `enable_data_quality_failure_keys`
+- `use_coderx_enterprise`
+
+Quoted `"true"` and `"false"` values are strings and are rejected. Direct
+`env_var()` expressions also return strings. Environment-driven workflows must
+generate typed YAML or JSON before invoking dbt. In model configuration and
+SQL, use the existing `tuva_boolean_var` package macro rather than ad hoc
+coercion.
+
+CodeRx Open is the default medication terminology. When
+`use_coderx_enterprise: true`, every CodeRx consumer reads user-managed
+`packages`, `drugs`, and `classes` relations from the target database's
+`coderx` schema. Keep that switch consistent across claims and clinical paths.
+
+## Data Quality
+
+- Data Quality is disabled by default.
+- Use **Input Data Quality** for Structural and Logical checks and **Output
+  Data Quality** for downstream rollups. Do not use `DQI` branding in this
+  package; DQI is a Tuva Enterprise product.
+- Logical row-level flags are tri-state: failure, pass, or not applicable.
+  Preserve applicability rather than coercing unknown checks to pass.
+- The stable Structural Data Quality relations are:
+  - `data_quality.structural`
+  - `data_quality.structural_test_results`
+  - `data_quality.structural_missing_columns`
+  - `data_quality.structural_data_type_mismatches`
+  - `data_quality.structural_primary_key_failure_counts`
+- The stable Logical Data Quality relations are:
+  - `data_quality.logical_test_catalog`
+  - `data_quality.logical_test_input_columns`
+  - `data_quality.logical_test_results`
+  - `data_quality.logical_failure_keys` when explicitly enabled
+- Other materialized helpers, flag relations, and macros are implementation
+  details rather than stable consumer contracts.
+- Do not call parity output Data Quality. Parity is a separate release
+  comparison tool.
+
+## Data Assets And Seeds
+
+- Every asset-bearing package resolves one complete immutable snapshot from
+  its installed package version. Do not add separate terminology, value-set,
+  provider-data, synthetic-data, or standalone-package asset-version vars.
+- Checked-in package seed CSVs are header-only dbt loader contracts. Published
+  object-storage payloads are the released data contents.
+- `data_assets.yml` must exactly inventory every Core payload path.
+- S3 is the released-content authority; GCS and Azure are verified mirrors.
+- A future-version payload prefix may be prepared before its version change
+  reaches `main`. It is a release candidate, is treated as reserved once
+  created, and must not contain `_release.json`.
+- Finalize the snapshot only after the version reaches `main`. The publisher
+  writes `_release.json` last, after every payload verifies, and binds it to
+  the exact package version and 40-character package commit.
+- dbt loaders do not read `_release.json` at runtime. Release automation does
+  read it and must verify byte-identical receipts in S3, GCS, and Azure before
+  tagging. Never weaken the exact-current-`main` commit gate.
+- Redshift loading uses `IAM_ROLE default`; never reintroduce embedded
+  long-lived cloud credentials into package loaders or CI configuration.
+- Data asset changes must preserve cross-warehouse loading behavior.
 - Do not modify `integration_tests/seeds/*` without explicit user approval.
-- For local validation, use the integration test defaults:
+  The integration project intentionally has no local seed directory in 1.0.
+- If a change requires synthetic columns or rows, obtain explicit generation
+  requirements before changing synthetic data.
+- Top-level `seeds/*` changes are allowed when requested, but validate them
+  through `integration_tests` before a PR.
+
+## Testing Framework
+
+Tuva Core uses three dbt-native behavioral test categories:
+
+- Unit tests are YAML files next to the models they protect. Use controlled
+  inputs and exact expected rows for deterministic model logic.
+- Data tests are generic tests in model YAML or singular SQL tests under
+  `tests/`. Use them for built-relation grains, keys, relationships, accepted
+  values, and cross-model invariants.
+- Parity tests are opt-in metric-producing models under `models/parity`. Use
+  them for analytical comparison against an immutable prior version.
+
+“Regression” describes why a unit or data test exists; it is not a fourth test
+type. For a confirmed logic bug, add the smallest deterministic dbt test that
+fails before the fix and passes after it.
+
+Use `dbt build` for normal validation because it runs unit tests, materializes
+models, and then runs data tests in DAG order. `dbt run` does not execute unit
+or data tests.
+
+Do not add a parallel Python framework for dbt model behavior. Python contract
+tests are appropriate only for repository automation or file-level contracts;
+keep them narrowly scoped and deliberately wire or document how they run.
+
+Parity metric IDs are immutable zero-padded strings. Never renumber, reuse, or
+redefine an existing ID; append a new ID for a new calculation.
+
+## Mandatory Local Workflow
+
+- Run dbt from the `integration_tests` project through `scripts/dbt-local`.
+  This is the one Core-local development helper and remains in this repository.
+- Use profiles from `~/.dbt` or `DBT_PROFILES_DIR`. Treat any
+  `integration_tests/profiles/*` files and `.github/workflows/*` as CI
+  configuration, not local runbooks.
+- For routine Core work, use `TUVA_DBT_PROFILE=snowflake-dev` against the
+  existing `dev_aaron` database and reuse its loaded data assets.
+- Do not run `dbt seed`, select seed nodes, or use an unscoped full-project
+  build when seed definitions, versions, schemas, and loading logic are
+  unchanged. Reload seeds only when those inputs changed or the user explicitly
+  requests it.
+- Keep `integration_tests/dbt_project.yml` on `profile: default` before
+  pushing.
+- Use the integration defaults unless the task requires otherwise:
   - `use_synthetic_data: true`
   - `synthetic_data_size: small`
-- For model, macro, test, or YAML work that does not change seeds, validate
-  through `integration_tests` with `TUVA_DBT_PROFILE=snowflake-dev` and reuse
-  the seed relations already loaded in `dev_aaron`.
-- If a change requires new synthetic columns or synthetic data rows, ask for
-  explicit generation requirements before editing synthetic data.
-- Top-level `seeds/*` changes are allowed when requested, but must be validated
-  through `integration_tests` before PR.
-- Do not add independent data-asset family versions. Every seed resolves
-  through the installed Tuva Core package version.
+  - `parity_enabled: false`
+  - `data_quality_enabled: false`
+- Use local DuckDB for DuckDB-specific portability checks or work that does
+  not need the large published data assets.
+- Never merge to `main` without Aaron's explicit approval.
 
-## Generated Artifacts
+Standard commands from the repository root:
 
-Do not commit generated or local-only artifacts, including:
+```bash
+scripts/dbt-local deps
+scripts/dbt-local debug
+scripts/dbt-local parse --no-partial-parse
+TUVA_DBT_PROFILE=snowflake-dev scripts/dbt-local build \
+  --select <selector> \
+  --exclude resource_type:seed
+```
+
+For a broader pre-PR build with unchanged seeds:
+
+```bash
+TUVA_DBT_PROFILE=snowflake-dev scripts/dbt-local build --full-refresh \
+  --select package:integration_tests package:the_tuva_project \
+  --exclude resource_type:seed
+```
+
+`dbt seed`, `dbt run`, and `dbt build` may require internet access because
+package data assets load from public object storage.
+
+## Validation By Change Type
+
+- Core model, macro, test, or YAML changes:
+  - Run `scripts/dbt-local deps` when dependencies may have changed.
+  - Run `scripts/dbt-local parse --no-partial-parse`.
+  - Run the narrowest useful Snowflake `dbt build`, excluding unchanged seeds.
+  - Run the broader full-refresh build before a PR when feasible.
+- Core asset manifest, seed header, or loader changes:
+  - Validate the Core package contract in this repository.
+  - Run an appropriate seed refresh and at least one DuckDB seed smoke test.
+  - Preserve cross-warehouse loader behavior.
+- Publisher, source-recipe, mirror, or asset-maintenance tooling changes:
+  - Work in `tuva-maintenance` and run its Python tests and DuckDB package smoke
+    validation.
+- Workflow changes:
+  - Run `actionlint` and any explicitly wired workflow contract tests.
+  - Review permissions, untrusted-code boundaries, immutable refs, and secret
+    exposure.
+- Documentation-only and repository-hygiene changes:
+  - Run `git diff --check` and verify changed local and external links.
+  - Do not run dbt solely because prose or empty-path declarations changed.
+- Docs site changes:
+  - Work in `docs`.
+  - Run `npm ci`, then
+    `TUVA_CORE_PATH=/absolute/path/to/tuva-core npm run build`.
+- DAG Viewer changes:
+  - Work in `dag-viewer`.
+  - Run `npm ci`, then
+    `TUVA_CORE_PATH=/absolute/path/to/tuva-core npm run build`.
+  - Use `npm run build:local` only when the Core checkout is literally the
+    sibling path `../tuva-core`, because that script sets the path itself.
+- Standalone package changes:
+  - Work in the owning package repository and validate it against the intended
+    immutable or local Core ref.
+
+## Generated And Local Artifacts
+
+Do not commit:
 
 - `target/`
 - `dbt_packages/`
@@ -100,66 +341,28 @@ Do not commit generated or local-only artifacts, including:
 - `node_modules/`
 - temporary scratch folders
 
-## Local Validation
+Preserve unrelated user changes in a dirty worktree. Do not delete generated
+or local files outside the task's explicit scope.
 
-Standard dbt commands:
+## SQL Portability
 
-- `scripts/dbt-local deps`
-- `scripts/dbt-local debug`
-- `scripts/dbt-local parse --no-partial-parse`
-- `scripts/dbt-local build --select <selector>`
-- `scripts/dbt-local build --full-refresh`
+Tuva Core supports:
 
-Validation expectations by change type:
+- Snowflake
+- Databricks
+- BigQuery
+- Microsoft Fabric
+- Redshift
+- DuckDB
 
-- Tuva Core model, macro, seed, test, or YAML changes:
-  - Run `scripts/dbt-local deps` when dependencies may have changed.
-  - Run the narrowest useful `scripts/dbt-local build --select <selector>`.
-  - When seeds are unchanged, use `TUVA_DBT_PROFILE=snowflake-dev` and exclude
-    seed nodes rather than reloading them.
-  - Run `scripts/dbt-local build --full-refresh` before PR when feasible.
-- Data asset publisher or metadata changes:
-  - Work in the sibling `tuva-maintenance` checkout and run the relevant script tests there.
-  - Run at least one seed smoke test against local DuckDB.
-- Docs changes:
-  - Use the sibling `docs` repository.
-  - Set `TUVA_CORE_PATH=/path/to/tuva-core`.
-  - Run `cd ../docs && npm ci && npm run build`.
-- DAG Viewer changes:
-  - Use the sibling `dag-viewer` repository.
-  - Set `TUVA_CORE_PATH=/path/to/tuva-core`.
-  - Run `cd ../dag-viewer && npm ci && npm run build:local`.
-- Data mart changes:
-  - Work in the relevant data mart repository.
-  - Validate that package against the local Tuva Core checkout when the mart
-    supports local package overrides.
+Write general-purpose SQL, prefer existing Tuva macros and package patterns,
+and isolate genuinely warehouse-specific behavior behind dispatched macros. A
+passing build on one warehouse is not evidence of portability to the others.
 
-`dbt seed`, `dbt run`, and `dbt build` may require internet access because seed
-content is loaded from public object storage.
+## GitHub And Pull Requests
 
-## SQL Portability Rules
-
-- Write SQL in general-purpose, cross-warehouse style.
-- Public Input Layer, Normalized, Claims Preprocessing, and Core fields ending
-  in `_flag` are nullable binary integers: `1` means true, `0` means false, and
-  null means unknown or not applicable. Reserve `_flag` for binary fields; use
-  `_code` or `_status` for categorical values, and cast flags with
-  `{{ dbt.type_int() }}`. Internal working flags and data-asset attributes are
-  outside this public contract.
-- Tuva Core must run on:
-  - Snowflake
-  - Databricks
-  - BigQuery
-  - Microsoft Fabric
-  - Redshift
-  - DuckDB
-- Prefer existing Tuva macros and package patterns over warehouse-specific SQL.
-- Keep warehouse-specific logic isolated behind dispatched macros when needed.
-
-## GitHub And PR Guidance
-
-- If creating an issue, create it in `tuva-health/tuva-core`.
-- Use exactly one release-note disposition on each issue and PR:
+- Create Tuva Core issues in `tuva-health/tuva-core`.
+- Apply exactly one release-note disposition to each issue and PR:
   - `breaking-change`
   - `enhancement`
   - `bug`
@@ -167,53 +370,59 @@ content is loaded from public object storage.
   - `terminology`
   - `connector`
   - `ignore-for-release`
-- PR bodies should include summary, validation, release-note label, and linked
-  issue when applicable.
-- Mirror the issue release-note label onto the PR.
+- PR bodies must summarize the change, validation, release-note disposition,
+  and linked issue when applicable. Mirror the issue label onto the PR.
 - Leave merge to the user.
 
-## CI Guidance
+## CI And Releases
 
-- In-repository pull requests automatically run `Tuva CI -- Snowflake`: one
-  Snowflake `dbt build --full-refresh` against the small synthetic dataset. The
-  build selects Tuva Core plus the integration-test project and runs unit and
-  data tests. Data Quality, including its optional failure-key relation, is
-  enabled so the complete Core test surface executes. Version changes do not
-  alter this automatic path. Parity remains disabled.
-- Run `Tuva CI -- All Warehouses` manually from the Actions tab for the final
-  release pull request. Its only input is the pull-request number. It accepts
-  only an open, mergeable, same-repository pull request into `main` that changes
-  the Tuva Core package version.
-- The all-warehouse workflow resolves the pull request test-merge and all eight
-  standalone package `main` branches once to exact commits. It then runs Tuva
-  Core, the integration-test project, and all eight packages on Snowflake,
-  BigQuery, Databricks, Fabric, and Redshift against synthetic small with Data
-  Quality and its optional failure-key relation enabled. Before warehouse
-  credentials are used, it verifies that every Core candidate asset exists in
-  S3, GCS, and Azure and that no `_release.json` has been finalized.
-- CI does not expose individual warehouse dispatches. Troubleshoot a single
-  warehouse locally when needed.
-- DuckDB portability is validated locally as needed rather than in GitHub CI.
-- Pull-request comment commands do not trigger CI and CI does not accept
-  arbitrary dbt commands, selectors, or flags.
-- Automatic secrets-backed CI does not execute fork code. After reviewing an
-  external pull request, a maintainer runs `External PR Snowflake CI` from the
-  Actions tab and supplies only the pull-request number. External version
-  changes are rejected because release CI requires a same-repository branch.
-- Standalone packages validate in their own repositories. Routine Snowflake CI
-  does not install standalone packages; only manual release CI snapshots their
-  `main` branches to exact commits before building.
-- Parity comparisons are separate, manually initiated Snowflake validations.
-- Do not edit `.github/workflows/create-release.yml` unless the task explicitly
-  targets release automation.
+- Same-repository pull requests automatically run `Tuva CI -- Snowflake`: one
+  fixed Snowflake `dbt build --full-refresh` against the small synthetic
+  dataset. It builds Tuva Core and the integration project, runs unit and data
+  tests, enables Data Quality and its optional failure-key relation, and keeps
+  parity disabled. A package-version change does not alter this automatic path.
+- Run `Tuva CI -- All Warehouses` manually for the final release PR. Its only
+  input is the pull-request number. It accepts only an open, mergeable,
+  same-repository PR into `main` whose test merge changes the Core version.
+- The all-warehouse workflow resolves the PR test merge and all eight
+  standalone package `main` branches once to exact commits. It builds that one
+  source lock on Snowflake, BigQuery, Databricks, Fabric, and Redshift with the
+  small synthetic dataset and complete Data Quality surface.
+- Before release-CI warehouse credentials are used, the workflow verifies that
+  every Core candidate asset exists under the future version in S3, GCS, and
+  Azure and that `_release.json` has not been finalized.
+- There is no individual-warehouse dispatcher. Troubleshoot one warehouse
+  locally; validate DuckDB portability locally as needed.
+- Pull-request comments do not trigger CI, and CI does not accept arbitrary
+  dbt commands, selectors, or flags.
+- Automatic secrets-backed CI never executes fork code. After review, a
+  maintainer runs `External PR Snowflake CI` and supplies only the PR number.
+  External version changes are rejected because release CI requires an
+  internal branch.
+- Routine Snowflake CI does not install standalone packages. Only manual
+  release CI snapshots all eight package `main` branches before building.
+- Parity comparison is a separate manually initiated Snowflake release
+  validation.
 
-## Output Contract
+Two similarly named release files have different required jobs:
 
-For each task, report:
+- `.github/workflows/create-release.yml` is the executable GitHub Actions
+  workflow. It validates current `main`, verifies complete commit-bound
+  receipts in all three clouds, creates the tag, and opens a draft GitHub
+  release.
+- `.github/release.yml` is not a workflow. GitHub reads it to categorize
+  automatically generated release notes by label.
+
+Keep both. Do not create another `.github/workflows/release.yml`, and do not
+edit release automation unless the task explicitly targets it.
+
+## Task Handoff
+
+For every task, report:
 
 - What changed and why.
-- Local validation commands run and key outcomes.
+- Validation commands and key outcomes.
 - Issue and PR URLs when created.
 - Branch and worktree path when relevant.
-- CI commands/check status when run.
-- Any blockers, assumptions, or required user decisions.
+- CI commands or check status when run.
+- Blockers, assumptions, and user decisions still required.

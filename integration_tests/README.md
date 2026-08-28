@@ -12,9 +12,9 @@ those inputs.
 - `tests/`: integration-only regression tests that validate behavior across the
   package boundary.
 - `macros/`: integration and CI helper macros.
-- `seeds/`: intentionally empty. Tuva Data Assets are defined by the Tuva Core
-  package and loaded from the immutable object-storage snapshot matching the
-  installed Tuva Core version.
+- There is no project-local `seeds/` directory. Tuva Data Assets are defined by
+  the Tuva Core package and loaded from the immutable object-storage snapshot
+  matching the installed Tuva Core version.
 - `profiles/`: CI-only warehouse profiles. Use your local `~/.dbt/profiles.yml`
   for development.
 
@@ -82,9 +82,10 @@ testing cross-package compatibility.
 
 `Tuva CI -- Snowflake` runs automatically for every in-repository pull request.
 It tests the exact pull-request merge commit on Snowflake using Tuva Core, the
-integration project, and the small synthetic dataset. Data Quality and its
-optional failure-key relation are enabled so the complete Core test surface
-runs. A package version change does not change this automatic path.
+integration project, and the small synthetic dataset. Structural and Logical
+Input Data Quality, Output Data Quality rollups, and the optional Logical
+failure-key relation are enabled so the complete Core test surface runs. A
+package version change does not change this automatic path.
 
 For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
 the Actions tab and enter only its pull-request number. The workflow accepts an

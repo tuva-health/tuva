@@ -24,8 +24,12 @@ models:
       - name: metric_id
         description: Immutable, zero-padded identifier for the metric definition.
         tests:
-          - unique
-          - not_null
+          - unique:
+              config:
+                enabled: "{{ (var('parity_enabled', false) is sameas true) and (var('claims_enabled', false) is sameas true) }}"
+          - not_null:
+              config:
+                enabled: "{{ (var('parity_enabled', false) is sameas true) and (var('claims_enabled', false) is sameas true) }}"
         config:
           meta:
             data_type: varchar
@@ -33,14 +37,18 @@ models:
       - name: metric_name
         description: Stable human-readable name for the metric definition.
         tests:
-          - not_null
+          - not_null:
+              config:
+                enabled: "{{ (var('parity_enabled', false) is sameas true) and (var('claims_enabled', false) is sameas true) }}"
         config:
           meta:
             data_type: varchar
       - name: result
         description: Numeric result calculated for the metric.
         tests:
-          - not_null
+          - not_null:
+              config:
+                enabled: "{{ (var('parity_enabled', false) is sameas true) and (var('claims_enabled', false) is sameas true) }}"
         config:
           meta:
             data_type: numeric
