@@ -9,4 +9,7 @@ default:
       dbname: "{{ env_var('DBT_REDSHIFT_CI_DATABASE') }}"
       schema: "public_{{ env_var('TUVA_CI_SCHEMA_PREFIX') }}"
       port: 5439
+      sslmode: require
+      is_serverless: true
+      connect_timeout: 120
       threads: "{{ env_var('DBT_REDSHIFT_CI_THREADS', '4') | int }}"
