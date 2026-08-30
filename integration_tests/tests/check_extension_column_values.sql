@@ -45,6 +45,7 @@ union all
 select
       '{{ item['name'] }}' as core_table
     , 'no populated extension value reached Core' as failure_reason
+from (select 1 as _tuva_extension_value_guard) as _tuva_extension_value_guard
 where exists (select 1 from {{ item['input'] }})
   and not exists (
       select 1
