@@ -385,28 +385,36 @@ passing build on one warehouse is not evidence of portability to the others.
   dataset. It builds Tuva Core and the integration project, runs unit and data
   tests, enables Data Quality and its optional failure-key relation, and keeps
   parity disabled. A package-version change does not alter this automatic path.
+  The Snowflake status is informational and is not required for merge.
 - Run `Tuva CI -- All Warehouses` manually for the final release PR. Its only
-  input is the pull-request number. It accepts only an open, mergeable,
-  same-repository PR into `main` whose test merge changes the Core version.
+  input is the pull-request number. It accepts any open, mergeable,
+  same-repository PR into `main`; CI does not inspect or compare package
+  versions.
 - The all-warehouse workflow resolves the PR test merge and all eight
   standalone package `main` branches once to exact commits. It builds that one
   source lock on Snowflake, BigQuery, Databricks, Fabric, and Redshift with the
   small synthetic dataset and complete Data Quality surface.
-- Before release-CI warehouse credentials are used, the workflow verifies that
-  every Core candidate asset exists under the future version in S3, GCS, and
-  Azure and that `_release.json` has not been finalized.
+- Version selection and comparison, candidate-asset checks, receipt handling,
+  tagging, and draft-release creation do not belong to CI.
 - There is no individual-warehouse dispatcher. Troubleshoot one warehouse
   locally; validate DuckDB portability locally as needed.
 - Pull-request comments do not trigger CI, and CI does not accept arbitrary
   dbt commands, selectors, or flags.
 - Automatic secrets-backed CI never executes fork code. After review, a
   maintainer runs `External PR Snowflake CI` and supplies only the PR number.
-  External version changes are rejected because release CI requires an
-  internal branch.
+  That workflow validates code only and does not inspect package versions.
 - Routine Snowflake CI does not install standalone packages. Only manual
-  release CI snapshots all eight package `main` branches before building.
+  all-warehouse CI snapshots all eight package `main` branches before building.
 - Parity comparison is a separate manually initiated Snowflake release
   validation.
+
+For a release, finish ordinary implementation first, then open the small
+manual PR that changes the Core package version declarations. Snowflake starts
+automatically and may be canceled because it is not a merge gate. Manually run
+`Tuva CI -- All Warehouses` for that PR, merge only after the matrix passes,
+then use the separate data-asset and release workflows to finalize receipts,
+create the tag, and open the draft release. Version selection and editing stay
+in the manual pull request.
 
 Two similarly named release files have different required jobs:
 

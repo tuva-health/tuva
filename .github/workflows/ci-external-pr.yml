@@ -97,49 +97,6 @@ jobs:
               return;
             }
 
-            async function projectVersion(ref) {
-              const { data } = await github.rest.repos.getContent({
-                ...context.repo,
-                path: "dbt_project.yml",
-                ref
-              });
-              if (Array.isArray(data) || data.type !== "file" || !data.content) {
-                throw new Error(`dbt_project.yml is not a readable file at ${ref}`);
-              }
-              const text = Buffer.from(
-                data.content.replace(/\n/g, ""),
-                data.encoding || "base64"
-              ).toString("utf8");
-              const versionPattern =
-                /^version:\s*(['"]?)([0-9A-Za-z.+-]+)\1\s*(?:#.*)?$/gm;
-              const matches = [...text.matchAll(versionPattern)];
-              if (matches.length !== 1) {
-                throw new Error(
-                  `expected exactly one top-level version at ${ref}; found ${matches.length}`
-                );
-              }
-              return matches[0][2];
-            }
-
-            let baseVersion;
-            let mergeVersion;
-            try {
-              [baseVersion, mergeVersion] = await Promise.all([
-                projectVersion(pr.base.sha),
-                projectVersion(mergeCommit.sha)
-              ]);
-            } catch (error) {
-              core.setFailed(`Could not inspect PR #${prNumber}'s version: ${error.message}`);
-              return;
-            }
-            if (baseVersion !== mergeVersion) {
-              core.setFailed(
-                "Version-changing pull requests must use an internal branch and " +
-                "Tuva CI -- All Warehouses."
-              );
-              return;
-            }
-
             core.setOutput("pr_number", String(prNumber));
             core.setOutput("base_sha", pr.base.sha);
             core.setOutput("head_sha", pr.head.sha);
