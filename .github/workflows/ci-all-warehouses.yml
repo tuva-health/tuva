@@ -28,7 +28,7 @@ jobs:
       merge_sha: ${{ steps.resolve.outputs.merge_sha }}
       schema_prefix: ${{ steps.resolve.outputs.schema_prefix }}
       concurrency_key: ${{ steps.resolve.outputs.concurrency_key }}
-      source_lock: ${{ steps.resolve.outputs.source_lock }}
+      source_lock: ${{ steps.candidate.outputs.source_lock }}
     steps:
       - name: Pin the pull request and package mains
         id: resolve
@@ -216,6 +216,48 @@ jobs:
               core.setFailed(`Could not resolve all-warehouse CI: ${error.message}`);
             }
 
+      - name: Check out the trusted workflow revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+
+      - name: Copy the trusted candidate verifier outside the checkout
+        run: >-
+          cp scripts/verify_data_asset_candidate.py
+          "$RUNNER_TEMP/verify_data_asset_candidate.py"
+
+      - name: Check out the exact pull request test merge
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ steps.resolve.outputs.merge_sha }}
+          persist-credentials: false
+
+      - name: Pin the complete cross-cloud data-asset candidate
+        id: candidate
+        env:
+          EXPECTED_PACKAGE_COMMIT: ${{ steps.resolve.outputs.head_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+          UNLOCKED_SOURCE_LOCK: ${{ steps.resolve.outputs.source_lock }}
+        run: >-
+          /usr/bin/python3 "$RUNNER_TEMP/verify_data_asset_candidate.py" resolve
+          --package-root .
+          --package tuva-core
+          --package-commit "$EXPECTED_PACKAGE_COMMIT"
+          --source-lock-json "$UNLOCKED_SOURCE_LOCK"
+
+      - name: Summarize the pinned data-asset candidate
+        env:
+          CANDIDATE_MARKER_SHA256: ${{ steps.candidate.outputs.candidate_marker_sha256 }}
+          PACKAGE_VERSION: ${{ steps.candidate.outputs.package_version }}
+        run: |
+          {
+            echo "## Data-asset candidate"
+            echo
+            echo "- Tuva Core version: \`$PACKAGE_VERSION\`"
+            echo "- Cross-cloud marker SHA-256: \`$CANDIDATE_MARKER_SHA256\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   run_all_warehouses:
     name: Run locked source set on all warehouses
     needs: resolve
@@ -226,6 +268,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
     with:
       checkout_ref: ${{ needs.resolve.outputs.merge_sha }}
+      trusted_ref: ${{ github.workflow_sha }}
       warehouse: all
       scope: all-packages
       source_lock: ${{ needs.resolve.outputs.source_lock }}

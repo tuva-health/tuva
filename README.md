@@ -169,12 +169,22 @@ Checked-in seed CSVs are header-only loader contracts. `data_assets.yml`
 declares the exact Core payload inventory; users do not configure independent
 terminology, value-set, provider-data, or synthetic-data versions.
 
-Future-version payloads can be prepared before a version change reaches
-`main`, but that payload-only prefix is a release candidate and must not contain
-`_release.json`. After merge, the publisher writes the receipt only when the
-complete snapshot verifies. The receipt binds the snapshot to the exact package
-commit and must match across S3, GCS, and Azure before the package tag can be
-created. dbt loaders do not read the receipt at runtime.
+Payloads can be prepared and polished repeatedly before release in dedicated
+mutable candidate stores. Candidate synchronization converges S3, GCS, and
+Azure to one complete inventory and writes `_candidate.json` last. A verifier
+from the trusted release-CI workflow commit hashes every compressed payload in
+all three clouds and pins the marker SHA-256 plus each provider-native object
+identity. Release CI loads Tuva Core from those exact candidate objects on each
+hosted release-CI warehouse and rechecks them before, after, and at final
+status. After merge, the candidate marker is rebound to current `main`; the
+publisher then promotes those exact payloads into the separate create-only
+released stores and writes
+`_release.json` only when the complete snapshot verifies. The receipt binds the
+snapshot to the exact package commit and must match across all three clouds
+before the package tag can be created. An exact version tag or published GitHub
+release permanently freezes that version; a draft-only release does not.
+Normal dbt loaders continue to use released storage and do not read either
+control file at runtime.
 
 Redshift loading uses `IAM_ROLE default`; configure the cluster or serverless
 namespace with a default IAM role that can read the selected data-asset bucket.

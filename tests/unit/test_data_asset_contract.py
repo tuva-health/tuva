@@ -328,6 +328,120 @@ class DataAssetContractTest(unittest.TestCase):
         for action_ref in action_refs:
             self.assertRegex(action_ref, r"^[0-9a-f]{40}$")
 
+    def test_all_warehouse_ci_pins_and_rechecks_mutable_candidate(self):
+        dispatcher = (
+            ROOT / ".github" / "workflows" / "ci-all-warehouses.yml"
+        ).read_text()
+        reusable = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+        verifier = (ROOT / "scripts" / "verify_data_asset_candidate.py").read_text()
+
+        self.assertIn("pr_number:", dispatcher)
+        self.assertNotIn("candidate_marker_sha256:\n        description:", dispatcher)
+        self.assertIn(
+            "source_lock: ${{ steps.candidate.outputs.source_lock }}",
+            dispatcher,
+        )
+        self.assertIn(
+            '/usr/bin/python3 "$RUNNER_TEMP/verify_data_asset_candidate.py" resolve',
+            dispatcher,
+        )
+        self.assertIn("ref: ${{ github.workflow_sha }}", dispatcher)
+        self.assertIn("trusted_ref: ${{ github.workflow_sha }}", dispatcher)
+        self.assertIn("EXPECTED_TRUSTED_REF: ${{ github.workflow_sha }}", reusable)
+        self.assertIn(
+            'cp scripts/verify_data_asset_candidate.py\n'
+            '          "$RUNNER_TEMP/verify_data_asset_candidate.py"',
+            dispatcher,
+        )
+        self.assertIn("--package-root .", dispatcher)
+        self.assertNotIn(
+            "python3 scripts/verify_data_asset_candidate.py resolve",
+            dispatcher,
+        )
+        self.assertNotIn(".ci-trusted", dispatcher)
+        self.assertNotIn(".ci-source", dispatcher)
+        self.assertLess(
+            dispatcher.index("Check out the trusted workflow revision"),
+            dispatcher.index("Copy the trusted candidate verifier"),
+        )
+        self.assertLess(
+            dispatcher.index("Copy the trusted candidate verifier"),
+            dispatcher.index("Check out the exact pull request test merge"),
+        )
+        self.assertLess(
+            dispatcher.index("Pin the complete cross-cloud data-asset candidate"),
+            dispatcher.index("run_all_warehouses:"),
+        )
+        self.assertIn(
+            "Verify source-locked candidate before using warehouse credentials",
+            reusable,
+        )
+        self.assertIn(
+            "Recheck source-locked candidate after the warehouse build",
+            reusable,
+        )
+        self.assertIn(
+            "Recheck every source-locked candidate identity before final status",
+            reusable,
+        )
+        verifier_invocations = [
+            line.strip()
+            for line in reusable.splitlines()
+            if 'verify_data_asset_candidate.py" verify' in line
+        ]
+        self.assertEqual(len(verifier_invocations), 3)
+        self.assertTrue(
+            all(
+                line.startswith(
+                    '/usr/bin/python3 "$RUNNER_TEMP/verify_data_asset_candidate.py"'
+                )
+                for line in verifier_invocations
+            )
+        )
+        self.assertEqual(
+            reusable.count(
+                'cp scripts/verify_data_asset_candidate.py '
+                '"$RUNNER_TEMP/verify_data_asset_candidate.py"'
+            ),
+            2,
+        )
+        self.assertNotIn(".ci-trusted", reusable)
+        self.assertNotIn(".ci-source", reusable)
+        self.assertIn('"object_identities"', reusable)
+        self.assertNotIn(
+            "python3 scripts/verify_data_asset_candidate.py verify",
+            reusable,
+        )
+        self.assertIn(
+            'dbt_vars["tuva_seed_buckets"] = {"tuva-core": candidate_bucket}',
+            reusable,
+        )
+        self.assertNotIn(
+            'dbt_vars["custom_bucket_name"] = candidate_bucket',
+            reusable,
+        )
+        self.assertNotIn("candidateMarkerIsCurrent", reusable)
+        self.assertIn("Data-asset candidate changed; rerun required", reusable)
+        self.assertIn("STORE_BASE_URLS", verifier)
+        self.assertIn('"s3": f"https://{CANDIDATE_BUCKET}.s3.amazonaws.com"', verifier)
+        self.assertIn(
+            '"gcs": f"https://storage.googleapis.com/{CANDIDATE_BUCKET}"',
+            verifier,
+        )
+        self.assertIn("tuvapublicresources.blob.core.windows.net", verifier)
+        self.assertIn("expected_marker_sha256", verifier)
+        self.assertIn("expected_object_identities", verifier)
+        self.assertIn("full_payload_hashes=True", verifier)
+        self.assertIn('transport("HASH" if full_payload_hashes else "HEAD"', verifier)
+        self.assertIn('headers.get("x-amz-version-id"', verifier)
+        self.assertIn('headers.get("x-goog-generation"', verifier)
+        self.assertIn('headers.get("etag"', verifier)
+        self.assertIn("release_guard(package, version)", verifier)
+        self.assertIn(
+            'tokens == {"no-store", "max-age=0", "must-revalidate"}',
+            verifier,
+        )
+
     def test_release_recovery_is_main_only_and_uses_current_main_commit(self):
         workflow = (ROOT / ".github" / "workflows" / "create-release.yml").read_text()
         self.assertIn("workflow_dispatch:", workflow)

@@ -13,7 +13,7 @@ validation, CI, and release rules.
   and dbt Fusion on DuckDB.
 - Repository `main` is the active integration line. A version on `main` is not
   a formal release by itself. A release also requires an immutable `v<version>`
-  tag, a GitHub release, and any required package data-asset receipt.
+  tag, a published GitHub release, and any required package data-asset receipt.
 - Treat published model schemas, grains, identifiers, variables, selectors,
   and stable Data Quality interfaces as public contracts. Assume a change is
   breaking unless compatibility is demonstrated.
@@ -204,12 +204,20 @@ CodeRx Open is the default medication terminology. When
   object-storage payloads are the released data contents.
 - `data_assets.yml` must exactly inventory every Core payload path.
 - S3 is the released-content authority; GCS and Azure are verified mirrors.
-- A future-version payload prefix may be prepared before its version change
-  reaches `main`. It is a release candidate, is treated as reserved once
-  created, and must not contain `_release.json`.
+- A package-version snapshot may be prepared and polished iteratively in the
+  dedicated mutable candidate stores before release. Candidate synchronization
+  may add, replace, or remove payloads while preserving recoverable object
+  versions and must write `_candidate.json` last after all three clouds agree.
+- An exact `v<version>` tag or published GitHub release freezes the candidate;
+  a draft-only GitHub release does not. Release CI must fail closed when it
+  cannot prove that neither immutable release boundary exists.
+- The released S3, GCS, and Azure stores are a separate create-only boundary.
+  Promotion copies one exact verified candidate into `<package>/<version>/` and
+  the publisher writes `_release.json` last. Once a version tag or published
+  GitHub release exists, that public prefix is permanently immutable.
 - Finalize the snapshot only after the version reaches `main`. The publisher
-  writes `_release.json` last, after every payload verifies, and binds it to
-  the exact package version and 40-character package commit.
+  binds `_release.json` to the exact package version and 40-character package
+  commit after every promoted payload verifies.
 - dbt loaders do not read `_release.json` at runtime. Release automation does
   read it and must verify byte-identical receipts in S3, GCS, and Azure before
   tagging. Never weaken the exact-current-`main` commit gate.
@@ -389,15 +397,23 @@ passing build on one warehouse is not evidence of portability to the others.
   parity disabled. A package-version change does not alter this automatic path.
   The Snowflake status is informational and is not required for merge.
 - Run `Tuva CI -- All Warehouses` manually for the final release PR. Its only
-  input is the pull-request number. It accepts any open, mergeable,
-  same-repository PR into `main`; CI does not inspect or compare package
-  versions.
+  input is the pull-request number. It accepts an open, mergeable,
+  same-repository PR into `main`, resolves the package version from that exact
+  test merge, and requires a complete candidate bound to the PR head.
 - The all-warehouse workflow resolves the PR test merge and all eight
-  standalone package `main` branches once to exact commits. It builds that one
-  source lock on Snowflake, BigQuery, Databricks, Fabric, and Redshift with the
-  small synthetic dataset and complete Data Quality surface.
-- Version selection and comparison, candidate-asset checks, receipt handling,
-  tagging, and draft-release creation do not belong to CI.
+  standalone package `main` branches once to exact commits. Before warehouse
+  credentials are used, a verifier from the trusted workflow commit streams
+  and hashes every declared payload in S3, GCS, and Azure, verifies the
+  byte-identical candidate marker, and pins each provider-native object
+  identity in the source lock. Only Tuva Core is internally redirected to the
+  candidate stores; standalone package assets continue to use released
+  storage.
+- The candidate marker SHA-256 and all marker and payload object identities are
+  part of the source lock and evidence. Every warehouse rechecks them before
+  and after building, and the final status performs a fresh trusted recheck.
+  Any replacement, metadata change, tag, or published release makes the result
+  stale. Candidate editing, release receipt creation, promotion, tagging, and
+  GitHub release creation remain outside CI.
 - There is no individual-warehouse dispatcher. Troubleshoot one warehouse
   locally; validate DuckDB portability locally as needed.
 - Pull-request comments do not trigger CI, and CI does not accept arbitrary

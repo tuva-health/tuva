@@ -91,16 +91,26 @@ required for merge.
 For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
 the Actions tab and enter only its pull-request number. The workflow accepts an
 open, mergeable, same-repository pull request into `main`. It does not inspect
-or compare package versions. The workflow resolves all eight standalone
-package `main` branches once to exact commits, then uses that single source lock
-for Snowflake, BigQuery, Databricks, Fabric, and Redshift.
+or compare package versions, but it resolves the version in the exact test
+merge so it can pin the matching Tuva Core candidate. The workflow verifies
+every declared payload byte and the byte-identical candidate marker in S3,
+GCS, and Azure before using warehouse credentials. It records each cloud's
+provider-native marker and payload identities in the source lock. The verifier
+always runs from the trusted workflow commit, not from the pull request. The
+workflow also resolves all eight standalone package `main` branches once to
+exact commits, then uses that single source lock for Snowflake, BigQuery,
+Databricks, Fabric, and Redshift.
 
 The manual release build selects the integration project, Tuva Core, AHRQ
 Quality Indicators, CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing,
-NYU ED Classification, Quality Measures, and Semantic Layer. CI validates the
-locked code and dbt graph only. Version selection and editing stay in the
-manual pull request; candidate-asset, receipt, tag, and draft-release work
-remain in the separate data-asset and release workflows.
+NYU ED Classification, Quality Measures, and Semantic Layer. Only Tuva Core's
+asset paths are redirected to the source-locked candidate; standalone package
+assets remain on released storage. Candidate editing stays in the maintenance
+workflow, while final receipt creation, promotion, tagging, and GitHub release
+creation remain in the separate release workflows. Each warehouse and the
+final status recheck every locked object identity, so any intervening payload
+or metadata edit requires a fresh run. An exact version tag or published
+GitHub release also blocks release CI; a draft-only release remains editable.
 
 Both workflows keep the small synthetic dataset and Data Quality failure-key
 coverage enabled while parity remains disabled. The all-warehouse workflow
