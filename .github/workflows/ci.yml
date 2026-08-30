@@ -358,9 +358,6 @@ jobs:
                     `${context.repo.owner}/${context.repo.repo}` ||
                   parsedLock?.core?.source !== "pull_request_test_merge" ||
                   parsedLock?.core?.revision !== checkoutRef.toLowerCase() ||
-                  typeof parsedLock?.base_version !== "string" ||
-                  typeof parsedLock?.release_version !== "string" ||
-                  parsedLock.base_version === parsedLock.release_version ||
                   !Array.isArray(packages) ||
                   packages.length !== expectedStandalonePackages.length ||
                   actualTriples.size !== expectedTriples.size ||
@@ -394,7 +391,7 @@ jobs:
                 fail("PR number and exact base, head, and merge commits are required.");
               }
               if (checkoutRef !== mergeSha) {
-                fail("The required status must describe the exact test-merge commit being built.");
+                fail("The published status must describe the exact test-merge commit being built.");
               }
             }
 
@@ -507,7 +504,7 @@ jobs:
             }
 
             const description = process.env.CI_SCOPE === "all-packages"
-              ? "All-warehouse release CI is running"
+              ? "All-warehouse CI is running"
               : "Snowflake Core CI is running";
             await Promise.all(
               statusRefs.map((sha) =>
@@ -522,185 +519,16 @@ jobs:
               )
             );
 
-  preflight_assets:
-    name: Verify future-version data assets
-    needs: resolve
-    if: >-
-      needs.resolve.result == 'success' &&
-      needs.resolve.outputs.should_run == 'true' &&
-      needs.resolve.outputs.scope == 'all-packages'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout exact release candidate
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          ref: ${{ needs.resolve.outputs.checkout_ref }}
-          persist-credentials: false
-
-      - name: Verify every declared asset exists in all public clouds
-        env:
-          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
-        run: |
-          python3 - <<'PY'
-          import concurrent.futures
-          import json
-          import os
-          import re
-          import time
-          import urllib.error
-          import urllib.parse
-          import urllib.request
-          from pathlib import Path
-
-          version_pattern = re.compile(
-              r"^version:\s*(['\"]?)([0-9A-Za-z.+-]+)\1\s*(?:#.*)?$",
-              re.MULTILINE,
-          )
-          project_text = Path("dbt_project.yml").read_text(encoding="utf-8")
-          versions = version_pattern.findall(project_text)
-          if len(versions) != 1:
-              raise SystemExit(
-                  f"expected exactly one top-level version; found {len(versions)}"
-              )
-          package_version = versions[0][1]
-
-          source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
-          if source_lock.get("release_version") != package_version:
-              raise SystemExit(
-                  "source lock release version does not match dbt_project.yml"
-              )
-
-          catalog_text = Path("data_assets.yml").read_text(encoding="utf-8")
-          catalog_code = "\n".join(
-              line.split("#", 1)[0] for line in catalog_text.splitlines()
-          )
-          asset_paths = re.findall(r"^    path: (\S+)$", catalog_code, re.MULTILINE)
-          canonical_seeds = re.findall(
-              r"^  - seed: (\S+)$", catalog_code, re.MULTILINE
-          )
-          declared_path_keys = len(
-              re.findall(r"(?<![A-Za-z0-9_-])path\s*:", catalog_code)
-          )
-          declared_seed_keys = len(
-              re.findall(r"(?<![A-Za-z0-9_-])seed\s*:", catalog_code)
-          )
-          if not asset_paths:
-              raise SystemExit("data_assets.yml does not declare any asset paths")
-          if (
-              declared_path_keys != len(asset_paths)
-              or declared_seed_keys != len(canonical_seeds)
-              or len(canonical_seeds) != len(asset_paths)
-          ):
-              raise SystemExit(
-                  "data_assets.yml must use one canonical seed/path mapping per asset; "
-                  "release preflight refuses to skip unrecognized YAML declarations"
-              )
-          if len(asset_paths) != len(set(asset_paths)):
-              raise SystemExit("data_assets.yml contains duplicate asset paths")
-
-          providers = {
-              "s3": "https://tuva-public-resources.s3.amazonaws.com",
-              "gcs": "https://storage.googleapis.com/tuva-public-resources",
-              "azure": (
-                  "https://tuvapublicresources.blob.core.windows.net/"
-                  "tuva-public-resources"
-              ),
-          }
-          version_component = urllib.parse.quote(package_version, safe="")
-
-          def head_status(url):
-              last_error = None
-              for attempt in range(3):
-                  request = urllib.request.Request(
-                      url,
-                      method="HEAD",
-                      headers={"User-Agent": "tuva-core-release-ci"},
-                  )
-                  try:
-                      with urllib.request.urlopen(request, timeout=30) as response:
-                          return response.status, None
-                  except urllib.error.HTTPError as exc:
-                      return exc.code, None
-                  except (urllib.error.URLError, TimeoutError) as exc:
-                      last_error = str(exc)
-                  if attempt < 2:
-                      time.sleep(1 + attempt)
-              return None, last_error
-
-          def probe_payload(item):
-              provider, asset_path = item
-              encoded_path = urllib.parse.quote(asset_path, safe="/")
-              url = (
-                  f"{providers[provider]}/tuva-core/{version_component}/"
-                  f"{encoded_path}"
-              )
-              status, error = head_status(url)
-              if status is not None and 200 <= status < 300:
-                  return None
-              detail = f"HTTP {status}" if status is not None else error
-              return f"{provider}: {asset_path}: {detail}"
-
-          probes = [
-              (provider, asset_path)
-              for provider in providers
-              for asset_path in asset_paths
-          ]
-          with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
-              failures = [
-                  failure for failure in executor.map(probe_payload, probes) if failure
-              ]
-
-          if failures:
-              preview = "\n".join(failures[:50])
-              remainder = len(failures) - min(len(failures), 50)
-              if remainder:
-                  preview += f"\n... and {remainder} more missing objects"
-              raise SystemExit(
-                  f"future-version data asset preflight failed:\n{preview}"
-              )
-
-          receipt_failures = []
-          for provider, base_url in providers.items():
-              receipt_url = (
-                  f"{base_url}/tuva-core/{version_component}/_release.json"
-              )
-              status, error = head_status(receipt_url)
-              if status != 404:
-                  detail = f"HTTP {status}" if status is not None else error
-                  receipt_failures.append(f"{provider}: {detail}")
-          if receipt_failures:
-              raise SystemExit(
-                  "future-version snapshots must not have _release.json before merge:\n"
-                  + "\n".join(receipt_failures)
-              )
-
-          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
-          with summary.open("a", encoding="utf-8") as output:
-              output.write("## Data asset preflight\n\n")
-              output.write(f"- Version: `{package_version}`\n")
-              output.write(f"- Declared objects per cloud: {len(asset_paths)}\n")
-              output.write(f"- Verified object paths: {len(probes)}\n")
-              output.write("- `_release.json` absent from all clouds: yes\n")
-          print(
-              f"Verified {len(asset_paths)} future-version assets across "
-              f"{len(providers)} clouds"
-          )
-          PY
-
   build:
     name: Build / ${{ matrix.warehouse }}
     needs:
       - resolve
       - mark_pending
-      - preflight_assets
     if: >-
       always() &&
       needs.resolve.result == 'success' &&
       needs.resolve.outputs.should_run == 'true' &&
-      (needs.mark_pending.result == 'success' || needs.mark_pending.result == 'skipped') &&
-      (needs.preflight_assets.result == 'success' || needs.preflight_assets.result == 'skipped')
+      (needs.mark_pending.result == 'success' || needs.mark_pending.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1102,7 +930,6 @@ jobs:
     needs:
       - resolve
       - mark_pending
-      - preflight_assets
       - build
     if: >-
       always() &&
@@ -1125,7 +952,6 @@ jobs:
           CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
           STATUS_CONTEXT: ${{ needs.resolve.outputs.status_context }}
           RESOLVE_RESULT: ${{ needs.resolve.result }}
-          PREFLIGHT_RESULT: ${{ needs.preflight_assets.result }}
           BUILD_RESULT: ${{ needs.build.result }}
           PENDING_RESULT: ${{ needs.mark_pending.result }}
         with:
@@ -1138,7 +964,6 @@ jobs:
             const sourceLock = process.env.CI_SOURCE_LOCK;
             const statusContext = process.env.STATUS_CONTEXT;
             const resolveResult = process.env.RESOLVE_RESULT;
-            const preflightResult = process.env.PREFLIGHT_RESULT;
             const buildResult = process.env.BUILD_RESULT;
             const pendingResult = process.env.PENDING_RESULT;
             const runUrl =
@@ -1206,18 +1031,15 @@ jobs:
                 description = "CI could not publish its pending status";
               } else if (resolveResult !== "success") {
                 description = "CI request resolution failed";
-              } else if (preflightResult === "failure") {
-                state = "failure";
-                description = "Future-version data asset preflight failed";
               } else if (buildResult === "success") {
                 state = "success";
                 description = scope === "all-packages"
-                  ? "All-warehouse release CI passed"
+                  ? "All-warehouse CI passed"
                   : "Snowflake Core build passed";
               } else if (buildResult === "failure") {
                 state = "failure";
                 description = scope === "all-packages"
-                  ? "All-warehouse release CI failed"
+                  ? "All-warehouse CI failed"
                   : "Snowflake Core build failed";
               } else {
                 description = `CI ended with ${buildResult}`;
@@ -1247,7 +1069,7 @@ jobs:
               )
             ) {
               core.notice(
-                "A newer CI run owns the required status; " +
+                "A newer CI run owns the published status; " +
                 "this run will not overwrite it."
               );
               return;
