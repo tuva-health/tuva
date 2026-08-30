@@ -121,7 +121,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.12"
   DBT_CORE_VERSION: "1.11.14"
   DBT_SNOWFLAKE_VERSION: "1.11.6"
   DBT_BIGQUERY_VERSION: "1.11.3"
@@ -561,7 +561,7 @@ jobs:
         if: matrix.warehouse == 'fabric'
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          curl "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list" | sudo tee /etc/apt/sources.list.d/msprod.list
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
@@ -668,16 +668,12 @@ jobs:
                   env_file.write(f"{item['env_var']}={revision}\n")
 
           integration_dir = Path("integration_tests")
-          release_manifest = ["packages:", "  - local: ../"]
+          release_manifest = ["packages:"]
           for item in packages:
               release_manifest.extend(
                   [
                       f"  - git: https://github.com/{item['repository']}.git",
-                      (
-                          "    revision: \"{{ env_var('"
-                          + item["env_var"]
-                          + "') }}\""
-                      ),
+                      f"    revision: {item['revision']}",
                   ]
               )
           (integration_dir / "packages.yml").write_text(
@@ -686,6 +682,107 @@ jobs:
           )
           (integration_dir / "ci-source-lock.json").write_text(
               json.dumps(source_lock, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      # Standalone packages declare their released Core dependency. Resolve
+      # that graph first, then replace only Core with this PR's test merge.
+      - name: Resolve standalone package dependencies
+        if: env.CI_SCOPE == 'all-packages'
+        run: >-
+          dbt deps --lock --upgrade
+          --project-dir ./integration_tests
+          --profiles-dir ./integration_tests/profiles/${{ matrix.warehouse }}
+
+      - name: Promote candidate Core in dependency lock
+        if: env.CI_SCOPE == 'all-packages'
+        env:
+          CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from copy import deepcopy
+          from pathlib import Path
+
+          import yaml
+          from dbt.config.project import package_config_from_data
+          from dbt.task.deps import _create_sha1_hash
+
+          integration_dir = Path("integration_tests")
+          packages_path = integration_dir / "packages.yml"
+          lock_path = integration_dir / "package-lock.yml"
+          packages_manifest = yaml.safe_load(
+              packages_path.read_text(encoding="utf-8")
+          )
+          package_lock = yaml.safe_load(lock_path.read_text(encoding="utf-8"))
+          source_lock = json.loads(os.environ["CI_SOURCE_LOCK"])
+
+          locked_packages = package_lock.get("packages")
+          if not isinstance(locked_packages, list):
+              raise SystemExit("resolved package lock has no package list")
+
+          core_entries = [
+              item
+              for item in locked_packages
+              if item.get("name") == "the_tuva_project"
+          ]
+          if len(core_entries) != 1:
+              raise SystemExit(
+                  "resolved package lock must contain exactly one Core dependency"
+              )
+
+          expected_packages = {
+              item["dbt_package"]: (
+                  f"https://github.com/{item['repository']}.git",
+                  item["revision"],
+              )
+              for item in source_lock["standalone_packages"]
+          }
+          by_name = {item.get("name"): item for item in locked_packages}
+          if len(by_name) != len(locked_packages):
+              raise SystemExit("resolved package lock contains duplicate project names")
+          for name, (repository, revision) in expected_packages.items():
+              item = by_name.get(name)
+              if item is None:
+                  raise SystemExit(f"resolved package lock is missing {name}")
+              if item.get("git") != repository or item.get("revision") != revision:
+                  raise SystemExit(f"resolved package lock changed the source for {name}")
+
+          final_manifest = {
+              "packages": [
+                  {"local": "../"},
+                  *packages_manifest["packages"],
+              ]
+          }
+          final_lock_packages = [
+              {"local": "../", "name": "the_tuva_project"},
+              *[
+                  item
+                  for item in locked_packages
+                  if item.get("name") != "the_tuva_project"
+              ],
+          ]
+          final_names = [item.get("name") for item in final_lock_packages]
+          if len(final_names) != len(set(final_names)):
+              raise SystemExit("final package lock contains duplicate project names")
+
+          # Match dbt's own package-lock hash calculation so the final deps
+          # command consumes this flattened lock instead of resolving again.
+          rendered_packages = package_config_from_data(
+              deepcopy(final_manifest), deepcopy(final_manifest)
+          ).packages
+          final_lock = {
+              "packages": final_lock_packages,
+              "sha1_hash": _create_sha1_hash(rendered_packages),
+          }
+          packages_path.write_text(
+              yaml.safe_dump(final_manifest, sort_keys=False),
+              encoding="utf-8",
+          )
+          lock_path.write_text(
+              yaml.safe_dump(final_lock, sort_keys=False),
               encoding="utf-8",
           )
           PY
@@ -718,7 +815,7 @@ jobs:
 
       - name: Install dbt dependencies
         run: >-
-          dbt deps --upgrade
+          dbt deps
           --project-dir ./integration_tests
           --profiles-dir ./integration_tests/profiles/${{ matrix.warehouse }}
 
