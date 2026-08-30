@@ -25,7 +25,7 @@ validated against both dbt Core 2.0 and dbt Fusion on DuckDB.
 | Normalized Layer | Portable type casting, reshaping, standardization, and terminology normalization |
 | Claims Preprocessing | Service categories, encounters, member months, claims enrollment, and provider attribution |
 | Core Data Model | Common claims, clinical, cost, utilization, and medication outputs |
-| Data Quality | Opt-in Structural and Logical Input Data Quality plus Output Data Quality rollups |
+| Data Quality | Opt-in Structural Data Quality and Logical Data Quality |
 | Metadata and parity | Package metadata and an opt-in metric producer for release comparison |
 | Data Assets | Version-aligned terminology, value sets, provider data, and synthetic data |
 

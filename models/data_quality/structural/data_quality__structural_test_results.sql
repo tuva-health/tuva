@@ -6,7 +6,7 @@
        else 'data_quality'
      ),
      alias = 'structural_test_results',
-     tags = ['data_quality', 'dq_rollup', 'dq_structural'],
+     tags = ['data_quality', 'dq_structural'],
      materialized = 'table'
    )
 }}

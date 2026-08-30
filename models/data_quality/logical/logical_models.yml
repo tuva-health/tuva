@@ -11,7 +11,6 @@ models:
       tags:
         - data_quality
         - dq_logical
-        - dq_rollup
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -40,23 +39,6 @@ models:
       - name: is_primary_key
       - name: column_order
 
-  - name: data_quality__data_source_catalog
-    description: One row per populated data source and source type, derived from structural metadata and enabled Input Layer tables.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_source_catalog
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    columns:
-      - name: data_source
-      - name: data_source_type
-      - name: input_table_count
-      - name: row_count
-
   - name: data_quality__logical_test_catalog
     description: Stable public catalog with one row per enabled Logical Data Quality test and the metadata required to interpret its results.
     config:
@@ -68,7 +50,6 @@ models:
       tags:
         - data_quality
         - dq_logical
-        - dq_rollup
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -149,7 +130,6 @@ models:
       tags:
         - data_quality
         - dq_logical
-        - dq_rollup
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -175,68 +155,6 @@ models:
         tests:
           - not_null
 
-  - name: data_quality__domain_catalog
-    description: Domain reporting hierarchy for source data quality rollups.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: domain_catalog
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - domain_group_key
-              - component_key
-    columns:
-      - name: domain_group_key
-        tests:
-          - not_null
-      - name: domain_group_name
-      - name: component_key
-        tests:
-          - not_null
-      - name: component_name
-      - name: display_order
-
-  - name: data_quality__domain_input_requirements
-    description: Maps source data quality reporting components to required Input Layer tables and optional columns.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: domain_input_requirements
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - domain_group_key
-              - component_key
-              - input_table_name
-              - input_column_name
-              - requirement_source
-    columns:
-      - name: domain_group_key
-        tests:
-          - not_null
-      - name: component_key
-        tests:
-          - not_null
-      - name: input_table_name
-        tests:
-          - not_null
-      - name: input_column_name
-      - name: requirement_level
-      - name: requirement_source
-
   - name: data_quality__logical_test_results
     description: One row per data source, input table, and logical test with tested, passed, failed, and not-applicable counts.
     config:
@@ -248,7 +166,6 @@ models:
       tags:
         - data_quality
         - dq_logical
-        - dq_rollup
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -341,188 +258,6 @@ models:
         tests:
           - not_null
 
-  - name: data_quality__structural_test_results
-    description: Four normalized structural readiness results for each data source and enabled Input Layer Model.
-    config:
-      access: public
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: structural_test_results
-      tags:
-        - data_quality
-        - dq_rollup
-        - dq_structural
-      materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - data_source
-              - input_table_name
-              - test_name
-    columns:
-      - name: data_source
-        description: Source identifier evaluated by the normalized structural check. Null retains the structural matrix's null-source semantics.
-      - name: input_table_name
-        description: Connector-owned Input Layer Model evaluated by the check.
-        tests:
-          - not_null
-      - name: test_name
-        description: Stable identifier for one of the four structural checks.
-        tests:
-          - not_null
-          - accepted_values:
-              arguments:
-                values:
-                  - structural__columns_exist
-                  - structural__data_types_correct
-                  - structural__table_populated
-                  - structural__primary_key_correct
-      - name: severity
-        description: Integer 1 for an active structural failure and null for pass or not evaluated.
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - 1
-                quote: false
-      - name: display_name
-      - name: description
-      - name: grain
-      - name: test_type
-      - name: check_category
-      - name: total_row_count
-        description: Number of Input Layer records represented by this Model and data-source result.
-      - name: tested_count
-        description: One when the check was evaluated and zero when it was not evaluated.
-      - name: failed_count
-        description: One when the check failed and zero otherwise.
-      - name: passed_count
-        description: One when the check passed and zero otherwise.
-      - name: not_evaluated_count
-        description: One when a prerequisite prevented evaluation and zero otherwise.
-
-  - name: data_quality__component_test_quality_results
-    description: Output Data Quality drilldown for relevant logical failures at data source, domain group, component, input table, and test grain. Structural findings remain in Input Data Quality and are intentionally excluded.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: component_test_quality_results
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    columns:
-      - name: data_source
-      - name: domain_group_key
-      - name: domain_group_name
-      - name: component_key
-      - name: component_name
-      - name: input_table_name
-      - name: test_name
-      - name: severity
-      - name: test_source
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - logical
-      - name: display_name
-      - name: description
-      - name: test_type
-      - name: tested_count
-      - name: failed_count
-
-  - name: data_quality__component_table_quality_results
-    description: Output Data Quality rollup of relevant logical failures at data source, domain group, component, and input table grain.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: component_table_quality_results
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    columns:
-      - name: data_source
-      - name: domain_group_key
-      - name: component_key
-      - name: input_table_name
-      - name: pct_passed
-      - name: pct_severity_1
-      - name: pct_severity_2
-      - name: pct_severity_3
-      - name: status
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - blocked
-                  - issues
-                  - passing
-                  - not_applicable
-
-  - name: data_quality__component_quality_results
-    description: Output Data Quality component rollups of relevant logical failures with pass percentage, severity percentages, counts, and status.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: component_quality_results
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    columns:
-      - name: data_source
-      - name: domain_group_key
-      - name: component_key
-      - name: pct_passed
-      - name: pct_severity_1
-      - name: pct_severity_2
-      - name: pct_severity_3
-      - name: status
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - blocked
-                  - issues
-                  - passing
-                  - not_applicable
-
-  - name: data_quality__source_quality_overview
-    description: Highest-level Output Data Quality rollup of relevant logical failures by data source and domain group.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: source_quality_overview
-      tags:
-        - data_quality
-        - dq_rollup
-      materialized: table
-    columns:
-      - name: data_source
-      - name: domain_group_key
-      - name: domain_group_name
-      - name: pct_passed
-      - name: pct_severity_1
-      - name: pct_severity_2
-      - name: pct_severity_3
-      - name: status
-        tests:
-          - accepted_values:
-              arguments:
-                values:
-                  - blocked
-                  - issues
-                  - passing
-                  - not_applicable
-
   - name: data_quality__logical_failure_keys
     description: Optional stable public key-only drilldown with one row per failing Logical Data Quality flag row. Disabled by default and enabled with enable_data_quality_failure_keys.
     config:
@@ -534,7 +269,6 @@ models:
       tags:
         - data_quality
         - dq_logical
-        - dq_rollup
       materialized: table
     columns:
       - name: data_source

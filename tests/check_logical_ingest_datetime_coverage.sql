@@ -2,7 +2,7 @@
      enabled = (the_tuva_project.tuva_boolean_var('data_quality_enabled', false))
        and ((the_tuva_project.tuva_boolean_var('claims_enabled', false)) or (the_tuva_project.tuva_boolean_var('clinical_enabled', false))),
      severity = 'error',
-     tags = ['data_quality', 'dq_logical', 'dq_rollup']
+     tags = ['data_quality', 'dq_logical']
    )
 }}
 

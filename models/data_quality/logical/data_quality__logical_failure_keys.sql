@@ -8,7 +8,7 @@
        else 'data_quality'
      ),
      alias = 'logical_failure_keys',
-     tags = ['data_quality', 'dq_logical', 'dq_rollup'],
+     tags = ['data_quality', 'dq_logical'],
      materialized = 'table'
    )
 }}
