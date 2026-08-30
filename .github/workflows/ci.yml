@@ -891,9 +891,9 @@ jobs:
           DBT_FABRIC_CI_SERVER: ${{ secrets.DBT_FABRIC_CI_SERVER }}
           DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
           DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
-          DBT_FABRIC_CI_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
-          DBT_FABRIC_CI_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
-          DBT_FABRIC_CI_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.DBT_FABRIC_CI_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.DBT_FABRIC_CI_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.DBT_FABRIC_CI_TENANT_ID }}
         run: |
           read -r -a ci_selectors <<< "$CI_DBT_SELECTOR"
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/fabric
