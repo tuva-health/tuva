@@ -203,11 +203,12 @@ seeds:
         data_asset:
           display_name: "APR-DRG"
           maintainer: "Solventum"
-          source_url: "https://www.solventum.com/en-us/home/health-information-technology/resources-education/available-resources/"
-          source_release: ""
+          source_url: "https://www.solventum.com/en-us/home/health-information-technology/solutions/apr-drg/"
+          source_release: "APR-DRG v43.0 descriptions"
           source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "annually"
+          notes: "Prior Tuva codes are retained with deprecated = 1. Tuva's release owner confirmed permission to redistribute the Solventum APR-DRG v43 descriptions on 2026-08-28."
       post_hook: "{{ load_versioned_seed('terminology','terminology__apr_drg.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -224,6 +225,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         apr_drg_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: apr_drg_code
         description: 'The All Patient Refined Diagnosis Related Group (APR-DRG) code.'
@@ -233,6 +235,8 @@ seeds:
         description: 'The Major Diagnostic Category (MDC) code associated with the APR-DRG.'
       - name: apr_drg_description
         description: 'The description of the All Patient Refined Diagnosis Related Group (APR-DRG).'
+      - name: deprecated
+        description: 'Indicates whether the APR-DRG code is absent from v43.0 (1) or current in v43.0 (0).'
 
   - name: terminology__bill_type
     description: |-
@@ -313,11 +317,11 @@ seeds:
         data_asset:
           display_name: "CVX"
           maintainer: "CDC National Center for Immunization and Respiratory Diseases"
-          source_url: "https://www2a.cdc.gov/vaccines/iis/iisstandards/vaccines.asp?rpt=cvx"
-          source_release: ""
-          source_last_updated: "2026-04-16"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_url: "https://www2.cdc.gov/vaccines/iis/iisstandards/downloads/cvx.txt"
+          source_release: "CDC CVX text source table"
+          source_last_updated: "2026-08-18"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "monthly"
       post_hook: "{{ load_versioned_seed('terminology','terminology__cvx.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -332,6 +336,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         long_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        last_updated: date
+        deprecated: integer
     columns:
       - name: cvx
         description: 'CVX code, which is a unique identifier for vaccines.'
@@ -339,6 +347,12 @@ seeds:
         description: 'Short description of the vaccine.'
       - name: long_description
         description: 'Long description of the vaccine.'
+      - name: status
+        description: 'Lifecycle status supplied by CDC.'
+      - name: last_updated
+        description: 'Date the CVX record was last updated by CDC.'
+      - name: deprecated
+        description: 'Indicates whether CDC marks the CVX code Inactive or Never Active (1) rather than current (0).'
 
   - name: terminology__discharge_disposition
     description: |-
@@ -475,10 +489,11 @@ seeds:
           display_name: "HCPCS Level II"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/healthcare-common-procedure-system/quarterly-update"
-          source_release: ""
+          source_release: "October 2026 Alpha-Numeric HCPCS File"
           source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          tuva_last_updated: "2026-08-28"
           update_frequency: "quarterly"
+          notes: "Contains five-character HCPCS Level II codes only. Modifier records are intentionally excluded. Prior codes are retained with deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__hcpcs_level_2.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -492,9 +507,10 @@ seeds:
         recid: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         long_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(65535) {%- endif -%}
         short_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: hcpcs
         description: 'The HCPCS Level II code.'
@@ -506,6 +522,8 @@ seeds:
         description: 'The long description of the HCPCS code.'
       - name: short_description
         description: 'The short description of the HCPCS code.'
+      - name: deprecated
+        description: 'Indicates whether the HCPCS Level II code is terminated or absent from the October 2026 release (1) rather than current (0).'
 
   - name: terminology__restructured_betos
     description: |-
@@ -515,14 +533,19 @@ seeds:
       join to it directly.
     config:
       meta:
+        primary_key_columns:
+          - hcpcs_cd
+          - first_rbcs_release_year
+        primary_key_strategy: natural_multi_column
         data_asset:
           display_name: "Restructured BETOS"
           maintainer: "CMS"
           source_url: "https://data.cms.gov/provider-summary-by-type-of-service/provider-service-classifications/restructured-betos-classification-system-rbcs"
-          source_release: "CMS Data RBCS public use file"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "RBCS Taxonomy RY26"
+          source_last_updated: "2026-08-21"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "annually"
+          notes: "Complete CMS RY26 row and schema replacement; prior Tuva-only rows and legacy alias columns are not retained. The relation grain is one row per HCPCS code and first RBCS release year so assignment history is explicit."
       post_hook: "{{ load_versioned_seed('terminology','terminology__restructured_betos.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -551,10 +574,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
         hcpcs_cd_end_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
-        rbcs_assignment_eff_dt: |
-          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
-        current_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
+        rbcs_latest_assignment: integer
+        first_rbcs_release_year: integer
+        rbcs_analysis_start_dt: date
+        rbcs_analysis_end_dt: date
+        alt_assignment_method: integer
+        rbcs_id_ever_reassigned: integer
     columns:
       - name: hcpcs_cd
         description: HCPCS or CPT code.
@@ -586,10 +611,18 @@ seeds:
         description: HCPCS Code Effective Date.
       - name: hcpcs_cd_end_dt
         description: HCPCS Code End Date.
-      - name: rbcs_assignment_eff_dt
-        description: Provides users with the earliest date that the RBCS ID is effective.
-      - name: current_flag
-        description: Flag where 1 = the current version of the RBCS for that particular HCPCS_CD, 0 = old version.
+      - name: rbcs_latest_assignment
+        description: CMS flag where 1 identifies the latest RBCS assignment for the HCPCS code and 0 identifies an earlier assignment.
+      - name: first_rbcs_release_year
+        description: First RBCS release year in which this assignment appeared.
+      - name: rbcs_analysis_start_dt
+        description: Beginning of the CMS analysis period for this assignment.
+      - name: rbcs_analysis_end_dt
+        description: End of the CMS analysis period for this assignment.
+      - name: alt_assignment_method
+        description: CMS flag indicating use of an alternative assignment method.
+      - name: rbcs_id_ever_reassigned
+        description: CMS flag indicating whether the HCPCS code has ever been reassigned to another RBCS ID.
 
   - name: terminology__icd_9_cm
     description: |-
@@ -604,10 +637,11 @@ seeds:
           display_name: "ICD-9-CM"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes/icd-9-cm-diagnosis-procedure-codes-abbreviated-and-full-code-titles"
-          source_release: "Historical ICD-9"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_release: "CMS ICD-9-CM versions 23 through 32 historical union"
+          source_last_updated: "2014-10-01"
+          tuva_last_updated: "2026-08-28"
           update_frequency: "static"
+          notes: "Codes present in v32 have deprecated = 0; codes found only in earlier releases have deprecated = 1. For v23-v26-only codes, the authoritative abbreviated title populates both description fields because CMS does not provide a full title in those archives."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -624,6 +658,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         short_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: icd_9_cm
         description: 'The ICD-9-CM code.'
@@ -631,6 +666,8 @@ seeds:
         description: 'The long description of the ICD-9-CM code.'
       - name: short_description
         description: 'The short description of the ICD-9-CM code.'
+      - name: deprecated
+        description: 'Indicates whether the code is historical and absent from final ICD-9-CM v32 (1) or present in v32 (0).'
 
   - name: terminology__icd_9_pcs
     description: |-
@@ -644,10 +681,11 @@ seeds:
           display_name: "ICD-9-PCS"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes/icd-9-cm-diagnosis-procedure-codes-abbreviated-and-full-code-titles"
-          source_release: "Historical ICD-9"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_release: "CMS ICD-9 procedure versions 23 through 32 historical union"
+          source_last_updated: "2014-10-01"
+          tuva_last_updated: "2026-08-28"
           update_frequency: "static"
+          notes: "Codes present in v32 have deprecated = 0; codes found only in earlier releases have deprecated = 1. For v23-v26-only codes, the authoritative abbreviated title populates both description fields because CMS does not provide a full title in those archives."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -664,6 +702,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         short_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: icd_9_pcs
         description: 'The ICD-9-PCS code.'
@@ -671,6 +710,8 @@ seeds:
         description: 'The long description of the ICD-9-PCS code.'
       - name: short_description
         description: 'The short description of the ICD-9-PCS code.'
+      - name: deprecated
+        description: 'Indicates whether the code is historical and absent from final ICD-9 procedure v32 (1) or present in v32 (0).'
 
 
   - name: terminology__icd_10_cm
@@ -687,10 +728,11 @@ seeds:
           display_name: "ICD-10-CM"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2026"
-          source_last_updated: "2025-12-17"
-          tuva_last_updated: "2026-04-29"
+          source_release: "FY 2027"
+          source_last_updated: ""
+          tuva_last_updated: "2026-08-28"
           update_frequency: "annually"
+          notes: "FY 2027 codes are current with deprecated = 0. All codes from the prior Tuva snapshot are retained; codes absent from FY 2027 have deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -709,6 +751,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         long_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: icd_10_cm
         description: 'Alpha-Numeric ICD-10-CM Code.'
@@ -718,6 +761,8 @@ seeds:
         description: 'The short description of the ICD-10-CM code.'
       - name: long_description
         description: 'The long description of the ICD-10-CM code.'
+      - name: deprecated
+        description: 'Indicates whether the ICD-10-CM code is absent from the FY 2027 release (1) or current in FY 2027 (0).'
 
   - name: terminology__icd_10_pcs
     description: |-
@@ -736,11 +781,11 @@ seeds:
           display_name: "ICD-10-PCS"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2026 April 1, 2026 update; AHRQ PRCCSR v2026.1 historical coverage"
-          source_last_updated: "2026-03-10"
-          tuva_last_updated: "2026-05-27"
+          source_release: "FY 2027; prior Tuva historical coverage"
+          source_last_updated: ""
+          tuva_last_updated: "2026-08-28"
           update_frequency: "annually"
-          notes: "Includes current CMS April 1, 2026 ICD-10-PCS codes plus historical ICD-10-PCS codes retained by AHRQ PRCCSR v2026.1. Deprecated is 1 when the code is no longer active in the current CMS code file."
+          notes: "Includes current FY 2027 ICD-10-PCS codes plus every valid historical ICD-10-PCS code from the prior Tuva snapshot. The prior non-code End of Content sentinel is excluded. Deprecated is 1 when the code is no longer active in the FY 2027 CMS code file."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -868,11 +913,12 @@ seeds:
           display_name: "LOINC"
           maintainer: "Regenstrief Institute"
           source_url: "https://loinc.org/downloads/"
-          source_release: "LOINC 2.82"
-          source_last_updated: "2026-02-24"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "LOINC 2.83"
+          source_last_updated: "2026-08-19"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "semiannually"
           license_url: "https://loinc.org/license/"
+          notes: "The official LOINC Complete archive requires a LOINC account. Prior Tuva concepts are retained with deprecated = 1 when absent from 2.83."
       post_hook: "{{ load_versioned_seed('terminology','terminology__loinc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -920,6 +966,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         version_last_changed: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: loinc
         description: 'The LOINC code.'
@@ -947,6 +994,12 @@ seeds:
         description: 'A code representing the top-level category for the test.'
       - name: class_type_description
         description: 'The top-level category for the test; Laboratory, Clinical, Claims attachments, or Surveys.'
+      - name: paneltype
+        description: 'Indicates whether the term is a panel, an organizer, or an individual observation in the LOINC source.'
+      - name: order_obs
+        description: 'Indicates whether the term is commonly used as an order, an observation, or both.'
+      - name: example_units
+        description: 'Example units supplied by LOINC for the term, when available.'
       - name: external_copyright_notice
         description: External copyright holder's copyright notice for this LOINC code.
       - name: status
@@ -955,6 +1008,8 @@ seeds:
         description: 'The first release version of LOINC that included this code.'
       - name: version_last_changed
         description: 'The last LOINC version in which this record was changed.'
+      - name: deprecated
+        description: 'Indicates whether the LOINC term is Deprecated or Discouraged, or is absent from LOINC 2.83 (1), rather than current (0).'
 
   - name: terminology__loinc_deprecated_mapping
     description: |-
@@ -967,10 +1022,10 @@ seeds:
         data_asset:
           maintainer: "Regenstrief Institute"
           source_url: "https://loinc.org/downloads/"
-          source_release: "LOINC 2.82"
-          source_last_updated: "2026-02-24"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "LOINC 2.83"
+          source_last_updated: "2026-08-19"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "semiannually"
           license_url: "https://loinc.org/license/"
       post_hook: "{{ load_versioned_seed('terminology','terminology__loinc_deprecated_mapping.csv.gz') }}"
       schema: |
@@ -999,11 +1054,11 @@ seeds:
       - name: comment
         description: 'Narrative text that explains the rationale for using the recommended replacement term.'
       - name: final_map_to
-        description: 'If there are multiple steps of deprecated codes, this is the final (active) code.'
+        description: 'The terminal code in the available replacement chain. It may remain noncurrent when LOINC provides no further successor relationship.'
       - name: all_comments
-        description: 'An aggregation of comments for any mapping steps between the deprecated code and the active code.'
+        description: 'An aggregation of comments for the available mapping steps between the deprecated code and the terminal code.'
       - name: depth
-        description: 'How many steps this mapping is to the active code.'
+        description: 'The number of additional mapping steps after map_to that lead to final_map_to.'
 
   - name: terminology__mdc
     description: |-
@@ -1046,12 +1101,13 @@ seeds:
     config:
       meta:
         data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january-1"
-          source_release: ""
+          maintainer: "CMS"
+          source_url: "https://www.cms.gov/data-research/files-for-order/limited-data-set-lds-files/master-beneficiary-summary-file-mbsf-lds"
+          source_release: "2025 LDS MBSF ABCD V2 Base Data Dictionary, with historical values retained"
           source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          tuva_last_updated: "2026-08-28"
           update_frequency: "ad hoc"
+          notes: "Includes current MBSF ABCD V2 values 00-06, 08-10, 99, and NA. Historical 07 and XX values are retained with deprecated = 1; any previously published source-specific values are also retained as deprecated. The prior Tuva description of NA as missing/unknown was corrected to the CMS meaning Non-Medicaid; an unversioned code table cannot represent both meanings for the same code."
       post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_dual_eligibility.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1065,11 +1121,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         dual_status_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: dual_status_code
         description: 'The code representing dual eligibility status.'
       - name: dual_status_description
         description: 'A description of the dual eligibility status.'
+      - name: deprecated
+        description: 'Indicates whether the dual-status value is historical (1) rather than current (0).'
 
   - name: terminology__medicare_orec
     description: |-
@@ -1152,10 +1211,10 @@ seeds:
         data_asset:
           display_name: "MS-DRG Weights and LOS"
           maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2026-ipps-final-rule-home-page"
-          source_release: "FY 2026 IPPS Final Rule Table 5"
+          source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2027-ipps-final-rule-home-page"
+          source_release: "FY 2021 through FY 2027 IPPS Final Rule Table 5"
           source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          tuva_last_updated: "2026-08-28"
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg_weights_los.csv.gz') }}"
       schema: |
@@ -1225,9 +1284,10 @@ seeds:
           display_name: "MS-DRG"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software"
-          source_release: "FY 2026 MS-DRG v43"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
+          source_release: "FY 2027 MS-DRG v44 final-rule Table 5"
+          source_last_updated: "2026-08-03"
+          tuva_last_updated: "2026-08-28"
+          notes: "Current FY2027 codes come from the final-rule Table 5. Prior-only MS-DRG codes remain with deprecated = 1 and their existing deprecated_date."
           update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg.csv.gz') }}"
       schema: |
@@ -1583,20 +1643,23 @@ seeds:
   - name: terminology__snomed_icd_10_map
     description: |-
       The SNOMED CT to ICD-10-CM map links clinical concepts to diagnosis codes for condition mapping.
-      It is maintained through the SNOMED CT U.S. Edition distributed
-      by the National Library of Medicine. The CMS HCC package uses this asset in suspecting models to map
-      SNOMED CT condition concepts to ICD-10-CM diagnosis codes.
+      SNOMED International maintains SNOMED CT, and the National Library of Medicine distributes the
+      U.S. Edition and its mapping resources. The CMS HCC package uses this asset in suspecting models to
+      map SNOMED CT condition concepts to ICD-10-CM diagnosis codes. Tuva publishes the coordinated March
+      2026 map as a release snapshot and preserves the source active field rather than appending obsolete
+      relationship rows as though they were current.
     config:
       meta:
         data_asset:
           display_name: "SNOMED to ICD-10 Map"
-          maintainer: "National Library of Medicine"
+          maintainer: "SNOMED International and National Library of Medicine"
           source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "March 2026 SNOMED CT to ICD-10-CM Mapping Resources (20260301)"
+          source_last_updated: "2026-03-01"
+          tuva_last_updated: "2026-08-29"
+          update_frequency: "semiannually"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
+          notes: "Current relationship snapshot coordinated with the March 2026 SNOMED CT U.S. Edition. Source lifecycle is retained in active; prior mapping rows are not appended without explicit relationship lifecycle. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_icd_10_map.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1618,7 +1681,7 @@ seeds:
         referenced_component_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         referenced_component_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4096) {%- endif -%}
         map_group: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         map_priority: |
@@ -1676,18 +1739,25 @@ seeds:
       SNOMED CT concepts identify clinical findings, disorders, procedures, body structures, organisms,
       and other clinical meanings. SNOMED CT is maintained by SNOMED International, and the U.S. Edition
       is distributed by the National Library of Medicine. Tuva uses this asset in the core lab result
-      model, the core observation model, core procedure models, and core condition models.
+      model, the core observation model, core procedure models, core condition models, and logical data
+      quality checks. The March 2026 U.S. Edition is merged with every concept from the prior Tuva
+      snapshot so historical source codes continue to resolve. The description remains the current
+      fully specified name (FSN), preserving the public column's established semantics.
     config:
       meta:
+        primary_key_columns:
+          - snomed_ct
+        primary_key_strategy: natural_single_column
         data_asset:
           display_name: "SNOMED CT"
-          maintainer: "National Library of Medicine"
+          maintainer: "SNOMED International and National Library of Medicine"
           source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "March 2026 SNOMED CT U.S. Edition (20260301)"
+          source_last_updated: "2026-03-01"
+          tuva_last_updated: "2026-08-29"
+          update_frequency: "semiannually"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
+          notes: "Active March 2026 concepts have deprecated = 0. Inactive concepts and any concept retained only from the prior Tuva snapshot have deprecated = 1. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1698,31 +1768,36 @@ seeds:
         snomed_ct: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4096) {%- endif -%}
         is_active: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         created: date
         last_updated: date
+        deprecated: integer
     columns:
       - name: snomed_ct
         description: 'The SNOMED CT code.'
       - name: description
-        description: 'The description of the SNOMED CT code.'
+        description: 'The active fully specified name (FSN) when available, otherwise the latest inactive FSN from the March 2026 U.S. Edition; prior-only concepts retain their previously published description.'
       - name: is_active
         description: 'Indicates if the SNOMED CT code is active.'
       - name: created
         description: 'The date when the SNOMED CT code was created.'
       - name: last_updated
         description: 'The date when the SNOMED CT code was last updated.'
+      - name: deprecated
+        description: 'Indicates whether the concept is inactive in the March 2026 U.S. Edition or retained only from the prior Tuva snapshot (1), rather than active in March 2026 (0).'
 
 
   - name: terminology__snomed_ct_transitive_closures
     description: |-
       SNOMED CT transitive closures expand the concept hierarchy so descendants and ancestors can be
-      queried directly. They are derived from SNOMED CT, which is maintained by SNOMED International and
-      distributed in the U.S. by the National Library of Medicine. Tuva publishes this asset for user-led
-      SNOMED CT hierarchy analysis and downstream clinical concept expansion; current Tuva Core models do
-      not join to it directly.
+      queried directly. SNOMED International maintains SNOMED CT, and the National Library of Medicine
+      distributes the U.S. Edition and its transitive closure resources. Tuva publishes the coordinated
+      March 2026 closure snapshot for user-led SNOMED CT hierarchy analysis and downstream clinical
+      concept expansion; current Tuva Core models do not join to it directly. The relation is reflexive:
+      every retained concept has one self-edge in addition to the current official ancestor edges. Prior
+      non-reflexive hierarchy edges are not appended to the current relationship snapshot.
     config:
       meta:
         primary_key_columns:
@@ -1731,13 +1806,14 @@ seeds:
         primary_key_strategy: natural_multi_column
         data_asset:
           display_name: "SNOMED CT Transitive Closures"
-          maintainer: "National Library of Medicine"
+          maintainer: "SNOMED International and National Library of Medicine"
           source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_release: "March 2026 SNOMED CT U.S. Edition Transitive Closure Resources (20260301)"
+          source_last_updated: "2026-03-01"
+          tuva_last_updated: "2026-08-29"
+          update_frequency: "semiannually"
           license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
+          notes: "Reflexive current hierarchy snapshot coordinated with the March 2026 SNOMED CT U.S. Edition. Every retained concept has one self-edge; prior non-reflexive closure edges are not retained as current relationships. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct_transitive_closures.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1748,11 +1824,11 @@ seeds:
         parent_snomed_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         parent_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4096) {%- endif -%}
         child_snomed_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         child_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4096) {%- endif -%}
     columns:
       - name: parent_snomed_code
         description: 'The SNOMED code of the parent concept.'
@@ -1866,10 +1942,11 @@ seeds:
           display_name: "ICD-10-PCS CMS Ontology"
           maintainer: "CMS"
           source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2026"
-          source_last_updated: "2025-12-17"
-          tuva_last_updated: "2026-04-29"
+          source_release: "FY 2027"
+          source_last_updated: ""
+          tuva_last_updated: "2026-08-28"
           update_frequency: "annually"
+          notes: "FY 2027 code axes are current with deprecated = 0. Prior Tuva ontology rows are retained with deprecated = 1 when the code is absent from FY 2027."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd10_pcs_cms_ontology.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1893,6 +1970,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         qualifier: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: icd10pcs_code
         description: ICD-10-PCS code
@@ -1910,6 +1988,8 @@ seeds:
         description: Device associated with the ICD-10-PCS code; corresponds to the sixth character of the code
       - name: qualifier
         description: Qualifier associated with the ICD-10-PCS code; corresponds to the seventh character of the code
+      - name: deprecated
+        description: Indicates whether the ICD-10-PCS code is absent from FY 2027 (1) or current in FY 2027 (0).
 
   - name: terminology__ssa_fips_state_county_crosswalk
     description: |-
@@ -1919,17 +1999,14 @@ seeds:
       enrichment and user-led SSA-to-FIPS crosswalks; current Tuva Core models do not join to it directly.
     config:
       meta:
-        primary_key_columns:
-          - fipscounty
-          - ssa_code
-        primary_key_strategy: natural_multi_column
         data_asset:
           maintainer: "National Bureau of Economic Research"
-          source_url: "https://data.nber.org/ssa-fips-state-county-crosswalk/2025/ssa_fips_state_county_2025.csv"
-          source_release: "2025 SSA-FIPS county crosswalk"
-          source_last_updated: "2024-09-06"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
+          source_url: "https://data.nber.org/ssa-fips-state-county-crosswalk/2026/ssa_fips_state_county_2026.csv"
+          source_release: "2026 SSA-FIPS county crosswalk"
+          source_last_updated: "2025-04-15"
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "annually"
+          notes: "Published as the authoritative 2026 relationship snapshot. Erroneous prior relationship rows are not retained as code history. The relation is unique on the nullable pair (fipscounty, ssa_code); authoritative ratebook-only and Connecticut planning-region rows may populate only one identifier."
       post_hook: "{{ load_versioned_seed('terminology','terminology__ssa_fips_state_county_crosswalk.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1953,6 +2030,23 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(64) {%- endif -%} 
         countyname_rate: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(128) {%- endif -%} 
+    columns:
+      - name: fipscounty
+        description: 'Five-character Federal Information Processing Standards (FIPS) state and county code when available, preserving leading zeros.'
+      - name: countyname_fips
+        description: 'County or county-equivalent name associated with the FIPS code when available.'
+      - name: state
+        description: 'Two-character U.S. postal abbreviation supplied by the source when available.'
+      - name: cbsa_code
+        description: 'Five-character Core-Based Statistical Area (CBSA) code assigned by CMS; null when the county is not assigned to a CBSA.'
+      - name: cbsa_name
+        description: 'Name of the Core-Based Statistical Area associated with the CBSA code; null when the county is not assigned to a CBSA.'
+      - name: ssa_code
+        description: 'Five-character Social Security Administration state and county code from the Medicare Advantage Ratebook when available, preserving leading zeros.'
+      - name: state_name
+        description: 'State or territory name from the Medicare Advantage Ratebook when available.'
+      - name: countyname_rate
+        description: 'County name from the Medicare Advantage Ratebook associated with the SSA code when available.'
 
   - name: terminology__ansi_fips_state
     description: |-
@@ -2091,11 +2185,12 @@ seeds:
       meta:
         data_asset:
           maintainer: "U.S. Census Bureau and ANSI/INCITS"
-          source_url: "https://www2.census.gov/geo/docs/reference/codes2020/national_county2020.txt"
-          source_release: "2020 Census county national codes file"
-          source_last_updated: "2023-02-13"
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
+          source_url: "https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip"
+          source_release: "2025 TIGER/Line county layer"
+          source_last_updated: ""
+          tuva_last_updated: "2026-08-28"
+          update_frequency: "annually"
+          notes: "Current 2025 counties are marked deprecated = 0. Prior Tuva county codes absent from the 2025 layer are retained with deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__fips_county.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2109,6 +2204,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         state : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        deprecated: integer
     columns:
       - name: fips_code
         description: 'The FIPS code for the county.'
@@ -2116,6 +2212,8 @@ seeds:
         description: 'The name of the county.'
       - name: state
         description: 'The state where the county is located.'
+      - name: deprecated
+        description: 'Indicates whether the FIPS county code is absent from the 2025 TIGER/Line county layer (1) or current (0).'
 
   - name: terminology__ssa_fips_state
     description: |-
