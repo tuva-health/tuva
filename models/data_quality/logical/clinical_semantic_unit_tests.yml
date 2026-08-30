@@ -294,9 +294,11 @@ unit_tests:
         format: sql
         rows: |
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
-          select 'rank_valid' as source_condition_id, 'p1' as person_id, 'a1' as patient_id, null as encounter_id
+          select 'rank_valid' as source_condition_id, 'p1' as person_id, 'a1' as patient_id
+            , cast(null as {{ string_type }}) as encounter_id
             , cast(null as date) as recorded_date, cast(null as date) as onset_date, cast(null as date) as resolved_date
             , 'icd-10-cm' as code_system, null as source_code, 1 as condition_rank
             , null as present_on_admit_code, 'source' as data_source
