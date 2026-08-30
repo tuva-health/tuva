@@ -82,11 +82,11 @@ testing cross-package compatibility.
 
 `Tuva CI -- Snowflake` runs automatically for every in-repository pull request.
 It tests the exact pull-request merge commit on Snowflake using Tuva Core, the
-integration project, and the small synthetic dataset. Structural and Logical
-Input Data Quality, Output Data Quality rollups, and the optional Logical
-failure-key relation are enabled so the complete Core test surface runs. A
-package version change does not change this automatic path. The Snowflake
-status is informational and is not required for merge.
+integration project, and the small synthetic dataset. Structural Data Quality,
+Logical Data Quality, and the optional Logical failure-key relation are enabled
+so the complete Core test surface runs. A package version change does not
+change this automatic path. The Snowflake status is informational and is not
+required for merge.
 
 For the final release pull request, dispatch `Tuva CI -- All Warehouses` from
 the Actions tab and enter only its pull-request number. The workflow accepts an

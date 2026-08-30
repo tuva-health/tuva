@@ -29,7 +29,7 @@ Tuva Core owns the common transformation path:
 - Service categories, encounters, member months, claims enrollment, and
   provider attribution in `models/claims_preprocessing`.
 - Public common-model outputs in `models/core`.
-- Opt-in Input Data Quality and Output Data Quality models in
+- Opt-in Structural Data Quality and Logical Data Quality models in
   `models/data_quality`.
 - Package metadata in `models/metadata`.
 - The opt-in parity metric producer in `models/parity`.
@@ -172,9 +172,10 @@ CodeRx Open is the default medication terminology. When
 ## Data Quality
 
 - Data Quality is disabled by default.
-- Use **Input Data Quality** for Structural and Logical checks and **Output
-  Data Quality** for downstream rollups. Do not use `DQI` branding in this
-  package; DQI is a Tuva Enterprise product.
+- Organize the framework around **Structural Data Quality** and **Logical Data
+  Quality**. Do not group these check families beneath another public layer or
+  add downstream output rollups without a separately accepted design. Do not
+  use `DQI` branding in this package; DQI is a Tuva Enterprise product.
 - Logical row-level flags are tri-state: failure, pass, or not applicable.
   Preserve applicability rather than coercing unknown checks to pass.
 - The stable Structural Data Quality relations are:
@@ -190,8 +191,9 @@ CodeRx Open is the default medication terminology. When
   - `data_quality.logical_failure_keys` when explicitly enabled
 - Other materialized helpers, flag relations, and macros are implementation
   details rather than stable consumer contracts.
-- Do not call parity output Data Quality. Parity is a separate release
-  comparison tool.
+- The supported selectors are `data_quality`, `dq_structural`, and
+  `dq_logical`.
+- Parity is separate from Data Quality and remains a release comparison tool.
 
 ## Data Assets And Seeds
 

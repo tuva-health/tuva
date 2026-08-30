@@ -7,7 +7,7 @@
        else 'data_quality'
      ),
      alias = 'logical_test_input_columns',
-     tags = ['data_quality', 'dq_logical', 'dq_rollup'],
+     tags = ['data_quality', 'dq_logical'],
      materialized = 'table'
    )
 }}

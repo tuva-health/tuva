@@ -14,12 +14,10 @@ vars:
   parity_enabled: false                # Keeps optional parity metric models out of normal development and CI builds.
 
   ## Data quality
-  # Enables neutral Structural and Logical Input Data Quality models plus
-  # Output Data Quality rollups.
+  # Enables Structural Data Quality and Logical Data Quality models.
   # Production projects can leave this false/omitted unless they want to build these queryable result tables.
   data_quality_enabled: false           # Keeps optional data-quality result models out of this compatibility run.
   enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
-  data_quality_domain_input_requirements: []  # Optional additional component-to-input dependency mappings.
 
   ## Medication terminology
   # False uses the package's CodeRx Open assets. True requires user-managed
