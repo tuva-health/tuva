@@ -153,6 +153,9 @@ jobs:
       - name: Test the portability linter
         run: python3 scripts/test_portability_lint.py
 
+      - name: Test the Core dbt var inventory
+        run: python3 tests/unit/test_dbt_var_inventory.py
+
       - name: Lint models for non-portable SQL
         run: python3 scripts/portability_lint.py
 
@@ -541,7 +544,7 @@ jobs:
       CI_DBT_SELECTOR: ${{ needs.resolve.outputs.selector }}
       TUVA_CI_SCHEMA_PREFIX: ${{ needs.resolve.outputs.schema_prefix }}
       CI_DBT_VARS: >-
-        {"use_synthetic_data": true, "synthetic_data_size": "small",
+        {"synthetic_data_size": "small",
         "parity_enabled": false, "data_quality_enabled": true,
         "enable_data_quality_failure_keys": true,
         "tuva_schema_prefix": "${{ needs.resolve.outputs.schema_prefix }}"}

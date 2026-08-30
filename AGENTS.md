@@ -164,6 +164,12 @@ generate typed YAML or JSON before invoking dbt. In model configuration and
 SQL, use the existing `tuva_boolean_var` package macro rather than ad hoc
 coercion.
 
+Keep `integration_tests/dbt_project.yml` as the canonical commented inventory
+of every public, integration-only, warehouse-specific, and internal Core dbt
+variable. Keep standalone-package variables in their separate section. The
+CI-wired `tests/unit/test_dbt_var_inventory.py` contract must stay aligned with
+new, renamed, or removed Core variable lookups.
+
 CodeRx Open is the default medication terminology. When
 `use_coderx_enterprise: true`, every CodeRx consumer reads user-managed
 `packages`, `drugs`, and `classes` relations from the target database's
@@ -266,7 +272,6 @@ redefine an existing ID; append a new ID for a new calculation.
 - Keep `integration_tests/dbt_project.yml` on `profile: default` before
   pushing.
 - Use the integration defaults unless the task requires otherwise:
-  - `use_synthetic_data: true`
   - `synthetic_data_size: small`
   - `parity_enabled: false`
   - `data_quality_enabled: false`

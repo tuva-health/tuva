@@ -187,6 +187,9 @@ class DataAssetContractTest(unittest.TestCase):
         load_macro = (
             ROOT / "macros" / "cross_database_utils" / "load_seed.sql"
         ).read_text()
+        path_test = (
+            ROOT / "tests" / "data_assets" / "test_package_seed_paths.sql"
+        ).read_text()
 
         self.assertIn("macro get_tuva_package_version()", version_macro)
         self.assertNotIn("get_installed_" + "package_version", version_macro)
@@ -214,6 +217,9 @@ class DataAssetContractTest(unittest.TestCase):
         )
         self.assertIn("var('custom_bucket_name', 'tuva-public-resources')", path_macro)
         self.assertIn("var('tuva_seed_buckets', {})", path_macro)
+        self.assertNotIn("the_tuva_project.get_seed_bucket", path_test)
+        self.assertIn("var('custom_bucket_name', 'tuva-public-resources')", path_test)
+        self.assertIn("var('tuva_seed_buckets', {})", path_test)
 
         self.assertIn("iam_role default", load_macro.lower())
         self.assertIn(
@@ -244,11 +250,7 @@ class DataAssetContractTest(unittest.TestCase):
         self.assertIn("set null_char = ''", load_macro)
         self.assertIn("'escapeChar' = '\\0'", load_macro)
         self.assertIn("'nullValue' = ''", load_macro)
-        self.assertIn('options.append(", header true") if headers == true', load_macro)
-        self.assertIn(
-            "PostgreSQL COPY CSV already treats an unquoted empty field as NULL",
-            load_macro,
-        )
+        self.assertNotIn("macro postgres__load_seed", load_macro)
         self.assertNotIn("null ''\\\\N''", load_macro)
 
         readme = (ROOT / "README.md").read_text()
