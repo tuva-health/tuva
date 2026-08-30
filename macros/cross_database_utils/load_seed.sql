@@ -384,52 +384,6 @@ COPY_OPTIONS (
 {% endif %}
 {% endmacro %}
 
-
-
-{% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
-{% do the_tuva_project.reset_seed_relation() %}
-{%- set columns = adapter.get_columns_in_relation(this) -%}
-{%- set collist = [] -%}
-{%- for col in columns -%}
-  {%- do collist.append(col.name) -%}
-{%- endfor -%}
-{%- set cols = collist|join(",") -%}
-
-{%- set s3_bucket = var("tuva_seeds_s3_bucket", uri.split("/")[0]) -%}
-{%- set s3_key = uri.split("/")[1:]|join("/") + "/" + pattern -%}
-{%- if var("tuva_seeds_s3_key_prefix", "") != "" -%}
-{%- set s3_key = var("tuva_seeds_s3_key_prefix") + "/" + s3_key -%}
-{%- endif -%}
-{%- set s3_region = "us-east-1" -%}
-{%- set options = ["(", "format csv", ", encoding ''utf8''"] -%}
-{%- do options.append(", header true") if headers == true -%}
-{# PostgreSQL COPY CSV already treats an unquoted empty field as NULL. #}
-{%- do options.append(")") -%}
-{%- set options_s = options | join("") -%}
-
-{% set sql %}
-SELECT aws_s3.table_import_from_s3(
-   '{{ this }}',
-   '{{ cols }}',
-   '{{ options_s }}',
-   aws_commons.create_s3_uri('{{s3_bucket}}', '{{s3_key}}', '{{s3_region}}')
-)
-{% endset %}
-
-{% call statement('postgressql',fetch_result=true) %}
-{{ sql }}
-{% endcall %}
-
-{% if execute %}
-{# debugging { log(sql, True)} #}
-{% set results = load_result('postgressql') %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ s3_bucket ~ "/" ~ s3_key ,True) }}
-{# debugging { log(results, True) } #}
-{% endif %}
-
-{% endmacro %}
-
-
 {% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
 {% do the_tuva_project.reset_seed_relation() %}
 {% set fabric_storage_root = var('tuva_seed_fabric_storage_root', 'https://tuvapublicresources.blob.core.windows.net') | trim('/') %}
