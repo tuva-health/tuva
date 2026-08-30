@@ -130,7 +130,7 @@ unit_tests:
             , cast(null as {{ string_type }}) as {{ plan_identifier }}
             , cast(null as {{ string_type }}) as data_source
             , cast(null as {{ string_type }}) as member_month_id
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - medical_claim_id: mc-u-1

@@ -92,5 +92,6 @@
         , cast(null as {{ dbt.type_string() }}) as column_name
         , cast(null as {{ dbt.type_string() }}) as mismatch_type
         , cast(null as {{ dbt.type_string() }}) as actual_value
+    from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
     where 1 = 0
 {% endif %}

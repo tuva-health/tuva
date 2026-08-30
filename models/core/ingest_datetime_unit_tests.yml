@@ -37,8 +37,8 @@ unit_tests:
             , 'CO' as state
             , '80202' as zip_code
             , 'Denver' as county
-            , cast(39.7 as decimal(18, 4)) as latitude
-            , cast(-104.9 as decimal(18, 4)) as longitude
+            , cast(39.7 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as latitude
+            , cast(-104.9 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as longitude
             , '555-0100' as phone
             , 'claims@example.com' as email
             , 'N' as ethnicity
@@ -66,8 +66,8 @@ unit_tests:
             , 'CO' as state
             , '80202' as zip_code
             , 'Denver' as county
-            , cast(39.7 as decimal(18, 4)) as latitude
-            , cast(-104.9 as decimal(18, 4)) as longitude
+            , cast(39.7 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as latitude
+            , cast(-104.9 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as longitude
             , '555-0101' as phone
             , 'excluded@example.com' as email
             , 'N' as ethnicity
@@ -81,7 +81,8 @@ unit_tests:
               'clinical_only', 'III', 'ClinicalOnly', 'Source', 'Patient', 'female', 'Asian'
             , cast('1990-01-01' as date), cast(null as date), 0, '222-22-2222'
             , '3 Clinical Way', 'Denver', 'CO', '80202', 'Denver'
-            , cast(39.7 as decimal(18, 4)), cast(-104.9 as decimal(18, 4))
+            , cast(39.7 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }})
+            , cast(-104.9 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }})
             , '555-0102', 'clinical@example.com', 'N', 'clinical_only', 'patient'
             , cast('2024-03-04 05:06:07' as {{ timestamp_type }})
             , cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'source'
@@ -191,19 +192,19 @@ unit_tests:
       - input: ref('terminology__icd_10_pcs')
         format: sql
         rows: |
-          select '__unused__' as icd_10_pcs, '__unused__' as description where 1 = 0
+          select '__unused__' as icd_10_pcs, '__unused__' as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_pcs')
         format: sql
         rows: |
-          select '__unused__' as icd_9_pcs, '__unused__' as short_description where 1 = 0
+          select '__unused__' as icd_9_pcs, '__unused__' as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__hcpcs_level_2')
         format: sql
         rows: |
-          select '__unused__' as hcpcs, '__unused__' as short_description where 1 = 0
+          select '__unused__' as hcpcs, '__unused__' as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__unused__' as snomed_ct, '__unused__' as description where 1 = 0
+          select '__unused__' as snomed_ct, '__unused__' as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - claim_id: claim_1

@@ -135,7 +135,7 @@ unit_tests:
               cast(null as {{ string_type }}) as claim_id
             , cast(null as {{ integer_type }}) as claim_line_number
             , cast(null as {{ string_type }}) as data_source
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - claim_id: shared-undetermined

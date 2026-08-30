@@ -145,8 +145,8 @@ unit_tests:
             , 'Denver' as city
             , 'CO' as state
             , '80202' as zip_code
-            , cast(null as decimal(18, 4)) as latitude
-            , cast(null as decimal(18, 4)) as longitude
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as latitude
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as longitude
             , cast(null as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source_a' as data_source
@@ -174,8 +174,8 @@ unit_tests:
             , 'Denver' as city
             , 'CO' as state
             , '80202' as zip_code
-            , cast(39.7 as decimal(18, 4)) as latitude
-            , cast(-104.9 as decimal(18, 4)) as longitude
+            , cast(39.7 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as latitude
+            , cast(-104.9 as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 4)' }}) as longitude
             , cast('2024-03-01 00:00:00' as {{ timestamp_type }}) as ingest_datetime
             , cast('2024-04-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
             , 'source_a' as data_source

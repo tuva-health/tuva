@@ -68,7 +68,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as icd_9_cm
             , cast(null as {{ string_type }}) as long_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
@@ -76,7 +76,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as snomed_ct
             , cast(null as {{ string_type }}) as description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__present_on_admission')
         format: sql
         rows: |
@@ -84,7 +84,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as present_on_admit_code
             , cast(null as {{ string_type }}) as present_on_admit_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - condition_id: b4ace79d04a310770199a0a86a51a2e3

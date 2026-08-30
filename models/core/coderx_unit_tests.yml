@@ -260,7 +260,7 @@ unit_tests:
       - input: ref('core__stg_coderx_drugs')
         format: sql
         rows: |
-          select 'no_match' as drug_id, 'No match' as drug_name where 1 = 0
+          select 'no_match' as drug_id, 'No match' as drug_name from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('core__stg_coderx_classes')
         format: sql
         rows: |
@@ -275,7 +275,7 @@ unit_tests:
             , cast(null as {{ string_type }}) as atc_3_name
             , cast(null as {{ string_type }}) as atc_4_code
             , cast(null as {{ string_type }}) as atc_4_name
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - medication_id: claim_medication
@@ -392,7 +392,7 @@ unit_tests:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
         rows: |
-          select '__not_used__' as claim_id where 1 = 0
+          select '__not_used__' as claim_id from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('normalized_input__stg_pharmacy_claim')
         format: sql
         rows: |
@@ -433,7 +433,7 @@ unit_tests:
             , null as provider_last_name
             , null as provider_first_name
             , null as provider_organization_name
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |

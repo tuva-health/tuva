@@ -258,7 +258,9 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 10 as row_count
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source
+            , '__dq_structural_null__' as data_source_key, 10 as row_count
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
@@ -340,7 +342,9 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 0 as row_count
+          select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source
+            , '__dq_structural_null__' as data_source_key, 0 as row_count
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
@@ -719,10 +723,10 @@ unit_tests:
         format: sql
         rows: |
           select
-                null as data_source
-              , null as data_source_key
-              , null as model_name
-              , null as row_count
-          where 1 = 0
+                cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source
+              , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
+              , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as model_name
+              , cast(null as {{ 'int64' if target.type == 'bigquery' else 'bigint' }}) as row_count
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows: []

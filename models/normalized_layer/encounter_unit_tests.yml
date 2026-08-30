@@ -37,9 +37,9 @@ unit_tests:
             , cast(null as {{ string_type }}) as primary_diagnosis_code
             , cast(null as {{ string_type }}) as drg_code_type
             , cast(null as {{ string_type }}) as drg_code
-            , cast(null as decimal(18, 2)) as paid_amount
-            , cast(null as decimal(18, 2)) as allowed_amount
-            , cast(null as decimal(18, 2)) as charge_amount
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}) as paid_amount
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}) as allowed_amount
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}) as charge_amount
             , cast(null as {{ timestamp_type }}) as ingest_datetime
             , 'source-ehr' as data_source
           union all
@@ -89,7 +89,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as admit_source_code
             , cast(null as {{ string_type }}) as admit_source_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__admit_type')
         format: sql
         rows: |
@@ -97,7 +97,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as admit_type_code
             , cast(null as {{ string_type }}) as admit_type_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__discharge_disposition')
         format: sql
         rows: |
@@ -105,7 +105,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as discharge_disposition_code
             , cast(null as {{ string_type }}) as discharge_disposition_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
@@ -113,7 +113,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as icd_10_cm
             , cast(null as {{ string_type }}) as long_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
@@ -121,7 +121,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as icd_9_cm
             , cast(null as {{ string_type }}) as long_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ms_drg')
         format: sql
         rows: |
@@ -129,7 +129,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as ms_drg_code
             , cast(null as {{ string_type }}) as ms_drg_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__apr_drg')
         format: sql
         rows: |
@@ -137,7 +137,7 @@ unit_tests:
           select
               cast(null as {{ string_type }}) as apr_drg_code
             , cast(null as {{ string_type }}) as apr_drg_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - encounter_id: enc-inpatient

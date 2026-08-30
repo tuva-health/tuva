@@ -88,7 +88,7 @@ unit_tests:
             , cast(null as {{ string_type }}) as service_category_2
             , cast(null as {{ string_type }}) as service_category_3
             , cast(null as {{ string_type }}) as source_model_name
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('service_category__service_categories')
         format: sql
         rows: |
