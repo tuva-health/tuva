@@ -13,13 +13,13 @@ with source_rows as (
           nullif(cast(drug_id as {{ coderx_string_type }}), 'NULL') as drug_id
         , nullif(cast(drug_name as {{ coderx_name_type }}), 'NULL') as drug_name
         , nullif(cast(atc_1_code as {{ coderx_string_type }}), 'NULL') as atc_1_code
-        , nullif(cast(atc_1_name as {{ coderx_string_type }}), 'NULL') as atc_1_name
+        , nullif(cast(atc_1_name as {{ coderx_name_type }}), 'NULL') as atc_1_name
         , nullif(cast(atc_2_code as {{ coderx_string_type }}), 'NULL') as atc_2_code
-        , nullif(cast(atc_2_name as {{ coderx_string_type }}), 'NULL') as atc_2_name
+        , nullif(cast(atc_2_name as {{ coderx_name_type }}), 'NULL') as atc_2_name
         , nullif(cast(atc_3_code as {{ coderx_string_type }}), 'NULL') as atc_3_code
-        , nullif(cast(atc_3_name as {{ coderx_string_type }}), 'NULL') as atc_3_name
+        , nullif(cast(atc_3_name as {{ coderx_name_type }}), 'NULL') as atc_3_name
         , nullif(cast(atc_4_code as {{ coderx_string_type }}), 'NULL') as atc_4_code
-        , nullif(cast(atc_4_name as {{ coderx_string_type }}), 'NULL') as atc_4_name
+        , nullif(cast(atc_4_name as {{ coderx_name_type }}), 'NULL') as atc_4_name
     {% if the_tuva_project.tuva_boolean_var('use_coderx_enterprise', false) %}
     from {{ source('coderx', 'classes') }}
     {% else %}
