@@ -1,7 +1,7 @@
 {% macro smart_union(relations, source_index='_source') %}
 {#
     Unions relations with automatic alignment of columns.
-    Missing columns are filled with NULL. Extension columns (prefixed) are sorted last.
+    Missing columns are filled with NULL. Columns matching the configured extension prefix are sorted last.
 
     smart_union vs dbt_utils.union_relations:
     ┌─────────────────────┬─────────────────────────────────────┬─────────────────────────┐
@@ -9,7 +9,7 @@
     ├─────────────────────┼─────────────────────────────────────┼─────────────────────────┤
     │ Source tracking     │ Full path string                    │ Numeric index (1, 2...) │
     │ Filter syntax       │ WHERE _source LIKE '%table_name%'   │ WHERE _source = 1       │
-    │ Column ordering     │ Arbitrary                           │ Core first, ext_ last   │
+    │ Column ordering     │ Arbitrary                           │ Core first, prefix last │
     └─────────────────────┴─────────────────────────────────────┴─────────────────────────┘
 
     Arguments:
