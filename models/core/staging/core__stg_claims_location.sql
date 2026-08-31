@@ -10,44 +10,28 @@ select distinct
     , data_source
 from {{ ref('core__medical_claim') }}
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select distinct
     rendering_npi as npi
     , data_source
 from {{ ref('core__medical_claim') }}
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select distinct
     billing_npi as npi
     , data_source
 from {{ ref('core__medical_claim') }}
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select distinct
     prescribing_provider_id as npi
     , data_source
 from {{ ref('core__pharmacy_claim') }}
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select distinct
     dispensing_provider_id as npi

@@ -14,11 +14,7 @@ select
 , data_source
 from {{ ref('encounters__stg_professional') }} as a
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select
   scg.claim_id

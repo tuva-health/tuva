@@ -66,11 +66,7 @@ inner join bill_type_requirement as d
   on a.claim_id = d.claim_id
   and a.data_source = d.data_source
 
-{% if target.type == 'fabric' %}
 union
-{% else %}
-union distinct
-{% endif %}
 
 select distinct
     a.claim_id
