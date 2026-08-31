@@ -58,53 +58,50 @@ cast(
 {% if the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true
    and the_tuva_project.tuva_boolean_var('claims_enabled', false) == true -%}
 
-{%- if execute -%}
-    {%- set passthrough_config = get_extension_passthrough_config() -%}
-    {%- set passthrough_prefix = passthrough_config['prefix'] | lower -%}
-    {%- set clinical_extension_columns = [] -%}
-
-    {%- for col in adapter.get_columns_in_relation(ref('core__int_patient_remove_duplicates')) -%}
-        {%- if col.name.lower().startswith(passthrough_prefix) -%}
-            {%- do clinical_extension_columns.append({"name": col.name, "data_type": col.data_type}) -%}
-        {%- endif -%}
-    {%- endfor -%}
-{%- else -%}
-    {%- set clinical_extension_columns = [] -%}
-{%- endif -%}
+{%- set patient_passthrough = get_extension_passthrough_config() -%}
+{%- set patient_extension_source = _get_extension_source_columns(
+    ref('core__int_patient_remove_duplicates'),
+    patient_passthrough['prefix']
+) -%}
 
 {%- set claims_patient_extension_columns -%}
-    {%- for clinical_col in clinical_extension_columns %}
-        , cast(null as {{ clinical_col["data_type"] }}) as {{ adapter.quote(clinical_col["name"]) }}
-    {%- endfor -%}
+    {{ select_null_extension_columns(
+        ref('core__int_patient_remove_duplicates'),
+        type_source_alias='clinical_patient',
+        _extension_source=patient_extension_source
+    ) }}
 {%- endset -%}
 
 {%- set clinical_patient_extension_columns -%}
-    {%- for clinical_col in clinical_extension_columns %}
-        , clinical_patient.{{ adapter.quote(clinical_col["name"]) }}
-    {%- endfor -%}
+    {{ select_extension_columns(
+        ref('core__int_patient_remove_duplicates'),
+        alias='clinical_patient',
+        strip_prefix=false,
+        _extension_source=patient_extension_source
+    ) }}
 {%- endset -%}
 
 {%- set unioned_extension_columns -%}
-    {%- for clinical_col in clinical_extension_columns %}
-        , unioned.{{ adapter.quote(clinical_col["name"]) }}
-    {%- endfor -%}
+    {{ select_extension_columns(
+        ref('core__int_patient_remove_duplicates'),
+        alias='unioned',
+        strip_prefix=false,
+        _extension_source=patient_extension_source
+    ) }}
 {%- endset -%}
 
 {%- set final_extension_columns -%}
-    {{ select_extension_columns(ref('core__int_patient_remove_duplicates'), alias='patient_base') }}
+    {{ select_extension_columns(
+        ref('core__int_patient_remove_duplicates'),
+        alias='patient_base',
+        _extension_source=patient_extension_source
+    ) }}
 {%- endset -%}
 
 with claims_patient as (
     select
         *
     from {{ ref('normalized__eligibility_remove_duplicates') }}
-)
-
-, person_list_to_exclude_because_in_claims as (
-    select distinct
-          person_id
-        , data_source
-    from claims_patient
 )
 
 , clinical_patient as (
@@ -175,6 +172,15 @@ with claims_patient as (
     from clinical_patient
 )
 
+, prioritized_patients as (
+    select
+          unioned.*
+        , max(case when unioned._source = 1 then 1 else 0 end) over (
+              partition by unioned.person_id, unioned.data_source
+          ) as _has_claims_record
+    from unioned
+)
+
 , patient_base as (
     select
           unioned.person_id
@@ -203,44 +209,11 @@ with claims_patient as (
         , unioned.ingest_datetime
         , unioned.tuva_last_run
         , cast(substring(cast(unioned.tuva_last_run as {{ dbt.type_string() }}), 1, 10) as date) as tuva_last_run_date
-    from unioned
-    where _source = 1
-
-    union all
-
-    select
-          unioned.person_id
-        , unioned.name_suffix
-        , unioned.first_name
-        , unioned.middle_name
-        , unioned.last_name
-        , unioned.sex
-        , unioned.race
-        , unioned.birth_date
-        , unioned.death_date
-        , unioned.death_flag
-        , unioned.social_security_number
-        , unioned.address
-        , unioned.city
-        , unioned.state
-        , unioned.zip_code
-        , unioned.county
-        , unioned.latitude
-        , unioned.longitude
-        , unioned.phone
-        , unioned.email
-        , unioned.ethnicity
-        {{ unioned_extension_columns }}
-        , unioned.data_source
-        , unioned.ingest_datetime
-        , unioned.tuva_last_run
-        , cast(substring(cast(unioned.tuva_last_run as {{ dbt.type_string() }}), 1, 10) as date) as tuva_last_run_date
-    from unioned
-    left outer join person_list_to_exclude_because_in_claims as claims_people
-        on unioned.person_id = claims_people.person_id
-        and unioned.data_source = claims_people.data_source
-    where _source = 2
-      and claims_people.person_id is null
+    from prioritized_patients as unioned
+    where unioned._source = 1
+       or unioned.person_id is null
+       or unioned.data_source is null
+       or unioned._has_claims_record = 0
 )
 
 select

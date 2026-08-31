@@ -2,10 +2,10 @@
 {#
     Returns the validated extension-column configuration.
 
-    `passthrough` must be a mapping, `prefix` must be a non-empty string, and
-    `strip` must be a real boolean. Macro arguments override the corresponding
-    configured value, but do not make an otherwise invalid project
-    configuration valid.
+    `passthrough` must be a mapping containing only `prefix` and `strip`,
+    `prefix` must be a non-empty string, and `strip` must be a real boolean.
+    Macro arguments override the corresponding configured value, but do not
+    make an otherwise invalid project configuration valid.
 #}
     {%- set passthrough_config = var('passthrough', {}) -%}
 
@@ -15,6 +15,16 @@
             ~ "`prefix` and `strip` keys."
         ) -%}
     {%- endif -%}
+
+    {%- set allowed_passthrough_keys = ['prefix', 'strip'] -%}
+    {%- for config_key in passthrough_config.keys() -%}
+        {%- if config_key not in allowed_passthrough_keys -%}
+            {%- do exceptions.raise_compiler_error(
+                "Invalid `passthrough` configuration: unsupported key `" ~ config_key
+                ~ "`. Allowed keys are `prefix` and `strip`."
+            ) -%}
+        {%- endif -%}
+    {%- endfor -%}
 
     {%- set configured_prefix = passthrough_config.get('prefix', 'x_') -%}
     {%- if configured_prefix is not string or configured_prefix | trim | length == 0 -%}
@@ -121,53 +131,20 @@
 {% endmacro %}
 
 
-{% macro select_extension_columns(relation, alias=none, prefix=none, strip_prefix=none) %}
+{% macro _get_extension_source_columns(relation, effective_prefix) %}
 {#
-    Selects extension columns from a relation.
+    Discovers extension-column names and data types once for downstream renderers.
 
-    Extension columns are identified case-insensitively by a prefix (default:
-    `x_`). The macro reads column metadata from the relation and emits the
-    matching columns. The prefix can optionally be stripped in the output.
-
-    Arguments:
-        relation: The relation to inspect.
-        alias: Optional SQL table alias used to qualify column references.
-        prefix: Optional explicit prefix; defaults to `passthrough.prefix`.
-        strip_prefix: Optional boolean; defaults to `passthrough.strip`.
-
-    Configuration in dbt_project.yml:
-        vars:
-          passthrough:
-            prefix: 'x_'
-            strip: false
-
-    Unit-test override:
-        dbt unit-test refs compile to ephemeral CTEs that cannot be introspected
-        reliably. `_extension_columns_override` supplies the source column names
-        for those tests. Include fixed columns too when testing collision errors.
+    The unit-test override supplies names without data types because dbt unit-test
+    refs compile to ephemeral CTEs that cannot be introspected reliably.
 #}
-    {%- set passthrough = get_extension_passthrough_config(prefix, strip_prefix) -%}
-    {%- set effective_prefix = passthrough['prefix'] -%}
-    {%- set effective_strip_prefix = passthrough['strip'] -%}
-
-    {%- if alias is not none
-        and (alias is not string or alias | trim | length == 0) -%}
-        {%- do exceptions.raise_compiler_error(
-            "Invalid `alias` argument to `select_extension_columns`: expected a "
-            ~ "non-empty string or `none`."
-        ) -%}
-    {%- endif -%}
-
     {%- if not execute -%}
-        {{ return('') }}
+        {{ return({'columns': [], 'using_override': false}) }}
     {%- endif -%}
 
-    {%- set alias_prefix = alias ~ '.' if alias else '' -%}
     {%- set prefix_lower = effective_prefix | lower -%}
-    {%- set extension_columns = [] -%}
-    {%- set source_column_names = [] -%}
+    {%- set source_columns = [] -%}
     {%- set using_override = false -%}
-
     {%- set declared_fixed_columns = _extension_declared_fixed_columns(relation) -%}
 
     {#- A prefix must never classify a declared fixed model column as an extension. -#}
@@ -201,20 +178,24 @@
                     ~ "non-empty column-name string."
                 ) -%}
             {%- endif -%}
-            {%- do source_column_names.append(column_name) -%}
+            {%- do source_columns.append({
+                'name': column_name,
+                'data_type': none
+            }) -%}
         {%- endfor -%}
     {%- else -%}
         {%- for column in adapter.get_columns_in_relation(relation) -%}
-            {%- do source_column_names.append(column.name) -%}
+            {%- do source_columns.append({
+                'name': column.name,
+                'data_type': column.data_type
+            }) -%}
         {%- endfor -%}
     {%- endif -%}
 
-    {%- if source_column_names | length == 0 -%}
-        {{ return('') }}
-    {%- endif -%}
-
+    {%- set extension_columns = [] -%}
     {%- set source_names_by_lower = {} -%}
-    {%- for column_name in source_column_names -%}
+    {%- for source_column in source_columns -%}
+        {%- set column_name = source_column['name'] -%}
         {%- set column_name_lower = column_name | lower -%}
         {%- if column_name_lower.startswith(prefix_lower) -%}
             {%- if column_name_lower in source_names_by_lower -%}
@@ -226,8 +207,70 @@
                 ) -%}
             {%- endif -%}
             {%- do source_names_by_lower.update({column_name_lower: column_name}) -%}
+            {%- do extension_columns.append(source_column) -%}
         {%- endif -%}
     {%- endfor -%}
+
+    {{ return({
+        'columns': extension_columns,
+        'using_override': using_override
+    }) }}
+{% endmacro %}
+
+
+{% macro select_extension_columns(relation, alias=none, prefix=none, strip_prefix=none, _extension_source=none) %}
+{#
+    Selects extension columns from a relation.
+
+    Extension columns are identified case-insensitively by a prefix (default:
+    `x_`). The macro reads column metadata from the relation and emits the
+    matching columns. The prefix can optionally be stripped in the output.
+
+    Arguments:
+        relation: The physical relation whose column metadata is inspected.
+        alias: Optional SQL table alias used to qualify column references. It
+            may name a schema-preserving ephemeral CTE sourced from `relation`.
+        prefix: Optional explicit prefix; defaults to `passthrough.prefix`.
+        strip_prefix: Optional boolean; defaults to `passthrough.strip`.
+
+    Configuration in dbt_project.yml:
+        vars:
+          passthrough:
+            prefix: 'x_'
+            strip: false
+
+    Unit-test override:
+        dbt unit-test refs compile to ephemeral CTEs that cannot be introspected
+        reliably. `_extension_columns_override` supplies the source column names
+        for those tests. Include fixed columns too when testing collision errors.
+#}
+    {%- set passthrough = get_extension_passthrough_config(prefix, strip_prefix) -%}
+    {%- set effective_prefix = passthrough['prefix'] -%}
+    {%- set effective_strip_prefix = passthrough['strip'] -%}
+
+    {%- if alias is not none
+        and (alias is not string or alias | trim | length == 0) -%}
+        {%- do exceptions.raise_compiler_error(
+            "Invalid `alias` argument to `select_extension_columns`: expected a "
+            ~ "non-empty string or `none`."
+        ) -%}
+    {%- endif -%}
+
+    {%- if not execute -%}
+        {{ return('') }}
+    {%- endif -%}
+
+    {%- set alias_prefix = alias ~ '.' if alias else '' -%}
+    {%- set extension_columns = [] -%}
+    {%- set extension_source = _extension_source
+        if _extension_source is not none
+        else _get_extension_source_columns(relation, effective_prefix) -%}
+    {%- set source_extension_columns = extension_source['columns'] -%}
+    {%- set using_override = extension_source['using_override'] -%}
+
+    {%- if source_extension_columns | length == 0 -%}
+        {{ return('') }}
+    {%- endif -%}
 
     {#- Only columns declared by the current output model reserve final names.
         A non-extension column on the inspected source relation may be omitted
@@ -248,56 +291,54 @@
     {%- endif -%}
 
     {%- set extension_output_names = {} -%}
-    {%- for column_name in source_column_names -%}
-        {%- set column_name_lower = column_name | lower -%}
-        {%- if column_name_lower.startswith(prefix_lower) -%}
-            {%- if effective_strip_prefix -%}
-                {%- set output_name = column_name[effective_prefix | length:] -%}
-            {%- else -%}
-                {%- set output_name = column_name -%}
-            {%- endif -%}
+    {%- for source_column in source_extension_columns -%}
+        {%- set column_name = source_column['name'] -%}
+        {%- if effective_strip_prefix -%}
+            {%- set output_name = column_name[effective_prefix | length:] -%}
+        {%- else -%}
+            {%- set output_name = column_name -%}
+        {%- endif -%}
 
-            {%- if output_name | length == 0 -%}
-                {%- do exceptions.raise_compiler_error(
-                    "Extension column `" ~ column_name ~ "` on relation `" ~ relation
-                    ~ "` becomes an empty output name when prefix `" ~ effective_prefix
-                    ~ "` is stripped. Rename the extension column or disable stripping."
-                ) -%}
-            {%- endif -%}
+        {%- if output_name | length == 0 -%}
+            {%- do exceptions.raise_compiler_error(
+                "Extension column `" ~ column_name ~ "` on relation `" ~ relation
+                ~ "` becomes an empty output name when prefix `" ~ effective_prefix
+                ~ "` is stripped. Rename the extension column or disable stripping."
+            ) -%}
+        {%- endif -%}
 
-            {%- set output_name_lower = output_name | lower -%}
-            {%- if output_name_lower in fixed_output_names -%}
-                {%- set collision = fixed_output_names[output_name_lower] -%}
-                {%- do exceptions.raise_compiler_error(
-                    "Extension column `" ~ column_name ~ "` on relation `" ~ relation
-                    ~ "` resolves to output column `" ~ output_name ~ "`, which "
-                    ~ "collides case-insensitively with fixed column `"
-                    ~ collision['name'] ~ "` in " ~ collision['location'] ~ ". Rename "
-                    ~ "the extension column, choose another prefix, or disable stripping."
-                ) -%}
-            {%- endif -%}
+        {%- set output_name_lower = output_name | lower -%}
+        {%- if output_name_lower in fixed_output_names -%}
+            {%- set collision = fixed_output_names[output_name_lower] -%}
+            {%- do exceptions.raise_compiler_error(
+                "Extension column `" ~ column_name ~ "` on relation `" ~ relation
+                ~ "` resolves to output column `" ~ output_name ~ "`, which "
+                ~ "collides case-insensitively with fixed column `"
+                ~ collision['name'] ~ "` in " ~ collision['location'] ~ ". Rename "
+                ~ "the extension column, choose another prefix, or disable stripping."
+            ) -%}
+        {%- endif -%}
 
-            {%- if output_name_lower in extension_output_names -%}
-                {%- do exceptions.raise_compiler_error(
-                    "Extension columns `" ~ extension_output_names[output_name_lower]
-                    ~ "` and `" ~ column_name ~ "` on relation `" ~ relation
-                    ~ "` both resolve case-insensitively to output column `" ~ output_name
-                    ~ "`. Extension output names must be unique case-insensitively."
-                ) -%}
-            {%- endif -%}
-            {%- do extension_output_names.update({output_name_lower: column_name}) -%}
+        {%- if output_name_lower in extension_output_names -%}
+            {%- do exceptions.raise_compiler_error(
+                "Extension columns `" ~ extension_output_names[output_name_lower]
+                ~ "` and `" ~ column_name ~ "` on relation `" ~ relation
+                ~ "` both resolve case-insensitively to output column `" ~ output_name
+                ~ "`. Extension output names must be unique case-insensitively."
+            ) -%}
+        {%- endif -%}
+        {%- do extension_output_names.update({output_name_lower: column_name}) -%}
 
-            {#- Overrides are an internal unit-test hook and do not carry the
-                adapter-normalized identifier casing returned by introspection. -#}
-            {%- set source_identifier = column_name if using_override else adapter.quote(column_name) -%}
-            {%- set source_expression = alias_prefix ~ source_identifier -%}
-            {%- if effective_strip_prefix -%}
-                {%- do extension_columns.append(
-                    source_expression ~ ' as ' ~ adapter.quote(output_name)
-                ) -%}
-            {%- else -%}
-                {%- do extension_columns.append(source_expression) -%}
-            {%- endif -%}
+        {#- Overrides are an internal unit-test hook and do not carry the
+            adapter-normalized identifier casing returned by introspection. -#}
+        {%- set source_identifier = column_name if using_override else adapter.quote(column_name) -%}
+        {%- set source_expression = alias_prefix ~ source_identifier -%}
+        {%- if effective_strip_prefix -%}
+            {%- do extension_columns.append(
+                source_expression ~ ' as ' ~ adapter.quote(output_name)
+            ) -%}
+        {%- else -%}
+            {%- do extension_columns.append(source_expression) -%}
         {%- endif -%}
     {%- endfor -%}
 
