@@ -157,6 +157,8 @@ data-asset versions are intentionally independent. Core assets use this layout:
 
 ```text
 tuva-core/<data-asset-version>/
+├── _manifest.json
+├── _release.json
 ├── terminology/
 ├── provider-data/
 ├── synthetic-data/
@@ -175,6 +177,12 @@ relation names, schemas, column types, tests, and load hooks. Payload inventory,
 source provenance, and candidate/released status live with the versioned cloud
 snapshot instead of in the dbt package. dbt loads only the selected path and
 does not read cloud manifest or release-status files.
+
+A `candidate` snapshot may be edited while it is being prepared. A `released`
+snapshot is read-only by default. The only exception is an explicit
+break-glass instruction from Aaron that names the exact package and asset
+version and gives a reason; maintenance must record that authorization, scope,
+reason, and the resulting file changes.
 
 S3 is the public source, and GCS and Azure mirror the same versioned paths.
 

@@ -219,7 +219,9 @@ CodeRx Open is the default medication terminology. When
   bind code commits to asset receipts.
 - Candidate cloud folders may be edited during release preparation. Released
   folders are normally immutable; cloud maintenance may override that lock
-  only when Aaron explicitly authorizes a scoped break-glass change.
+  only when Aaron explicitly authorizes a break-glass change for the exact
+  package and asset version and supplies a reason. Record the authorization,
+  scope, reason, and resulting file changes in the maintenance audit output.
 - Redshift loading uses `IAM_ROLE default`; never reintroduce embedded
   long-lived cloud credentials into package loaders or CI configuration.
 - Data asset changes must preserve cross-warehouse loading behavior.
