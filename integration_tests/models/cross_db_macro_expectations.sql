@@ -67,6 +67,22 @@ with literal_rows as (
 
 )
 
+, duplicate_rows as (
+
+    select 1 as duplicate_key
+    {{ the_tuva_project.union_distinct() }}
+    select 1 as duplicate_key
+
+)
+
+, union_expectations as (
+
+    select count(*) as union_distinct_count
+    from duplicate_rows
+
+)
+
 select *
 from scalar_expectations
 cross join aggregate_expectations
+cross join union_expectations

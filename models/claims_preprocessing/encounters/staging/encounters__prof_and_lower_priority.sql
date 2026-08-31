@@ -14,7 +14,7 @@ select
 , data_source
 from {{ ref('encounters__stg_professional') }} as a
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select
   scg.claim_id

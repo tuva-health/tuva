@@ -54,6 +54,10 @@ models:
           name: cross_db_macro_expectations_string_agg_joins_in_order
           arguments:
             expression: "string_agg_result = 'a,b,c'"
+      - dbt_utils.expression_is_true:
+          name: cross_db_macro_expectations_union_distinct_deduplicates_rows
+          arguments:
+            expression: "union_distinct_count = 1"
     columns:
       - name: trim_result
         description: "the_tuva_project.trim('  padded  ')"
@@ -77,3 +81,5 @@ models:
         description: "the_tuva_project.bool_or_agg over (true, false, true), cast to int"
       - name: string_agg_result
         description: "the_tuva_project.string_agg over ('a', 'b', 'c') ordered by ordinal"
+      - name: union_distinct_count
+        description: "Row count after the_tuva_project.union_distinct combines two identical rows"

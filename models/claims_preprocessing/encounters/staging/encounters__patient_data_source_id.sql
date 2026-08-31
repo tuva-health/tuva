@@ -8,7 +8,7 @@ select distinct person_id
 , data_source
 from {{ ref('normalized__medical_claim') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select distinct person_id
 , data_source

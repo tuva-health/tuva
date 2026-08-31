@@ -66,7 +66,7 @@ inner join bill_type_requirement as d
   on a.claim_id = d.claim_id
   and a.data_source = d.data_source
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select distinct
     a.claim_id

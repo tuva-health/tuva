@@ -12,7 +12,7 @@ select claim_id
 , 0 as priority_number
 from {{ ref('office_visits__int_office_visits_radiology') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
@@ -22,7 +22,7 @@ select claim_id
 , 1 as priority_number
 from {{ ref('office_visits__int_office_visits_surgery') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
@@ -32,7 +32,7 @@ select claim_id
 , 2 as priority_number
 from {{ ref('office_visits__int_office_visits_injections') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
@@ -42,7 +42,7 @@ select claim_id
 , 3 as priority_number
 from {{ ref('office_visits__int_office_visits_ptotst') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
@@ -52,7 +52,7 @@ select claim_id
 , 4 as priority_number
 from {{ ref('office_visits__int_office_visits_em') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
@@ -62,7 +62,7 @@ select claim_id
 , 5 as priority_number
 from {{ ref('office_visits__int_office_visits_telehealth') }}
 
-union
+{{ the_tuva_project.union_distinct() }}
 
 select claim_id
 , claim_line_number
