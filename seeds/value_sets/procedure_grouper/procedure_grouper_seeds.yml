@@ -10,15 +10,6 @@ seeds:
           - procedure_family
           - procedure
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Tuva Procedure Grouper"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva Procedure Grouper v1"
-          source_last_updated: "2026-05-27"
-          tuva_last_updated: "2026-05-27"
-          update_frequency: "ad hoc"
-          notes: "Initial hierarchy is derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 and Tuva clinical review."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -74,15 +65,6 @@ seeds:
           - code_system
           - code
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Tuva Procedure Grouper Code Map"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva Procedure Grouper v1"
-          source_last_updated: "2026-05-27"
-          tuva_last_updated: "2026-05-27"
-          update_frequency: "ad hoc"
-          notes: "Initial mappings are derived from AHRQ CCSR for ICD-10-PCS Procedures v2026.1 with Tuva overrides for active CMS April 2026 ICD-10-PCS codes not yet present in AHRQ PRCCSR v2026.1."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper_code_map.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}

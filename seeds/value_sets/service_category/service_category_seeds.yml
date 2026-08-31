@@ -14,15 +14,6 @@ seeds:
           - start_valid_date
           - end_valid_date
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "CCS Services and Procedures"
-          maintainer: "AHRQ HCUP"
-          source_url: "https://hcup-us.ahrq.gov/toolssoftware/ccs_svcsproc/ccssvcproc.jsp"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
-          notes: "Used by claims preprocessing for service category and encounter grouping."
       post_hook: "{{ load_versioned_seed('value_sets','service_category__ccs_services_procedures.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -66,15 +57,6 @@ seeds:
       identify substance-use related claims. It is maintained by AHRQ HCUP. Tuva uses this asset in claims
       preprocessing service category and encounter grouping models.
     config:
-      meta:
-        data_asset:
-          display_name: "AHRQ CCSRs: DXCCSR v2023.1"
-          maintainer: "AHRQ HCUP"
-          source_url: "https://hcup-us.ahrq.gov/toolssoftware/ccsr/ccs_refined.jsp"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','service_category__dxccsr_v2023_1_cleaned_map.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -160,14 +142,6 @@ seeds:
       Tuva uses this asset in claims preprocessing service category and encounter grouping models and
       semantic layer models.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','service_category__service_categories.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}

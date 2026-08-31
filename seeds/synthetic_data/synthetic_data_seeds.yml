@@ -11,13 +11,6 @@ seeds:
           - appointment_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__appointment') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -69,13 +62,6 @@ seeds:
           - source_condition_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__condition') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -124,13 +110,6 @@ seeds:
           - encounter_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__encounter') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -198,13 +177,6 @@ seeds:
           - plan
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__eligibility') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -304,13 +276,6 @@ seeds:
           - immunization_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__immunization') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -376,13 +341,6 @@ seeds:
           - lab_result_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__lab_result') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -469,13 +427,6 @@ seeds:
       meta:
         primary_key_columns: [location_id, data_source]
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__location') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -506,13 +457,6 @@ seeds:
       meta:
         primary_key_columns: [medication_id, data_source]
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__medication') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -550,13 +494,6 @@ seeds:
       meta:
         primary_key_columns: [practitioner_id, data_source]
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__practitioner') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -581,13 +518,6 @@ seeds:
       meta:
         primary_key_columns: [source_procedure_id, data_source]
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__procedure') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -623,14 +553,6 @@ seeds:
           - claim_line_number
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Synthetic Medical Claim"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__medical_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -911,13 +833,6 @@ seeds:
           - observation_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__observation') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -984,14 +899,6 @@ seeds:
           - claim_line_number
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Synthetic Pharmacy Claim"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__pharmacy_claim') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -1055,13 +962,6 @@ seeds:
           - patient_id
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__patient') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}
@@ -1133,13 +1033,6 @@ seeds:
           - plan
           - data_source
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva synthetic data v1.2.4"
-          source_last_updated: ""
-          tuva_last_updated: "2026-06-25"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_synthetic_seed('synthetic_data__provider_attribution') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_synthetic_data{% else %}synthetic_data{%- endif -%}

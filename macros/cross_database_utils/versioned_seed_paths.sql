@@ -33,74 +33,38 @@
 {% endmacro %}
 
 
-{% macro get_seed_bucket(database, package_slug=none) %}
-  {% set bucket_overrides = var('tuva_seed_buckets', {}) %}
-  {% set normalized_database = database | string | trim %}
-  {% set alternate_database = normalized_database | replace('-', '_') %}
-  {% set bucket = none %}
-
-  {% if bucket_overrides is mapping %}
-    {% if normalized_database in bucket_overrides %}
-      {% set bucket = bucket_overrides[normalized_database] %}
-    {% elif alternate_database in bucket_overrides %}
-      {% set bucket = bucket_overrides[alternate_database] %}
-    {% endif %}
-  {% endif %}
-
-  {% if bucket is none and package_slug is not none and bucket_overrides is mapping %}
-    {% set normalized_slug = package_slug | string | trim %}
-    {% set alternate_slug = normalized_slug | replace('-', '_') %}
-    {% if normalized_slug in bucket_overrides %}
-      {% set bucket = bucket_overrides[normalized_slug] %}
-    {% elif alternate_slug in bucket_overrides %}
-      {% set bucket = bucket_overrides[alternate_slug] %}
-    {% endif %}
-  {% endif %}
-
-  {% if bucket is none %}
-    {% set bucket = var('custom_bucket_name', 'tuva-public-resources') %}
-  {% endif %}
-
-  {% set normalized_bucket = bucket | string | trim %}
-  {% if normalized_bucket.startswith('s3://') %}
-    {% set normalized_bucket = normalized_bucket[5:] %}
-  {% endif %}
-
-  {{ return(normalized_bucket | trim('/')) }}
-{% endmacro %}
-
-
-{% macro get_package_seed_uri(package_slug, package_version, object_path='', bucket=none) %}
-  {% set normalized_slug = package_slug | string | trim | trim('/') %}
-  {% if normalized_slug == '' or '/' in normalized_slug %}
+{% macro get_package_seed_uri(asset_root, asset_version, object_path='', bucket=none) %}
+  {% set normalized_root = asset_root | string | trim | trim('/') %}
+  {% set root_parts = normalized_root.split('/') %}
+  {% if normalized_root == '' or '' in root_parts or '.' in root_parts or '..' in root_parts %}
     {% do exceptions.raise_compiler_error(
-        "Tuva package seed slug must be a nonempty path segment. Received '" ~ package_slug ~ "'."
+        "Tuva data asset root must contain only nonempty path segments. Received '" ~ asset_root ~ "'."
     ) %}
   {% endif %}
 
-  {% set normalized_version = package_version | string | trim %}
+  {% set normalized_version = asset_version | string | trim %}
   {% if normalized_version.startswith('v') %}
     {% set normalized_version = normalized_version[1:] %}
   {% endif %}
   {% set normalized_version = normalized_version | trim('/') %}
   {% if normalized_version == '' or '/' in normalized_version %}
     {% do exceptions.raise_compiler_error(
-        "Tuva package seed version must be a nonempty path segment. Received '" ~ package_version ~ "'."
+        "Tuva data asset version must be a nonempty path segment. Received '" ~ asset_version ~ "'."
     ) %}
   {% endif %}
 
   {% if bucket is none %}
-    {% set normalized_bucket = the_tuva_project.get_seed_bucket(normalized_slug) %}
+    {% set normalized_bucket = var('custom_bucket_name', 'tuva-public-resources') | string | trim %}
   {% else %}
     {% set normalized_bucket = bucket | string | trim %}
-    {% if normalized_bucket.startswith('s3://') %}
-      {% set normalized_bucket = normalized_bucket[5:] %}
-    {% endif %}
-    {% set normalized_bucket = normalized_bucket | trim('/') %}
   {% endif %}
+  {% if normalized_bucket.startswith('s3://') %}
+    {% set normalized_bucket = normalized_bucket[5:] %}
+  {% endif %}
+  {% set normalized_bucket = normalized_bucket | trim('/') %}
 
   {% set normalized_object_path = object_path | string | trim | trim('/') %}
-  {% set uri = normalized_bucket ~ '/' ~ normalized_slug ~ '/' ~ normalized_version %}
+  {% set uri = normalized_bucket ~ '/' ~ normalized_root ~ '/' ~ normalized_version %}
   {% if normalized_object_path != '' %}
     {% set uri = uri ~ '/' ~ normalized_object_path %}
   {% endif %}
@@ -109,7 +73,7 @@
 {% endmacro %}
 
 
-{% macro load_package_seed(package_slug, package_version, object_path, compression=true, headers=true, null_marker=true, bucket=none) %}
+{% macro load_package_seed(asset_root, asset_version, object_path, compression=true, headers=true, null_marker=true, bucket=none) %}
   {% set normalized_object_path = object_path | string | trim | trim('/') %}
   {% if normalized_object_path == '' %}
     {% do exceptions.raise_compiler_error("Tuva package seed object_path must not be empty.") %}
@@ -121,8 +85,8 @@
 
   {{ return(the_tuva_project.load_seed(
       the_tuva_project.get_package_seed_uri(
-          package_slug,
-          package_version,
+          asset_root,
+          asset_version,
           object_folder,
           bucket
       ),
@@ -134,40 +98,24 @@
 {% endmacro %}
 
 
-{% macro get_versioned_seed_uri(database, version_override=none) %}
-  {% if version_override is not none %}
-    {% do exceptions.raise_compiler_error(
-        "Per-family Tuva seed version overrides were removed in 1.0. "
-        ~ "Data assets must use the installed Tuva Core package version."
-    ) %}
-  {% endif %}
-
+{% macro get_versioned_seed_uri(database) %}
   {{ return(the_tuva_project.get_package_seed_uri(
       'tuva-core',
-      the_tuva_project.get_tuva_package_version(),
-      the_tuva_project.get_seed_database_folder(database),
-      the_tuva_project.get_seed_bucket(database, 'tuva-core')
+      var('tuva_core_data_asset_version', '1.0.0'),
+      the_tuva_project.get_seed_database_folder(database)
   )) }}
 {% endmacro %}
 
 
-{% macro load_versioned_seed(database, seed_object_name, version=none, compression=true, headers=true, null_marker=true) %}
-  {% if version is not none %}
-    {% do exceptions.raise_compiler_error(
-        "Per-family Tuva seed version overrides were removed in 1.0. "
-        ~ "Data assets must use the installed Tuva Core package version."
-    ) %}
-  {% endif %}
-
+{% macro load_versioned_seed(database, seed_object_name, compression=true, headers=true, null_marker=true) %}
   {% set object_path = the_tuva_project.get_seed_database_folder(database) ~ '/' ~ seed_object_name %}
   {{ return(the_tuva_project.load_package_seed(
       'tuva-core',
-      the_tuva_project.get_tuva_package_version(),
+      var('tuva_core_data_asset_version', '1.0.0'),
       object_path,
       compression,
       headers,
-      null_marker,
-      the_tuva_project.get_seed_bucket(database, 'tuva-core')
+      null_marker
   )) }}
 {% endmacro %}
 
@@ -215,21 +163,13 @@
 {% endmacro %}
 
 
-{% macro load_versioned_synthetic_seed(seed_name, version=none, compression=true, headers=true, null_marker=true) %}
-  {% if version is not none %}
-    {% do exceptions.raise_compiler_error(
-        "Synthetic-data version overrides were removed in 1.0. "
-        ~ "Data assets must use the installed Tuva Core package version."
-    ) %}
-  {% endif %}
-
+{% macro load_versioned_synthetic_seed(seed_name, compression=true, headers=true, null_marker=true) %}
   {{ return(the_tuva_project.load_package_seed(
       'tuva-core',
-      the_tuva_project.get_tuva_package_version(),
+      var('tuva_core_data_asset_version', '1.0.0'),
       the_tuva_project.get_synthetic_seed_object_path(seed_name),
       compression,
       headers,
-      null_marker,
-      the_tuva_project.get_seed_bucket('synthetic_data', 'tuva-core')
+      null_marker
   )) }}
 {% endmacro %}

@@ -13,14 +13,6 @@ seeds:
         primary_key_columns:
           - concept_id
         primary_key_strategy: natural_single_column
-        data_asset:
-          display_name: "Tuva Concepts"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','value_sets__tuva_concepts.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -101,14 +93,6 @@ seeds:
         primary_key_columns:
           - value_set_member_id
         primary_key_strategy: natural_single_column
-        data_asset:
-          display_name: "Tuva Value Set Members"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','value_sets__tuva_value_set_members.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -172,14 +156,6 @@ seeds:
         primary_key_columns:
           - coding_system_id
         primary_key_strategy: natural_single_column
-        data_asset:
-          display_name: "Coding Systems"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('value_sets','value_sets__coding_systems.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}

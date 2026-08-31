@@ -40,11 +40,10 @@ vars:
   # The var is not needed in production projects that map their own source data.
   synthetic_data_size: small           # Selects the small or large payload; Core's loader fallback is large.
 
-  ## Data asset releases and buckets
-  # Tuva Core resolves assets from tuva-core/<installed-package-version>/.
+  ## Data assets
+  # Package code and data-asset versions are independent and manually coordinated.
+  tuva_core_data_asset_version: '1.0.0' # Loads tuva-core/1.0.0/.
   custom_bucket_name: tuva-public-resources  # Default public bucket for package data assets.
-  # Resolution precedence is Core asset family, package slug, then custom_bucket_name.
-  tuva_seed_buckets: {}                # Optional bucket overrides keyed by Core asset family or package slug.
 
   ## Schema naming
   # Optional prefix for output schemas, e.g. dev_aaron_core, dev_aaron_input_layer.
@@ -85,7 +84,7 @@ vars:
 
   ## Standalone package variables
   # Importing a standalone package enables it. These vars change package behavior;
-  # none is a package-level on/off switch or an external-asset version pin.
+  # none is a package-level on/off switch.
   ccsr:
     wide_condition_enabled: true       # Includes the optional wide condition-category output.
     wide_procedure_enabled: true       # Includes the optional wide procedure-category output.

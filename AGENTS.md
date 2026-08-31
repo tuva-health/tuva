@@ -13,7 +13,7 @@ validation, CI, and release rules.
   and dbt Fusion on DuckDB.
 - Repository `main` is the active integration line. A version on `main` is not
   a formal release by itself. A release also requires an immutable `v<version>`
-  tag, a GitHub release, and any required package data-asset receipt.
+  tag and a GitHub release.
 - Treat published model schemas, grains, identifiers, variables, selectors,
   and stable Data Quality interfaces as public contracts. Assume a change is
   breaking unless compatibility is demonstrated.
@@ -33,8 +33,7 @@ Tuva Core owns the common transformation path:
   `models/data_quality`.
 - Package metadata in `models/metadata`.
 - The opt-in parity metric producer in `models/parity`.
-- Core-owned seed headers, loader macros, and the exact asset inventory in
-  `seeds`, `macros`, and `data_assets.yml`.
+- Core-owned seed headers and loader macros in `seeds` and `macros`.
 
 Tuva Core does not own optional marts or extensions. The accepted 1.0
 standalone packages are:
@@ -64,10 +63,10 @@ Related repositories have distinct ownership:
   maintainer-only utilities.
 - Each connector owns its source-to-Input-Layer mappings.
 
-Core still owns `data_assets.yml`, checked-in seed headers, runtime loader
-macros, and changes to those package contracts. Route publisher, recipe,
-mirror, and maintenance-tool changes to `tuva-maintenance`; do not route every
-data-asset change there.
+Core still owns checked-in seed headers, runtime loader macros, and changes to
+those package contracts. Cloud manifests own payload inventory and source
+provenance. Route publisher, recipe, mirror, and maintenance-tool changes to
+the maintenance tooling; do not put those concerns in the dbt package.
 
 ## Architecture And Public-Contract Rules
 
@@ -203,22 +202,24 @@ CodeRx Open is the default medication terminology. When
 
 ## Data Assets And Seeds
 
-- Every asset-bearing package resolves one complete immutable snapshot from
-  its installed package version. Do not add separate terminology, value-set,
-  provider-data, synthetic-data, or standalone-package asset-version vars.
+- Every asset-bearing package owns one namespaced data-asset-version variable.
+  Package code and data-asset versions are intentionally independent and are
+  coordinated manually. Do not add separate terminology, value-set,
+  provider-data, or synthetic-data version variables.
+- Core uses `tuva_core_data_asset_version`, defaulting to `1.0.0`, directly in
+  `tuva-core/<data-asset-version>/`.
 - Checked-in package seed CSVs are header-only dbt loader contracts. Published
   object-storage payloads are the released data contents.
-- `data_assets.yml` must exactly inventory every Core payload path.
-- S3 is the released-content authority; GCS and Azure are verified mirrors.
-- A future-version payload prefix may be prepared before its version change
-  reaches `main`. It is a release candidate, is treated as reserved once
-  created, and must not contain `_release.json`.
-- Finalize the snapshot only after the version reaches `main`. The publisher
-  writes `_release.json` last, after every payload verifies, and binds it to
-  the exact package version and 40-character package commit.
-- dbt loaders do not read `_release.json` at runtime. Release automation does
-  read it and must verify byte-identical receipts in S3, GCS, and Azure before
-  tagging. Never weaken the exact-current-`main` commit gate.
+- Keep seed relation contracts, column types, tests, aliases, tags, and loader
+  hooks in the package. Do not duplicate payload inventory or structured
+  source provenance in the package; those belong in the cloud manifest.
+- S3 is the public source; GCS and Azure mirror the same versioned paths.
+- dbt loaders read only the configured path. They do not read `_manifest.json`,
+  `_release.json`, or candidate/released status, and package releases do not
+  bind code commits to asset receipts.
+- Candidate cloud folders may be edited during release preparation. Released
+  folders are normally immutable; cloud maintenance may override that lock
+  only when Aaron explicitly authorizes a scoped break-glass change.
 - Redshift loading uses `IAM_ROLE default`; never reintroduce embedded
   long-lived cloud credentials into package loaders or CI configuration.
 - Data asset changes must preserve cross-warehouse loading behavior.
@@ -401,8 +402,8 @@ passing build on one warehouse is not evidence of portability to the others.
   standalone package `main` branches once to exact commits. It builds that one
   source lock on Snowflake, BigQuery, Databricks, Fabric, and Redshift with the
   small synthetic dataset and complete Data Quality surface.
-- Version selection and comparison, candidate-asset checks, receipt handling,
-  tagging, and draft-release creation do not belong to CI.
+- Version selection and comparison, data-asset publication, tagging, and
+  draft-release creation do not belong to CI.
 - There is no individual-warehouse dispatcher. Troubleshoot one warehouse
   locally; validate DuckDB portability locally as needed.
 - Pull-request comments do not trigger CI, and CI does not accept arbitrary
@@ -419,16 +420,14 @@ For a release, finish ordinary implementation first, then open the small
 manual PR that changes the Core package version declarations. Snowflake starts
 automatically and may be canceled because it is not a merge gate. Manually run
 `Tuva CI -- All Warehouses` for that PR, merge only after the matrix passes,
-then use the separate data-asset and release workflows to finalize receipts,
-create the tag, and open the draft release. Version selection and editing stay
-in the manual pull request.
+then create the tag and open the draft release. Data-asset versions and cloud
+release status are coordinated independently through their own manifests.
 
 Two similarly named release files have different required jobs:
 
 - `.github/workflows/create-release.yml` is the executable GitHub Actions
-  workflow. It validates current `main`, verifies complete commit-bound
-  receipts in all three clouds, creates the tag, and opens a draft GitHub
-  release.
+  workflow. It validates current `main`, creates the package tag, and opens a
+  draft GitHub release. It does not inspect or modify data assets.
 - `.github/release.yml` is not a workflow. GitHub reads it to categorize
   automatically generated release notes by label.
 
