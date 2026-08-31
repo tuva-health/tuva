@@ -153,17 +153,17 @@ unit_tests:
       - input: ref('terminology__race')
         format: sql
         rows: |
-          select '__dq_no_match__' as description where 1 = 0
+          select '__dq_no_match__' as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ethnicity')
         format: sql
         rows: |
-          select '__dq_no_match__' as code where 1 = 0
+          select '__dq_no_match__' as code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ansi_fips_state')
         format: sql
         rows: |
           select '__dq_no_match__' as ansi_fips_state_code
             , '__dq_no_match__' as ansi_fips_state_abbreviation
-            , '__dq_no_match__' as ansi_fips_state_name where 1 = 0
+            , '__dq_no_match__' as ansi_fips_state_name from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - patient_id: integer_one
@@ -209,17 +209,17 @@ unit_tests:
       - input: ref('terminology__race')
         format: sql
         rows: |
-          select '__dq_no_match__' as description where 1 = 0
+          select '__dq_no_match__' as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ethnicity')
         format: sql
         rows: |
-          select '__dq_no_match__' as code where 1 = 0
+          select '__dq_no_match__' as code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ansi_fips_state')
         format: sql
         rows: |
           select '__dq_no_match__' as ansi_fips_state_code
             , '__dq_no_match__' as ansi_fips_state_abbreviation
-            , '__dq_no_match__' as ansi_fips_state_name where 1 = 0
+            , '__dq_no_match__' as ansi_fips_state_name from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - patient_id: lowercase_patient

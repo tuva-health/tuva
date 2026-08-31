@@ -260,7 +260,7 @@ unit_tests:
       - input: ref('core__stg_coderx_drugs')
         format: sql
         rows: |
-          select 'no_match' as drug_id, 'No match' as drug_name where 1 = 0
+          select 'no_match' as drug_id, 'No match' as drug_name from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('core__stg_coderx_classes')
         format: sql
         rows: |
@@ -275,7 +275,7 @@ unit_tests:
             , cast(null as {{ string_type }}) as atc_3_name
             , cast(null as {{ string_type }}) as atc_4_code
             , cast(null as {{ string_type }}) as atc_4_name
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - medication_id: claim_medication
@@ -392,12 +392,13 @@ unit_tests:
       - input: ref('input_layer__pharmacy_claim')
         format: sql
         rows: |
-          select '__not_used__' as claim_id where 1 = 0
+          select '__not_used__' as claim_id from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('normalized_input__stg_pharmacy_claim')
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               'enterprise_pharmacy_claim' as claim_id
             , 1 as claim_line_number
@@ -405,8 +406,8 @@ unit_tests:
             , 'member' as member_id
             , 'payer' as payer
             , 'plan' as {{ plan_identifier }}
-            , null as prescribing_provider_npi
-            , null as dispensing_provider_npi
+            , cast(null as {{ string_type }}) as prescribing_provider_npi
+            , cast(null as {{ string_type }}) as dispensing_provider_npi
             , cast('2024-01-01' as date) as dispensing_date
             , '99988877766' as ndc_code
             , 30 as quantity
@@ -427,13 +428,14 @@ unit_tests:
       - input: ref('provider_data__provider')
         format: sql
         rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               'no_match' as npi
-            , null as entity_type_code
-            , null as provider_last_name
-            , null as provider_first_name
-            , null as provider_organization_name
-          where 1 = 0
+            , cast(null as {{ string_type }}) as entity_type_code
+            , cast(null as {{ string_type }}) as provider_last_name
+            , cast(null as {{ string_type }}) as provider_first_name
+            , cast(null as {{ string_type }}) as provider_organization_name
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('core__stg_coderx_packages')
         format: sql
         rows: |

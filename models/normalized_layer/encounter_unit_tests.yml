@@ -17,8 +17,9 @@ unit_tests:
       - input: ref('input_layer__encounter')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set numeric_type = 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' %}
           select
               'enc-inpatient' as encounter_id
             , 'person-1' as person_id
@@ -37,9 +38,9 @@ unit_tests:
             , cast(null as {{ string_type }}) as primary_diagnosis_code
             , cast(null as {{ string_type }}) as drg_code_type
             , cast(null as {{ string_type }}) as drg_code
-            , cast(null as decimal(18, 2)) as paid_amount
-            , cast(null as decimal(18, 2)) as allowed_amount
-            , cast(null as decimal(18, 2)) as charge_amount
+            , cast(null as {{ numeric_type }}) as paid_amount
+            , cast(null as {{ numeric_type }}) as allowed_amount
+            , cast(null as {{ numeric_type }}) as charge_amount
             , cast(null as {{ timestamp_type }}) as ingest_datetime
             , 'source-ehr' as data_source
           union all
@@ -47,31 +48,31 @@ unit_tests:
               'enc-outpatient', 'person-2', 'patient-2', 'emergency department'
             , cast('2024-02-01' as date), cast('2024-02-01' as date)
             , null, null, null, null, null, null, null, null, null, null, null
-            , null, null, null, cast(null as {{ timestamp_type }}), 'source-ehr'
+            , cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ timestamp_type }}), 'source-ehr'
           union all
           select
               'enc-office', 'person-3', 'patient-3', 'office visit'
             , cast('2024-03-01' as date), cast('2024-03-01' as date)
             , null, null, null, null, null, null, null, null, null, null, null
-            , null, null, null, cast(null as {{ timestamp_type }}), 'source-ehr'
+            , cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ timestamp_type }}), 'source-ehr'
           union all
           select
               'enc-other', 'person-4', 'patient-4', 'orphaned claim'
             , cast('2024-04-01' as date), cast('2024-04-01' as date)
             , null, null, null, null, null, null, null, null, null, null, null
-            , null, null, null, cast(null as {{ timestamp_type }}), 'source-ehr'
+            , cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ timestamp_type }}), 'source-ehr'
           union all
           select
               'enc-unmatched', 'person-5', 'patient-5', 'source-only value'
             , cast('2024-05-01' as date), cast('2024-05-01' as date)
             , null, null, null, null, null, null, null, null, null, null, null
-            , null, null, null, cast(null as {{ timestamp_type }}), 'source-ehr'
+            , cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ timestamp_type }}), 'source-ehr'
           union all
           select
               'enc-null', 'person-6', 'patient-6', cast(null as {{ string_type }})
             , cast('2024-06-01' as date), cast('2024-06-01' as date)
             , null, null, null, null, null, null, null, null, null, null, null
-            , null, null, null, cast(null as {{ timestamp_type }}), 'source-ehr'
+            , cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ numeric_type }}), cast(null as {{ timestamp_type }}), 'source-ehr'
       - input: ref('terminology__encounter_type')
         format: sql
         rows: |
@@ -85,59 +86,59 @@ unit_tests:
       - input: ref('terminology__admit_source')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as admit_source_code
             , cast(null as {{ string_type }}) as admit_source_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__admit_type')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as admit_type_code
             , cast(null as {{ string_type }}) as admit_type_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__discharge_disposition')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as discharge_disposition_code
             , cast(null as {{ string_type }}) as discharge_disposition_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as icd_10_cm
             , cast(null as {{ string_type }}) as long_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as icd_9_cm
             , cast(null as {{ string_type }}) as long_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ms_drg')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as ms_drg_code
             , cast(null as {{ string_type }}) as ms_drg_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__apr_drg')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as apr_drg_code
             , cast(null as {{ string_type }}) as apr_drg_description
-          where 1 = 0
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - encounter_id: enc-inpatient

@@ -6,33 +6,33 @@
 
 with snomed_ct as (
 
-    select cast(snomed_ct as {{ dbt.type_string() }}) as snomed_ct
-    from {{ ref('terminology__snomed_ct') }}
+    select cast(snomed_seed.snomed_ct as {{ dbt.type_string() }}) as snomed_ct
+    from {{ ref('terminology__snomed_ct') }} as snomed_seed
 
 )
 
 , icd_10_cm as (
 
-    select cast(icd_10_cm as {{ dbt.type_string() }}) as icd_10_cm
-    from {{ ref('terminology__icd_10_cm') }}
+    select cast(icd_10_cm_seed.icd_10_cm as {{ dbt.type_string() }}) as icd_10_cm
+    from {{ ref('terminology__icd_10_cm') }} as icd_10_cm_seed
 
 )
 
 , transitive_closures as (
 
     select
-        cast(parent_snomed_code as {{ dbt.type_string() }}) as parent_snomed_code
-      , cast(child_snomed_code as {{ dbt.type_string() }}) as child_snomed_code
-    from {{ ref('terminology__snomed_ct_transitive_closures') }}
+        cast(closure_seed.parent_snomed_code as {{ dbt.type_string() }}) as parent_snomed_code
+      , cast(closure_seed.child_snomed_code as {{ dbt.type_string() }}) as child_snomed_code
+    from {{ ref('terminology__snomed_ct_transitive_closures') }} as closure_seed
 
 )
 
 , snomed_icd_10_map as (
 
     select
-        cast(referenced_component_id as {{ dbt.type_string() }}) as referenced_component_id
-      , cast(map_target as {{ dbt.type_string() }}) as map_target
-    from {{ ref('terminology__snomed_icd_10_map') }}
+        cast(map_seed.referenced_component_id as {{ dbt.type_string() }}) as referenced_component_id
+      , cast(map_seed.map_target as {{ dbt.type_string() }}) as map_target
+    from {{ ref('terminology__snomed_icd_10_map') }} as map_seed
 
 )
 

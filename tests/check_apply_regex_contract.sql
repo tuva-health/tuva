@@ -50,5 +50,6 @@ from contract_cases
 where coalesce(actual_result, -1) <> coalesce(expected_result, -1)
 {% else %}
 select 1 as disabled_on_fabric
+from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
 where 1 = 0
 {% endif %}

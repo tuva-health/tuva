@@ -443,15 +443,15 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with row_ids as (
+          {% set row_ids_sql %}
               select 'missing_values' as claim_id, 1 as claim_line_number
               union all
               select 'invalid_values', 0
               union all
               select 'valid_values', 1
-          )
+          {% endset %}
           select
                 row_ids.claim_id
               , row_ids.claim_line_number
@@ -477,7 +477,9 @@ unit_tests:
                 end as ingest_datetime
               , case when row_ids.claim_id = 'missing_values' then cast(null as {{ string_type }}) when row_ids.claim_id = 'invalid_values' then 'true' else '1' end as in_network_flag
               , 'source' as data_source
-          from row_ids
+          from (
+              {{ row_ids_sql }}
+          ) as row_ids
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -549,7 +551,7 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with cases as (
+          {% set cases_sql %}
               select 'paid_month_match' as claim_id, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as paid_date, cast('2023-12-15' as date) as dispensing_date, 'source_a' as data_source
               union all
               select 'dispensing_match_paid_miss', 'person', 'member', 'payer', 'plan', cast('2024-02-01' as date), cast('2024-01-15' as date), 'source_a'
@@ -577,7 +579,7 @@ unit_tests:
               select 'paid_date_missing', 'person', 'member', 'payer', 'plan', cast(null as date), cast('2024-01-01' as date), 'source_a'
               union all
               select 'literal_null_sentinel', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), '__dq_null__'
-          )
+          {% endset %}
           select
                 cases.claim_id
               , 1 as claim_line_number
@@ -599,7 +601,9 @@ unit_tests:
               , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cast(null as integer) as in_network_flag
               , cases.data_source
-          from cases
+          from (
+              {{ cases_sql }}
+          ) as cases
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -671,7 +675,7 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with cases as (
+          {% set cases_sql %}
               select 'before_spine' as claim_id, cast('1899-12-31' as date) as paid_date, 'source_before_spine' as data_source
               union all
               select 'before_semantic_minimum', cast('1999-12-31' as date), 'source_before_minimum'
@@ -683,7 +687,7 @@ unit_tests:
               select 'after_tuva_last_run', cast('2025-02-01' as date), 'source_after_run'
               union all
               select 'after_spine', cast('2101-01-01' as date), 'source_after_spine'
-          )
+          {% endset %}
           select
                 cases.claim_id
               , 1 as claim_line_number
@@ -705,7 +709,9 @@ unit_tests:
               , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cast(null as integer) as in_network_flag
               , cases.data_source
-          from cases
+          from (
+              {{ cases_sql }}
+          ) as cases
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -754,15 +760,15 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with row_ids as (
+          {% set row_ids_sql %}
               select 'missing_paid_date' as claim_id, 1 as claim_line_number
               union all
               select 'invalid_values', 0
               union all
               select 'valid_values', 1
-          )
+          {% endset %}
           select
                 row_ids.claim_id
               , row_ids.claim_line_number
@@ -821,7 +827,9 @@ unit_tests:
                 end as ingest_datetime
               , case when row_ids.claim_id = 'missing_paid_date' then cast(null as {{ string_type }}) when row_ids.claim_id = 'invalid_values' then 'false' else '1' end as in_network_flag
               , 'source' as data_source
-          from row_ids
+          from (
+              {{ row_ids_sql }}
+          ) as row_ids
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -943,13 +951,13 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with row_ids as (
+          {% set row_ids_sql %}
               select 'before_claim_end' as claim_id, cast('2024-02-01' as date) as claim_end_date
               union all
               select 'same_as_claim_end', cast('2024-01-15' as date)
               union all
               select 'missing_claim_end', cast(null as date)
-          )
+          {% endset %}
           select
                 row_ids.claim_id
               , 1 as claim_line_number
@@ -994,7 +1002,9 @@ unit_tests:
               , cast(null as {{ timestamp_type }}) as ingest_datetime
               , 0 as in_network_flag
               , 'source' as data_source
-          from row_ids
+          from (
+              {{ row_ids_sql }}
+          ) as row_ids
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -1121,9 +1131,9 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(256)' if target.type == 'redshift' else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with cases as (
+          {% set cases_sql %}
               select 'exact_professional' as claim_id, 'professional' as claim_type, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as claim_line_start_date, cast('2024-02-01' as date) as claim_start_date, cast('2024-03-01' as date) as admission_date, 'source_a' as data_source, '111' as bill_type_code, cast(null as {{ string_type }}) as drg_code_type, cast(null as {{ string_type }}) as diagnosis_code_type, cast(null as {{ string_type }}) as procedure_code_type, cast(null as {{ string_type }}) as diagnosis_code_1, cast(null as {{ string_type }}) as procedure_code_1
               union all
               select 'uppercase_professional', 'PROFESSIONAL', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-02-01' as date), cast('2024-03-01' as date), 'source_a', '111', null, null, null, null, null
@@ -1167,7 +1177,7 @@ unit_tests:
               select 'sentinel_code_collision', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), '__dq_null__', '111', null, 'icd-10-cm', 'icd-10-pcs', 'D001', 'P001'
               union all
               select 'sentinel_code_collision', 'institutional', 'person', 'member', 'payer', 'plan', cast('2024-01-01' as date), cast('2024-01-01' as date), cast(null as date), null, '111', null, 'icd-10-cm', 'icd-10-pcs', 'BAD', 'BAD'
-          )
+          {% endset %}
           select
                 cases.claim_id
               , 1 as claim_line_number
@@ -1182,16 +1192,16 @@ unit_tests:
               , cases.claim_line_start_date as claim_line_end_date
               , cases.admission_date
               , cast(null as date) as discharge_date
-              , null as admit_source_code
-              , null as admit_type_code
-              , null as discharge_disposition_code
-              , null as place_of_service_code
+              , cast(null as {{ string_type }}) as admit_source_code
+              , cast(null as {{ string_type }}) as admit_type_code
+              , cast(null as {{ string_type }}) as discharge_disposition_code
+              , cast(null as {{ string_type }}) as place_of_service_code
               , cases.bill_type_code
-              , null as revenue_center_code
-              , null as hcpcs_code
-              , null as rendering_npi
-              , null as billing_npi
-              , null as facility_npi
+              , cast(null as {{ string_type }}) as revenue_center_code
+              , cast(null as {{ string_type }}) as hcpcs_code
+              , cast(null as {{ string_type }}) as rendering_npi
+              , cast(null as {{ string_type }}) as billing_npi
+              , cast(null as {{ string_type }}) as facility_npi
               , cases.drg_code_type
               , case when cases.drg_code_type is not null then '001' end as drg_code
               , cases.diagnosis_code_type
@@ -1200,10 +1210,10 @@ unit_tests:
               , 1 as paid_amount
               , 2 as allowed_amount
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}cases.diagnosis_code_1{% else %}null{% endif %} as diagnosis_code_{{ index }}
+              , {% if index == 1 %}cases.diagnosis_code_1{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}cases.procedure_code_1{% else %}null{% endif %} as procedure_code_{{ index }}
+              , {% if index == 1 %}cases.procedure_code_1{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
               , cast(null as date) as procedure_date_{{ index }}
@@ -1212,7 +1222,9 @@ unit_tests:
               , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cast(null as integer) as in_network_flag
               , cases.data_source
-          from cases
+          from (
+              {{ cases_sql }}
+          ) as cases
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -1524,7 +1536,7 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with cases as (
+          {% set cases_sql %}
               select 'before_spine' as claim_id, cast('1899-12-31' as date) as claim_date, 'source_before_spine' as data_source
               union all
               select 'before_semantic_minimum', cast('1999-12-31' as date), 'source_before_minimum'
@@ -1536,7 +1548,7 @@ unit_tests:
               select 'after_tuva_last_run', cast('2025-02-01' as date), 'source_after_run'
               union all
               select 'after_spine', cast('2101-01-01' as date), 'source_after_spine'
-          )
+          {% endset %}
           select
                 cases.claim_id
               , 1 as claim_line_number
@@ -1581,7 +1593,9 @@ unit_tests:
               , cast(null as {{ timestamp_type }}) as ingest_datetime
               , cast(null as integer) as in_network_flag
               , cases.data_source
-          from cases
+          from (
+              {{ cases_sql }}
+          ) as cases
       - input: ref('input_layer__eligibility')
         format: sql
         rows: |
@@ -1674,7 +1688,8 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          with row_ids as (
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(256)' if target.type == 'redshift' else 'varchar' %}
+          {% set row_ids_sql %}
               select 'single_line' as claim_id, 1 as claim_line_number, 'source' as data_source
               union all
               select 'same_values', 1, 'source'
@@ -1700,7 +1715,7 @@ unit_tests:
               select 'cross_source', 1, 'source_a'
               union all
               select 'cross_source', 1, 'source_b'
-          )
+          {% endset %}
           select
                 row_ids.claim_id
               , row_ids.claim_line_number
@@ -1751,13 +1766,15 @@ unit_tests:
                       when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'Z002'
                       else null
                     end
-                {% else %}null{% endif %} as diagnosis_code_{{ index }}
+                {% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}'P001'{% else %}null{% endif %} as procedure_code_{{ index }}
+              , {% if index == 1 %}'P001'{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
               {% endfor %}
               , row_ids.data_source
-          from row_ids
+          from (
+              {{ row_ids_sql }}
+          ) as row_ids
     expect:
       rows:
         - claim_id: single_line

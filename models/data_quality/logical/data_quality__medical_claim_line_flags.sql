@@ -69,32 +69,6 @@
     ~ " and " ~ dq_member_month_spine_date_where_sql(inferred_claim_date_sql)
     ~ " and " ~ inferred_claim_date_sql ~ " <= cast(" ~ tuva_last_run_timestamp_sql ~ " as date)"
 %}
-{% set no_matching_eligibility_where_sql %}
-not exists (
-    select 1
-    from eligibility_rows_with_effective_end_date as eligibility_rows
-    where eligibility_rows.person_id = source_rows.person_id
-      and eligibility_rows.member_id = source_rows.member_id
-      and eligibility_rows.payer = source_rows.payer
-      and eligibility_rows.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
-      and eligibility_rows.data_source = source_rows.data_source
-      and (
-          {{ date_part('year', inferred_claim_date_sql) }} * 100
-          + {{ date_part('month', inferred_claim_date_sql) }}
-      ) >= (
-          {{ date_part('year', 'eligibility_rows.enrollment_start_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows.enrollment_start_date') }}
-      )
-      and (
-          {{ date_part('year', inferred_claim_date_sql) }} * 100
-          + {{ date_part('month', inferred_claim_date_sql) }}
-      ) <= (
-          {{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }}
-      )
-)
-{% endset %}
-
 {% set diagnosis_code_union_queries = [] %}
 {% for column_name in diagnosis_code_columns %}
     {% set query %}
@@ -149,6 +123,52 @@ source_rows as (
         , medical_claim_rows.claim_line_number as _dq_claim_line_number_key
         , medical_claim_rows.data_source as _dq_data_source_key
     from {{ ref('input_layer__medical_claim') }} as medical_claim_rows
+),
+
+source_eligibility_member_months as (
+    select distinct
+          source_rows.person_id
+        , source_rows.member_id
+        , source_rows.payer
+        , source_rows.{{ quote_column('plan') }}
+        , source_rows.data_source
+        , cast({{ date_part('year', inferred_claim_date_sql) }} as {{ dbt.type_int() }}) as _dq_claim_year
+        , cast({{ date_part('month', inferred_claim_date_sql) }} as {{ dbt.type_int() }}) as _dq_claim_month
+    from source_rows
+    where {{ eligibility_match_applicable_where_sql }}
+),
+
+matching_eligibility_member_months as (
+    select distinct
+          source_member_months.person_id
+        , source_member_months.member_id
+        , source_member_months.payer
+        , source_member_months.{{ quote_column('plan') }}
+        , source_member_months.data_source
+        , source_member_months._dq_claim_year
+        , source_member_months._dq_claim_month
+        , 1 as _dq_has_matching_eligibility
+    from source_eligibility_member_months as source_member_months
+    inner join eligibility_rows_with_effective_end_date as eligibility_rows
+        on eligibility_rows.person_id = source_member_months.person_id
+       and eligibility_rows.member_id = source_member_months.member_id
+       and eligibility_rows.payer = source_member_months.payer
+       and eligibility_rows.{{ quote_column('plan') }} = source_member_months.{{ quote_column('plan') }}
+       and eligibility_rows.data_source = source_member_months.data_source
+       and (
+            source_member_months._dq_claim_year > cast({{ date_part('year', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+            or (
+                source_member_months._dq_claim_year = cast({{ date_part('year', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+                and source_member_months._dq_claim_month >= cast({{ date_part('month', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+            )
+       )
+       and (
+            source_member_months._dq_claim_year < cast({{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+            or (
+                source_member_months._dq_claim_year = cast({{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+                and source_member_months._dq_claim_month <= cast({{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+            )
+       )
 ),
 
 diagnosis_codes as (
@@ -446,10 +466,18 @@ final as (
             procedure_code_populated_where_sql ~ " and " ~ procedure_code_type_valid_where
           ) }} as procedure_code_1_to_25_invalid
         , {{ dq_logical_int_flag_sql(
-            no_matching_eligibility_where_sql | trim,
+            "matching_eligibility_member_months._dq_has_matching_eligibility is null",
             eligibility_match_applicable_where_sql
           ) }} as no_matching_eligibility_span
     from source_rows
+    left join matching_eligibility_member_months
+        on matching_eligibility_member_months.person_id = source_rows.person_id
+       and matching_eligibility_member_months.member_id = source_rows.member_id
+       and matching_eligibility_member_months.payer = source_rows.payer
+       and matching_eligibility_member_months.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
+       and matching_eligibility_member_months.data_source = source_rows.data_source
+       and matching_eligibility_member_months._dq_claim_year = cast({{ date_part('year', inferred_claim_date_sql) }} as {{ dbt.type_int() }})
+       and matching_eligibility_member_months._dq_claim_month = cast({{ date_part('month', inferred_claim_date_sql) }} as {{ dbt.type_int() }})
     left join diagnosis_code_flags
         on (
             source_rows._dq_claim_id_key = diagnosis_code_flags._dq_claim_id_key

@@ -94,5 +94,6 @@ union all
     {%- endfor %}
 {%- else %}
 select cast(null as {{ dbt.type_string() }}) as failure_reason
-where false
+from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
+where 1 = 0
 {%- endif %}

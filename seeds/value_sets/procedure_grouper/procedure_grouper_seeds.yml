@@ -34,7 +34,7 @@ seeds:
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- elif target.type == "redshift" -%} varchar(65535) {%- else -%} varchar(3000) {%- endif -%}
         last_update_date: date
         last_update_note: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}

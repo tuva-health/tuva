@@ -70,16 +70,14 @@ with enabled_models as (
         , actual_source_populations.data_source_key
         , actual_source_populations.row_count
     from actual_source_populations
+    left join domain_grid as existing_domain_grid
+        on existing_domain_grid.input_layer_domain = actual_source_populations.input_layer_domain
+        and existing_domain_grid.input_table_name = actual_source_populations.input_table_name
+        and existing_domain_grid.model_name = actual_source_populations.model_name
+        and existing_domain_grid.data_source_key = actual_source_populations.data_source_key
     where actual_source_populations.data_source is null
       and actual_source_populations.row_count > 0
-      and not exists (
-          select 1
-          from domain_grid
-          where domain_grid.input_layer_domain = actual_source_populations.input_layer_domain
-            and domain_grid.input_table_name = actual_source_populations.input_table_name
-            and domain_grid.model_name = actual_source_populations.model_name
-            and domain_grid.data_source_key = actual_source_populations.data_source_key
-      )
+      and existing_domain_grid.input_layer_domain is null
 
 )
 

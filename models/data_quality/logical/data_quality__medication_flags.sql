@@ -65,16 +65,19 @@ practitioner_rows as (
 ),
 
 ndc_rows as (
-    select distinct
-          ndc11 as ndc_lookup_code
-    from {{ ref('core__stg_coderx_packages') }}
+    select distinct ndc_lookup_code
+    from (
+        select
+              ndc11 as ndc_lookup_code
+        from {{ ref('core__stg_coderx_packages') }}
 
-    union
+        union all
 
-    select distinct
-          replace(nullif(ndc, 'NULL'), '-', '') as ndc_lookup_code
-    from {{ ref('core__stg_coderx_packages') }}
-    where nullif(ndc, 'NULL') is not null
+        select
+              replace(nullif(ndc, 'NULL'), '-', '') as ndc_lookup_code
+        from {{ ref('core__stg_coderx_packages') }}
+        where nullif(ndc, 'NULL') is not null
+    ) as ndc_candidates
 ),
 
 final as (

@@ -224,19 +224,19 @@ unit_tests:
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_cm where 1 = 0
+          select '__dq_no_match__' as icd_10_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_cm where 1 = 0
+          select '__dq_no_match__' as icd_9_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct where 1 = 0
+          select '__dq_no_match__' as snomed_ct from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__present_on_admission')
         format: sql
         rows: |
-          select '__dq_no_match__' as present_on_admit_code where 1 = 0
+          select '__dq_no_match__' as present_on_admit_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - source_condition_id: valid
@@ -294,9 +294,11 @@ unit_tests:
         format: sql
         rows: |
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
-          select 'rank_valid' as source_condition_id, 'p1' as person_id, 'a1' as patient_id, null as encounter_id
+          select 'rank_valid' as source_condition_id, 'p1' as person_id, 'a1' as patient_id
+            , cast(null as {{ string_type }}) as encounter_id
             , cast(null as date) as recorded_date, cast(null as date) as onset_date, cast(null as date) as resolved_date
             , 'icd-10-cm' as code_system, null as source_code, 1 as condition_rank
             , null as present_on_admit_code, 'source' as data_source
@@ -328,15 +330,15 @@ unit_tests:
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_cm where 1 = 0
+          select '__dq_no_match__' as icd_9_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct where 1 = 0
+          select '__dq_no_match__' as snomed_ct from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__present_on_admission')
         format: sql
         rows: |
-          select '__dq_no_match__' as present_on_admit_code where 1 = 0
+          select '__dq_no_match__' as present_on_admit_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - source_condition_id: rank_valid
@@ -416,19 +418,19 @@ unit_tests:
       - input: ref('terminology__admit_source')
         format: sql
         rows: |
-          select '__dq_no_match__' as admit_source_code where 1 = 0
+          select '__dq_no_match__' as admit_source_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__admit_type')
         format: sql
         rows: |
-          select '__dq_no_match__' as admit_type_code where 1 = 0
+          select '__dq_no_match__' as admit_type_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__discharge_disposition')
         format: sql
         rows: |
-          select '__dq_no_match__' as discharge_disposition_code where 1 = 0
+          select '__dq_no_match__' as discharge_disposition_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('provider_data__provider')
         format: sql
         rows: |
-          select '__dq_no_match__' as npi where 1 = 0
+          select '__dq_no_match__' as npi from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
@@ -436,7 +438,7 @@ unit_tests:
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_cm where 1 = 0
+          select '__dq_no_match__' as icd_9_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__ms_drg')
         format: sql
         rows: |
@@ -444,7 +446,7 @@ unit_tests:
       - input: ref('terminology__apr_drg')
         format: sql
         rows: |
-          select '__dq_no_match__' as apr_drg_code where 1 = 0
+          select '__dq_no_match__' as apr_drg_code from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - encounter_id: pair_fail
@@ -852,7 +854,7 @@ unit_tests:
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct where 1 = 0
+          select '__dq_no_match__' as snomed_ct from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - lab_result_id: valid
@@ -994,46 +996,58 @@ unit_tests:
           select 'pair_fail' as medication_id, 'p1' as person_id, 'b2' as patient_id, null as encounter_id
             , null as practitioner_id, cast(null as date) as dispensing_date, cast(null as date) as prescribing_date
             , null as source_code_type, null as source_code, null as ndc_code, null as rxnorm_code, null as atc_code
-            , cast(null as decimal(18, 2)) as quantity, cast(null as decimal(18, 2)) as days_supply, 'source' as data_source
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}) as quantity
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}) as days_supply, 'source' as data_source
           union all
           select 'encounter_fail', 'p1', 'a1', 'e2', null, cast(null as date), cast(null as date)
-            , null, null, null, null, null, cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , null, null, null, null, null
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'local_system', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'EpicMedication', 'LOCAL-1', null, null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'rxnorm_not_in_crosswalk', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'RxNorm', 'unmapped_rxcui', null, 'unmapped_rxcui', null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'atc_not_in_crosswalk', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'ATC', 'unmapped_atc', null, null, 'unmapped_atc'
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'ndc_hyphenated', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'NDC', '12345-6789-01', '12345-6789-01', null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'ndc_invalid', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'ndc', '99999-9999-99', '99999-9999-99', null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'ndc_literal_null', 'p1', 'a1', null, null, cast(null as date), cast(null as date)
             , 'ndc', 'NULL', 'NULL', null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source'
           union all
           select 'cross_source_patient_pair', 'cross_person_patient', 'cross_patient_patient', null
             , null, cast(null as date), cast(null as date), null, null, null, null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source_b'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source_b'
           union all
           select 'cross_source_encounter_pair', 'cross_person_encounter', 'cross_patient_encounter', 'cross_encounter'
             , null, cast(null as date), cast(null as date), null, null, null, null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source_b'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source_b'
           union all
           select 'cross_source_practitioner', 'cross_person_encounter', 'cross_patient_encounter', null
             , 'cross_practitioner', cast(null as date), cast(null as date), null, null, null, null, null
-            , cast(null as decimal(18, 2)), cast(null as decimal(18, 2)), 'source_b'
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }})
+            , cast(null as {{ 'numeric' if target.type == 'bigquery' else 'decimal(18, 2)' }}), 'source_b'
           ) as fixture_rows
       - input: ref('input_layer__patient')
         format: sql
@@ -1202,7 +1216,7 @@ unit_tests:
       - input: ref('terminology__observation_type')
         format: sql
         rows: |
-          select '__dq_no_match__' as observation_type where 1 = 0
+          select '__dq_no_match__' as observation_type from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__loinc')
         format: sql
         rows: |
@@ -1210,23 +1224,23 @@ unit_tests:
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct where 1 = 0
+          select '__dq_no_match__' as snomed_ct from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_cm where 1 = 0
+          select '__dq_no_match__' as icd_10_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_cm where 1 = 0
+          select '__dq_no_match__' as icd_9_cm from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_pcs where 1 = 0
+          select '__dq_no_match__' as icd_10_pcs from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_pcs where 1 = 0
+          select '__dq_no_match__' as icd_9_pcs from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - observation_id: pair_fail
@@ -1335,15 +1349,15 @@ unit_tests:
       - input: ref('terminology__icd_10_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_10_pcs where 1 = 0
+          select '__dq_no_match__' as icd_10_pcs from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_pcs')
         format: sql
         rows: |
-          select '__dq_no_match__' as icd_9_pcs where 1 = 0
+          select '__dq_no_match__' as icd_9_pcs from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          select '__dq_no_match__' as snomed_ct where 1 = 0
+          select '__dq_no_match__' as snomed_ct from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
       rows:
         - source_procedure_id: pair_fail
@@ -1431,32 +1445,32 @@ unit_tests:
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as icd_10_cm, cast(null as {{ string_type }}) as short_description where 1 = 0
+          select '__dq_no_match__' as icd_10_cm, cast(null as {{ string_type }}) as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as icd_9_cm, cast(null as {{ string_type }}) as short_description where 1 = 0
+          select '__dq_no_match__' as icd_9_cm, cast(null as {{ string_type }}) as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_10_pcs')
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as icd_10_pcs, cast(null as {{ string_type }}) as description where 1 = 0
+          select '__dq_no_match__' as icd_10_pcs, cast(null as {{ string_type }}) as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__icd_9_pcs')
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as icd_9_pcs, cast(null as {{ string_type }}) as short_description where 1 = 0
+          select '__dq_no_match__' as icd_9_pcs, cast(null as {{ string_type }}) as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__hcpcs_level_2')
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as hcpcs, cast(null as {{ string_type }}) as short_description where 1 = 0
+          select '__dq_no_match__' as hcpcs, cast(null as {{ string_type }}) as short_description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select '__dq_no_match__' as snomed_ct, cast(null as {{ string_type }}) as description where 1 = 0
+          select '__dq_no_match__' as snomed_ct, cast(null as {{ string_type }}) as description from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
       - input: ref('terminology__loinc')
         format: sql
         rows: |

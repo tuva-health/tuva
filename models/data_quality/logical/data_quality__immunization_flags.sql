@@ -59,8 +59,8 @@ encounter_id_rows as (
 ),
 
 cvx_rows as (
-    select distinct cvx
-    from {{ ref('terminology__cvx') }}
+    select distinct cvx_terminology.cvx
+    from {{ ref('terminology__cvx') }} as cvx_terminology
 ),
 
 immunization_status_rows as (

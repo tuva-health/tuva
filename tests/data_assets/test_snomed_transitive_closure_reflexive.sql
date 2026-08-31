@@ -6,19 +6,19 @@
 
 with snomed_ct as (
 
-    select cast(snomed_ct as {{ dbt.type_string() }}) as snomed_ct
-    from {{ ref('terminology__snomed_ct') }}
+    select cast(snomed_seed.snomed_ct as {{ dbt.type_string() }}) as snomed_ct
+    from {{ ref('terminology__snomed_ct') }} as snomed_seed
 
 )
 
 , reflexive_edges as (
 
     select
-        cast(parent_snomed_code as {{ dbt.type_string() }}) as snomed_ct
+        cast(closure_seed.parent_snomed_code as {{ dbt.type_string() }}) as snomed_ct
       , count(*) as row_count
-    from {{ ref('terminology__snomed_ct_transitive_closures') }}
-    where parent_snomed_code = child_snomed_code
-    group by cast(parent_snomed_code as {{ dbt.type_string() }})
+    from {{ ref('terminology__snomed_ct_transitive_closures') }} as closure_seed
+    where closure_seed.parent_snomed_code = closure_seed.child_snomed_code
+    group by cast(closure_seed.parent_snomed_code as {{ dbt.type_string() }})
 
 )
 
