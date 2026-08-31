@@ -17,7 +17,7 @@ unit_tests:
       - input: ref('input_layer__condition')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           select
               'c' as source_condition_id
@@ -64,7 +64,7 @@ unit_tests:
       - input: ref('terminology__icd_9_cm')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as icd_9_cm
             , cast(null as {{ string_type }}) as long_description
@@ -72,7 +72,7 @@ unit_tests:
       - input: ref('terminology__snomed_ct')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as snomed_ct
             , cast(null as {{ string_type }}) as description
@@ -80,7 +80,7 @@ unit_tests:
       - input: ref('terminology__present_on_admission')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               cast(null as {{ string_type }}) as present_on_admit_code
             , cast(null as {{ string_type }}) as present_on_admit_description

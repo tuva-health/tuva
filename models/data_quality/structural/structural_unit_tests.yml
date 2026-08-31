@@ -13,7 +13,7 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 10 as row_count
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, cast('__dq_structural_value__:Medicare MSSP' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 10 as row_count
           union all
           select 'claims', 'UHC Medicaid', '__dq_structural_value__:UHC Medicaid', 'medical_claim', 'input_layer__medical_claim', 20
           union all
@@ -56,7 +56,8 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, null as data_source, '__dq_structural_null__' as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 0 as row_count
+          {% set string_type = 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'claims' as input_layer_domain, cast(null as {{ string_type }}) as data_source, cast('__dq_structural_null__' as {{ string_type }}) as data_source_key, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, 0 as row_count
           union all
           select 'claims', null, '__dq_structural_null__', 'medical_claim', 'input_layer__medical_claim', 0
           union all
@@ -212,7 +213,7 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, null as data_source, '__dq_structural_null__' as data_source_key, 0 as row_count
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, null as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 0 as row_count
           union all
           select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 0
           union all
@@ -220,7 +221,7 @@ unit_tests:
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, null as data_source, '__dq_structural_null__' as data_source_key
+          select 'claims' as input_layer_domain, null as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
     expect:
       rows:
         - input_layer_domain: claims
@@ -303,13 +304,13 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'medical_claim' as table_name, 'input_layer__medical_claim' as model_name, '__dq_structural_null__' as data_source, '__dq_structural_value__:__dq_structural_null__' as data_source_key, 4 as row_count
+          select 'claims' as input_layer_domain, 'medical_claim' as table_name, 'input_layer__medical_claim' as model_name, '__dq_structural_null__' as data_source, cast('__dq_structural_value__:__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 4 as row_count
           union all
           select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 2
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, '__dq_structural_null__' as data_source, '__dq_structural_value__:__dq_structural_null__' as data_source_key
+          select 'claims' as input_layer_domain, '__dq_structural_null__' as data_source, cast('__dq_structural_value__:__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
     expect:
       rows:
         - input_layer_domain: claims
@@ -344,11 +345,11 @@ unit_tests:
         rows: |
           select 'claims' as input_layer_domain, 'pharmacy_claim' as table_name, 'input_layer__pharmacy_claim' as model_name
             , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source
-            , '__dq_structural_null__' as data_source_key, 0 as row_count
+            , cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 0 as row_count
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, '__dq_structural_value__:Medicare MSSP' as data_source_key
+          select 'claims' as input_layer_domain, 'Medicare MSSP' as data_source, cast('__dq_structural_value__:Medicare MSSP' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
     expect:
       rows:
         - input_layer_domain: claims

@@ -6,7 +6,19 @@
    )
 }}
 
-with cte as (
+with undetermined_claim_lines as (
+
+select distinct
+      claim_id
+    , claim_line_number
+    , data_source
+    , 1 as is_undetermined
+from {{ ref('encounters__stg_medical_claim') }}
+where claim_type = 'undetermined'
+
+)
+
+, cte as (
 select claim_id
  , claim_line_number
  , data_source
@@ -362,11 +374,8 @@ select
 order by candidate.priority_number, case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
        , candidate.encounter_type, candidate.encounter_id) as claim_line_attribution_number
 from cte as candidate
-where not exists (
-    select 1
-    from {{ ref('encounters__stg_medical_claim') }} as staged_claim
-    where staged_claim.claim_id = candidate.claim_id
-      and staged_claim.claim_line_number = candidate.claim_line_number
-      and staged_claim.data_source = candidate.data_source
-      and staged_claim.claim_type = 'undetermined'
-)
+left outer join undetermined_claim_lines
+    on candidate.claim_id = undetermined_claim_lines.claim_id
+    and candidate.claim_line_number = undetermined_claim_lines.claim_line_number
+    and candidate.data_source = undetermined_claim_lines.data_source
+where undetermined_claim_lines.is_undetermined is null

@@ -18,7 +18,7 @@ unit_tests:
       - input: ref('normalized__medical_claim_diagnoses')
         format: sql
         rows: |
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select
               'claim-professional' as claim_id
             , 'source-a' as data_source

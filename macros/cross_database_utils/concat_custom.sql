@@ -6,7 +6,7 @@
 {%- endmacro %}
 
 {% macro default__concat_custom(fields) -%}
-    {{ return(dbt.concat(fields)) }}
+    {{ return('(' ~ dbt.concat(fields) ~ ')') }}
 {%- endmacro %}
 
 {% macro athena__concat_custom(fields) %}

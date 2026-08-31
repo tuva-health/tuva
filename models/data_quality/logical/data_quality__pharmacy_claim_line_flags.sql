@@ -29,32 +29,6 @@
     ~ " and " ~ dq_member_month_spine_date_where_sql('source_rows.paid_date')
     ~ " and source_rows.paid_date <= cast(" ~ tuva_last_run_timestamp_sql ~ " as date)"
 %}
-{% set no_matching_eligibility_where_sql %}
-not exists (
-    select 1
-    from eligibility_rows_with_effective_end_date as eligibility_rows
-    where eligibility_rows.person_id = source_rows.person_id
-      and eligibility_rows.member_id = source_rows.member_id
-      and eligibility_rows.payer = source_rows.payer
-      and eligibility_rows.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
-      and eligibility_rows.data_source = source_rows.data_source
-      and (
-          {{ date_part('year', 'source_rows.paid_date') }} * 100
-          + {{ date_part('month', 'source_rows.paid_date') }}
-      ) >= (
-          {{ date_part('year', 'eligibility_rows.enrollment_start_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows.enrollment_start_date') }}
-      )
-      and (
-          {{ date_part('year', 'source_rows.paid_date') }} * 100
-          + {{ date_part('month', 'source_rows.paid_date') }}
-      ) <= (
-          {{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} * 100
-          + {{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }}
-      )
-)
-{% endset %}
-
 with eligibility_rows_with_effective_end_date as (
     select
           eligibility_rows.*
@@ -71,6 +45,47 @@ with eligibility_rows_with_effective_end_date as (
 source_rows as (
     select *
     from {{ ref('input_layer__pharmacy_claim') }}
+),
+
+source_eligibility_member_months as (
+    select distinct
+          source_rows.person_id
+        , source_rows.member_id
+        , source_rows.payer
+        , source_rows.{{ quote_column('plan') }}
+        , source_rows.data_source
+        , (
+              {{ date_part('year', 'source_rows.paid_date') }} * 100
+              + {{ date_part('month', 'source_rows.paid_date') }}
+          ) as _dq_claim_year_month
+    from source_rows
+    where {{ eligibility_match_applicable_where_sql }}
+),
+
+matching_eligibility_member_months as (
+    select distinct
+          source_member_months.person_id
+        , source_member_months.member_id
+        , source_member_months.payer
+        , source_member_months.{{ quote_column('plan') }}
+        , source_member_months.data_source
+        , source_member_months._dq_claim_year_month
+        , 1 as _dq_has_matching_eligibility
+    from source_eligibility_member_months as source_member_months
+    inner join eligibility_rows_with_effective_end_date as eligibility_rows
+        on eligibility_rows.person_id = source_member_months.person_id
+       and eligibility_rows.member_id = source_member_months.member_id
+       and eligibility_rows.payer = source_member_months.payer
+       and eligibility_rows.{{ quote_column('plan') }} = source_member_months.{{ quote_column('plan') }}
+       and eligibility_rows.data_source = source_member_months.data_source
+       and source_member_months._dq_claim_year_month >= (
+            {{ date_part('year', 'eligibility_rows.enrollment_start_date') }} * 100
+            + {{ date_part('month', 'eligibility_rows.enrollment_start_date') }}
+       )
+       and source_member_months._dq_claim_year_month <= (
+            {{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} * 100
+            + {{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }}
+       )
 ),
 
 final as (
@@ -146,10 +161,20 @@ final as (
             "source_rows.paid_amount is not null and source_rows.allowed_amount is not null"
           ) }} as paid_amount_gt_allowed_amount
         , {{ dq_logical_int_flag_sql(
-            no_matching_eligibility_where_sql | trim,
+            "matching_eligibility_member_months._dq_has_matching_eligibility is null",
             eligibility_match_applicable_where_sql
           ) }} as no_matching_eligibility_span
     from source_rows
+    left join matching_eligibility_member_months
+        on matching_eligibility_member_months.person_id = source_rows.person_id
+       and matching_eligibility_member_months.member_id = source_rows.member_id
+       and matching_eligibility_member_months.payer = source_rows.payer
+       and matching_eligibility_member_months.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
+       and matching_eligibility_member_months.data_source = source_rows.data_source
+       and matching_eligibility_member_months._dq_claim_year_month = (
+            {{ date_part('year', 'source_rows.paid_date') }} * 100
+            + {{ date_part('month', 'source_rows.paid_date') }}
+       )
     left join {{ ref('provider_data__provider') }} as prescribing_provider_lookup
         on cast(source_rows.prescribing_provider_npi as {{ string_type }}) = cast(prescribing_provider_lookup.npi as {{ string_type }})
     left join {{ ref('provider_data__provider') }} as dispensing_provider_lookup

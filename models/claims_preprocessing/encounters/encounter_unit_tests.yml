@@ -16,73 +16,103 @@ unit_tests:
         claims_enabled: true
     given:
       - input: ref('acute_inpatient__prof_claims')
-        rows: []
+        format: sql
+        rows: &empty_crosswalk_rows |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          select
+                cast(null as {{ string_type }}) as claim_id
+              , cast(null as {{ integer_type }}) as claim_line_number
+              , cast(null as {{ string_type }}) as data_source
+              , cast(null as {{ string_type }}) as encounter_id
+              , cast(null as {{ string_type }}) as old_encounter_id
+              , cast(null as {{ integer_type }}) as claim_attribution_number
+              , cast(null as {{ string_type }}) as encounter_type
+              , cast(null as {{ string_type }}) as encounter_group
+              , cast(null as {{ integer_type }}) as priority_number
+              , cast(null as {{ string_type }}) as anchor_claim_id
+          where 1 = 0
       - input: ref('emergency_department__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('inpatient_psych__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('inpatient_rehab__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('inpatient_long_term__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('inpatient_snf__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('inpatient_substance_use__prof_claims')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('office_visits__int_office_visits_claim_line')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('urgent_care__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_psych__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_rehab__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('asc__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('dialysis__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_hospice__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('home_health__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_surgery__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_injections__match_claims_to_anchor')
-        rows:
-          - claim_id: undetermined_claim
-            claim_line_number: 1
-            data_source: source-a
-            old_encounter_id: anchor-1
-          - claim_id: professional_claim
-            claim_line_number: 1
-            data_source: source-a
-            old_encounter_id: anchor-1
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'anchor-1' as old_encounter_id
+          union all
+          select 'professional_claim', 1, 'source-a', 'anchor-1'
       - input: ref('outpatient_ptotst__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_substance_use__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_radiology__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('outpatient_hospital_or_clinic__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('encounters__int_institutional_claim_lines')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('lab__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('dme__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('ambulance__match_claims_to_anchor')
-        rows: []
+        format: sql
+        rows: *empty_crosswalk_rows
       - input: ref('encounters__stg_medical_claim')
-        rows:
-          - claim_id: undetermined_claim
-            claim_line_number: 1
-            data_source: source-a
-            claim_type: undetermined
-          - claim_id: professional_claim
-            claim_line_number: 1
-            data_source: source-a
-            claim_type: professional
+        format: sql
+        rows: |
+          select 'undetermined_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'undetermined' as claim_type
+          union all
+          select 'professional_claim', 1, 'source-a', 'professional'
     expect:
       rows:
         - claim_id: professional_claim

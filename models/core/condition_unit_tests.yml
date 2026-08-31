@@ -20,7 +20,7 @@ unit_tests:
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           select 'mc-1' as medical_claim_id, 'c' as claim_id, 1 as claim_line_number, 'professional' as claim_type, 'person-1' as person_id, 'member-1' as member_id, 'payer' as payer, 'plan' as {{ plan_identifier }}, cast('2024-01-01' as date) as recorded_date, 1 as condition_rank, 'icd-10-cm' as code_system, 'A001' as source_code, 'A001' as normalized_code, 'Long description' as normalized_description, cast(null as {{ string_type }}) as present_on_admit_code, cast(null as {{ string_type }}) as present_on_admit_description, cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run, 'a_b' as data_source
           union all
           select 'mc-2', 'b_c', 1, 'professional', 'person-2', 'member-2', 'payer', 'plan', cast('2024-01-01' as date), 1, 'icd-10-cm', 'A001', 'A001', 'Long description', null, null, cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'a'

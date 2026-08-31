@@ -443,7 +443,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with row_ids as (
               select 'missing_values' as claim_id, 1 as claim_line_number
@@ -754,7 +754,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type == 'bigquery' else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with row_ids as (
               select 'missing_paid_date' as claim_id, 1 as claim_line_number
@@ -1121,7 +1121,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(256)' if target.type == 'redshift' else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           with cases as (
               select 'exact_professional' as claim_id, 'professional' as claim_type, 'person' as person_id, 'member' as member_id, 'payer' as payer, 'plan' as plan_value, cast('2024-01-01' as date) as claim_line_start_date, cast('2024-02-01' as date) as claim_start_date, cast('2024-03-01' as date) as admission_date, 'source_a' as data_source, '111' as bill_type_code, cast(null as {{ string_type }}) as drg_code_type, cast(null as {{ string_type }}) as diagnosis_code_type, cast(null as {{ string_type }}) as procedure_code_type, cast(null as {{ string_type }}) as diagnosis_code_1, cast(null as {{ string_type }}) as procedure_code_1
@@ -1182,16 +1182,16 @@ unit_tests:
               , cases.claim_line_start_date as claim_line_end_date
               , cases.admission_date
               , cast(null as date) as discharge_date
-              , null as admit_source_code
-              , null as admit_type_code
-              , null as discharge_disposition_code
-              , null as place_of_service_code
+              , cast(null as {{ string_type }}) as admit_source_code
+              , cast(null as {{ string_type }}) as admit_type_code
+              , cast(null as {{ string_type }}) as discharge_disposition_code
+              , cast(null as {{ string_type }}) as place_of_service_code
               , cases.bill_type_code
-              , null as revenue_center_code
-              , null as hcpcs_code
-              , null as rendering_npi
-              , null as billing_npi
-              , null as facility_npi
+              , cast(null as {{ string_type }}) as revenue_center_code
+              , cast(null as {{ string_type }}) as hcpcs_code
+              , cast(null as {{ string_type }}) as rendering_npi
+              , cast(null as {{ string_type }}) as billing_npi
+              , cast(null as {{ string_type }}) as facility_npi
               , cases.drg_code_type
               , case when cases.drg_code_type is not null then '001' end as drg_code
               , cases.diagnosis_code_type
@@ -1200,10 +1200,10 @@ unit_tests:
               , 1 as paid_amount
               , 2 as allowed_amount
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}cases.diagnosis_code_1{% else %}null{% endif %} as diagnosis_code_{{ index }}
+              , {% if index == 1 %}cases.diagnosis_code_1{% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}cases.procedure_code_1{% else %}null{% endif %} as procedure_code_{{ index }}
+              , {% if index == 1 %}cases.procedure_code_1{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
               , cast(null as date) as procedure_date_{{ index }}
@@ -1674,6 +1674,7 @@ unit_tests:
         format: sql
         rows: |
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(256)' if target.type == 'redshift' else 'varchar' %}
           with row_ids as (
               select 'single_line' as claim_id, 1 as claim_line_number, 'source' as data_source
               union all
@@ -1751,10 +1752,10 @@ unit_tests:
                       when row_ids.claim_id = 'mixed_values' and row_ids.claim_line_number = 2 then 'Z002'
                       else null
                     end
-                {% else %}null{% endif %} as diagnosis_code_{{ index }}
+                {% else %}cast(null as {{ string_type }}){% endif %} as diagnosis_code_{{ index }}
               {% endfor %}
               {% for index in range(1, 26) %}
-              , {% if index == 1 %}'P001'{% else %}null{% endif %} as procedure_code_{{ index }}
+              , {% if index == 1 %}'P001'{% else %}cast(null as {{ string_type }}){% endif %} as procedure_code_{{ index }}
               {% endfor %}
               , row_ids.data_source
           from row_ids

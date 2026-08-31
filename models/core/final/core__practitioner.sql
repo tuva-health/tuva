@@ -28,21 +28,26 @@
 
 with prac as (
     {{ smart_union([ref('core__stg_claims_practitioner'), ref('normalized__practitioner')], source_index='_record_source') }}
+),
+
+prioritized_practitioners as (
+    select
+          prac.*
+        , max(case when prac._record_source = 2 then 1 else 0 end) over (
+              partition by prac.practitioner_id, prac.data_source
+          ) as _has_clinical_record
+    from prac
 )
 
 select
     {{ tuva_core_columns }}
     {{ tuva_extension_columns }}
     {{ tuva_metadata_columns }}
-from prac
-where prac._record_source = 2
-   or not exists (
-        select 1
-        from prac as clinical_practitioner
-        where clinical_practitioner._record_source = 2
-          and clinical_practitioner.practitioner_id = prac.practitioner_id
-          and clinical_practitioner.data_source = prac.data_source
-   )
+from prioritized_practitioners
+where _record_source = 2
+   or practitioner_id is null
+   or data_source is null
+   or _has_clinical_record = 0
 
 {% elif the_tuva_project.tuva_boolean_var('clinical_enabled', false) == true -%}
 
