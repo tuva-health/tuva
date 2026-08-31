@@ -7,10 +7,10 @@
 with snomed_ct as (
 
     select
-        cast(snomed_ct as {{ dbt.type_string() }}) as snomed_ct
-      , upper(cast(is_active as {{ dbt.type_string() }})) as is_active
-      , deprecated
-    from {{ ref('terminology__snomed_ct') }}
+        cast(snomed_seed.snomed_ct as {{ dbt.type_string() }}) as snomed_ct
+      , upper(cast(snomed_seed.is_active as {{ dbt.type_string() }})) as is_active
+      , snomed_seed.deprecated
+    from {{ ref('terminology__snomed_ct') }} as snomed_seed
 
 )
 
