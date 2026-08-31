@@ -19,6 +19,102 @@ FAMILY_FOLDERS = {
     "value_sets": "value-sets",
 }
 
+TERMINOLOGY_LIFECYCLE_HEADERS = {
+    "terminology__apr_drg.csv": [
+        "apr_drg_code", "medical_surgical", "mdc_code",
+        "apr_drg_description", "deprecated",
+    ],
+    "terminology__cvx.csv": [
+        "cvx", "short_description", "long_description", "status",
+        "last_updated", "deprecated",
+    ],
+    "terminology__fips_county.csv": [
+        "fips_code", "county", "state", "deprecated",
+    ],
+    "terminology__hcpcs_level_2.csv": [
+        "hcpcs", "seqnum", "recid", "long_description",
+        "short_description", "deprecated",
+    ],
+    "terminology__icd10_pcs_cms_ontology.csv": [
+        "icd10pcs_code", "section", "body_system", "operation",
+        "body_part", "approach", "device", "qualifier", "deprecated",
+    ],
+    "terminology__icd_10_cm.csv": [
+        "icd_10_cm", "billable_code_flag", "short_description",
+        "long_description", "deprecated",
+    ],
+    "terminology__icd_10_pcs.csv": [
+        "icd_10_pcs", "description", "deprecated",
+    ],
+    "terminology__icd_9_cm.csv": [
+        "icd_9_cm", "long_description", "short_description", "deprecated",
+    ],
+    "terminology__icd_9_pcs.csv": [
+        "icd_9_pcs", "long_description", "short_description", "deprecated",
+    ],
+    "terminology__loinc.csv": [
+        "loinc", "short_name", "long_common_name", "component", "property",
+        "time_aspect", "system", "scale_type", "method_type", "class_code",
+        "class_description", "class_type_code", "class_type_description",
+        "paneltype", "order_obs", "example_units",
+        "external_copyright_notice", "status", "version_first_released",
+        "version_last_changed", "deprecated",
+    ],
+    "terminology__medicare_dual_eligibility.csv": [
+        "dual_status_code", "dual_status_description", "deprecated",
+    ],
+    "terminology__snomed_ct.csv": [
+        "snomed_ct", "description", "is_active", "created", "last_updated",
+        "deprecated",
+    ],
+    "terminology__restructured_betos.csv": [
+        "hcpcs_cd", "rbcs_id", "rbcs_cat", "rbcs_cat_desc",
+        "rbcs_cat_subcat", "rbcs_subcat_desc", "rbcs_famnumb",
+        "rbcs_family_desc", "rbcs_major_ind", "hcpcs_cd_add_dt",
+        "hcpcs_cd_end_dt", "rbcs_latest_assignment", "first_rbcs_release_year",
+        "rbcs_analysis_start_dt", "rbcs_analysis_end_dt",
+        "alt_assignment_method", "rbcs_id_ever_reassigned",
+    ],
+}
+
+SNOMED_RELATIONSHIP_HEADERS = {
+    "terminology__snomed_ct_transitive_closures.csv": [
+        "parent_snomed_code", "parent_description", "child_snomed_code",
+        "child_description",
+    ],
+    "terminology__snomed_icd_10_map.csv": [
+        "id", "effective_time", "active", "module_id", "ref_set_id",
+        "referenced_component_id", "referenced_component_name", "map_group",
+        "map_priority", "map_rule", "map_advice", "map_target",
+        "map_target_name", "correlation_id", "map_category_id",
+        "map_category_name",
+    ],
+}
+
+SNOMED_RELEASES = {
+    "terminology__snomed_ct": (
+        "March 2026 SNOMED CT U.S. Edition (20260301)"
+    ),
+    "terminology__snomed_ct_transitive_closures": (
+        "March 2026 SNOMED CT U.S. Edition Transitive Closure Resources "
+        "(20260301)"
+    ),
+    "terminology__snomed_icd_10_map": (
+        "March 2026 SNOMED CT to ICD-10-CM Mapping Resources (20260301)"
+    ),
+}
+
+SSA_FIPS_STATE_COUNTY_CROSSWALK_HEADER = [
+    "fipscounty",
+    "countyname_fips",
+    "state",
+    "cbsa_code",
+    "cbsa_name",
+    "ssa_code",
+    "state_name",
+    "countyname_rate",
+]
+
 
 def parse_catalog():
     text = (ROOT / "data_assets.yml").read_text()
@@ -58,6 +154,16 @@ def parse_seed_hooks():
                 if synthetic_match:
                     hooks[seed_name] = ("synthetic_data", synthetic_match.group(1))
     return hooks
+
+
+def seed_definition(yaml_text, seed_name):
+    match = re.search(
+        rf"(?ms)^  - name: {re.escape(seed_name)}\n.*?(?=^  - name: |\Z)",
+        yaml_text,
+    )
+    if match is None:
+        raise AssertionError(f"Missing seed definition: {seed_name}")
+    return match.group(0)
 
 
 class DataAssetContractTest(unittest.TestCase):
@@ -109,6 +215,66 @@ class DataAssetContractTest(unittest.TestCase):
                 self.assertTrue(header, seed_name)
                 self.assertTrue(all(header), seed_name)
                 self.assertIsNone(next(rows, None), seed_name)
+
+    def test_refreshed_terminology_headers_preserve_lifecycle_contract(self):
+        seed_root = ROOT / "seeds" / "terminology"
+        for filename, expected_header in TERMINOLOGY_LIFECYCLE_HEADERS.items():
+            with self.subTest(filename=filename):
+                with (seed_root / filename).open(
+                    encoding="utf-8-sig", newline=""
+                ) as handle:
+                    self.assertEqual(next(csv.reader(handle)), expected_header)
+
+    def test_ssa_fips_state_county_crosswalk_documents_header(self):
+        seed_root = ROOT / "seeds" / "terminology"
+        filename = "terminology__ssa_fips_state_county_crosswalk.csv"
+        with (seed_root / filename).open(
+            encoding="utf-8-sig", newline=""
+        ) as handle:
+            header = next(csv.reader(handle))
+        self.assertEqual(header, SSA_FIPS_STATE_COUNTY_CROSSWALK_HEADER)
+
+        yaml_text = (seed_root / "terminology_seeds.yml").read_text()
+        definition = seed_definition(
+            yaml_text, "terminology__ssa_fips_state_county_crosswalk"
+        )
+        documented = re.findall(
+            r"(?m)^      - name: ([a-z0-9_]+)\n        description: .+$",
+            definition,
+        )
+        self.assertEqual(documented, SSA_FIPS_STATE_COUNTY_CROSSWALK_HEADER)
+
+    def test_hcpcs_long_description_supports_full_cms_source_text(self):
+        yaml_text = (
+            ROOT / "seeds" / "terminology" / "terminology_seeds.yml"
+        ).read_text()
+        definition = seed_definition(yaml_text, "terminology__hcpcs_level_2")
+        self.assertIn("varchar(16777216)", definition)
+        self.assertIn("varchar(max)", definition)
+        self.assertIn("varchar(65535)", definition)
+        self.assertNotIn("varchar(2000)", definition)
+
+    def test_snomed_relationship_headers_and_atomic_release_contract(self):
+        seed_root = ROOT / "seeds" / "terminology"
+        for filename, expected_header in SNOMED_RELATIONSHIP_HEADERS.items():
+            with self.subTest(filename=filename):
+                with (seed_root / filename).open(
+                    encoding="utf-8-sig", newline=""
+                ) as handle:
+                    self.assertEqual(next(csv.reader(handle)), expected_header)
+
+        yaml_text = (seed_root / "terminology_seeds.yml").read_text()
+        for seed_name, source_release in SNOMED_RELEASES.items():
+            with self.subTest(seed_name=seed_name):
+                definition = seed_definition(yaml_text, seed_name)
+                self.assertIn(f'source_release: "{source_release}"', definition)
+                self.assertIn('source_last_updated: "2026-03-01"', definition)
+                self.assertIn('update_frequency: "semiannually"', definition)
+                self.assertIn(
+                    'license_url: "https://www.nlm.nih.gov/healthit/'
+                    'snomedct/snomed_licensing.html"',
+                    definition,
+                )
 
     def test_package_version_is_the_only_asset_version(self):
         project_text = (ROOT / "dbt_project.yml").read_text()
