@@ -5,19 +5,30 @@ config-version: 2
 profile: default
 
 vars:
+  # This is the canonical commented inventory for Tuva Core variables. Keep
+  # every public, integration-only, warehouse-specific, and internal test var
+  # documented here when its lookup is added or changed.
+  # Every Core boolean below must be a native, unquoted YAML boolean.
+
+  ## Tuva Core variables
+
   ## Domain enablement
   # These vars default to false in Tuva Core when omitted.
   # Integration tests set them true so local and CI builds exercise the full Tuva Core path.
   claims_enabled: true                 # Enables payer/claims input layer, normalization, claims preprocessing, and claims-derived core tables.
   clinical_enabled: true               # Enables provider/clinical input layer, normalization, and clinical-derived core tables.
   provider_attribution_enabled: true   # Enables provider attribution input and claims preprocessing attribution. Requires claims_enabled.
-  parity_enabled: false                # Keeps optional parity metric models out of normal development and CI builds.
+
+  ## Parity
+  # Enables maintainer release-comparison metrics when claims are also enabled.
+  parity_enabled: false                # Normal development and CI default.
 
   ## Data quality
   # Enables Structural Data Quality and Logical Data Quality models.
   # Production projects can leave this false/omitted unless they want to build these queryable result tables.
   data_quality_enabled: false           # Keeps optional data-quality result models out of this compatibility run.
-  enable_data_quality_failure_keys: false  # Adds the optional key-only logical failure drilldown table.
+  # Requires data_quality_enabled and at least one of claims_enabled or clinical_enabled.
+  enable_data_quality_failure_keys: false  # Adds the optional key-only Logical failure drilldown table.
 
   ## Medication terminology
   # False uses the package's CodeRx Open assets. True requires user-managed
@@ -25,16 +36,54 @@ vars:
   use_coderx_enterprise: false
 
   ## Synthetic data validation
-  # These vars are for this integration_tests project. They are not normal production Tuva Core settings.
-  use_synthetic_data: true             # Maps package synthetic seeds into this project's Input Layer models.
-  synthetic_data_size: small           # Synthetic payload to load: small or large.
+  # This integration project always maps package synthetic seeds into its Input Layer models.
+  # The var is not needed in production projects that map their own source data.
+  synthetic_data_size: small           # Selects the small or large payload; Core's loader fallback is large.
 
   ## Data asset releases and buckets
   # Tuva Core resolves assets from tuva-core/<installed-package-version>/.
   custom_bucket_name: tuva-public-resources  # Default public bucket for package data assets.
-  tuva_seed_buckets: {}                # Optional per-family bucket overrides, keyed by seed family.
+  # Resolution precedence is Core asset family, package slug, then custom_bucket_name.
+  tuva_seed_buckets: {}                # Optional bucket overrides keyed by Core asset family or package slug.
 
-  ## Standalone package behavior
+  ## Schema naming
+  # Optional prefix for output schemas, e.g. dev_aaron_core, dev_aaron_input_layer.
+  # tuva_schema_prefix: dev_aaron
+
+  ## Run metadata
+  # Root package default is the dbt run_started_at timestamp in UTC.
+  # Uncomment to force a fixed value in the tuva_last_run column.
+  # tuva_last_run: "2026-01-01 00:00:00"
+
+  ## Extension columns
+  # Allows prefixed custom columns to flow from a supported Input Layer model
+  # to the same-named Core table. Derived outputs such as member_month are excluded.
+  # passthrough:
+  #   prefix: 'x_'                     # Prefix used to identify extension columns.
+  #   strip: false                     # Whether to strip the prefix in final output aliases.
+
+  ## Provider attribution
+  # Optional current-panel as-of date override for provider ranking and current assignments.
+  # When omitted, each source uses its latest claim end date capped at the current date.
+  # provider_attribution_as_of_date: "2026-01-01"
+
+  ## Warehouse-specific seed loading
+  # Microsoft Fabric public storage endpoint used by seed loading macros.
+  # tuva_seed_fabric_storage_root: "https://tuvapublicresources.blob.core.windows.net"
+
+  ## Internal test hooks
+  # Local filesystem root for validating staged package data assets with DuckDB.
+  # The root must contain <bucket>/<package>/<version>/...; omit in normal projects.
+  # tuva_seed_duckdb_storage_root: "/tmp/tuva-data-assets"
+  # Internal dbt unit-test hook for extension-column tests; do not set in normal projects.
+  # _extension_columns_override: []
+  # Internal dbt unit-test hook for the shared columns used by smart_union.
+  # _smart_union_columns_override: []
+  # Internal dbt unit-test hook for the medical-claim procedure positions to expand.
+  # The normal default is every position from 1 through 25.
+  # _medical_claim_procedure_cols_override: [1]
+
+  ## Standalone package variables
   # Importing a standalone package enables it. These vars change package behavior;
   # none is a package-level on/off switch or an external-asset version pin.
   ccsr:
@@ -70,41 +119,6 @@ vars:
 
   quality_measures:
     quality_measures_period_end: "2018-12-31"  # Matches the shipped small synthetic dataset.
-
-  ## Schema naming
-  # Optional prefix for output schemas, e.g. dev_aaron_core, dev_aaron_input_layer.
-  # tuva_schema_prefix: dev_aaron
-
-  ## Run metadata
-  # Root package default is the dbt run_started_at timestamp in UTC.
-  # Uncomment to force a fixed value in the tuva_last_run column.
-  # tuva_last_run: "2026-01-01 00:00:00"
-
-  ## Extension columns
-  # Allows prefixed custom columns to flow from a supported Input Layer model
-  # to the same-named Core table. Derived outputs such as member_month are excluded.
-  # passthrough:
-  #   prefix: 'x_'                     # Prefix used to identify extension columns.
-  #   strip: false                     # Whether to strip the prefix in final output aliases.
-
-  ## Provider attribution
-  # Optional current-panel as-of date override for assigned_beneficiaries_current.
-  # provider_attribution_as_of_date: "2026-01-01"
-
-  ## Warehouse-specific seed loading
-  # Microsoft Fabric public storage endpoint used by seed loading macros.
-  # tuva_seed_fabric_storage_root: "https://tuvapublicresources.blob.core.windows.net"
-  # Warehouse-specific S3 bucket override used by seed loading macros.
-  # tuva_seeds_s3_bucket: tuva-public-resources
-  # Optional prefix under the selected S3 bucket.
-  # tuva_seeds_s3_key_prefix: ""
-
-  ## Internal test hooks
-  # Local filesystem root for validating staged package data assets with DuckDB.
-  # The root must contain <bucket>/<package>/<version>/...; omit in normal projects.
-  # tuva_seed_duckdb_storage_root: "/tmp/tuva-data-assets"
-  # Internal dbt unit-test hook for extension-column tests; do not set in normal projects.
-  # _extension_columns_override: []
 
 
 model-paths: ["models"]

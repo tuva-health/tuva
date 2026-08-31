@@ -46,11 +46,9 @@ and reads profiles from `~/.dbt` unless `DBT_PROFILES_DIR`,
 
 ## Synthetic Data
 
-Synthetic data is controlled through vars in `integration_tests/dbt_project.yml`.
-The defaults are:
-
-- `use_synthetic_data: true`
-- `synthetic_data_size: small`
+The integration project always maps the package's synthetic seeds into its
+Input Layer models. `synthetic_data_size` controls which published payload is
+loaded and defaults to `small`.
 
 Use the large synthetic data release for heavier validation:
 
