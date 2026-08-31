@@ -7,19 +7,19 @@
 with loinc as (
 
     select
-        loinc
-      , deprecated
-    from {{ ref('terminology__loinc') }}
+        loinc_seed.loinc
+      , loinc_seed.deprecated
+    from {{ ref('terminology__loinc') }} as loinc_seed
 
 )
 
 , mappings as (
 
     select
-        loinc
-      , map_to
-      , final_map_to
-    from {{ ref('terminology__loinc_deprecated_mapping') }}
+        mapping_seed.loinc
+      , mapping_seed.map_to
+      , mapping_seed.final_map_to
+    from {{ ref('terminology__loinc_deprecated_mapping') }} as mapping_seed
 
 )
 
