@@ -11,15 +11,7 @@
    )
 }}
 
-with enabled_domains as (
-
-    select distinct
-          input_layer_domain
-    from {{ ref('data_quality__structural_source_populations') }}
-
-)
-
-, non_null_sources as (
+with non_null_sources as (
 
     select
           input_layer_domain
@@ -43,12 +35,9 @@ from non_null_sources
 union all
 
 select
-      enabled_domains.input_layer_domain
+      source_populations.input_layer_domain
     , cast(null as {{ dbt.type_string() }}) as data_source
     , '{{ dq_structural_null_source_key() }}' as data_source_key
-from enabled_domains
-where not exists (
-    select 1
-    from non_null_sources
-    where non_null_sources.input_layer_domain = enabled_domains.input_layer_domain
-)
+from {{ ref('data_quality__structural_source_populations') }} as source_populations
+group by source_populations.input_layer_domain
+having count(source_populations.data_source) = 0

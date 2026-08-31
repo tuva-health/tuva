@@ -54,10 +54,8 @@ source_eligibility_member_months as (
         , source_rows.payer
         , source_rows.{{ quote_column('plan') }}
         , source_rows.data_source
-        , (
-              cast({{ date_part('year', 'source_rows.paid_date') }} as {{ dbt.type_int() }}) * 100
-              + cast({{ date_part('month', 'source_rows.paid_date') }} as {{ dbt.type_int() }})
-          ) as _dq_claim_year_month
+        , cast({{ date_part('year', 'source_rows.paid_date') }} as {{ dbt.type_int() }}) as _dq_claim_year
+        , cast({{ date_part('month', 'source_rows.paid_date') }} as {{ dbt.type_int() }}) as _dq_claim_month
     from source_rows
     where {{ eligibility_match_applicable_where_sql }}
 ),
@@ -69,7 +67,8 @@ matching_eligibility_member_months as (
         , source_member_months.payer
         , source_member_months.{{ quote_column('plan') }}
         , source_member_months.data_source
-        , source_member_months._dq_claim_year_month
+        , source_member_months._dq_claim_year
+        , source_member_months._dq_claim_month
         , 1 as _dq_has_matching_eligibility
     from source_eligibility_member_months as source_member_months
     inner join eligibility_rows_with_effective_end_date as eligibility_rows
@@ -78,13 +77,19 @@ matching_eligibility_member_months as (
        and eligibility_rows.payer = source_member_months.payer
        and eligibility_rows.{{ quote_column('plan') }} = source_member_months.{{ quote_column('plan') }}
        and eligibility_rows.data_source = source_member_months.data_source
-       and source_member_months._dq_claim_year_month >= (
-            cast({{ date_part('year', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }}) * 100
-            + cast({{ date_part('month', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+       and (
+            source_member_months._dq_claim_year > cast({{ date_part('year', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+            or (
+                source_member_months._dq_claim_year = cast({{ date_part('year', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+                and source_member_months._dq_claim_month >= cast({{ date_part('month', 'eligibility_rows.enrollment_start_date') }} as {{ dbt.type_int() }})
+            )
        )
-       and source_member_months._dq_claim_year_month <= (
-            cast({{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }}) * 100
-            + cast({{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+       and (
+            source_member_months._dq_claim_year < cast({{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+            or (
+                source_member_months._dq_claim_year = cast({{ date_part('year', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+                and source_member_months._dq_claim_month <= cast({{ date_part('month', 'eligibility_rows._dq_effective_enrollment_end_date') }} as {{ dbt.type_int() }})
+            )
        )
 ),
 
@@ -171,10 +176,8 @@ final as (
        and matching_eligibility_member_months.payer = source_rows.payer
        and matching_eligibility_member_months.{{ quote_column('plan') }} = source_rows.{{ quote_column('plan') }}
        and matching_eligibility_member_months.data_source = source_rows.data_source
-       and matching_eligibility_member_months._dq_claim_year_month = (
-            cast({{ date_part('year', 'source_rows.paid_date') }} as {{ dbt.type_int() }}) * 100
-            + cast({{ date_part('month', 'source_rows.paid_date') }} as {{ dbt.type_int() }})
-       )
+       and matching_eligibility_member_months._dq_claim_year = cast({{ date_part('year', 'source_rows.paid_date') }} as {{ dbt.type_int() }})
+       and matching_eligibility_member_months._dq_claim_month = cast({{ date_part('month', 'source_rows.paid_date') }} as {{ dbt.type_int() }})
     left join {{ ref('provider_data__provider') }} as prescribing_provider_lookup
         on cast(source_rows.prescribing_provider_npi as {{ string_type }}) = cast(prescribing_provider_lookup.npi as {{ string_type }})
     left join {{ ref('provider_data__provider') }} as dispensing_provider_lookup

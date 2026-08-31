@@ -31,6 +31,7 @@ unit_tests:
               , cast(null as {{ string_type }}) as encounter_group
               , cast(null as {{ integer_type }}) as priority_number
               , cast(null as {{ string_type }}) as anchor_claim_id
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
           where 1 = 0
       - input: ref('emergency_department__prof_claims')
         format: sql

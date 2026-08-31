@@ -24,7 +24,7 @@ unit_tests:
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
           {% set numeric_type = 'numeric' %}
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
-          with base as (
+          {% set base_sql %}
               select
                   'mc-u-1' as medical_claim_id
                 , 'undetermined_claim' as claim_id
@@ -58,7 +58,7 @@ unit_tests:
               select 'mc-u-2', 'undetermined_claim', 2, 'undetermined', 'person-1', 'member-1', 'payer-a', 'plan-a', cast('2024-01-01' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), cast('2024-01-02' as date), cast(2 as {{ numeric_type }}), 'A0425', '1111111111', cast('2024-01-10' as date), cast(20 as {{ numeric_type }}), cast(22 as {{ numeric_type }}), cast(25 as {{ numeric_type }}), cast(2 as {{ numeric_type }}), cast(3 as {{ numeric_type }}), cast(4 as {{ numeric_type }}), cast(31 as {{ numeric_type }}), 0, cast('2024-01-31' as date), cast('2024-02-01 00:00:00' as {{ timestamp_type }}), 'medical_claim.csv', 'source-a'
               union all
               select 'mc-p-1', 'professional_claim', 1, 'professional', 'person-2', 'member-2', 'payer-b', 'plan-b', cast('2024-03-01' as date), cast('2024-03-01' as date), cast('2024-03-01' as date), cast('2024-03-01' as date), cast(1 as {{ numeric_type }}), '99214', '2222222222', cast('2024-03-10' as date), cast(30 as {{ numeric_type }}), cast(32 as {{ numeric_type }}), cast(35 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(0 as {{ numeric_type }}), cast(32 as {{ numeric_type }}), 1, cast('2024-03-31' as date), cast('2024-04-01 00:00:00' as {{ timestamp_type }}), 'medical_claim.csv', 'source-b'
-          )
+          {% endset %}
           select
               base.*
             , cast(null as date) as admission_date
@@ -90,7 +90,9 @@ unit_tests:
             , cast(null as {{ string_type }}) as billing_name
             , cast(null as {{ string_type }}) as facility_npi
             , cast(null as {{ string_type }}) as facility_name
-          from base
+          from (
+              {{ base_sql }}
+          ) as base
       - input: ref('service_category__service_category_grouper')
         format: sql
         rows: |

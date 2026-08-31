@@ -730,4 +730,13 @@ unit_tests:
               , cast(null as {{ 'int64' if target.type == 'bigquery' else 'bigint' }}) as row_count
           from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
     expect:
-      rows: []
+      format: sql
+      rows: |
+        select
+              cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'varchar' }}) as data_source
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'varchar' }}) as input_table_name
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'varchar' }}) as column_name
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'varchar' }}) as test
+            , cast(null as {{ 'int64' if target.type == 'bigquery' else 'bigint' }}) as test_result
+        from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
+        where 1 = 0
