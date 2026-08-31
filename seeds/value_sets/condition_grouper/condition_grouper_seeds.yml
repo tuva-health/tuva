@@ -10,15 +10,6 @@ seeds:
           - condition_family
           - condition
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Tuva Condition Grouper"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva Condition Grouper v1"
-          source_last_updated: "2026-05-26"
-          tuva_last_updated: "2026-05-26"
-          update_frequency: "ad hoc"
-          notes: "Source of truth is the Tuva Conditions & Procedures Google Sheet."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -76,15 +67,6 @@ seeds:
           - code_system
           - code
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Tuva Condition Grouper Code Map"
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: "Tuva Condition Grouper v1"
-          source_last_updated: "2026-05-26"
-          tuva_last_updated: "2026-05-26"
-          update_frequency: "ad hoc"
-          notes: "Source of truth is the Tuva Conditions & Procedures Google Sheet."
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper_code_map.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}

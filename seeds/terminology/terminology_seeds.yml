@@ -7,16 +7,6 @@ seeds:
       was performed or where a medication or immunization was administered. Tuva uses this terminology in
       the core immunization model to translate immunization body site codes into body site descriptions.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://terminology.hl7.org/CodeSystem-v3-ActSite.html"
-          source_release: "HL7 Terminology v7.1.0; ActSite CodeSystem v4.0.0"
-          source_last_updated: "2019-03-20"
-          tuva_last_updated: "2026-05-23"
-          update_frequency: "ad hoc"
-          license_url: "https://terminology.hl7.org/license.html"
-          notes: "Tuva uses this terminology in the core immunization model to translate immunization body site codes into body site descriptions."
       post_hook: "{{ load_versioned_seed('terminology','terminology__act_site.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -41,14 +31,6 @@ seeds:
       asset in core encounter models, input normalization models, claims preprocessing service category
       and encounter grouping models, and data quality checks.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/claim-source-inpatient-admission-code-ffs"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__admit_source.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -79,14 +61,6 @@ seeds:
       asset in core encounter models, input normalization models, claims preprocessing service category
       and encounter grouping models, and data quality checks.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__admit_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -111,14 +85,6 @@ seeds:
       Appointment cancellation reason codes identify why a scheduled clinical appointment was cancelled.
       They are maintained by HL7 FHIR and remain available as a terminology reference.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://terminology.hl7.org/CodeSystem-appointment-cancellation-reason.json"
-          source_release: "HL7 Terminology appointment-cancellation-reason CodeSystem"
-          source_last_updated: "2026-03-09"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_cancellation_reason.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -142,14 +108,6 @@ seeds:
       booked, fulfilled, cancelled, or no-show. They are maintained by HL7 FHIR and remain available as a
       terminology reference.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://hl7.org/fhir/R4/codesystem-appointmentstatus.json"
-          source_release: "FHIR R4 AppointmentStatus CodeSystem"
-          source_last_updated: "2025-03-21"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_status.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -168,14 +126,6 @@ seeds:
       Appointment type codes categorize the purpose or kind of scheduled clinical visit. They are
       maintained by HL7 FHIR and remain available as a terminology reference.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://terminology.hl7.org/CodeSystem-v2-0276.json"
-          source_release: "HL7 Terminology v2-0276 CodeSystem"
-          source_last_updated: "2026-03-09"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__appointment_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -199,16 +149,6 @@ seeds:
       mortality. They are maintained by Solventum. Tuva uses this terminology set to pull in descriptions
       when your claims data uses APR-DRG codes.
     config:
-      meta:
-        data_asset:
-          display_name: "APR-DRG"
-          maintainer: "Solventum"
-          source_url: "https://www.solventum.com/en-us/home/health-information-technology/solutions/apr-drg/"
-          source_release: "APR-DRG v43.0 descriptions"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "Prior Tuva codes are retained with deprecated = 1. Tuva's release owner confirmed permission to redistribute the Solventum APR-DRG v43 descriptions on 2026-08-28."
       post_hook: "{{ load_versioned_seed('terminology','terminology__apr_drg.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -245,14 +185,6 @@ seeds:
       Tuva uses this asset in input normalization models, claims preprocessing service category and
       encounter grouping models, and data quality checks.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/bill-type-code"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__bill_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -285,14 +217,6 @@ seeds:
       core claims models, encounter grouping, and data quality logic; current models do not need to join
       to this terminology table to use them.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__claim_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -313,15 +237,6 @@ seeds:
       National Center for Immunization and Respiratory Diseases. Tuva uses this asset in the core
       immunization model.
     config:
-      meta:
-        data_asset:
-          display_name: "CVX"
-          maintainer: "CDC National Center for Immunization and Respiratory Diseases"
-          source_url: "https://www2.cdc.gov/vaccines/iis/iisstandards/downloads/cvx.txt"
-          source_release: "CDC CVX text source table"
-          source_last_updated: "2026-08-18"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "monthly"
       post_hook: "{{ load_versioned_seed('terminology','terminology__cvx.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -362,14 +277,6 @@ seeds:
       preprocessing service category and encounter grouping models, data quality checks, and retained
       readmissions models in the Quality Measures package.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/patient-discharge-status-code-ffs"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__discharge_disposition.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -392,14 +299,6 @@ seeds:
       core encounter, claims utilization, semantic layer, and downstream utilization analytics; current
       models do not need to join to this terminology table to use them.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__encounter_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -425,14 +324,6 @@ seeds:
       patient, and data quality logic; current models carry the value through without joining to this
       terminology table.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ethnicity.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -456,14 +347,6 @@ seeds:
       and data quality logic; current models carry the value through without joining to this terminology
       table.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__sex.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -484,16 +367,6 @@ seeds:
       equipment, and other non-CPT services. They are maintained by CMS. Tuva uses this asset in the core
       observation model and core procedure models.
     config:
-      meta:
-        data_asset:
-          display_name: "HCPCS Level II"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/healthcare-common-procedure-system/quarterly-update"
-          source_release: "October 2026 Alpha-Numeric HCPCS File"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "quarterly"
-          notes: "Contains five-character HCPCS Level II codes only. Modifier records are intentionally excluded. Prior codes are retained with deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__hcpcs_level_2.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -537,15 +410,6 @@ seeds:
           - hcpcs_cd
           - first_rbcs_release_year
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Restructured BETOS"
-          maintainer: "CMS"
-          source_url: "https://data.cms.gov/provider-summary-by-type-of-service/provider-service-classifications/restructured-betos-classification-system-rbcs"
-          source_release: "RBCS Taxonomy RY26"
-          source_last_updated: "2026-08-21"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "Complete CMS RY26 row and schema replacement; prior Tuva-only rows and legacy alias columns are not retained. The relation grain is one row per HCPCS code and first RBCS release year so assignment history is explicit."
       post_hook: "{{ load_versioned_seed('terminology','terminology__restructured_betos.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -632,16 +496,6 @@ seeds:
       core encounter models, claims preprocessing service category and encounter grouping models, and data
       quality checks.
     config:
-      meta:
-        data_asset:
-          display_name: "ICD-9-CM"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes/icd-9-cm-diagnosis-procedure-codes-abbreviated-and-full-code-titles"
-          source_release: "CMS ICD-9-CM versions 23 through 32 historical union"
-          source_last_updated: "2014-10-01"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "static"
-          notes: "Codes present in v32 have deprecated = 0; codes found only in earlier releases have deprecated = 1. For v23-v26-only codes, the authoritative abbreviated title populates both description fields because CMS does not provide a full title in those archives."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -676,16 +530,6 @@ seeds:
       reporting. Tuva uses this asset in the core observation model, core procedure models, and data
       quality checks.
     config:
-      meta:
-        data_asset:
-          display_name: "ICD-9-PCS"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes/icd-9-cm-diagnosis-procedure-codes-abbreviated-and-full-code-titles"
-          source_release: "CMS ICD-9 procedure versions 23 through 32 historical union"
-          source_last_updated: "2014-10-01"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "static"
-          notes: "Codes present in v32 have deprecated = 0; codes found only in earlier releases have deprecated = 1. For v23-v26-only codes, the authoritative abbreviated title populates both description fields because CMS does not provide a full title in those archives."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_9_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -723,16 +567,6 @@ seeds:
       grouping models, data quality checks, and retained readmissions models in the Quality Measures
       package.
     config:
-      meta:
-        data_asset:
-          display_name: "ICD-10-CM"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2027"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "FY 2027 codes are current with deprecated = 0. All codes from the prior Tuva snapshot are retained; codes absent from FY 2027 have deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_cm.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -777,15 +611,6 @@ seeds:
         primary_key_columns:
           - icd_10_pcs
         primary_key_strategy: natural_single_column
-        data_asset:
-          display_name: "ICD-10-PCS"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2027; prior Tuva historical coverage"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "Includes current FY 2027 ICD-10-PCS codes plus every valid historical ICD-10-PCS code from the prior Tuva snapshot. The prior non-code End of Content sentinel is excluded. Deprecated is 1 when the code is no longer active in the FY 2027 CMS code file."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd_10_pcs.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -813,14 +638,6 @@ seeds:
       Immunization route codes identify how a vaccine was administered, such as intramuscular or oral.
       They are maintained by HL7 FHIR. Tuva uses this asset in the core immunization model.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://terminology.hl7.org/CodeSystem-v3-RouteOfAdministration.json"
-          source_release: "HL7 Terminology v3 RouteOfAdministration CodeSystem"
-          source_last_updated: "2026-03-09"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_route_code.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -843,14 +660,6 @@ seeds:
       Immunization status reason codes identify why an immunization was not completed or did not occur as
       expected. They are maintained by HL7 FHIR. Tuva uses this asset in the core immunization model.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://hl7.org/fhir/R4/valueset-immunization-status-reason.json"
-          source_release: "FHIR R4 Immunization Status Reason ValueSet"
-          source_last_updated: "2025-03-21"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_status_reason.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -877,14 +686,6 @@ seeds:
       Immunization status codes identify whether an immunization record is completed, entered in error, or
       not done. They are maintained by HL7 FHIR. Tuva uses this asset in the core immunization model.
     config:
-      meta:
-        data_asset:
-          maintainer: "Health Level Seven International"
-          source_url: "https://hl7.org/fhir/R4/valueset-immunization-status.json"
-          source_release: "FHIR R4 Immunization Status ValueSet"
-          source_last_updated: "2025-03-21"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__immunization_status.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -908,17 +709,6 @@ seeds:
       observations. They are maintained by the Regenstrief Institute and used to standardize lab and
       observation data. Tuva uses this asset in the core lab result model and the core observation model.
     config:
-      meta:
-        data_asset:
-          display_name: "LOINC"
-          maintainer: "Regenstrief Institute"
-          source_url: "https://loinc.org/downloads/"
-          source_release: "LOINC 2.83"
-          source_last_updated: "2026-08-19"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "semiannually"
-          license_url: "https://loinc.org/license/"
-          notes: "The official LOINC Complete archive requires a LOINC account. Prior Tuva concepts are retained with deprecated = 1 when absent from 2.83."
       post_hook: "{{ load_versioned_seed('terminology','terminology__loinc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1018,15 +808,6 @@ seeds:
       and user-led cleanup of deprecated lab and observation codes; current Tuva Core models do not join
       to it directly.
     config:
-      meta:
-        data_asset:
-          maintainer: "Regenstrief Institute"
-          source_url: "https://loinc.org/downloads/"
-          source_release: "LOINC 2.83"
-          source_last_updated: "2026-08-19"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "semiannually"
-          license_url: "https://loinc.org/license/"
       post_hook: "{{ load_versioned_seed('terminology','terminology__loinc_deprecated_mapping.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1067,15 +848,6 @@ seeds:
       this asset for inpatient DRG analytics and user-led enrichment of major diagnostic categories;
       current Tuva Core models do not join to it directly.
     config:
-      meta:
-        data_asset:
-          display_name: "MDC"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software"
-          source_release: "FY 2026 MS-DRG v43"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__mdc.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1099,15 +871,6 @@ seeds:
       as the expected vocabulary for dual_status_code in eligibility and core eligibility outputs; current
       models carry the code through without joining to this terminology table.
     config:
-      meta:
-        data_asset:
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/data-research/files-for-order/limited-data-set-lds-files/master-beneficiary-summary-file-mbsf-lds"
-          source_release: "2025 LDS MBSF ABCD V2 Base Data Dictionary, with historical values retained"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "ad hoc"
-          notes: "Includes current MBSF ABCD V2 values 00-06, 08-10, 99, and NA. Historical 07 and XX values are retained with deprecated = 1; any previously published source-specific values are also retained as deprecated. The prior Tuva description of NA as missing/unknown was corrected to the CMS meaning Non-Medicaid; an unversioned code table cannot represent both meanings for the same code."
       post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_dual_eligibility.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1138,14 +901,6 @@ seeds:
       eligibility and core eligibility outputs; current models carry the code through without joining to
       this terminology table.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/original-reason-entitlement-code"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_orec.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1172,14 +927,6 @@ seeds:
       for medicare_status_code in eligibility and core eligibility outputs; current models carry the code
       through without joining to this terminology table.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/beneficiary-medicare-status-code"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__medicare_status.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology
@@ -1207,15 +954,6 @@ seeds:
       inpatient payment, benchmarking, and user-led MS-DRG enrichment; current Tuva Core models do not
       join to it directly.
     config:
-      meta:
-        data_asset:
-          display_name: "MS-DRG Weights and LOS"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2027-ipps-final-rule-home-page"
-          source_release: "FY 2021 through FY 2027 IPPS Final Rule Table 5"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg_weights_los.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1279,16 +1017,6 @@ seeds:
       encounter grouping models, data quality checks, and retained readmissions models in the Quality
       Measures package.
     config:
-      meta:
-        data_asset:
-          display_name: "MS-DRG"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software"
-          source_release: "FY 2027 MS-DRG v44 final-rule Table 5"
-          source_last_updated: "2026-08-03"
-          tuva_last_updated: "2026-08-28"
-          notes: "Current FY2027 codes come from the final-rule Table 5. Prior-only MS-DRG codes remain with deprecated = 1 and their existing deprecated_date."
-          update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ms_drg.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1328,16 +1056,6 @@ seeds:
       CodeRx Open package records map National Drug Codes to RxNorm drug concepts. Tuva distributes this
       annual open snapshot for medication enrichment, pharmacy normalization, and data quality checks.
     config:
-      meta:
-        data_asset:
-          display_name: "CodeRx Packages"
-          maintainer: "CodeRx"
-          source_url: "https://coderx.io/coderx-open"
-          source_release: "CodeRx Open snapshot 2026-07-08"
-          source_last_updated: "2026-07-08"
-          tuva_last_updated: "2026-08-24"
-          update_frequency: "annually"
-          notes: "CodeRx Open package data distributed with Tuva Core."
       post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_packages.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1392,14 +1110,6 @@ seeds:
       signs, survey, and other observation categories. They are maintained by Tuva Health. Tuva uses this
       asset in the core observation model.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__observation_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1418,14 +1128,6 @@ seeds:
       coverage types. They are maintained by Tuva Health. Tuva uses this asset in data quality checks and
       as the expected normalized payer_type vocabulary for eligibility and core eligibility outputs.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__payer_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1447,14 +1149,6 @@ seeds:
       normalization models, claims preprocessing service category and encounter grouping models, and data
       quality checks.
     config:
-      meta:
-        data_asset:
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/place-of-service-codes/code-sets"
-          source_release: ""
-          source_last_updated: "2026-02-17"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__place_of_service.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1480,14 +1174,6 @@ seeds:
       began. Tuva sources this terminology from CMS Medicare claims variable documentation. Tuva uses
       this asset in core condition models and input normalization models.
     config:
-      meta:
-        data_asset:
-          maintainer: "CMS"
-          source_url: "https://bluebutton.cms.gov/resources/variables/clm_poa_ind_sw1/"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-05-24"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__present_on_admission.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1513,14 +1199,6 @@ seeds:
       Tuva uses these values as the expected normalized race vocabulary for eligibility, patient, and data
       quality logic; current models carry the value through without joining to this terminology table.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__race.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1546,14 +1224,6 @@ seeds:
       data. Tuva uses this asset in input normalization models, claims preprocessing service category and
       encounter grouping models, and data quality checks.
     config:
-      meta:
-        data_asset:
-          maintainer: "ResDAC"
-          source_url: "https://resdac.org/cms-data/variables/revenue-center-code-ffs"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__revenue_center.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1578,16 +1248,6 @@ seeds:
       CodeRx Open class records map RxNorm drug concepts to Anatomical Therapeutic Chemical classification
       levels. Tuva distributes this annual open snapshot for medication enrichment and analytics.
     config:
-      meta:
-        data_asset:
-          display_name: "CodeRx Classes"
-          maintainer: "CodeRx"
-          source_url: "https://coderx.io/coderx-open"
-          source_release: "CodeRx Open snapshot 2026-07-08"
-          source_last_updated: "2026-07-08"
-          tuva_last_updated: "2026-08-24"
-          update_frequency: "annually"
-          notes: "CodeRx Open drug class data distributed with Tuva Core."
       post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_classes.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1649,17 +1309,6 @@ seeds:
       2026 map as a release snapshot and preserves the source active field rather than appending obsolete
       relationship rows as though they were current.
     config:
-      meta:
-        data_asset:
-          display_name: "SNOMED to ICD-10 Map"
-          maintainer: "SNOMED International and National Library of Medicine"
-          source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: "March 2026 SNOMED CT to ICD-10-CM Mapping Resources (20260301)"
-          source_last_updated: "2026-03-01"
-          tuva_last_updated: "2026-08-29"
-          update_frequency: "semiannually"
-          license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-          notes: "Current relationship snapshot coordinated with the March 2026 SNOMED CT U.S. Edition. Source lifecycle is retained in active; prior mapping rows are not appended without explicit relationship lifecycle. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_icd_10_map.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1748,16 +1397,6 @@ seeds:
         primary_key_columns:
           - snomed_ct
         primary_key_strategy: natural_single_column
-        data_asset:
-          display_name: "SNOMED CT"
-          maintainer: "SNOMED International and National Library of Medicine"
-          source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: "March 2026 SNOMED CT U.S. Edition (20260301)"
-          source_last_updated: "2026-03-01"
-          tuva_last_updated: "2026-08-29"
-          update_frequency: "semiannually"
-          license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-          notes: "Active March 2026 concepts have deprecated = 0. Inactive concepts and any concept retained only from the prior Tuva snapshot have deprecated = 1. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1804,16 +1443,6 @@ seeds:
           - parent_snomed_code
           - child_snomed_code
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "SNOMED CT Transitive Closures"
-          maintainer: "SNOMED International and National Library of Medicine"
-          source_url: "https://www.nlm.nih.gov/healthit/snomedct/us_edition.html"
-          source_release: "March 2026 SNOMED CT U.S. Edition Transitive Closure Resources (20260301)"
-          source_last_updated: "2026-03-01"
-          tuva_last_updated: "2026-08-29"
-          update_frequency: "semiannually"
-          license_url: "https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html"
-          notes: "Reflexive current hierarchy snapshot coordinated with the March 2026 SNOMED CT U.S. Edition. Every retained concept has one self-edge; prior non-reflexive closure edges are not retained as current relationships. UMLS Metathesaurus license terms, including the SNOMED CT Affiliate License provisions, apply."
       post_hook: "{{ load_versioned_seed('terminology','terminology__snomed_ct_transitive_closures.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1845,16 +1474,6 @@ seeds:
       CodeRx Open drug records describe active, prescribable RxNorm concepts and their corresponding
       unbranded clinical drug concepts. Tuva distributes this annual open snapshot for medication enrichment.
     config:
-      meta:
-        data_asset:
-          display_name: "CodeRx Drugs"
-          maintainer: "CodeRx"
-          source_url: "https://coderx.io/coderx-open"
-          source_release: "CodeRx Open snapshot 2026-07-08"
-          source_last_updated: "2026-07-08"
-          tuva_last_updated: "2026-08-24"
-          update_frequency: "annually"
-          notes: "CodeRx Open drug data distributed with Tuva Core."
       post_hook: "{{ load_versioned_seed('terminology','terminology__coderx_drugs.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1901,15 +1520,6 @@ seeds:
       area, and invasiveness groups. They are maintained by the Harvey L. Neiman Health Policy Institute.
       Tuva uses this asset in claims preprocessing service category and encounter grouping models.
     config:
-      meta:
-        data_asset:
-          display_name: "NITOS"
-          maintainer: "Harvey L. Neiman Health Policy Institute"
-          source_url: "https://www.neimanhpi.org/wp-content/uploads/2024/11/nitos_40hpi.xlsx"
-          source_release: "NITOS Version 4.0"
-          source_last_updated: "2024-11-12"
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__nitos.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1937,16 +1547,6 @@ seeds:
       section, body system, root operation, body part, approach, device, and qualifier. It is maintained
       by CMS. Tuva uses this asset in AHRQ CCSR models.
     config:
-      meta:
-        data_asset:
-          display_name: "ICD-10-PCS CMS Ontology"
-          maintainer: "CMS"
-          source_url: "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
-          source_release: "FY 2027"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "FY 2027 code axes are current with deprecated = 0. Prior Tuva ontology rows are retained with deprecated = 1 when the code is absent from FY 2027."
       post_hook: "{{ load_versioned_seed('terminology','terminology__icd10_pcs_cms_ontology.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
@@ -1998,15 +1598,6 @@ seeds:
       Economic Research from federal reference data. Tuva publishes this asset for Medicare geographic
       enrichment and user-led SSA-to-FIPS crosswalks; current Tuva Core models do not join to it directly.
     config:
-      meta:
-        data_asset:
-          maintainer: "National Bureau of Economic Research"
-          source_url: "https://data.nber.org/ssa-fips-state-county-crosswalk/2026/ssa_fips_state_county_2026.csv"
-          source_release: "2026 SSA-FIPS county crosswalk"
-          source_last_updated: "2025-04-15"
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "Published as the authoritative 2026 relationship snapshot. Erroneous prior relationship rows are not retained as code history. The relation is unique on the nullable pair (fipscounty, ssa_code); authoritative ratebook-only and Connecticut planning-region rows may populate only one identifier."
       post_hook: "{{ load_versioned_seed('terminology','terminology__ssa_fips_state_county_crosswalk.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2054,14 +1645,6 @@ seeds:
       normalization. They are maintained by the U.S. Census Bureau and ANSI/INCITS. Tuva uses this asset
       in input normalization models.
     config:
-      meta:
-        data_asset:
-          maintainer: "U.S. Census Bureau and ANSI/INCITS"
-          source_url: "https://www2.census.gov/geo/docs/reference/codes2020/national_state2020.txt"
-          source_release: "2020 Census state national codes file"
-          source_last_updated: "2023-02-13"
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ansi_fips_state.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2088,14 +1671,6 @@ seeds:
     description: |-
       The calendar table is a public daily reference asset with common date attributes maintained by Tuva Health. Tuva Core preserves it for compatible downstream use, including the Semantic Layer, CMS HCC, and AHRQ Quality Indicators. Core normalization, member-month construction, and provider attribution do not use calendar membership to validate or erase already-typed dates; member-month processing uses a separate package-owned monthly spine.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__calendar.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2153,14 +1728,6 @@ seeds:
       expected vocabulary for code_type fields across input, core, and downstream models; current models
       carry the value through without joining to this reference table.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__code_type.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2182,15 +1749,6 @@ seeds:
       enrichment and user-led population health analytics; current Tuva Core models do not join to it
       directly.
     config:
-      meta:
-        data_asset:
-          maintainer: "U.S. Census Bureau and ANSI/INCITS"
-          source_url: "https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip"
-          source_release: "2025 TIGER/Line county layer"
-          source_last_updated: ""
-          tuva_last_updated: "2026-08-28"
-          update_frequency: "annually"
-          notes: "Current 2025 counties are marked deprecated = 0. Prior Tuva county codes absent from the 2025 layer are retained with deprecated = 1."
       post_hook: "{{ load_versioned_seed('terminology','terminology__fips_county.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2222,14 +1780,6 @@ seeds:
       data. Tuva publishes this asset for Medicare geographic normalization and user-led SSA state-code
       crosswalks; current Tuva Core models do not join to it directly.
     config:
-      meta:
-        data_asset:
-          maintainer: "Tuva Health"
-          source_url: "Tuva Health"
-          source_release: ""
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__ssa_fips_state.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2259,14 +1809,6 @@ seeds:
           - FIPS
           - YEAR
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "SVI US County"
-          maintainer: "CDC/ATSDR"
-          source_url: "https://svi.cdc.gov/Documents/Data/2022/csv/states_counties/SVI_2022_US_county.csv"
-          source_release: "2022 SVI"
-          source_last_updated: "2024-11-25"
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__svi_us_county.csv.gz') }}"
       schema: |-
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -2761,15 +2303,6 @@ seeds:
       tract-level social vulnerability enrichment and population health analytics; current Tuva Core
       models do not join to it directly.
     config:
-      meta:
-        data_asset:
-          display_name: "SVI US"
-          maintainer: "CDC/ATSDR"
-          source_url: "https://svi.cdc.gov/Documents/Data/2022/csv/states/SVI_2022_US.csv"
-          source_release: "2022 SVI"
-          source_last_updated: "2024-11-25"
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('terminology','terminology__svi_us.csv.gz') }}"
       schema: |-
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}

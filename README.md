@@ -152,11 +152,13 @@ or data tests.
 
 ## Data Assets
 
-Every asset-bearing 1.0 package resolves one complete snapshot from its
-installed package version. Core assets use this layout:
+Tuva Core loads one explicitly selected data-asset version. Package code and
+data-asset versions are intentionally independent. Core assets use this layout:
 
 ```text
-tuva-core/<package-version>/
+tuva-core/<data-asset-version>/
+├── _manifest.json
+├── _release.json
 ├── terminology/
 ├── provider-data/
 ├── synthetic-data/
@@ -165,24 +167,32 @@ tuva-core/<package-version>/
 └── value-sets/
 ```
 
-Checked-in seed CSVs are header-only loader contracts. `data_assets.yml`
-declares the exact Core payload inventory; users do not configure independent
-terminology, value-set, provider-data, or synthetic-data versions.
+The `tuva_core_data_asset_version` variable defaults to `1.0.0` and is used
+directly in this path. A root project can override it when intentionally
+testing a different complete snapshot. `custom_bucket_name` can point the same
+loader contracts at another bucket.
 
-Future-version payloads can be prepared before a version change reaches
-`main`, but that payload-only prefix is a release candidate and must not contain
-`_release.json`. After merge, the publisher writes the receipt only when the
-complete snapshot verifies. The receipt binds the snapshot to the exact package
-commit and must match across S3, GCS, and Azure before the package tag can be
-created. dbt loaders do not read the receipt at runtime.
+Checked-in seed CSVs are header-only loader contracts; seed YAML retains the
+relation names, schemas, column types, tests, and load hooks. Payload inventory,
+source provenance, and candidate/released status live with the versioned cloud
+snapshot instead of in the dbt package. dbt loads only the selected path and
+does not read cloud manifest or release-status files.
+
+A `candidate` snapshot may be edited while it is being prepared. A `released`
+snapshot is read-only by default. The only exception is an explicit
+break-glass instruction from Aaron that names the exact package and asset
+version and gives a reason; maintenance must record that authorization, scope,
+reason, and the resulting file changes.
+
+S3 is the public source, and GCS and Azure mirror the same versioned paths.
 
 Redshift loading uses `IAM_ROLE default`; configure the cluster or serverless
 namespace with a default IAM role that can read the selected data-asset bucket.
 Released gzip objects carry `Content-Encoding: gzip` for compatible
 object-store loading.
 
-Release, publication, synthetic-data generation, and repository-maintenance
-tooling lives in the separate `tuva-maintenance` repository. The Core-specific
+Publication, mirroring, verification, synthetic-data generation, and
+repository-maintenance tooling lives outside this dbt package. The Core-specific
 `scripts/dbt-local` helper remains here because it runs this checkout through
 the local integration project.
 

@@ -12,9 +12,9 @@ those inputs.
 - `tests/`: integration-only regression tests that validate behavior across the
   package boundary.
 - `macros/`: integration and CI helper macros.
-- There is no project-local `seeds/` directory. Tuva Data Assets are defined by
-  the Tuva Core package and loaded from the immutable object-storage snapshot
-  matching the installed Tuva Core version.
+- There is no project-local `seeds/` directory. Tuva Core supplies header-only
+  seed contracts and loads their contents from the selected versioned
+  object-storage folder.
 - `profiles/`: CI-only warehouse profiles. Use your local `~/.dbt/profiles.yml`
   for development.
 
@@ -58,10 +58,11 @@ scripts/dbt-local build --full-refresh \
   --vars '{synthetic_data_size: large}'
 ```
 
-Supported data-asset bucket overrides and other vars are documented in
-`integration_tests/dbt_project.yml`. Asset versions are not configured
-separately; they always match the installed Tuva Core package version. Treat
-that file as the canonical commented example for local development.
+The `tuva_core_data_asset_version` and `custom_bucket_name` variables are
+documented in `integration_tests/dbt_project.yml`. The data-asset version is an
+explicit path selector and is intentionally independent from the installed
+Tuva Core package version. Treat that file as the canonical commented example
+for local development.
 
 ## Tuva Core Validation
 
@@ -96,9 +97,8 @@ for Snowflake, BigQuery, Databricks, Fabric, and Redshift.
 The manual release build selects the integration project, Tuva Core, AHRQ
 Quality Indicators, CCSR, CMS Chronic Conditions, CMS HCC, FHIR Preprocessing,
 NYU ED Classification, Quality Measures, and Semantic Layer. CI validates the
-locked code and dbt graph only. Version selection and editing stay in the
-manual pull request; candidate-asset, receipt, tag, and draft-release work
-remain in the separate data-asset and release workflows.
+locked code and dbt graph only. Data-asset publication and mirroring remain
+separate from package tagging and draft release creation.
 
 Both workflows keep the small synthetic dataset and Data Quality failure-key
 coverage enabled while parity remains disabled. The all-warehouse workflow
@@ -115,7 +115,7 @@ inspect package versions.
 ## Data Asset Loading
 
 `dbt seed` and `dbt build` load Tuva Data Assets, including synthetic input data,
-from `tuva-core/<installed-package-version>/`. Synthetic objects are selected
+from `tuva-core/<tuva_core_data_asset_version>/`. Synthetic objects are selected
 from the `synthetic-data/small/` or `synthetic-data/large/` subfolder. `dbt run`
 assumes those seed relations already exist, so run `dbt seed` or `dbt build`
 first on a fresh database.

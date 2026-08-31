@@ -14,15 +14,6 @@ seeds:
           - service_year
           - assignment_methodology
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "CMS Provider Attribution: Assignment Windows"
-          maintainer: "CMS Shared Savings Program"
-          source_url: "https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-losses-assignment-methodology-specifications-version.pdf-0"
-          source_release: "Shared Savings and Losses, Assignment and Quality Performance Standard Methodology Specifications Version 14"
-          source_last_updated: "2026-04-27"
-          tuva_last_updated: "2026-08-26"
-          update_frequency: "annually"
-          notes: "Assignment windows are transcribed from Appendix B, Table 9, pages 88-89."
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__assignment_windows.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -83,15 +74,6 @@ seeds:
       beneficiary assignment. They are maintained by CMS in the Shared Savings and Losses and Assignment
       Methodology specifications. Tuva uses this asset in provider attribution models.
     config:
-      meta:
-        data_asset:
-          display_name: "CMS Provider Attribution: Primary Care HCPCS Codes"
-          maintainer: "CMS Shared Savings Program"
-          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
-          source_release: "Shared Savings and Losses and Assignment Methodology v7"
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__primary_care_hcpcs_codes.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -110,15 +92,6 @@ seeds:
       Program beneficiary assignment. They are maintained by CMS in the Shared Savings and Losses and
       Assignment Methodology specifications. Tuva uses this asset in provider attribution models.
     config:
-      meta:
-        data_asset:
-          display_name: "CMS Provider Attribution: Provider Specialty Assignment Codes"
-          maintainer: "CMS Shared Savings Program"
-          source_url: "https://www.cms.gov/medicare/medicare-fee-for-service-payment/sharedsavingsprogram/downloads/shared-savings-losses-assignment-spec-v7.pdf"
-          source_release: "Shared Savings and Losses and Assignment Methodology v7"
-          source_last_updated: ""
-          tuva_last_updated: "2026-03-30"
-          update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('value_sets','cms_provider_attribution__provider_specialty_assignment_codes.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}

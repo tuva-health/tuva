@@ -11,13 +11,6 @@ seeds:
           - npi
           - taxonomy_code
         primary_key_strategy: natural_multi_column
-        data_asset:
-          maintainer: "CMS NPPES and NUCC"
-          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: "CMS NPPES 2026-07-13; NUCC Healthcare Provider Taxonomy Code Set v26.0 (effective 2026-07-01)"
-          source_last_updated: "2026-07-13"
-          tuva_last_updated: "2026-07-16"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__other_provider_taxonomy.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
@@ -52,14 +45,6 @@ seeds:
       Provider records contain public NPI profile information used for provider enrichment, specialty
       grouping, and attribution workflows. They are maintained by CMS in NPPES.
     config:
-      meta:
-        data_asset:
-          maintainer: "CMS NPPES"
-          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: "CMS NPPES 2026-07-13"
-          source_last_updated: "2026-07-13"
-          tuva_last_updated: "2026-07-16"
-          update_frequency: "monthly"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__provider.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
@@ -176,14 +161,6 @@ seeds:
           - medicare_provider_supplier_type_description
           - provider_taxonomy_code
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Medicare Provider and Supplier Taxonomy Crosswalk"
-          maintainer: "CMS"
-          source_url: "https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk"
-          source_release: "CMS Data Medicare Provider and Supplier Taxonomy Crosswalk, November 2025"
-          source_last_updated: ""
-          tuva_last_updated: "2026-07-16"
-          update_frequency: "ad hoc"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__medicare_provider_and_supplier_taxonomy_crosswalk.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
@@ -206,15 +183,6 @@ seeds:
       Payments program. It is maintained by CMS Open Payments. Tuva publishes this asset for user-led CMS
       Open Payments and teaching-hospital analytics; current Tuva Core models do not join to it directly.
     config:
-      meta:
-        data_asset:
-          display_name: "Electing Teaching Hospital List"
-          maintainer: "CMS Open Payments"
-          source_url: "https://www.cms.gov/files/document/copy-2026-reporting-cycle-teaching-hospital-list-october-2025.xlsx"
-          source_release: "2026 reporting cycle"
-          source_last_updated: ""
-          tuva_last_updated: "2026-04-29"
-          update_frequency: "annually"
       post_hook: "{{ load_versioned_seed('provider_data','provider_data__electing_teaching_hospital_list.csv.gz') }}"
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_data{% else %}provider_data{%- endif -%}
@@ -311,14 +279,6 @@ seeds:
           - npi
           - taxonomy_col
         primary_key_strategy: natural_multi_column
-        data_asset:
-          display_name: "Provider Taxonomy Unpivot"
-          maintainer: "CMS NPPES"
-          source_url: "https://download.cms.gov/nppes/NPI_Files.html"
-          source_release: "CMS NPPES 2026-07-13"
-          source_last_updated: "2026-07-13"
-          tuva_last_updated: "2026-07-16"
-          update_frequency: "ad hoc"
         columns:
           - name: npi
             description: 'The National Provider Identifier (NPI).'
