@@ -57,10 +57,12 @@ unit_tests:
           select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'hospice-encounter' as encounter_id, 1 as claim_attribution_number
       - input: ref('inpatient_substance_use__prof_claims')
         format: sql
-        rows: *empty_crosswalk_rows
+        rows: |
+          select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'substance-encounter' as encounter_id, 1 as claim_attribution_number
       - input: ref('office_visits__int_office_visits_claim_line')
         format: sql
-        rows: *empty_crosswalk_rows
+        rows: |
+          select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'office-encounter' as old_encounter_id, 'office visit radiology' as encounter_type
       - input: ref('urgent_care__match_claims_to_anchor')
         format: sql
         rows: *empty_crosswalk_rows
@@ -130,7 +132,17 @@ unit_tests:
           encounter_id: f1d4798551acd93ebdd672b219cc1aa4
           encounter_type: outpatient injections
           encounter_group: outpatient
-          priority_number: 18
+          priority_number: 17
+          anchor_claim_id: null
+          claim_line_attribution_number: 1
+        - claim_id: hospice_prof_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: substance-encounter
+          encounter_id: 0584fcec3f1da8f2b829ca8c53e8d661
+          encounter_type: inpatient substance use
+          encounter_group: inpatient
+          priority_number: 6
           anchor_claim_id: null
           claim_line_attribution_number: 1
         - claim_id: hospice_prof_claim
@@ -142,7 +154,17 @@ unit_tests:
           encounter_group: inpatient
           priority_number: 7
           anchor_claim_id: null
-          claim_line_attribution_number: 1
+          claim_line_attribution_number: 2
+        - claim_id: hospice_prof_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: office-encounter
+          encounter_id: d68e202bf46bc24eb2115642b57ccc06
+          encounter_type: office visit radiology
+          encounter_group: office based
+          priority_number: 7
+          anchor_claim_id: null
+          claim_line_attribution_number: 3
 
   - name: test_patient_data_source_id_uses_unambiguous_stable_encoding
     description: >-

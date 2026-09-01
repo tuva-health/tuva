@@ -112,9 +112,9 @@ where claim_attribution_number = 1
 union all
 
 /* Keep hospice below the existing inpatient priorities but above every
-   office-based and outpatient candidate. This preserves the relative order of
-   all existing encounter types while allowing hospice professional lines to
-   contribute to their inpatient hospice encounter. */
+   office-based and outpatient candidate. Priority 7 is intentionally shared
+   with office visit radiology so existing published priority values do not
+   change; the final row_number tie-break puts inpatient hospice first. */
 select claim_id
 , claim_line_number
 , data_source
@@ -148,7 +148,7 @@ select claim_id
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 8 as priority_number
+, 7 as priority_number
 , null as anchor_claim_id
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type = 'office visit radiology'
@@ -161,7 +161,7 @@ select claim_id
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 9 as priority_number
+, 8 as priority_number
 , null as anchor_claim_id
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type <> 'office visit radiology'
@@ -175,7 +175,7 @@ select claim_id
 , old_encounter_id
 , 'urgent care' as encounter_type
 , 'outpatient' as encounter_group
-, 10 as priority_number
+, 9 as priority_number
 , null as anchor_claim_id
 from {{ ref('urgent_care__match_claims_to_anchor') }}
 
@@ -187,7 +187,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient psych' as encounter_type
 , 'outpatient' as encounter_group
-, 11 as priority_number
+, 10 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_psych__match_claims_to_anchor') }}
 
@@ -199,7 +199,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient rehabilitation' as encounter_type
 , 'outpatient' as encounter_group
-, 12 as priority_number
+, 11 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_rehab__match_claims_to_anchor') }}
 
@@ -211,7 +211,7 @@ select claim_id
 , old_encounter_id
 , 'ambulatory surgery center' as encounter_type
 , 'outpatient' as encounter_group
-, 13 as priority_number
+, 12 as priority_number
 , null as anchor_claim_id
 from {{ ref('asc__match_claims_to_anchor') }}
 
@@ -223,7 +223,7 @@ select claim_id
 , old_encounter_id
 , 'dialysis' as encounter_type
 , 'outpatient' as encounter_group
-, 14 as priority_number
+, 13 as priority_number
 , null as anchor_claim_id
 from {{ ref('dialysis__match_claims_to_anchor') }}
 
@@ -235,7 +235,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient hospice' as encounter_type
 , 'outpatient' as encounter_group
-, 15 as priority_number
+, 14 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_hospice__match_claims_to_anchor') }}
 
@@ -247,7 +247,7 @@ select claim_id
 , old_encounter_id
 , 'home health' as encounter_type
 , 'outpatient' as encounter_group
-, 16 as priority_number
+, 15 as priority_number
 , null as anchor_claim_id
 from {{ ref('home_health__match_claims_to_anchor') }}
 
@@ -259,7 +259,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient surgery' as encounter_type
 , 'outpatient' as encounter_group
-, 17 as priority_number
+, 16 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_surgery__match_claims_to_anchor') }}
 
@@ -271,7 +271,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient injections' as encounter_type
 , 'outpatient' as encounter_group
-, 18 as priority_number
+, 17 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_injections__match_claims_to_anchor') }}
 
@@ -283,7 +283,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient pt/ot/st' as encounter_type
 , 'outpatient' as encounter_group
-, 19 as priority_number
+, 18 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_ptotst__match_claims_to_anchor') }}
 
@@ -295,7 +295,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient substance use' as encounter_type
 , 'outpatient' as encounter_group
-, 20 as priority_number
+, 19 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_substance_use__match_claims_to_anchor') }}
 
@@ -307,7 +307,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient radiology' as encounter_type
 , 'outpatient' as encounter_group
-, 21 as priority_number
+, 20 as priority_number
 , null as anchor_claim_id
 from {{ ref('outpatient_radiology__match_claims_to_anchor') }}
 
@@ -388,7 +388,9 @@ select
 , candidate.priority_number
 , candidate.anchor_claim_id
 , row_number() over (partition by candidate.claim_id, candidate.claim_line_number, candidate.data_source
-order by candidate.priority_number, case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
+order by candidate.priority_number
+       , case when candidate.encounter_type = 'inpatient hospice' then 0 else 1 end
+       , case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
        , candidate.encounter_type, candidate.encounter_id) as claim_line_attribution_number
 from cte as candidate
 left outer join undetermined_claim_lines
