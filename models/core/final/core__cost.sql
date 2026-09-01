@@ -5,7 +5,8 @@
 
 with combine as (
   select
-      a.person_id
+      a.member_month_id
+    , a.person_id
     , a.member_id
     , a.year_month
     , a.payer
@@ -39,8 +40,10 @@ with combine as (
     , coalesce(c.emergency_department_paid, 0) as emergency_department_paid
     , coalesce(c.home_health_paid, 0) as home_health_paid
     , coalesce(c.inpatient_hospice_paid, 0) as inpatient_hospice_paid
+    , coalesce(c.inpatient_long_term_acute_care_paid, 0) as inpatient_long_term_acute_care_paid
     , coalesce(c.inpatient_psychiatric_paid, 0) as inpatient_psychiatric_paid
     , coalesce(c.inpatient_rehabilitation_paid, 0) as inpatient_rehabilitation_paid
+    , coalesce(c.inpatient_substance_use_paid, 0) as inpatient_substance_use_paid
     , coalesce(c.lab_paid, 0) as lab_paid
     , coalesce(c.observation_paid, 0) as observation_paid
     , coalesce(c.office_based_other_paid, 0) as office_based_other_paid
@@ -55,6 +58,7 @@ with combine as (
     , coalesce(c.outpatient_psychiatric_paid, 0) as outpatient_psychiatric_paid
     , coalesce(c.outpatient_radiology_paid, 0) as outpatient_radiology_paid
     , coalesce(c.outpatient_rehabilitation_paid, 0) as outpatient_rehabilitation_paid
+    , coalesce(c.outpatient_substance_use_paid, 0) as outpatient_substance_use_paid
     , coalesce(c.outpatient_surgery_paid, 0) as outpatient_surgery_paid
     , coalesce(c.pharmacy_paid, 0) as pharmacy_paid_2
     , coalesce(c.skilled_nursing_paid, 0) as skilled_nursing_paid
@@ -78,8 +82,10 @@ with combine as (
     , coalesce(e.emergency_department_allowed, 0) as emergency_department_allowed
     , coalesce(e.home_health_allowed, 0) as home_health_allowed
     , coalesce(e.inpatient_hospice_allowed, 0) as inpatient_hospice_allowed
+    , coalesce(e.inpatient_long_term_acute_care_allowed, 0) as inpatient_long_term_acute_care_allowed
     , coalesce(e.inpatient_psychiatric_allowed, 0) as inpatient_psychiatric_allowed
     , coalesce(e.inpatient_rehabilitation_allowed, 0) as inpatient_rehabilitation_allowed
+    , coalesce(e.inpatient_substance_use_allowed, 0) as inpatient_substance_use_allowed
     , coalesce(e.lab_allowed, 0) as lab_allowed
     , coalesce(e.observation_allowed, 0) as observation_allowed
     , coalesce(e.office_based_other_allowed, 0) as office_based_other_allowed
@@ -94,6 +100,7 @@ with combine as (
     , coalesce(e.outpatient_psychiatric_allowed, 0) as outpatient_psychiatric_allowed
     , coalesce(e.outpatient_radiology_allowed, 0) as outpatient_radiology_allowed
     , coalesce(e.outpatient_rehabilitation_allowed, 0) as outpatient_rehabilitation_allowed
+    , coalesce(e.outpatient_substance_use_allowed, 0) as outpatient_substance_use_allowed
     , coalesce(e.outpatient_surgery_allowed, 0) as outpatient_surgery_allowed
     , coalesce(e.pharmacy_allowed, 0) as pharmacy_allowed_2
     , coalesce(e.skilled_nursing_allowed, 0) as skilled_nursing_allowed
@@ -133,7 +140,8 @@ with combine as (
 )
 
 select
-    person_id
+    member_month_id
+  , person_id
   , member_id
   , year_month
   , payer
@@ -165,8 +173,10 @@ select
   , emergency_department_paid
   , home_health_paid
   , inpatient_hospice_paid
+  , inpatient_long_term_acute_care_paid
   , inpatient_psychiatric_paid
   , inpatient_rehabilitation_paid
+  , inpatient_substance_use_paid
   , lab_paid
   , observation_paid
   , office_based_other_paid
@@ -181,6 +191,7 @@ select
   , outpatient_psychiatric_paid
   , outpatient_radiology_paid
   , outpatient_rehabilitation_paid
+  , outpatient_substance_use_paid
   , outpatient_surgery_paid
   , pharmacy_paid_2
   , skilled_nursing_paid
@@ -202,8 +213,10 @@ select
   , emergency_department_allowed
   , home_health_allowed
   , inpatient_hospice_allowed
+  , inpatient_long_term_acute_care_allowed
   , inpatient_psychiatric_allowed
   , inpatient_rehabilitation_allowed
+  , inpatient_substance_use_allowed
   , lab_allowed
   , observation_allowed
   , office_based_other_allowed
@@ -218,6 +231,7 @@ select
   , outpatient_psychiatric_allowed
   , outpatient_radiology_allowed
   , outpatient_rehabilitation_allowed
+  , outpatient_substance_use_allowed
   , outpatient_surgery_allowed
   , pharmacy_allowed_2
   , skilled_nursing_allowed

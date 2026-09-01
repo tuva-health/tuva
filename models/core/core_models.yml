@@ -3703,39 +3703,46 @@ models:
       Computes paid and allowed amounts by service category at the member-month grain.
 
       This model starts from core.member_month, so payer, custom, and Tuva-assigned attribution fields flow through from core member months without changing cost values.
+
+      Primary key: member_month_id.
     columns:
+      - name: member_month_id
+        description: Synthetic key copied from core.member_month for the same person,
+          member, year month, payer, plan, and data source.
+        tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: Unique identifier for the person represented by the member month.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: member_id
         description: Identifier that links the person to a particular insurance product
           or health plan for the member month.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: year_month
         description: Year and month for the member-month or aggregation period,
           formatted as YYYYMM.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: payer
         description: Name of the payer associated with the record.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: plan
         description: Name of the health plan associated with the record.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: payer_attributed_provider
         description: Provider assigned to the member month by the payer.
         config:
@@ -3874,6 +3881,11 @@ models:
         config:
           meta:
             data_type: number
+      - name: inpatient_long_term_acute_care_paid
+        description: Per member per month paid amount for inpatient long-term acute care services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_paid
         description: Per member per month paid amount for inpatient psychiatric services.
         config:
@@ -3881,6 +3893,11 @@ models:
             data_type: number
       - name: inpatient_rehabilitation_paid
         description: Per member per month paid amount for inpatient rehabilitation services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_substance_use_paid
+        description: Per member per month paid amount for inpatient substance use services.
         config:
           meta:
             data_type: number
@@ -3953,6 +3970,11 @@ models:
       - name: outpatient_rehabilitation_paid
         description: Per member per month paid amount for outpatient rehabilitation
           services.
+        config:
+          meta:
+            data_type: number
+      - name: outpatient_substance_use_paid
+        description: Per member per month paid amount for outpatient substance use services.
         config:
           meta:
             data_type: number
@@ -4064,6 +4086,11 @@ models:
         config:
           meta:
             data_type: number
+      - name: inpatient_long_term_acute_care_allowed
+        description: Per member per month allowed amount for inpatient long-term acute care services.
+        config:
+          meta:
+            data_type: number
       - name: inpatient_psychiatric_allowed
         description: Per member per month allowed amount for inpatient psychiatric services.
         config:
@@ -4072,6 +4099,11 @@ models:
       - name: inpatient_rehabilitation_allowed
         description: Per member per month allowed amount for inpatient rehabilitation
           services.
+        config:
+          meta:
+            data_type: number
+      - name: inpatient_substance_use_allowed
+        description: Per member per month allowed amount for inpatient substance use services.
         config:
           meta:
             data_type: number
@@ -4149,6 +4181,11 @@ models:
         config:
           meta:
             data_type: number
+      - name: outpatient_substance_use_allowed
+        description: Per member per month allowed amount for outpatient substance use services.
+        config:
+          meta:
+            data_type: number
       - name: outpatient_surgery_allowed
         description: Per member per month allowed amount for outpatient surgery services.
         config:
@@ -4184,7 +4221,6 @@ models:
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
 
   - name: core__utilization
     config:
@@ -4211,40 +4247,45 @@ models:
 
       This model starts from core__member_month so every eligible member month is included, joins claim-sourced records from core__encounter by person_id, year_month, and data_source, and fills missing utilization counts with zero. It carries payer, custom, and Tuva-assigned attribution fields from core member months.
 
-      Primary key: person_id, member_id, year_month, payer, plan, data_source.
+      Primary key: member_month_id.
     columns:
+      - name: member_month_id
+        description: Synthetic key copied from core.member_month for the same person,
+          member, year month, payer, plan, and data source.
+        tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: Unique identifier for the person represented by the member month.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: member_id
         description: Identifier that links the person to a particular insurance product
           or health plan for the member month.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: year_month
         description: Year and month for the member-month or aggregation period,
           formatted as YYYYMM.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: payer
         description: Name of the payer associated with the record.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: plan
         description: Name of the health plan associated with the record.
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
       - name: payer_attributed_provider
         description: Provider assigned to the member month by the payer.
         config:
@@ -4517,7 +4558,6 @@ models:
         config:
           meta:
             data_type: varchar
-            is_primary_key: true
 
   - name: int_cost_service_categories
     config:
