@@ -7,11 +7,11 @@
 with normalized_code_keys as (
 
     select
-        lower(trim(code_system)) as code_system
+        lower({{ the_tuva_project.trim('code_system') }}) as code_system
       , case
-            when lower(trim(code_system)) = 'icd-10-cm'
-                then upper(replace(trim(code), '.', ''))
-            else trim(code)
+            when lower({{ the_tuva_project.trim('code_system') }}) = 'icd-10-cm'
+                then upper(replace({{ the_tuva_project.trim('code') }}, '.', ''))
+            else {{ the_tuva_project.trim('code') }}
         end as code
     from {{ ref('tuva_condition_grouper_code_map') }}
 

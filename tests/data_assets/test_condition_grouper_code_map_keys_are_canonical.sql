@@ -8,9 +8,9 @@ select
     code_system
   , code
 from {{ ref('tuva_condition_grouper_code_map') }}
-where code_system != lower(trim(code_system))
+where code_system != lower({{ the_tuva_project.trim('code_system') }})
    or code != case
-        when lower(trim(code_system)) = 'icd-10-cm'
-            then upper(replace(trim(code), '.', ''))
-        else trim(code)
+        when lower({{ the_tuva_project.trim('code_system') }}) = 'icd-10-cm'
+            then upper(replace({{ the_tuva_project.trim('code') }}, '.', ''))
+        else {{ the_tuva_project.trim('code') }}
       end

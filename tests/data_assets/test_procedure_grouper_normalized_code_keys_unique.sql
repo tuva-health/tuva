@@ -7,8 +7,8 @@
 with normalized_code_keys as (
 
     select
-        lower(trim(code_system)) as code_system
-      , upper(replace(trim(code), '.', '')) as code
+        lower({{ the_tuva_project.trim('code_system') }}) as code_system
+      , upper(replace({{ the_tuva_project.trim('code') }}, '.', '')) as code
     from {{ ref('tuva_procedure_grouper_code_map') }}
 
 )

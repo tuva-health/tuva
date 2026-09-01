@@ -38,17 +38,17 @@ with all_conditions as (
 , active_condition_grouper_candidates as (
 
     select
-        lower(trim(code_system)) as code_system
+        lower({{ the_tuva_project.trim('code_system') }}) as code_system
       , case
-            when lower(trim(code_system)) = 'icd-10-cm'
-                then upper(replace(trim(code), '.', ''))
-            else trim(code)
+            when lower({{ the_tuva_project.trim('code_system') }}) = 'icd-10-cm'
+                then upper(replace({{ the_tuva_project.trim('code') }}, '.', ''))
+            else {{ the_tuva_project.trim('code') }}
         end as code
       , condition_family
       , condition
     from {{ ref('tuva_condition_grouper_code_map') }}
-    where lower(trim(status)) = 'active'
-      and lower(trim(code_system)) in ('icd-10-cm', 'snomed-ct')
+    where lower({{ the_tuva_project.trim('status') }}) = 'active'
+      and lower({{ the_tuva_project.trim('code_system') }}) in ('icd-10-cm', 'snomed-ct')
 
 )
 
@@ -100,9 +100,9 @@ select
   {{ tuva_metadata_columns_from_all_conditions }}
 from all_conditions
 left join condition_grouper
-    on lower(trim(all_conditions.code_system)) = condition_grouper.code_system
+    on lower({{ the_tuva_project.trim('all_conditions.code_system') }}) = condition_grouper.code_system
     and case
-            when lower(trim(all_conditions.code_system)) = 'icd-10-cm'
-                then upper(replace(trim(all_conditions.normalized_code), '.', ''))
-            else trim(all_conditions.normalized_code)
+            when lower({{ the_tuva_project.trim('all_conditions.code_system') }}) = 'icd-10-cm'
+                then upper(replace({{ the_tuva_project.trim('all_conditions.normalized_code') }}, '.', ''))
+            else {{ the_tuva_project.trim('all_conditions.normalized_code') }}
         end = condition_grouper.code
