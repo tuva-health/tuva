@@ -61,6 +61,11 @@ on:
         required: false
         type: string
         default: ""
+      status_target:
+        description: Pull request revision to receive the CI status (head or merge)
+        required: false
+        type: string
+        default: merge
     secrets:
       DBT_SNOWFLAKE_CI_ACCOUNT:
         required: false
@@ -134,7 +139,7 @@ env:
 
 jobs:
   portability_lint:
-    name: Portability lint
+    name: Validate portable SQL and dbt config
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -160,7 +165,7 @@ jobs:
         run: python3 scripts/portability_lint.py
 
   resolve:
-    name: Resolve request
+    name: Resolve exact CI inputs
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -178,6 +183,7 @@ jobs:
       base_sha: ${{ steps.resolve.outputs.base_sha }}
       head_sha: ${{ steps.resolve.outputs.head_sha }}
       merge_sha: ${{ steps.resolve.outputs.merge_sha }}
+      status_sha: ${{ steps.resolve.outputs.status_sha }}
     steps:
       - name: Normalize request
         id: resolve
@@ -194,6 +200,7 @@ jobs:
           INPUT_BASE_SHA: ${{ inputs.base_sha || '' }}
           INPUT_HEAD_SHA: ${{ inputs.head_sha || '' }}
           INPUT_MERGE_SHA: ${{ inputs.merge_sha || '' }}
+          INPUT_STATUS_TARGET: ${{ inputs.status_target || 'merge' }}
         with:
           script: |
             const supportedWarehouses = [
@@ -276,6 +283,8 @@ jobs:
             let baseSha = "";
             let headSha = "";
             let mergeSha = "";
+            let statusTarget = "merge";
+            let statusSha = "";
             let resolutionError = "";
 
             function fail(message) {
@@ -296,6 +305,7 @@ jobs:
               baseSha = process.env.INPUT_BASE_SHA.trim();
               headSha = process.env.INPUT_HEAD_SHA.trim();
               mergeSha = process.env.INPUT_MERGE_SHA.trim();
+              statusTarget = process.env.INPUT_STATUS_TARGET.trim();
             } else if (context.eventName === "pull_request") {
               const pr = context.payload.pull_request;
               const baseRepository = `${context.repo.owner}/${context.repo.repo}`.toLowerCase();
@@ -391,11 +401,20 @@ jobs:
                 !exactSha.test(headSha) ||
                 !exactSha.test(mergeSha)
               ) {
-                fail("PR number and exact base, head, and merge commits are required.");
+                fail(
+                  "PR number and exact base, head, and merge commits are required."
+                );
               }
               if (checkoutRef !== mergeSha) {
-                fail("The published status must describe the exact test-merge commit being built.");
+                fail("CI with a published status must build the exact test-merge commit.");
               }
+              if (!new Set(["head", "merge"]).has(statusTarget)) {
+                fail("status_target must be head or merge.");
+              }
+              if (scope === "all-packages" && statusTarget !== "merge") {
+                fail("All-warehouse CI must publish status to the test-merge commit.");
+              }
+              statusSha = statusTarget === "head" ? headSha : mergeSha;
             }
 
             const runId = process.env.GITHUB_RUN_ID || "";
@@ -427,16 +446,18 @@ jobs:
             core.setOutput("base_sha", baseSha);
             core.setOutput("head_sha", headSha);
             core.setOutput("merge_sha", mergeSha);
+            core.setOutput("status_sha", statusSha);
 
             if (resolutionError) {
               core.setFailed(resolutionError);
             }
 
   mark_pending:
-    name: Publish pending status
+    name: Report CI started
     needs: resolve
     if: >-
       always() &&
+      needs.resolve.result == 'success' &&
       needs.resolve.outputs.should_run == 'true' &&
       needs.resolve.outputs.publish_status == 'true'
     runs-on: ubuntu-latest
@@ -452,6 +473,7 @@ jobs:
           EXPECTED_BASE_SHA: ${{ needs.resolve.outputs.base_sha }}
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+          STATUS_SHA: ${{ needs.resolve.outputs.status_sha }}
           CI_SCOPE: ${{ needs.resolve.outputs.scope }}
           STATUS_CONTEXT: ${{ needs.resolve.outputs.status_context }}
         with:
@@ -480,50 +502,42 @@ jobs:
               return;
             }
 
-            const statusRefs = [process.env.HEAD_SHA, process.env.MERGE_SHA];
-            const latestStatuses = await Promise.all(
-              statusRefs.map(async (ref) => {
-                const { data: statuses } =
-                  await github.rest.repos.listCommitStatusesForRef({
-                    ...context.repo,
-                    ref,
-                    per_page: 100
-                  });
-                return statuses.find(
-                  (status) => status.context === process.env.STATUS_CONTEXT
-                );
-              })
+            const statusSha = process.env.STATUS_SHA;
+            const { data: statuses } =
+              await github.rest.repos.listCommitStatusesForRef({
+                ...context.repo,
+                ref: statusSha,
+                per_page: 100
+              });
+            const latestStatus = statuses.find(
+              (status) => status.context === process.env.STATUS_CONTEXT
             );
-            const newerRunOwnsStatus = latestStatuses.some((status) => {
-              if (!status || status.target_url === targetUrl) {
+            const newerRunOwnsStatus = (() => {
+              if (!latestStatus || latestStatus.target_url === targetUrl) {
                 return false;
               }
-              const match = status.target_url?.match(/\/actions\/runs\/(\d+)/);
+              const match = latestStatus.target_url?.match(/\/actions\/runs\/(\d+)/);
               return match && BigInt(match[1]) > BigInt(context.runId);
-            });
+            })();
             if (newerRunOwnsStatus) {
               core.setFailed("A newer CI run already owns this status context.");
               return;
             }
 
             const description = process.env.CI_SCOPE === "all-packages"
-              ? "All-warehouse CI is running"
-              : "Snowflake Core CI is running";
-            await Promise.all(
-              statusRefs.map((sha) =>
-                github.rest.repos.createCommitStatus({
-                  ...context.repo,
-                  sha,
-                  state: "pending",
-                  context: process.env.STATUS_CONTEXT,
-                  description,
-                  target_url: targetUrl
-                })
-              )
-            );
+              ? "Running dbt builds on five warehouses"
+              : "Running Snowflake dbt build";
+            await github.rest.repos.createCommitStatus({
+              ...context.repo,
+              sha: statusSha,
+              state: "pending",
+              context: process.env.STATUS_CONTEXT,
+              description,
+              target_url: targetUrl
+            });
 
   build:
-    name: Build / ${{ matrix.warehouse }}
+    name: Run dbt build / ${{ matrix.warehouse }}
     needs:
       - resolve
       - mark_pending
@@ -1026,13 +1040,14 @@ jobs:
           retention-days: 90
 
   finalize_status:
-    name: Publish final status
+    name: Report CI result
     needs:
       - resolve
       - mark_pending
       - build
     if: >-
       always() &&
+      needs.resolve.result == 'success' &&
       needs.resolve.outputs.should_run == 'true' &&
       needs.resolve.outputs.publish_status == 'true'
     runs-on: ubuntu-latest
@@ -1048,6 +1063,7 @@ jobs:
           EXPECTED_BASE_SHA: ${{ needs.resolve.outputs.base_sha }}
           EXPECTED_HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
           EXPECTED_MERGE_SHA: ${{ needs.resolve.outputs.merge_sha }}
+          STATUS_SHA: ${{ needs.resolve.outputs.status_sha }}
           CI_SCOPE: ${{ needs.resolve.outputs.scope }}
           CI_SOURCE_LOCK: ${{ needs.resolve.outputs.source_lock }}
           STATUS_CONTEXT: ${{ needs.resolve.outputs.status_context }}
@@ -1060,6 +1076,7 @@ jobs:
             const expectedBase = process.env.EXPECTED_BASE_SHA;
             const expectedHead = process.env.EXPECTED_HEAD_SHA;
             const expectedMerge = process.env.EXPECTED_MERGE_SHA;
+            const statusSha = process.env.STATUS_SHA;
             const scope = process.env.CI_SCOPE;
             const sourceLock = process.env.CI_SOURCE_LOCK;
             const statusContext = process.env.STATUS_CONTEXT;
@@ -1134,13 +1151,13 @@ jobs:
               } else if (buildResult === "success") {
                 state = "success";
                 description = scope === "all-packages"
-                  ? "All-warehouse CI passed"
-                  : "Snowflake Core build passed";
+                  ? "All five warehouse dbt builds passed"
+                  : "Snowflake dbt build passed";
               } else if (buildResult === "failure") {
                 state = "failure";
                 description = scope === "all-packages"
-                  ? "All-warehouse CI failed"
-                  : "Snowflake Core build failed";
+                  ? "All five warehouse dbt builds failed"
+                  : "Snowflake dbt build failed";
               } else {
                 description = `CI ended with ${buildResult}`;
               }
@@ -1149,25 +1166,16 @@ jobs:
               description = "CI could not revalidate the pull request";
             }
 
-            const statusRefs = [expectedHead, expectedMerge];
-            const latestStatuses = await Promise.all(
-              statusRefs.map(async (ref) => {
-                const { data: statuses } =
-                  await github.rest.repos.listCommitStatusesForRef({
-                    ...context.repo,
-                    ref,
-                    per_page: 100
-                  });
-                return statuses.find(
-                  (status) => status.context === statusContext
-                );
-              })
+            const { data: statuses } =
+              await github.rest.repos.listCommitStatusesForRef({
+                ...context.repo,
+                ref: statusSha,
+                per_page: 100
+              });
+            const latestStatus = statuses.find(
+              (status) => status.context === statusContext
             );
-            if (
-              latestStatuses.some(
-                (status) => status && status.target_url !== runUrl
-              )
-            ) {
+            if (latestStatus && latestStatus.target_url !== runUrl) {
               core.notice(
                 "A newer CI run owns the published status; " +
                 "this run will not overwrite it."
@@ -1175,18 +1183,14 @@ jobs:
               return;
             }
 
-            await Promise.all(
-              statusRefs.map((sha) =>
-                github.rest.repos.createCommitStatus({
-                  ...context.repo,
-                  sha,
-                  state,
-                  context: statusContext,
-                  description,
-                  target_url: runUrl
-                })
-              )
-            );
+            await github.rest.repos.createCommitStatus({
+              ...context.repo,
+              sha: statusSha,
+              state,
+              context: statusContext,
+              description,
+              target_url: runUrl
+            });
             if (state === "error") {
               core.setFailed(description);
             }
