@@ -5,7 +5,8 @@
 
 with member_months as (
   select
-      person_id
+      member_month_id
+    , person_id
     , member_id
     , year_month
     , payer
@@ -91,7 +92,8 @@ with member_months as (
 )
 
 select
-    member_months.person_id
+    member_months.member_month_id
+  , member_months.person_id
   , member_months.member_id
   , member_months.year_month
   , member_months.payer
