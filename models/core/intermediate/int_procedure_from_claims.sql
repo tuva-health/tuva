@@ -89,30 +89,22 @@ with encounter_crosswalk as (
 )
 
 select distinct
-    {{ dbt.safe_cast(
-        concat_custom([
-            "'claims'",
-            "'_'",
-            "cast(data_source as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(claim_id as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "coalesce(cast(encounter_id as " ~ dbt.type_string() ~ "), 'no_encounter')",
-            "'_'",
-            "cast(procedure_sequence_id as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(coalesce(code_system, 'unknown') as " ~ dbt.type_string() ~ ")",
-            "'_'",
-            "cast(source_code as " ~ dbt.type_string() ~ ")",
-            "case when procedure_date is not null then concat('_', cast(procedure_date as " ~ dbt.type_string() ~ ")) else '' end",
-            "case when modifier_1 is not null then concat('_', modifier_1) else '' end",
-            "case when modifier_2 is not null then concat('_', modifier_2) else '' end",
-            "case when modifier_3 is not null then concat('_', modifier_3) else '' end",
-            "case when modifier_4 is not null then concat('_', modifier_4) else '' end",
-            "case when modifier_5 is not null then concat('_', modifier_5) else '' end",
-            "case when practitioner_id is not null then concat('_', practitioner_id) else '' end"
-        ]), api.Column.translate_type("string"))
-    }} as procedure_id
+    {{ the_tuva_project.stable_id_hash([
+        "'claims procedure'",
+        'data_source',
+        'claim_id',
+        'encounter_id',
+        'procedure_sequence_id',
+        'code_system',
+        'source_code',
+        'procedure_date',
+        'modifier_1',
+        'modifier_2',
+        'modifier_3',
+        'modifier_4',
+        'modifier_5',
+        'practitioner_id'
+    ]) }} as procedure_id
     , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(member_id as {{ dbt.type_string() }}) as member_id
     , cast(null as {{ dbt.type_string() }}) as patient_id

@@ -1,0 +1,87 @@
+version: 2
+
+unit_tests:
+  - name: test_claims_procedure_uses_collision_safe_domain_id
+    description: >-
+      Proves claims procedure IDs preserve underscore-delimited component
+      boundaries and distinguish a null encounter from the former literal
+      no_encounter sentinel.
+    model: int_procedure_from_claims
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+    given:
+      - input: ref('normalized__medical_claim_procedures')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+                'person-1' as person_id
+              , 'member-1' as member_id
+              , 'c' as claim_id
+              , 1 as claim_line_number
+              , 1 as procedure_sequence_id
+              , cast(null as date) as procedure_date
+              , cast(null as {{ string_type }}) as practitioner_id
+              , 'hcpcs' as code_system
+              , 'A001' as source_code
+              , cast(null as {{ string_type }}) as source_description
+              , 'A001' as normalized_code
+              , cast(null as {{ string_type }}) as normalized_description
+              , cast(null as {{ string_type }}) as modifier_1
+              , cast(null as {{ string_type }}) as modifier_2
+              , cast(null as {{ string_type }}) as modifier_3
+              , cast(null as {{ string_type }}) as modifier_4
+              , cast(null as {{ string_type }}) as modifier_5
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+              , 'a_b' as data_source
+          union all
+          select
+                'person-2', 'member-2', 'b_c', 1, 1, cast(null as date), null
+              , 'hcpcs', 'A001', null, 'A001', null
+              , null, null, null, null, null, null
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'a'
+          union all
+          select
+                'person-3', 'member-3', 'claim', 1, 1, cast(null as date), null
+              , 'hcpcs', 'A001', null, 'A001', null
+              , null, null, null, null, null, null
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'source'
+          union all
+          select
+                'person-4', 'member-4', 'claim-literal', 1, 1, cast(null as date), null
+              , 'hcpcs', 'A001', null, 'A001', null
+              , null, null, null, null, null, null
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}), 'source'
+      - input: ref('encounters__combined_claim_line_crosswalk')
+        format: sql
+        rows: |
+          select 'c' as claim_id, 1 as claim_line_number, 'a_b' as data_source, 'enc' as encounter_id, 1 as claim_line_attribution_number
+          union all select 'b_c', 1, 'a', 'enc', 1
+          union all select 'claim-literal', 1, 'source', 'no_encounter', 1
+    expect:
+      rows:
+        - procedure_id: 80da4009cb1bc9fbfb1507b41852c44d
+          person_id: person-1
+          claim_id: c
+          encounter_id: enc
+          data_source: a_b
+        - procedure_id: e4e43b464352826af5c8c7cee7f2954d
+          person_id: person-2
+          claim_id: b_c
+          encounter_id: enc
+          data_source: a
+        - procedure_id: 91f61f9b1cd05bd8e4398007a1cef4b2
+          person_id: person-3
+          claim_id: claim
+          encounter_id: null
+          data_source: source
+        - procedure_id: 0107b0683cfb81ec86f4a40b7ae1bf67
+          person_id: person-4
+          claim_id: claim-literal
+          encounter_id: no_encounter
+          data_source: source

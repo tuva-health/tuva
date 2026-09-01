@@ -10,18 +10,14 @@
     Hashing the natural key instead makes the id a pure function of the row, so
     the same encounter keeps the same id no matter what else is in the data.
 
-    Fields are cast to string, null-marked and pipe-delimited before hashing so
-    that a null and an empty string cannot produce the same input, and neither
-    can ('a','bc') and ('ab','c').
+    Each field uses the shared stable-ID encoding before hashing. That encoding
+    distinguishes null, empty strings, literal sentinel values, escaped
+    characters, and component boundaries. Callers include the encounter type
+    as the first field so encounter domains remain distinct.
 #}
 
 {% macro encounter_id_input_string(fields) -%}
-    {%- set parts = [] -%}
-    {%- for field in fields -%}
-        {%- do parts.append("coalesce(cast(" ~ field ~ " as " ~ dbt.type_string() ~ "), '<NULL>')") -%}
-        {%- if not loop.last -%}{%- do parts.append("'|'") -%}{%- endif -%}
-    {%- endfor -%}
-    {{ the_tuva_project.concat_custom(parts) }}
+    {{ the_tuva_project.stable_id_input_string(fields) }}
 {%- endmacro %}
 
 
@@ -31,13 +27,13 @@
 
 
 {% macro default__encounter_id_hash(fields) -%}
-    md5({{ the_tuva_project.encounter_id_input_string(fields) }})
+    lower(md5({{ the_tuva_project.encounter_id_input_string(fields) }}))
 {%- endmacro %}
 
 
 {# BigQuery's md5() returns bytes. #}
 {% macro bigquery__encounter_id_hash(fields) -%}
-    to_hex(md5({{ the_tuva_project.encounter_id_input_string(fields) }}))
+    lower(to_hex(md5({{ the_tuva_project.encounter_id_input_string(fields) }})))
 {%- endmacro %}
 
 

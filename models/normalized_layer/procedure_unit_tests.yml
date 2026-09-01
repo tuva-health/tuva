@@ -1,0 +1,76 @@
+version: 2
+
+unit_tests:
+  - name: test_normalized_procedure_uses_collision_safe_domain_id
+    description: >-
+      Proves clinical procedure IDs preserve source-key boundaries that the
+      former underscore-delimited identifier collapsed.
+    model: normalized__procedure
+    config:
+      enabled: "{{ var('clinical_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        clinical_enabled: true
+        _extension_columns_override: []
+        tuva_last_run: '2024-01-01 00:00:00'
+    given:
+      - input: ref('input_layer__procedure')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          select
+                'c' as source_procedure_id
+              , 'person-1' as person_id
+              , 'patient-1' as patient_id
+              , cast(null as {{ string_type }}) as encounter_id
+              , cast('2024-01-01' as date) as procedure_date
+              , 'local' as code_system
+              , 'code-1' as source_code
+              , 'description' as source_description
+              , cast(null as {{ string_type }}) as modifier_1
+              , cast(null as {{ string_type }}) as modifier_2
+              , cast(null as {{ string_type }}) as modifier_3
+              , cast(null as {{ string_type }}) as modifier_4
+              , cast(null as {{ string_type }}) as modifier_5
+              , cast(null as {{ string_type }}) as practitioner_id
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
+              , 'a_b' as data_source
+          union all
+          select
+                'b_c', 'person-2', 'patient-2', null
+              , cast('2024-01-01' as date), 'local', 'code-2', 'description'
+              , null, null, null, null, null, null
+              , cast(null as {{ timestamp_type }}), 'a'
+      - input: ref('terminology__icd_10_pcs')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as icd_10_pcs, cast(null as {{ string_type }}) as description
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+      - input: ref('terminology__icd_9_pcs')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as icd_9_pcs, cast(null as {{ string_type }}) as short_description
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+      - input: ref('terminology__hcpcs_level_2')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as hcpcs, cast(null as {{ string_type }}) as short_description
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+      - input: ref('terminology__snomed_ct')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as snomed_ct, cast(null as {{ string_type }}) as description
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+    expect:
+      rows:
+        - procedure_id: bd68d0fe75e880eefc854d0ec42fedf0
+          person_id: person-1
+          data_source: a_b
+        - procedure_id: 699c699c53bc5e8b2cd73ad65e1fe2ac
+          person_id: person-2
+          data_source: a
