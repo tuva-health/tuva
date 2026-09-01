@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   resolve:
-    name: Resolve pull request and package sources
+    name: Resolve release PR and package source lock
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -217,7 +217,7 @@ jobs:
             }
 
   run_all_warehouses:
-    name: Run locked source set on all warehouses
+    name: Run locked dbt builds on all warehouses
     needs: resolve
     permissions:
       contents: read
@@ -236,6 +236,7 @@ jobs:
       base_sha: ${{ needs.resolve.outputs.base_sha }}
       head_sha: ${{ needs.resolve.outputs.head_sha }}
       merge_sha: ${{ needs.resolve.outputs.merge_sha }}
+      status_target: merge
     secrets:
       DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
       DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}

@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   resolve:
-    name: Resolve external pull request
+    name: Resolve reviewed external PR
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -105,7 +105,7 @@ jobs:
             core.setOutput("concurrency_key", `snowflake-external-pr-${prNumber}`);
 
   run_snowflake:
-    name: Run reviewed code on Snowflake
+    name: Run Snowflake dbt build for reviewed PR
     needs: resolve
     permissions:
       contents: read
@@ -124,6 +124,7 @@ jobs:
       base_sha: ${{ needs.resolve.outputs.base_sha }}
       head_sha: ${{ needs.resolve.outputs.head_sha }}
       merge_sha: ${{ needs.resolve.outputs.merge_sha }}
+      status_target: head
     secrets:
       DBT_SNOWFLAKE_CI_ACCOUNT: ${{ secrets.DBT_SNOWFLAKE_CI_ACCOUNT }}
       DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
