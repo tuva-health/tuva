@@ -6,7 +6,9 @@
 
 -- Grouper coverage can lag the current ICD-10-CM release. Unmapped terminology
 -- codes intentionally remain valid and produce null grouper fields in Core.
--- Every code that is mapped must still resolve to the retained terminology.
+-- Mapping validity is independent of terminology lifecycle: current and
+-- deprecated codes may both be mapped, but every mapped code must remain
+-- present in the retained terminology relation.
 
 with icd_10_cm_codes as (
 

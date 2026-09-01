@@ -1,6 +1,109 @@
 version: 2
 
 unit_tests:
+  - name: test_core_condition_grouper_assigns_at_most_one_active_target
+    description: >-
+      Proves that Core condition preserves one input row per condition record,
+      normalizes ICD-10-CM case and decimal formatting on both sides of the
+      grouper join, applies active mappings to retained historical codes and
+      nonbillable headings, and leaves unsupported code systems and inactive mappings ungrouped. A
+      deliberately ambiguous normalized active key is left ungrouped without
+      multiplying the Core row, while identical duplicate targets collapse to
+      one assignment.
+    model: core__condition
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: false
+    given:
+      - input: ref('int_condition_from_claims')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          with fixture_rows as (
+              select 'condition-icd-10-cm' as condition_id, 'person-1' as person_id, 'ICD-10-CM' as code_system, 'e03.9' as normalized_code
+              union all select 'condition-snomed-ct', 'person-2', 'snomed-ct', '123456789'
+              union all select 'condition-unsupported', 'person-3', 'icd-9-cm', '2449'
+              union all select 'condition-ambiguous-map', 'person-4', 'icd-10-cm', 'R99.9'
+              union all select 'condition-identical-map-duplicates', 'person-5', 'icd-10-cm', 'J45.909'
+              union all select 'condition-historical-active-map', 'person-6', 'icd-10-cm', 's23.420a'
+              union all select 'condition-inactive-map', 'person-7', 'icd-10-cm', 'B00.0'
+              union all select 'condition-incomplete-map', 'person-8', 'icd-10-cm', 'M99.9'
+              union all select 'condition-nonbillable-heading', 'person-9', 'icd-10-cm', 'b37'
+          )
+          select
+              condition_id
+            , cast(null as {{ string_type }}) as source_condition_id
+            , person_id
+            , cast(null as {{ string_type }}) as member_id
+            , cast(null as {{ string_type }}) as patient_id
+            , cast(null as {{ string_type }}) as encounter_id
+            , cast(null as {{ string_type }}) as claim_id
+            , cast(null as {{ string_type }}) as payer
+            , cast(null as date) as recorded_date
+            , cast(null as date) as onset_date
+            , cast(null as date) as resolved_date
+            , cast(null as {{ string_type }}) as status
+            , cast(null as {{ string_type }}) as condition_type
+            , code_system
+            , normalized_code as source_code
+            , cast(null as {{ string_type }}) as source_description
+            , normalized_code
+            , cast(null as {{ string_type }}) as normalized_description
+            , 1 as condition_rank
+            , cast(null as {{ string_type }}) as present_on_admit_code
+            , cast(null as {{ string_type }}) as present_on_admit_description
+            , cast(null as {{ timestamp_type }}) as ingest_datetime
+            , cast(null as {{ timestamp_type }}) as tuva_last_run
+            , 'source' as data_source
+          from fixture_rows
+      - input: ref('tuva_condition_grouper_code_map')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'icd-10-cm' as code_system, 'E039' as code, 'Endocrine & Metabolic Disease' as condition_family, 'Hypothyroidism' as condition, 'active' as status
+          union all select 'snomed-ct', '123456789', 'Respiratory Disease', 'Asthma', 'active'
+          union all select 'icd-10-cm', 'R999', 'Symptoms, Signs & Abnormal Findings', 'Abnormal Clinical or Laboratory Findings', 'active'
+          union all select 'ICD-10-CM', 'r99.9', 'Other', 'Other Specified and Unspecified Conditions', 'active'
+          union all select 'icd-10-cm', 'J45909', 'Respiratory Disease', 'Asthma', 'active'
+          union all select 'ICD-10-CM', 'j45.909', 'Respiratory Disease', 'Asthma', 'active'
+          union all select 'icd-10-cm', 'S23420A', 'Injury & Poisoning', 'Sprain and Strain', 'active'
+          union all select 'icd-10-cm', 'B000', 'Infectious Disease', 'Herpesvirus Infection', 'inactive'
+          union all select 'icd-10-cm', 'M999', 'Musculoskeletal Disease', cast(null as {{ string_type }}), 'active'
+          union all select 'icd-10-cm', 'B37', 'Infectious Disease', 'Fungal Infections', 'active'
+    expect:
+      rows:
+        - condition_id: condition-icd-10-cm
+          condition_family: Endocrine & Metabolic Disease
+          condition: Hypothyroidism
+        - condition_id: condition-snomed-ct
+          condition_family: Respiratory Disease
+          condition: Asthma
+        - condition_id: condition-unsupported
+          condition_family: null
+          condition: null
+        - condition_id: condition-ambiguous-map
+          condition_family: null
+          condition: null
+        - condition_id: condition-identical-map-duplicates
+          condition_family: Respiratory Disease
+          condition: Asthma
+        - condition_id: condition-historical-active-map
+          condition_family: Injury & Poisoning
+          condition: Sprain and Strain
+        - condition_id: condition-inactive-map
+          condition_family: null
+          condition: null
+        - condition_id: condition-incomplete-map
+          condition_family: null
+          condition: null
+        - condition_id: condition-nonbillable-heading
+          condition_family: Infectious Disease
+          condition: Fungal Infections
+
   - name: test_claims_condition_stable_ids_and_semantics
     description: >-
       Proves that claims condition IDs preserve ordered parent values across
