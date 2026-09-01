@@ -3,13 +3,12 @@ version: 2
 seeds:
   - name: tuva_procedure_grouper
     description: |-
-      The Tuva Procedure Grouper defines the procedure hierarchy used to classify normalized procedure records in core.procedure. Each row represents one mutually exclusive procedure and its parent procedure family.
+      The Tuva Procedure Grouper defines the procedure hierarchy used to classify normalized procedure records in core.procedure. Each row represents one mutually exclusive procedure and its parent procedure family. Every hierarchy row in a released snapshot is active and is referenced by at least one active code mapping.
     config:
       meta:
         primary_key_columns:
-          - procedure_family
           - procedure
-        primary_key_strategy: natural_multi_column
+        primary_key_strategy: natural_single_column
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -36,8 +35,11 @@ seeds:
           - not_null
       - name: procedure
         description: Mutually exclusive procedure name assigned by the Tuva Procedure Grouper.
+        tests:
+          - not_null
+          - unique
       - name: status
-        description: Governance status of the procedure row. Active rows are available for use in Tuva Procedure Grouper mappings.
+        description: Governance status of the procedure row. Released hierarchy rows are active; inactive is reserved for a future explicitly retired hierarchy assignment and is not used in the reviewed 1.0 snapshot.
         tests:
           - not_null
           - accepted_values:
@@ -49,16 +51,13 @@ seeds:
         description: Date this procedure row was last reviewed or updated.
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the procedure row.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - procedure_family
-              - "{{ quote_column('procedure') }}"
-
   - name: tuva_procedure_grouper_code_map
     description: |-
-      The Tuva Procedure Grouper Code Map assigns supported procedure codes to exactly one Tuva procedure. The code_system and code columns form the primary key and join to code_system and normalized_code in core.procedure. Tuva currently supports ICD-10-PCS procedure mappings; unsupported procedure code systems remain null in core.procedure.
+      The Tuva Procedure Grouper Code Map assigns each supported procedure code to exactly one Tuva procedure. The normalized code_system and code columns form the primary key and join to code_system and normalized_code in core.procedure.
+
+      The 1.0 mapping scope is intentionally ICD-10-PCS only. CPT, HCPCS, ICD-9-PCS, SNOMED CT, and other procedure code systems therefore remain ungrouped and produce null grouper fields in core.procedure. Coverage may trail the newest terminology release when no reviewed, compatible grouper source is yet available. The reviewed FY2027 terminology gap is exactly 101 current ICD-10-PCS codes; those codes intentionally remain unmapped until they receive a clinical assignment.
+
+      Mapping status is assignment governance, not terminology lifecycle. Every retained and approved mapping in a released snapshot is active, including mappings for terminology codes marked deprecated. Terminology.deprecated remains the authority for whether a code is current or historical. Inactive is reserved for an explicitly retired or unapproved assignment and is not emitted in the reviewed 1.0 snapshot.
     config:
       meta:
         primary_key_columns:
@@ -102,11 +101,11 @@ seeds:
       - name: code_description
         description: Human-readable description for the mapped procedure code from the source terminology.
       - name: code_system
-        description: Procedure code system for the mapped code. Current supported value is icd-10-pcs.
+        description: Canonical procedure code system for the mapped code. The only supported value in the 1.0 mapping is icd-10-pcs.
         tests:
           - not_null
       - name: status
-        description: Status of the code mapping. Active mappings are available for current use; inactive mappings are retained for historical codes.
+        description: Governance status of the code-to-procedure assignment, independent of terminology deprecation. Every retained approved mapping is active, including mappings for historical or deprecated terminology codes; inactive is reserved for an explicitly retired or unapproved assignment and is not present in a reviewed release.
         tests:
           - not_null
           - accepted_values:

@@ -4,9 +4,10 @@
    )
 }}
 
--- Grouper coverage can lag the current ICD-10-PCS release. Unmapped terminology
--- codes intentionally remain valid and produce null grouper fields in Core.
--- Every code that is mapped must still resolve to the retained terminology.
+-- Procedure Grouper scope is intentionally ICD-10-PCS-only. Coverage can lag
+-- the current terminology release; the exact reviewed FY2027 gap is enforced
+-- separately. Every retained mapping, including mappings for deprecated codes,
+-- must still resolve to the retained terminology.
 
 with icd_10_pcs_codes as (
 

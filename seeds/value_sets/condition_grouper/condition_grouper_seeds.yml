@@ -7,9 +7,8 @@ seeds:
     config:
       meta:
         primary_key_columns:
-          - condition_family
           - condition
-        primary_key_strategy: natural_multi_column
+        primary_key_strategy: natural_single_column
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper.csv.gz') }}"
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_value_sets{% else %}value_sets{%- endif -%}
@@ -38,6 +37,7 @@ seeds:
         description: Mutually exclusive condition name assigned by the Tuva Condition Grouper.
         tests:
           - not_null
+          - unique
       - name: status
         description: Governance status of the condition row. Active rows are available for use in Tuva Condition Grouper mappings.
         tests:
@@ -47,20 +47,19 @@ seeds:
                 values: ['active', 'inactive']
       - name: description
         description: Human-readable description of the condition and its placement in the condition family.
+        tests:
+          - not_null
       - name: last_update_date
         description: Date this condition row was last reviewed or updated.
+        tests:
+          - not_null
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the condition row.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - condition_family
-              - condition
-
+        tests:
+          - not_null
   - name: tuva_condition_grouper_code_map
     description: |-
-      The Tuva Condition Grouper Code Map assigns supported diagnosis codes to exactly one Tuva condition. The code_system and code columns form the primary key and join to code_system and normalized_code in core.condition. Tuva currently supports ICD-10-CM and SNOMED CT diagnosis mappings; unsupported condition code systems remain null in core.condition.
+      The Tuva Condition Grouper Code Map assigns supported diagnosis codes to exactly one Tuva condition. The code_system and code columns form the primary key and join to code_system and normalized_code in core.condition. Tuva currently supports ICD-10-CM, including valid retained nonbillable headings, and SNOMED CT diagnosis mappings; unsupported condition code systems remain null in core.condition.
     config:
       meta:
         primary_key_columns:
@@ -105,12 +104,21 @@ seeds:
           - not_null
       - name: code_description
         description: Human-readable description for the mapped diagnosis code from the source terminology.
+        tests:
+          - not_null
       - name: code_system
         description: Diagnosis code system for the mapped code. Current supported values are icd-10-cm and snomed-ct.
         tests:
           - not_null
+          - accepted_values:
+              arguments:
+                values: ['icd-10-cm', 'snomed-ct']
       - name: status
-        description: Status of the code mapping. Active mappings are available for current use; inactive mappings are retained for historical codes.
+        description: >-
+          Governance status of the code-to-condition assignment, independent
+          of the terminology code lifecycle. Active mappings populate Core for
+          both current and retained historical or deprecated codes. Inactive
+          mappings do not populate Core.
         tests:
           - not_null
           - accepted_values:
@@ -118,8 +126,12 @@ seeds:
                 values: ['active', 'inactive']
       - name: last_update_date
         description: Date this code mapping row was last reviewed or updated.
+        tests:
+          - not_null
       - name: last_update_note
         description: Short note describing the reason for the most recent update to the code mapping row.
+        tests:
+          - not_null
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

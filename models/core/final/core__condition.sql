@@ -35,6 +35,43 @@ with all_conditions as (
 {%- endif %}
 )
 
+, active_condition_grouper_candidates as (
+
+    select
+        lower(trim(code_system)) as code_system
+      , case
+            when lower(trim(code_system)) = 'icd-10-cm'
+                then upper(replace(trim(code), '.', ''))
+            else trim(code)
+        end as code
+      , condition_family
+      , condition
+    from {{ ref('tuva_condition_grouper_code_map') }}
+    where lower(trim(status)) = 'active'
+      and lower(trim(code_system)) in ('icd-10-cm', 'snomed-ct')
+
+)
+
+, condition_grouper as (
+
+    select
+        code_system
+      , code
+      , max(condition_family) as condition_family
+      , max(condition) as condition
+    from active_condition_grouper_candidates
+    group by
+        code_system
+      , code
+    -- Collapse identical duplicates, but fail closed when one normalized code
+    -- has multiple active targets or an incomplete target.
+    having count(condition_family) = count(*)
+       and count(condition) = count(*)
+       and min(condition_family) = max(condition_family)
+       and min(condition) = max(condition)
+
+)
+
 select
     all_conditions.condition_id
   , all_conditions.source_condition_id
@@ -62,6 +99,10 @@ select
   {{ tuva_extension_columns_from_all_conditions }}
   {{ tuva_metadata_columns_from_all_conditions }}
 from all_conditions
-left join {{ ref('tuva_condition_grouper_code_map') }} as condition_grouper
-    on lower(all_conditions.code_system) = condition_grouper.code_system
-        and replace(all_conditions.normalized_code, '.', '') = condition_grouper.code
+left join condition_grouper
+    on lower(trim(all_conditions.code_system)) = condition_grouper.code_system
+    and case
+            when lower(trim(all_conditions.code_system)) = 'icd-10-cm'
+                then upper(replace(trim(all_conditions.normalized_code), '.', ''))
+            else trim(all_conditions.normalized_code)
+        end = condition_grouper.code
