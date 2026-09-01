@@ -1,0 +1,263 @@
+version: 2
+
+unit_tests:
+  - name: test_cost_service_category_2_paid_pivot_includes_all_generated_categories
+    description: >-
+      Protects the complete service-category-2 paid-amount surface for the
+      long-term acute care and substance-use categories emitted by Claims
+      Preprocessing.
+    model: int_cost_service_category_2_paid_pivot
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-02-01 00:00:00'
+    given:
+      - input: ref('int_cost_service_categories')
+        rows:
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: inpatient long term acute care
+            total_paid: 10
+            data_source: source-1
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: inpatient substance use
+            total_paid: 20
+            data_source: source-1
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: outpatient substance use
+            total_paid: 30
+            data_source: source-1
+    expect:
+      rows:
+        - person_id: person-1
+          member_id: member-1
+          year_month: '202401'
+          payer: payer-1
+          plan: plan-1
+          inpatient_long_term_acute_care_paid: 10
+          inpatient_substance_use_paid: 20
+          outpatient_substance_use_paid: 30
+          data_source: source-1
+
+  - name: test_cost_service_category_2_allowed_pivot_includes_all_generated_categories
+    description: >-
+      Protects the complete service-category-2 allowed-amount surface for the
+      long-term acute care and substance-use categories emitted by Claims
+      Preprocessing.
+    model: int_cost_service_category_2_allowed_pivot
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-02-01 00:00:00'
+    given:
+      - input: ref('int_cost_service_categories')
+        rows:
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: inpatient long term acute care
+            total_allowed: 11
+            data_source: source-1
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: inpatient substance use
+            total_allowed: 21
+            data_source: source-1
+          - person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            service_category_2: outpatient substance use
+            total_allowed: 31
+            data_source: source-1
+    expect:
+      rows:
+        - person_id: person-1
+          member_id: member-1
+          year_month: '202401'
+          payer: payer-1
+          plan: plan-1
+          inpatient_long_term_acute_care_allowed: 11
+          inpatient_substance_use_allowed: 21
+          outpatient_substance_use_allowed: 31
+          data_source: source-1
+
+  - name: test_core_cost_preserves_member_month_id_and_complete_sc2_amounts
+    description: >-
+      Verifies that Core cost preserves the member-month key and publishes the
+      newly covered service-category-2 paid and allowed amounts.
+    model: core__cost
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-02-01 00:00:00'
+    given:
+      - input: ref('core__member_month')
+        rows:
+          - member_month_id: member-month-1
+            person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            data_source: source-1
+      - input: ref('int_cost_service_category_1_paid_pivot')
+        rows: []
+      - input: ref('int_cost_service_category_2_paid_pivot')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+              'person-1' as person_id
+            , 'member-1' as member_id
+            , '202401' as year_month
+            , 'payer-1' as payer
+            , 'plan-1' as {{ plan_identifier }}
+            , 0 as acute_inpatient_paid
+            , 0 as ambulance_paid
+            , 0 as ambulatory_surgery_center_paid
+            , 0 as dialysis_paid
+            , 0 as durable_medical_equipment_paid
+            , 0 as emergency_department_paid
+            , 0 as home_health_paid
+            , 0 as inpatient_hospice_paid
+            , 10 as inpatient_long_term_acute_care_paid
+            , 0 as inpatient_psychiatric_paid
+            , 0 as inpatient_rehabilitation_paid
+            , 20 as inpatient_substance_use_paid
+            , 0 as lab_paid
+            , 0 as observation_paid
+            , 0 as office_based_other_paid
+            , 0 as office_based_ptotst_paid
+            , 0 as office_based_radiology_paid
+            , 0 as office_based_surgery_paid
+            , 0 as office_based_visit_paid
+            , 0 as other_paid
+            , 0 as outpatient_hospice_paid
+            , 0 as outpatient_hospital_or_clinic_paid
+            , 0 as outpatient_ptotst_paid
+            , 0 as outpatient_psychiatric_paid
+            , 0 as outpatient_radiology_paid
+            , 0 as outpatient_rehabilitation_paid
+            , 30 as outpatient_substance_use_paid
+            , 0 as outpatient_surgery_paid
+            , 0 as pharmacy_paid
+            , 0 as skilled_nursing_paid
+            , 0 as telehealth_visit_paid
+            , 0 as urgent_care_paid
+            , 'source-1' as data_source
+      - input: ref('int_cost_service_category_1_allowed_pivot')
+        rows: []
+      - input: ref('int_cost_service_category_2_allowed_pivot')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+              'person-1' as person_id
+            , 'member-1' as member_id
+            , '202401' as year_month
+            , 'payer-1' as payer
+            , 'plan-1' as {{ plan_identifier }}
+            , 0 as acute_inpatient_allowed
+            , 0 as ambulance_allowed
+            , 0 as ambulatory_surgery_center_allowed
+            , 0 as dialysis_allowed
+            , 0 as durable_medical_equipment_allowed
+            , 0 as emergency_department_allowed
+            , 0 as home_health_allowed
+            , 0 as inpatient_hospice_allowed
+            , 11 as inpatient_long_term_acute_care_allowed
+            , 0 as inpatient_psychiatric_allowed
+            , 0 as inpatient_rehabilitation_allowed
+            , 21 as inpatient_substance_use_allowed
+            , 0 as lab_allowed
+            , 0 as observation_allowed
+            , 0 as office_based_other_allowed
+            , 0 as office_based_ptotst_allowed
+            , 0 as office_based_radiology_allowed
+            , 0 as office_based_surgery_allowed
+            , 0 as office_based_visit_allowed
+            , 0 as other_allowed
+            , 0 as outpatient_hospice_allowed
+            , 0 as outpatient_hospital_or_clinic_allowed
+            , 0 as outpatient_ptotst_allowed
+            , 0 as outpatient_psychiatric_allowed
+            , 0 as outpatient_radiology_allowed
+            , 0 as outpatient_rehabilitation_allowed
+            , 31 as outpatient_substance_use_allowed
+            , 0 as outpatient_surgery_allowed
+            , 0 as pharmacy_allowed
+            , 0 as skilled_nursing_allowed
+            , 0 as telehealth_visit_allowed
+            , 0 as urgent_care_allowed
+            , 'source-1' as data_source
+    expect:
+      rows:
+        - member_month_id: member-month-1
+          inpatient_long_term_acute_care_paid: 10
+          inpatient_substance_use_paid: 20
+          outpatient_substance_use_paid: 30
+          inpatient_long_term_acute_care_allowed: 11
+          inpatient_substance_use_allowed: 21
+          outpatient_substance_use_allowed: 31
+          data_source: source-1
+
+  - name: test_core_utilization_preserves_member_month_id
+    description: >-
+      Verifies that Core utilization preserves the member-month key while
+      calculating claim-sourced encounter counts.
+    model: core__utilization
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        tuva_last_run: '2024-02-01 00:00:00'
+    given:
+      - input: ref('core__member_month')
+        rows:
+          - member_month_id: member-month-1
+            person_id: person-1
+            member_id: member-1
+            year_month: '202401'
+            payer: payer-1
+            plan: plan-1
+            data_source: source-1
+      - input: ref('core__encounter')
+        rows:
+          - person_id: person-1
+            encounter_start_date: '2024-01-15'
+            encounter_group: inpatient
+            encounter_type: acute inpatient
+            encounter_source_type: claim
+            data_source: source-1
+    expect:
+      rows:
+        - member_month_id: member-month-1
+          total_encounter_count: 1
+          inpatient_count: 1
+          acute_inpatient_count: 1
+          data_source: source-1
