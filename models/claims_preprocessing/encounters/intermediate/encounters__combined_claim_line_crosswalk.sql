@@ -111,6 +111,23 @@ where claim_attribution_number = 1
 
 union all
 
+/* Keep hospice below the existing inpatient priorities but above every
+   office-based and outpatient candidate. Priority 7 is intentionally shared
+   with office visit radiology so existing published priority values do not
+   change; the final row_number tie-break puts inpatient hospice first. */
+select claim_id
+, claim_line_number
+, data_source
+, encounter_id
+, 'inpatient hospice' as encounter_type
+, 'inpatient' as encounter_group
+, 7 as priority_number
+, null as anchor_claim_id
+from {{ ref('inpatient_hospice__prof_claims') }}
+where claim_attribution_number = 1
+
+union all
+
 select claim_id
 , claim_line_number
 , data_source
@@ -371,7 +388,9 @@ select
 , candidate.priority_number
 , candidate.anchor_claim_id
 , row_number() over (partition by candidate.claim_id, candidate.claim_line_number, candidate.data_source
-order by candidate.priority_number, case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
+order by candidate.priority_number
+       , case when candidate.encounter_type = 'inpatient hospice' then 0 else 1 end
+       , case when candidate.claim_id = candidate.anchor_claim_id then 1 else 99 end
        , candidate.encounter_type, candidate.encounter_id) as claim_line_attribution_number
 from cte as candidate
 left outer join undetermined_claim_lines

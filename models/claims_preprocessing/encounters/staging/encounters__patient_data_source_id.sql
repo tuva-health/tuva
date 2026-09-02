@@ -18,5 +18,9 @@ from {{ ref('normalized__eligibility') }}
 select
 person_id
 , data_source
-, {{ the_tuva_project.concat_custom(['person_id', "'|'", 'data_source']) }} as patient_data_source_id
+, {{ the_tuva_project.stable_id_hash([
+    "'patient data source'",
+    'person_id',
+    'data_source'
+  ]) }} as patient_data_source_id
 from multiple_sources
