@@ -316,7 +316,7 @@ models:
 
       If a claim has different diagnosis values in the same position across claim lines, all of those values appear in core.condition with the same condition_rank. For example, different values in diagnosis_code_2 each have condition_rank = 2. Repeated claims diagnoses with identical Core output values are collapsed into one row. Diagnoses associated with different encounters remain separate rows.
 
-      Valid retained nonbillableICD-10-CM headings are mapped because incomplete codes occur in real-world source data. Mapping status is independent of terminology lifecycle, so an active mapping still groups a retained historical or deprecated code. Ambiguous active mapping keys fail closed and leave the grouper fields null without multiplying the condition row.
+      Valid retained nonbillable ICD-10-CM headings are mapped because incomplete codes occur in real-world source data. Mapping status is independent of terminology lifecycle, so an active mapping still groups a retained historical or deprecated code. Ambiguous active mapping keys fail closed and leave the grouper fields null without multiplying the condition row.
 
       Primary key: condition_id.
     tests:
