@@ -49,7 +49,7 @@ select
   , all_procedures.normalized_code
   , all_procedures.normalized_description
   , procedure_grouper.procedure_family
-  , procedure_grouper.{{ quote_column("procedure") }} as {{ quote_column("procedure") }}
+  , procedure_grouper.procedure_name as procedure_name
   , all_procedures.modifier_1
   , all_procedures.modifier_2
   , all_procedures.modifier_3

@@ -19,7 +19,7 @@ seeds:
       column_types:
         procedure_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
+        procedure_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -33,7 +33,7 @@ seeds:
         description: Analytic rollup family for the procedure, such as Cardiovascular, Gastrointestinal, Musculoskeletal, or Urinary System.
         tests:
           - not_null
-      - name: procedure
+      - name: procedure_name
         description: Mutually exclusive procedure name assigned by the Tuva Procedure Grouper.
         tests:
           - not_null
@@ -74,7 +74,7 @@ seeds:
       column_types:
         procedure_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
+        procedure_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -92,7 +92,7 @@ seeds:
         description: Analytic procedure family assigned to the procedure code.
         tests:
           - not_null
-      - name: procedure
+      - name: procedure_name
         description: Mutually exclusive Tuva procedure assigned to the procedure code.
       - name: code
         description: Procedure code mapped to the Tuva procedure. ICD-10-PCS codes are stored without decimal formatting.
