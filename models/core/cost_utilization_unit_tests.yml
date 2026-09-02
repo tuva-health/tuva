@@ -125,7 +125,26 @@ unit_tests:
             plan: plan-1
             data_source: source-1
       - input: ref('int_cost_service_category_1_paid_pivot')
-        rows: []
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set numeric_type = 'numeric' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+              cast(null as {{ string_type }}) as person_id
+            , cast(null as {{ string_type }}) as member_id
+            , cast(null as {{ string_type }}) as year_month
+            , cast(null as {{ string_type }}) as payer
+            , cast(null as {{ string_type }}) as {{ plan_identifier }}
+            , cast(null as {{ string_type }}) as data_source
+            , cast(null as {{ numeric_type }}) as inpatient_paid
+            , cast(null as {{ numeric_type }}) as outpatient_paid
+            , cast(null as {{ numeric_type }}) as office_based_paid
+            , cast(null as {{ numeric_type }}) as ancillary_paid
+            , cast(null as {{ numeric_type }}) as other_paid
+            , cast(null as {{ numeric_type }}) as pharmacy_paid
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
+          where 1 = 0
       - input: ref('int_cost_service_category_2_paid_pivot')
         format: sql
         rows: |
@@ -170,7 +189,26 @@ unit_tests:
             , 0 as urgent_care_paid
             , 'source-1' as data_source
       - input: ref('int_cost_service_category_1_allowed_pivot')
-        rows: []
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set numeric_type = 'numeric' %}
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          select
+              cast(null as {{ string_type }}) as person_id
+            , cast(null as {{ string_type }}) as member_id
+            , cast(null as {{ string_type }}) as year_month
+            , cast(null as {{ string_type }}) as payer
+            , cast(null as {{ string_type }}) as {{ plan_identifier }}
+            , cast(null as {{ string_type }}) as data_source
+            , cast(null as {{ numeric_type }}) as inpatient_allowed
+            , cast(null as {{ numeric_type }}) as outpatient_allowed
+            , cast(null as {{ numeric_type }}) as office_based_allowed
+            , cast(null as {{ numeric_type }}) as ancillary_allowed
+            , cast(null as {{ numeric_type }}) as other_allowed
+            , cast(null as {{ numeric_type }}) as pharmacy_allowed
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture
+          where 1 = 0
       - input: ref('int_cost_service_category_2_allowed_pivot')
         format: sql
         rows: |

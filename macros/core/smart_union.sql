@@ -119,7 +119,7 @@
         {%- if col.name.lower() in relation_cols %}
         {#- Overrides are an internal unit-test hook and do not carry the
             adapter-normalized identifier casing returned by introspection. -#}
-        {{ col.name if columns_override is not none else adapter.quote(col.name) }}
+        {{ quote_column(col.name) if columns_override is not none else adapter.quote(col.name) }}
         {%- else %}
         cast(null as {{ col.data_type }}) as {{ adapter.quote(col.name) }}
         {%- endif %}

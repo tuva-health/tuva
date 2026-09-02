@@ -23,21 +23,23 @@ unit_tests:
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with fixture_rows as (
-              select 'condition-icd-10-cm' as condition_id, 'person-1' as person_id, 'ICD-10-CM' as code_system, 'e03.9' as normalized_code
-              union all select 'condition-snomed-ct', 'person-2', 'snomed-ct', '123456789'
-              union all select 'condition-unsupported', 'person-3', 'icd-9-cm', '2449'
-              union all select 'condition-ambiguous-map', 'person-4', 'icd-10-cm', 'R99.9'
-              union all select 'condition-identical-map-duplicates', 'person-5', 'icd-10-cm', 'J45.909'
-              union all select 'condition-historical-active-map', 'person-6', 'icd-10-cm', 's23.420a'
-              union all select 'condition-inactive-map', 'person-7', 'icd-10-cm', 'B00.0'
-              union all select 'condition-incomplete-map', 'person-8', 'icd-10-cm', 'M99.9'
-              union all select 'condition-nonbillable-heading', 'person-9', 'icd-10-cm', 'b37'
-          )
+          {# Keep this fixture flat: Fabric CTAS fails when dbt's unit-test wrapper creates a third nested CTE level. #}
+          {% set fixture_rows = [
+              ['condition-icd-10-cm', 'person-1', 'ICD-10-CM', 'e03.9']
+            , ['condition-snomed-ct', 'person-2', 'snomed-ct', '123456789']
+            , ['condition-unsupported', 'person-3', 'icd-9-cm', '2449']
+            , ['condition-ambiguous-map', 'person-4', 'icd-10-cm', 'R99.9']
+            , ['condition-identical-map-duplicates', 'person-5', 'icd-10-cm', 'J45.909']
+            , ['condition-historical-active-map', 'person-6', 'icd-10-cm', 's23.420a']
+            , ['condition-inactive-map', 'person-7', 'icd-10-cm', 'B00.0']
+            , ['condition-incomplete-map', 'person-8', 'icd-10-cm', 'M99.9']
+            , ['condition-nonbillable-heading', 'person-9', 'icd-10-cm', 'b37']
+          ] %}
+          {% for fixture_row in fixture_rows %}
           select
-              condition_id
+              '{{ fixture_row[0] }}' as condition_id
             , cast(null as {{ string_type }}) as source_condition_id
-            , person_id
+            , '{{ fixture_row[1] }}' as person_id
             , cast(null as {{ string_type }}) as member_id
             , cast(null as {{ string_type }}) as patient_id
             , cast(null as {{ string_type }}) as encounter_id
@@ -48,10 +50,10 @@ unit_tests:
             , cast(null as date) as resolved_date
             , cast(null as {{ string_type }}) as status
             , cast(null as {{ string_type }}) as condition_type
-            , code_system
-            , normalized_code as source_code
+            , '{{ fixture_row[2] }}' as code_system
+            , '{{ fixture_row[3] }}' as source_code
             , cast(null as {{ string_type }}) as source_description
-            , normalized_code
+            , '{{ fixture_row[3] }}' as normalized_code
             , cast(null as {{ string_type }}) as normalized_description
             , 1 as condition_rank
             , cast(null as {{ string_type }}) as present_on_admit_code
@@ -59,7 +61,8 @@ unit_tests:
             , cast(null as {{ timestamp_type }}) as ingest_datetime
             , cast(null as {{ timestamp_type }}) as tuva_last_run
             , 'source' as data_source
-          from fixture_rows
+          {% if not loop.last %}union all{% endif %}
+          {% endfor %}
       - input: ref('tuva_condition_grouper_code_map')
         format: sql
         rows: |
