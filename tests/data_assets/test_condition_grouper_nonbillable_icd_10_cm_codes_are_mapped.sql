@@ -17,5 +17,5 @@ left join {{ ref('tuva_condition_grouper_code_map') }} as code_map
         {{ the_tuva_project.trim('terminology.icd_10_cm') }}, '.', ''
     ))
     and code_map.status = 'active'
-where terminology.billable_code_flag = 0
+where terminology.billable_code_flag = '0'
   and code_map.code is null
