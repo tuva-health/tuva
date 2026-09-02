@@ -14,7 +14,7 @@ from {{ ref('provider_attribution') }}
 
 {% elif the_tuva_project.tuva_boolean_var('provider_attribution_enabled', false) ==  false -%}
 
-{% if target.type == 'fabric' %}
+{% if target.type in ('fabric', 'sqlserver') %}
 select top 0
       cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as member_id

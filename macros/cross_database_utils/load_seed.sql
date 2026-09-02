@@ -136,7 +136,10 @@ copy  {{ this }}
         {%- set null_char = '' -%}
 
         {% for col in columns %}
-            {% do column_definitions.append(col.name ~ " string" ) %}
+            {# Positional names on the staging table. A Glue table carrying a
+               reserved word such as `procedure` cannot be read by CTAS at all,
+               so the real names are reapplied in the select below. #}
+            {% do column_definitions.append("c" ~ loop.index0 ~ " string" ) %}
         {% endfor %}
 
         {%- set col_ddl = column_definitions|join(',') -%}
@@ -173,7 +176,7 @@ copy  {{ this }}
             CREATE TABLE {{ table_name }} AS
                 SELECT
                 {% for col in columns %}
-                    cast(nullif({{ col.name }},'{{ null_char }}') as {{ dml_data_type(col.dtype) }}) as {{ col.name }} {%-if not loop.last -%},{%- endif %}
+                    cast(nullif(c{{ loop.index0 }},'{{ null_char }}') as {{ dml_data_type(col.dtype) }}) as `{{ col.name }}` {%-if not loop.last -%},{%- endif %}
                 {% endfor %}
                 FROM {{ tmp_table }}
                 WHERE "$path" like '{{ full_path }}%';

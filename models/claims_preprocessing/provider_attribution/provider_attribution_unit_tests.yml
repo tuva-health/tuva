@@ -19,7 +19,7 @@ unit_tests:
       - input: ref('normalized__medical_claim')
         format: sql
         rows: |
-          {% set numeric_type = 'numeric' %}
+          {% set numeric_type = 'decimal(18, 2)' if target.type == 'athena' else 'numeric' %}
           select
               'undetermined_claim' as claim_id
             , 1 as claim_line_number

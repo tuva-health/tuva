@@ -27,7 +27,7 @@ from {{ ref('input_layer__provider_attribution') }}
 
 {% else -%}
 
-{% if target.type == 'fabric' %}
+{% if target.type in ('fabric', 'sqlserver') %}
 select top 0
       cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as member_id

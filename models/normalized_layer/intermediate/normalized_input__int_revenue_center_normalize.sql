@@ -13,7 +13,7 @@ select
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} as med
 left outer join {{ ref('terminology__revenue_center') }} as rev
-    {% if target.type == 'fabric' %}
+    {% if target.type in ('fabric', 'sqlserver') %}
         on RIGHT(REPLICATE('0', 4) + med.revenue_center_code, 4) = rev.revenue_center_code
     {% else %}
         on lpad(med.revenue_center_code, 4, '0') = rev.revenue_center_code

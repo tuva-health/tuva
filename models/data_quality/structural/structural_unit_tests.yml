@@ -213,7 +213,7 @@ unit_tests:
       - input: ref('data_quality__structural_source_populations')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, null as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 0 as row_count
+          select 'claims' as input_layer_domain, 'eligibility' as table_name, 'input_layer__eligibility' as model_name, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key, 0 as row_count
           union all
           select 'claims', 'medical_claim', 'input_layer__medical_claim', null, '__dq_structural_null__', 0
           union all
@@ -221,7 +221,7 @@ unit_tests:
       - input: ref('data_quality__structural_data_sources')
         format: sql
         rows: |
-          select 'claims' as input_layer_domain, null as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
+          select 'claims' as input_layer_domain, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source, cast('__dq_structural_null__' as {{ 'varchar(65535)' if target.type == 'redshift' else 'varchar(max)' if target.type in ['fabric', 'sqlserver'] else 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as data_source_key
     expect:
       rows:
         - input_layer_domain: claims

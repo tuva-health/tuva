@@ -25,3 +25,12 @@ where (
 )
 
 {% endmacro %}
+
+
+{#
+  SQL Server is T-SQL and needs the same named-column CTE, but dbt-sqlserver
+  registers no adapter-type parent, so fabric__ is not reached by dispatch.
+#}
+{% macro sqlserver__test_expression_is_true(model, expression, column_name=none, condition='1=1') %}
+    {{ return(fabric__test_expression_is_true(model, expression, column_name, condition)) }}
+{% endmacro %}

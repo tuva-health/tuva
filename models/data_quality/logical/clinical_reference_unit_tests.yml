@@ -129,13 +129,13 @@ unit_tests:
               'person_1' as person_id
             , 'integer_one' as patient_id
             , 'male' as sex
-            , null as race
-            , null as ethnicity
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as race
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as ethnicity
             , cast('1980-01-01' as date) as birth_date
             , cast('2020-01-01' as date) as death_date
             , 1 as death_flag
-            , null as state
-            , null as zip_code
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as state
+            , cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as zip_code
             , 'source' as data_source
           union all
           select 'person_2', 'integer_one_missing_date', 'male', null, null
@@ -199,9 +199,9 @@ unit_tests:
           select fixture_rows.*, cast(null as {{ timestamp_type }}) as ingest_datetime
           from (
           select 'case_variant_person' as person_id, 'lowercase_patient' as patient_id
-            , 'male' as sex, null as race, null as ethnicity
+            , 'male' as sex, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as race, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as ethnicity
             , cast('1980-01-01' as date) as birth_date, cast(null as date) as death_date
-            , 0 as death_flag, null as state, null as zip_code, 'source' as data_source
+            , 0 as death_flag, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as state, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as zip_code, 'source' as data_source
           union all
           select 'case_variant_person', 'uppercase_patient', 'Male', null, null
             , cast('1980-01-01' as date), cast(null as date), 0, null, null, 'source'
@@ -327,7 +327,7 @@ unit_tests:
         format: sql
         rows: |
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          select 'null_location' as location_id, null as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
+          select 'null_location' as location_id, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
           union all
           select 'valid_location', '1111111111', cast('2000-01-01' as {{ timestamp_type }}), 'source'
           union all
@@ -360,7 +360,7 @@ unit_tests:
         format: sql
         rows: |
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          select 'null_practitioner' as practitioner_id, null as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
+          select 'null_practitioner' as practitioner_id, cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as npi, cast(null as {{ timestamp_type }}) as ingest_datetime, 'source' as data_source
           union all
           select 'individual_practitioner', '1111111111', cast('2000-01-01' as {{ timestamp_type }}), 'source'
           union all

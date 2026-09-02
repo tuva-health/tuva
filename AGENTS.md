@@ -373,6 +373,13 @@ Write general-purpose SQL, prefer existing Tuva macros and package patterns,
 and isolate genuinely warehouse-specific behavior behind dispatched macros. A
 passing build on one warehouse is not evidence of portability to the others.
 
+Logical Data Quality depends on case-sensitive string comparison. SQL Server
+targets therefore require a case-sensitive database collation such as
+`SQL_Latin1_General_CP1_CS_AS`; the engine default
+`SQL_Latin1_General_CP1_CI_AS` makes those checks pass silently on values they
+should flag. Do not work around this by lowercasing the compared values, which
+would erase the case contract the checks exist to enforce.
+
 ## GitHub And Pull Requests
 
 - Create Tuva Core issues in `tuva-health/tuva-core`.

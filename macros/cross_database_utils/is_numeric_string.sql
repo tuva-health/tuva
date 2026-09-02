@@ -43,3 +43,9 @@
     )
 
 {%- endmacro -%}
+
+{# SQL Server is T-SQL. dbt-sqlserver registers no adapter-type parent,
+   so fabric__ macros are not reached by dispatch and must be aliased. #}
+{% macro sqlserver__is_numeric_string(column_name) -%}
+    {{ the_tuva_project.fabric__is_numeric_string(column_name) }}
+{%- endmacro %}

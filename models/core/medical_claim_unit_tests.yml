@@ -22,7 +22,7 @@ unit_tests:
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          {% set numeric_type = 'numeric' %}
+          {% set numeric_type = 'decimal(18, 2)' if target.type == 'athena' else 'numeric' %}
           {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
           {% set base_sql %}
               select

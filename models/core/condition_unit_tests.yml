@@ -23,17 +23,8 @@ unit_tests:
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
           {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
-          with fixture_rows as (
-              select 'condition-icd-10-cm' as condition_id, 'person-1' as person_id, 'ICD-10-CM' as code_system, 'e03.9' as normalized_code
-              union all select 'condition-snomed-ct', 'person-2', 'snomed-ct', '123456789'
-              union all select 'condition-unsupported', 'person-3', 'icd-9-cm', '2449'
-              union all select 'condition-ambiguous-map', 'person-4', 'icd-10-cm', 'R99.9'
-              union all select 'condition-identical-map-duplicates', 'person-5', 'icd-10-cm', 'J45.909'
-              union all select 'condition-historical-active-map', 'person-6', 'icd-10-cm', 's23.420a'
-              union all select 'condition-inactive-map', 'person-7', 'icd-10-cm', 'B00.0'
-              union all select 'condition-incomplete-map', 'person-8', 'icd-10-cm', 'M99.9'
-              union all select 'condition-nonbillable-heading', 'person-9', 'icd-10-cm', 'b37'
-          )
+          -- Derived table rather than a leading CTE: T-SQL rejects a nested
+          -- WITH when this ephemeral input is inlined as a CTE by the unit test.
           select
               condition_id
             , cast(null as {{ string_type }}) as source_condition_id
@@ -59,7 +50,17 @@ unit_tests:
             , cast(null as {{ timestamp_type }}) as ingest_datetime
             , cast(null as {{ timestamp_type }}) as tuva_last_run
             , 'source' as data_source
-          from fixture_rows
+          from (
+              select 'condition-icd-10-cm' as condition_id, 'person-1' as person_id, 'ICD-10-CM' as code_system, 'e03.9' as normalized_code
+              union all select 'condition-snomed-ct', 'person-2', 'snomed-ct', '123456789'
+              union all select 'condition-unsupported', 'person-3', 'icd-9-cm', '2449'
+              union all select 'condition-ambiguous-map', 'person-4', 'icd-10-cm', 'R99.9'
+              union all select 'condition-identical-map-duplicates', 'person-5', 'icd-10-cm', 'J45.909'
+              union all select 'condition-historical-active-map', 'person-6', 'icd-10-cm', 's23.420a'
+              union all select 'condition-inactive-map', 'person-7', 'icd-10-cm', 'B00.0'
+              union all select 'condition-incomplete-map', 'person-8', 'icd-10-cm', 'M99.9'
+              union all select 'condition-nonbillable-heading', 'person-9', 'icd-10-cm', 'b37'
+          ) as fixture_rows
       - input: ref('tuva_condition_grouper_code_map')
         format: sql
         rows: |

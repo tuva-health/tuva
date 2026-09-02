@@ -5,7 +5,7 @@ unit_tests:
     description: >
       Verifies that provider attribution year_month accepts only an exact
       six-digit YYYYMM value with a valid month, flags malformed populated
-      values, and reports null as not applicable because Structural Data
+      values, and reports cast(null as {{ 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' }}) as not applicable because Structural Data
       Quality owns primary-key nulls.
     model: data_quality__provider_attribution_flags
     config:

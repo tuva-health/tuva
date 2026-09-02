@@ -58,3 +58,9 @@
     regexp_matches({{ column_name }}, '{{ regex }}')
 
 {%- endmacro -%}
+
+{# SQL Server is T-SQL. dbt-sqlserver registers no adapter-type parent,
+   so fabric__ macros are not reached by dispatch and must be aliased. #}
+{% macro sqlserver__apply_regex(column_name, regex) -%}
+    {{ the_tuva_project.fabric__apply_regex(column_name, regex) }}
+{%- endmacro %}
