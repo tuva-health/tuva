@@ -12,158 +12,54 @@
    )
 }}
 
-{% set definitions_by_model = {} %}
+{#
+    The manifest is emitted by data_quality__logical_test_results_part_N, which
+    are implementation details rather than consumer contracts. Splitting it on
+    whole flag models keeps each generated statement inside Athena's
+    262,144-byte query-string limit; this relation stays the stable public
+    interface and is a thin union over the parts.
+#}
 
-{% for definition in dq_enabled_logical_test_manifest() %}
-    {% set source_model_name = definition['source_model_name'] %}
-    {% if definitions_by_model.get(source_model_name) is none %}
-        {% do definitions_by_model.update({source_model_name: []}) %}
-    {% endif %}
-    {% do definitions_by_model[source_model_name].append(definition) %}
+{% set part_models = [] %}
+{% for chunk_index in range(the_tuva_project.dq_logical_chunk_count()) %}
+    {% do part_models.append(ref('data_quality__logical_test_results_part_' ~ (chunk_index + 1))) %}
 {% endfor %}
 
-{% set aggregate_ctes = [] %}
-{% set test_definition_ctes = [] %}
-{% set result_queries = [] %}
-
-{% for source_model_name, model_definitions in definitions_by_model.items() %}
-    {% set model_index = loop.index %}
-    {% set aggregate_columns = [] %}
-    {% set test_definition_queries = [] %}
-    {% set tested_count_cases = [] %}
-    {% set failed_count_cases = [] %}
-    {% set not_applicable_count_cases = [] %}
-
-    {% for definition in model_definitions %}
-        {% set test_ordinal = loop.index %}
-        {% set flag_column = quote_column(definition['flag_column_name']) %}
-
-        {% do aggregate_columns.append(
-            "cast(sum(cast(case when " ~ flag_column ~ " in (0, 1) then 1 else 0 end as "
-            ~ dbt.type_bigint() ~ ")) as " ~ dbt.type_bigint() ~ ") as tested_count_" ~ test_ordinal
-        ) %}
-        {% do aggregate_columns.append(
-            "cast(sum(cast(coalesce(" ~ flag_column ~ ", 0) as " ~ dbt.type_bigint() ~ ")) as "
-            ~ dbt.type_bigint() ~ ") as failed_count_" ~ test_ordinal
-        ) %}
-        {% do aggregate_columns.append(
-            "cast(sum(cast(case when " ~ flag_column ~ " is null then 1 else 0 end as "
-            ~ dbt.type_bigint() ~ ")) as " ~ dbt.type_bigint() ~ ") as not_applicable_count_" ~ test_ordinal
-        ) %}
-
-        {% set test_definition_query %}
-            select
-                  cast({{ test_ordinal }} as {{ dbt.type_int() }}) as test_ordinal
-                , {{ dq_string_literal_sql(definition['input_table_name']) }} as input_table_name
-                , {{ dq_string_literal_sql(definition['test_name']) }} as test_name
-                , {{ dq_string_literal_sql(definition['display_name']) }} as display_name
-                , {{ dq_string_literal_sql(definition['description']) }} as description
-                , {{ dq_string_literal_sql(definition['grain']) }} as grain
-                , {{ dq_string_literal_sql(definition['flag_table_name']) }} as flag_table_name
-                , {{ dq_string_literal_sql(definition['flag_column_name']) }} as flag_column_name
-                , {{ dq_string_literal_sql(definition['test_type']) }} as test_type
-                , cast({{ definition['severity'] }} as {{ dbt.type_int() }}) as severity
-        {% endset %}
-        {% do test_definition_queries.append(test_definition_query | trim) %}
-        {% do tested_count_cases.append(
-            "when " ~ test_ordinal ~ " then flag_aggregates.tested_count_" ~ test_ordinal
-        ) %}
-        {% do failed_count_cases.append(
-            "when " ~ test_ordinal ~ " then flag_aggregates.failed_count_" ~ test_ordinal
-        ) %}
-        {% do not_applicable_count_cases.append(
-            "when " ~ test_ordinal ~ " then flag_aggregates.not_applicable_count_" ~ test_ordinal
-        ) %}
-    {% endfor %}
-
-    {% set aggregate_cte %}
-        logical_model_{{ model_index }}_aggregates as (
-            select
-                  cast(data_source as {{ dbt.type_string() }}) as data_source
-                , cast(
-                    sum(cast(1 as {{ dbt.type_bigint() }}))
-                    as {{ dbt.type_bigint() }}
-                  ) as total_row_count
-                , {{ aggregate_columns | join('\n                , ') }}
-            from {{ ref(source_model_name) }}
-            group by cast(data_source as {{ dbt.type_string() }})
-        )
-    {% endset %}
-    {% do aggregate_ctes.append(aggregate_cte | trim) %}
-
-    {% set test_definition_cte %}
-        logical_model_{{ model_index }}_tests as (
-            {{ test_definition_queries | join('\n            union all\n') }}
-        )
-    {% endset %}
-    {% do test_definition_ctes.append(test_definition_cte | trim) %}
-
-    {% set result_query %}
-        select
-              flag_aggregates.data_source
-            , test_definitions.input_table_name
-            , test_definitions.test_name
-            , test_definitions.display_name
-            , test_definitions.description
-            , test_definitions.grain
-            , test_definitions.flag_table_name
-            , test_definitions.flag_column_name
-            , test_definitions.test_type
-            , test_definitions.severity
-            , flag_aggregates.total_row_count
-            , cast(
-                case test_definitions.test_ordinal
-                    {{ tested_count_cases | join('\n                    ') }}
-                end
-              as {{ dbt.type_bigint() }}) as tested_count
-            , cast(
-                case test_definitions.test_ordinal
-                    {{ failed_count_cases | join('\n                    ') }}
-                end
-              as {{ dbt.type_bigint() }}) as failed_count
-            , cast(
-                case test_definitions.test_ordinal
-                    {{ tested_count_cases | join('\n                    ') }}
-                end
-                - case test_definitions.test_ordinal
-                    {{ failed_count_cases | join('\n                    ') }}
-                end
-              as {{ dbt.type_bigint() }}) as passed_count
-            , cast(
-                case test_definitions.test_ordinal
-                    {{ not_applicable_count_cases | join('\n                    ') }}
-                end
-              as {{ dbt.type_bigint() }}) as not_applicable_count
-        from logical_model_{{ model_index }}_aggregates as flag_aggregates
-        cross join logical_model_{{ model_index }}_tests as test_definitions
-    {% endset %}
-    {% do result_queries.append(result_query | trim) %}
-{% endfor %}
-
-{% if result_queries | length > 0 %}
-    with
-    {{ (aggregate_ctes + test_definition_ctes) | join('\n    , ') }}
-
-    select *
-    from (
-        {{ result_queries | join('\n        union all\n') }}
-    ) as logical_test_results
-{% else %}
+select
+      cast(data_source as {{ dbt.type_string() }}) as data_source
+    , cast(input_table_name as {{ dbt.type_string() }}) as input_table_name
+    , cast(test_name as {{ dbt.type_string() }}) as test_name
+    , cast(display_name as {{ dbt.type_string() }}) as display_name
+    , cast(description as {{ dbt.type_string() }}) as description
+    , cast(grain as {{ dbt.type_string() }}) as grain
+    , cast(flag_table_name as {{ dbt.type_string() }}) as flag_table_name
+    , cast(flag_column_name as {{ dbt.type_string() }}) as flag_column_name
+    , cast(test_type as {{ dbt.type_string() }}) as test_type
+    , cast(severity as {{ dbt.type_int() }}) as severity
+    , cast(total_row_count as {{ dbt.type_bigint() }}) as total_row_count
+    , cast(tested_count as {{ dbt.type_bigint() }}) as tested_count
+    , cast(failed_count as {{ dbt.type_bigint() }}) as failed_count
+    , cast(passed_count as {{ dbt.type_bigint() }}) as passed_count
+    , cast(not_applicable_count as {{ dbt.type_bigint() }}) as not_applicable_count
+from (
+    {% for part_model in part_models %}
     select
-          cast(null as {{ dbt.type_string() }}) as data_source
-        , cast(null as {{ dbt.type_string() }}) as input_table_name
-        , cast(null as {{ dbt.type_string() }}) as test_name
-        , cast(null as {{ dbt.type_string() }}) as display_name
-        , cast(null as {{ dbt.type_string() }}) as description
-        , cast(null as {{ dbt.type_string() }}) as grain
-        , cast(null as {{ dbt.type_string() }}) as flag_table_name
-        , cast(null as {{ dbt.type_string() }}) as flag_column_name
-        , cast(null as {{ dbt.type_string() }}) as test_type
-        , cast(null as {{ dbt.type_int() }}) as severity
-        , cast(null as {{ dbt.type_bigint() }}) as total_row_count
-        , cast(null as {{ dbt.type_bigint() }}) as tested_count
-        , cast(null as {{ dbt.type_bigint() }}) as failed_count
-        , cast(null as {{ dbt.type_bigint() }}) as passed_count
-        , cast(null as {{ dbt.type_bigint() }}) as not_applicable_count
-    {{ dq_empty_result_guard_sql() }}
-{% endif %}
+          data_source
+        , input_table_name
+        , test_name
+        , display_name
+        , description
+        , grain
+        , flag_table_name
+        , flag_column_name
+        , test_type
+        , severity
+        , total_row_count
+        , tested_count
+        , failed_count
+        , passed_count
+        , not_applicable_count
+    from {{ part_model }}
+    {% if not loop.last %}union all{% endif %}
+    {% endfor %}
+) as logical_test_results

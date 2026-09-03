@@ -13,60 +13,38 @@
    )
 }}
 
-{% set key_queries = [] %}
-{% set string_type = dbt.type_string() %}
-
 {#
-  percent_escaped_v1 encodes key components in key_columns order. Null is N.
-  A non-null value is V plus its string value after replacing % with %25 and
-  then | with %7C; therefore an empty string is V. Components are joined by |.
-  Decode %7C before %25 so escaped percent sequences remain unambiguous.
+    The manifest is emitted by data_quality__logical_failure_keys_part_N, which
+    are implementation details rather than consumer contracts. Splitting it
+    keeps each generated statement inside Athena's 262,144-byte query-string
+    limit; this relation stays the stable public interface and is a thin union
+    over the parts. dq_logical_chunk_count sets how many parts there are.
 #}
-{% for definition in dq_enabled_logical_test_manifest() %}
-    {% set key_value_parts = [] %}
-    {% for key_column in definition['key_columns'] %}
-        {% set qualified_key_column = "flags." ~ quote_column(key_column) %}
-        {% set string_key_value = "cast(" ~ qualified_key_column ~ " as " ~ string_type ~ ")" %}
-        {% set escaped_key_value = "replace(replace(" ~ string_key_value ~ ", '%', '%25'), '|', '%7C')" %}
-        {% set encoded_component =
-            "case when " ~ qualified_key_column ~ " is null then 'N' else "
-            ~ concat_custom(["'V'", escaped_key_value])
-            ~ " end"
-        %}
-        {% do key_value_parts.append(encoded_component) %}
-        {% if not loop.last %}
-            {% do key_value_parts.append("'|'") %}
-        {% endif %}
-    {% endfor %}
 
-    {% set query %}
-        select
-              cast(flags.data_source as {{ string_type }}) as data_source
-            , {{ dq_string_literal_sql(definition['input_table_name']) }} as input_table_name
-            , {{ dq_string_literal_sql(definition['test_name']) }} as test_name
-            , {{ dq_string_literal_sql(definition['grain']) }} as grain
-            , {{ dq_string_literal_sql(definition['key_columns'] | join(',')) }} as key_columns
-            , 'percent_escaped_v1' as key_values_format
-            , {{ concat_custom(key_value_parts) }} as key_values
-        from {{ ref(definition['source_model_name']) }} as flags
-        where flags.{{ quote_column(definition['flag_column_name']) }} = 1
-    {% endset %}
-    {% do key_queries.append(query) %}
+{% set part_models = [] %}
+{% for chunk_index in range(the_tuva_project.dq_logical_chunk_count()) %}
+    {% do part_models.append(ref('data_quality__logical_failure_keys_part_' ~ (chunk_index + 1))) %}
 {% endfor %}
 
-{% if key_queries | length > 0 %}
-    select *
-    from (
-        {{ key_queries | join('\nunion all\n') }}
-    ) as logical_failure_keys
-{% else %}
+select
+      cast(data_source as {{ dbt.type_string() }}) as data_source
+    , cast(input_table_name as {{ dbt.type_string() }}) as input_table_name
+    , cast(test_name as {{ dbt.type_string() }}) as test_name
+    , cast(grain as {{ dbt.type_string() }}) as grain
+    , cast(key_columns as {{ dbt.type_string() }}) as key_columns
+    , cast(key_values_format as {{ dbt.type_string() }}) as key_values_format
+    , cast(key_values as {{ dbt.type_string() }}) as key_values
+from (
+    {% for part_model in part_models %}
     select
-          cast(null as {{ dbt.type_string() }}) as data_source
-        , cast(null as {{ dbt.type_string() }}) as input_table_name
-        , cast(null as {{ dbt.type_string() }}) as test_name
-        , cast(null as {{ dbt.type_string() }}) as grain
-        , cast(null as {{ dbt.type_string() }}) as key_columns
-        , cast(null as {{ dbt.type_string() }}) as key_values_format
-        , cast(null as {{ dbt.type_string() }}) as key_values
-    {{ dq_empty_result_guard_sql() }}
-{% endif %}
+          data_source
+        , input_table_name
+        , test_name
+        , grain
+        , key_columns
+        , key_values_format
+        , key_values
+    from {{ part_model }}
+    {% if not loop.last %}union all{% endif %}
+    {% endfor %}
+) as logical_failure_keys

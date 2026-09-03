@@ -6,10 +6,14 @@ unit_tests:
       Verifies exact fail, pass, and not-applicable counts for multiple flags,
       populated and null data sources, and independently aggregated flag
       models.
-    model: data_quality__logical_test_results
+    model: data_quality__logical_test_results_part_1
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false)) | as_bool }}"
     overrides:
+      vars:
+        # One part means every overridden flag model lands in part 1, so the
+        # aggregate assertions stay independent of how the manifest is chunked.
+        dq_logical_chunk_count: 1
       macros:
         dq_enabled_logical_test_manifest:
           - source_model_name: data_quality__medical_claim_line_flags
@@ -146,10 +150,14 @@ unit_tests:
       Verifies that the optional failure-key detail emits only failed rows from
       multiple flag models and distinguishes pipes, percent signs, empty
       strings, and null key components with percent_escaped_v1.
-    model: data_quality__logical_failure_keys
+    model: data_quality__logical_failure_keys_part_1
     config:
       enabled: "{{ (var('data_quality_enabled', false) and var('claims_enabled', false) and var('enable_data_quality_failure_keys', false)) | as_bool }}"
     overrides:
+      vars:
+        # One part means every overridden definition lands in part 1, so the
+        # encoding assertions stay independent of how the manifest is chunked.
+        dq_logical_chunk_count: 1
       macros:
         dq_enabled_logical_test_manifest:
           - source_model_name: data_quality__medical_claim_line_flags

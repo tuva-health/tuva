@@ -70,6 +70,13 @@ vars:
   # Microsoft Fabric public storage endpoint used by seed loading macros.
   # tuva_seed_fabric_storage_root: "https://tuvapublicresources.blob.core.windows.net"
 
+  ## Data quality internals
+  # Number of part models the Logical Data Quality failure-key and result
+  # relations are split across. Each part is one slice of the test manifest,
+  # kept small enough that the generated statement stays inside Athena's
+  # 262,144-byte query-string limit. Raise it if the manifest grows.
+  # dq_logical_chunk_count: 4
+
   ## Internal test hooks
   # Local filesystem root for validating staged package data assets with DuckDB.
   # The root must contain <bucket>/<package>/<version>/...; omit in normal projects.
