@@ -10,7 +10,7 @@ with normalized_code_targets as (
         lower({{ the_tuva_project.trim('code_system') }}) as code_system
       , upper(replace({{ the_tuva_project.trim('code') }}, '.', '')) as code
       , procedure_family
-      , {{ quote_column('procedure') }} as {{ quote_column('procedure') }}
+      , procedure_name as procedure_name
     from {{ ref('tuva_procedure_grouper_code_map') }}
 
 )
@@ -23,4 +23,4 @@ group by
     code_system
   , code
 having count(distinct procedure_family) != 1
-    or count(distinct {{ quote_column('procedure') }}) != 1
+    or count(distinct procedure_name) != 1

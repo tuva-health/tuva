@@ -45,7 +45,7 @@ with all_conditions as (
             else {{ the_tuva_project.trim('code') }}
         end as code
       , condition_family
-      , condition
+      , condition_name
     from {{ ref('tuva_condition_grouper_code_map') }}
     where lower({{ the_tuva_project.trim('status') }}) = 'active'
       and lower({{ the_tuva_project.trim('code_system') }}) in ('icd-10-cm', 'snomed-ct')
@@ -58,7 +58,7 @@ with all_conditions as (
         candidates.code_system
       , candidates.code
       , max(candidates.condition_family) as condition_family
-      , max(candidates.condition) as condition
+      , max(candidates.condition_name) as condition_name
     from active_condition_grouper_candidates as candidates
     group by
         candidates.code_system
@@ -66,9 +66,9 @@ with all_conditions as (
     -- Collapse identical duplicates, but fail closed when one normalized code
     -- has multiple active targets or an incomplete target.
     having count(candidates.condition_family) = count(*)
-       and count(candidates.condition) = count(*)
+       and count(candidates.condition_name) = count(*)
        and min(candidates.condition_family) = max(candidates.condition_family)
-       and min(candidates.condition) = max(candidates.condition)
+       and min(candidates.condition_name) = max(candidates.condition_name)
 
 )
 
@@ -92,7 +92,7 @@ select
   , all_conditions.normalized_code
   , all_conditions.normalized_description
   , condition_grouper.condition_family
-  , condition_grouper.condition
+  , condition_grouper.condition_name
   , all_conditions.condition_rank
   , all_conditions.present_on_admit_code
   , all_conditions.present_on_admit_description

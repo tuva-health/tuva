@@ -1,5 +1,5 @@
 {{ config(
-     enabled = target.type != 'fabric',
+     enabled = target.type not in ('fabric', 'sqlserver'),
      severity = 'error',
      tags = ['contract', 'regex_contract']
    )
@@ -11,7 +11,7 @@
   and null behavior across the adapters that expose regular expressions.
 #}
 
-{% if target.type != 'fabric' %}
+{% if target.type not in ('fabric', 'sqlserver') %}
 {% set regex_cases = [
     ('unanchored_search', "'prefix123suffix'", '[0-9]+', '1'),
     ('explicit_start_anchor_rejects_prefix', "'prefix123suffix'", '^[0-9]+', '0'),

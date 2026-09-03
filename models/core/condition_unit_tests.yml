@@ -67,7 +67,7 @@ unit_tests:
         format: sql
         rows: |
           {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
-          select 'icd-10-cm' as code_system, 'E039' as code, 'Endocrine & Metabolic Disease' as condition_family, 'Hypothyroidism' as condition, 'active' as status
+          select 'icd-10-cm' as code_system, 'E039' as code, 'Endocrine & Metabolic Disease' as condition_family, 'Hypothyroidism' as condition_name, 'active' as status
           union all select 'snomed-ct', '123456789', 'Respiratory Disease', 'Asthma', 'active'
           union all select 'icd-10-cm', 'R999', 'Symptoms, Signs & Abnormal Findings', 'Abnormal Clinical or Laboratory Findings', 'active'
           union all select 'ICD-10-CM', 'r99.9', 'Other', 'Other Specified and Unspecified Conditions', 'active'
@@ -81,31 +81,31 @@ unit_tests:
       rows:
         - condition_id: condition-icd-10-cm
           condition_family: Endocrine & Metabolic Disease
-          condition: Hypothyroidism
+          condition_name: Hypothyroidism
         - condition_id: condition-snomed-ct
           condition_family: Respiratory Disease
-          condition: Asthma
+          condition_name: Asthma
         - condition_id: condition-unsupported
           condition_family: null
-          condition: null
+          condition_name: null
         - condition_id: condition-ambiguous-map
           condition_family: null
-          condition: null
+          condition_name: null
         - condition_id: condition-identical-map-duplicates
           condition_family: Respiratory Disease
-          condition: Asthma
+          condition_name: Asthma
         - condition_id: condition-historical-active-map
           condition_family: Injury & Poisoning
-          condition: Sprain and Strain
+          condition_name: Sprain and Strain
         - condition_id: condition-inactive-map
           condition_family: null
-          condition: null
+          condition_name: null
         - condition_id: condition-incomplete-map
           condition_family: null
-          condition: null
+          condition_name: null
         - condition_id: condition-nonbillable-heading
           condition_family: Infectious Disease
-          condition: Fungal Infections
+          condition_name: Fungal Infections
 
   - name: test_claims_condition_stable_ids_and_semantics
     description: >-

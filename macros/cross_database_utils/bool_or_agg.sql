@@ -26,3 +26,9 @@
 {% macro fabric__bool_or_agg(expression) %}
   cast( max( cast( {{ expression }} as int) ) as bit)
 {% endmacro %}
+
+{# SQL Server is T-SQL. dbt-sqlserver registers no adapter-type parent,
+   so fabric__ macros are not reached by dispatch and must be aliased. #}
+{% macro sqlserver__bool_or_agg(expression) -%}
+    {{ the_tuva_project.fabric__bool_or_agg(expression) }}
+{%- endmacro %}

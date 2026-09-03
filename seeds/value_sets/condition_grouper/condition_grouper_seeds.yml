@@ -19,7 +19,7 @@ seeds:
       column_types:
         condition_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        condition: |
+        condition_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -33,7 +33,7 @@ seeds:
         description: Analytic rollup family for the condition, such as Cardiovascular Disease, Cancer, or Mental Health Disorders.
         tests:
           - not_null
-      - name: condition
+      - name: condition_name
         description: Mutually exclusive condition name assigned by the Tuva Condition Grouper.
         tests:
           - not_null
@@ -76,7 +76,7 @@ seeds:
       column_types:
         condition_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        condition: |
+        condition_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -94,7 +94,7 @@ seeds:
         description: Analytic condition family assigned to the diagnosis code.
         tests:
           - not_null
-      - name: condition
+      - name: condition_name
         description: Mutually exclusive Tuva condition assigned to the diagnosis code.
         tests:
           - not_null

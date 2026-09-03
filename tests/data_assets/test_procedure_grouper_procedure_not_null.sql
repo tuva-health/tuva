@@ -7,15 +7,15 @@
 select
     'tuva_procedure_grouper' as table_name
   , procedure_family
-  , {{ quote_column('procedure') }}
+  , procedure_name
 from {{ ref('tuva_procedure_grouper') }}
-where {{ quote_column('procedure') }} is null
+where procedure_name is null
 
 union all
 
 select
     'tuva_procedure_grouper_code_map' as table_name
   , procedure_family
-  , {{ quote_column('procedure') }}
+  , procedure_name
 from {{ ref('tuva_procedure_grouper_code_map') }}
-where {{ quote_column('procedure') }} is null
+where procedure_name is null

@@ -17,6 +17,14 @@ Tuva Core requires dbt 1.10.5 through 2.x and supports Snowflake, Databricks,
 BigQuery, Microsoft Fabric, Redshift, and DuckDB. The 1.0 package ecosystem is
 validated against both dbt Core 2.0 and dbt Fusion on DuckDB.
 
+SQL Server deployments must use a case-sensitive database collation such as
+`SQL_Latin1_General_CP1_CS_AS`. Logical Data Quality compares values against
+exact lowercase literals, for example `sex in ('male', 'female', 'unknown')`.
+Under the SQL Server default `SQL_Latin1_General_CP1_CI_AS`, `'MALE'` compares
+equal to `'male'`, so those checks silently report an invalid value as valid
+instead of failing. Set the collation when the database is created; changing it
+afterwards requires rebuilding the affected objects.
+
 ## What Tuva Core Includes
 
 | Area | Responsibility |

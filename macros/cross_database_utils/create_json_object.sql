@@ -187,3 +187,9 @@ select
 from {{ table_ref }}
 group by {{ group_by_col }}
 {% endmacro %}
+
+{# SQL Server is T-SQL. dbt-sqlserver registers no adapter-type parent,
+   so fabric__ macros are not reached by dispatch and must be aliased. #}
+{% macro sqlserver__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) -%}
+    {{ the_tuva_project.fabric__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) }}
+{%- endmacro %}

@@ -15,3 +15,9 @@
 {% macro default__left(expression, length) %}
   left( {{ expression }}, {{ length }} )
 {% endmacro %}
+
+
+{# Athena/Trino has no left(); substr is the portable spelling. #}
+{% macro athena__left(expression, length) %}
+  substr( {{ expression }}, 1, {{ length }} )
+{% endmacro %}

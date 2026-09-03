@@ -501,7 +501,7 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: condition
+      - name: condition_name
         description: Mutually exclusive condition assigned by the Tuva Condition
           Grouper. This field is populated when code_system is
           icd-10-cm or snomed-ct and normalized_code has one unambiguous active
@@ -3523,7 +3523,7 @@ models:
         config:
           meta:
             data_type: varchar
-      - name: procedure
+      - name: procedure_name
         description: Mutually exclusive analytic procedure assigned by the Tuva Procedure
           Grouper. Tuva populates this by joining normalized ICD-10-PCS procedure codes
           to tuva_procedure_grouper_code_map. This field remains null for HCPCS,

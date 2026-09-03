@@ -6,7 +6,7 @@
 
 select
     procedure_family
-  , {{ quote_column('procedure') }} as {{ quote_column('procedure') }}
+  , procedure_name as procedure_name
   , status
 from {{ ref('tuva_procedure_grouper') }}
 where status != 'active'

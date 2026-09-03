@@ -19,21 +19,21 @@ seeds:
       column_types:
         procedure_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
+        procedure_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- elif target.type == "redshift" -%} varchar(65535) {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type in ("fabric", "sqlserver") -%} varchar(max) {%- elif target.type == "redshift" -%} varchar(65535) {%- else -%} varchar(3000) {%- endif -%}
         last_update_date: date
         last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type in ("fabric", "sqlserver") -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
     columns:
       - name: procedure_family
         description: Analytic rollup family for the procedure, such as Cardiovascular, Gastrointestinal, Musculoskeletal, or Urinary System.
         tests:
           - not_null
-      - name: procedure
+      - name: procedure_name
         description: Mutually exclusive procedure name assigned by the Tuva Procedure Grouper.
       - name: status
         description: Governance status of the procedure row. Released hierarchy rows are active; inactive is reserved for a future explicitly retired hierarchy assignment and is not used in the reviewed 1.0 snapshot.
@@ -71,25 +71,25 @@ seeds:
       column_types:
         procedure_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        procedure: |
+        procedure_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type in ("fabric", "sqlserver") -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
         code_system: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         last_update_date: date
         last_update_note: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type == "fabric" -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type == "snowflake" -%} varchar(16777216) {%- elif target.type in ("fabric", "sqlserver") -%} varchar(max) {%- else -%} varchar(3000) {%- endif -%}
     columns:
       - name: procedure_family
         description: Analytic procedure family assigned to the procedure code.
         tests:
           - not_null
-      - name: procedure
+      - name: procedure_name
         description: Mutually exclusive Tuva procedure assigned to the procedure code.
       - name: code
         description: Procedure code mapped to the Tuva procedure. ICD-10-PCS codes are stored without decimal formatting.

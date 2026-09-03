@@ -12,23 +12,30 @@
    )
 }}
 
+{#
+    Only the first UNION ALL branch carries column aliases; the rest inherit
+    them positionally. With one branch per logical test this keeps the
+    generated statement well inside Athena's 262,144-byte query-string limit,
+    which the fully-aliased form exceeded.
+#}
+
 {% set catalog_queries = [] %}
 
 {% for definition in dq_enabled_logical_test_manifest() %}
     {% set query %}
         select
-              {{ dq_string_literal_sql(definition['test_name']) }} as test_name
-            , {{ dq_string_literal_sql(definition['display_name']) }} as display_name
-            , {{ dq_string_literal_sql(definition['description']) }} as description
-            , {{ dq_string_literal_sql(definition['input_model_name']) }} as input_model_name
-            , {{ dq_string_literal_sql(definition['input_table_name']) }} as input_table_name
-            , {{ dq_string_literal_sql(definition['source_model_name']) }} as flag_model_name
-            , {{ dq_string_literal_sql(definition['flag_table_name']) }} as flag_table_name
-            , {{ dq_string_literal_sql(definition['flag_column_name']) }} as flag_column_name
-            , {{ dq_string_literal_sql(definition['grain']) }} as grain
-            , {{ dq_string_literal_sql(definition['key_columns'] | join(',')) }} as key_columns
-            , {{ dq_string_literal_sql(definition['test_type']) }} as test_type
-            , cast({{ definition['severity'] }} as {{ dbt.type_int() }}) as severity
+              {{ dq_string_literal_sql(definition['test_name']) }}{{ ' as test_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['display_name']) }}{{ ' as display_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['description']) }}{{ ' as description' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['input_model_name']) }}{{ ' as input_model_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['input_table_name']) }}{{ ' as input_table_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['source_model_name']) }}{{ ' as flag_model_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['flag_table_name']) }}{{ ' as flag_table_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['flag_column_name']) }}{{ ' as flag_column_name' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['grain']) }}{{ ' as grain' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['key_columns'] | join(',')) }}{{ ' as key_columns' if loop.first else '' }}
+            , {{ dq_string_literal_sql(definition['test_type']) }}{{ ' as test_type' if loop.first else '' }}
+            , cast({{ definition['severity'] }} as {{ dbt.type_int() }}){{ ' as severity' if loop.first else '' }}
     {% endset %}
     {% do catalog_queries.append(query) %}
 {% endfor %}

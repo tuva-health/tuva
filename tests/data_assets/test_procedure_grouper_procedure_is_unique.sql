@@ -5,8 +5,8 @@
 }}
 
 select
-    {{ quote_column('procedure') }} as {{ quote_column('procedure') }}
+    procedure_name as procedure_name
 from {{ ref('tuva_procedure_grouper') }}
 group by
-    {{ quote_column('procedure') }}
+    procedure_name
 having count(*) > 1

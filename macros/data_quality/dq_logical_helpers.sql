@@ -86,3 +86,63 @@
         ~ " and " ~ bill_type_prefix_expression ~ " in ('11', '12')"
     ) }}
 {% endmacro %}
+
+
+{#
+    Athena caps a query string at 262,144 bytes. The logical failure-key and
+    result models emit one UNION ALL branch per enabled logical test, which
+    passes that cap well before the manifest is exhausted, and unlike the test
+    catalog they cannot be brought under it by trimming aliases and whitespace.
+
+    Splitting the manifest across several materialized part models turns one
+    oversized statement into several small ones. The public relation stays a
+    thin UNION over the parts. Parts are implementation details, not consumer
+    contracts.
+#}
+
+{% macro dq_logical_chunk_count() %}
+    {{ return(var('dq_logical_chunk_count', 4) | int) }}
+{% endmacro %}
+
+
+{% macro dq_enabled_logical_test_manifest_chunk(chunk_index) %}
+    {% set chunk_count = the_tuva_project.dq_logical_chunk_count() %}
+    {% set chunk = [] %}
+    {% for definition in dq_enabled_logical_test_manifest() %}
+        {% if loop.index0 % chunk_count == chunk_index %}
+            {% do chunk.append(definition) %}
+        {% endif %}
+    {% endfor %}
+    {{ return(chunk) }}
+{% endmacro %}
+
+
+{#
+    logical_test_results groups the manifest by source flag model and builds
+    per-model aggregate CTEs, so its chunks must split on whole models. Slicing
+    on definition index would spread one flag model's definitions across parts
+    and each part would aggregate only its own slice.
+#}
+
+{% macro dq_enabled_logical_test_manifest_chunk_by_model(chunk_index) %}
+    {% set chunk_count = the_tuva_project.dq_logical_chunk_count() %}
+    {% set source_models = [] %}
+    {% for definition in dq_enabled_logical_test_manifest() %}
+        {% if definition['source_model_name'] not in source_models %}
+            {% do source_models.append(definition['source_model_name']) %}
+        {% endif %}
+    {% endfor %}
+    {% set selected = [] %}
+    {% for source_model_name in source_models %}
+        {% if loop.index0 % chunk_count == chunk_index %}
+            {% do selected.append(source_model_name) %}
+        {% endif %}
+    {% endfor %}
+    {% set chunk = [] %}
+    {% for definition in dq_enabled_logical_test_manifest() %}
+        {% if definition['source_model_name'] in selected %}
+            {% do chunk.append(definition) %}
+        {% endif %}
+    {% endfor %}
+    {{ return(chunk) }}
+{% endmacro %}

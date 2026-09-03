@@ -5,8 +5,8 @@
 }}
 
 select
-    condition
+    condition_name
 from {{ ref('tuva_condition_grouper') }}
 group by
-    condition
+    condition_name
 having count(distinct condition_family) != 1
