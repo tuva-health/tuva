@@ -55,20 +55,20 @@ with all_conditions as (
 , condition_grouper as (
 
     select
-        code_system
-      , code
-      , max(condition_family) as condition_family
-      , max(condition_name) as condition_name
-    from active_condition_grouper_candidates
+        candidates.code_system
+      , candidates.code
+      , max(candidates.condition_family) as condition_family
+      , max(candidates.condition_name) as condition_name
+    from active_condition_grouper_candidates as candidates
     group by
-        code_system
-      , code
+        candidates.code_system
+      , candidates.code
     -- Collapse identical duplicates, but fail closed when one normalized code
     -- has multiple active targets or an incomplete target.
-    having count(condition_family) = count(*)
-       and count(condition_name) = count(*)
-       and min(condition_family) = max(condition_family)
-       and min(condition_name) = max(condition_name)
+    having count(candidates.condition_family) = count(*)
+       and count(candidates.condition_name) = count(*)
+       and min(candidates.condition_family) = max(candidates.condition_family)
+       and min(candidates.condition_name) = max(candidates.condition_name)
 
 )
 

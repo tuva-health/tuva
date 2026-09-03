@@ -4,15 +4,11 @@
 }}
 
 {%- set tuva_core_columns -%}
-      {{ dbt.safe_cast(
-          concat_custom([
-              "'clinical'",
-              "'_'",
-              "cast(procedure_source.data_source as " ~ dbt.type_string() ~ ")",
-              "'_'",
-              "cast(procedure_source.source_procedure_id as " ~ dbt.type_string() ~ ")"
-          ]), api.Column.translate_type("string"))
-      }} as procedure_id
+      {{ the_tuva_project.stable_id_hash([
+          "'clinical procedure'",
+          'procedure_source.data_source',
+          'procedure_source.source_procedure_id'
+      ]) }} as procedure_id
     , cast(procedure_source.person_id as {{ dbt.type_string() }}) as person_id
     , cast(null as {{ dbt.type_string() }}) as member_id
     , cast(procedure_source.patient_id as {{ dbt.type_string() }}) as patient_id

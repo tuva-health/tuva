@@ -1,13 +1,16 @@
 version: 2
 
 unit_tests:
-  - name: test_combined_encounter_crosswalk_excludes_undetermined_candidates
+  - name: test_combined_encounter_crosswalk_handles_undetermined_and_hospice_candidates
     description: >
       Broad same-day matchers can produce an encounter candidate for an
       undetermined claim. The final combined crosswalk must exclude that
       candidate while preserving the same classified candidate, so the
-      undetermined line flows through the orphan fallback. Regression coverage
-      for https://github.com/tuva-health/tuva-core/issues/1388.
+      undetermined line flows through the orphan fallback. It must also consume
+      hospice professional-claim matches and place them below existing
+      inpatient priorities but above outpatient candidates. Regression
+      coverage for https://github.com/tuva-health/tuva-core/issues/1388 and
+      https://github.com/tuva-health/tuva-core/issues/1394.
     model: encounters__combined_claim_line_crosswalk
     config:
       enabled: "{{ var('claims_enabled', false) | as_bool }}"
@@ -48,12 +51,18 @@ unit_tests:
       - input: ref('inpatient_snf__prof_claims')
         format: sql
         rows: *empty_crosswalk_rows
+      - input: ref('inpatient_hospice__prof_claims')
+        format: sql
+        rows: |
+          select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'hospice-encounter' as encounter_id, 1 as claim_attribution_number
       - input: ref('inpatient_substance_use__prof_claims')
         format: sql
-        rows: *empty_crosswalk_rows
+        rows: |
+          select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'substance-encounter' as encounter_id, 1 as claim_attribution_number
       - input: ref('office_visits__int_office_visits_claim_line')
         format: sql
-        rows: *empty_crosswalk_rows
+        rows: |
+          select 'hospice_prof_claim' as claim_id, 1 as claim_line_number, 'source-a' as data_source, 'office-encounter' as old_encounter_id, 'office visit radiology' as encounter_type
       - input: ref('urgent_care__match_claims_to_anchor')
         format: sql
         rows: *empty_crosswalk_rows
@@ -120,12 +129,84 @@ unit_tests:
           claim_line_number: 1
           data_source: source-a
           old_encounter_id: anchor-1
-          encounter_id: 599f9d17ecf5bc86e964968be6fea2cf
+          encounter_id: f1d4798551acd93ebdd672b219cc1aa4
           encounter_type: outpatient injections
           encounter_group: outpatient
           priority_number: 17
           anchor_claim_id: null
           claim_line_attribution_number: 1
+        - claim_id: hospice_prof_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: substance-encounter
+          encounter_id: 0584fcec3f1da8f2b829ca8c53e8d661
+          encounter_type: inpatient substance use
+          encounter_group: inpatient
+          priority_number: 6
+          anchor_claim_id: null
+          claim_line_attribution_number: 1
+        - claim_id: hospice_prof_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: hospice-encounter
+          encounter_id: 6823a3d0e472c12d95ed4248c6456eed
+          encounter_type: inpatient hospice
+          encounter_group: inpatient
+          priority_number: 7
+          anchor_claim_id: null
+          claim_line_attribution_number: 2
+        - claim_id: hospice_prof_claim
+          claim_line_number: 1
+          data_source: source-a
+          old_encounter_id: office-encounter
+          encounter_id: d68e202bf46bc24eb2115642b57ccc06
+          encounter_type: office visit radiology
+          encounter_group: office based
+          priority_number: 7
+          anchor_claim_id: null
+          claim_line_attribution_number: 3
+
+  - name: test_patient_data_source_id_uses_unambiguous_stable_encoding
+    description: >-
+      Proves patient_data_source_id distinguishes pipe-delimited component
+      boundaries, null, empty strings, and the former literal null sentinel.
+      These cases collided under the pre-1.0 raw concatenation contract.
+    model: encounters__patient_data_source_id
+    config:
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+    given:
+      - input: ref('normalized__medical_claim')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select 'a|b' as person_id, 'c' as data_source
+          union all select 'a', 'b|c'
+          union all select cast(null as {{ string_type }}), 'source'
+      - input: ref('normalized__eligibility')
+        format: sql
+        rows: |
+          select '<NULL>' as person_id, 'source' as data_source
+          union all select '', 'source'
+    expect:
+      rows:
+        - person_id: a|b
+          data_source: c
+          patient_data_source_id: 6df3a7e57fc92cfa0be719b5adf946f8
+        - person_id: a
+          data_source: b|c
+          patient_data_source_id: e5310aa4d517cbca0fc4c5b827430b0c
+        - person_id: null
+          data_source: source
+          patient_data_source_id: d52d0aaae616fbaf04b69c2e0a758efa
+        - person_id: <NULL>
+          data_source: source
+          patient_data_source_id: 6c73a9dd22de8d9d6318a28394f496b3
+        - person_id: ''
+          data_source: source
+          patient_data_source_id: ab07412b6175919ea556de5888d90102
 
   - name: test_undetermined_claim_lines_receive_source_scoped_orphan_encounters
     description: >
@@ -172,19 +253,19 @@ unit_tests:
         - claim_id: shared-undetermined
           claim_line_number: 1
           data_source: source-a
-          encounter_id: 02288fa2b6c8335e69225d63811d6187
+          encounter_id: 8064c56a071fed311a8a820b4c249ca1
           encounter_type: orphaned claim
           encounter_group: other
         - claim_id: shared-undetermined
           claim_line_number: 2
           data_source: source-a
-          encounter_id: 02288fa2b6c8335e69225d63811d6187
+          encounter_id: 8064c56a071fed311a8a820b4c249ca1
           encounter_type: orphaned claim
           encounter_group: other
         - claim_id: shared-undetermined
           claim_line_number: 1
           data_source: source-b
-          encounter_id: 4e85975bd2bdd2e25e0558d72ac95af7
+          encounter_id: f49d40e1f7a1b5865812f52b43f2a5eb
           encounter_type: orphaned claim
           encounter_group: other
 
@@ -240,6 +321,6 @@ unit_tests:
         - claim_id: 'shared_claim'
           claim_line_number: 1
           data_source: 'source_b'
-          encounter_id: 'df275fbe54ad3d9527ec49ce64abfafa'
+          encounter_id: '3fea38bb36c37ec87adde74cfe8825ab'
           encounter_type: 'orphaned claim'
           encounter_group: 'other'

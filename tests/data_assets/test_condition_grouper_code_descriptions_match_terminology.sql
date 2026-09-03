@@ -8,17 +8,20 @@ with terminology_descriptions as (
 
     select
         'icd-10-cm' as code_system
-      , icd_10_cm as code
-      , coalesce(nullif(long_description, ''), short_description) as code_description
-    from {{ ref('terminology__icd_10_cm') }}
+      , terminology.icd_10_cm as code
+      , coalesce(
+            nullif(terminology.long_description, '')
+          , terminology.short_description
+        ) as code_description
+    from {{ ref('terminology__icd_10_cm') }} as terminology
 
     union all
 
     select
         'snomed-ct' as code_system
-      , snomed_ct as code
-      , description as code_description
-    from {{ ref('terminology__snomed_ct') }}
+      , terminology.snomed_ct as code
+      , terminology.description as code_description
+    from {{ ref('terminology__snomed_ct') }} as terminology
 
 )
 

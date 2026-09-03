@@ -5300,9 +5300,12 @@ models:
 
   - name: encounters__patient_data_source_id
     description: |-
-      One row per person per data source. patient_data_source_id is the person
-      and the source concatenated rather than a rank, so it does not change when
-      other people are added to the data.
+      One row per person per data source. patient_data_source_id is a
+      deterministic 32-character lowercase hash of an unambiguous encoding of
+      the patient-data-source domain marker, person_id, and data_source. It
+      distinguishes null, empty strings, literal sentinel values, escaped
+      characters, and component boundaries and does not change when unrelated
+      people are added to the data.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -5311,3 +5314,25 @@ models:
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: patient_data_source_id
+        description: >-
+          Deterministic patient-and-source identifier created with Tuva's
+          collision-safe stable-ID encoding.
+        tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: person_id
+        description: Person identifier from the normalized claims inputs.
+        config:
+          meta:
+            data_type: varchar
+      - name: data_source
+        description: Source system in which the person record appears.
+        config:
+          meta:
+            data_type: varchar

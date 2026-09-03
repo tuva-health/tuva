@@ -10,4 +10,4 @@ select
 from {{ ref('tuva_procedure_grouper_code_map') }}
 where code_system != 'icd-10-pcs'
    or code != upper(replace({{ the_tuva_project.trim('code') }}, '.', ''))
-   or length(code) != 7
+   or {{ the_tuva_project.length('code') }} != 7

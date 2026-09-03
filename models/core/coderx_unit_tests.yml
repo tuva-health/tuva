@@ -448,3 +448,157 @@ unit_tests:
           claim_line_number: 1
           ndc_code: '99988877766'
           ndc_description: CodeRx Enterprise package drug
+
+  - name: test_core_medication_keeps_overlapping_claims_and_clinical_ids
+    description: >-
+      A clinical medication and a pharmacy-claim medication may reuse the same
+      source identifier within one data source. source_type is part of the
+      Core medication grain, so both domain records must remain present.
+    model: core__medication
+    config:
+      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+    overrides:
+      vars:
+        claims_enabled: true
+        clinical_enabled: true
+        use_coderx_enterprise: false
+        _extension_columns_override: []
+        _smart_union_columns_override:
+          - medication_id
+          - source_type
+          - person_id
+          - member_id
+          - patient_id
+          - encounter_id
+          - claim_id
+          - claim_line_number
+          - payer
+          - plan
+          - dispensing_date
+          - prescribing_date
+          - source_code_type
+          - source_code
+          - source_description
+          - ndc_code
+          - ndc_description
+          - rxnorm_code
+          - atc_code
+          - route
+          - strength
+          - quantity
+          - quantity_unit
+          - days_supply
+          - practitioner_id
+          - ingest_datetime
+          - tuva_last_run
+          - data_source
+    given:
+      - input: ref('core__stg_claims_medication')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          select
+                'shared-id' as medication_id
+              , 'claims' as source_type
+              , 'person-claims' as person_id
+              , 'member-claims' as member_id
+              , cast(null as {{ string_type }}) as patient_id
+              , cast(null as {{ string_type }}) as encounter_id
+              , 'rx-claim' as claim_id
+              , 1 as claim_line_number
+              , 'payer' as payer
+              , 'plan' as {{ plan_identifier }}
+              , cast('2024-01-01' as date) as dispensing_date
+              , cast(null as date) as prescribing_date
+              , cast(null as {{ string_type }}) as source_code_type
+              , cast(null as {{ string_type }}) as source_code
+              , cast(null as {{ string_type }}) as source_description
+              , cast(null as {{ string_type }}) as ndc_code
+              , cast(null as {{ string_type }}) as ndc_description
+              , cast(null as {{ string_type }}) as rxnorm_code
+              , cast(null as {{ string_type }}) as atc_code
+              , cast(null as {{ string_type }}) as route
+              , cast(null as {{ string_type }}) as strength
+              , cast(null as {{ integer_type }}) as quantity
+              , cast(null as {{ string_type }}) as quantity_unit
+              , cast(null as {{ integer_type }}) as days_supply
+              , cast(null as {{ string_type }}) as practitioner_id
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+              , 'shared-source' as data_source
+      - input: ref('normalized__medication')
+        format: sql
+        rows: |
+          {% set plan_identifier = '[plan]' if target.type in ['fabric', 'sqlserver'] else '`plan`' if target.type == 'bigquery' else 'plan' %}
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          {% set timestamp_type = 'datetime2(0)' if target.type in ['fabric', 'sqlserver'] else 'timestamp' %}
+          {% set integer_type = 'int64' if target.type == 'bigquery' else 'bigint' %}
+          select
+                'shared-id' as medication_id
+              , 'clinical' as source_type
+              , 'person-clinical' as person_id
+              , cast(null as {{ string_type }}) as member_id
+              , 'patient-clinical' as patient_id
+              , cast(null as {{ string_type }}) as encounter_id
+              , cast(null as {{ string_type }}) as claim_id
+              , cast(null as {{ integer_type }}) as claim_line_number
+              , cast(null as {{ string_type }}) as payer
+              , cast(null as {{ string_type }}) as {{ plan_identifier }}
+              , cast(null as date) as dispensing_date
+              , cast('2024-01-01' as date) as prescribing_date
+              , cast(null as {{ string_type }}) as source_code_type
+              , cast(null as {{ string_type }}) as source_code
+              , cast(null as {{ string_type }}) as source_description
+              , cast(null as {{ string_type }}) as ndc_code
+              , cast(null as {{ string_type }}) as ndc_description
+              , cast(null as {{ string_type }}) as rxnorm_code
+              , cast(null as {{ string_type }}) as atc_code
+              , cast(null as {{ string_type }}) as route
+              , cast(null as {{ string_type }}) as strength
+              , cast(null as {{ integer_type }}) as quantity
+              , cast(null as {{ string_type }}) as quantity_unit
+              , cast(null as {{ integer_type }}) as days_supply
+              , cast(null as {{ string_type }}) as practitioner_id
+              , cast(null as {{ timestamp_type }}) as ingest_datetime
+              , cast('2024-01-01 00:00:00' as {{ timestamp_type }}) as tuva_last_run
+              , 'shared-source' as data_source
+      - input: ref('core__stg_coderx_packages')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as ndc11, cast(null as {{ string_type }}) as ndc, cast(null as {{ string_type }}) as drug_id, cast(null as {{ string_type }}) as drug_name
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+      - input: ref('core__stg_coderx_drugs')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select cast(null as {{ string_type }}) as drug_id, cast(null as {{ string_type }}) as drug_name
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+      - input: ref('core__stg_coderx_classes')
+        format: sql
+        rows: |
+          {% set string_type = 'string' if target.type in ['bigquery', 'databricks'] else 'varchar' %}
+          select
+                cast(null as {{ string_type }}) as drug_id
+              , cast(null as {{ string_type }}) as atc_1_code
+              , cast(null as {{ string_type }}) as atc_1_name
+              , cast(null as {{ string_type }}) as atc_2_code
+              , cast(null as {{ string_type }}) as atc_2_name
+              , cast(null as {{ string_type }}) as atc_3_code
+              , cast(null as {{ string_type }}) as atc_3_name
+              , cast(null as {{ string_type }}) as atc_4_code
+              , cast(null as {{ string_type }}) as atc_4_name
+          from (select 1 as _tuva_empty_fixture) as _tuva_empty_fixture where 1 = 0
+    expect:
+      rows:
+        - medication_id: shared-id
+          source_type: claims
+          person_id: person-claims
+          data_source: shared-source
+        - medication_id: shared-id
+          source_type: clinical
+          person_id: person-clinical
+          data_source: shared-source

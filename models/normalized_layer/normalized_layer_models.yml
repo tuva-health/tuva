@@ -247,10 +247,33 @@ models:
       <<: *normalized_output_config
       alias: normalized__practitioner
   - name: normalized__procedure
-    description: Casts clinical procedure records from input_layer__procedure before core.procedure consumes them.
+    description: >-
+      Casts clinical procedure records from input_layer__procedure and creates
+      the collision-safe, domain-separated 32-character procedure_id before
+      core.procedure consumes them.
     config:
       <<: *normalized_output_config
       alias: normalized__procedure
+    columns:
+      - name: procedure_id
+        description: >-
+          Deterministic Tuva identifier created by hashing an unambiguous
+          encoding of the clinical-procedure domain marker, data_source, and
+          source_procedure_id.
+        tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            data_type: varchar
+            is_primary_key: true
+      - name: data_source
+        description: Source system that supplied the clinical procedure.
+        tests:
+          - not_null
+        config:
+          meta:
+            data_type: varchar
 
 ### Normalized Claim Input Layer
 ##    Final

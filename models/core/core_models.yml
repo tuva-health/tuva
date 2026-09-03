@@ -242,7 +242,7 @@ models:
             data_type: varchar
   - name: int_procedure_from_claims
     description: |-
-      Creates core-ready claims-derived procedure rows from normalized__medical_claim_procedures. This model joins normalized procedure rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the Tuva synthetic procedure_id used by core.procedure.
+      Creates core-ready claims-derived procedure rows from normalized__medical_claim_procedures. This model joins normalized procedure rows to the claims preprocessing encounter claim-line crosswalk to populate encounter_id, then creates the collision-safe, domain-separated Tuva synthetic procedure_id used by core.procedure.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -257,7 +257,12 @@ models:
       materialized: table
     columns:
       - name: procedure_id
-        description: Tuva synthetic identifier for the claims-derived procedure row.
+        description: >-
+          Deterministic 32-character lowercase Tuva identifier created by
+          hashing an unambiguous encoding of the claims-procedure domain,
+          source, claim, encounter, procedure sequence, code, procedure date,
+          modifiers, and practitioner. Null, empty, sentinel-like, and
+          delimiter-bearing values remain distinct.
         tests:
           - not_null
         config:
@@ -2150,12 +2155,15 @@ models:
 
       When clinical data is enabled, this model pulls from input_layer__medication through normalized__medication. When claims data is enabled, this model pulls from core.pharmacy_claim through core__stg_claims_medication. Tuva derives NDC, RxNorm, and ATC codes and descriptions from the package's CodeRx Open data assets when standard medication codes are available. When `use_coderx_enterprise` is true, Tuva's shared CodeRx interfaces instead use user-managed `packages`, `drugs`, and `classes` relations in the target database's `coderx` schema throughout pharmacy normalization, medication enrichment, data quality, and dependent packages. If CodeRx supplies multiple class rows for a drug, Tuva selects the lexicographically first non-null level 3 ATC code to preserve the medication grain. Claims-derived rows use pharmacy_claim_id as medication_id, set source_type to claims, populate claim_id and claim_line_number from core.pharmacy_claim, and populate practitioner_id from the prescribing provider NPI.
 
-      Primary key: medication_id, data_source.
+      Clinical and claims records retain their source identifiers in medication_id. Because those two domains can independently reuse the same value in one data source, source_type is part of the public key.
+
+      Primary key: medication_id, source_type, data_source.
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns:
               - medication_id
+              - source_type
               - data_source
     config:
       schema: |
@@ -2168,7 +2176,9 @@ models:
       - name: medication_id
         description: Identifier for a medication record within a data source. Clinical rows
           are populated from input_layer__medication.medication_id. Claims rows
-          are populated from core.pharmacy_claim.pharmacy_claim_id.
+          are populated from core.pharmacy_claim.pharmacy_claim_id. The same
+          value may exist in both source domains, so use source_type and
+          data_source with this field as the complete record key.
         tests:
           - not_null
         config:
@@ -2177,10 +2187,19 @@ models:
             is_primary_key: true
       - name: source_type
         description: Indicates whether the medication row came from claims or clinical
-          data. Accepted values are claims and clinical.
+          data. Accepted values are claims and clinical. This field is part of
+          the public primary key with medication_id and data_source.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - claims
+                  - clinical
         config:
           meta:
             data_type: varchar
+            is_primary_key: true
       - name: person_id
         description: Globally unique identifier for the person associated with the
           medication record. Clinical rows are populated from
@@ -3355,7 +3374,7 @@ models:
 
       Claims-derived rows are created from the input layer medical_claim table. Tuva creates one procedure row for each non-null HCPCS code on a medical claim line and one procedure row for each non-null procedure_code_1 through procedure_code_25 value on the claim header. HCPCS rows retain HCPCS modifiers from the medical claim line and use the rendering NPI as practitioner_id. Clinical rows are created directly from input_layer__procedure when the clinical input layer is enabled.
 
-      The Normalized Layer unpivots claims procedure fields and normalizes supported procedure code systems. The int_procedure_from_claims model attaches encounter_id for claims-derived rows and creates the Tuva synthetic procedure_id. Core procedure unions normalized clinical procedure rows with claims-derived procedure rows from int_procedure_from_claims, then joins normalized ICD-10-PCS codes to the Tuva Procedure Grouper to populate procedure_family and procedure. Clinical extension columns are pulled through when clinical data is enabled.
+      The Normalized Layer unpivots claims procedure fields and normalizes supported procedure code systems. The normalized clinical path and int_procedure_from_claims create collision-safe, domain-separated 32-character procedure IDs. Core procedure unions normalized clinical procedure rows with claims-derived procedure rows from int_procedure_from_claims, then joins normalized ICD-10-PCS codes to the Tuva Procedure Grouper to populate procedure_family and procedure. Clinical extension columns are pulled through when clinical data is enabled.
 
       Primary key: procedure_id.
     tests:
@@ -3372,7 +3391,13 @@ models:
       materialized: table
     columns:
       - name: procedure_id
-        description: Tuva synthetic record-level identifier for the procedure. Clinical IDs are created in normalized__procedure from source_procedure_id and data_source. Claims-derived IDs are created in int_procedure_from_claims from source data, claim, encounter, procedure sequence, code system, source code, HCPCS modifiers when present, and rendering NPI when present.
+        description: >-
+          Collision-safe, domain-separated 32-character lowercase Tuva
+          identifier for the procedure. Clinical IDs hash data_source and
+          source_procedure_id in the clinical-procedure domain. Claims-derived
+          IDs hash source, claim, encounter, procedure sequence, code,
+          procedure date, HCPCS modifiers, and rendering practitioner in the
+          claims-procedure domain.
         tests:
           - not_null
         config:
