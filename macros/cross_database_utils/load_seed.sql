@@ -461,9 +461,22 @@ WITH (
   {%- set data_source_name = 'tuva_seed_' ~ container | replace('-', '_') | replace('.', '_') -%}
   {%- set object_path = blob_path ~ '/' ~ pattern -%}
   {%- set source_args = "'" ~ object_path ~ "', data_source = '" ~ data_source_name ~ "', single_blob" -%}
+  {#
+      Seeds run concurrently, so two threads can both pass the existence check
+      before either creates the data source. Swallow the resulting duplicate
+      error and re-check, rather than letting a harmless race fail the load.
+  #}
   {% set ensure_source %}
     if not exists (select 1 from sys.external_data_sources where name = '{{ data_source_name }}')
-      exec('create external data source [{{ data_source_name }}] with (type = BLOB_STORAGE, location = ''{{ storage_root }}/{{ container }}'')');
+    begin
+      begin try
+        exec('create external data source [{{ data_source_name }}] with (type = BLOB_STORAGE, location = ''{{ storage_root }}/{{ container }}'')');
+      end try
+      begin catch
+        if not exists (select 1 from sys.external_data_sources where name = '{{ data_source_name }}')
+          throw;
+      end catch
+    end
   {% endset %}
   {% call statement('sqlserver_seed_source', fetch_result=false) %}{{ ensure_source }}{% endcall %}
 {%- else -%}
