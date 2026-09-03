@@ -205,7 +205,7 @@ unit_tests:
       Verifies an unmatched CodeRx Enterprise package remains unenriched and does not fall back to CodeRx Open terminology.
     model: core__medication
     config:
-      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
     overrides:
       vars:
         clinical_enabled: false
@@ -293,7 +293,7 @@ unit_tests:
       Verifies a matched CodeRx Enterprise package enriches claims medication with NDC, RxNorm, and ATC codes and descriptions.
     model: core__medication
     config:
-      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+      enabled: "{{ var('claims_enabled', false) | as_bool }}"
     overrides:
       vars:
         clinical_enabled: false
@@ -456,7 +456,7 @@ unit_tests:
       Core medication grain, so both domain records must remain present.
     model: core__medication
     config:
-      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+      enabled: "{{ (var('claims_enabled', false) and var('clinical_enabled', false)) | as_bool }}"
     overrides:
       vars:
         claims_enabled: true
