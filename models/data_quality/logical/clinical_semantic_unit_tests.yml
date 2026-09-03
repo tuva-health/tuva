@@ -1497,7 +1497,7 @@ unit_tests:
       preservation of raw source fields.
     model: core__medication
     config:
-      enabled: "{{ (var('claims_enabled', false) or var('clinical_enabled', false)) | as_bool }}"
+      enabled: "{{ var('clinical_enabled', false) | as_bool }}"
     overrides:
       vars:
         claims_enabled: false
