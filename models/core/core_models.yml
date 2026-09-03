@@ -454,12 +454,14 @@ models:
           meta:
             data_type: varchar
       - name: code_system
-        description: Code system for source_code. For claims-derived rows, this comes
-          from input_layer.medical_claim.diagnosis_code_type and may be inferred
-          or corrected through ICD terminology matching in the Normalized
-          Layer. For clinical rows, this comes from
-          input_layer.condition.code_system. Values are lowercased during
-          normalization. Common condition code systems include icd-10-cm,
+        description: Code system for source_code. For claims-derived rows, Tuva uses
+          diagnosis_code_type when the code matches the declared ICD system;
+          otherwise, it infers the system from terminology matches, preferring
+          ICD-10-CM over ICD-9-CM when both match. For clinical rows, Tuva does not
+          infer or correct the code system and only searches the declared terminology.
+          normalized_code and normalized_description are populated when a terminology
+          match is found; otherwise, they remain null. Unmatched rows retain the
+          lowercased source code system value. Common values include icd-10-cm,
           icd-9-cm, and snomed-ct.
         config:
           meta:
