@@ -399,8 +399,10 @@ would erase the case contract the checks exist to enforce.
 
 - Same-repository pull requests automatically run `Tuva CI -- Snowflake`: one
   fixed Snowflake `dbt build --full-refresh` against the small synthetic
-  dataset. It builds Tuva Core and the integration project, runs unit and data
-  tests, enables Data Quality and its optional failure-key relation, and keeps
+  dataset. It builds this PR's local Tuva Core, the integration project, and all
+  eight standalone packages pinned to Git release tags in
+  `integration_tests/packages.yml`. It runs unit and data tests, enables Data
+  Quality and its optional failure-key relation, and keeps
   parity disabled. A package-version change does not alter this automatic path.
   The Snowflake status is informational and is not required for merge.
 - Run `Tuva CI -- All Warehouses` manually for the final release PR. Its only
@@ -419,9 +421,14 @@ would erase the case contract the checks exist to enforce.
   dbt commands, selectors, or flags.
 - Automatic secrets-backed CI never executes fork code. After review, a
   maintainer runs `External PR Snowflake CI` and supplies only the PR number.
-  That workflow validates code only and does not inspect package versions.
-- Routine Snowflake CI does not install standalone packages. Only manual
-  all-warehouse CI snapshots all eight package `main` branches before building.
+  That workflow uses the same checked-in package tags and does not choose or
+  compare Core release versions or perform release operations.
+- Routine Snowflake CI installs and builds all eight standalone packages from
+  the checked-in Git release tags. It verifies installed versions and commit
+  locks and requires successful model results from every package. The manifest,
+  run results, dependency lock, and package evidence are retained as artifacts.
+  Manual all-warehouse CI independently snapshots all eight package `main`
+  branches before building; it does not use the checked-in release tags.
 - Parity comparison is a separate manually initiated Snowflake release
   validation.
 

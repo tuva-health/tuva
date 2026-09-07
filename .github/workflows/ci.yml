@@ -20,7 +20,7 @@ on:
         required: true
         type: string
       scope:
-        description: Package scope to validate (core or all-packages)
+        description: Dependency mode (core uses checked-in tags; all-packages snapshots mains)
         required: true
         type: string
       source_lock:
@@ -210,8 +210,6 @@ jobs:
               "fabric",
               "redshift"
             ];
-            const coreSelector =
-              "package:integration_tests package:the_tuva_project";
             const allPackagesSelector = [
               "package:integration_tests",
               "package:the_tuva_project",
@@ -342,7 +340,7 @@ jobs:
               fail(`Unsupported CI request: ${warehouse}:${scope}`);
             }
             if (scope === "core" && sourceLock) {
-              fail("Core-only CI must not receive a standalone package source lock.");
+              fail("Checked-in dependency CI must not receive a main-branch package source lock.");
             }
             if (shouldRun && !checkoutRef) {
               fail("checkout_ref is required.");
@@ -426,9 +424,8 @@ jobs:
               ? `${schemaBase}_r${runId}_a${runAttempt}`
               : "";
             const adapterMatrix = warehouse === "all" ? supportedWarehouses : [warehouse];
-            const selector = scope === "all-packages"
-              ? allPackagesSelector
-              : coreSelector;
+            // Both modes build the full ecosystem; only dependency resolution differs.
+            const selector = allPackagesSelector;
             const statusContext = scope === "all-packages"
               ? "Tuva CI / All Warehouses"
               : "Tuva CI / Snowflake";
@@ -853,15 +850,45 @@ jobs:
           dbt debug --project-dir ./integration_tests --profiles-dir ./integration_tests/profiles/snowflake
           if [[ "$CI_SCOPE" == "core" ]]; then
             # Regression for #1392: explicit claims=false must not mask clinical=true.
-            dbt --quiet ls \
-              --project-dir ./integration_tests \
-              --profiles-dir ./integration_tests/profiles/snowflake \
-              --no-partial-parse \
-              --resource-type model \
-              --select core__person_id_crosswalk \
-              --output name \
-              --vars '{"claims_enabled": false, "clinical_enabled": true, "provider_attribution_enabled": false, "data_quality_enabled": false, "parity_enabled": false, "use_coderx_enterprise": false}' \
-              | grep -Fxq core__person_id_crosswalk
+            # Claims marts require claims models, so isolate this Core-only parse.
+            python3 - <<'PYTHON'
+          import json
+          import shutil
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+
+          source = Path("integration_tests").resolve()
+          with tempfile.TemporaryDirectory(prefix="tuva-clinical-ci-") as temporary:
+              project = Path(temporary)
+              shutil.copy2(source / "dbt_project.yml", project / "dbt_project.yml")
+              for directory in ("models", "macros", "tests"):
+                  (project / directory).symlink_to(source / directory, target_is_directory=True)
+              (project / "dbt_packages").mkdir()
+              for package in ("the_tuva_project", "dbt_utils"):
+                  (project / "dbt_packages" / package).symlink_to(
+                      (source / "dbt_packages" / package).resolve(), target_is_directory=True
+                  )
+              variables = {
+                  "claims_enabled": False, "clinical_enabled": True,
+                  "provider_attribution_enabled": False, "data_quality_enabled": False,
+                  "parity_enabled": False, "use_coderx_enterprise": False,
+              }
+              result = subprocess.run(
+                  ["dbt", "--quiet", "ls", "--project-dir", str(project),
+                   "--profiles-dir", str(source / "profiles/snowflake"),
+                   "--no-partial-parse", "--resource-type", "model",
+                   "--select", "core__person_id_crosswalk", "--output", "name",
+                   "--vars", json.dumps(variables)],
+                  capture_output=True, text=True,
+              )
+              print(result.stdout, end="")
+              print(result.stderr, end="", file=sys.stderr)
+              result.check_returncode()
+              if "core__person_id_crosswalk" not in result.stdout.splitlines():
+                  raise SystemExit("Clinical-only Core person ID crosswalk is not enabled")
+          PYTHON
           fi
           dbt build --full-refresh \
             --project-dir ./integration_tests \
@@ -869,6 +896,91 @@ jobs:
             --sqlparse "$DBT_SQLPARSE_OPTIONS" \
             --select "${ci_selectors[@]}" \
             --vars "$CI_DBT_VARS"
+
+      - name: Verify tagged-package Snowflake results
+        if: env.CI_SCOPE == 'core'
+        env:
+          CI_CHECKOUT_REF: ${{ needs.resolve.outputs.checkout_ref }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          import yaml
+
+          project = Path("integration_tests")
+          expected = {
+              "ahrq_quality_indicators": "ahrq_quality_indicators",
+              "ccsr": "ccsr",
+              "cms_chronic_conditions": "cms_chronic_conditions",
+              "cms_hcc": "cms_hcc",
+              "fhir_preprocessing": "fhir_preprocessing",
+              "nyu_ed_classification": "nyu_ed_classification",
+              "quality_measures": "quality_measures",
+              "semantic_layer": "semantic-layer",
+          }
+          declared = yaml.safe_load((project / "packages.yml").read_text())["packages"]
+          locked = yaml.safe_load((project / "package-lock.yml").read_text())["packages"]
+          by_name = {package.get("name"): package for package in locked}
+          if {"local": "../"} not in declared or by_name.get("the_tuva_project") != {
+              "local": "../", "name": "the_tuva_project"
+          }:
+              raise SystemExit("Snowflake must build the checked-out local Core")
+          manifest = json.loads((project / "target/manifest.json").read_text())
+          results = json.loads((project / "target/run_results.json").read_text())
+          successful_models = {}
+          for result in results["results"]:
+              node = manifest["nodes"].get(result["unique_id"], {})
+              if result["status"] == "success" and node.get("resource_type") == "model":
+                  package = node["package_name"]
+                  successful_models[package] = successful_models.get(package, 0) + 1
+          evidence = {"core_commit": os.environ["CI_CHECKOUT_REF"], "packages": []}
+          for name, repository in expected.items():
+              url = f"https://github.com/tuva-health/{repository}.git"
+              entries = [item for item in declared if item.get("git") == url]
+              tag = entries[0].get("revision", "") if len(entries) == 1 else ""
+              if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
+                  raise SystemExit(f"{name} must use one explicit stable Git release tag")
+              lock = by_name.get(name, {})
+              revision = lock.get("revision", "")
+              if lock.get("git") != url or not re.fullmatch(r"[0-9a-f]{40}", revision):
+                  raise SystemExit(f"{name} has no exact Git dependency lock")
+              installed = project / "dbt_packages" / name
+              version = str(yaml.safe_load((installed / "dbt_project.yml").read_text())["version"])
+              installed_revision = subprocess.check_output(
+                  ["git", "-C", str(installed), "rev-parse", "HEAD"], text=True
+              ).strip()
+              if version != tag[1:] or installed_revision != revision:
+                  raise SystemExit(f"{name} installed version/commit differs from its release lock")
+              if successful_models.get(name, 0) == 0:
+                  raise SystemExit(f"{name} has no successful model result in this Snowflake build")
+              evidence["packages"].append({
+                  "package": name, "repository": url, "tag": tag,
+                  "revision": revision, "version": version,
+                  "successful_models": successful_models[name],
+              })
+          (project / "ci-tagged-package-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n"
+          )
+          print(json.dumps(evidence, indent=2))
+          PY
+
+      - name: Upload tagged-package Snowflake evidence
+        if: always() && env.CI_SCOPE == 'core'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tuva-snowflake-tagged-ci-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            integration_tests/ci-tagged-package-evidence.json
+            integration_tests/packages.yml
+            integration_tests/package-lock.yml
+            integration_tests/target/manifest.json
+            integration_tests/target/run_results.json
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Build on BigQuery
         if: matrix.warehouse == 'bigquery'
