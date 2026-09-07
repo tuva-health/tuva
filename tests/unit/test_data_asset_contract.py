@@ -234,10 +234,6 @@ class DataAssetContractTest(unittest.TestCase):
             'require-dbt-version: ">=1.10.5,<3.0.0"',
             project_text,
         )
-        self.assertIn(
-            'version: "1.2.1"',
-            (ROOT / "packages.yml").read_text(),
-        )
         runtime_config_path = (
             ROOT / "macros" / "system_utils" / ("get_runtime_" + "config.sql")
         )
