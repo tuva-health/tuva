@@ -60,7 +60,22 @@ compatibility, and release lifecycle.
 
 ## Install Tuva Core
 
-Add a published version to the parent project's `packages.yml`:
+Install a published GitHub release directly from the parent project's
+`packages.yml`. Use its exact tag, including the `v` prefix:
+
+```yaml
+packages:
+  - git: "https://github.com/tuva-health/tuva-core.git"
+    revision: "<published-release-tag>"
+```
+
+For example, a published `v1.0.0` release uses `revision: "v1.0.0"`.
+Git installation does not require the release to be indexed by dbt Hub.
+An exact 40-character commit can also identify a reviewed development revision.
+Avoid mutable branch names for production installations.
+
+Once the version is available on dbt Hub, this alternative installs the same
+package. Use one form per package, not both:
 
 ```yaml
 packages:
@@ -68,13 +83,11 @@ packages:
     version: "<published-version>"
 ```
 
-For development against an explicitly reviewed Git ref:
-
-```yaml
-packages:
-  - git: "https://github.com/tuva-health/tuva-core.git"
-    revision: "<immutable-tag-or-commit>"
-```
+Add each optional Tuva package to the same root `packages.yml` using its own
+repository URL and published tag. The parent project installs Core explicitly;
+standalone packages do not install it for you. Semantic Layer also requires
+the sibling packages listed in its installation instructions. Existing
+dependencies such as `dbt-labs/dbt_utils` can continue to resolve through Hub.
 
 Install dependencies with `dbt deps`. The parent project must expose the Tuva
 Input Layer models and enable the domains it maps:
