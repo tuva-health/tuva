@@ -310,7 +310,7 @@ models:
             data_type: varchar
   - name: core__condition
     description: |
-      The condition table stores diagnoses and problems from claims and clinical sources. Claims-derived rows come from the diagnosis code columns in input_layer.medical_claim. Clinical rows come from input_layer.condition. The Normalized Layer matches source codes to ICD-10-CM, ICD-9-CM, and SNOMED CT terminology as supported by each source path. core.condition unions normalized clinical and claims condition rows, then applies the Tuva Condition Grouper to supported normalized ICD-10-CM and SNOMED CT codes to populate condition_family and condition.
+      The condition table stores diagnoses and problems from claims and clinical sources. Claims-derived rows come from the diagnosis code columns in input_layer.medical_claim. Clinical rows come from input_layer.condition. The Normalized Layer matches source codes to ICD-10-CM, ICD-9-CM, and SNOMED CT terminology as supported by each source path. core.condition unions normalized clinical and claims condition rows, then applies the Tuva Condition Grouper to supported normalized ICD-10-CM and SNOMED CT codes to populate condition_family and condition_name.
 
       All clinical condition records and every populated medical-claim diagnosis position from the enabled Input Layer sources flow through to core.condition, including invalid codes that do not appear in the supported terminology sets. Unmatched codes retain their source_code and have null normalized_code and normalized_description. Claims diagnoses are retained regardless of claim_type or encounter assignment; diagnoses without an encounter assignment have a null encounter_id.
 
