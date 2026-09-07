@@ -158,6 +158,24 @@ class DataAssetContractTest(unittest.TestCase):
                 self.assertTrue(all(header), seed_name)
                 self.assertIsNone(next(rows, None), seed_name)
 
+    def test_grouper_primary_keys_reference_existing_columns(self):
+        for family in ("condition", "procedure"):
+            folder = ROOT / "seeds" / "value_sets" / f"{family}_grouper"
+            yaml_text = (folder / f"{family}_grouper_seeds.yml").read_text()
+            for suffix in ("", "_code_map"):
+                seed_name = f"tuva_{family}_grouper{suffix}"
+                with self.subTest(seed=seed_name):
+                    definition = seed_definition(yaml_text, seed_name)
+                    keys_match = re.search(
+                        r"(?m)^        primary_key_columns:\n((?:          - .+\n)+)",
+                        definition,
+                    )
+                    self.assertIsNotNone(keys_match, seed_name)
+                    keys = re.findall(r"(?m)^          - (\S+)$", keys_match.group(1))
+                    with (folder / f"{seed_name}.csv").open(newline="") as handle:
+                        header = next(csv.reader(handle))
+                    self.assertTrue(set(keys).issubset(header), (seed_name, keys, header))
+
     def test_refreshed_terminology_headers_preserve_lifecycle_contract(self):
         seed_root = ROOT / "seeds" / "terminology"
         for filename, expected_header in TERMINOLOGY_LIFECYCLE_HEADERS.items():

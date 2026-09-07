@@ -7,7 +7,7 @@ seeds:
     config:
       meta:
         primary_key_columns:
-          - procedure
+          - procedure_name
         primary_key_strategy: natural_single_column
       post_hook: "{{ load_versioned_seed('value_sets','tuva_procedure_grouper.csv.gz') }}"
       schema: |
