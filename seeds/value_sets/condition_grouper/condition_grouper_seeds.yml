@@ -7,7 +7,7 @@ seeds:
     config:
       meta:
         primary_key_columns:
-          - condition
+          - condition_name
         primary_key_strategy: natural_single_column
       post_hook: "{{ load_versioned_seed('value_sets','tuva_condition_grouper.csv.gz') }}"
       schema: |
