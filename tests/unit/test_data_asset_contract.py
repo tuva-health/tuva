@@ -249,7 +249,7 @@ class DataAssetContractTest(unittest.TestCase):
         self.assertIsNotNone(asset_version_match)
         self.assertEqual(asset_version_match.group(1), "1.0.0")
         self.assertIn(
-            'require-dbt-version: ">=1.10.5,<3.0.0"',
+            'require-dbt-version: [">=1.10.5", "<3.0.0"]',
             project_text,
         )
         runtime_config_path = (
